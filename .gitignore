@@ -1,0 +1,43 @@
+# ---------------------------------------------------------------------------
+# CanHav Research .gitignore
+# Per project governance: ALL Markdown (*.md) and Cursor rule (*.mdc) files are
+# excluded from version control. The user maintains dev-notes locally only.
+# ---------------------------------------------------------------------------
+
+# Markdown & Cursor rules (governance requirement)
+*.md
+*.mdc
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+
+# Local data store (file-backed DynamoDB adapter)
+backend/data/store.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

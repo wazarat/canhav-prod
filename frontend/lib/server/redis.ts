@@ -13,23 +13,48 @@ import { Redis } from "@upstash/redis";
  * Reads happen at request/build time (ISR); the only write is the approval flip
  * in /api/approve. When Upstash env vars are absent (pure offline dev), callers
  * fall back to the local `backend/data/store.json` via `lib/server/store.ts`.
+ *
+ * Credentials come from either the Vercel "Upstash for Redis" integration
+ * (`KV_REST_API_URL` / `KV_REST_API_TOKEN`) or a native Upstash project
+ * (`UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`); see `restUrl`/`restToken`.
  */
 
 export const STORE_KEY = process.env.REDIS_STORE_KEY || "canhav:store";
 
+/**
+ * Resolve the Upstash REST credentials. The Vercel Marketplace "Upstash for
+ * Redis" integration injects `KV_REST_API_URL` / `KV_REST_API_TOKEN` (it keeps
+ * the legacy Vercel KV prefix), while a manually-configured Upstash project uses
+ * `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`. Accept either so the app
+ * works regardless of how the store was provisioned.
+ */
+function restUrl(): string | undefined {
+  return process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+}
+
+function restToken(): string | undefined {
+  return process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+}
+
 /** Whether Upstash REST credentials are configured in the environment. */
 export function hasUpstash(): boolean {
-  return Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN,
-  );
+  return Boolean(restUrl() && restToken());
 }
 
 let _redis: Redis | null = null;
 
 function getRedis(): Redis {
   if (!_redis) {
-    // Uses UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN.
-    _redis = Redis.fromEnv();
+    const url = restUrl();
+    const token = restToken();
+    if (!url || !token) {
+      throw new Error(
+        "Upstash REST credentials are missing. Set KV_REST_API_URL + " +
+          "KV_REST_API_TOKEN (Vercel integration) or UPSTASH_REDIS_REST_URL + " +
+          "UPSTASH_REDIS_REST_TOKEN.",
+      );
+    }
+    _redis = new Redis({ url, token });
   }
   return _redis;
 }

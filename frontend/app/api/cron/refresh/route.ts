@@ -51,7 +51,12 @@ export async function GET(req: Request): Promise<NextResponse> {
   }
   if (!hasUpstash()) {
     return NextResponse.json(
-      { ok: false, error: "Upstash is not configured (UPSTASH_REDIS_REST_URL/TOKEN)." },
+      {
+        ok: false,
+        error:
+          "Upstash is not configured (set KV_REST_API_URL/KV_REST_API_TOKEN from the " +
+          "Vercel integration, or UPSTASH_REDIS_REST_URL/UPSTASH_REDIS_REST_TOKEN).",
+      },
       { status: 400 },
     );
   }

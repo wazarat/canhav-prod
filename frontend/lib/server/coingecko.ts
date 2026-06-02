@@ -34,9 +34,13 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   "usd-ai": null,
   usdc: "usd-coin",
   usdt0: "usdt0",
-  // RWAs (most have no CoinGecko-listed Arbitrum token yet)
+  // RWAs (most have no CoinGecko-listed Arbitrum token yet). Verified via the
+  // CoinGecko /search + /coins endpoints:
+  //   - franklin-templeton-benji: BENJI on Arbitrum One ($1.00 NAV) -> full
+  //     on-chain (Alchemy) + market data.
+  //   - aryze-eusd / centrifuge: listed but NOT on Arbitrum -> market data only.
   arcton: null,
-  aryze: null,
+  aryze: "aryze-eusd",
   atmosphera: null,
   centrifuge: "centrifuge",
   "chateau-capital": null,
@@ -44,7 +48,7 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   dualmint: null,
   "estate-protocol": null,
   "florence-finance": null,
-  "franklin-templeton": null,
+  "franklin-templeton": "franklin-templeton-benji",
 };
 
 export interface TokenResolution {

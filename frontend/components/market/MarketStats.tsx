@@ -37,16 +37,38 @@ function changeTone(value: number | null): "positive" | "danger" | "neutral" {
  * CoinGecko market snapshot (market cap, volume, ATH/ATL, price changes). Hidden
  * when the protocol has no CoinGecko-listed token.
  */
+function NoMarketCard({ message }: { message: string }) {
+  return (
+    <Card className="space-y-2">
+      <div className="flex items-center justify-between pb-1">
+        <CardTitle>Market</CardTitle>
+        <Badge tone="neutral">Not listed</Badge>
+      </div>
+      <p className="text-sm text-ink-300">{message}</p>
+    </Card>
+  );
+}
+
 export async function MarketStats({
   profile,
 }: {
   profile: StablecoinProfile | RwaProfile;
 }) {
+  const isStablecoin = profile.category === "Stablecoin";
   const coinId = coinIdForSlug(profile.slug);
-  if (!coinId) return null;
+
+  if (!coinId) {
+    if (isStablecoin) return null;
+    return (
+      <NoMarketCard message="This protocol has no CoinGecko-listed token, so live market data (price, market cap, volume) isn't available yet." />
+    );
+  }
 
   const data = await fetchMarketData(coinId, LIVE_REVALIDATE);
-  if (!data) return null;
+  if (!data) {
+    if (isStablecoin) return null;
+    return <NoMarketCard message="Market data is temporarily unavailable from CoinGecko." />;
+  }
 
   return (
     <Card className="space-y-1 divide-y divide-ink-800/60">

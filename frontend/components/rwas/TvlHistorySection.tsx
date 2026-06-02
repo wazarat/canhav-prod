@@ -27,14 +27,18 @@ export async function TvlHistorySection({ profile }: { profile: RwaProfile }) {
   const trend = tvlTrend(points);
   const sourceLabel = source ? SOURCE_LABEL[source] : "unavailable";
 
+  const hasSeries = points.length >= 2;
+
   return (
     <Card>
       <div className="flex items-center justify-between">
         <CardTitle>Total value locked</CardTitle>
-        <Badge tone={TREND_TONE[trend]}>{TREND_LABEL[trend]}</Badge>
+        {hasSeries && <Badge tone={TREND_TONE[trend]}>{TREND_LABEL[trend]}</Badge>}
       </div>
       <p className="mt-1 text-xs text-ink-300">
-        {points.length}-day series · source: {sourceLabel}
+        {hasSeries
+          ? `${points.length}-day series · source: ${sourceLabel}`
+          : "No TVL history yet · a Dune query or CoinGecko market cap will populate this chart"}
       </p>
       <div className="mt-4">
         <TvlChart id={profile.slug} points={points} trend={trend} />

@@ -58,10 +58,28 @@ export async function OnchainPanel({
   profile: StablecoinProfile | RwaProfile;
 }) {
   const token = await resolveEntityToken(profile);
-  if (!token.address) return null;
+  const isStablecoin = profile.category === "Stablecoin";
+
+  if (!token.address) {
+    // Stablecoins always have a token; suppress the panel on a rare miss.
+    if (isStablecoin) return null;
+    // RWAs are frequently pre-token — say so explicitly instead of rendering nothing.
+    return (
+      <Card className="space-y-2">
+        <div className="flex items-center justify-between">
+          <CardTitle>On-chain</CardTitle>
+          <Badge tone="neutral">No public token</Badge>
+        </div>
+        <p className="text-sm text-ink-300">
+          No public Arbitrum token contract is mapped for this protocol yet, so live on-chain
+          supply, transfers, and TVL aren&apos;t available. They&apos;ll appear automatically once a
+          verified contract is added to the RWA registry or a Dune query is wired up.
+        </p>
+      </Card>
+    );
+  }
 
   const address = token.address;
-  const isStablecoin = profile.category === "Stablecoin";
 
   // No key configured: still surface the resolved address + Arbiscan link.
   if (!hasAlchemy()) {

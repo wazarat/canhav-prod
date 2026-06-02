@@ -1,7 +1,9 @@
 import "server-only";
 
+import { fetchTotalValueLocked } from "@/lib/server/alchemy";
 import { coinIdForSlug, fetchMarketChart } from "@/lib/server/coingecko";
 import { fetchPegHistory, fetchTvlHistory } from "@/lib/server/dune";
+import { resolveEntityToken } from "@/lib/server/resolve";
 import type {
   PegDataPoint,
   RwaProfile,
@@ -100,6 +102,25 @@ export function pegHealth(points: PegDataPoint[]): PegHealth {
 
 export function latestValue(points: TvlDataPoint[]): number | null {
   return points.length ? points[points.length - 1].value : null;
+}
+
+/**
+ * Current RWA TVL for the headline stat. Prefers the live on-chain proxy
+ * (Alchemy: supply x price) since most RWA tokens have no CoinGecko market cap;
+ * falls back to the latest point of the resolved series. Returns null when
+ * neither is available.
+ */
+export async function resolveCurrentTvl(profile: RwaProfile): Promise<number | null> {
+  const token = await resolveEntityToken(profile);
+  if (token.address && token.priceUsd !== null) {
+    const result = await fetchTotalValueLocked(
+      [{ address: token.address, decimals: token.decimals, priceUsd: token.priceUsd }],
+      LIVE_REVALIDATE,
+    );
+    if (result.value !== null) return result.value;
+  }
+  const { points } = await resolveTvlSeries(profile);
+  return latestValue(points);
 }
 
 export function changePct(points: { value: number }[]): number | null {

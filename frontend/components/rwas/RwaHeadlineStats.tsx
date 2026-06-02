@@ -1,5 +1,5 @@
 import { StatCard } from "@/components/ui/StatCard";
-import { changePct, latestValue, resolveTvlSeries, tvlTrend } from "@/lib/server/series";
+import { changePct, resolveCurrentTvl, resolveTvlSeries, tvlTrend } from "@/lib/server/series";
 import type { RwaProfile } from "@/lib/types";
 import { formatPct, formatUsdCompact } from "@/lib/utils";
 
@@ -11,8 +11,10 @@ const TREND_LABEL = {
 
 /** Live headline stats: TVL, 30d change, asset class, trend. */
 export async function RwaHeadlineStats({ profile }: { profile: RwaProfile }) {
-  const { points } = await resolveTvlSeries(profile);
-  const tvl = latestValue(points);
+  const [{ points }, tvl] = await Promise.all([
+    resolveTvlSeries(profile),
+    resolveCurrentTvl(profile),
+  ]);
   const pct = changePct(points);
   const trend = tvlTrend(points);
 

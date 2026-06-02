@@ -48,7 +48,7 @@ export default async function RwasPage() {
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Approved" value={`${profiles.length}`} hint="Visible publicly" />
-        <StatCard label="Aggregate TVL" value={formatUsdCompact(aggregateTvl)} hint="Mock figures" />
+        <StatCard label="Aggregate TVL" value={formatUsdCompact(aggregateTvl)} hint="Live on-chain proxy" />
         <StatCard label="Asset classes" value={`${assetClasses.size}`} hint="Across approved" />
         <StatCard label="Tracked total" value={`${counts.total}`} hint={`${counts.pending} pending`} />
       </section>

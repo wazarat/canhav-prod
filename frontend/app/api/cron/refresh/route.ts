@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { fetchTotalSupply, fetchTotalValueLocked } from "@/lib/server/alchemy";
 import { resolveForSlug, COINGECKO_IDS } from "@/lib/server/coingecko";
 import { hasUpstash, putItem, readAllItemsFromRedis } from "@/lib/server/redis";
+import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
 
 /**
  * Live-metrics refresh — Vercel Cron entrypoint (replaces the Render job).
@@ -74,33 +75,53 @@ export async function GET(req: Request): Promise<NextResponse> {
     const category: string = item.Category || "";
     const row = { slug, address: null as string | null, metric: null as number | null, note: "" };
 
-    // Skip the CoinGecko round-trip (and its delay) for unmapped protocols.
-    if (!COINGECKO_IDS[slug]) {
-      row.note = "no CoinGecko mapping";
+    let address: string | null = null;
+    let decimals: number | null = null;
+    let priceUsd: number | null = null;
+
+    // 1. CoinGecko resolution (only when a coin id is mapped — saves the round-trip).
+    if (COINGECKO_IDS[slug]) {
+      const resolution = await resolveForSlug(slug);
+      await sleep(COINGECKO_DELAY_MS);
+      if (resolution) {
+        address = resolution.address;
+        decimals = resolution.decimals;
+        priceUsd = resolution.priceUsd;
+      } else {
+        row.note = "CoinGecko lookup failed";
+      }
+    }
+
+    // 2. RWA registry fallback: most RWA tokens aren't on CoinGecko, so pin their
+    //    Arbitrum address/price here. Only used when CoinGecko yielded no address.
+    if (category === CATEGORY_RWA && !address) {
+      const reg = rwaTokenForSlug(slug);
+      if (reg) {
+        address = reg.address.toLowerCase();
+        decimals = reg.decimals ?? decimals;
+        const regPrice = reg.pegged ? 1 : (reg.priceUsd ?? null);
+        priceUsd = regPrice ?? priceUsd;
+      }
+    }
+
+    if (!address) {
+      if (!row.note) {
+        row.note = COINGECKO_IDS[slug]
+          ? "resolved coin, but no Arbitrum address"
+          : "no CoinGecko mapping or registry entry";
+      }
       results.push(row);
       continue;
     }
 
-    const resolution = await resolveForSlug(slug);
-    await sleep(COINGECKO_DELAY_MS);
-
-    if (!resolution) {
-      row.note = "CoinGecko lookup failed";
-      results.push(row);
-      continue;
-    }
-
-    const { address, decimals, priceUsd } = resolution;
     row.address = address;
     item.ContractAddress = address;
     if (category === CATEGORY_RWA) {
-      item.VaultAddresses = address ? [address] : [];
+      item.VaultAddresses = [address];
     }
 
     let mutated = true;
-    if (!address) {
-      row.note = "resolved coin, but no Arbitrum address";
-    } else if (!hasAlchemy) {
+    if (!hasAlchemy) {
       row.note = "address persisted; ALCHEMY_API_KEY missing (metric skipped)";
     } else if (category === CATEGORY_STABLECOIN) {
       const result = await fetchTotalSupply(address, decimals);

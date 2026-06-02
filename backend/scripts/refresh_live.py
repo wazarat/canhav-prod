@@ -41,7 +41,7 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from app.config import get_env, load_env  # noqa: E402
 from app.db import get_repository, schema  # noqa: E402
-from app.live import alchemy, coingecko  # noqa: E402
+from app.live import alchemy, coingecko, rwa_registry  # noqa: E402
 
 
 def _now_iso() -> str:
@@ -60,26 +60,47 @@ def refresh_item(item: dict, *, has_alchemy: bool, dry_run: bool) -> dict:
     category = item.get("Category")
     row = {"slug": slug, "category": category, "address": None, "metric": None, "note": ""}
 
-    resolution = coingecko.resolve_for_slug(slug)
-    time.sleep(1.5)  # free-tier etiquette
+    address: Optional[str] = None
+    decimals = None
+    price = None
 
-    if resolution is None:
-        row["note"] = "no CoinGecko mapping/lookup"
-        return row
+    # 1. CoinGecko resolution (only when a coin id is mapped for this slug).
+    if coingecko.COINGECKO_IDS.get(slug):
+        resolution = coingecko.resolve_for_slug(slug)
+        time.sleep(1.5)  # free-tier etiquette
+        if resolution is None:
+            row["note"] = "CoinGecko lookup failed"
+        else:
+            address = resolution.get("address")
+            decimals = resolution.get("decimals")
+            price = resolution.get("priceUsd")
 
-    address = resolution.get("address")
-    decimals = resolution.get("decimals")
-    price = resolution.get("priceUsd")
+    # 2. RWA registry fallback: most RWA tokens aren't on CoinGecko, so pin their
+    #    Arbitrum address/price here. Only used when CoinGecko yielded no address.
+    if category == schema.CATEGORY_RWA and not address:
+        reg = rwa_registry.rwa_token_for_slug(slug)
+        if reg:
+            address = reg["address"].lower()
+            decimals = reg.get("decimals") if reg.get("decimals") is not None else decimals
+            reg_price = 1.0 if reg.get("pegged") else reg.get("priceUsd")
+            price = reg_price if reg_price is not None else price
+
     row["address"] = address
+
+    if not address:
+        if not row["note"]:
+            row["note"] = (
+                "resolved coin, but no Arbitrum address"
+                if coingecko.COINGECKO_IDS.get(slug)
+                else "no CoinGecko mapping or registry entry"
+            )
+        return row
 
     if not dry_run:
         item["ContractAddress"] = address
         if category == schema.CATEGORY_RWA:
-            item["VaultAddresses"] = [address] if address else []
+            item["VaultAddresses"] = [address]
 
-    if not address:
-        row["note"] = "resolved coin, but no Arbitrum address"
-        return row
     if not has_alchemy:
         row["note"] = "address persisted; ALCHEMY_API_KEY missing (metric skipped)"
         return row

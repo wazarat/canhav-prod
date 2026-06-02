@@ -22,12 +22,14 @@ import type { CategoryDef, RwaProfile, StablecoinProfile } from "@/lib/types";
 export const IS_MOCK_DATA = false;
 
 /**
- * Whether live on-chain/analytics metrics are still pending. Profile metadata
- * is real (CSV-backed via the store), but supply/peg/TVL come from the live
- * Alchemy/Dune overlays (B2), which are not fully wired up yet — so those
- * headline figures render empty. Drives the "metrics pending" banner.
+ * Whether live on-chain/analytics metrics are still pending. Now `false`: the
+ * daily refresh cron (frontend/app/api/cron/refresh) resolves each protocol's
+ * Arbitrum address (CoinGecko + the RWA registry) and writes live Alchemy
+ * supply/TVL to the store, so headline figures are real. Historical peg/TVL
+ * charts still fall back to CoinGecko until Dune query IDs are wired up, but
+ * that's surfaced per-chart rather than via a global banner.
  */
-export const LIVE_METRICS_PENDING = true;
+export const LIVE_METRICS_PENDING = false;
 
 /** All profiles regardless of status — STAGING / admin only. */
 export async function getAllStablecoins(): Promise<StablecoinProfile[]> {

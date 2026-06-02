@@ -56,7 +56,7 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     "dualmint": None,
     "estate-protocol": None,
     "florence-finance": None,
-    "franklin-templeton": None,
+    "franklin-templeton": "franklin-templeton-benji",
 }
 
 

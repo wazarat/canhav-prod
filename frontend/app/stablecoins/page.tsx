@@ -62,7 +62,7 @@ export default async function StablecoinsPage() {
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Approved" value={`${profiles.length}`} hint={`${usdCount} USD · ${eurCount} EUR`} />
-        <StatCard label="Aggregate supply" value={formatUsdCompact(aggregateSupply)} hint="Mock figures" />
+        <StatCard label="Aggregate supply" value={formatUsdCompact(aggregateSupply)} hint="Live via Alchemy" />
         <StatCard label="Avg peg deviation" value={avgDeviation === null ? "—" : `${avgDeviation} bps`} />
         <StatCard label="Peg targets" value={`${usdCount + eurCount > 0 ? "USD / EUR" : "—"}`} hint="Multi-currency" />
       </section>

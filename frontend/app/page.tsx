@@ -76,7 +76,7 @@ export default async function DashboardPage() {
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Active categories" value={`${activeCategories} / ${CATEGORIES.length}`} hint="Stablecoins live; more in progress" />
         <StatCard label="Approved stablecoins" value={`${approved.length}`} hint="Visible on the public dashboard" />
-        <StatCard label="Aggregate supply" value={formatUsdCompact(aggregateSupply)} hint="Mock — live via Alchemy (Step 4)" />
+        <StatCard label="Aggregate supply" value={formatUsdCompact(aggregateSupply)} hint="Live via Alchemy" />
         <StatCard
           label="Avg peg deviation"
           value={avgDeviation === null ? "—" : `${avgDeviation} bps`}

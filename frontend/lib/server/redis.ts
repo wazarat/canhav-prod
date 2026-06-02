@@ -65,6 +65,17 @@ export async function readAllItemsFromRedis(): Promise<Record<string, any>[]> {
 }
 
 /**
+ * Write a full store item back to the Upstash hash (HSET by `<PK>|<SK>`).
+ * Used by the live-metrics cron. Mirrors `put_item` in the Python adapters.
+ */
+export async function putItem(item: Record<string, any>): Promise<void> {
+  const pk = item.PK;
+  const sk = item.SK;
+  if (!pk || !sk) throw new Error("Item must include both 'PK' and 'SK'.");
+  await getRedis().hset(STORE_KEY, { [`${pk}|${sk}`]: JSON.stringify(item) });
+}
+
+/**
  * Flip a protocol's approval status in Upstash. Returns the updated item, or
  * `null` if the protocol does not exist. Mirrors `update_status` in the Python
  * adapters (sets `Status` + `UpdatedAt`).

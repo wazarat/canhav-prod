@@ -2,36 +2,48 @@ import { Lock } from "lucide-react";
 
 import { MockDataBanner } from "@/components/MockDataBanner";
 import { RwaTable } from "@/components/rwas/RwaTable";
+import { ApprovalConsole, type ApprovalItem } from "@/components/staging/ApprovalConsole";
 import { StablecoinTable } from "@/components/stablecoins/StablecoinTable";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
-import {
-  getAllRwas,
-  getAllStablecoins,
-  getRwaStagingCounts,
-  getStagingCounts,
-  LIVE_METRICS_PENDING,
-} from "@/lib/data";
+import { LIVE_METRICS_PENDING } from "@/lib/data";
+import { readLiveStore } from "@/lib/server/store";
 
 export const metadata = {
   title: "Staging (restricted)",
   robots: { index: false, follow: false },
 };
 
+// Read the backend store live (not the build-time export) so approvals made via
+// /api/approve are reflected immediately, without a rebuild.
+export const dynamic = "force-dynamic";
+
 export default function StagingPage() {
-  const stablecoins = getAllStablecoins();
-  const rwas = getAllRwas();
-  const scCounts = getStagingCounts();
-  const rwaCounts = getRwaStagingCounts();
+  const { stablecoins, rwas } = readLiveStore();
 
   const scPending = stablecoins.filter((p) => p.status === "PENDING_APPROVAL");
   const scApproved = stablecoins.filter((p) => p.status === "APPROVED");
   const rwaPending = rwas.filter((p) => p.status === "PENDING_APPROVAL");
   const rwaApproved = rwas.filter((p) => p.status === "APPROVED");
 
-  const total = scCounts.total + rwaCounts.total;
-  const approved = scCounts.approved + rwaCounts.approved;
-  const pending = scCounts.pending + rwaCounts.pending;
+  const total = stablecoins.length + rwas.length;
+  const approved = scApproved.length + rwaApproved.length;
+  const pending = total - approved;
+
+  const consoleItems: ApprovalItem[] = [
+    ...stablecoins.map((p) => ({
+      category: "Stablecoin" as const,
+      slug: p.slug,
+      name: p.name,
+      status: p.status,
+    })),
+    ...rwas.map((p) => ({
+      category: "RWA" as const,
+      slug: p.slug,
+      name: p.name,
+      status: p.status,
+    })),
+  ].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="container space-y-10 py-12">
@@ -46,8 +58,8 @@ export default function StagingPage() {
         <p className="max-w-2xl text-sm text-ink-300">
           Every protocol enters as <span className="font-mono text-ink-100">PENDING_APPROVAL</span>{" "}
           and only renders publicly once explicitly marked{" "}
-          <span className="font-mono text-ink-100">APPROVED</span>. This view is read-only in this
-          phase — the interactive flip and authentication arrive in Step 4.
+          <span className="font-mono text-ink-100">APPROVED</span>. Use the console below to flip
+          status (token-gated). Public pages are static and refresh on the next build.
         </p>
       </header>
 
@@ -58,6 +70,14 @@ export default function StagingPage() {
         <StatCard label="Approved" value={`${approved}`} hint="Public" />
         <StatCard label="Pending review" value={`${pending}`} hint="Not yet public" />
       </section>
+
+      {/* Interactive approval console (token-gated) */}
+      <div className="space-y-3">
+        <h2 className="font-display text-xl font-semibold tracking-tight text-ink-50">
+          Approve / revert
+        </h2>
+        <ApprovalConsole items={consoleItems} />
+      </div>
 
       {/* Stablecoins */}
       <div className="space-y-6">

@@ -75,6 +75,7 @@ class StablecoinProfile(BaseModel):
     github: Optional[str] = None
     coingecko: Optional[str] = None
     auditUrl: Optional[str] = None
+    contractAddress: Optional[str] = None
     totalSupply: TotalSupply = Field(default_factory=TotalSupply)
     historicalPegData: HistoricalPegData = Field(default_factory=HistoricalPegData)
     arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
@@ -102,6 +103,7 @@ class StablecoinProfile(BaseModel):
             "GitHub": self.github,
             "CoinGecko": self.coingecko,
             "AuditURL": self.auditUrl,
+            "ContractAddress": self.contractAddress,
             "TotalSupply": self.totalSupply.model_dump(),
             "HistoricalPegData": self.historicalPegData.model_dump(),
             "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
@@ -125,6 +127,7 @@ class StablecoinProfile(BaseModel):
             github=item.get("GitHub"),
             coingecko=item.get("CoinGecko"),
             auditUrl=item.get("AuditURL"),
+            contractAddress=item.get("ContractAddress"),
             totalSupply=TotalSupply(**(item.get("TotalSupply") or {})),
             historicalPegData=HistoricalPegData(**(item.get("HistoricalPegData") or {})),
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
@@ -171,6 +174,8 @@ class RwaProfile(BaseModel):
     github: Optional[str] = None
     coingecko: Optional[str] = None
     auditUrl: Optional[str] = None
+    contractAddress: Optional[str] = None
+    vaultAddresses: Optional[List[str]] = None
     totalValueLocked: TotalValueLocked = Field(default_factory=TotalValueLocked)
     historicalTvlData: HistoricalTvlData = Field(default_factory=HistoricalTvlData)
     arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
@@ -198,6 +203,8 @@ class RwaProfile(BaseModel):
             "GitHub": self.github,
             "CoinGecko": self.coingecko,
             "AuditURL": self.auditUrl,
+            "ContractAddress": self.contractAddress,
+            "VaultAddresses": self.vaultAddresses,
             "TotalValueLocked": self.totalValueLocked.model_dump(),
             "HistoricalTvlData": self.historicalTvlData.model_dump(),
             "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
@@ -221,6 +228,8 @@ class RwaProfile(BaseModel):
             github=item.get("GitHub"),
             coingecko=item.get("CoinGecko"),
             auditUrl=item.get("AuditURL"),
+            contractAddress=item.get("ContractAddress"),
+            vaultAddresses=item.get("VaultAddresses"),
             totalValueLocked=TotalValueLocked(**(item.get("TotalValueLocked") or {})),
             historicalTvlData=HistoricalTvlData(**(item.get("HistoricalTvlData") or {})),
             arbitrumPortalMetadata=ArbitrumPortalMetadata(

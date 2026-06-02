@@ -1,27 +1,86 @@
 """
-Alchemy overlay — on-chain circulating supply.  [DEFERRED — Step 4]
+Alchemy overlay — on-chain supply (stablecoins) and TVL (RWAs).  [Step 4 B2]
 
-Goal: populate each profile's ``TotalSupply`` attribute with live circulating
-supply pulled from Alchemy's FREE tier (no other providers without approval).
+Implemented against the free-tier Alchemy Arbitrum JSON-RPC endpoint using only
+the standard library (``urllib``), so no installs are required.
 
-Planned approach:
-  - Read ``ALCHEMY_API_KEY`` from the environment.
-  - For each token's Arbitrum contract address, call ``alchemy_getTokenMetadata``
-    (decimals) + ``eth_call`` on ``totalSupply()`` (selector 0x18160ddd), or use
-    Alchemy's token API, then scale by decimals.
-  - Wrap the result in the same shape the schema/UI already expect.
+  - ``fetch_total_supply(address, decimals)`` reads ``totalSupply()`` (and, if
+    ``decimals`` is unknown, ``decimals()``) via ``eth_call`` and scales it.
+  - ``fetch_total_value_locked(holdings)`` sums ``supply_i * priceUsd_i`` across
+    a protocol's token/vault contracts (price comes from CoinGecko). This is an
+    AUM/market-cap proxy for TVL — documented as such — since the free tier has
+    no protocol-specific TVL feed.
 
-NOTE: token contract addresses are NOT in the CSV — they must be resolved first
-(e.g. from CoinGecko/Arbitrum token lists) and stored on the profile before this
-overlay can run. That mapping is part of the Step 4 work.
+Both fail soft: a missing ``ALCHEMY_API_KEY`` or any RPC error yields a result
+with ``value=None`` rather than raising, so the runner can continue.
 
-This module is intentionally NOT imported or executed during Steps 1-3.
+Token/vault addresses are resolved up front by ``app.live.coingecko`` and stored
+on each profile; this module only consumes addresses.
 """
 
 from __future__ import annotations
 
-import os
-from typing import Optional, TypedDict
+import json
+import urllib.error
+import urllib.request
+from datetime import datetime, timezone
+from typing import List, Optional, TypedDict
+
+from ..config import get_env
+
+# Function selectors (first 4 bytes of keccak256 of the signature).
+SELECTOR_TOTAL_SUPPLY = "0x18160ddd"  # totalSupply()
+SELECTOR_DECIMALS = "0x313ce567"  # decimals()
+
+DEFAULT_BASE_URL = "https://arb-mainnet.g.alchemy.com/v2"
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _rpc_url() -> Optional[str]:
+    key = get_env("ALCHEMY_API_KEY")
+    if not key:
+        return None
+    base = get_env("ALCHEMY_ARBITRUM_BASE_URL", DEFAULT_BASE_URL) or DEFAULT_BASE_URL
+    return f"{base.rstrip('/')}/{key}"
+
+
+def _eth_call(url: str, to: str, data: str, *, timeout: float = 20.0) -> Optional[str]:
+    """Return the hex result of an ``eth_call``, or ``None`` on error."""
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "eth_call",
+        "params": [{"to": to, "data": data}, "latest"],
+    }
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json", "Accept": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+    except (urllib.error.URLError, TimeoutError, ValueError):
+        return None
+    if not isinstance(body, dict) or body.get("error"):
+        return None
+    result = body.get("result")
+    if not isinstance(result, str) or not result.startswith("0x") or len(result) <= 2:
+        return None
+    return result
+
+
+def _hex_to_int(value: Optional[str]) -> Optional[int]:
+    if not value:
+        return None
+    try:
+        return int(value, 16)
+    except ValueError:
+        return None
 
 
 class TotalSupplyResult(TypedDict):
@@ -30,21 +89,36 @@ class TotalSupplyResult(TypedDict):
     updatedAt: Optional[str]
 
 
-def fetch_total_supply(token_address: str, *, decimals: int = 18) -> TotalSupplyResult:
+def fetch_total_supply(token_address: str, *, decimals: Optional[int] = None) -> TotalSupplyResult:
     """
-    Return live circulating supply for an Arbitrum token contract.
+    Return live circulating supply (token units) for an Arbitrum token contract.
 
-    DEFERRED: implement in Step 4 using the free-tier Alchemy API and
-    ``ALCHEMY_API_KEY``. Must return the shape above so callers/UI are unchanged.
+    ``value`` is ``None`` if the key is missing or the call fails. For a USD-pegged
+    stablecoin, supply in token units ~= circulating USD, which is what the UI
+    renders.
     """
-    _ = os.environ.get("ALCHEMY_API_KEY")  # required at implementation time
-    raise NotImplementedError(
-        "Alchemy total-supply overlay is deferred to Step 4. "
-        "See AGENT_HANDOFF.md for the implementation plan."
-    )
+    empty: TotalSupplyResult = {"value": None, "source": "alchemy", "updatedAt": None}
+    url = _rpc_url()
+    if not url or not token_address:
+        return empty
+
+    raw = _hex_to_int(_eth_call(url, token_address, SELECTOR_TOTAL_SUPPLY))
+    if raw is None:
+        return empty
+
+    if decimals is None:
+        decimals = _hex_to_int(_eth_call(url, token_address, SELECTOR_DECIMALS))
+        if decimals is None:
+            decimals = 18  # ERC-20 default
+
+    value = raw / (10 ** decimals)
+    return {"value": value, "source": "alchemy", "updatedAt": _now_iso()}
 
 
-# --- RWAs ------------------------------------------------------------------
+class Holding(TypedDict, total=False):
+    address: str
+    decimals: Optional[int]
+    priceUsd: Optional[float]
 
 
 class TotalValueLockedResult(TypedDict):
@@ -53,20 +127,33 @@ class TotalValueLockedResult(TypedDict):
     updatedAt: Optional[str]
 
 
-def fetch_total_value_locked(vault_addresses: list[str]) -> TotalValueLockedResult:
+def fetch_total_value_locked(holdings: List[Holding]) -> TotalValueLockedResult:
     """
-    Return live total value locked (USD) for an RWA protocol's on-chain vaults.
+    Return live total value locked (USD) for an RWA protocol.
 
-    DEFERRED: implement in Step 4. Planned approach mirrors the stablecoin
-    supply overlay — sum balances / share-price across the protocol's vault or
-    token contracts via the free-tier Alchemy API, priced into USD. As with the
-    token overlay, the vault/token addresses are NOT in the CSV and must be
-    resolved and stored on the profile first.
-
-    Must return the shape above so callers/UI are unchanged.
+    Computed as ``sum(totalSupply_i * priceUsd_i)`` over the protocol's token /
+    vault contracts. This is an AUM / market-cap proxy for TVL (the free tier has
+    no protocol-specific TVL feed). ``value`` is ``None`` if nothing could be
+    priced (no key, no address, or no price).
     """
-    _ = os.environ.get("ALCHEMY_API_KEY")  # required at implementation time
-    raise NotImplementedError(
-        "Alchemy RWA TVL overlay is deferred to Step 4. "
-        "See AGENT_HANDOFF.md for the implementation plan."
-    )
+    empty: TotalValueLockedResult = {"value": None, "source": "alchemy", "updatedAt": None}
+    url = _rpc_url()
+    if not url or not holdings:
+        return empty
+
+    total = 0.0
+    priced_any = False
+    for h in holdings:
+        address = (h.get("address") or "").strip()
+        price = h.get("priceUsd")
+        if not address or price is None:
+            continue
+        supply = fetch_total_supply(address, decimals=h.get("decimals"))
+        if supply["value"] is None:
+            continue
+        total += supply["value"] * float(price)
+        priced_any = True
+
+    if not priced_any:
+        return empty
+    return {"value": total, "source": "alchemy", "updatedAt": _now_iso()}

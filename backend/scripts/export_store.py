@@ -69,6 +69,7 @@ def _common_fields(item: dict) -> dict:
         "github": item.get("GitHub"),
         "coingecko": item.get("CoinGecko"),
         "auditUrl": item.get("AuditURL"),
+        "contractAddress": item.get("ContractAddress"),
         "arbitrumPortalMetadata": item.get("ArbitrumPortalMetadata") or dict(_DEFAULT_PORTAL),
         "createdAt": item.get("CreatedAt") or "",
         "updatedAt": item.get("UpdatedAt") or "",
@@ -90,6 +91,7 @@ def stablecoin_from_item(item: dict) -> dict:
 def rwa_from_item(item: dict) -> dict:
     profile = {"category": "RWA", **_common_fields(item)}
     profile["assetClass"] = item.get("AssetClass", "Multi-Asset")
+    profile["vaultAddresses"] = item.get("VaultAddresses")
     profile["totalValueLocked"] = item.get("TotalValueLocked") or dict(_DEFAULT_TOTAL)
     profile["historicalTvlData"] = item.get("HistoricalTvlData") or {
         "points": [],

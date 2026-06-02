@@ -66,6 +66,10 @@ export function RwaProfileCard({ profile }: { profile: RwaProfile }) {
           <LinkRow label="CoinGecko" href={profile.coingecko} />
           <LinkRow label="Audit report" href={profile.auditUrl} />
           <LinkRow label="Arbitrum Portal" href={meta.portalUrl} />
+          <LinkRow
+            label="Contract (Arbiscan)"
+            href={profile.contractAddress ? `https://arbiscan.io/token/${profile.contractAddress}` : null}
+          />
         </div>
       </Card>
     </div>

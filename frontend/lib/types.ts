@@ -81,6 +81,8 @@ export interface StablecoinProfile {
   github: string | null;
   coingecko: string | null;
   auditUrl: string | null;
+  /** Resolved Arbitrum token contract address (CoinGecko, Step 4 B2). */
+  contractAddress?: string | null;
   totalSupply: TotalSupply;
   historicalPegData: HistoricalPegData;
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
@@ -147,6 +149,9 @@ export interface RwaProfile {
   github: string | null;
   coingecko: string | null;
   auditUrl: string | null;
+  /** Resolved Arbitrum token/vault contract address(es) (CoinGecko, Step 4 B2). */
+  contractAddress?: string | null;
+  vaultAddresses?: string[] | null;
   totalValueLocked: TotalValueLocked;
   historicalTvlData: HistoricalTvlData;
   arbitrumPortalMetadata: ArbitrumPortalMetadata;

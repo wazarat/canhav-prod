@@ -12,7 +12,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import {
   getApprovedRwas,
   getApprovedRwaBySlug,
-  IS_MOCK_DATA,
+  LIVE_METRICS_PENDING,
   latestTvl,
   tvlChangePct,
   tvlTrend,
@@ -87,7 +87,7 @@ export default function RwaProfilePage({ params }: PageProps) {
         </div>
       </header>
 
-      {IS_MOCK_DATA && <MockDataBanner metrics="TVL and AUM" />}
+      {LIVE_METRICS_PENDING && <MockDataBanner metrics="TVL and AUM" />}
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="TVL" value={formatUsdCompact(tvl)} hint="Mock — Alchemy in Step 4" />

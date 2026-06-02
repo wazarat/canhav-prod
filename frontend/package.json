@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "export-store": "python3 ../backend/scripts/export_store.py",
+    "predev": "npm run export-store",
     "dev": "next dev",
+    "prebuild": "npm run export-store",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

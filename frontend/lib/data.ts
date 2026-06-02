@@ -1,5 +1,5 @@
-import { rwaMockData } from "@/lib/mock/rwaMockData";
-import { stablecoinMockData } from "@/lib/mock/stablecoinMockData";
+import generatedRwas from "@/lib/generated/rwas.json";
+import generatedStablecoins from "@/lib/generated/stablecoins.json";
 import type { CategoryDef, RwaProfile, StablecoinProfile } from "@/lib/types";
 
 /**
@@ -7,14 +7,30 @@ import type { CategoryDef, RwaProfile, StablecoinProfile } from "@/lib/types";
  *
  * The APPROVAL GATE lives here: public-facing pages must only ever call the
  * `*Approved*` accessors. `getAllStablecoins()` is reserved for the restricted
- * /staging view. When the live API (Step 4) lands, only the bodies of these
- * functions change — call sites stay identical.
+ * /staging view. Call sites never change — only the SOURCE these read from.
+ *
+ * SOURCE is the backend store (Step 4): `backend/scripts/export_store.py` reads
+ * `backend/data/store.json` and emits the camelCase JSON imported here. Re-run
+ * that export (it also runs via the `predev`/`prebuild` npm scripts) after each
+ * approval flip so newly APPROVED protocols appear publicly.
  */
 
-const SOURCE: StablecoinProfile[] = stablecoinMockData;
+const SOURCE: StablecoinProfile[] = generatedStablecoins as unknown as StablecoinProfile[];
 
-/** Whether the dataset is mock (used to render a clear "mock data" banner). */
-export const IS_MOCK_DATA = true;
+/**
+ * Whether the dataset is illustrative mock data. Now `false`: profiles come
+ * from the real CSV-backed store. Live Alchemy/Dune metrics (supply, peg, TVL)
+ * are still pending (Step 4 B2), so headline figures may be empty until then.
+ */
+export const IS_MOCK_DATA = false;
+
+/**
+ * Whether live on-chain/analytics metrics are still pending. Profile metadata
+ * is real (CSV-backed via the store), but supply/peg/TVL come from the live
+ * Alchemy/Dune overlays (Step 4 B2), which are not wired up yet — so those
+ * headline figures render empty. Drives the "metrics pending" banner.
+ */
+export const LIVE_METRICS_PENDING = true;
 
 /** All profiles regardless of status — STAGING / admin only. */
 export function getAllStablecoins(): StablecoinProfile[] {
@@ -78,7 +94,7 @@ export function pegHealth(profile: StablecoinProfile): PegHealth {
 /* RWA accessors (same approval gate as stablecoins)                          */
 /* -------------------------------------------------------------------------- */
 
-const RWA_SOURCE: RwaProfile[] = rwaMockData;
+const RWA_SOURCE: RwaProfile[] = generatedRwas as unknown as RwaProfile[];
 
 /** All RWA profiles regardless of status — STAGING / admin only. */
 export function getAllRwas(): RwaProfile[] {

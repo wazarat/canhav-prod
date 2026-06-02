@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { MockDataBanner } from "@/components/MockDataBanner";
 import { RwaTable } from "@/components/rwas/RwaTable";
 import { StatCard } from "@/components/ui/StatCard";
-import { getApprovedRwas, getRwaStagingCounts, IS_MOCK_DATA } from "@/lib/data";
+import { getApprovedRwas, getRwaStagingCounts, LIVE_METRICS_PENDING } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
 
 export const metadata = {
@@ -40,7 +40,7 @@ export default function RwasPage() {
         </p>
       </header>
 
-      {IS_MOCK_DATA && <MockDataBanner metrics="TVL and AUM" />}
+      {LIVE_METRICS_PENDING && <MockDataBanner metrics="TVL and AUM" />}
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Approved" value={`${profiles.length}`} hint="Visible publicly" />

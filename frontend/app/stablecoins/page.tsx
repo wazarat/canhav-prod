@@ -7,7 +7,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import {
   getApprovedStablecoins,
   getStagingCounts,
-  IS_MOCK_DATA,
+  LIVE_METRICS_PENDING,
   pegDeviationBps,
 } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
@@ -54,7 +54,7 @@ export default function StablecoinsPage() {
         </p>
       </header>
 
-      {IS_MOCK_DATA && <MockDataBanner />}
+      {LIVE_METRICS_PENDING && <MockDataBanner />}
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Approved" value={`${profiles.length}`} hint={`${usdCount} USD · ${eurCount} EUR`} />

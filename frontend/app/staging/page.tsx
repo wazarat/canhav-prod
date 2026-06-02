@@ -10,7 +10,7 @@ import {
   getAllStablecoins,
   getRwaStagingCounts,
   getStagingCounts,
-  IS_MOCK_DATA,
+  LIVE_METRICS_PENDING,
 } from "@/lib/data";
 
 export const metadata = {
@@ -51,7 +51,7 @@ export default function StagingPage() {
         </p>
       </header>
 
-      {IS_MOCK_DATA && <MockDataBanner metrics="Supply, peg and TVL" />}
+      {LIVE_METRICS_PENDING && <MockDataBanner metrics="Supply, peg and TVL" />}
 
       <section className="grid grid-cols-3 gap-4">
         <StatCard label="Total tracked" value={`${total}`} hint="All categories" />

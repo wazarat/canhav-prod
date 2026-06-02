@@ -12,7 +12,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import {
   getApprovedStablecoins,
   getApprovedStablecoinBySlug,
-  IS_MOCK_DATA,
+  LIVE_METRICS_PENDING,
   latestPegPrice,
   pegDeviationBps,
   pegHealth,
@@ -93,7 +93,7 @@ export default function StablecoinProfilePage({ params }: PageProps) {
         </div>
       </header>
 
-      {IS_MOCK_DATA && <MockDataBanner />}
+      {LIVE_METRICS_PENDING && <MockDataBanner />}
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Latest peg" value={`${symbol}${formatPeg(latest)}`} />

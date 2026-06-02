@@ -1,23 +1,17 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
-import { MockDataBanner } from "@/components/MockDataBanner";
-import { PegVarianceChart } from "@/components/stablecoins/PegVarianceChart";
+import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/OnchainPanel";
+import { MarketStats, MarketStatsSkeleton } from "@/components/market/MarketStats";
+import { PegHistorySection } from "@/components/stablecoins/PegHistorySection";
 import { ProfileCard } from "@/components/stablecoins/ProfileCard";
+import { StablecoinHeadlineStats } from "@/components/stablecoins/StablecoinHeadlineStats";
 import { Badge } from "@/components/ui/Badge";
-import { Card, CardTitle } from "@/components/ui/Card";
-import { StatCard } from "@/components/ui/StatCard";
-import {
-  getApprovedStablecoins,
-  getApprovedStablecoinBySlug,
-  LIVE_METRICS_PENDING,
-  latestPegPrice,
-  pegDeviationBps,
-  pegHealth,
-} from "@/lib/data";
-import { formatPeg, formatUsdCompact } from "@/lib/utils";
+import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
+import { getApprovedStablecoins, getApprovedStablecoinBySlug } from "@/lib/data";
 
 interface PageProps {
   params: { slug: string };
@@ -39,30 +33,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-const HEALTH_TONE = {
-  tight: "positive",
-  watch: "warning",
-  loose: "danger",
-} as const;
-
-const HEALTH_LABEL = {
-  tight: "Tight peg",
-  watch: "Watch",
-  loose: "Loose peg",
-} as const;
-
 export default async function StablecoinProfilePage({ params }: PageProps) {
   const profile = await getApprovedStablecoinBySlug(params.slug);
   if (!profile) notFound();
-
-  const latest = latestPegPrice(profile);
-  const bps = pegDeviationBps(profile);
-  const health = pegHealth(profile);
-  const symbol = profile.pegTarget === "EUR" ? "€" : "$";
-  const supplyLabel =
-    profile.pegTarget === "EUR" && profile.totalSupply.value !== null
-      ? `€${formatUsdCompact(profile.totalSupply.value).slice(1)}`
-      : formatUsdCompact(profile.totalSupply.value);
 
   return (
     <div className="container space-y-8 py-12">
@@ -95,34 +68,27 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
         </div>
       </header>
 
-      {LIVE_METRICS_PENDING && <MockDataBanner />}
-
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Latest peg" value={`${symbol}${formatPeg(latest)}`} />
-        <StatCard label="Deviation" value={bps === null ? "—" : `${bps} bps`} />
-        <StatCard label="Circulating supply" value={supplyLabel} hint="Mock — Alchemy in Step 4" />
-        <StatCard label="Peg health" value={HEALTH_LABEL[health]} />
-      </section>
+      <Suspense fallback={<StatGridSkeleton />}>
+        <StablecoinHeadlineStats profile={profile} />
+      </Suspense>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <div className="flex items-center justify-between">
-            <CardTitle>Historical peg variance</CardTitle>
-            <Badge tone={HEALTH_TONE[health]}>{HEALTH_LABEL[health]}</Badge>
-          </div>
-          <p className="mt-1 text-xs text-ink-300">
-            {profile.historicalPegData.points.length}-day series · source: Dune (mock)
-          </p>
-          <div className="mt-4">
-            <PegVarianceChart
-              id={profile.slug}
-              points={profile.historicalPegData.points}
-              pegTarget={profile.pegTarget}
-            />
-          </div>
-        </Card>
+        <div className="space-y-6 lg:col-span-2">
+          <Suspense fallback={<ChartCardSkeleton title="Historical peg variance" />}>
+            <PegHistorySection profile={profile} />
+          </Suspense>
 
-        <ProfileCard profile={profile} />
+          <Suspense fallback={<OnchainPanelSkeleton />}>
+            <OnchainPanel profile={profile} />
+          </Suspense>
+        </div>
+
+        <div className="space-y-4">
+          <ProfileCard profile={profile} />
+          <Suspense fallback={<MarketStatsSkeleton />}>
+            <MarketStats profile={profile} />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

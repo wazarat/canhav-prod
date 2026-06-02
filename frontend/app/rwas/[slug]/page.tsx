@@ -1,23 +1,17 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
-import { MockDataBanner } from "@/components/MockDataBanner";
+import { MarketStats, MarketStatsSkeleton } from "@/components/market/MarketStats";
+import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/OnchainPanel";
+import { RwaHeadlineStats } from "@/components/rwas/RwaHeadlineStats";
 import { RwaProfileCard } from "@/components/rwas/RwaProfileCard";
-import { TvlChart } from "@/components/rwas/TvlChart";
+import { TvlHistorySection } from "@/components/rwas/TvlHistorySection";
 import { Badge } from "@/components/ui/Badge";
-import { Card, CardTitle } from "@/components/ui/Card";
-import { StatCard } from "@/components/ui/StatCard";
-import {
-  getApprovedRwas,
-  getApprovedRwaBySlug,
-  LIVE_METRICS_PENDING,
-  latestTvl,
-  tvlChangePct,
-  tvlTrend,
-} from "@/lib/data";
-import { formatUsdCompact } from "@/lib/utils";
+import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
+import { getApprovedRwas, getApprovedRwaBySlug } from "@/lib/data";
 
 interface PageProps {
   params: { slug: string };
@@ -39,26 +33,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-const TREND_TONE = {
-  growing: "positive",
-  stable: "neutral",
-  declining: "danger",
-} as const;
-
-const TREND_LABEL = {
-  growing: "Growing",
-  stable: "Stable",
-  declining: "Declining",
-} as const;
-
 export default async function RwaProfilePage({ params }: PageProps) {
   const profile = await getApprovedRwaBySlug(params.slug);
   if (!profile) notFound();
-
-  const tvl = latestTvl(profile);
-  const pct = tvlChangePct(profile);
-  const trend = tvlTrend(profile);
-  const sign = pct !== null && pct > 0 ? "+" : "";
 
   return (
     <div className="container space-y-8 py-12">
@@ -89,30 +66,27 @@ export default async function RwaProfilePage({ params }: PageProps) {
         </div>
       </header>
 
-      {LIVE_METRICS_PENDING && <MockDataBanner metrics="TVL and AUM" />}
-
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="TVL" value={formatUsdCompact(tvl)} hint="Mock — Alchemy in Step 4" />
-        <StatCard label="30d change" value={pct === null ? "—" : `${sign}${pct.toFixed(1)}%`} />
-        <StatCard label="Asset class" value={profile.assetClass} />
-        <StatCard label="Trend" value={TREND_LABEL[trend]} />
-      </section>
+      <Suspense fallback={<StatGridSkeleton />}>
+        <RwaHeadlineStats profile={profile} />
+      </Suspense>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <div className="flex items-center justify-between">
-            <CardTitle>Total value locked</CardTitle>
-            <Badge tone={TREND_TONE[trend]}>{TREND_LABEL[trend]}</Badge>
-          </div>
-          <p className="mt-1 text-xs text-ink-300">
-            {profile.historicalTvlData.points.length}-day series · source: Dune (mock)
-          </p>
-          <div className="mt-4">
-            <TvlChart id={profile.slug} points={profile.historicalTvlData.points} trend={trend} />
-          </div>
-        </Card>
+        <div className="space-y-6 lg:col-span-2">
+          <Suspense fallback={<ChartCardSkeleton title="Total value locked" />}>
+            <TvlHistorySection profile={profile} />
+          </Suspense>
 
-        <RwaProfileCard profile={profile} />
+          <Suspense fallback={<OnchainPanelSkeleton />}>
+            <OnchainPanel profile={profile} />
+          </Suspense>
+        </div>
+
+        <div className="space-y-4">
+          <RwaProfileCard profile={profile} />
+          <Suspense fallback={<MarketStatsSkeleton />}>
+            <MarketStats profile={profile} />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

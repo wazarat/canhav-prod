@@ -1,5 +1,8 @@
 import "server-only";
 
+import { readSecret } from "@/lib/server/env";
+import { fetchJson, sleep } from "@/lib/server/http";
+
 /**
  * CoinGecko resolver — Arbitrum contract address + USD price.
  *
@@ -52,44 +55,34 @@ export interface TokenResolution {
   source: "coingecko";
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function getJson(url: string, timeoutMs = 20_000): Promise<any | null> {
+/**
+ * Fetch JSON from CoinGecko with one 429 backoff retry. Pass `revalidate`
+ * (seconds) for cached live-render reads on the detail pages; omit it for the
+ * always-fresh cron path.
+ */
+async function getJson(url: string, revalidate?: number): Promise<any | null> {
   const headers: Record<string, string> = {
     "User-Agent": "canhav-research/1.0",
     Accept: "application/json",
   };
-  const apiKey = process.env.COINGECKO_API_KEY;
+  const apiKey = readSecret("COINGECKO_API_KEY");
   if (apiKey) headers["x-cg-demo-api-key"] = apiKey;
 
-  const attempt = async (): Promise<any | null> => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const res = await fetch(url, { headers, signal: controller.signal, cache: "no-store" });
-      if (res.status === 429) return { __rateLimited: true };
-      if (!res.ok) return null;
-      return await res.json();
-    } catch {
-      return null;
-    } finally {
-      clearTimeout(timer);
-    }
-  };
-
-  let data = await attempt();
-  if (data && data.__rateLimited) {
+  let res = await fetchJson(url, { headers, revalidate });
+  if (res.status === 429) {
     await sleep(8_000); // back off once and retry
-    data = await attempt();
-    if (data && data.__rateLimited) return null;
+    res = await fetchJson(url, { headers, revalidate });
+    if (res.status === 429) return null;
   }
-  return data;
+  if (res.status < 200 || res.status >= 300) return null;
+  return res.data;
 }
 
 /** Resolve a CoinGecko coin id to its Arbitrum address + USD price. */
-export async function resolveCoin(coinId: string): Promise<TokenResolution | null> {
+export async function resolveCoin(
+  coinId: string,
+  revalidate?: number,
+): Promise<TokenResolution | null> {
   const params = new URLSearchParams({
     localization: "false",
     tickers: "false",
@@ -98,7 +91,10 @@ export async function resolveCoin(coinId: string): Promise<TokenResolution | nul
     developer_data: "false",
     sparkline: "false",
   });
-  const data = await getJson(`${COINGECKO_BASE}/coins/${encodeURIComponent(coinId)}?${params}`);
+  const data = await getJson(
+    `${COINGECKO_BASE}/coins/${encodeURIComponent(coinId)}?${params}`,
+    revalidate,
+  );
   if (!data || typeof data !== "object") return null;
 
   let address: string | null = null;
@@ -129,8 +125,145 @@ export async function resolveCoin(coinId: string): Promise<TokenResolution | nul
 }
 
 /** Resolve via the curated COINGECKO_IDS map; null if unmapped. */
-export async function resolveForSlug(slug: string): Promise<TokenResolution | null> {
+export async function resolveForSlug(
+  slug: string,
+  revalidate?: number,
+): Promise<TokenResolution | null> {
   const coinId = COINGECKO_IDS[slug];
   if (!coinId) return null;
-  return resolveCoin(coinId);
+  return resolveCoin(coinId, revalidate);
+}
+
+/** The curated CoinGecko coin id for a slug, or null if unmapped. */
+export function coinIdForSlug(slug: string): string | null {
+  return COINGECKO_IDS[slug] ?? null;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Market data + history (detail pages)                                       */
+/* -------------------------------------------------------------------------- */
+
+export interface MarketData {
+  coinId: string;
+  currentPrice: number | null;
+  marketCap: number | null;
+  marketCapRank: number | null;
+  totalVolume: number | null;
+  circulatingSupply: number | null;
+  totalSupply: number | null;
+  maxSupply: number | null;
+  ath: number | null;
+  atl: number | null;
+  priceChange24h: number | null;
+  priceChange7d: number | null;
+  priceChange30d: number | null;
+  source: "coingecko";
+}
+
+function num(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+/** Rich market snapshot for a coin id (market cap, volume, ATH/ATL, changes). */
+export async function fetchMarketData(
+  coinId: string,
+  revalidate?: number,
+): Promise<MarketData | null> {
+  const params = new URLSearchParams({
+    localization: "false",
+    tickers: "false",
+    market_data: "true",
+    community_data: "false",
+    developer_data: "false",
+    sparkline: "false",
+  });
+  const data = await getJson(
+    `${COINGECKO_BASE}/coins/${encodeURIComponent(coinId)}?${params}`,
+    revalidate,
+  );
+  if (!data || typeof data !== "object") return null;
+  const m = data.market_data;
+  if (!m || typeof m !== "object") return null;
+
+  const usd = (obj: unknown): number | null =>
+    obj && typeof obj === "object" ? num((obj as any).usd) : null;
+
+  return {
+    coinId,
+    currentPrice: usd(m.current_price),
+    marketCap: usd(m.market_cap),
+    marketCapRank: num(data.market_cap_rank),
+    totalVolume: usd(m.total_volume),
+    circulatingSupply: num(m.circulating_supply),
+    totalSupply: num(m.total_supply),
+    maxSupply: num(m.max_supply),
+    ath: usd(m.ath),
+    atl: usd(m.atl),
+    priceChange24h: num(m.price_change_percentage_24h),
+    priceChange7d: num(m.price_change_percentage_7d),
+    priceChange30d: num(m.price_change_percentage_30d),
+    source: "coingecko",
+  };
+}
+
+export interface ChartPoint {
+  date: string; // YYYY-MM-DD
+  price: number;
+}
+
+export interface MarketChart {
+  /** Daily USD price series (≈1.0 for healthy stablecoins). */
+  prices: ChartPoint[];
+  /** Daily USD market-cap series (used as an RWA TVL proxy). */
+  marketCaps: { date: string; value: number }[];
+  source: "coingecko";
+}
+
+/** Keep the last observation per UTC day from CoinGecko's [ts, value] pairs. */
+function dailyFromPairs(pairs: any): Map<string, number> {
+  const byDate = new Map<string, number>();
+  if (!Array.isArray(pairs)) return byDate;
+  for (const pair of pairs) {
+    if (!Array.isArray(pair) || pair.length < 2) continue;
+    const ts = num(pair[0]);
+    const value = num(pair[1]);
+    if (ts === null || value === null) continue;
+    byDate.set(new Date(ts).toISOString().slice(0, 10), value);
+  }
+  return byDate;
+}
+
+/**
+ * Daily price + market-cap history for a coin id over `days`. CoinGecko's free
+ * tier auto-selects granularity, so we downsample to one point per UTC day.
+ */
+export async function fetchMarketChart(
+  coinId: string,
+  days = 30,
+  opts: { vsCurrency?: string; revalidate?: number } = {},
+): Promise<MarketChart | null> {
+  const { vsCurrency = "usd", revalidate } = opts;
+  const params = new URLSearchParams({
+    vs_currency: vsCurrency,
+    days: String(days),
+  });
+  const data = await getJson(
+    `${COINGECKO_BASE}/coins/${encodeURIComponent(coinId)}/market_chart?${params}`,
+    revalidate,
+  );
+  if (!data || typeof data !== "object") return null;
+
+  const prices = dailyFromPairs(data.prices);
+  const caps = dailyFromPairs(data.market_caps);
+  if (prices.size === 0 && caps.size === 0) return null;
+
+  return {
+    prices: Array.from(prices, ([date, price]) => ({ date, price })).sort((a, b) =>
+      a.date.localeCompare(b.date),
+    ),
+    marketCaps: Array.from(caps, ([date, value]) => ({ date, value })).sort((a, b) =>
+      a.date.localeCompare(b.date),
+    ),
+    source: "coingecko",
+  };
 }

@@ -1,5 +1,4 @@
-import generatedRwas from "@/lib/generated/rwas.json";
-import generatedStablecoins from "@/lib/generated/stablecoins.json";
+import { readLiveStore } from "@/lib/server/store";
 import type { CategoryDef, RwaProfile, StablecoinProfile } from "@/lib/types";
 
 /**
@@ -7,49 +6,50 @@ import type { CategoryDef, RwaProfile, StablecoinProfile } from "@/lib/types";
  *
  * The APPROVAL GATE lives here: public-facing pages must only ever call the
  * `*Approved*` accessors. `getAllStablecoins()` is reserved for the restricted
- * /staging view. Call sites never change — only the SOURCE these read from.
+ * /staging view. Call sites only change in that the accessors are now `async`.
  *
- * SOURCE is the backend store (Step 4): `backend/scripts/export_store.py` reads
- * `backend/data/store.json` and emits the camelCase JSON imported here. Re-run
- * that export (it also runs via the `predev`/`prebuild` npm scripts) after each
- * approval flip so newly APPROVED protocols appear publicly.
+ * SOURCE is the backend store read at request/build time via
+ * `lib/server/store.ts`: Upstash Redis in production (and locally when the
+ * Upstash env vars are set), or `backend/data/store.json` from disk for offline
+ * dev. An approval flip via /api/approve appears publicly after revalidation.
  */
-
-const SOURCE: StablecoinProfile[] = generatedStablecoins as unknown as StablecoinProfile[];
 
 /**
  * Whether the dataset is illustrative mock data. Now `false`: profiles come
  * from the real CSV-backed store. Live Alchemy/Dune metrics (supply, peg, TVL)
- * are still pending (Step 4 B2), so headline figures may be empty until then.
+ * are still pending (B2), so headline figures may be empty until then.
  */
 export const IS_MOCK_DATA = false;
 
 /**
  * Whether live on-chain/analytics metrics are still pending. Profile metadata
  * is real (CSV-backed via the store), but supply/peg/TVL come from the live
- * Alchemy/Dune overlays (Step 4 B2), which are not wired up yet — so those
+ * Alchemy/Dune overlays (B2), which are not fully wired up yet — so those
  * headline figures render empty. Drives the "metrics pending" banner.
  */
 export const LIVE_METRICS_PENDING = true;
 
 /** All profiles regardless of status — STAGING / admin only. */
-export function getAllStablecoins(): StablecoinProfile[] {
-  return [...SOURCE].sort((a, b) => a.name.localeCompare(b.name));
+export async function getAllStablecoins(): Promise<StablecoinProfile[]> {
+  const { stablecoins } = await readLiveStore();
+  return [...stablecoins].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /** Public: only APPROVED profiles ever leave this function. */
-export function getApprovedStablecoins(): StablecoinProfile[] {
-  return getAllStablecoins().filter((p) => p.status === "APPROVED");
+export async function getApprovedStablecoins(): Promise<StablecoinProfile[]> {
+  return (await getAllStablecoins()).filter((p) => p.status === "APPROVED");
 }
 
 /** Public: a single APPROVED profile, or null (so pending items 404 publicly). */
-export function getApprovedStablecoinBySlug(slug: string): StablecoinProfile | null {
-  return getApprovedStablecoins().find((p) => p.slug === slug) ?? null;
+export async function getApprovedStablecoinBySlug(
+  slug: string,
+): Promise<StablecoinProfile | null> {
+  return (await getApprovedStablecoins()).find((p) => p.slug === slug) ?? null;
 }
 
 /** Staging: a single profile of any status. */
-export function getStablecoinBySlug(slug: string): StablecoinProfile | null {
-  return SOURCE.find((p) => p.slug === slug) ?? null;
+export async function getStablecoinBySlug(slug: string): Promise<StablecoinProfile | null> {
+  return (await getAllStablecoins()).find((p) => p.slug === slug) ?? null;
 }
 
 export interface StagingCounts {
@@ -58,8 +58,8 @@ export interface StagingCounts {
   pending: number;
 }
 
-export function getStagingCounts(): StagingCounts {
-  const all = getAllStablecoins();
+export async function getStagingCounts(): Promise<StagingCounts> {
+  const all = await getAllStablecoins();
   const approved = all.filter((p) => p.status === "APPROVED").length;
   return { total: all.length, approved, pending: all.length - approved };
 }
@@ -94,30 +94,29 @@ export function pegHealth(profile: StablecoinProfile): PegHealth {
 /* RWA accessors (same approval gate as stablecoins)                          */
 /* -------------------------------------------------------------------------- */
 
-const RWA_SOURCE: RwaProfile[] = generatedRwas as unknown as RwaProfile[];
-
 /** All RWA profiles regardless of status — STAGING / admin only. */
-export function getAllRwas(): RwaProfile[] {
-  return [...RWA_SOURCE].sort((a, b) => a.name.localeCompare(b.name));
+export async function getAllRwas(): Promise<RwaProfile[]> {
+  const { rwas } = await readLiveStore();
+  return [...rwas].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /** Public: only APPROVED RWA profiles ever leave this function. */
-export function getApprovedRwas(): RwaProfile[] {
-  return getAllRwas().filter((p) => p.status === "APPROVED");
+export async function getApprovedRwas(): Promise<RwaProfile[]> {
+  return (await getAllRwas()).filter((p) => p.status === "APPROVED");
 }
 
 /** Public: a single APPROVED RWA profile, or null (so pending items 404). */
-export function getApprovedRwaBySlug(slug: string): RwaProfile | null {
-  return getApprovedRwas().find((p) => p.slug === slug) ?? null;
+export async function getApprovedRwaBySlug(slug: string): Promise<RwaProfile | null> {
+  return (await getApprovedRwas()).find((p) => p.slug === slug) ?? null;
 }
 
 /** Staging: a single RWA profile of any status. */
-export function getRwaBySlug(slug: string): RwaProfile | null {
-  return RWA_SOURCE.find((p) => p.slug === slug) ?? null;
+export async function getRwaBySlug(slug: string): Promise<RwaProfile | null> {
+  return (await getAllRwas()).find((p) => p.slug === slug) ?? null;
 }
 
-export function getRwaStagingCounts(): StagingCounts {
-  const all = getAllRwas();
+export async function getRwaStagingCounts(): Promise<StagingCounts> {
+  const all = await getAllRwas();
   const approved = all.filter((p) => p.status === "APPROVED").length;
   return { total: all.length, approved, pending: all.length - approved };
 }
@@ -161,14 +160,12 @@ export const CATEGORIES: CategoryDef[] = [
     label: "Stablecoins",
     description: "Pegged dollar & euro assets, peg health, and circulating supply.",
     status: "active",
-    trackedCount: getAllStablecoins().length,
   },
   {
     slug: "rwas",
     label: "Real World Assets",
     description: "Tokenized treasuries, credit, equities, and off-chain collateral.",
     status: "active",
-    trackedCount: getAllRwas().length,
   },
   {
     slug: "lending",

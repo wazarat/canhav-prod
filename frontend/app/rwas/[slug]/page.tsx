@@ -23,13 +23,15 @@ interface PageProps {
   params: { slug: string };
 }
 
+export const revalidate = 300;
+
 // Pre-render only APPROVED profiles; pending items are not public.
-export function generateStaticParams() {
-  return getApprovedRwas().map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  return (await getApprovedRwas()).map((p) => ({ slug: p.slug }));
 }
 
-export function generateMetadata({ params }: PageProps): Metadata {
-  const profile = getApprovedRwaBySlug(params.slug);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const profile = await getApprovedRwaBySlug(params.slug);
   if (!profile) return { title: "Not found" };
   return {
     title: `${profile.name}`,
@@ -49,8 +51,8 @@ const TREND_LABEL = {
   declining: "Declining",
 } as const;
 
-export default function RwaProfilePage({ params }: PageProps) {
-  const profile = getApprovedRwaBySlug(params.slug);
+export default async function RwaProfilePage({ params }: PageProps) {
+  const profile = await getApprovedRwaBySlug(params.slug);
   if (!profile) notFound();
 
   const tvl = latestTvl(profile);

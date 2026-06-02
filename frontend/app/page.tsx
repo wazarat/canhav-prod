@@ -6,14 +6,30 @@ import { Button } from "@/components/ui/Button";
 import { StatCard } from "@/components/ui/StatCard";
 import {
   CATEGORIES,
+  getAllRwas,
+  getAllStablecoins,
   getApprovedStablecoins,
   pegDeviationBps,
 } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
 
-export default function DashboardPage() {
-  const approved = getApprovedStablecoins();
+export const revalidate = 300;
+
+export default async function DashboardPage() {
+  const [approved, allStablecoins, allRwas] = await Promise.all([
+    getApprovedStablecoins(),
+    getAllStablecoins(),
+    getAllRwas(),
+  ]);
   const activeCategories = CATEGORIES.filter((c) => c.status === "active").length;
+
+  const trackedBySlug: Record<string, number> = {
+    stablecoins: allStablecoins.length,
+    rwas: allRwas.length,
+  };
+  const categories = CATEGORIES.map((c) =>
+    c.slug in trackedBySlug ? { ...c, trackedCount: trackedBySlug[c.slug] } : c,
+  );
 
   const aggregateSupply = approved.reduce((sum, p) => sum + (p.totalSupply.value ?? 0), 0);
   const deviations = approved
@@ -80,7 +96,7 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
-        <CategoryGrid categories={CATEGORIES} />
+        <CategoryGrid categories={categories} />
       </section>
     </div>
   );

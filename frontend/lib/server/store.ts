@@ -1,16 +1,18 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { repoRoot } from "@/lib/server/env";
+import { hasUpstash, readAllItemsFromRedis } from "@/lib/server/redis";
 import type { RwaProfile, StablecoinProfile } from "@/lib/types";
 
 /**
- * Server-only LIVE reader for the backend store (`backend/data/store.json`).
+ * Server-only unified reader for the backend store.
  *
- * Public pages read the build-time generated JSON (static, fast). The restricted
- * `/staging` page instead reads the store directly at request time through this
- * module, so an approval flip via /api/approve is reflected immediately without
- * a rebuild. Same camelCase mapping as `backend/scripts/export_store.py`.
+ * Primary source is Upstash Redis (hash `canhav:store`), read at request/build
+ * time so every page reflects the live store and an approval flip via
+ * /api/approve shows up after revalidation. When Upstash env vars are absent
+ * (pure offline dev with the Python LocalAdapter), it falls back to reading
+ * `backend/data/store.json` from disk. Items map PascalCase -> camelCase here.
  */
 
 interface StoreFile {
@@ -21,7 +23,7 @@ function storePath(): string {
   return path.join(repoRoot(), "backend", "data", "store.json");
 }
 
-function readItems(): Record<string, unknown>[] {
+function readItemsFromDisk(): Record<string, unknown>[] {
   try {
     const raw = readFileSync(storePath(), "utf-8");
     const parsed = JSON.parse(raw) as StoreFile;
@@ -29,6 +31,41 @@ function readItems(): Record<string, unknown>[] {
   } catch {
     return [];
   }
+}
+
+async function readItems(): Promise<Record<string, unknown>[]> {
+  if (hasUpstash()) {
+    return readAllItemsFromRedis();
+  }
+  return readItemsFromDisk();
+}
+
+/**
+ * Offline-dev fallback writer: flip a protocol's status directly in
+ * `backend/data/store.json` (mirrors the Python LocalAdapter). Only used when
+ * Upstash env vars are absent; production always goes through Redis. Returns the
+ * updated item, or `null` if the protocol was not found.
+ */
+export function setStatusLocal(
+  category: string,
+  slug: string,
+  status: "APPROVED" | "PENDING_APPROVAL",
+): Record<string, any> | null {
+  const file = storePath();
+  let parsed: StoreFile & Record<string, unknown>;
+  try {
+    parsed = JSON.parse(readFileSync(file, "utf-8"));
+  } catch {
+    return null;
+  }
+  const items = (parsed.items ?? {}) as Record<string, Record<string, any>>;
+  const field = `CATEGORY#${category}|PROTOCOL#${slug}`;
+  const item = items[field];
+  if (!item) return null;
+  item.Status = status;
+  item.UpdatedAt = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+  writeFileSync(file, `${JSON.stringify(parsed, null, 2)}\n`, "utf-8");
+  return item;
 }
 
 function common(item: Record<string, any>) {
@@ -66,11 +103,11 @@ export interface LiveStore {
   rwas: RwaProfile[];
 }
 
-export function readLiveStore(): LiveStore {
+export async function readLiveStore(): Promise<LiveStore> {
   const stablecoins: StablecoinProfile[] = [];
   const rwas: RwaProfile[] = [];
 
-  for (const raw of readItems()) {
+  for (const raw of await readItems()) {
     const item = raw as Record<string, any>;
     if (item.Category === "Stablecoin") {
       stablecoins.push({

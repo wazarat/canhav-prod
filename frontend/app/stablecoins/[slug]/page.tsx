@@ -23,13 +23,15 @@ interface PageProps {
   params: { slug: string };
 }
 
+export const revalidate = 300;
+
 // Pre-render only APPROVED profiles; pending items are not public.
-export function generateStaticParams() {
-  return getApprovedStablecoins().map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  return (await getApprovedStablecoins()).map((p) => ({ slug: p.slug }));
 }
 
-export function generateMetadata({ params }: PageProps): Metadata {
-  const profile = getApprovedStablecoinBySlug(params.slug);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const profile = await getApprovedStablecoinBySlug(params.slug);
   if (!profile) return { title: "Not found" };
   return {
     title: `${profile.name}`,
@@ -49,8 +51,8 @@ const HEALTH_LABEL = {
   loose: "Loose peg",
 } as const;
 
-export default function StablecoinProfilePage({ params }: PageProps) {
-  const profile = getApprovedStablecoinBySlug(params.slug);
+export default async function StablecoinProfilePage({ params }: PageProps) {
+  const profile = await getApprovedStablecoinBySlug(params.slug);
   if (!profile) notFound();
 
   const latest = latestPegPrice(profile);

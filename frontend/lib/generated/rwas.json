@@ -1,0 +1,420 @@
+[
+  {
+    "arbitrumPortalMetadata": {
+      "bannerUrl": "https://portal-data.arbitrum.io/images/projects/arcton-banner.webp",
+      "chains": [
+        "Arbitrum One"
+      ],
+      "foundedDate": "May 01 2021, 04:00 AM EDT",
+      "isArbitrumNative": false,
+      "isLive": true,
+      "isPubliclyAudited": false,
+      "logoUrl": "https://portal-data.arbitrum.io/images/projects/arcton-logo.webp",
+      "portalUrl": "https://portal.arbitrum.io/projects/arcton",
+      "subCategory": "Real World Assets (RWAs)"
+    },
+    "assetClass": "Tokenized Equities",
+    "auditUrl": null,
+    "category": "RWA",
+    "coingecko": "We dont have  a token",
+    "contractAddress": null,
+    "createdAt": "2026-06-02T15:04:57Z",
+    "description": "The first trading platform for startup IPOs",
+    "discord": "https://discord.gg/jeDBheXM",
+    "github": null,
+    "historicalTvlData": {
+      "points": [],
+      "source": "dune",
+      "updatedAt": null
+    },
+    "name": "Arcton",
+    "slug": "arcton",
+    "status": "PENDING_APPROVAL",
+    "symbol": "ARC",
+    "totalValueLocked": {
+      "source": "alchemy",
+      "updatedAt": null,
+      "value": null
+    },
+    "twitter": "https://twitter.com/Arctonhq",
+    "updatedAt": "2026-06-02T15:08:18Z",
+    "vaultAddresses": null,
+    "website": "https://arcton.com/"
+  },
+  {
+    "arbitrumPortalMetadata": {
+      "bannerUrl": "https://portal-data.arbitrum.io/images/projects/aryze-banner.webp",
+      "chains": [
+        "Arbitrum One"
+      ],
+      "foundedDate": "June 01 2017, 04:00 AM EDT",
+      "isArbitrumNative": false,
+      "isLive": true,
+      "isPubliclyAudited": false,
+      "logoUrl": "https://portal-data.arbitrum.io/images/projects/aryze-logo.webp",
+      "portalUrl": "https://portal.arbitrum.io/projects/aryze",
+      "subCategory": "Real World Assets (RWAs)"
+    },
+    "assetClass": "Stablecoins & FX",
+    "auditUrl": null,
+    "category": "RWA",
+    "coingecko": null,
+    "contractAddress": null,
+    "createdAt": "2026-06-02T15:04:57Z",
+    "description": "Aryze offers Stablecoin Services, including seamless cross-border payments, secure treasury management, branded stablecoins (SaaS), and tokenization—backed by real-world assets to ensure transparency, compliance, and trust.",
+    "discord": "https://discord.com/invite/C2xjkatmpC",
+    "github": "https://github.com/ARYZEofficial",
+    "historicalTvlData": {
+      "points": [],
+      "source": "dune",
+      "updatedAt": null
+    },
+    "name": "Aryze",
+    "slug": "aryze",
+    "status": "PENDING_APPROVAL",
+    "symbol": "ARYZE",
+    "totalValueLocked": {
+      "source": "alchemy",
+      "updatedAt": null,
+      "value": null
+    },
+    "twitter": "https://x.com/ARYZEofficial",
+    "updatedAt": "2026-06-02T15:08:18Z",
+    "vaultAddresses": null,
+    "website": "https://www.aryze.io/"
+  },
+  {
+    "arbitrumPortalMetadata": {
+      "bannerUrl": "https://portal-data.arbitrum.io/images/projects/atmosphera-banner.webp",
+      "chains": [
+        "Arbitrum One"
+      ],
+      "foundedDate": "October 10 2025, 12:00 AM EDT",
+      "isArbitrumNative": false,
+      "isLive": true,
+      "isPubliclyAudited": false,
+      "logoUrl": "https://portal-data.arbitrum.io/images/projects/atmosphera-logo.webp",
+      "portalUrl": "https://portal.arbitrum.io/projects/atmosphera",
+      "subCategory": "Real World Assets (RWAs)"
+    },
+    "assetClass": "Event Finance",
+    "auditUrl": null,
+    "category": "RWA",
+    "coingecko": null,
+    "contractAddress": null,
+    "createdAt": "2026-06-02T15:04:57Z",
+    "description": "Invest in events.\n‍Pocket the upside.\nDiscover, fund, and profit from world-class events. Investing and real returns.",
+    "discord": "https://t.me/atmospherainvest",
+    "github": null,
+    "historicalTvlData": {
+      "points": [],
+      "source": "dune",
+      "updatedAt": null
+    },
+    "name": "Atmosphera",
+    "slug": "atmosphera",
+    "status": "PENDING_APPROVAL",
+    "symbol": "ATMO",
+    "totalValueLocked": {
+      "source": "alchemy",
+      "updatedAt": null,
+      "value": null
+    },
+    "twitter": null,
+    "updatedAt": "2026-06-02T15:08:18Z",
+    "vaultAddresses": null,
+    "website": "https://atmosphera.live/"
+  },
+  {
+    "arbitrumPortalMetadata": {
+      "bannerUrl": "https://portal-data.arbitrum.io/images/projects/centrifuge-banner.webp",
+      "chains": [
+        "Arbitrum One"
+      ],
+      "foundedDate": "June 01 2017, 04:00 AM EDT",
+      "isArbitrumNative": false,
+      "isLive": true,
+      "isPubliclyAudited": false,
+      "logoUrl": "https://portal-data.arbitrum.io/images/projects/centrifuge-logo.webp",
+      "portalUrl": "https://portal.arbitrum.io/projects/centrifuge",
+      "subCategory": "Real World Assets (RWAs)"
+    },
+    "assetClass": "Private Credit",
+    "auditUrl": null,
+    "category": "RWA",
+    "coingecko": "https://www.coingecko.com/en/coins/centrifuge",
+    "contractAddress": null,
+    "createdAt": "2026-06-02T15:04:57Z",
+    "description": "The first protocol to bring real-world assets onchain, we’re building a better financial system.",
+    "discord": "https://discord.com/invite/yEzyUq5gxF",
+    "github": "https://github.com/centrifuge",
+    "historicalTvlData": {
+      "points": [],
+      "source": "dune",
+      "updatedAt": null
+    },
+    "name": "Centrifuge",
+    "slug": "centrifuge",
+    "status": "PENDING_APPROVAL",
+    "symbol": "CFG",
+    "totalValueLocked": {
+      "source": "alchemy",
+      "updatedAt": null,
+      "value": null
+    },
+    "twitter": "https://twitter.com/centrifuge",
+    "updatedAt": "2026-06-02T15:42:31Z",
+    "vaultAddresses": null,
+    "website": "https://centrifuge.io/"
+  },
+  {
+    "arbitrumPortalMetadata": {
+      "bannerUrl": "https://portal-data.arbitrum.io/images/projects/chateau-capital-banner.webp",
+      "chains": [
+        "Arbitrum One"
+      ],
+      "foundedDate": "May 01 2023, 04:00 AM EDT",
+      "isArbitrumNative": false,
+      "isLive": true,
+      "isPubliclyAudited": false,
+      "logoUrl": "https://portal-data.arbitrum.io/images/projects/chateau-capital-logo.webp",
+      "portalUrl": "https://portal.arbitrum.io/projects/chateau-capital",
+      "subCategory": "Real World Assets (RWAs)"
+    },
+    "assetClass": "Structured Products",
+    "auditUrl": null,
+    "category": "RWA",
+    "coingecko": null,
+    "contractAddress": null,
+    "createdAt": "2026-06-02T15:04:57Z",
+    "description": "Chateau allows DeFi users to invest in institutional-grade equity, debt, and derivatives on chain.",
+    "discord": null,
+    "github": "https://github.com/chateau-capital/ca",
+    "historicalTvlData": {
+      "points": [],
+      "source": "dune",
+      "updatedAt": null
+    },
+    "name": "Chateau Capital",
+    "slug": "chateau-capital",
+    "status": "PENDING_APPROVAL",
+    "symbol": "CHAT",
+    "totalValueLocked": {
+      "source": "alchemy",
+      "updatedAt": null,
+      "value": null
+    },
+    "twitter": "https://twitter.com/Chateau_capital",
+    "updatedAt": "2026-06-02T15:08:18Z",
+    "vaultAddresses": null,
+    "website": "https://www.chateau.capital/"
+  },
+  {
+    "arbitrumPortalMetadata": {
+      "bannerUrl": "https://portal-data.arbitrum.io/images/projects/dinari-banner.webp",
+      "chains": [
+        "Arbitrum One"
+      ],
+      "foundedDate": "October 01 2021, 04:00 AM EDT",
+      "isArbitrumNative": false,
+      "isLive": true,
+      "isPubliclyAudited": false,
+      "logoUrl": "https://portal-data.arbitrum.io/images/projects/dinari-logo.webp",
+      "portalUrl": "https://portal.arbitrum.io/projects/dinari",
+      "subCategory": "Real World Assets (RWAs)"
+    },
+    "assetClass": "Tokenized Equities",
+    "auditUrl": null,
+    "category": "RWA",
+    "coingecko": null,
+    "contractAddress": null,
+    "createdAt": "2026-06-02T15:04:57Z",
+    "description": "Dinari dShares are 1:1 backed Real World Asset tokens of stocks, ETFs, bonds, REITs, and other assets. Dinari is an SEC registered transfer agent, and hold a reserve in a treausury vault which is audited regularly by a Big 4 Accounting firm, and has raised $7.5million seed funding from top investors including 500 Global, SIG, etc",
+    "discord": "https://discord.gg/dinari",
+    "github": "https://github.com/dinaricrypto/sbt-contracts",
+    "historicalTvlData": {
+      "points": [],
+      "source": "dune",
+      "updatedAt": null
+    },
+    "name": "Dinari",
+    "slug": "dinari",
+    "status": "PENDING_APPROVAL",
+    "symbol": "dSHARE",
+    "totalValueLocked": {
+      "source": "alchemy",
+      "updatedAt": null,
+      "value": null
+    },
+    "twitter": "https://twitter.com/DinariGlobal",
+    "updatedAt": "2026-06-02T15:08:18Z",
+    "vaultAddresses": null,
+    "website": "https://dinari.com/"
+  },
+  {
+    "arbitrumPortalMetadata": {
+      "bannerUrl": "https://portal-data.arbitrum.io/images/projects/dualmint-banner.webp",
+      "chains": [],
+      "foundedDate": "April 01 2022, 04:00 AM EDT",
+      "isArbitrumNative": false,
+      "isLive": true,
+      "isPubliclyAudited": false,
+      "logoUrl": "https://portal-data.arbitrum.io/images/projects/dualmint-logo.webp",
+      "portalUrl": "https://portal.arbitrum.io/projects/dualmint",
+      "subCategory": "Real World Assets (RWAs)"
+    },
+    "assetClass": "Multi-Asset",
+    "auditUrl": null,
+    "category": "RWA",
+    "coingecko": null,
+    "contractAddress": null,
+    "createdAt": "2026-06-02T15:04:57Z",
+    "description": "DualMint's mission is become more than an RWA marketplace. It’s the first protocol purpose-built to scale small-ticket, high-frequency, recession-proof assets into the kind of yield infrastructure DeFi needs.\n\nOur goal is to make this overlooked category a composable DeFi base layer stable, scalable, and infrastructure-grade.",
+    "discord": "https://t.me/dualmint",
+    "github": null,
+    "historicalTvlData": {
+      "points": [],
+      "source": "dune",
+      "updatedAt": null
+    },
+    "name": "DualMint",
+    "slug": "dualmint",
+    "status": "PENDING_APPROVAL",
+    "symbol": "DMINT",
+    "totalValueLocked": {
+      "source": "alchemy",
+      "updatedAt": null,
+      "value": null
+    },
+    "twitter": "https://x.com/dualmintrwa",
+    "updatedAt": "2026-06-02T15:08:18Z",
+    "vaultAddresses": null,
+    "website": "https://www.dualmint.com"
+  },
+  {
+    "arbitrumPortalMetadata": {
+      "bannerUrl": "https://portal-data.arbitrum.io/images/projects/estate-protocol-banner.webp",
+      "chains": [
+        "Arbitrum One"
+      ],
+      "foundedDate": "January 01 2022, 05:00 AM EST",
+      "isArbitrumNative": true,
+      "isLive": true,
+      "isPubliclyAudited": false,
+      "logoUrl": "https://portal-data.arbitrum.io/images/projects/estate-protocol-logo.webp",
+      "portalUrl": "https://portal.arbitrum.io/projects/estate-protocol",
+      "subCategory": "Real World Assets (RWAs)"
+    },
+    "assetClass": "Real Estate",
+    "auditUrl": null,
+    "category": "RWA",
+    "coingecko": null,
+    "contractAddress": null,
+    "createdAt": "2026-06-02T15:04:57Z",
+    "description": "Earn yields from institutional grade tokenized real estate",
+    "discord": "https://discord.com/invite/FRANJG3QZu",
+    "github": "https://github.com/Estate-Protocol-Home",
+    "historicalTvlData": {
+      "points": [],
+      "source": "dune",
+      "updatedAt": null
+    },
+    "name": "Estate Protocol",
+    "slug": "estate-protocol",
+    "status": "PENDING_APPROVAL",
+    "symbol": "EST",
+    "totalValueLocked": {
+      "source": "alchemy",
+      "updatedAt": null,
+      "value": null
+    },
+    "twitter": "https://twitter.com/EstateProtocol",
+    "updatedAt": "2026-06-02T15:08:18Z",
+    "vaultAddresses": null,
+    "website": "https://www.estateprotocol.com/"
+  },
+  {
+    "arbitrumPortalMetadata": {
+      "bannerUrl": "https://portal-data.arbitrum.io/images/projects/florence-finance-banner.webp",
+      "chains": [
+        "Arbitrum One"
+      ],
+      "foundedDate": null,
+      "isArbitrumNative": false,
+      "isLive": true,
+      "isPubliclyAudited": false,
+      "logoUrl": "https://portal-data.arbitrum.io/images/projects/florence-finance-logo.webp",
+      "portalUrl": "https://portal.arbitrum.io/projects/florence-finance",
+      "subCategory": "Real World Assets (RWAs)"
+    },
+    "assetClass": "Private Credit",
+    "auditUrl": null,
+    "category": "RWA",
+    "coingecko": null,
+    "contractAddress": null,
+    "createdAt": "2026-06-02T15:04:57Z",
+    "description": "Florence Finance belongs to the Real World Assets (RWAs) category.",
+    "discord": "https://discord.gg/ykKMD9U5GB",
+    "github": "https://github.com/florence-finance",
+    "historicalTvlData": {
+      "points": [],
+      "source": "dune",
+      "updatedAt": null
+    },
+    "name": "Florence Finance",
+    "slug": "florence-finance",
+    "status": "PENDING_APPROVAL",
+    "symbol": "FLR",
+    "totalValueLocked": {
+      "source": "alchemy",
+      "updatedAt": null,
+      "value": null
+    },
+    "twitter": "https://x.com/FinanceFlorence?s=20",
+    "updatedAt": "2026-06-02T15:08:18Z",
+    "vaultAddresses": null,
+    "website": "https://florence.finance/"
+  },
+  {
+    "arbitrumPortalMetadata": {
+      "bannerUrl": "https://portal-data.arbitrum.io/images/projects/franklin-templeton-banner.webp",
+      "chains": [
+        "Arbitrum One"
+      ],
+      "foundedDate": null,
+      "isArbitrumNative": false,
+      "isLive": true,
+      "isPubliclyAudited": false,
+      "logoUrl": "https://portal-data.arbitrum.io/images/projects/franklin-templeton-logo.webp",
+      "portalUrl": "https://portal.arbitrum.io/projects/franklin-templeton",
+      "subCategory": "Real World Assets (RWAs)"
+    },
+    "assetClass": "Treasuries & Funds",
+    "auditUrl": null,
+    "category": "RWA",
+    "coingecko": null,
+    "contractAddress": null,
+    "createdAt": "2026-06-02T15:04:57Z",
+    "description": "Digital Assets Technology - Digital Assets Investment Strategies - Node Operations.",
+    "discord": null,
+    "github": null,
+    "historicalTvlData": {
+      "points": [],
+      "source": "dune",
+      "updatedAt": null
+    },
+    "name": "Franklin Templeton",
+    "slug": "franklin-templeton",
+    "status": "PENDING_APPROVAL",
+    "symbol": "BENJI",
+    "totalValueLocked": {
+      "source": "alchemy",
+      "updatedAt": null,
+      "value": null
+    },
+    "twitter": "https://x.com/FTDA_US",
+    "updatedAt": "2026-06-02T15:42:31Z",
+    "vaultAddresses": null,
+    "website": "https://www.franklinresources.com/"
+  }
+]

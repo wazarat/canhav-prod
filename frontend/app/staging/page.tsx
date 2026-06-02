@@ -18,8 +18,8 @@ export const metadata = {
 // /api/approve are reflected immediately, without a rebuild.
 export const dynamic = "force-dynamic";
 
-export default function StagingPage() {
-  const { stablecoins, rwas } = readLiveStore();
+export default async function StagingPage() {
+  const { stablecoins, rwas } = await readLiveStore();
 
   const scPending = stablecoins.filter((p) => p.status === "PENDING_APPROVAL");
   const scApproved = stablecoins.filter((p) => p.status === "APPROVED");
@@ -59,7 +59,7 @@ export default function StagingPage() {
           Every protocol enters as <span className="font-mono text-ink-100">PENDING_APPROVAL</span>{" "}
           and only renders publicly once explicitly marked{" "}
           <span className="font-mono text-ink-100">APPROVED</span>. Use the console below to flip
-          status (token-gated). Public pages are static and refresh on the next build.
+          status (token-gated). Public pages revalidate within minutes of an approval.
         </p>
       </header>
 

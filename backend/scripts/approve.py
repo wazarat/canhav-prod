@@ -21,8 +21,9 @@ Usage:
     # List every staged item and its current status (no changes)
     python3 backend/scripts/approve.py --list
 
-After approving, re-run the export so the frontend picks up the change:
-    python3 backend/scripts/export_store.py
+With ``DB_BACKEND=redis`` this writes straight to Upstash and the frontend
+picks up the change on its next revalidation — no export step. (The /staging
+console's Approve button calls the same logic via /api/approve.)
 
 Stdlib only.
 """
@@ -138,8 +139,6 @@ def main(argv: List[str]) -> int:
     print(f"Protocol: {args.category}/{args.slug}  ({updated.get('Name', '')})")
     print(f"Status  : {before} -> {after}")
     print(f"Updated : {updated.get('UpdatedAt', '')}")
-    print()
-    print("Next: python3 backend/scripts/export_store.py  (refresh the frontend data)")
     return 0
 
 

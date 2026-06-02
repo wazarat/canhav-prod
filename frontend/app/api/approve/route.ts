@@ -1,29 +1,26 @@
-import { execFile } from "node:child_process";
-import path from "node:path";
-import { promisify } from "node:util";
-
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { readSecret, repoRoot } from "@/lib/server/env";
+import { readSecret } from "@/lib/server/env";
+import { hasUpstash, setStatus } from "@/lib/server/redis";
+import { setStatusLocal } from "@/lib/server/store";
 
 /**
- * Restricted approval endpoint (Step 4, Goal A2/A3).
+ * Restricted approval endpoint (Goal A2/A3).
  *
- * Drives the SAME Python engine the CLI uses: it shells out to
- * `backend/scripts/approve.py` (flip status) and then `export_store.py`
- * (refresh the build-time JSON), so there is exactly one source of approval
- * logic. The `/staging` page reads `store.json` live, so the flip shows there
- * instantly; public pages are static and refresh on the next `npm run build`.
+ * Writes the status flip directly to the store in TypeScript — no Python at
+ * runtime. Production uses Upstash Redis (`setStatus`, an HSET on the
+ * `canhav:store` hash); offline dev without Upstash env falls back to editing
+ * `backend/data/store.json` (`setStatusLocal`), mirroring the Python
+ * LocalAdapter. Then it revalidates the dynamic /staging page and the public
+ * list/detail paths so the flip is reflected.
  *
- * Auth: a shared bearer token (`APPROVAL_TOKEN` in backend/.env). This is a
- * single-user internal action, so a constant-time token check is sufficient.
+ * Auth: a shared bearer token (`APPROVAL_TOKEN`). This is a single-user internal
+ * action, so a constant-time token check is sufficient.
  */
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const execFileAsync = promisify(execFile);
 
 const VALID_CATEGORIES = new Set(["Stablecoin", "RWA"]);
 const SLUG_RE = /^[a-z0-9-]{1,64}$/;
@@ -46,11 +43,15 @@ function extractToken(req: Request): string | null {
   return header && header.trim() !== "" ? header.trim() : null;
 }
 
+function basePath(category: string): string {
+  return category === "RWA" ? "/rwas" : "/stablecoins";
+}
+
 export async function POST(req: Request): Promise<NextResponse> {
   const expected = readSecret("APPROVAL_TOKEN");
   if (!expected) {
     return NextResponse.json(
-      { ok: false, error: "Server is missing APPROVAL_TOKEN (set it in backend/.env)." },
+      { ok: false, error: "Server is missing APPROVAL_TOKEN (set it in env / backend/.env)." },
       { status: 500 },
     );
   }
@@ -85,42 +86,32 @@ export async function POST(req: Request): Promise<NextResponse> {
       { status: 400 },
     );
   }
-  const revert = action === "revert";
 
-  const root = repoRoot();
-  const approveArgs = [
-    path.join("backend", "scripts", "approve.py"),
-    "--category",
-    category,
-    "--slug",
-    slug,
-    ...(revert ? ["--revert"] : []),
-  ];
+  const status: "APPROVED" | "PENDING_APPROVAL" =
+    action === "revert" ? "PENDING_APPROVAL" : "APPROVED";
 
   try {
-    // 1) Flip the status via the Python engine (no shell — args are passed
-    //    directly to execFile, and slug/category are validated above).
-    const { stdout: approveOut } = await execFileAsync("python3", approveArgs, {
-      cwd: root,
-      timeout: 20_000,
-    });
-    // 2) Refresh the build-time export so a subsequent build is correct.
-    await execFileAsync("python3", [path.join("backend", "scripts", "export_store.py")], {
-      cwd: root,
-      timeout: 20_000,
-    });
+    const item = hasUpstash()
+      ? await setStatus(category, slug, status)
+      : setStatusLocal(category, slug, status);
 
-    // Make the dynamic staging page and (on next render) public pages reflect it.
+    if (!item) {
+      return NextResponse.json(
+        { ok: false, error: `No ${category} found with slug '${slug}'.` },
+        { status: 404 },
+      );
+    }
+
+    // Reflect on the dynamic staging page and the public list/detail pages.
     revalidatePath("/staging");
-    revalidatePath("/stablecoins");
-    revalidatePath("/rwas");
+    revalidatePath(basePath(category));
+    revalidatePath(`${basePath(category)}/${slug}`);
 
-    const status = revert ? "PENDING_APPROVAL" : "APPROVED";
-    return NextResponse.json({ ok: true, category, slug, status, detail: approveOut.trim() });
+    return NextResponse.json({ ok: true, category, slug, status });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
-      { ok: false, error: "Approval command failed.", detail: message },
+      { ok: false, error: "Approval write failed.", detail: message },
       { status: 500 },
     );
   }

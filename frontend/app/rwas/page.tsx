@@ -11,9 +11,13 @@ export const metadata = {
   title: "Real World Assets",
 };
 
-export default function RwasPage() {
-  const profiles = getApprovedRwas();
-  const counts = getRwaStagingCounts();
+export const revalidate = 300;
+
+export default async function RwasPage() {
+  const [profiles, counts] = await Promise.all([
+    getApprovedRwas(),
+    getRwaStagingCounts(),
+  ]);
 
   const aggregateTvl = profiles.reduce((sum, p) => sum + (p.totalValueLocked.value ?? 0), 0);
   const assetClasses = new Set(profiles.map((p) => p.assetClass));

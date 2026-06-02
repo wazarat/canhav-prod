@@ -16,9 +16,13 @@ export const metadata = {
   title: "Stablecoins",
 };
 
-export default function StablecoinsPage() {
-  const profiles = getApprovedStablecoins();
-  const counts = getStagingCounts();
+export const revalidate = 300;
+
+export default async function StablecoinsPage() {
+  const [profiles, counts] = await Promise.all([
+    getApprovedStablecoins(),
+    getStagingCounts(),
+  ]);
 
   const aggregateSupply = profiles.reduce((sum, p) => sum + (p.totalSupply.value ?? 0), 0);
   const deviations = profiles

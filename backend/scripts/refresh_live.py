@@ -7,7 +7,10 @@ Pipeline per protocol:
      keyless) and persist the address on the store item.
   2. Stablecoins: read on-chain ``totalSupply()`` via Alchemy -> ``TotalSupply``.
      RWAs: compute ``sum(totalSupply * priceUsd)`` (an AUM proxy) -> ``TotalValueLocked``.
-  3. Re-run the build-time export so the frontend picks up the new figures.
+
+Writes straight to the configured store (``DB_BACKEND``; ``redis`` in production,
+``local`` for offline dev). The frontend reads that store at request/build time,
+so there is no build-time export step anymore.
 
 History series (``HistoricalPegData`` / ``HistoricalTvlData``) are intentionally
 left empty here: per the current decision, Dune is wired but not active until
@@ -20,7 +23,6 @@ Usage:
     python3 backend/scripts/refresh_live.py                 # all protocols
     python3 backend/scripts/refresh_live.py --only usdc tether
     python3 backend/scripts/refresh_live.py --dry-run       # resolve + report, no writes
-    python3 backend/scripts/refresh_live.py --no-export     # skip the JSON re-export
 
 Stdlib only.
 """
@@ -28,7 +30,6 @@ Stdlib only.
 from __future__ import annotations
 
 import argparse
-import subprocess
 import sys
 import time
 from pathlib import Path
@@ -106,7 +107,9 @@ def main(argv: List[str]) -> int:
     parser = argparse.ArgumentParser(description="Refresh live Alchemy metrics for staged profiles.")
     parser.add_argument("--only", nargs="*", default=None, help="Limit to these slugs.")
     parser.add_argument("--dry-run", action="store_true", help="Resolve + report, write nothing.")
-    parser.add_argument("--no-export", action="store_true", help="Skip the JSON re-export step.")
+    # Deprecated no-op: the build-time export was removed (frontend reads the
+    # store at runtime). Accepted so existing cron commands keep working.
+    parser.add_argument("--no-export", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args(argv[1:])
 
     load_env()  # backend/.env -> os.environ (no-op if file absent)
@@ -140,10 +143,6 @@ def main(argv: List[str]) -> int:
     print("-" * 78)
     print(f"{'Resolved/updated' if not args.dry_run else 'Would update'}: {updated} item(s).")
     print("History (peg/TVL series) left untouched — Dune is wired but not active yet.")
-
-    if not args.dry_run and not args.no_export:
-        print("\nRe-exporting store -> frontend ...")
-        subprocess.run([sys.executable, str(BACKEND_ROOT / "scripts" / "export_store.py")], check=False)
 
     return 0
 

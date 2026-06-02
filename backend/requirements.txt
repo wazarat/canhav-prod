@@ -1,20 +1,14 @@
 # CanHav Research — backend dependencies
 #
-# NOTE: the Step 1-3 ingestion script (scripts/ingest_stablecoins.py) and the
-# LocalAdapter run on the Python standard library ALONE — you can run them with
-# no installs. The packages below are for the DynamoDB backend and the deferred
-# Step 4 FastAPI / live-overlay work.
+# NOTE: the ingestion scripts and the LocalAdapter run on the Python standard
+# library ALONE — you can run them with no installs (DB_BACKEND=local). The
+# packages below are for the Upstash Redis backend and typed models.
 
-# Typed models + (future) FastAPI validation
+# Typed models
 pydantic>=2.6,<3
 
-# DynamoDB backend (DB_BACKEND=dynamo)
-boto3>=1.34
+# Redis backend (DB_BACKEND=redis) — point REDIS_URL at Upstash (rediss://...)
+redis>=5
 
-# .env loading
-python-dotenv>=1.0
-
-# --- Step 4 (deferred): approval API + live Alchemy/Dune overlays ----------
-# fastapi>=0.110
-# uvicorn[standard]>=0.29
-# requests>=2.31
+# Live overlays (Alchemy / CoinGecko) use the standard library (urllib) — no
+# extra HTTP dependency required.

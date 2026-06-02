@@ -6,7 +6,7 @@ Usage:
     repo = get_repository()        # LocalAdapter by default
     repo.put_item(item)
 
-Set ``DB_BACKEND=dynamo`` (plus AWS env) to switch to DynamoDB in Step 4.
+Set ``DB_BACKEND=redis`` (plus ``REDIS_URL``) to switch to Upstash Redis.
 """
 
 from __future__ import annotations
@@ -31,14 +31,14 @@ def get_repository() -> Repository:
     """Return the configured repository (local file store by default)."""
     backend = os.environ.get("DB_BACKEND", "local").strip().lower()
 
-    if backend == "dynamo":
-        from .dynamo_adapter import DynamoAdapter
+    if backend == "redis":
+        from .redis_adapter import RedisAdapter
 
-        return DynamoAdapter()
+        return RedisAdapter()
 
     if backend not in ("local", ""):
         raise ValueError(
-            f"Unknown DB_BACKEND={backend!r}. Use 'local' (default) or 'dynamo'."
+            f"Unknown DB_BACKEND={backend!r}. Use 'local' (default) or 'redis'."
         )
 
     from .local_adapter import LocalAdapter

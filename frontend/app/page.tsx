@@ -47,6 +47,12 @@ export default function DashboardPage() {
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
+          <Button asChild variant="secondary">
+            <Link href="/rwas">
+              Explore RWAs
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </section>
 

@@ -1,5 +1,6 @@
+import { rwaMockData } from "@/lib/mock/rwaMockData";
 import { stablecoinMockData } from "@/lib/mock/stablecoinMockData";
-import type { CategoryDef, StablecoinProfile } from "@/lib/types";
+import type { CategoryDef, RwaProfile, StablecoinProfile } from "@/lib/types";
 
 /**
  * Data accessors.
@@ -74,6 +75,67 @@ export function pegHealth(profile: StablecoinProfile): PegHealth {
 }
 
 /* -------------------------------------------------------------------------- */
+/* RWA accessors (same approval gate as stablecoins)                          */
+/* -------------------------------------------------------------------------- */
+
+const RWA_SOURCE: RwaProfile[] = rwaMockData;
+
+/** All RWA profiles regardless of status — STAGING / admin only. */
+export function getAllRwas(): RwaProfile[] {
+  return [...RWA_SOURCE].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Public: only APPROVED RWA profiles ever leave this function. */
+export function getApprovedRwas(): RwaProfile[] {
+  return getAllRwas().filter((p) => p.status === "APPROVED");
+}
+
+/** Public: a single APPROVED RWA profile, or null (so pending items 404). */
+export function getApprovedRwaBySlug(slug: string): RwaProfile | null {
+  return getApprovedRwas().find((p) => p.slug === slug) ?? null;
+}
+
+/** Staging: a single RWA profile of any status. */
+export function getRwaBySlug(slug: string): RwaProfile | null {
+  return RWA_SOURCE.find((p) => p.slug === slug) ?? null;
+}
+
+export function getRwaStagingCounts(): StagingCounts {
+  const all = getAllRwas();
+  const approved = all.filter((p) => p.status === "APPROVED").length;
+  return { total: all.length, approved, pending: all.length - approved };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Derived TVL helpers                                                        */
+/* -------------------------------------------------------------------------- */
+
+export function latestTvl(profile: RwaProfile): number | null {
+  const points = profile.historicalTvlData.points;
+  return points.length ? points[points.length - 1].value : null;
+}
+
+/** Percentage change in TVL across the available series (first → last). */
+export function tvlChangePct(profile: RwaProfile): number | null {
+  const points = profile.historicalTvlData.points;
+  if (points.length < 2) return null;
+  const first = points[0].value;
+  const last = points[points.length - 1].value;
+  if (first === 0) return null;
+  return ((last - first) / first) * 100;
+}
+
+export type TvlTrend = "growing" | "stable" | "declining";
+
+export function tvlTrend(profile: RwaProfile): TvlTrend {
+  const pct = tvlChangePct(profile);
+  if (pct === null) return "stable";
+  if (pct >= 3) return "growing";
+  if (pct <= -3) return "declining";
+  return "stable";
+}
+
+/* -------------------------------------------------------------------------- */
 /* Category taxonomy                                                          */
 /* -------------------------------------------------------------------------- */
 
@@ -88,8 +150,9 @@ export const CATEGORIES: CategoryDef[] = [
   {
     slug: "rwas",
     label: "Real World Assets",
-    description: "Tokenized treasuries, credit, and off-chain collateral.",
-    status: "coming_soon",
+    description: "Tokenized treasuries, credit, equities, and off-chain collateral.",
+    status: "active",
+    trackedCount: getAllRwas().length,
   },
   {
     slug: "lending",

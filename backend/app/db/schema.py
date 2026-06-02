@@ -24,15 +24,28 @@ SK = "SK"
 
 # --- Categories (taxonomy partitions) --------------------------------------
 CATEGORY_STABLECOIN = "Stablecoin"
+CATEGORY_RWA = "RWA"
 
 # Categories queued for the sequential rollout (kept here for reference).
 FUTURE_CATEGORIES = (
-    "RWA",
     "Lending",
     "Perpetuals",
     "Yield",
     "DEX",
     "Options",
+)
+
+# Derived RWA asset classes (the CSV labels everything "Real World Assets
+# (RWAs)"; the finer classification is assigned during ingestion).
+RWA_ASSET_CLASSES = (
+    "Tokenized Equities",
+    "Private Credit",
+    "Real Estate",
+    "Treasuries & Funds",
+    "Event Finance",
+    "Structured Products",
+    "Multi-Asset",
+    "Stablecoins & FX",
 )
 
 # --- Approval status values ------------------------------------------------

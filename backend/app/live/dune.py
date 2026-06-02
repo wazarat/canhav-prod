@@ -44,3 +44,34 @@ def fetch_peg_history(query_id: int, *, days: int = 30) -> HistoricalPegResult:
         "Dune peg-history overlay is deferred to Step 4. "
         "See AGENT_HANDOFF.md for the implementation plan."
     )
+
+
+# --- RWAs ------------------------------------------------------------------
+
+
+class TvlPoint(TypedDict):
+    date: str
+    value: float
+
+
+class HistoricalTvlResult(TypedDict):
+    points: List[TvlPoint]
+    source: str  # always "dune"
+    updatedAt: Optional[str]
+
+
+def fetch_tvl_history(query_id: int, *, days: int = 30) -> HistoricalTvlResult:
+    """
+    Return a daily TVL / AUM series (USD) for one RWA protocol.
+
+    DEFERRED: implement in Step 4 using the free-tier Dune API and
+    ``DUNE_API_KEY`` (same execute → poll → results flow as the peg overlay).
+    Normalize rows into ``[{ "date": "YYYY-MM-DD", "value": <float> }, ...]``.
+
+    Must return the shape above so callers/UI are unchanged.
+    """
+    _ = os.environ.get("DUNE_API_KEY")  # required at implementation time
+    raise NotImplementedError(
+        "Dune RWA TVL-history overlay is deferred to Step 4. "
+        "See AGENT_HANDOFF.md for the implementation plan."
+    )

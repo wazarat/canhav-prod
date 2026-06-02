@@ -42,3 +42,31 @@ def fetch_total_supply(token_address: str, *, decimals: int = 18) -> TotalSupply
         "Alchemy total-supply overlay is deferred to Step 4. "
         "See AGENT_HANDOFF.md for the implementation plan."
     )
+
+
+# --- RWAs ------------------------------------------------------------------
+
+
+class TotalValueLockedResult(TypedDict):
+    value: Optional[float]
+    source: str  # always "alchemy"
+    updatedAt: Optional[str]
+
+
+def fetch_total_value_locked(vault_addresses: list[str]) -> TotalValueLockedResult:
+    """
+    Return live total value locked (USD) for an RWA protocol's on-chain vaults.
+
+    DEFERRED: implement in Step 4. Planned approach mirrors the stablecoin
+    supply overlay — sum balances / share-price across the protocol's vault or
+    token contracts via the free-tier Alchemy API, priced into USD. As with the
+    token overlay, the vault/token addresses are NOT in the CSV and must be
+    resolved and stored on the profile first.
+
+    Must return the shape above so callers/UI are unchanged.
+    """
+    _ = os.environ.get("ALCHEMY_API_KEY")  # required at implementation time
+    raise NotImplementedError(
+        "Alchemy RWA TVL overlay is deferred to Step 4. "
+        "See AGENT_HANDOFF.md for the implementation plan."
+    )

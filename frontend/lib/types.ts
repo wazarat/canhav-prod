@@ -87,3 +87,69 @@ export interface StablecoinProfile {
   createdAt: string;
   updatedAt: string;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Real World Assets (RWAs) — Phase 2                                         */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The underlying off-chain asset a tokenization protocol brings on-chain.
+ * Derived during ingestion (the CSV only labels everything "Real World
+ * Assets (RWAs)"), analogous to how stablecoin symbols/peg targets are derived.
+ */
+export type RwaAssetClass =
+  | "Tokenized Equities"
+  | "Private Credit"
+  | "Real Estate"
+  | "Treasuries & Funds"
+  | "Event Finance"
+  | "Structured Products"
+  | "Multi-Asset"
+  | "Stablecoins & FX";
+
+/** A single historical TVL / AUM observation (source: Dune, Step 4). */
+export interface TvlDataPoint {
+  /** ISO date (YYYY-MM-DD). */
+  date: string;
+  /** Total value locked / assets under management, in USD. */
+  value: number;
+}
+
+/** On-chain total value locked / AUM (source: Alchemy, Step 4). */
+export interface TotalValueLocked {
+  /** TVL in USD, or null until the live overlay runs. */
+  value: number | null;
+  source: "alchemy";
+  /** ISO timestamp of the last refresh, or null if never. */
+  updatedAt: string | null;
+}
+
+/** Macro TVL history wrapper (source: Dune, Step 4). */
+export interface HistoricalTvlData {
+  points: TvlDataPoint[];
+  source: "dune";
+  updatedAt: string | null;
+}
+
+export interface RwaProfile {
+  category: "RWA";
+  slug: string;
+  name: string;
+  /** Short ticker/label for the protocol (derived; CSV has no symbol column). */
+  symbol: string;
+  status: ApprovalStatus;
+  /** Derived underlying-asset classification. */
+  assetClass: RwaAssetClass;
+  description: string;
+  website: string | null;
+  twitter: string | null;
+  discord: string | null;
+  github: string | null;
+  coingecko: string | null;
+  auditUrl: string | null;
+  totalValueLocked: TotalValueLocked;
+  historicalTvlData: HistoricalTvlData;
+  arbitrumPortalMetadata: ArbitrumPortalMetadata;
+  createdAt: string;
+  updatedAt: string;
+}

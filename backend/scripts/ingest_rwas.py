@@ -1,0 +1,189 @@
+#!/usr/bin/env python3
+"""
+Phase 2, Step 3 — seed the 10 RWA protocols from the Arbitrum Portal CSV.
+
+Reads `Arbitrum Ecosystem - scrape v2.csv`, extracts the 10 target Real World
+Asset protocols, maps each CSV row onto the DynamoDB single-table item shape
+(``CATEGORY#RWA`` partition), and stages it with ``Status = PENDING_APPROVAL``
+via the configured repository (LocalAdapter by default — no installs, no cloud).
+
+Live-sourced fields (``TotalValueLocked`` from Alchemy, ``HistoricalTvlData``
+from Dune) are intentionally left empty here; they are populated in Step 4.
+
+The CSV only labels every row generically as "Real World Assets (RWAs)", so the
+finer ``AssetClass`` is assigned here (the same place stablecoin symbols / peg
+targets are assigned for that module).
+
+Run from anywhere:
+    python3 backend/scripts/ingest_rwas.py
+    python3 backend/scripts/ingest_rwas.py "/path/to/some.csv"
+
+Stdlib only.
+"""
+
+from __future__ import annotations
+
+import csv
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
+# Make `app` importable regardless of the current working directory.
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
+if str(BACKEND_ROOT) not in sys.path:
+    sys.path.insert(0, str(BACKEND_ROOT))
+
+from app.db import get_repository, schema  # noqa: E402
+
+# CSV slug -> (display name, symbol/ticker, asset class). These are the exact
+# Phase-2 RWA targets; symbol + asset class are assigned here since the CSV has
+# no such columns (it labels every row "Real World Assets (RWAs)").
+TARGETS: Dict[str, Tuple[str, str, str]] = {
+    "arcton": ("Arcton", "ARC", "Tokenized Equities"),
+    "aryze": ("Aryze", "ARYZE", "Stablecoins & FX"),
+    "atmosphera": ("Atmosphera", "ATMO", "Event Finance"),
+    "centrifuge": ("Centrifuge", "CFG", "Private Credit"),
+    "chateau-capital": ("Chateau Capital", "CHAT", "Structured Products"),
+    "dinari": ("Dinari", "dSHARE", "Tokenized Equities"),
+    "dualmint": ("DualMint", "DMINT", "Multi-Asset"),
+    "estate-protocol": ("Estate Protocol", "EST", "Real Estate"),
+    "florence-finance": ("Florence Finance", "FLR", "Private Credit"),
+    "franklin-templeton": ("Franklin Templeton", "BENJI", "Treasuries & Funds"),
+}
+
+DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
+DOWNLOADS_CSV = Path.home() / "Downloads" / "Arbitrum Ecosystem - scrape v2.csv"
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _clean(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    v = value.strip()
+    return v or None
+
+
+def _as_bool(value: Optional[str]) -> bool:
+    return (value or "").strip().upper() == "TRUE"
+
+
+def _split_chains(value: Optional[str]) -> List[str]:
+    if not value:
+        return []
+    return [c.strip() for c in value.split("|") if c.strip()]
+
+
+def resolve_csv_path(argv: List[str]) -> Path:
+    if len(argv) > 1 and argv[1].strip():
+        return Path(argv[1]).expanduser()
+    if DEFAULT_CSV.exists():
+        return DEFAULT_CSV
+    if DOWNLOADS_CSV.exists():
+        return DOWNLOADS_CSV
+    return DEFAULT_CSV  # let the caller surface a clear "not found" error
+
+
+def row_to_item(row: Dict[str, str], created_at: str) -> dict:
+    """Map one CSV row onto a single-table item (Status=PENDING_APPROVAL)."""
+    slug = (row.get("Slug") or "").strip()
+    name, symbol, asset_class = TARGETS[slug]
+    now = _now_iso()
+
+    return {
+        schema.PK: schema.category_pk(schema.CATEGORY_RWA),
+        schema.SK: schema.protocol_sk(slug),
+        "Category": schema.CATEGORY_RWA,
+        "Status": schema.STATUS_PENDING,
+        "Name": name,
+        "Slug": slug,
+        "Symbol": symbol,
+        "AssetClass": asset_class,
+        "Description": _clean(row.get("Description")) or "",
+        "Website": _clean(row.get("Website")),
+        "Twitter": _clean(row.get("Twitter")),
+        "Discord": _clean(row.get("Discord")),
+        "GitHub": _clean(row.get("GitHub")),
+        "CoinGecko": _clean(row.get("CoinGecko")),
+        "AuditURL": _clean(row.get("Audit URL")),
+        # Live overlays — populated in Step 4 (Alchemy / Dune).
+        "TotalValueLocked": {"value": None, "source": "alchemy", "updatedAt": None},
+        "HistoricalTvlData": {"points": [], "source": "dune", "updatedAt": None},
+        "ArbitrumPortalMetadata": {
+            "portalUrl": _clean(row.get("Portal URL")),
+            "logoUrl": _clean(row.get("Logo URL")),
+            "bannerUrl": _clean(row.get("Banner URL")),
+            "chains": _split_chains(row.get("Chains")),
+            "subCategory": _clean(row.get("Sub-category")),
+            "isLive": _as_bool(row.get("Is Live")),
+            "isArbitrumNative": _as_bool(row.get("Is Arbitrum Native")),
+            "isPubliclyAudited": _as_bool(row.get("Is Publicly Audited")),
+            "foundedDate": _clean(row.get("Founded Date")),
+        },
+        "CreatedAt": created_at,
+        "UpdatedAt": now,
+    }
+
+
+def main(argv: List[str]) -> int:
+    csv_path = resolve_csv_path(argv)
+    if not csv_path.exists():
+        print(f"ERROR: CSV not found at {csv_path}", file=sys.stderr)
+        print(
+            "Pass a path explicitly: python3 backend/scripts/ingest_rwas.py "
+            '"/path/to/Arbitrum Ecosystem - scrape v2.csv"',
+            file=sys.stderr,
+        )
+        return 1
+
+    repo = get_repository()
+    pk = schema.category_pk(schema.CATEGORY_RWA)
+
+    # Collect matching rows by slug (CSV is the source of truth).
+    matched: Dict[str, Dict[str, str]] = {}
+    with csv_path.open("r", encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        for row in reader:
+            slug = (row.get("Slug") or "").strip()
+            if slug in TARGETS and slug not in matched:
+                matched[slug] = row
+
+    staged: List[str] = []
+    for slug in TARGETS:
+        row = matched.get(slug)
+        if row is None:
+            continue
+        # Idempotent: preserve original CreatedAt on re-ingest.
+        existing = repo.get_item(pk, schema.protocol_sk(slug))
+        created_at = (existing or {}).get("CreatedAt") or _now_iso()
+        item = row_to_item(row, created_at)
+        repo.put_item(item)
+        staged.append(slug)
+
+    # --- Report ------------------------------------------------------------
+    print(f"Source CSV : {csv_path}")
+    print(f"Backend    : {type(repo).__name__}")
+    print(f"Partition  : {pk}")
+    print("-" * 72)
+    print(f"{'STATUS':<18}{'ASSET CLASS':<22}{'NAME'}")
+    print("-" * 72)
+    for slug in TARGETS:
+        if slug in staged:
+            name, _, asset_class = TARGETS[slug]
+            print(f"{schema.STATUS_PENDING:<18}{asset_class:<22}{name}")
+    print("-" * 72)
+    print(f"Staged {len(staged)} / {len(TARGETS)} target RWA protocols as PENDING_APPROVAL.")
+
+    missing = [s for s in TARGETS if s not in staged]
+    if missing:
+        print(f"WARNING: missing from CSV: {', '.join(missing)}", file=sys.stderr)
+        return 2
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

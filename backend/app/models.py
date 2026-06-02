@@ -20,6 +20,16 @@ from .db import schema
 
 ApprovalStatus = Literal["PENDING_APPROVAL", "APPROVED"]
 PegTarget = Literal["USD", "EUR"]
+RwaAssetClass = Literal[
+    "Tokenized Equities",
+    "Private Credit",
+    "Real Estate",
+    "Treasuries & Funds",
+    "Event Finance",
+    "Structured Products",
+    "Multi-Asset",
+    "Stablecoins & FX",
+]
 
 
 class PegDataPoint(BaseModel):
@@ -117,6 +127,102 @@ class StablecoinProfile(BaseModel):
             auditUrl=item.get("AuditURL"),
             totalSupply=TotalSupply(**(item.get("TotalSupply") or {})),
             historicalPegData=HistoricalPegData(**(item.get("HistoricalPegData") or {})),
+            arbitrumPortalMetadata=ArbitrumPortalMetadata(
+                **(item.get("ArbitrumPortalMetadata") or {})
+            ),
+            createdAt=item.get("CreatedAt"),
+            updatedAt=item.get("UpdatedAt"),
+        )
+
+
+# --- RWAs ------------------------------------------------------------------
+
+
+class TvlDataPoint(BaseModel):
+    date: str  # YYYY-MM-DD
+    value: float
+
+
+class TotalValueLocked(BaseModel):
+    value: Optional[float] = None
+    source: Literal["alchemy"] = "alchemy"
+    updatedAt: Optional[str] = None
+
+
+class HistoricalTvlData(BaseModel):
+    points: List[TvlDataPoint] = Field(default_factory=list)
+    source: Literal["dune"] = "dune"
+    updatedAt: Optional[str] = None
+
+
+class RwaProfile(BaseModel):
+    """Parallel of :class:`StablecoinProfile` for the RWA category partition."""
+
+    category: Literal["RWA"] = "RWA"
+    slug: str
+    name: str
+    symbol: str = ""
+    status: ApprovalStatus = "PENDING_APPROVAL"
+    assetClass: RwaAssetClass = "Multi-Asset"
+    description: str = ""
+    website: Optional[str] = None
+    twitter: Optional[str] = None
+    discord: Optional[str] = None
+    github: Optional[str] = None
+    coingecko: Optional[str] = None
+    auditUrl: Optional[str] = None
+    totalValueLocked: TotalValueLocked = Field(default_factory=TotalValueLocked)
+    historicalTvlData: HistoricalTvlData = Field(default_factory=HistoricalTvlData)
+    arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
+        default_factory=ArbitrumPortalMetadata
+    )
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
+
+    # --- DynamoDB item bridge ---------------------------------------------
+    def to_item(self) -> dict:
+        """Serialize to a single-table item (with PK/SK and PascalCase attrs)."""
+        return {
+            schema.PK: schema.category_pk(schema.CATEGORY_RWA),
+            schema.SK: schema.protocol_sk(self.slug),
+            "Category": self.category,
+            "Status": self.status,
+            "Name": self.name,
+            "Slug": self.slug,
+            "Symbol": self.symbol,
+            "AssetClass": self.assetClass,
+            "Description": self.description,
+            "Website": self.website,
+            "Twitter": self.twitter,
+            "Discord": self.discord,
+            "GitHub": self.github,
+            "CoinGecko": self.coingecko,
+            "AuditURL": self.auditUrl,
+            "TotalValueLocked": self.totalValueLocked.model_dump(),
+            "HistoricalTvlData": self.historicalTvlData.model_dump(),
+            "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
+            "CreatedAt": self.createdAt,
+            "UpdatedAt": self.updatedAt,
+        }
+
+    @classmethod
+    def from_item(cls, item: dict) -> "RwaProfile":
+        """Inverse of :meth:`to_item`."""
+        return cls(
+            slug=item["Slug"],
+            name=item["Name"],
+            symbol=item.get("Symbol", ""),
+            status=item.get("Status", "PENDING_APPROVAL"),
+            assetClass=item.get("AssetClass", "Multi-Asset"),
+            description=item.get("Description", ""),
+            website=item.get("Website"),
+            twitter=item.get("Twitter"),
+            discord=item.get("Discord"),
+            github=item.get("GitHub"),
+            coingecko=item.get("CoinGecko"),
+            auditUrl=item.get("AuditURL"),
+            totalValueLocked=TotalValueLocked(**(item.get("TotalValueLocked") or {})),
+            historicalTvlData=HistoricalTvlData(**(item.get("HistoricalTvlData") or {})),
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
                 **(item.get("ArbitrumPortalMetadata") or {})
             ),

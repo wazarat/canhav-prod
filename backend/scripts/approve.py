@@ -45,6 +45,8 @@ from app.db import get_repository, schema  # noqa: E402
 CATEGORIES = {
     "Stablecoin": schema.CATEGORY_STABLECOIN,
     "RWA": schema.CATEGORY_RWA,
+    "Entity": schema.CATEGORY_ENTITY,
+    "Token": schema.CATEGORY_TOKEN,
 }
 
 

@@ -380,7 +380,7 @@ def build_entity_item(parent_row: Optional[Dict[str, str]], created_at: str) -> 
         schema.PK: schema.category_pk(schema.CATEGORY_ENTITY),
         schema.SK: schema.protocol_sk(ENTITY_SLUG),
         "Category": schema.CATEGORY_ENTITY,
-        "Status": schema.STATUS_PENDING,
+        "Status": schema.STATUS_APPROVED,
         "Name": "USD.AI",
         "Slug": ENTITY_SLUG,
         "Symbol": "USD.AI",
@@ -440,11 +440,10 @@ def main(argv: List[str]) -> int:
     print("-" * 64)
     print(f"{'STATUS':<18}{'SYMBOL':<10}{'NAME'}")
     print("-" * 64)
-    print(f"{schema.STATUS_PENDING:<18}{'USD.AI':<10}USD.AI")
+    print(f"{schema.STATUS_APPROVED:<18}{'USD.AI':<10}USD.AI")
     print("-" * 64)
     print(
-        f"Staged USD.AI entity ({len(MEMBER_COINS)} member coins) as "
-        "PENDING_APPROVAL."
+        f"Published USD.AI entity ({len(MEMBER_COINS)} member coins) as APPROVED."
     )
     return 0
 

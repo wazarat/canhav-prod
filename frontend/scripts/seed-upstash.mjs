@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * One-shot seeder: push the local backend store into the production Upstash
- * hash so /staging has something to approve.
+ * hash so production pages can read the dataset.
  *
  * It reads `backend/data/store.json` and HSETs every item into the
  * `canhav:store` hash under `<PK>|<SK>` with a JSON-encoded value — exactly the
@@ -64,7 +64,7 @@ for (const item of items) {
     console.warn(`Skipping item without PK/SK: ${JSON.stringify(item).slice(0, 80)}…`);
     continue;
   }
-  payload[`${pk}|${sk}`] = JSON.stringify(item);
+  payload[`${pk}|${sk}`] = JSON.stringify({ ...item, Status: "APPROVED" });
 }
 
 const redis = new Redis({ url, token });
@@ -80,4 +80,4 @@ const byCategory = items.reduce((acc, it) => {
 
 console.log(`Seeded ${fields.length} items into hash "${STORE_KEY}".`);
 console.log(`By category: ${JSON.stringify(byCategory)}`);
-console.log("Done. Reload /staging — items should appear under Pending review.");
+console.log("Done. Reload /stablecoins, /entities, /rwas, and /tokens.");

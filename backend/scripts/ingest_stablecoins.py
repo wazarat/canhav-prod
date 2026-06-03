@@ -4,7 +4,7 @@ Step 3 — seed the 10 Phase-1 stablecoins from the Arbitrum Portal CSV.
 
 Reads `Arbitrum Ecosystem - scrape v2.csv`, extracts the 10 target stablecoins,
 maps each CSV row onto the DynamoDB single-table item shape, and stages it with
-``Status = PENDING_APPROVAL`` via the configured repository (LocalAdapter by
+``Status = APPROVED`` via the configured repository (LocalAdapter by
 default — no installs, no cloud).
 
 Live-sourced fields (``TotalSupply`` from Alchemy, ``HistoricalPegData`` from
@@ -107,7 +107,7 @@ def resolve_csv_path(argv: List[str]) -> Path:
 
 
 def row_to_item(row: Dict[str, str], created_at: str) -> dict:
-    """Map one CSV row onto a single-table item (Status=PENDING_APPROVAL)."""
+    """Map one CSV row onto a single-table item (Status=APPROVED)."""
     slug = (row.get("Slug") or "").strip()
     name, symbol, peg = TARGETS[slug]
     now = _now_iso()
@@ -116,7 +116,7 @@ def row_to_item(row: Dict[str, str], created_at: str) -> dict:
         schema.PK: schema.category_pk(schema.CATEGORY_STABLECOIN),
         schema.SK: schema.protocol_sk(slug),
         "Category": schema.CATEGORY_STABLECOIN,
-        "Status": schema.STATUS_PENDING,
+        "Status": schema.STATUS_APPROVED,
         "Name": name,
         "Slug": slug,
         "Symbol": symbol,
@@ -172,7 +172,7 @@ def row_to_item_generic(row: Dict[str, str], created_at: str) -> dict:
         schema.PK: schema.category_pk(schema.CATEGORY_STABLECOIN),
         schema.SK: schema.protocol_sk((row.get("Slug") or "").strip()),
         "Category": schema.CATEGORY_STABLECOIN,
-        "Status": schema.STATUS_PENDING,
+        "Status": schema.STATUS_APPROVED,
         "Name": _clean(row.get("Name")) or "",
         "Slug": (row.get("Slug") or "").strip(),
         "Symbol": "",
@@ -278,7 +278,7 @@ def main(argv: List[str]) -> int:
     print("-" * 64)
     total_staged = len(staged) + len(usd_ai_staged)
     total_targets = len(TARGETS) + len(USD_AI_COINS)
-    print(f"Staged {total_staged} / {total_targets} target stablecoins as PENDING_APPROVAL.")
+    print(f"Published {total_staged} / {total_targets} target stablecoins as APPROVED.")
     if removed_legacy:
         print(f"Removed legacy '{USD_AI_PARENT_SLUG}' stablecoin (superseded by USDai + sUSDai).")
 

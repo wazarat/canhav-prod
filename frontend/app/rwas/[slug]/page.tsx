@@ -19,7 +19,7 @@ interface PageProps {
 
 export const revalidate = 300;
 
-// Pre-render only APPROVED profiles; pending items are not public.
+// Pre-render all profiles present in the store.
 export async function generateStaticParams() {
   return (await getApprovedRwas()).map((p) => ({ slug: p.slug }));
 }

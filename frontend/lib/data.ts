@@ -10,14 +10,14 @@ import type {
 /**
  * Data accessors.
  *
- * The APPROVAL GATE lives here: public-facing pages must only ever call the
- * `*Approved*` accessors. `getAllStablecoins()` is reserved for the restricted
- * /staging view. Call sites only change in that the accessors are now `async`.
+ * Profiles are published as soon as they are ingested and synced to the store.
+ * `getApproved*` names are kept for call-site stability; they return every item
+ * in the store (no manual approval step).
  *
  * SOURCE is the backend store read at request/build time via
  * `lib/server/store.ts`: Upstash Redis in production (and locally when the
  * Upstash env vars are set), or `backend/data/store.json` from disk for offline
- * dev. An approval flip via /api/approve appears publicly after revalidation.
+ * dev.
  */
 
 /**
@@ -37,39 +37,25 @@ export const IS_MOCK_DATA = false;
  */
 export const LIVE_METRICS_PENDING = false;
 
-/** All profiles regardless of status — STAGING / admin only. */
+/** All stablecoin profiles in the store. */
 export async function getAllStablecoins(): Promise<StablecoinProfile[]> {
   const { stablecoins } = await readLiveStore();
   return [...stablecoins].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** Public: only APPROVED profiles ever leave this function. */
+/** Published stablecoins (all items in the store). */
 export async function getApprovedStablecoins(): Promise<StablecoinProfile[]> {
-  return (await getAllStablecoins()).filter((p) => p.status === "APPROVED");
+  return getAllStablecoins();
 }
 
-/** Public: a single APPROVED profile, or null (so pending items 404 publicly). */
 export async function getApprovedStablecoinBySlug(
   slug: string,
 ): Promise<StablecoinProfile | null> {
-  return (await getApprovedStablecoins()).find((p) => p.slug === slug) ?? null;
-}
-
-/** Staging: a single profile of any status. */
-export async function getStablecoinBySlug(slug: string): Promise<StablecoinProfile | null> {
   return (await getAllStablecoins()).find((p) => p.slug === slug) ?? null;
 }
 
-export interface StagingCounts {
-  total: number;
-  approved: number;
-  pending: number;
-}
-
-export async function getStagingCounts(): Promise<StagingCounts> {
-  const all = await getAllStablecoins();
-  const approved = all.filter((p) => p.status === "APPROVED").length;
-  return { total: all.length, approved, pending: all.length - approved };
+export async function getStablecoinBySlug(slug: string): Promise<StablecoinProfile | null> {
+  return getApprovedStablecoinBySlug(slug);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -108,25 +94,17 @@ export async function getAllRwas(): Promise<RwaProfile[]> {
   return [...rwas].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** Public: only APPROVED RWA profiles ever leave this function. */
+/** Published RWAs (all items in the store). */
 export async function getApprovedRwas(): Promise<RwaProfile[]> {
-  return (await getAllRwas()).filter((p) => p.status === "APPROVED");
+  return getAllRwas();
 }
 
-/** Public: a single APPROVED RWA profile, or null (so pending items 404). */
 export async function getApprovedRwaBySlug(slug: string): Promise<RwaProfile | null> {
-  return (await getApprovedRwas()).find((p) => p.slug === slug) ?? null;
-}
-
-/** Staging: a single RWA profile of any status. */
-export async function getRwaBySlug(slug: string): Promise<RwaProfile | null> {
   return (await getAllRwas()).find((p) => p.slug === slug) ?? null;
 }
 
-export async function getRwaStagingCounts(): Promise<StagingCounts> {
-  const all = await getAllRwas();
-  const approved = all.filter((p) => p.status === "APPROVED").length;
-  return { total: all.length, approved, pending: all.length - approved };
+export async function getRwaBySlug(slug: string): Promise<RwaProfile | null> {
+  return getApprovedRwaBySlug(slug);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -159,71 +137,49 @@ export function tvlTrend(profile: RwaProfile): TvlTrend {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Token accessors (same approval gate)                                       */
+/* Token accessors                                                            */
 /* -------------------------------------------------------------------------- */
 
-/** All token profiles regardless of status — STAGING / admin only. */
 export async function getAllTokens(): Promise<TokenProfile[]> {
   const { tokens } = await readLiveStore();
   return [...tokens].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** Public: only APPROVED token profiles ever leave this function. */
 export async function getApprovedTokens(): Promise<TokenProfile[]> {
-  return (await getAllTokens()).filter((p) => p.status === "APPROVED");
+  return getAllTokens();
 }
 
-/** Public: a single APPROVED token profile, or null (so pending items 404). */
 export async function getApprovedTokenBySlug(slug: string): Promise<TokenProfile | null> {
-  return (await getApprovedTokens()).find((p) => p.slug === slug) ?? null;
-}
-
-/** Staging: a single token profile of any status. */
-export async function getTokenBySlug(slug: string): Promise<TokenProfile | null> {
   return (await getAllTokens()).find((p) => p.slug === slug) ?? null;
 }
 
-export async function getTokenStagingCounts(): Promise<StagingCounts> {
-  const all = await getAllTokens();
-  const approved = all.filter((p) => p.status === "APPROVED").length;
-  return { total: all.length, approved, pending: all.length - approved };
+export async function getTokenBySlug(slug: string): Promise<TokenProfile | null> {
+  return getApprovedTokenBySlug(slug);
 }
 
 /* -------------------------------------------------------------------------- */
 /* Entity accessors (top-tier umbrella protocols)                             */
 /* -------------------------------------------------------------------------- */
 
-/** All entity profiles regardless of status — STAGING / admin only. */
 export async function getAllEntities(): Promise<EntityProfile[]> {
   const { entities } = await readLiveStore();
   return [...entities].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** Public: only APPROVED entity profiles ever leave this function. */
 export async function getApprovedEntities(): Promise<EntityProfile[]> {
-  return (await getAllEntities()).filter((p) => p.status === "APPROVED");
+  return getAllEntities();
 }
 
-/** Public: a single APPROVED entity profile, or null (so pending items 404). */
 export async function getApprovedEntityBySlug(slug: string): Promise<EntityProfile | null> {
-  return (await getApprovedEntities()).find((p) => p.slug === slug) ?? null;
-}
-
-/** Staging: a single entity profile of any status. */
-export async function getEntityBySlug(slug: string): Promise<EntityProfile | null> {
   return (await getAllEntities()).find((p) => p.slug === slug) ?? null;
 }
 
-export async function getEntityStagingCounts(): Promise<StagingCounts> {
-  const all = await getAllEntities();
-  const approved = all.filter((p) => p.status === "APPROVED").length;
-  return { total: all.length, approved, pending: all.length - approved };
+export async function getEntityBySlug(slug: string): Promise<EntityProfile | null> {
+  return getApprovedEntityBySlug(slug);
 }
 
 /**
- * Resolve an entity's member coins to their full (APPROVED) profiles. Returns
- * the member ref plus the matching stablecoin/token profile (or null if the
- * coin isn't approved/found yet) so the entity page can render live data.
+ * Resolve an entity's member coins to their store profiles.
  */
 export async function getEntityMemberCoins(
   entity: EntityProfile,

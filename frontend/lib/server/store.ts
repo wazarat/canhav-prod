@@ -15,7 +15,7 @@ import type {
  *
  * Primary source is Upstash Redis (hash `canhav:store`), read at request/build
  * time so every page reflects the live store and an approval flip via
- * /api/approve shows up after revalidation. When Upstash env vars are absent
+ * When Upstash env vars are absent
  * (pure offline dev with the Python LocalAdapter), it falls back to reading
  * `backend/data/store.json` from disk. Items map PascalCase -> camelCase here.
  */
@@ -78,7 +78,7 @@ function common(item: Record<string, any>) {
     slug: String(item.Slug ?? ""),
     name: String(item.Name ?? ""),
     symbol: String(item.Symbol ?? ""),
-    status: (item.Status ?? "PENDING_APPROVAL") as StablecoinProfile["status"],
+    status: (item.Status ?? "APPROVED") as StablecoinProfile["status"],
     description: String(item.Description ?? ""),
     website: item.Website ?? null,
     twitter: item.Twitter ?? null,
@@ -161,7 +161,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         slug: String(item.Slug ?? ""),
         name: String(item.Name ?? ""),
         symbol: String(item.Symbol ?? ""),
-        status: (item.Status ?? "PENDING_APPROVAL") as EntityProfile["status"],
+        status: (item.Status ?? "APPROVED") as EntityProfile["status"],
         tagline: String(item.Tagline ?? ""),
         description: String(item.Description ?? ""),
         differentiator: String(item.Differentiator ?? ""),

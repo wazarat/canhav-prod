@@ -155,7 +155,6 @@ export async function GET(req: Request): Promise<NextResponse> {
   revalidatePath("/stablecoins");
   revalidatePath("/rwas");
   revalidatePath("/tokens");
-  revalidatePath("/staging");
   for (const { category, slug } of touchedSlugs) {
     const base =
       category === CATEGORY_RWA

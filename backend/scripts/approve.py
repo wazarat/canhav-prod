@@ -22,8 +22,7 @@ Usage:
     python3 backend/scripts/approve.py --list
 
 With ``DB_BACKEND=redis`` this writes straight to Upstash and the frontend
-picks up the change on its next revalidation — no export step. (The /staging
-console's Approve button calls the same logic via /api/approve.)
+picks up the change on its next revalidation — no export step.
 
 Stdlib only.
 """

@@ -4,12 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { MockDataBanner } from "@/components/MockDataBanner";
 import { StablecoinTable } from "@/components/stablecoins/StablecoinTable";
 import { StatCard } from "@/components/ui/StatCard";
-import {
-  getApprovedStablecoins,
-  getStagingCounts,
-  LIVE_METRICS_PENDING,
-  pegDeviationBps,
-} from "@/lib/data";
+import { getApprovedStablecoins, LIVE_METRICS_PENDING, pegDeviationBps } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
 
 export const metadata = {
@@ -19,10 +14,7 @@ export const metadata = {
 export const revalidate = 300;
 
 export default async function StablecoinsPage() {
-  const [profiles, counts] = await Promise.all([
-    getApprovedStablecoins(),
-    getStagingCounts(),
-  ]);
+  const profiles = await getApprovedStablecoins();
 
   const aggregateSupply = profiles.reduce((sum, p) => sum + (p.totalSupply.value ?? 0), 0);
   const deviations = profiles
@@ -52,22 +44,21 @@ export default async function StablecoinsPage() {
         </h1>
         <p className="max-w-2xl text-sm text-ink-300">
           Pegged dollar and euro assets on Arbitrum — peg health, circulating supply, and protocol
-          metadata. Showing{" "}
-          <span className="font-medium text-ink-100">{counts.approved} approved</span> of{" "}
-          {counts.total} tracked; {counts.pending} awaiting review.
+          metadata. <span className="font-medium text-ink-100">{profiles.length}</span> protocols
+          tracked.
         </p>
       </header>
 
       {LIVE_METRICS_PENDING && <MockDataBanner />}
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Approved" value={`${profiles.length}`} hint={`${usdCount} USD · ${eurCount} EUR`} />
+        <StatCard label="Tracked" value={`${profiles.length}`} hint={`${usdCount} USD · ${eurCount} EUR`} />
         <StatCard label="Aggregate supply" value={formatUsdCompact(aggregateSupply)} hint="Live via Alchemy" />
         <StatCard label="Avg peg deviation" value={avgDeviation === null ? "—" : `${avgDeviation} bps`} />
         <StatCard label="Peg targets" value={`${usdCount + eurCount > 0 ? "USD / EUR" : "—"}`} hint="Multi-currency" />
       </section>
 
-      <StablecoinTable profiles={profiles} emptyHint="No approved stablecoins yet." />
+      <StablecoinTable profiles={profiles} emptyHint="No stablecoins in the store yet." />
     </div>
   );
 }

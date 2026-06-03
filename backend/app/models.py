@@ -66,7 +66,7 @@ class StablecoinProfile(BaseModel):
     slug: str
     name: str
     symbol: str
-    status: ApprovalStatus = "PENDING_APPROVAL"
+    status: ApprovalStatus = "APPROVED"
     pegTarget: PegTarget = "USD"
     description: str = ""
     website: Optional[str] = None
@@ -121,7 +121,7 @@ class StablecoinProfile(BaseModel):
             slug=item["Slug"],
             name=item["Name"],
             symbol=item.get("Symbol", ""),
-            status=item.get("Status", "PENDING_APPROVAL"),
+            status=item.get("Status", "APPROVED"),
             pegTarget=item.get("PegTarget", "USD"),
             description=item.get("Description", ""),
             website=item.get("Website"),
@@ -169,7 +169,7 @@ class RwaProfile(BaseModel):
     slug: str
     name: str
     symbol: str = ""
-    status: ApprovalStatus = "PENDING_APPROVAL"
+    status: ApprovalStatus = "APPROVED"
     assetClass: RwaAssetClass = "Multi-Asset"
     description: str = ""
     website: Optional[str] = None
@@ -223,7 +223,7 @@ class RwaProfile(BaseModel):
             slug=item["Slug"],
             name=item["Name"],
             symbol=item.get("Symbol", ""),
-            status=item.get("Status", "PENDING_APPROVAL"),
+            status=item.get("Status", "APPROVED"),
             assetClass=item.get("AssetClass", "Multi-Asset"),
             description=item.get("Description", ""),
             website=item.get("Website"),
@@ -256,7 +256,7 @@ class TokenProfile(BaseModel):
     slug: str
     name: str
     symbol: str = ""
-    status: ApprovalStatus = "PENDING_APPROVAL"
+    status: ApprovalStatus = "APPROVED"
     tokenType: TokenType = "Governance"
     description: str = ""
     website: Optional[str] = None
@@ -306,7 +306,7 @@ class TokenProfile(BaseModel):
             slug=item["Slug"],
             name=item["Name"],
             symbol=item.get("Symbol", ""),
-            status=item.get("Status", "PENDING_APPROVAL"),
+            status=item.get("Status", "APPROVED"),
             tokenType=item.get("TokenType", "Governance"),
             description=item.get("Description", ""),
             website=item.get("Website"),
@@ -394,7 +394,7 @@ class EntityProfile(BaseModel):
     slug: str
     name: str
     symbol: str = ""
-    status: ApprovalStatus = "PENDING_APPROVAL"
+    status: ApprovalStatus = "APPROVED"
     tagline: str = ""
     description: str = ""
     differentiator: str = ""
@@ -455,7 +455,7 @@ class EntityProfile(BaseModel):
             slug=item["Slug"],
             name=item["Name"],
             symbol=item.get("Symbol", ""),
-            status=item.get("Status", "PENDING_APPROVAL"),
+            status=item.get("Status", "APPROVED"),
             tagline=item.get("Tagline", ""),
             description=item.get("Description", ""),
             differentiator=item.get("Differentiator", ""),

@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 
 import { TokenTable } from "@/components/tokens/TokenTable";
 import { StatCard } from "@/components/ui/StatCard";
-import { getApprovedTokens, getTokenStagingCounts } from "@/lib/data";
+import { getApprovedTokens } from "@/lib/data";
 
 export const metadata = {
   title: "Tokens",
@@ -12,10 +12,7 @@ export const metadata = {
 export const revalidate = 300;
 
 export default async function TokensPage() {
-  const [profiles, counts] = await Promise.all([
-    getApprovedTokens(),
-    getTokenStagingCounts(),
-  ]);
+  const profiles = await getApprovedTokens();
 
   const types = new Set(profiles.map((p) => p.tokenType));
 
@@ -34,20 +31,19 @@ export default async function TokensPage() {
           Tokens
         </h1>
         <p className="max-w-2xl text-sm text-ink-300">
-          Governance & utility tokens powering Arbitrum protocol ecosystems. Showing{" "}
-          <span className="font-medium text-ink-100">{counts.approved} approved</span> of{" "}
-          {counts.total} tracked; {counts.pending} awaiting review.
+          Governance & utility tokens powering Arbitrum protocol ecosystems.{" "}
+          <span className="font-medium text-ink-100">{profiles.length}</span> tokens tracked.
         </p>
       </header>
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Approved" value={`${profiles.length}`} hint="Visible publicly" />
-        <StatCard label="Token types" value={`${types.size}`} hint="Across approved" />
-        <StatCard label="Tracked total" value={`${counts.total}`} hint={`${counts.pending} pending`} />
-        <StatCard label="Pending" value={`${counts.pending}`} hint="Not yet public" />
+        <StatCard label="Tracked" value={`${profiles.length}`} hint="Tokens in store" />
+        <StatCard label="Token types" value={`${types.size}`} hint="Distinct types" />
+        <StatCard label="Governance" value={`${profiles.filter((p) => p.tokenType === "Governance").length}`} hint="Governance tokens" />
+        <StatCard label="Utility" value={`${profiles.filter((p) => p.tokenType === "Utility").length}`} hint="Utility tokens" />
       </section>
 
-      <TokenTable profiles={profiles} emptyHint="No approved tokens yet." />
+      <TokenTable profiles={profiles} emptyHint="No tokens in the store yet." />
     </div>
   );
 }

@@ -143,7 +143,8 @@ def main(argv: List[str]) -> int:
     hset_args: List[str] = ["HSET", key]
     by_category: Dict[str, int] = {}
     for field, item in items.items():
-        hset_args.extend([field, json.dumps(item, ensure_ascii=False)])
+        published = {**item, "Status": "APPROVED"}
+        hset_args.extend([field, json.dumps(published, ensure_ascii=False)])
         cat = item.get("Category", "?")
         by_category[cat] = by_category.get(cat, 0) + 1
 
@@ -186,8 +187,8 @@ def main(argv: List[str]) -> int:
 
     print("-" * 64)
     print(
-        f"Synced {len(items)} item(s) to Upstash. The frontend picks them up on its "
-        "next ISR revalidation (or redeploy). Approve them at /staging."
+        f"Synced {len(items)} item(s) to Upstash (Status=APPROVED). The frontend picks "
+        "them up on its next ISR revalidation (or redeploy)."
     )
     return 0
 

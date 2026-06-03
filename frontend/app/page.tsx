@@ -64,8 +64,8 @@ export default async function DashboardPage() {
           <span className="text-gradient-brand">Arbitrum ecosystem</span>.
         </h1>
         <p className="text-lg text-ink-300">
-          Research-grade taxonomy and datasets across stablecoins, RWAs, lending, perpetuals and
-          more — every profile gated by an explicit approval workflow before it goes live.
+          Research-grade taxonomy and datasets across stablecoins, RWAs, entities, tokens, lending,
+          perpetuals and more — published as soon as data is ingested and synced.
         </p>
         <div className="flex flex-wrap gap-3">
           <Button asChild>
@@ -138,12 +138,12 @@ export default async function DashboardPage() {
       {/* Summary stats */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Active categories" value={`${activeCategories} / ${CATEGORIES.length}`} hint="Stablecoins live; more in progress" />
-        <StatCard label="Approved stablecoins" value={`${approved.length}`} hint="Visible on the public dashboard" />
+        <StatCard label="Stablecoins tracked" value={`${approved.length}`} hint="In the live store" />
         <StatCard label="Aggregate supply" value={formatUsdCompact(aggregateSupply)} hint="Live via Alchemy" />
         <StatCard
           label="Avg peg deviation"
           value={avgDeviation === null ? "—" : `${avgDeviation} bps`}
-          hint="Across approved profiles"
+          hint="Across tracked stablecoins"
         />
       </section>
 

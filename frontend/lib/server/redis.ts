@@ -11,7 +11,7 @@ import { Redis } from "@upstash/redis";
  * Python ops jobs read/write the same shape.
  *
  * Reads happen at request/build time (ISR); the only write is the approval flip
- * in /api/approve. When Upstash env vars are absent (pure offline dev), callers
+ * When Upstash env vars are absent (pure offline dev), callers
  * fall back to the local `backend/data/store.json` via `lib/server/store.ts`.
  *
  * Credentials come from either the Vercel "Upstash for Redis" integration

@@ -4,7 +4,7 @@ Phase 2, Step 3 — seed the 10 RWA protocols from the Arbitrum Portal CSV.
 
 Reads `Arbitrum Ecosystem - scrape v2.csv`, extracts the 10 target Real World
 Asset protocols, maps each CSV row onto the DynamoDB single-table item shape
-(``CATEGORY#RWA`` partition), and stages it with ``Status = PENDING_APPROVAL``
+(``CATEGORY#RWA`` partition), and publishes it with ``Status = APPROVED``
 via the configured repository (LocalAdapter by default — no installs, no cloud).
 
 Live-sourced fields (``TotalValueLocked`` from Alchemy, ``HistoricalTvlData``
@@ -88,7 +88,7 @@ def resolve_csv_path(argv: List[str]) -> Path:
 
 
 def row_to_item(row: Dict[str, str], created_at: str) -> dict:
-    """Map one CSV row onto a single-table item (Status=PENDING_APPROVAL)."""
+    """Map one CSV row onto a single-table item (Status=APPROVED)."""
     slug = (row.get("Slug") or "").strip()
     name, symbol, asset_class = TARGETS[slug]
     now = _now_iso()
@@ -97,7 +97,7 @@ def row_to_item(row: Dict[str, str], created_at: str) -> dict:
         schema.PK: schema.category_pk(schema.CATEGORY_RWA),
         schema.SK: schema.protocol_sk(slug),
         "Category": schema.CATEGORY_RWA,
-        "Status": schema.STATUS_PENDING,
+        "Status": schema.STATUS_APPROVED,
         "Name": name,
         "Slug": slug,
         "Symbol": symbol,
@@ -175,7 +175,7 @@ def main(argv: List[str]) -> int:
             name, _, asset_class = TARGETS[slug]
             print(f"{schema.STATUS_PENDING:<18}{asset_class:<22}{name}")
     print("-" * 72)
-    print(f"Staged {len(staged)} / {len(TARGETS)} target RWA protocols as PENDING_APPROVAL.")
+    print(f"Published {len(staged)} / {len(TARGETS)} target RWA protocols as APPROVED.")
 
     missing = [s for s in TARGETS if s not in staged]
     if missing:

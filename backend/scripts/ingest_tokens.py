@@ -91,7 +91,7 @@ def token_item(slug: str, parent_row: Optional[Dict[str, str]], created_at: str)
         schema.PK: schema.category_pk(schema.CATEGORY_TOKEN),
         schema.SK: schema.protocol_sk(slug),
         "Category": schema.CATEGORY_TOKEN,
-        "Status": schema.STATUS_PENDING,
+        "Status": schema.STATUS_APPROVED,
         "Name": spec["name"],
         "Slug": slug,
         "Symbol": spec["symbol"],
@@ -153,7 +153,7 @@ def main(argv: List[str]) -> int:
         spec = TOKENS[slug]
         print(f"{schema.STATUS_PENDING:<18}{spec['symbol']:<10}{spec['name']}")
     print("-" * 64)
-    print(f"Staged {len(staged)} / {len(TOKENS)} token(s) as PENDING_APPROVAL.")
+    print(f"Published {len(staged)} / {len(TOKENS)} token(s) as APPROVED.")
     return 0
 
 

@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { MockDataBanner } from "@/components/MockDataBanner";
 import { RwaTable } from "@/components/rwas/RwaTable";
 import { StatCard } from "@/components/ui/StatCard";
-import { getApprovedRwas, getRwaStagingCounts, LIVE_METRICS_PENDING } from "@/lib/data";
+import { getApprovedRwas, LIVE_METRICS_PENDING } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
 
 export const metadata = {
@@ -14,10 +14,7 @@ export const metadata = {
 export const revalidate = 300;
 
 export default async function RwasPage() {
-  const [profiles, counts] = await Promise.all([
-    getApprovedRwas(),
-    getRwaStagingCounts(),
-  ]);
+  const profiles = await getApprovedRwas();
 
   const aggregateTvl = profiles.reduce((sum, p) => sum + (p.totalValueLocked.value ?? 0), 0);
   const assetClasses = new Set(profiles.map((p) => p.assetClass));
@@ -38,22 +35,21 @@ export default async function RwasPage() {
         </h1>
         <p className="max-w-2xl text-sm text-ink-300">
           Tokenized off-chain assets on Arbitrum — private credit, tokenized equities, real estate,
-          treasuries, and more. Showing{" "}
-          <span className="font-medium text-ink-100">{counts.approved} approved</span> of{" "}
-          {counts.total} tracked; {counts.pending} awaiting review.
+          treasuries, and more.{" "}
+          <span className="font-medium text-ink-100">{profiles.length}</span> protocols tracked.
         </p>
       </header>
 
       {LIVE_METRICS_PENDING && <MockDataBanner metrics="TVL and AUM" />}
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Approved" value={`${profiles.length}`} hint="Visible publicly" />
+        <StatCard label="Tracked" value={`${profiles.length}`} hint="RWA protocols" />
         <StatCard label="Aggregate TVL" value={formatUsdCompact(aggregateTvl)} hint="Live on-chain proxy" />
-        <StatCard label="Asset classes" value={`${assetClasses.size}`} hint="Across approved" />
-        <StatCard label="Tracked total" value={`${counts.total}`} hint={`${counts.pending} pending`} />
+        <StatCard label="Asset classes" value={`${assetClasses.size}`} hint="Distinct classes" />
+        <StatCard label="In store" value={`${profiles.length}`} hint="Synced from ingest" />
       </section>
 
-      <RwaTable profiles={profiles} emptyHint="No approved RWA protocols yet." />
+      <RwaTable profiles={profiles} emptyHint="No RWA protocols in the store yet." />
     </div>
   );
 }

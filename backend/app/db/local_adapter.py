@@ -76,6 +76,14 @@ class LocalAdapter(Repository):
     def get_item(self, pk: str, sk: str) -> Optional[Item]:
         return self._load().get(_key(pk, sk))
 
+    def delete_item(self, pk: str, sk: str) -> bool:
+        items = self._load()
+        if _key(pk, sk) not in items:
+            return False
+        del items[_key(pk, sk)]
+        self._save(items)
+        return True
+
     def query(self, pk: str, status: Optional[str] = None) -> List[Item]:
         results = [it for it in self._load().values() if it.get(schema.PK) == pk]
         if status is not None:

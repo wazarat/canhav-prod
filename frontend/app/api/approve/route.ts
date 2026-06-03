@@ -22,7 +22,7 @@ import { setStatusLocal } from "@/lib/server/store";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const VALID_CATEGORIES = new Set(["Stablecoin", "RWA"]);
+const VALID_CATEGORIES = new Set(["Stablecoin", "RWA", "Token", "Entity"]);
 const SLUG_RE = /^[a-z0-9-]{1,64}$/;
 
 function timingSafeEqual(a: string, b: string): boolean {
@@ -44,7 +44,16 @@ function extractToken(req: Request): string | null {
 }
 
 function basePath(category: string): string {
-  return category === "RWA" ? "/rwas" : "/stablecoins";
+  switch (category) {
+    case "RWA":
+      return "/rwas";
+    case "Token":
+      return "/tokens";
+    case "Entity":
+      return "/entities";
+    default:
+      return "/stablecoins";
+  }
 }
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -76,7 +85,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 
   if (!category || !VALID_CATEGORIES.has(category)) {
     return NextResponse.json(
-      { ok: false, error: "category must be 'Stablecoin' or 'RWA'." },
+      { ok: false, error: "category must be 'Stablecoin', 'RWA', 'Token', or 'Entity'." },
       { status: 400 },
     );
   }

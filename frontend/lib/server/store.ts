@@ -3,7 +3,12 @@ import path from "node:path";
 
 import { repoRoot } from "@/lib/server/env";
 import { hasUpstash, readAllItemsFromRedis } from "@/lib/server/redis";
-import type { RwaProfile, StablecoinProfile } from "@/lib/types";
+import type {
+  EntityProfile,
+  RwaProfile,
+  StablecoinProfile,
+  TokenProfile,
+} from "@/lib/types";
 
 /**
  * Server-only unified reader for the backend store.
@@ -82,6 +87,7 @@ function common(item: Record<string, any>) {
     coingecko: item.CoinGecko ?? null,
     auditUrl: item.AuditURL ?? null,
     contractAddress: item.ContractAddress ?? null,
+    entitySlug: item.EntitySlug ?? null,
     arbitrumPortalMetadata: item.ArbitrumPortalMetadata ?? {
       portalUrl: null,
       logoUrl: null,
@@ -101,11 +107,15 @@ function common(item: Record<string, any>) {
 export interface LiveStore {
   stablecoins: StablecoinProfile[];
   rwas: RwaProfile[];
+  tokens: TokenProfile[];
+  entities: EntityProfile[];
 }
 
 export async function readLiveStore(): Promise<LiveStore> {
   const stablecoins: StablecoinProfile[] = [];
   const rwas: RwaProfile[] = [];
+  const tokens: TokenProfile[] = [];
+  const entities: EntityProfile[] = [];
 
   for (const raw of await readItems()) {
     const item = raw as Record<string, any>;
@@ -138,10 +148,64 @@ export async function readLiveStore(): Promise<LiveStore> {
           updatedAt: null,
         },
       } as RwaProfile);
+    } else if (item.Category === "Token") {
+      tokens.push({
+        category: "Token",
+        ...common(item),
+        tokenType: (item.TokenType ?? "Governance") as TokenProfile["tokenType"],
+        totalSupply: item.TotalSupply ?? { value: null, source: "alchemy", updatedAt: null },
+      } as TokenProfile);
+    } else if (item.Category === "Entity") {
+      entities.push({
+        category: "Entity",
+        slug: String(item.Slug ?? ""),
+        name: String(item.Name ?? ""),
+        symbol: String(item.Symbol ?? ""),
+        status: (item.Status ?? "PENDING_APPROVAL") as EntityProfile["status"],
+        tagline: String(item.Tagline ?? ""),
+        description: String(item.Description ?? ""),
+        differentiator: String(item.Differentiator ?? ""),
+        officialDocs: item.OfficialDocs ?? null,
+        website: item.Website ?? null,
+        twitter: item.Twitter ?? null,
+        discord: item.Discord ?? null,
+        github: item.GitHub ?? null,
+        components: item.Components ?? [],
+        faq: item.Faq ?? [],
+        orgStructure: item.OrgStructure ?? [],
+        tradFiComparison: item.TradFiComparison ?? [],
+        risks: item.Risks ?? [],
+        investmentRounds: item.InvestmentRounds ?? [],
+        partnerships: item.Partnerships ?? [],
+        currentScale: item.CurrentScale ?? {
+          tvlUsd: null,
+          users: null,
+          aprPct: null,
+          targetAprPct: null,
+          loanPipelineUsd: null,
+          partnerships: null,
+        },
+        memberCoins: item.MemberCoins ?? [],
+        arbitrumPortalMetadata: item.ArbitrumPortalMetadata ?? {
+          portalUrl: null,
+          logoUrl: null,
+          bannerUrl: null,
+          chains: [],
+          subCategory: null,
+          isLive: false,
+          isArbitrumNative: false,
+          isPubliclyAudited: false,
+          foundedDate: null,
+        },
+        createdAt: String(item.CreatedAt ?? ""),
+        updatedAt: String(item.UpdatedAt ?? ""),
+      } as EntityProfile);
     }
   }
 
   stablecoins.sort((a, b) => a.name.localeCompare(b.name));
   rwas.sort((a, b) => a.name.localeCompare(b.name));
-  return { stablecoins, rwas };
+  tokens.sort((a, b) => a.name.localeCompare(b.name));
+  entities.sort((a, b) => a.name.localeCompare(b.name));
+  return { stablecoins, rwas, tokens, entities };
 }

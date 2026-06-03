@@ -34,6 +34,10 @@ from app.db import get_repository, schema  # noqa: E402
 
 # CSV slug -> (display name, symbol, peg target). These are the exact Phase-1
 # targets; symbols/peg targets are added here since the CSV has no such columns.
+#
+# Note: the legacy combined "usd-ai" stablecoin is superseded by the two USD.AI
+# coins below (USDai + sUSDai), which are part of the USD.AI Entity. The old
+# "usd-ai" stablecoin item is deleted on run.
 TARGETS: Dict[str, Tuple[str, str, str]] = {
     "ethena": ("Ethena (USDe)", "USDe", schema.PEG_USD),
     "inverse-finance": ("Inverse Finance", "DOLA", schema.PEG_USD),
@@ -42,9 +46,29 @@ TARGETS: Dict[str, Tuple[str, str, str]] = {
     "stably": ("Stably", "USDS.s", schema.PEG_USD),
     "tether": ("Tether (USDT)", "USDT", schema.PEG_USD),
     "trueusd": ("TrueUSD", "TUSD", schema.PEG_USD),
-    "usd-ai": ("USD.AI (sUSDai)", "sUSDai", schema.PEG_USD),
     "usdc": ("USDC", "USDC", schema.PEG_USD),
     "usdt0": ("USDT0", "USDT0", schema.PEG_USD),
+}
+
+# USD.AI's two synthetic-dollar coins. They have no dedicated CSV row, so they
+# are derived from the existing "usd-ai" Portal row (shared website / portal
+# metadata) but get distinct slug / name / symbol / CoinGecko / contract and are
+# tagged with EntitySlug="usd-ai" so they list under the USD.AI Entity. Addresses
+# + CoinGecko ids verified via CoinGecko (detail_platforms["arbitrum-one"]).
+USD_AI_PARENT_SLUG = "usd-ai"
+USD_AI_COINS: Dict[str, Dict[str, str]] = {
+    "usdai": {
+        "name": "USDai",
+        "symbol": "USDAI",
+        "coingecko": "https://www.coingecko.com/en/coins/usdai",
+        "contractAddress": "0x0a1a1a107e45b7ced86833863f482bc5f4ed82ef",
+    },
+    "susdai": {
+        "name": "sUSDai",
+        "symbol": "sUSDai",
+        "coingecko": "https://www.coingecko.com/en/coins/susdai",
+        "contractAddress": "0x0b2b2b2076d95dda7817e785989fe353fe955ef9",
+    },
 }
 
 DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
@@ -104,7 +128,64 @@ def row_to_item(row: Dict[str, str], created_at: str) -> dict:
         "GitHub": _clean(row.get("GitHub")),
         "CoinGecko": _clean(row.get("CoinGecko")),
         "AuditURL": _clean(row.get("Audit URL")),
+        "ContractAddress": None,
+        "EntitySlug": None,
         # Live overlays — populated in Step 4 (Alchemy / Dune).
+        "TotalSupply": {"value": None, "source": "alchemy", "updatedAt": None},
+        "HistoricalPegData": {"points": [], "source": "dune", "updatedAt": None},
+        "ArbitrumPortalMetadata": {
+            "portalUrl": _clean(row.get("Portal URL")),
+            "logoUrl": _clean(row.get("Logo URL")),
+            "bannerUrl": _clean(row.get("Banner URL")),
+            "chains": _split_chains(row.get("Chains")),
+            "subCategory": _clean(row.get("Sub-category")),
+            "isLive": _as_bool(row.get("Is Live")),
+            "isArbitrumNative": _as_bool(row.get("Is Arbitrum Native")),
+            "isPubliclyAudited": _as_bool(row.get("Is Publicly Audited")),
+            "foundedDate": _clean(row.get("Founded Date")),
+        },
+        "CreatedAt": created_at,
+        "UpdatedAt": now,
+    }
+
+
+def usd_ai_coin_item(
+    slug: str, parent_row: Dict[str, str], created_at: str
+) -> dict:
+    """Build a USDai / sUSDai item from the shared USD.AI Portal row."""
+    spec = USD_AI_COINS[slug]
+    item = row_to_item_generic(parent_row, created_at)
+    item[schema.SK] = schema.protocol_sk(slug)
+    item["Name"] = spec["name"]
+    item["Slug"] = slug
+    item["Symbol"] = spec["symbol"]
+    item["CoinGecko"] = spec["coingecko"]
+    item["ContractAddress"] = spec["contractAddress"]
+    item["EntitySlug"] = USD_AI_PARENT_SLUG
+    return item
+
+
+def row_to_item_generic(row: Dict[str, str], created_at: str) -> dict:
+    """Like row_to_item but without the TARGETS name/symbol/peg lookup."""
+    now = _now_iso()
+    return {
+        schema.PK: schema.category_pk(schema.CATEGORY_STABLECOIN),
+        schema.SK: schema.protocol_sk((row.get("Slug") or "").strip()),
+        "Category": schema.CATEGORY_STABLECOIN,
+        "Status": schema.STATUS_PENDING,
+        "Name": _clean(row.get("Name")) or "",
+        "Slug": (row.get("Slug") or "").strip(),
+        "Symbol": "",
+        "PegTarget": schema.PEG_USD,
+        "Description": _clean(row.get("Description")) or "",
+        "Website": _clean(row.get("Website")),
+        "Twitter": _clean(row.get("Twitter")),
+        "Discord": _clean(row.get("Discord")),
+        "GitHub": _clean(row.get("GitHub")),
+        "CoinGecko": _clean(row.get("CoinGecko")),
+        "AuditURL": _clean(row.get("Audit URL")),
+        "ContractAddress": None,
+        "EntitySlug": None,
         "TotalSupply": {"value": None, "source": "alchemy", "updatedAt": None},
         "HistoricalPegData": {"points": [], "source": "dune", "updatedAt": None},
         "ArbitrumPortalMetadata": {
@@ -137,14 +218,18 @@ def main(argv: List[str]) -> int:
     repo = get_repository()
     pk = schema.category_pk(schema.CATEGORY_STABLECOIN)
 
-    # Collect matching rows by slug (CSV is the source of truth).
+    # Collect matching rows by slug (CSV is the source of truth). The legacy
+    # "usd-ai" row is captured to source the two USD.AI coins below.
     matched: Dict[str, Dict[str, str]] = {}
+    usd_ai_row: Optional[Dict[str, str]] = None
     with csv_path.open("r", encoding="utf-8", newline="") as fh:
         reader = csv.DictReader(fh)
         for row in reader:
             slug = (row.get("Slug") or "").strip()
             if slug in TARGETS and slug not in matched:
                 matched[slug] = row
+            if slug == USD_AI_PARENT_SLUG and usd_ai_row is None:
+                usd_ai_row = row
 
     staged: List[str] = []
     for slug in TARGETS:
@@ -158,6 +243,24 @@ def main(argv: List[str]) -> int:
         repo.put_item(item)
         staged.append(slug)
 
+    # USD.AI coins (USDai + sUSDai), derived from the shared "usd-ai" row.
+    usd_ai_staged: List[str] = []
+    if usd_ai_row is not None:
+        for slug in USD_AI_COINS:
+            existing = repo.get_item(pk, schema.protocol_sk(slug))
+            created_at = (existing or {}).get("CreatedAt") or _now_iso()
+            repo.put_item(usd_ai_coin_item(slug, usd_ai_row, created_at))
+            usd_ai_staged.append(slug)
+    else:
+        print(
+            f"WARNING: no '{USD_AI_PARENT_SLUG}' row in CSV; "
+            "USDai / sUSDai not staged.",
+            file=sys.stderr,
+        )
+
+    # Drop the legacy combined "usd-ai" stablecoin (superseded by the two coins).
+    removed_legacy = repo.delete_item(pk, schema.protocol_sk(USD_AI_PARENT_SLUG))
+
     # --- Report ------------------------------------------------------------
     print(f"Source CSV : {csv_path}")
     print(f"Backend    : {type(repo).__name__}")
@@ -169,8 +272,15 @@ def main(argv: List[str]) -> int:
         if slug in staged:
             name, symbol, _ = TARGETS[slug]
             print(f"{schema.STATUS_PENDING:<18}{symbol:<10}{name}")
+    for slug in usd_ai_staged:
+        spec = USD_AI_COINS[slug]
+        print(f"{schema.STATUS_PENDING:<18}{spec['symbol']:<10}{spec['name']} (USD.AI)")
     print("-" * 64)
-    print(f"Staged {len(staged)} / {len(TARGETS)} target stablecoins as PENDING_APPROVAL.")
+    total_staged = len(staged) + len(usd_ai_staged)
+    total_targets = len(TARGETS) + len(USD_AI_COINS)
+    print(f"Staged {total_staged} / {total_targets} target stablecoins as PENDING_APPROVAL.")
+    if removed_legacy:
+        print(f"Removed legacy '{USD_AI_PARENT_SLUG}' stablecoin (superseded by USDai + sUSDai).")
 
     missing = [s for s in TARGETS if s not in staged]
     if missing:

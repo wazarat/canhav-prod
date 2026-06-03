@@ -83,6 +83,9 @@ class RedisAdapter(Repository):
         except (json.JSONDecodeError, TypeError):
             return None
 
+    def delete_item(self, pk: str, sk: str) -> bool:
+        return bool(self.client.hdel(self.store_key, _key(pk, sk)))
+
     def query(self, pk: str, status: Optional[str] = None) -> List[Item]:
         results = [it for it in self._load().values() if it.get(schema.PK) == pk]
         if status is not None:

@@ -3,10 +3,12 @@ import {
   ArrowUpRight,
   Banknote,
   CandlestickChart,
+  CircleDollarSign,
   Coins,
   Landmark,
   LineChart,
   Layers,
+  Network,
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
@@ -16,8 +18,10 @@ import type { CategoryDef, CategorySlug } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<CategorySlug, LucideIcon> = {
+  entities: Network,
   stablecoins: Coins,
   rwas: Landmark,
+  tokens: CircleDollarSign,
   lending: Banknote,
   perpetuals: CandlestickChart,
   yield: Sparkles,

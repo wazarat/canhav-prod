@@ -1,13 +1,17 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Network } from "lucide-react";
 
 import { CategoryGrid } from "@/components/CategoryGrid";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { StatCard } from "@/components/ui/StatCard";
 import {
   CATEGORIES,
+  getAllEntities,
   getAllRwas,
   getAllStablecoins,
+  getAllTokens,
+  getApprovedEntities,
   getApprovedStablecoins,
   pegDeviationBps,
 } from "@/lib/data";
@@ -16,16 +20,23 @@ import { formatUsdCompact } from "@/lib/utils";
 export const revalidate = 300;
 
 export default async function DashboardPage() {
-  const [approved, allStablecoins, allRwas] = await Promise.all([
-    getApprovedStablecoins(),
-    getAllStablecoins(),
-    getAllRwas(),
-  ]);
+  const [approved, allStablecoins, allRwas, allEntities, allTokens, approvedEntities] =
+    await Promise.all([
+      getApprovedStablecoins(),
+      getAllStablecoins(),
+      getAllRwas(),
+      getAllEntities(),
+      getAllTokens(),
+      getApprovedEntities(),
+    ]);
   const activeCategories = CATEGORIES.filter((c) => c.status === "active").length;
+  const featuredEntity = approvedEntities[0] ?? null;
 
   const trackedBySlug: Record<string, number> = {
+    entities: allEntities.length,
     stablecoins: allStablecoins.length,
     rwas: allRwas.length,
+    tokens: allTokens.length,
   };
   const categories = CATEGORIES.map((c) =>
     c.slug in trackedBySlug ? { ...c, trackedCount: trackedBySlug[c.slug] } : c,
@@ -58,19 +69,71 @@ export default async function DashboardPage() {
         </p>
         <div className="flex flex-wrap gap-3">
           <Button asChild>
+            <Link href="/entities">
+              Explore entities
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+          <Button asChild variant="secondary">
             <Link href="/stablecoins">
               Explore stablecoins
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
-          <Button asChild variant="secondary">
-            <Link href="/rwas">
-              Explore RWAs
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
         </div>
       </section>
+
+      {/* Featured entity */}
+      {featuredEntity && (
+        <section>
+          <Link href={`/entities/${featuredEntity.slug}`} className="block">
+            <div className="group glass relative overflow-hidden rounded-2xl border border-neon-500/30 p-6 transition-all duration-200 hover:border-neon-500/60 hover:glow-ring md:p-8">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="max-w-2xl space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="grid h-9 w-9 place-items-center rounded-xl border border-neon-500/30 bg-neon-500/10 text-neon-400">
+                      <Network className="h-5 w-5" />
+                    </span>
+                    <Badge tone="neon">Featured entity</Badge>
+                  </div>
+                  <h2 className="font-display text-2xl font-semibold tracking-tight text-ink-50">
+                    {featuredEntity.name}
+                    <ArrowUpRight className="ml-1 inline h-5 w-5 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neon-400" />
+                  </h2>
+                  <p className="text-sm leading-relaxed text-ink-300">
+                    {featuredEntity.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {featuredEntity.memberCoins.map((c) => (
+                      <Badge key={c.slug} tone={c.category === "Token" ? "neon" : "electric"}>
+                        {c.symbol}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex gap-6">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wider text-ink-300">TVL</p>
+                    <p className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink-50">
+                      {formatUsdCompact(featuredEntity.currentScale.tvlUsd)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wider text-ink-300">
+                      sUSDai APR
+                    </p>
+                    <p className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink-50">
+                      {featuredEntity.currentScale.aprPct != null
+                        ? `${featuredEntity.currentScale.aprPct.toFixed(2)}%`
+                        : "—"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Link>
+        </section>
+      )}
 
       {/* Summary stats */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">

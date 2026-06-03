@@ -76,6 +76,8 @@ class StablecoinProfile(BaseModel):
     coingecko: Optional[str] = None
     auditUrl: Optional[str] = None
     contractAddress: Optional[str] = None
+    # Slug of the parent umbrella Entity (e.g. "usd-ai"), if this coin is grouped.
+    entitySlug: Optional[str] = None
     totalSupply: TotalSupply = Field(default_factory=TotalSupply)
     historicalPegData: HistoricalPegData = Field(default_factory=HistoricalPegData)
     arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
@@ -104,6 +106,7 @@ class StablecoinProfile(BaseModel):
             "CoinGecko": self.coingecko,
             "AuditURL": self.auditUrl,
             "ContractAddress": self.contractAddress,
+            "EntitySlug": self.entitySlug,
             "TotalSupply": self.totalSupply.model_dump(),
             "HistoricalPegData": self.historicalPegData.model_dump(),
             "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
@@ -128,6 +131,7 @@ class StablecoinProfile(BaseModel):
             coingecko=item.get("CoinGecko"),
             auditUrl=item.get("AuditURL"),
             contractAddress=item.get("ContractAddress"),
+            entitySlug=item.get("EntitySlug"),
             totalSupply=TotalSupply(**(item.get("TotalSupply") or {})),
             historicalPegData=HistoricalPegData(**(item.get("HistoricalPegData") or {})),
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
@@ -232,6 +236,245 @@ class RwaProfile(BaseModel):
             vaultAddresses=item.get("VaultAddresses"),
             totalValueLocked=TotalValueLocked(**(item.get("TotalValueLocked") or {})),
             historicalTvlData=HistoricalTvlData(**(item.get("HistoricalTvlData") or {})),
+            arbitrumPortalMetadata=ArbitrumPortalMetadata(
+                **(item.get("ArbitrumPortalMetadata") or {})
+            ),
+            createdAt=item.get("CreatedAt"),
+            updatedAt=item.get("UpdatedAt"),
+        )
+
+
+# --- Tokens ----------------------------------------------------------------
+
+TokenType = Literal["Governance", "Utility"]
+
+
+class TokenProfile(BaseModel):
+    """A standalone governance / utility token (e.g. CHIP)."""
+
+    category: Literal["Token"] = "Token"
+    slug: str
+    name: str
+    symbol: str = ""
+    status: ApprovalStatus = "PENDING_APPROVAL"
+    tokenType: TokenType = "Governance"
+    description: str = ""
+    website: Optional[str] = None
+    twitter: Optional[str] = None
+    discord: Optional[str] = None
+    github: Optional[str] = None
+    coingecko: Optional[str] = None
+    auditUrl: Optional[str] = None
+    contractAddress: Optional[str] = None
+    # Slug of the parent umbrella Entity (e.g. "usd-ai").
+    entitySlug: Optional[str] = None
+    totalSupply: TotalSupply = Field(default_factory=TotalSupply)
+    arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
+        default_factory=ArbitrumPortalMetadata
+    )
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
+
+    def to_item(self) -> dict:
+        return {
+            schema.PK: schema.category_pk(schema.CATEGORY_TOKEN),
+            schema.SK: schema.protocol_sk(self.slug),
+            "Category": self.category,
+            "Status": self.status,
+            "Name": self.name,
+            "Slug": self.slug,
+            "Symbol": self.symbol,
+            "TokenType": self.tokenType,
+            "Description": self.description,
+            "Website": self.website,
+            "Twitter": self.twitter,
+            "Discord": self.discord,
+            "GitHub": self.github,
+            "CoinGecko": self.coingecko,
+            "AuditURL": self.auditUrl,
+            "ContractAddress": self.contractAddress,
+            "EntitySlug": self.entitySlug,
+            "TotalSupply": self.totalSupply.model_dump(),
+            "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
+            "CreatedAt": self.createdAt,
+            "UpdatedAt": self.updatedAt,
+        }
+
+    @classmethod
+    def from_item(cls, item: dict) -> "TokenProfile":
+        return cls(
+            slug=item["Slug"],
+            name=item["Name"],
+            symbol=item.get("Symbol", ""),
+            status=item.get("Status", "PENDING_APPROVAL"),
+            tokenType=item.get("TokenType", "Governance"),
+            description=item.get("Description", ""),
+            website=item.get("Website"),
+            twitter=item.get("Twitter"),
+            discord=item.get("Discord"),
+            github=item.get("GitHub"),
+            coingecko=item.get("CoinGecko"),
+            auditUrl=item.get("AuditURL"),
+            contractAddress=item.get("ContractAddress"),
+            entitySlug=item.get("EntitySlug"),
+            totalSupply=TotalSupply(**(item.get("TotalSupply") or {})),
+            arbitrumPortalMetadata=ArbitrumPortalMetadata(
+                **(item.get("ArbitrumPortalMetadata") or {})
+            ),
+            createdAt=item.get("CreatedAt"),
+            updatedAt=item.get("UpdatedAt"),
+        )
+
+
+# --- Entities (top-tier umbrella protocols) --------------------------------
+
+
+class EntityComponent(BaseModel):
+    name: str
+    description: str
+
+
+class FaqItem(BaseModel):
+    question: str
+    answer: str
+    # Pinned questions sort to the top of the FAQ.
+    pinned: bool = False
+
+
+class OrgUnit(BaseModel):
+    name: str
+    role: str
+    description: str
+
+
+class TradFiRow(BaseModel):
+    product: str
+    similarity: str
+    differences: str
+
+
+class InvestmentRound(BaseModel):
+    date: str
+    round: str
+    amountUsd: Optional[float] = None
+    amountLabel: Optional[str] = None
+    investors: List[str] = Field(default_factory=list)
+    link: Optional[str] = None
+
+
+class Partnership(BaseModel):
+    name: str
+    date: str
+    amountLabel: Optional[str] = None
+    description: str = ""
+
+
+class CurrentScale(BaseModel):
+    tvlUsd: Optional[float] = None
+    users: Optional[int] = None
+    aprPct: Optional[float] = None
+    targetAprPct: Optional[float] = None
+    loanPipelineUsd: Optional[float] = None
+    partnerships: Optional[int] = None
+
+
+class MemberCoinRef(BaseModel):
+    slug: str
+    name: str
+    symbol: str
+    # Which category partition the coin lives in.
+    category: Literal["Stablecoin", "Token"]
+    role: str = ""
+
+
+class EntityProfile(BaseModel):
+    """A top-tier umbrella protocol grouping several coins (e.g. USD.AI)."""
+
+    category: Literal["Entity"] = "Entity"
+    slug: str
+    name: str
+    symbol: str = ""
+    status: ApprovalStatus = "PENDING_APPROVAL"
+    tagline: str = ""
+    description: str = ""
+    differentiator: str = ""
+    officialDocs: Optional[str] = None
+    website: Optional[str] = None
+    twitter: Optional[str] = None
+    discord: Optional[str] = None
+    github: Optional[str] = None
+    components: List[EntityComponent] = Field(default_factory=list)
+    faq: List[FaqItem] = Field(default_factory=list)
+    orgStructure: List[OrgUnit] = Field(default_factory=list)
+    tradFiComparison: List[TradFiRow] = Field(default_factory=list)
+    risks: List[str] = Field(default_factory=list)
+    investmentRounds: List[InvestmentRound] = Field(default_factory=list)
+    partnerships: List[Partnership] = Field(default_factory=list)
+    currentScale: CurrentScale = Field(default_factory=CurrentScale)
+    memberCoins: List[MemberCoinRef] = Field(default_factory=list)
+    arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
+        default_factory=ArbitrumPortalMetadata
+    )
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
+
+    def to_item(self) -> dict:
+        return {
+            schema.PK: schema.category_pk(schema.CATEGORY_ENTITY),
+            schema.SK: schema.protocol_sk(self.slug),
+            "Category": self.category,
+            "Status": self.status,
+            "Name": self.name,
+            "Slug": self.slug,
+            "Symbol": self.symbol,
+            "Tagline": self.tagline,
+            "Description": self.description,
+            "Differentiator": self.differentiator,
+            "OfficialDocs": self.officialDocs,
+            "Website": self.website,
+            "Twitter": self.twitter,
+            "Discord": self.discord,
+            "GitHub": self.github,
+            "Components": [c.model_dump() for c in self.components],
+            "Faq": [f.model_dump() for f in self.faq],
+            "OrgStructure": [o.model_dump() for o in self.orgStructure],
+            "TradFiComparison": [t.model_dump() for t in self.tradFiComparison],
+            "Risks": list(self.risks),
+            "InvestmentRounds": [r.model_dump() for r in self.investmentRounds],
+            "Partnerships": [p.model_dump() for p in self.partnerships],
+            "CurrentScale": self.currentScale.model_dump(),
+            "MemberCoins": [m.model_dump() for m in self.memberCoins],
+            "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
+            "CreatedAt": self.createdAt,
+            "UpdatedAt": self.updatedAt,
+        }
+
+    @classmethod
+    def from_item(cls, item: dict) -> "EntityProfile":
+        return cls(
+            slug=item["Slug"],
+            name=item["Name"],
+            symbol=item.get("Symbol", ""),
+            status=item.get("Status", "PENDING_APPROVAL"),
+            tagline=item.get("Tagline", ""),
+            description=item.get("Description", ""),
+            differentiator=item.get("Differentiator", ""),
+            officialDocs=item.get("OfficialDocs"),
+            website=item.get("Website"),
+            twitter=item.get("Twitter"),
+            discord=item.get("Discord"),
+            github=item.get("GitHub"),
+            components=[EntityComponent(**c) for c in (item.get("Components") or [])],
+            faq=[FaqItem(**f) for f in (item.get("Faq") or [])],
+            orgStructure=[OrgUnit(**o) for o in (item.get("OrgStructure") or [])],
+            tradFiComparison=[TradFiRow(**t) for t in (item.get("TradFiComparison") or [])],
+            risks=list(item.get("Risks") or []),
+            investmentRounds=[
+                InvestmentRound(**r) for r in (item.get("InvestmentRounds") or [])
+            ],
+            partnerships=[Partnership(**p) for p in (item.get("Partnerships") or [])],
+            currentScale=CurrentScale(**(item.get("CurrentScale") or {})),
+            memberCoins=[MemberCoinRef(**m) for m in (item.get("MemberCoins") or [])],
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
                 **(item.get("ArbitrumPortalMetadata") or {})
             ),

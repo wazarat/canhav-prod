@@ -2,7 +2,7 @@ import "server-only";
 
 import { resolveForSlug } from "@/lib/server/coingecko";
 import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
-import type { RwaProfile, StablecoinProfile } from "@/lib/types";
+import type { RwaProfile, StablecoinProfile, TokenProfile } from "@/lib/types";
 
 /**
  * Resolve an entity's Arbitrum contract address + decimals + USD price for the
@@ -28,7 +28,7 @@ export interface ResolvedToken {
 }
 
 export async function resolveEntityToken(
-  profile: StablecoinProfile | RwaProfile,
+  profile: StablecoinProfile | RwaProfile | TokenProfile,
 ): Promise<ResolvedToken> {
   const stored = (profile.contractAddress || "").trim().toLowerCase() || null;
   const live = await resolveForSlug(profile.slug, LIVE_REVALIDATE);

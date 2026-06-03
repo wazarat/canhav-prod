@@ -1,5 +1,11 @@
 import { readLiveStore } from "@/lib/server/store";
-import type { CategoryDef, RwaProfile, StablecoinProfile } from "@/lib/types";
+import type {
+  CategoryDef,
+  EntityProfile,
+  RwaProfile,
+  StablecoinProfile,
+  TokenProfile,
+} from "@/lib/types";
 
 /**
  * Data accessors.
@@ -153,10 +159,99 @@ export function tvlTrend(profile: RwaProfile): TvlTrend {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Token accessors (same approval gate)                                       */
+/* -------------------------------------------------------------------------- */
+
+/** All token profiles regardless of status — STAGING / admin only. */
+export async function getAllTokens(): Promise<TokenProfile[]> {
+  const { tokens } = await readLiveStore();
+  return [...tokens].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Public: only APPROVED token profiles ever leave this function. */
+export async function getApprovedTokens(): Promise<TokenProfile[]> {
+  return (await getAllTokens()).filter((p) => p.status === "APPROVED");
+}
+
+/** Public: a single APPROVED token profile, or null (so pending items 404). */
+export async function getApprovedTokenBySlug(slug: string): Promise<TokenProfile | null> {
+  return (await getApprovedTokens()).find((p) => p.slug === slug) ?? null;
+}
+
+/** Staging: a single token profile of any status. */
+export async function getTokenBySlug(slug: string): Promise<TokenProfile | null> {
+  return (await getAllTokens()).find((p) => p.slug === slug) ?? null;
+}
+
+export async function getTokenStagingCounts(): Promise<StagingCounts> {
+  const all = await getAllTokens();
+  const approved = all.filter((p) => p.status === "APPROVED").length;
+  return { total: all.length, approved, pending: all.length - approved };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Entity accessors (top-tier umbrella protocols)                             */
+/* -------------------------------------------------------------------------- */
+
+/** All entity profiles regardless of status — STAGING / admin only. */
+export async function getAllEntities(): Promise<EntityProfile[]> {
+  const { entities } = await readLiveStore();
+  return [...entities].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Public: only APPROVED entity profiles ever leave this function. */
+export async function getApprovedEntities(): Promise<EntityProfile[]> {
+  return (await getAllEntities()).filter((p) => p.status === "APPROVED");
+}
+
+/** Public: a single APPROVED entity profile, or null (so pending items 404). */
+export async function getApprovedEntityBySlug(slug: string): Promise<EntityProfile | null> {
+  return (await getApprovedEntities()).find((p) => p.slug === slug) ?? null;
+}
+
+/** Staging: a single entity profile of any status. */
+export async function getEntityBySlug(slug: string): Promise<EntityProfile | null> {
+  return (await getAllEntities()).find((p) => p.slug === slug) ?? null;
+}
+
+export async function getEntityStagingCounts(): Promise<StagingCounts> {
+  const all = await getAllEntities();
+  const approved = all.filter((p) => p.status === "APPROVED").length;
+  return { total: all.length, approved, pending: all.length - approved };
+}
+
+/**
+ * Resolve an entity's member coins to their full (APPROVED) profiles. Returns
+ * the member ref plus the matching stablecoin/token profile (or null if the
+ * coin isn't approved/found yet) so the entity page can render live data.
+ */
+export async function getEntityMemberCoins(
+  entity: EntityProfile,
+): Promise<
+  { ref: EntityProfile["memberCoins"][number]; profile: StablecoinProfile | TokenProfile | null }[]
+> {
+  const [stablecoins, tokens] = await Promise.all([getAllStablecoins(), getAllTokens()]);
+  return entity.memberCoins.map((ref) => {
+    const profile =
+      ref.category === "Stablecoin"
+        ? (stablecoins.find((p) => p.slug === ref.slug) ?? null)
+        : (tokens.find((p) => p.slug === ref.slug) ?? null);
+    return { ref, profile };
+  });
+}
+
+/* -------------------------------------------------------------------------- */
 /* Category taxonomy                                                          */
 /* -------------------------------------------------------------------------- */
 
 export const CATEGORIES: CategoryDef[] = [
+  {
+    slug: "entities",
+    label: "Entities",
+    description:
+      "Umbrella protocols that group stablecoins, RWAs, and tokens under one issuer.",
+    status: "active",
+  },
   {
     slug: "stablecoins",
     label: "Stablecoins",
@@ -167,6 +262,12 @@ export const CATEGORIES: CategoryDef[] = [
     slug: "rwas",
     label: "Real World Assets",
     description: "Tokenized treasuries, credit, equities, and off-chain collateral.",
+    status: "active",
+  },
+  {
+    slug: "tokens",
+    label: "Tokens",
+    description: "Governance & utility tokens powering protocol ecosystems.",
     status: "active",
   },
   {

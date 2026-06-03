@@ -26,6 +26,17 @@ SK = "SK"
 # --- Categories (taxonomy partitions) --------------------------------------
 CATEGORY_STABLECOIN = "Stablecoin"
 CATEGORY_RWA = "RWA"
+# Top-tier umbrella protocols that group several coins (e.g. USD.AI groups USDai,
+# sUSDai and CHIP). Entities "sit above" Stablecoins/RWAs in the taxonomy.
+CATEGORY_ENTITY = "Entity"
+# Standalone governance / utility tokens (e.g. CHIP).
+CATEGORY_TOKEN = "Token"
+
+# Token classifications (the store has no such column; assigned at ingest).
+TOKEN_TYPES = (
+    "Governance",
+    "Utility",
+)
 
 # Categories queued for the sequential rollout (kept here for reference).
 FUTURE_CATEGORIES = (

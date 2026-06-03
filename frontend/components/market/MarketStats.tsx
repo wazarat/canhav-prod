@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { coinIdForSlug, fetchMarketData } from "@/lib/server/coingecko";
-import type { RwaProfile, StablecoinProfile } from "@/lib/types";
+import type { RwaProfile, StablecoinProfile, TokenProfile } from "@/lib/types";
 import { formatNumberCompact, formatPct, formatUsdCompact } from "@/lib/utils";
 
 const LIVE_REVALIDATE = 300;
@@ -52,7 +52,7 @@ function NoMarketCard({ message }: { message: string }) {
 export async function MarketStats({
   profile,
 }: {
-  profile: StablecoinProfile | RwaProfile;
+  profile: StablecoinProfile | RwaProfile | TokenProfile;
 }) {
   const isStablecoin = profile.category === "Stablecoin";
   const coinId = coinIdForSlug(profile.slug);

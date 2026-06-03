@@ -4,14 +4,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
-import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/OnchainPanel";
 import { MarketStats, MarketStatsSkeleton } from "@/components/market/MarketStats";
-import { PegHistorySection } from "@/components/stablecoins/PegHistorySection";
-import { ProfileCard } from "@/components/stablecoins/ProfileCard";
-import { StablecoinHeadlineStats } from "@/components/stablecoins/StablecoinHeadlineStats";
+import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/OnchainPanel";
+import { TokenProfileCard } from "@/components/tokens/TokenProfileCard";
 import { Badge } from "@/components/ui/Badge";
-import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
-import { getApprovedStablecoins, getApprovedStablecoinBySlug } from "@/lib/data";
+import { getApprovedTokens, getApprovedTokenBySlug } from "@/lib/data";
 
 interface PageProps {
   params: { slug: string };
@@ -19,22 +16,18 @@ interface PageProps {
 
 export const revalidate = 300;
 
-// Pre-render only APPROVED profiles; pending items are not public.
 export async function generateStaticParams() {
-  return (await getApprovedStablecoins()).map((p) => ({ slug: p.slug }));
+  return (await getApprovedTokens()).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const profile = await getApprovedStablecoinBySlug(params.slug);
+  const profile = await getApprovedTokenBySlug(params.slug);
   if (!profile) return { title: "Not found" };
-  return {
-    title: `${profile.name}`,
-    description: profile.description,
-  };
+  return { title: profile.name, description: profile.description };
 }
 
-export default async function StablecoinProfilePage({ params }: PageProps) {
-  const profile = await getApprovedStablecoinBySlug(params.slug);
+export default async function TokenProfilePage({ params }: PageProps) {
+  const profile = await getApprovedTokenBySlug(params.slug);
   if (!profile) notFound();
 
   return (
@@ -44,8 +37,8 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
           Dashboard
         </Link>
         <ChevronRight className="h-3.5 w-3.5 text-ink-500" />
-        <Link href="/stablecoins" className="transition-colors hover:text-ink-50">
-          Stablecoins
+        <Link href="/tokens" className="transition-colors hover:text-ink-50">
+          Tokens
         </Link>
         <ChevronRight className="h-3.5 w-3.5 text-ink-500" />
         <span className="text-ink-100">{profile.name}</span>
@@ -60,12 +53,10 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
             <Badge tone="neutral" className="font-mono">
               {profile.symbol}
             </Badge>
-            <Badge tone={profile.pegTarget === "EUR" ? "neon" : "electric"}>
-              {profile.pegTarget} peg
-            </Badge>
+            <Badge tone="neon">{profile.tokenType}</Badge>
             {profile.entitySlug && (
               <Link href={`/entities/${profile.entitySlug}`}>
-                <Badge tone="neon">Part of USD.AI</Badge>
+                <Badge tone="electric">Part of USD.AI</Badge>
               </Link>
             )}
           </div>
@@ -73,23 +64,15 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
         </div>
       </header>
 
-      <Suspense fallback={<StatGridSkeleton />}>
-        <StablecoinHeadlineStats profile={profile} />
-      </Suspense>
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <Suspense fallback={<ChartCardSkeleton title="Historical peg variance" />}>
-            <PegHistorySection profile={profile} />
-          </Suspense>
-
           <Suspense fallback={<OnchainPanelSkeleton />}>
             <OnchainPanel profile={profile} />
           </Suspense>
         </div>
 
         <div className="space-y-4">
-          <ProfileCard profile={profile} />
+          <TokenProfileCard profile={profile} />
           <Suspense fallback={<MarketStatsSkeleton />}>
             <MarketStats profile={profile} />
           </Suspense>

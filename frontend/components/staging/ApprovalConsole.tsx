@@ -7,7 +7,7 @@ import { Check, KeyRound, Loader2, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 
 export interface ApprovalItem {
-  category: "Stablecoin" | "RWA";
+  category: "Stablecoin" | "RWA" | "Token" | "Entity";
   slug: string;
   name: string;
   status: "PENDING_APPROVAL" | "APPROVED";

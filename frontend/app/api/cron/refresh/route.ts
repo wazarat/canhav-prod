@@ -26,6 +26,7 @@ export const maxDuration = 60;
 
 const CATEGORY_STABLECOIN = "Stablecoin";
 const CATEGORY_RWA = "RWA";
+const CATEGORY_TOKEN = "Token";
 const COINGECKO_DELAY_MS = 1_500; // free-tier etiquette between lookups
 
 function nowIso(): string {
@@ -123,7 +124,8 @@ export async function GET(req: Request): Promise<NextResponse> {
     let mutated = true;
     if (!hasAlchemy) {
       row.note = "address persisted; ALCHEMY_API_KEY missing (metric skipped)";
-    } else if (category === CATEGORY_STABLECOIN) {
+    } else if (category === CATEGORY_STABLECOIN || category === CATEGORY_TOKEN) {
+      // Tokens, like stablecoins, expose circulating supply.
       const result = await fetchTotalSupply(address, decimals);
       item.TotalSupply = { ...result };
       row.metric = result.value;
@@ -149,12 +151,22 @@ export async function GET(req: Request): Promise<NextResponse> {
 
   // Refresh public surfaces + each touched detail page.
   revalidatePath("/");
+  revalidatePath("/entities");
   revalidatePath("/stablecoins");
   revalidatePath("/rwas");
+  revalidatePath("/tokens");
   revalidatePath("/staging");
   for (const { category, slug } of touchedSlugs) {
-    revalidatePath(`${category === CATEGORY_RWA ? "/rwas" : "/stablecoins"}/${slug}`);
+    const base =
+      category === CATEGORY_RWA
+        ? "/rwas"
+        : category === CATEGORY_TOKEN
+          ? "/tokens"
+          : "/stablecoins";
+    revalidatePath(`${base}/${slug}`);
   }
+  // Entity detail pages embed member-coin live data, so refresh them too.
+  revalidatePath("/entities/[slug]", "page");
 
   return NextResponse.json({
     ok: true,

@@ -31,7 +31,11 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   stably: null,
   tether: "tether",
   trueusd: "true-usd",
-  "usd-ai": null,
+  // USD.AI synthetic dollars (verified on CoinGecko, Arbitrum One).
+  usdai: "usdai",
+  susdai: "susdai",
+  // CHIP (USD.AI governance token) — not listed on CoinGecko yet.
+  chip: null,
   usdc: "usd-coin",
   usdt0: "usdt0",
   // RWAs (most have no CoinGecko-listed Arbitrum token yet). Verified via the

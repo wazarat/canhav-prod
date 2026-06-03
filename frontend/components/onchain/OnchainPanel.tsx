@@ -13,7 +13,7 @@ import {
   hasAlchemy,
 } from "@/lib/server/alchemy";
 import { resolveEntityToken } from "@/lib/server/resolve";
-import type { RwaProfile, StablecoinProfile } from "@/lib/types";
+import type { RwaProfile, StablecoinProfile, TokenProfile } from "@/lib/types";
 import {
   arbiscanToken,
   arbiscanTx,
@@ -55,15 +55,17 @@ function MetaRow({ label, value }: { label: string; value: React.ReactNode }) {
 export async function OnchainPanel({
   profile,
 }: {
-  profile: StablecoinProfile | RwaProfile;
+  profile: StablecoinProfile | RwaProfile | TokenProfile;
 }) {
   const token = await resolveEntityToken(profile);
-  const isStablecoin = profile.category === "Stablecoin";
+  // Supply-based categories (stablecoins, tokens) read totalSupply(); RWAs use a
+  // priced TVL proxy.
+  const isStablecoin = profile.category === "Stablecoin" || profile.category === "Token";
 
   if (!token.address) {
     // Stablecoins always have a token; suppress the panel on a rare miss.
-    if (isStablecoin) return null;
-    // RWAs are frequently pre-token — say so explicitly instead of rendering nothing.
+    if (profile.category === "Stablecoin") return null;
+    // RWAs / pre-launch tokens are frequently pre-token — say so explicitly.
     return (
       <Card className="space-y-2">
         <div className="flex items-center justify-between">

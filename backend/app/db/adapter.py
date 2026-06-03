@@ -27,6 +27,10 @@ class Repository(ABC):
         """Fetch a single item, or ``None`` if it doesn't exist."""
 
     @abstractmethod
+    def delete_item(self, pk: str, sk: str) -> bool:
+        """Delete an item; returns ``True`` if it existed, ``False`` otherwise."""
+
+    @abstractmethod
     def query(self, pk: str, status: Optional[str] = None) -> List[Item]:
         """Return all items in a partition, optionally filtered by ``Status``."""
 

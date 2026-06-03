@@ -11,10 +11,12 @@ export type ApprovalStatus = "PENDING_APPROVAL" | "APPROVED";
 
 export type PegTarget = "USD" | "EUR";
 
-/** Top-level taxonomy categories. Only "Stablecoin" is active in Phase 1. */
+/** Top-level taxonomy categories. */
 export type CategorySlug =
+  | "entities"
   | "stablecoins"
   | "rwas"
+  | "tokens"
   | "lending"
   | "perpetuals"
   | "yield"
@@ -83,6 +85,8 @@ export interface StablecoinProfile {
   auditUrl: string | null;
   /** Resolved Arbitrum token contract address (CoinGecko, Step 4 B2). */
   contractAddress?: string | null;
+  /** Slug of the parent umbrella Entity (e.g. "usd-ai"), if grouped. */
+  entitySlug?: string | null;
   totalSupply: TotalSupply;
   historicalPegData: HistoricalPegData;
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
@@ -154,6 +158,126 @@ export interface RwaProfile {
   vaultAddresses?: string[] | null;
   totalValueLocked: TotalValueLocked;
   historicalTvlData: HistoricalTvlData;
+  arbitrumPortalMetadata: ArbitrumPortalMetadata;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tokens — governance / utility tokens (e.g. CHIP)                           */
+/* -------------------------------------------------------------------------- */
+
+export type TokenType = "Governance" | "Utility";
+
+export interface TokenProfile {
+  category: "Token";
+  slug: string;
+  name: string;
+  symbol: string;
+  status: ApprovalStatus;
+  tokenType: TokenType;
+  description: string;
+  website: string | null;
+  twitter: string | null;
+  discord: string | null;
+  github: string | null;
+  coingecko: string | null;
+  auditUrl: string | null;
+  contractAddress?: string | null;
+  /** Slug of the parent umbrella Entity (e.g. "usd-ai"). */
+  entitySlug?: string | null;
+  totalSupply: TotalSupply;
+  arbitrumPortalMetadata: ArbitrumPortalMetadata;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Entities — top-tier umbrella protocols that group several coins            */
+/* -------------------------------------------------------------------------- */
+
+export interface EntityComponent {
+  name: string;
+  description: string;
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+  pinned?: boolean;
+}
+
+export interface OrgUnit {
+  name: string;
+  role: string;
+  description: string;
+}
+
+export interface TradFiRow {
+  product: string;
+  similarity: string;
+  differences: string;
+}
+
+export interface InvestmentRound {
+  date: string;
+  round: string;
+  amountUsd: number | null;
+  amountLabel: string | null;
+  investors: string[];
+  link: string | null;
+}
+
+export interface Partnership {
+  name: string;
+  date: string;
+  amountLabel: string | null;
+  description: string;
+}
+
+export interface CurrentScale {
+  tvlUsd: number | null;
+  users: number | null;
+  aprPct: number | null;
+  targetAprPct: number | null;
+  loanPipelineUsd: number | null;
+  partnerships: number | null;
+}
+
+/** Which category partition a member coin lives in. */
+export type MemberCoinCategory = "Stablecoin" | "Token";
+
+export interface MemberCoinRef {
+  slug: string;
+  name: string;
+  symbol: string;
+  category: MemberCoinCategory;
+  role: string;
+}
+
+export interface EntityProfile {
+  category: "Entity";
+  slug: string;
+  name: string;
+  symbol: string;
+  status: ApprovalStatus;
+  tagline: string;
+  description: string;
+  differentiator: string;
+  officialDocs: string | null;
+  website: string | null;
+  twitter: string | null;
+  discord: string | null;
+  github: string | null;
+  components: EntityComponent[];
+  faq: FaqItem[];
+  orgStructure: OrgUnit[];
+  tradFiComparison: TradFiRow[];
+  risks: string[];
+  investmentRounds: InvestmentRound[];
+  partnerships: Partnership[];
+  currentScale: CurrentScale;
+  memberCoins: MemberCoinRef[];
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   createdAt: string;
   updatedAt: string;

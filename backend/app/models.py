@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 from .db import schema
 
 ApprovalStatus = Literal["PENDING_APPROVAL", "APPROVED"]
-PegTarget = Literal["USD", "EUR"]
+PegTarget = Literal["USD", "EUR", "GBP"]
 RwaAssetClass = Literal[
     "Tokenized Equities",
     "Private Credit",

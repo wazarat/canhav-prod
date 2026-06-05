@@ -2,7 +2,8 @@
 """
 Seed the Entity category — top-tier umbrella protocols that group several coins.
 
-Seeds USD.AI and Jupiter. Editorial content (components, FAQ, org structure,
+Seeds USD.AI, Jupiter, and the batch stablecoin issuers (Ethena, Sky,
+Monerium, Stably, TrueUSD). Editorial content (components, FAQ, org structure,
 TradFi comparison, risks, events, partnerships, current scale) is curated here.
 Shared metadata (website / portal banner) is pulled from a Portal CSV row when
 available; Jupiter has no CSV row and uses hardcoded defaults.
@@ -28,6 +29,11 @@ if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
 from app.db import get_repository, schema  # noqa: E402
+
+SCRIPTS_ROOT = Path(__file__).resolve().parent
+if str(SCRIPTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_ROOT))
+from entity_specs_batch import BATCH_ENTITY_SPECS  # noqa: E402
 
 DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
 DOWNLOADS_CSV = Path.home() / "Downloads" / "Arbitrum Ecosystem - scrape v2.csv"
@@ -776,6 +782,8 @@ ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         },
     },
 }
+
+ENTITY_SPECS.update(BATCH_ENTITY_SPECS)
 
 
 def build_entity_item(

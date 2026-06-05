@@ -9,7 +9,7 @@
 
 export type ApprovalStatus = "PENDING_APPROVAL" | "APPROVED";
 
-export type PegTarget = "USD" | "EUR";
+export type PegTarget = "USD" | "EUR" | "GBP";
 
 /** Top-level taxonomy categories. */
 export type CategorySlug =

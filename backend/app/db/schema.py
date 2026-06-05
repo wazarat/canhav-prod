@@ -68,6 +68,7 @@ VALID_STATUSES = (STATUS_PENDING, STATUS_APPROVED)
 # --- Peg targets -----------------------------------------------------------
 PEG_USD = "USD"
 PEG_EUR = "EUR"
+PEG_GBP = "GBP"
 
 
 def category_pk(category: str) -> str:

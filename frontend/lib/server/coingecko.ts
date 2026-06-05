@@ -25,10 +25,19 @@ const ARBITRUM_PLATFORM = "arbitrum-one";
 export const COINGECKO_IDS: Record<string, string | null> = {
   // Stablecoins
   ethena: "ethena-usde",
+  susde: "ethena-staked-usde",
+  usdtb: null,
+  ena: "ethena",
   "inverse-finance": "dola-usd",
   monerium: "monerium-eur-money",
+  gbpe: null,
   sky: "usds",
+  susds: "susds",
+  dai: "dai",
+  stusds: null,
+  "sky-gov": "sky",
   stably: null,
+  veusd: "veusd",
   tether: "tether",
   trueusd: "true-usd",
   // USD.AI synthetic dollars (verified on CoinGecko, Arbitrum One).

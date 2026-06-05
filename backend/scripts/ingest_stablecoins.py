@@ -58,6 +58,142 @@ TARGETS: Dict[str, Tuple[str, str, str]] = {
 USD_AI_PARENT_SLUG = "usd-ai"
 JUPITER_PARENT_SLUG = "jupiter"
 
+# Umbrella entities whose primary CSV stablecoin row doubles as a member product.
+ENTITY_PARENT_SLUGS = frozenset({"ethena", "sky", "monerium", "stably", "trueusd"})
+
+# Field patches applied to CSV-derived parent stablecoins when seeding entities.
+ENTITY_PARENT_PATCHES: Dict[str, Dict[str, str]] = {
+    "ethena": {
+        "name": "USDe",
+        "subCategory": "Stablecoin",
+        "description": (
+            "Synthetic dollar pegged via delta-hedging BTC/ETH spot plus perp shorts "
+            "and liquid stables. Not fiat-backed. Mint/redeem KYC-gated to market makers."
+        ),
+    },
+    "sky": {
+        "name": "USDS",
+        "subCategory": "Stablecoin",
+        "description": (
+            "Primary Sky dollar (DAI successor). ERC-20 with 1:1 USDC swap and base "
+            "for sUSDS yield wrapper."
+        ),
+    },
+    "monerium": {
+        "name": "EURe",
+        "subCategory": "Stablecoin",
+        "description": (
+            "Regulated euro e-money issued by Monerium hf. Redeemable at par via "
+            "Web3 IBAN and banking rails."
+        ),
+    },
+    "stably": {
+        "name": "Stably USD",
+        "subCategory": "Stablecoin",
+        "description": (
+            "Stablecoin-as-a-service dollar from Stably, distinct from Sky USDS."
+        ),
+    },
+    "trueusd": {
+        "name": "TUSD",
+        "subCategory": "Stablecoin",
+        "description": (
+            "Fiat-backed USD stablecoin with daily attestations and Chainlink Proof "
+            "of Reserve. No native yield."
+        ),
+        "contractAddress": "0x4d15a3a2286d883af0aa1b3f21367843fac63e07",
+    },
+}
+
+# Extra stablecoin products per umbrella entity (slug -> spec).
+BATCH_ENTITY_COINS: Dict[str, Dict[str, Dict[str, str]]] = {
+    "ethena": {
+        "susde": {
+            "name": "sUSDe",
+            "symbol": "sUSDe",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/ethena-staked-usde",
+            "contractAddress": "0x9d39a5de30e57443bff2a8307a4256c8797a3497",
+            "description": (
+                "Staked USDe receipt token accruing protocol revenue. Savings asset, "
+                "not a separate pegged stablecoin."
+            ),
+        },
+        "usdtb": {
+            "name": "USDtb",
+            "symbol": "USDtb",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "description": (
+                "Treasury-backed dollar distinct from synthetic USDe, backed by "
+                "short-term Treasuries / BUIDL exposure."
+            ),
+        },
+    },
+    "sky": {
+        "susds": {
+            "name": "sUSDS",
+            "symbol": "sUSDS",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/susds",
+            "contractAddress": None,
+            "description": (
+                "Yield-bearing USDS via Sky Savings Rate. Non-custodial wrapper with "
+                "compounding exchange rate."
+            ),
+        },
+        "dai": {
+            "name": "DAI",
+            "symbol": "DAI",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/dai",
+            "contractAddress": None,
+            "description": "Legacy Maker collateral-minted stablecoin.",
+        },
+        "stusds": {
+            "name": "stUSDS",
+            "symbol": "stUSDS",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "description": (
+                "Expert-user yield from SKY-backed borrowing with dynamic "
+                "utilization-based returns."
+            ),
+        },
+    },
+    "monerium": {
+        "gbpe": {
+            "name": "GBPe",
+            "symbol": "GBPe",
+            "pegTarget": schema.PEG_GBP,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "description": "Regulated pound e-money from Monerium hf.",
+        },
+    },
+    "stably": {
+        "veusd": {
+            "name": "VeUSD",
+            "symbol": "VeUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/veusd",
+            "contractAddress": None,
+            "description": (
+                "VeChain USD stablecoin developed by Stably, issued by Prime Trust."
+            ),
+        },
+    },
+}
+
 USD_AI_COINS: Dict[str, Dict[str, str]] = {
     "usdai": {
         "name": "USDai",
@@ -195,12 +331,14 @@ def entity_coin_item(
     discord: Optional[str] = None,
     github: Optional[str] = None,
 ) -> dict:
-    """Build a stablecoin item for an umbrella entity (USD.AI or Jupiter)."""
+    """Build a stablecoin item for an umbrella entity (USD.AI, Jupiter, batch issuers)."""
     item = row_to_item_generic(parent_row or {}, created_at)
     item[schema.SK] = schema.protocol_sk(slug)
     item["Name"] = spec["name"]
     item["Slug"] = slug
     item["Symbol"] = spec["symbol"]
+    if spec.get("pegTarget"):
+        item["PegTarget"] = spec["pegTarget"]
     item["SubCategory"] = spec.get("subCategory")
     item["Description"] = spec.get("description") or item["Description"]
     item["CoinGecko"] = spec.get("coingecko")
@@ -295,6 +433,17 @@ def main(argv: List[str]) -> int:
         existing = repo.get_item(pk, schema.protocol_sk(slug))
         created_at = (existing or {}).get("CreatedAt") or _now_iso()
         item = row_to_item(row, created_at)
+        if slug in ENTITY_PARENT_SLUGS:
+            item["EntitySlug"] = slug
+            patch = ENTITY_PARENT_PATCHES.get(slug, {})
+            if patch.get("name"):
+                item["Name"] = patch["name"]
+            if patch.get("subCategory"):
+                item["SubCategory"] = patch["subCategory"]
+            if patch.get("description"):
+                item["Description"] = patch["description"]
+            if patch.get("contractAddress"):
+                item["ContractAddress"] = patch["contractAddress"]
         repo.put_item(item)
         staged.append(slug)
 
@@ -336,6 +485,29 @@ def main(argv: List[str]) -> int:
         )
         jupiter_staged.append(slug)
 
+    # Batch entity extra stablecoins (Ethena, Sky, Monerium, Stably).
+    batch_staged: List[str] = []
+    for entity_slug, coins in BATCH_ENTITY_COINS.items():
+        parent_row = matched.get(entity_slug)
+        for slug, spec in coins.items():
+            existing = repo.get_item(pk, schema.protocol_sk(slug))
+            created_at = (existing or {}).get("CreatedAt") or _now_iso()
+            row = parent_row or {}
+            repo.put_item(
+                entity_coin_item(
+                    slug,
+                    spec,
+                    entity_slug,
+                    row,
+                    created_at,
+                    website=_clean(row.get("Website")),
+                    twitter=_clean(row.get("Twitter")),
+                    discord=_clean(row.get("Discord")),
+                    github=_clean(row.get("GitHub")),
+                )
+            )
+            batch_staged.append(slug)
+
     # Drop the legacy combined "usd-ai" stablecoin (superseded by the two coins).
     removed_legacy = repo.delete_item(pk, schema.protocol_sk(USD_AI_PARENT_SLUG))
 
@@ -356,9 +528,19 @@ def main(argv: List[str]) -> int:
     for slug in jupiter_staged:
         spec = JUPITER_COINS[slug]
         print(f"{schema.STATUS_PENDING:<18}{spec['symbol']:<10}{spec['name']} (Jupiter)")
+    for slug in batch_staged:
+        for entity_slug, coins in BATCH_ENTITY_COINS.items():
+            if slug in coins:
+                spec = coins[slug]
+                print(
+                    f"{schema.STATUS_PENDING:<18}{spec['symbol']:<10}"
+                    f"{spec['name']} ({entity_slug})"
+                )
+                break
     print("-" * 64)
-    total_staged = len(staged) + len(usd_ai_staged) + len(jupiter_staged)
-    total_targets = len(TARGETS) + len(USD_AI_COINS) + len(JUPITER_COINS)
+    batch_count = sum(len(c) for c in BATCH_ENTITY_COINS.values())
+    total_staged = len(staged) + len(usd_ai_staged) + len(jupiter_staged) + len(batch_staged)
+    total_targets = len(TARGETS) + len(USD_AI_COINS) + len(JUPITER_COINS) + batch_count
     print(f"Published {total_staged} / {total_targets} target stablecoins as APPROVED.")
     if removed_legacy:
         print(f"Removed legacy '{USD_AI_PARENT_SLUG}' stablecoin (superseded by USDai + sUSDai).")

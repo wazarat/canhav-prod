@@ -25,7 +25,8 @@ function PegCell({ profile }: { profile: StablecoinProfile }) {
   const latest = latestPegPrice(profile);
   const bps = pegDeviationBps(profile);
   const health = pegHealth(profile);
-  const symbol = profile.pegTarget === "EUR" ? "€" : "$";
+  const symbol =
+    profile.pegTarget === "EUR" ? "€" : profile.pegTarget === "GBP" ? "£" : "$";
   return (
     <div className="flex flex-col gap-1">
       <span className="font-mono text-ink-50">
@@ -68,7 +69,9 @@ export function StablecoinTable({ profiles, showStatus = false, emptyHint }: Sta
             const supplyLabel =
               p.pegTarget === "EUR" && supply !== null
                 ? `€${formatUsdCompact(supply).slice(1)}`
-                : formatUsdCompact(supply);
+                : p.pegTarget === "GBP" && supply !== null
+                  ? `£${formatUsdCompact(supply).slice(1)}`
+                  : formatUsdCompact(supply);
             return (
               <TR key={p.slug}>
                 <TD>

@@ -32,6 +32,8 @@ from app.db import get_repository, schema  # noqa: E402
 
 USD_AI_PARENT_SLUG = "usd-ai"
 JUPITER_PARENT_SLUG = "jupiter"
+ETHENA_PARENT_SLUG = "ethena"
+SKY_PARENT_SLUG = "sky"
 
 # slug -> spec. USD.AI tokens pull shared metadata from the Portal row; Jupiter
 # tokens are fully curated (Solana-native, no Arbitrum CSV row).
@@ -96,6 +98,44 @@ TOKENS: Dict[str, Dict[str, Optional[str]]] = {
         "twitter": "https://x.com/JupiterExchange",
         "discord": "https://discord.gg/jup",
         "github": "https://github.com/jup-ag",
+    },
+    "ena": {
+        "name": "ENA",
+        "symbol": "ENA",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token for Ethena protocol parameters, treasury, and ecosystem "
+            "development. ERC-20 on Ethereum and bridged networks."
+        ),
+        "entitySlug": ETHENA_PARENT_SLUG,
+        "coingecko": "https://www.coingecko.com/en/coins/ethena",
+        "contractAddress": "0x57e114B691Db790C35207b2e685D4A43181e6061",
+        "csvParentSlug": ETHENA_PARENT_SLUG,
+        "chains": None,
+        "website": None,
+        "twitter": None,
+        "discord": None,
+        "github": None,
+    },
+    "sky-gov": {
+        "name": "SKY",
+        "symbol": "SKY",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Sky governance token (MKR successor). Stake to earn rewards or borrow USDS. "
+            "Supply ~23.46B after the Sep 2024 migration."
+        ),
+        "entitySlug": SKY_PARENT_SLUG,
+        "coingecko": "https://www.coingecko.com/en/coins/sky",
+        "contractAddress": None,
+        "csvParentSlug": SKY_PARENT_SLUG,
+        "chains": None,
+        "website": None,
+        "twitter": None,
+        "discord": None,
+        "github": None,
     },
     "jupsol": {
         "name": "JupSOL",

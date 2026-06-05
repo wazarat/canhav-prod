@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 
 import { TokenTable } from "@/components/tokens/TokenTable";
 import { StatCard } from "@/components/ui/StatCard";
-import { getApprovedTokens } from "@/lib/data";
+import { getApprovedEntities, getApprovedTokens } from "@/lib/data";
 
 export const metadata = {
   title: "Tokens",
@@ -12,7 +12,7 @@ export const metadata = {
 export const revalidate = 300;
 
 export default async function TokensPage() {
-  const profiles = await getApprovedTokens();
+  const [profiles, entities] = await Promise.all([getApprovedTokens(), getApprovedEntities()]);
 
   const types = new Set(profiles.map((p) => p.tokenType));
 
@@ -43,7 +43,7 @@ export default async function TokensPage() {
         <StatCard label="Utility" value={`${profiles.filter((p) => p.tokenType === "Utility").length}`} hint="Utility tokens" />
       </section>
 
-      <TokenTable profiles={profiles} emptyHint="No tokens in the store yet." />
+      <TokenTable profiles={profiles} entities={entities} emptyHint="No tokens in the store yet." />
     </div>
   );
 }

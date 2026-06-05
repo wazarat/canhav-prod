@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { ArrowUpRight, ExternalLink, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
@@ -42,9 +43,16 @@ export function MemberCoins({ coins }: { coins: CoinLiveData[] }) {
                 </div>
                 <span className="font-mono text-xs text-ink-400">{coin.symbol}</span>
               </div>
-              <Badge tone={coin.category === "Token" ? "neon" : "electric"}>
-                {coin.category}
-              </Badge>
+              <div className="flex flex-col items-end gap-1">
+                <Badge tone={coin.category === "Token" ? "neon" : "electric"}>
+                  {coin.category}
+                </Badge>
+                {coin.subCategory && (
+                  <Badge tone="neutral" className="text-[10px]">
+                    {coin.subCategory}
+                  </Badge>
+                )}
+              </div>
             </div>
             {coin.role && <p className="text-sm text-ink-300">{coin.role}</p>}
             <div className="mt-auto flex items-center gap-4 pt-2 text-xs text-ink-300">
@@ -118,9 +126,12 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
               <Badge tone="neutral" className="font-mono">
                 {coin.symbol}
               </Badge>
-              <Badge tone={coin.category === "Token" ? "neon" : "electric"}>
-                {coin.category}
-              </Badge>
+              <div className="flex flex-wrap gap-1">
+                <Badge tone={coin.category === "Token" ? "neon" : "electric"}>
+                  {coin.category}
+                </Badge>
+                {coin.subCategory && <Badge tone="neutral">{coin.subCategory}</Badge>}
+              </div>
             </div>
             {coin.role && <p className="text-sm text-ink-300">{coin.role}</p>}
           </div>
@@ -208,10 +219,10 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
               />
               <ModalRow label="Decimals" value={coin.onchain?.decimals ?? "—"} />
               <ModalRow
-                label="Arbitrum contract"
+                label={coin.links.explorerLabel}
                 value={
                   <a
-                    href={coin.links.arbiscan ?? "#"}
+                    href={coin.links.explorer ?? "#"}
                     target="_blank"
                     rel="noreferrer"
                     className="font-mono text-electric-400 hover:underline"
@@ -227,17 +238,24 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
             </div>
           ) : (
             <p className="text-sm text-ink-300">
-              No public Arbitrum token contract is mapped for this coin yet, so live on-chain
-              supply isn&apos;t available.
+              No public token contract is mapped for this coin yet, so live on-chain supply
+              isn&apos;t available.
             </p>
           )}
         </Section>
 
         {/* Links */}
         <div className="mt-5 flex flex-wrap gap-2">
+          <Link
+            href={coin.profilePath}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-1.5 text-xs font-medium text-electric-300 transition-colors hover:bg-electric-500/20"
+          >
+            Full profile
+            <ArrowUpRight className="h-3 w-3" />
+          </Link>
           <ModalLink label="Website" href={coin.links.website} />
           <ModalLink label="CoinGecko" href={coin.links.coingecko} />
-          <ModalLink label="Arbiscan" href={coin.links.arbiscan} />
+          <ModalLink label={coin.links.explorerLabel} href={coin.links.explorer} />
         </div>
       </div>
     </div>

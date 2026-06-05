@@ -8,7 +8,7 @@ import { MarketStats, MarketStatsSkeleton } from "@/components/market/MarketStat
 import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/OnchainPanel";
 import { TokenProfileCard } from "@/components/tokens/TokenProfileCard";
 import { Badge } from "@/components/ui/Badge";
-import { getApprovedTokens, getApprovedTokenBySlug } from "@/lib/data";
+import { getApprovedTokenBySlug, getApprovedTokens, getEntityBySlug } from "@/lib/data";
 
 interface PageProps {
   params: { slug: string };
@@ -29,6 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function TokenProfilePage({ params }: PageProps) {
   const profile = await getApprovedTokenBySlug(params.slug);
   if (!profile) notFound();
+  const entity = profile.entitySlug ? await getEntityBySlug(profile.entitySlug) : null;
 
   return (
     <div className="container space-y-8 py-12">
@@ -54,9 +55,10 @@ export default async function TokenProfilePage({ params }: PageProps) {
               {profile.symbol}
             </Badge>
             <Badge tone="neon">{profile.tokenType}</Badge>
-            {profile.entitySlug && (
-              <Link href={`/entities/${profile.entitySlug}`}>
-                <Badge tone="electric">Part of USD.AI</Badge>
+            {profile.subCategory && <Badge tone="neutral">{profile.subCategory}</Badge>}
+            {entity && (
+              <Link href={`/entities/${entity.slug}`}>
+                <Badge tone="electric">Part of {entity.name}</Badge>
               </Link>
             )}
           </div>

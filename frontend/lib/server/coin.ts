@@ -36,16 +36,28 @@ export interface CoinLiveData {
   category: "Stablecoin" | "Token";
   /** Member-coin role label (e.g. "Yield-bearing synthetic dollar"). */
   role: string;
+  subCategory: string | null;
   description: string;
   contractAddress: string | null;
+  chains: string[];
+  profilePath: string;
   hasAlchemy: boolean;
   market: MarketData | null;
   onchain: CoinOnchain | null;
   links: {
     website: string | null;
     coingecko: string | null;
-    arbiscan: string | null;
+    explorer: string | null;
+    explorerLabel: string;
   };
+}
+
+function explorerLink(chains: string[], address: string | null): { url: string | null; label: string } {
+  if (!address) return { url: null, label: "Explorer" };
+  if (chains.some((c) => c.toLowerCase().includes("solana"))) {
+    return { url: `https://solscan.io/token/${address}`, label: "Solscan" };
+  }
+  return { url: `https://arbiscan.io/token/${address}`, label: "Arbiscan" };
 }
 
 export async function getCoinLiveData(
@@ -73,21 +85,30 @@ export async function getCoinLiveData(
       }
     : null;
 
+  const chains = profile.arbitrumPortalMetadata.chains ?? [];
+  const explorer = explorerLink(chains, address);
+  const profilePath =
+    profile.category === "Stablecoin" ? `/stablecoins/${profile.slug}` : `/tokens/${profile.slug}`;
+
   return {
     slug: profile.slug,
     name: profile.name,
     symbol: profile.symbol,
     category: profile.category,
     role,
+    subCategory: profile.subCategory ?? null,
     description: profile.description,
     contractAddress: address,
+    chains,
+    profilePath,
     hasAlchemy: hasAlchemy(),
     market,
     onchain,
     links: {
       website: profile.website,
       coingecko: profile.coingecko,
-      arbiscan: address ? `https://arbiscan.io/token/${address}` : null,
+      explorer: explorer.url,
+      explorerLabel: explorer.label,
     },
   };
 }

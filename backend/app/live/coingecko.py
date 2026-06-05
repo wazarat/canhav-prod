@@ -44,6 +44,15 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     "tether": "tether",
     "trueusd": "true-usd",
     "usd-ai": None,
+    "usdai": "usdai",
+    "susdai": "susdai",
+    "chip": None,
+    # Jupiter (Solana)
+    "jup": "jupiter-exchange-solana",
+    "jlp": "jupiter-perpetuals-liquidity-provider-token",
+    "jupsol": "jupiter-staked-sol",
+    "jupusd": "jupusd",
+    "jljupusd": None,
     "usdc": "usd-coin",
     "usdt0": "usdt0",
     # RWAs (most have no CoinGecko-listed Arbitrum token yet)

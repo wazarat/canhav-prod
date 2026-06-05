@@ -68,6 +68,7 @@ class StablecoinProfile(BaseModel):
     symbol: str
     status: ApprovalStatus = "APPROVED"
     pegTarget: PegTarget = "USD"
+    subCategory: Optional[str] = None
     description: str = ""
     website: Optional[str] = None
     twitter: Optional[str] = None
@@ -98,6 +99,7 @@ class StablecoinProfile(BaseModel):
             "Slug": self.slug,
             "Symbol": self.symbol,
             "PegTarget": self.pegTarget,
+            "SubCategory": self.subCategory,
             "Description": self.description,
             "Website": self.website,
             "Twitter": self.twitter,
@@ -123,6 +125,7 @@ class StablecoinProfile(BaseModel):
             symbol=item.get("Symbol", ""),
             status=item.get("Status", "APPROVED"),
             pegTarget=item.get("PegTarget", "USD"),
+            subCategory=item.get("SubCategory"),
             description=item.get("Description", ""),
             website=item.get("Website"),
             twitter=item.get("Twitter"),
@@ -246,7 +249,25 @@ class RwaProfile(BaseModel):
 
 # --- Tokens ----------------------------------------------------------------
 
-TokenType = Literal["Governance", "Utility"]
+TokenType = Literal["Governance", "Utility", "Yield", "LST"]
+StablecoinSubCategory = Literal["Stablecoin", "Staked Stablecoin"]
+TokenSubCategory = Literal[
+    "Governance Token",
+    "Yield-generating Token",
+    "LST",
+    "Utility Token",
+]
+RiskCategory = Literal[
+    "Counterparty",
+    "Network",
+    "Oracle",
+    "Reserve / Depeg",
+    "Smart Contract",
+    "Governance",
+    "Collateral",
+    "Regulatory",
+    "Systemic",
+]
 
 
 class TokenProfile(BaseModel):
@@ -258,6 +279,7 @@ class TokenProfile(BaseModel):
     symbol: str = ""
     status: ApprovalStatus = "APPROVED"
     tokenType: TokenType = "Governance"
+    subCategory: Optional[str] = None
     description: str = ""
     website: Optional[str] = None
     twitter: Optional[str] = None
@@ -285,6 +307,7 @@ class TokenProfile(BaseModel):
             "Slug": self.slug,
             "Symbol": self.symbol,
             "TokenType": self.tokenType,
+            "SubCategory": self.subCategory,
             "Description": self.description,
             "Website": self.website,
             "Twitter": self.twitter,
@@ -308,6 +331,7 @@ class TokenProfile(BaseModel):
             symbol=item.get("Symbol", ""),
             status=item.get("Status", "APPROVED"),
             tokenType=item.get("TokenType", "Governance"),
+            subCategory=item.get("SubCategory"),
             description=item.get("Description", ""),
             website=item.get("Website"),
             twitter=item.get("Twitter"),
@@ -385,6 +409,41 @@ class MemberCoinRef(BaseModel):
     # Which category partition the coin lives in.
     category: Literal["Stablecoin", "Token"]
     role: str = ""
+    subCategory: Optional[str] = None
+
+
+class EntityRisk(BaseModel):
+    category: str
+    description: str
+
+
+def _parse_risks(raw: object) -> List[EntityRisk]:
+    """Accept legacy string bullets or typed {category, description} objects."""
+    if not raw:
+        return []
+    out: List[EntityRisk] = []
+    for item in raw:  # type: ignore[union-attr]
+        if isinstance(item, str):
+            out.append(EntityRisk(category="Systemic", description=item))
+        elif isinstance(item, dict):
+            out.append(EntityRisk(**item))
+    return out
+
+
+class EntityEvent(BaseModel):
+    date: str
+    title: str
+    description: str
+    link: Optional[str] = None
+
+
+class ScaleLabels(BaseModel):
+    tvl: Optional[str] = None
+    users: Optional[str] = None
+    apr: Optional[str] = None
+    pipeline: Optional[str] = None
+    partnerships: Optional[str] = None
+    coins: Optional[str] = None
 
 
 class EntityProfile(BaseModel):
@@ -407,10 +466,12 @@ class EntityProfile(BaseModel):
     faq: List[FaqItem] = Field(default_factory=list)
     orgStructure: List[OrgUnit] = Field(default_factory=list)
     tradFiComparison: List[TradFiRow] = Field(default_factory=list)
-    risks: List[str] = Field(default_factory=list)
+    risks: List[EntityRisk] = Field(default_factory=list)
+    events: List[EntityEvent] = Field(default_factory=list)
     investmentRounds: List[InvestmentRound] = Field(default_factory=list)
     partnerships: List[Partnership] = Field(default_factory=list)
     currentScale: CurrentScale = Field(default_factory=CurrentScale)
+    scaleLabels: Optional[ScaleLabels] = None
     memberCoins: List[MemberCoinRef] = Field(default_factory=list)
     arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
         default_factory=ArbitrumPortalMetadata
@@ -439,8 +500,10 @@ class EntityProfile(BaseModel):
             "Faq": [f.model_dump() for f in self.faq],
             "OrgStructure": [o.model_dump() for o in self.orgStructure],
             "TradFiComparison": [t.model_dump() for t in self.tradFiComparison],
-            "Risks": list(self.risks),
+            "Risks": [r.model_dump() for r in self.risks],
+            "Events": [e.model_dump() for e in self.events],
             "InvestmentRounds": [r.model_dump() for r in self.investmentRounds],
+            "ScaleLabels": self.scaleLabels.model_dump() if self.scaleLabels else None,
             "Partnerships": [p.model_dump() for p in self.partnerships],
             "CurrentScale": self.currentScale.model_dump(),
             "MemberCoins": [m.model_dump() for m in self.memberCoins],
@@ -468,12 +531,16 @@ class EntityProfile(BaseModel):
             faq=[FaqItem(**f) for f in (item.get("Faq") or [])],
             orgStructure=[OrgUnit(**o) for o in (item.get("OrgStructure") or [])],
             tradFiComparison=[TradFiRow(**t) for t in (item.get("TradFiComparison") or [])],
-            risks=list(item.get("Risks") or []),
+            risks=_parse_risks(item.get("Risks")),
+            events=[EntityEvent(**e) for e in (item.get("Events") or [])],
             investmentRounds=[
                 InvestmentRound(**r) for r in (item.get("InvestmentRounds") or [])
             ],
             partnerships=[Partnership(**p) for p in (item.get("Partnerships") or [])],
             currentScale=CurrentScale(**(item.get("CurrentScale") or {})),
+            scaleLabels=ScaleLabels(**item["ScaleLabels"])
+            if item.get("ScaleLabels")
+            else None,
             memberCoins=[MemberCoinRef(**m) for m in (item.get("MemberCoins") or [])],
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
                 **(item.get("ArbitrumPortalMetadata") or {})

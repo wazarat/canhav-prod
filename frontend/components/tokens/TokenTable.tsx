@@ -4,15 +4,23 @@ import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
-import type { TokenProfile } from "@/lib/types";
+import type { EntityProfile, TokenProfile } from "@/lib/types";
 
 interface TokenTableProps {
   profiles: TokenProfile[];
+  entities?: EntityProfile[];
   showStatus?: boolean;
   emptyHint?: string;
 }
 
-export function TokenTable({ profiles, showStatus = false, emptyHint }: TokenTableProps) {
+export function TokenTable({
+  profiles,
+  entities = [],
+  showStatus = false,
+  emptyHint,
+}: TokenTableProps) {
+  const entityName = (slug: string | null | undefined) =>
+    entities.find((e) => e.slug === slug)?.name ?? slug ?? null;
   if (profiles.length === 0) {
     return (
       <div className="glass rounded-2xl px-6 py-12 text-center text-sm text-ink-300">
@@ -54,7 +62,10 @@ export function TokenTable({ profiles, showStatus = false, emptyHint }: TokenTab
                 </p>
               </TD>
               <TD>
-                <Badge tone="neon">{p.tokenType}</Badge>
+                <div className="flex flex-wrap gap-1">
+                  <Badge tone="neon">{p.tokenType}</Badge>
+                  {p.subCategory && <Badge tone="neutral">{p.subCategory}</Badge>}
+                </div>
               </TD>
               <TD>
                 {p.entitySlug ? (
@@ -62,7 +73,7 @@ export function TokenTable({ profiles, showStatus = false, emptyHint }: TokenTab
                     href={`/entities/${p.entitySlug}`}
                     className="text-xs text-electric-400 hover:underline"
                   >
-                    {p.entitySlug}
+                    {entityName(p.entitySlug)}
                   </Link>
                 ) : (
                   <span className="text-ink-400">—</span>

@@ -11,7 +11,7 @@ import { ProfileCard } from "@/components/stablecoins/ProfileCard";
 import { StablecoinHeadlineStats } from "@/components/stablecoins/StablecoinHeadlineStats";
 import { Badge } from "@/components/ui/Badge";
 import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
-import { getApprovedStablecoins, getApprovedStablecoinBySlug } from "@/lib/data";
+import { getApprovedStablecoinBySlug, getApprovedStablecoins, getEntityBySlug } from "@/lib/data";
 
 interface PageProps {
   params: { slug: string };
@@ -36,6 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function StablecoinProfilePage({ params }: PageProps) {
   const profile = await getApprovedStablecoinBySlug(params.slug);
   if (!profile) notFound();
+  const entity = profile.entitySlug ? await getEntityBySlug(profile.entitySlug) : null;
 
   return (
     <div className="container space-y-8 py-12">
@@ -63,9 +64,10 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
             <Badge tone={profile.pegTarget === "EUR" ? "neon" : "electric"}>
               {profile.pegTarget} peg
             </Badge>
-            {profile.entitySlug && (
-              <Link href={`/entities/${profile.entitySlug}`}>
-                <Badge tone="neon">Part of USD.AI</Badge>
+            {profile.subCategory && <Badge tone="neutral">{profile.subCategory}</Badge>}
+            {entity && (
+              <Link href={`/entities/${entity.slug}`}>
+                <Badge tone="neon">Part of {entity.name}</Badge>
               </Link>
             )}
           </div>

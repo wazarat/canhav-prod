@@ -5,6 +5,8 @@ import { repoRoot } from "@/lib/server/env";
 import { hasUpstash, readAllItemsFromRedis } from "@/lib/server/redis";
 import type {
   EntityProfile,
+  EntityRisk,
+  RiskCategory,
   RwaProfile,
   StablecoinProfile,
   TokenProfile,
@@ -73,6 +75,20 @@ export function setStatusLocal(
   return item;
 }
 
+function parseRisks(raw: unknown): EntityRisk[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((item) => {
+    if (typeof item === "string") {
+      return { category: "Systemic" as RiskCategory, description: item };
+    }
+    const r = item as Record<string, string>;
+    return {
+      category: (r.category ?? "Systemic") as RiskCategory,
+      description: r.description ?? "",
+    };
+  });
+}
+
 function common(item: Record<string, any>) {
   return {
     slug: String(item.Slug ?? ""),
@@ -124,6 +140,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         category: "Stablecoin",
         ...common(item),
         pegTarget: (item.PegTarget ?? "USD") as StablecoinProfile["pegTarget"],
+        subCategory: item.SubCategory ?? null,
         totalSupply: item.TotalSupply ?? { value: null, source: "alchemy", updatedAt: null },
         historicalPegData: item.HistoricalPegData ?? {
           points: [],
@@ -153,6 +170,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         category: "Token",
         ...common(item),
         tokenType: (item.TokenType ?? "Governance") as TokenProfile["tokenType"],
+        subCategory: item.SubCategory ?? null,
         totalSupply: item.TotalSupply ?? { value: null, source: "alchemy", updatedAt: null },
       } as TokenProfile);
     } else if (item.Category === "Entity") {
@@ -174,9 +192,11 @@ export async function readLiveStore(): Promise<LiveStore> {
         faq: item.Faq ?? [],
         orgStructure: item.OrgStructure ?? [],
         tradFiComparison: item.TradFiComparison ?? [],
-        risks: item.Risks ?? [],
+        risks: parseRisks(item.Risks),
+        events: item.Events ?? [],
         investmentRounds: item.InvestmentRounds ?? [],
         partnerships: item.Partnerships ?? [],
+        scaleLabels: item.ScaleLabels ?? undefined,
         currentScale: item.CurrentScale ?? {
           tvlUsd: null,
           users: null,

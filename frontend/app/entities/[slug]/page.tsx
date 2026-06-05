@@ -7,6 +7,7 @@ import { ArrowUpRight, BookOpen, ChevronRight } from "lucide-react";
 import {
   ComponentsSection,
   DifferentiatorSection,
+  EventsSection,
   FaqSection,
   InvestmentRoundsSection,
   OrgStructureSection,
@@ -75,6 +76,13 @@ export default async function EntityProfilePage({ params }: PageProps) {
   if (!profile) notFound();
 
   const scale = profile.currentScale;
+  const labels = profile.scaleLabels ?? {};
+  const tvlLabel = labels.tvl ?? "Total deposits / TVL";
+  const usersLabel = labels.users ?? "Users";
+  const aprLabel = labels.apr ?? "sUSDai APR";
+  const pipelineLabel = labels.pipeline ?? "Loan pipeline";
+  const partnershipsLabel = labels.partnerships ?? "Partnerships";
+  const coinsLabel = labels.coins ?? `Coins under ${profile.name}`;
 
   return (
     <div className="container space-y-12 py-12">
@@ -142,28 +150,28 @@ export default async function EntityProfilePage({ params }: PageProps) {
 
       {/* Current scale */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
-        <StatCard label="Total deposits / TVL" value={formatUsdCompact(scale.tvlUsd)} hint="Latest data" />
+        <StatCard label={tvlLabel} value={formatUsdCompact(scale.tvlUsd)} hint="Latest data" />
         <StatCard
-          label="Users"
+          label={usersLabel}
           value={scale.users != null ? `${(scale.users / 1000).toFixed(0)}K+` : "—"}
-          hint="Depositors"
+          hint={labels.users ? undefined : "Depositors"}
         />
         <StatCard
-          label="sUSDai APR"
+          label={aprLabel}
           value={scale.aprPct != null ? `${scale.aprPct.toFixed(2)}%` : "—"}
           hint={scale.targetAprPct != null ? `Target ${scale.targetAprPct.toFixed(2)}%` : undefined}
         />
         <StatCard
-          label="Loan pipeline"
+          label={pipelineLabel}
           value={formatUsdCompact(scale.loanPipelineUsd)}
-          hint="Active"
+          hint={labels.pipeline ? "Manual / curated" : "Active"}
         />
         <StatCard
-          label="Partnerships"
+          label={partnershipsLabel}
           value={scale.partnerships != null ? `${scale.partnerships}+` : "—"}
-          hint="Approved facilities"
+          hint={labels.partnerships ? undefined : "Approved facilities"}
         />
-        <StatCard label="Coins" value={`${profile.memberCoins.length}`} hint="Under USD.AI" />
+        <StatCard label={coinsLabel} value={`${profile.memberCoins.length}`} hint="Member products" />
       </section>
 
       {/* Components */}
@@ -190,6 +198,9 @@ export default async function EntityProfilePage({ params }: PageProps) {
       {/* FAQ */}
       <FaqSection faq={profile.faq} />
 
+      {/* Timeline / news */}
+      <EventsSection events={profile.events} />
+
       {/* Organizational structure */}
       <OrgStructureSection org={profile.orgStructure} />
 
@@ -203,7 +214,7 @@ export default async function EntityProfilePage({ params }: PageProps) {
       <PartnershipsSection partnerships={profile.partnerships} />
 
       {/* Similarity to TradFi (bottom) */}
-      <TradFiComparisonSection rows={profile.tradFiComparison} />
+      <TradFiComparisonSection rows={profile.tradFiComparison} entityName={profile.name} />
     </div>
   );
 }

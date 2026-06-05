@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
@@ -36,7 +37,20 @@ export function ProfileCard({ profile }: { profile: StablecoinProfile }) {
         <CardTitle className="pb-3">Metadata</CardTitle>
         <div className="pt-1">
           <MetaRow label="Peg target" value={profile.pegTarget} />
-          <MetaRow label="Sub-category" value={meta.subCategory ?? "—"} />
+          <MetaRow label="Sub-category" value={profile.subCategory ?? meta.subCategory ?? "—"} />
+          {profile.entitySlug && (
+            <MetaRow
+              label="Issuer"
+              value={
+                <Link
+                  href={`/entities/${profile.entitySlug}`}
+                  className="text-electric-400 hover:underline"
+                >
+                  View entity
+                </Link>
+              }
+            />
+          )}
           <MetaRow
             label="Chains"
             value={meta.chains.length ? meta.chains.join(", ") : "—"}
@@ -70,8 +84,18 @@ export function ProfileCard({ profile }: { profile: StablecoinProfile }) {
           <LinkRow label="Audit report" href={profile.auditUrl} />
           <LinkRow label="Arbitrum Portal" href={meta.portalUrl} />
           <LinkRow
-            label="Contract (Arbiscan)"
-            href={profile.contractAddress ? `https://arbiscan.io/token/${profile.contractAddress}` : null}
+            label={
+              meta.chains.some((c) => c.toLowerCase().includes("solana"))
+                ? "Contract (Solscan)"
+                : "Contract (Arbiscan)"
+            }
+            href={
+              profile.contractAddress
+                ? meta.chains.some((c) => c.toLowerCase().includes("solana"))
+                  ? `https://solscan.io/token/${profile.contractAddress}`
+                  : `https://arbiscan.io/token/${profile.contractAddress}`
+                : null
+            }
           />
         </div>
       </Card>

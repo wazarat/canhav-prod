@@ -36,6 +36,12 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   susdai: "susdai",
   // CHIP (USD.AI governance token) — not listed on CoinGecko yet.
   chip: null,
+  // Jupiter (Solana) — market data via CoinGecko; on-chain supply is Solana-only.
+  jup: "jupiter-exchange-solana",
+  jlp: "jupiter-perpetuals-liquidity-provider-token",
+  jupsol: "jupiter-staked-sol",
+  jupusd: "jupusd",
+  jljupusd: null,
   usdc: "usd-coin",
   usdt0: "usdt0",
   // RWAs (most have no CoinGecko-listed Arbitrum token yet). Verified via the

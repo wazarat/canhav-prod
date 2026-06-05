@@ -5,6 +5,8 @@ import { Card, CardTitle } from "@/components/ui/Card";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import type {
   EntityComponent,
+  EntityEvent,
+  EntityRisk,
   FaqItem,
   InvestmentRound,
   OrgUnit,
@@ -25,9 +27,13 @@ function SectionHeading({ title, subtitle }: { title: string; subtitle?: string 
 
 export function ComponentsSection({ components }: { components: EntityComponent[] }) {
   if (!components.length) return null;
+  const title =
+    components.length === 1
+      ? "Main component"
+      : `Main components (${components.length})`;
   return (
     <section className="space-y-4">
-      <SectionHeading title="Three main components" />
+      <SectionHeading title={title} />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {components.map((c, i) => (
           <Card key={c.name} className="space-y-2">
@@ -100,7 +106,7 @@ export function OrgStructureSection({ org }: { org: OrgUnit[] }) {
   );
 }
 
-export function RisksSection({ risks }: { risks: string[] }) {
+export function RisksSection({ risks }: { risks: EntityRisk[] }) {
   if (!risks.length) return null;
   return (
     <section className="space-y-4">
@@ -110,11 +116,47 @@ export function RisksSection({ risks }: { risks: string[] }) {
           {risks.map((r, i) => (
             <li key={i} className="flex gap-3">
               <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
-              <span className="text-sm leading-relaxed text-ink-300">{r}</span>
+              <div className="space-y-1">
+                <Badge tone="warning" className="w-fit">
+                  {r.category}
+                </Badge>
+                <p className="text-sm leading-relaxed text-ink-300">{r.description}</p>
+              </div>
             </li>
           ))}
         </ul>
       </Card>
+    </section>
+  );
+}
+
+export function EventsSection({ events }: { events: EntityEvent[] }) {
+  if (!events.length) return null;
+  return (
+    <section className="space-y-4">
+      <SectionHeading title="Timeline & news" subtitle="Key milestones in the entity's history." />
+      <div className="space-y-3">
+        {events.map((e) => (
+          <Card key={`${e.date}-${e.title}`} className="space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <CardTitle className="text-base">{e.title}</CardTitle>
+              <Badge tone="neutral">{e.date}</Badge>
+            </div>
+            <p className="text-sm leading-relaxed text-ink-300">{e.description}</p>
+            {e.link && (
+              <a
+                href={e.link}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-0.5 text-xs text-electric-400 hover:underline"
+              >
+                source
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
+            )}
+          </Card>
+        ))}
+      </div>
     </section>
   );
 }
@@ -201,14 +243,20 @@ export function PartnershipsSection({ partnerships }: { partnerships: Partnershi
   );
 }
 
-export function TradFiComparisonSection({ rows }: { rows: TradFiRow[] }) {
+export function TradFiComparisonSection({
+  rows,
+  entityName,
+}: {
+  rows: TradFiRow[];
+  entityName?: string;
+}) {
   if (!rows.length) return null;
+  const subtitle = entityName
+    ? `How ${entityName} maps onto established TradFi structures, and where it diverges.`
+    : "How this entity maps onto established TradFi structures, and where it diverges.";
   return (
     <section className="space-y-4">
-      <SectionHeading
-        title="Similarity to traditional finance products"
-        subtitle="How USD.AI maps onto established TradFi structures, and where it diverges."
-      />
+      <SectionHeading title="Similarity to traditional finance products" subtitle={subtitle} />
       <TableShell>
         <Table className="min-w-[720px]">
           <THead>

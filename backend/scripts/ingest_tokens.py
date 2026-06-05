@@ -31,13 +31,16 @@ if str(BACKEND_ROOT) not in sys.path:
 from app.db import get_repository, schema  # noqa: E402
 
 USD_AI_PARENT_SLUG = "usd-ai"
+JUPITER_PARENT_SLUG = "jupiter"
 
-# slug -> spec. Shared metadata is pulled from the USD.AI Portal row.
-TOKENS: Dict[str, Dict[str, str]] = {
+# slug -> spec. USD.AI tokens pull shared metadata from the Portal row; Jupiter
+# tokens are fully curated (Solana-native, no Arbitrum CSV row).
+TOKENS: Dict[str, Dict[str, Optional[str]]] = {
     "chip": {
         "name": "CHIP",
         "symbol": "CHIP",
         "tokenType": "Governance",
+        "subCategory": "Governance Token",
         "description": (
             "CHIP is the governance token of USD.AI. CHIP holders steer the "
             "protocol's DAO — collateral parameters, risk policy, treasury and "
@@ -45,6 +48,73 @@ TOKENS: Dict[str, Dict[str, str]] = {
             "It is distributed via the USD.AI ICO (Permian Labs)."
         ),
         "entitySlug": USD_AI_PARENT_SLUG,
+        "coingecko": None,
+        "contractAddress": None,
+        "csvParentSlug": USD_AI_PARENT_SLUG,
+        "chains": None,
+        "website": None,
+        "twitter": None,
+        "discord": None,
+        "github": None,
+    },
+    "jup": {
+        "name": "JUP",
+        "symbol": "JUP",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "JUP is the governance token of Jupiter DAO (Jupiter United Planet). "
+            "Founder Meow has stated it is for DAO governance only, not a utility "
+            "token. Supply is capped at 10B with 50% allocated to the community."
+        ),
+        "entitySlug": JUPITER_PARENT_SLUG,
+        "coingecko": "https://www.coingecko.com/en/coins/jupiter-exchange-solana",
+        "contractAddress": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+        "csvParentSlug": None,
+        "chains": ["Solana"],
+        "website": "https://jup.ag",
+        "twitter": "https://x.com/JupiterExchange",
+        "discord": "https://discord.gg/jup",
+        "github": "https://github.com/jup-ag",
+    },
+    "jlp": {
+        "name": "JLP",
+        "symbol": "JLP",
+        "tokenType": "Yield",
+        "subCategory": "Yield-generating Token",
+        "description": (
+            "Jupiter Liquidity Provider token: a tradeable basket of SOL (~44%), ETH (~9%), "
+            "BTC (~11%), USDC (~27%), USDT (~9%) (~35% stable / 65% volatile). Value = "
+            "index + trader PnL + 75% of perp fees auto-compounded. LPs are the house."
+        ),
+        "entitySlug": JUPITER_PARENT_SLUG,
+        "coingecko": "https://www.coingecko.com/en/coins/jupiter-perpetuals-liquidity-provider-token",
+        "contractAddress": "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4",
+        "csvParentSlug": None,
+        "chains": ["Solana"],
+        "website": "https://jup.ag/perps",
+        "twitter": "https://x.com/JupiterExchange",
+        "discord": "https://discord.gg/jup",
+        "github": "https://github.com/jup-ag",
+    },
+    "jupsol": {
+        "name": "JupSOL",
+        "symbol": "JUPSOL",
+        "tokenType": "LST",
+        "subCategory": "LST",
+        "description": (
+            "Jupiter Staked SOL liquid staking token. Represents staked SOL in "
+            "Jupiter's staking product with DeFi composability across the ecosystem."
+        ),
+        "entitySlug": JUPITER_PARENT_SLUG,
+        "coingecko": "https://www.coingecko.com/en/coins/jupiter-staked-sol",
+        "contractAddress": "jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v",
+        "csvParentSlug": None,
+        "chains": ["Solana"],
+        "website": "https://jup.ag/stake",
+        "twitter": "https://x.com/JupiterExchange",
+        "discord": "https://discord.gg/jup",
+        "github": "https://github.com/jup-ag",
     },
 }
 
@@ -87,6 +157,9 @@ def token_item(slug: str, parent_row: Optional[Dict[str, str]], created_at: str)
     spec = TOKENS[slug]
     row = parent_row or {}
     now = _now_iso()
+    chains = spec.get("chains")
+    if chains is None and row:
+        chains = _split_chains(row.get("Chains"))
     return {
         schema.PK: schema.category_pk(schema.CATEGORY_TOKEN),
         schema.SK: schema.protocol_sk(slug),
@@ -96,24 +169,24 @@ def token_item(slug: str, parent_row: Optional[Dict[str, str]], created_at: str)
         "Slug": slug,
         "Symbol": spec["symbol"],
         "TokenType": spec["tokenType"],
+        "SubCategory": spec.get("subCategory"),
         "Description": spec["description"],
-        "Website": _clean(row.get("Website")) or "https://usd.ai",
-        "Twitter": _clean(row.get("Twitter")),
-        "Discord": _clean(row.get("Discord")),
-        "GitHub": _clean(row.get("GitHub")),
-        # Not yet listed on CoinGecko / no verified Arbitrum contract.
-        "CoinGecko": None,
+        "Website": spec.get("website") or _clean(row.get("Website")) or "https://usd.ai",
+        "Twitter": spec.get("twitter") or _clean(row.get("Twitter")),
+        "Discord": spec.get("discord") or _clean(row.get("Discord")),
+        "GitHub": spec.get("github") or _clean(row.get("GitHub")),
+        "CoinGecko": spec.get("coingecko"),
         "AuditURL": _clean(row.get("Audit URL")),
-        "ContractAddress": None,
+        "ContractAddress": spec.get("contractAddress"),
         "EntitySlug": spec["entitySlug"],
         "TotalSupply": {"value": None, "source": "alchemy", "updatedAt": None},
         "ArbitrumPortalMetadata": {
             "portalUrl": _clean(row.get("Portal URL")),
             "logoUrl": _clean(row.get("Logo URL")),
             "bannerUrl": _clean(row.get("Banner URL")),
-            "chains": _split_chains(row.get("Chains")),
-            "subCategory": "Token",
-            "isLive": _as_bool(row.get("Is Live")),
+            "chains": chains or [],
+            "subCategory": spec.get("subCategory") or "Token",
+            "isLive": _as_bool(row.get("Is Live")) or bool(chains),
             "isArbitrumNative": _as_bool(row.get("Is Arbitrum Native")),
             "isPubliclyAudited": _as_bool(row.get("Is Publicly Audited")),
             "foundedDate": _clean(row.get("Founded Date")),
@@ -125,19 +198,21 @@ def token_item(slug: str, parent_row: Optional[Dict[str, str]], created_at: str)
 
 def main(argv: List[str]) -> int:
     csv_path = resolve_csv_path(argv)
-    parent_row: Optional[Dict[str, str]] = None
+    csv_rows: Dict[str, Dict[str, str]] = {}
     if csv_path.exists():
         with csv_path.open("r", encoding="utf-8", newline="") as fh:
             for row in csv.DictReader(fh):
-                if (row.get("Slug") or "").strip() == USD_AI_PARENT_SLUG:
-                    parent_row = row
-                    break
+                slug = (row.get("Slug") or "").strip()
+                if slug:
+                    csv_rows[slug] = row
 
     repo = get_repository()
     pk = schema.category_pk(schema.CATEGORY_TOKEN)
 
     staged: List[str] = []
-    for slug in TOKENS:
+    for slug, spec in TOKENS.items():
+        csv_parent = spec.get("csvParentSlug")
+        parent_row = csv_rows.get(csv_parent) if csv_parent else None
         existing = repo.get_item(pk, schema.protocol_sk(slug))
         created_at = (existing or {}).get("CreatedAt") or _now_iso()
         repo.put_item(token_item(slug, parent_row, created_at))

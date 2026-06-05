@@ -76,6 +76,8 @@ export interface StablecoinProfile {
   symbol: string;
   status: ApprovalStatus;
   pegTarget: PegTarget;
+  /** Optional sub-classification (e.g. "Staked Stablecoin"). */
+  subCategory?: StablecoinSubCategory | null;
   description: string;
   website: string | null;
   twitter: string | null;
@@ -167,7 +169,17 @@ export interface RwaProfile {
 /* Tokens — governance / utility tokens (e.g. CHIP)                           */
 /* -------------------------------------------------------------------------- */
 
-export type TokenType = "Governance" | "Utility";
+export type TokenType = "Governance" | "Utility" | "Yield" | "LST";
+
+/** Finer taxonomy for stablecoins (e.g. staked stablecoin). */
+export type StablecoinSubCategory = "Stablecoin" | "Staked Stablecoin";
+
+/** Finer taxonomy for tokens (e.g. governance, yield-bearing, LST). */
+export type TokenSubCategory =
+  | "Governance Token"
+  | "Yield-generating Token"
+  | "LST"
+  | "Utility Token";
 
 export interface TokenProfile {
   category: "Token";
@@ -176,6 +188,8 @@ export interface TokenProfile {
   symbol: string;
   status: ApprovalStatus;
   tokenType: TokenType;
+  /** Optional sub-classification (e.g. "Governance Token", "LST"). */
+  subCategory?: TokenSubCategory | null;
   description: string;
   website: string | null;
   twitter: string | null;
@@ -253,6 +267,41 @@ export interface MemberCoinRef {
   symbol: string;
   category: MemberCoinCategory;
   role: string;
+  /** Optional sub-classification mirrored from the product profile. */
+  subCategory?: string | null;
+}
+
+export type RiskCategory =
+  | "Counterparty"
+  | "Network"
+  | "Oracle"
+  | "Reserve / Depeg"
+  | "Smart Contract"
+  | "Governance"
+  | "Collateral"
+  | "Regulatory"
+  | "Systemic";
+
+export interface EntityRisk {
+  category: RiskCategory;
+  description: string;
+}
+
+export interface EntityEvent {
+  date: string;
+  title: string;
+  description: string;
+  link?: string | null;
+}
+
+/** Optional display labels for entity headline stat cards. */
+export interface ScaleLabels {
+  tvl?: string;
+  users?: string;
+  apr?: string;
+  pipeline?: string;
+  partnerships?: string;
+  coins?: string;
 }
 
 export interface EntityProfile {
@@ -273,10 +322,13 @@ export interface EntityProfile {
   faq: FaqItem[];
   orgStructure: OrgUnit[];
   tradFiComparison: TradFiRow[];
-  risks: string[];
+  risks: EntityRisk[];
+  events: EntityEvent[];
   investmentRounds: InvestmentRound[];
   partnerships: Partnership[];
   currentScale: CurrentScale;
+  /** Per-entity labels for the headline stat row (defaults to USD.AI copy when omitted). */
+  scaleLabels?: ScaleLabels;
   memberCoins: MemberCoinRef[];
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   createdAt: string;

@@ -56,18 +56,50 @@ TARGETS: Dict[str, Tuple[str, str, str]] = {
 # tagged with EntitySlug="usd-ai" so they list under the USD.AI Entity. Addresses
 # + CoinGecko ids verified via CoinGecko (detail_platforms["arbitrum-one"]).
 USD_AI_PARENT_SLUG = "usd-ai"
+JUPITER_PARENT_SLUG = "jupiter"
+
 USD_AI_COINS: Dict[str, Dict[str, str]] = {
     "usdai": {
         "name": "USDai",
         "symbol": "USDAI",
+        "subCategory": "Stablecoin",
         "coingecko": "https://www.coingecko.com/en/coins/usdai",
         "contractAddress": "0x0a1a1a107e45b7ced86833863f482bc5f4ed82ef",
     },
     "susdai": {
         "name": "sUSDai",
         "symbol": "sUSDai",
+        "subCategory": "Staked Stablecoin",
         "coingecko": "https://www.coingecko.com/en/coins/susdai",
         "contractAddress": "0x0b2b2b2076d95dda7817e785989fe353fe955ef9",
+    },
+}
+
+# Jupiter stablecoins (Solana SPL). No CSV row; curated metadata + Solana mints.
+JUPITER_COINS: Dict[str, Dict[str, str]] = {
+    "jupusd": {
+        "name": "JupUSD",
+        "symbol": "JUPUSD",
+        "subCategory": "Stablecoin",
+        "coingecko": "https://www.coingecko.com/en/coins/jupusd",
+        "contractAddress": "JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD",
+        "description": (
+            "Reserve-backed Solana stablecoin built with Ethena: ~90% USDtb "
+            "(BlackRock BUIDL-backed) + 10% USDC buffer. Does not yield natively "
+            "(compliance). Custody via Anchorage Digital and Porto."
+        ),
+    },
+    "jljupusd": {
+        "name": "jlJupUSD",
+        "symbol": "jlJUPUSD",
+        "subCategory": "Staked Stablecoin",
+        "coingecko": None,
+        "contractAddress": None,
+        "description": (
+            "Deposit JupUSD into Jupiter Lend Earn to receive jlJupUSD, which earns "
+            "interest and incentives while staying liquid and usable as collateral. "
+            "The yield-bearing counterpart to plain JupUSD."
+        ),
     },
 }
 
@@ -129,6 +161,7 @@ def row_to_item(row: Dict[str, str], created_at: str) -> dict:
         "CoinGecko": _clean(row.get("CoinGecko")),
         "AuditURL": _clean(row.get("Audit URL")),
         "ContractAddress": None,
+        "SubCategory": None,
         "EntitySlug": None,
         # Live overlays — populated in Step 4 (Alchemy / Dune).
         "TotalSupply": {"value": None, "source": "alchemy", "updatedAt": None},
@@ -149,19 +182,40 @@ def row_to_item(row: Dict[str, str], created_at: str) -> dict:
     }
 
 
-def usd_ai_coin_item(
-    slug: str, parent_row: Dict[str, str], created_at: str
+def entity_coin_item(
+    slug: str,
+    spec: Dict[str, str],
+    entity_slug: str,
+    parent_row: Optional[Dict[str, str]],
+    created_at: str,
+    *,
+    chains: Optional[List[str]] = None,
+    website: Optional[str] = None,
+    twitter: Optional[str] = None,
+    discord: Optional[str] = None,
+    github: Optional[str] = None,
 ) -> dict:
-    """Build a USDai / sUSDai item from the shared USD.AI Portal row."""
-    spec = USD_AI_COINS[slug]
-    item = row_to_item_generic(parent_row, created_at)
+    """Build a stablecoin item for an umbrella entity (USD.AI or Jupiter)."""
+    item = row_to_item_generic(parent_row or {}, created_at)
     item[schema.SK] = schema.protocol_sk(slug)
     item["Name"] = spec["name"]
     item["Slug"] = slug
     item["Symbol"] = spec["symbol"]
-    item["CoinGecko"] = spec["coingecko"]
-    item["ContractAddress"] = spec["contractAddress"]
-    item["EntitySlug"] = USD_AI_PARENT_SLUG
+    item["SubCategory"] = spec.get("subCategory")
+    item["Description"] = spec.get("description") or item["Description"]
+    item["CoinGecko"] = spec.get("coingecko")
+    item["ContractAddress"] = spec.get("contractAddress")
+    item["EntitySlug"] = entity_slug
+    if website:
+        item["Website"] = website
+    if twitter:
+        item["Twitter"] = twitter
+    if discord:
+        item["Discord"] = discord
+    if github:
+        item["GitHub"] = github
+    if chains:
+        item["ArbitrumPortalMetadata"]["chains"] = chains
     return item
 
 
@@ -185,6 +239,7 @@ def row_to_item_generic(row: Dict[str, str], created_at: str) -> dict:
         "CoinGecko": _clean(row.get("CoinGecko")),
         "AuditURL": _clean(row.get("Audit URL")),
         "ContractAddress": None,
+        "SubCategory": None,
         "EntitySlug": None,
         "TotalSupply": {"value": None, "source": "alchemy", "updatedAt": None},
         "HistoricalPegData": {"points": [], "source": "dune", "updatedAt": None},
@@ -249,7 +304,9 @@ def main(argv: List[str]) -> int:
         for slug in USD_AI_COINS:
             existing = repo.get_item(pk, schema.protocol_sk(slug))
             created_at = (existing or {}).get("CreatedAt") or _now_iso()
-            repo.put_item(usd_ai_coin_item(slug, usd_ai_row, created_at))
+            repo.put_item(
+                entity_coin_item(slug, USD_AI_COINS[slug], USD_AI_PARENT_SLUG, usd_ai_row, created_at)
+            )
             usd_ai_staged.append(slug)
     else:
         print(
@@ -257,6 +314,27 @@ def main(argv: List[str]) -> int:
             "USDai / sUSDai not staged.",
             file=sys.stderr,
         )
+
+    # Jupiter stablecoins (JupUSD + jlJupUSD).
+    jupiter_staged: List[str] = []
+    for slug in JUPITER_COINS:
+        existing = repo.get_item(pk, schema.protocol_sk(slug))
+        created_at = (existing or {}).get("CreatedAt") or _now_iso()
+        repo.put_item(
+            entity_coin_item(
+                slug,
+                JUPITER_COINS[slug],
+                JUPITER_PARENT_SLUG,
+                None,
+                created_at,
+                chains=["Solana"],
+                website="https://jup.ag",
+                twitter="https://x.com/JupiterExchange",
+                discord="https://discord.gg/jup",
+                github="https://github.com/jup-ag",
+            )
+        )
+        jupiter_staged.append(slug)
 
     # Drop the legacy combined "usd-ai" stablecoin (superseded by the two coins).
     removed_legacy = repo.delete_item(pk, schema.protocol_sk(USD_AI_PARENT_SLUG))
@@ -275,9 +353,12 @@ def main(argv: List[str]) -> int:
     for slug in usd_ai_staged:
         spec = USD_AI_COINS[slug]
         print(f"{schema.STATUS_PENDING:<18}{spec['symbol']:<10}{spec['name']} (USD.AI)")
+    for slug in jupiter_staged:
+        spec = JUPITER_COINS[slug]
+        print(f"{schema.STATUS_PENDING:<18}{spec['symbol']:<10}{spec['name']} (Jupiter)")
     print("-" * 64)
-    total_staged = len(staged) + len(usd_ai_staged)
-    total_targets = len(TARGETS) + len(USD_AI_COINS)
+    total_staged = len(staged) + len(usd_ai_staged) + len(jupiter_staged)
+    total_targets = len(TARGETS) + len(USD_AI_COINS) + len(JUPITER_COINS)
     print(f"Published {total_staged} / {total_targets} target stablecoins as APPROVED.")
     if removed_legacy:
         print(f"Removed legacy '{USD_AI_PARENT_SLUG}' stablecoin (superseded by USDai + sUSDai).")

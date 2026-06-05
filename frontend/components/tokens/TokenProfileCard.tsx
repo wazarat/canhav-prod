@@ -37,6 +37,9 @@ export function TokenProfileCard({ profile }: { profile: TokenProfile }) {
         <CardTitle className="pb-3">Metadata</CardTitle>
         <div className="pt-1">
           <MetaRow label="Token type" value={<Badge tone="neon">{profile.tokenType}</Badge>} />
+          {profile.subCategory && (
+            <MetaRow label="Sub-category" value={<Badge tone="neutral">{profile.subCategory}</Badge>} />
+          )}
           {profile.entitySlug && (
             <MetaRow
               label="Issuer"
@@ -76,8 +79,22 @@ export function TokenProfileCard({ profile }: { profile: TokenProfile }) {
           <LinkRow label="Audit report" href={profile.auditUrl} />
           <LinkRow label="Arbitrum Portal" href={meta.portalUrl} />
           <LinkRow
-            label="Contract (Arbiscan)"
-            href={profile.contractAddress ? `https://arbiscan.io/token/${profile.contractAddress}` : null}
+            label={
+              profile.arbitrumPortalMetadata.chains.some((c) =>
+                c.toLowerCase().includes("solana"),
+              )
+                ? "Contract (Solscan)"
+                : "Contract (Arbiscan)"
+            }
+            href={
+              profile.contractAddress
+                ? profile.arbitrumPortalMetadata.chains.some((c) =>
+                    c.toLowerCase().includes("solana"),
+                  )
+                  ? `https://solscan.io/token/${profile.contractAddress}`
+                  : `https://arbiscan.io/token/${profile.contractAddress}`
+                : null
+            }
           />
         </div>
       </Card>

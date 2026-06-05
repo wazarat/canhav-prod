@@ -266,7 +266,7 @@ JUPITER_COINS: Dict[str, Dict[str, str]] = {
         ),
     },
     "jljupusd": {
-        "name": "jlJupUSD",
+        "name": "Jupiter Lend JUPUSD",
         "symbol": "jlJUPUSD",
         "subCategory": "Staked Stablecoin",
         "coingecko": None,

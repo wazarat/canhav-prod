@@ -189,7 +189,12 @@ export interface MarketData {
   priceChange24h: number | null;
   priceChange7d: number | null;
   priceChange30d: number | null;
-  source: "coingecko";
+  fullyDilutedValuation?: number | null;
+  holdersCount?: number | null;
+  volumeChange24h?: number | null;
+  volToMktCapRatio?: number | null;
+  liqToMktCapRatio?: number | null;
+  source: "coingecko" | "curated";
 }
 
 function num(value: unknown): number | null {

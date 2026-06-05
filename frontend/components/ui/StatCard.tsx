@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
+
 import { cn } from "@/lib/utils";
 
 interface StatCardProps {
   label: string;
-  value: string;
+  value: ReactNode;
   hint?: string;
   source?: string;
   className?: string;
@@ -19,9 +21,9 @@ export function StatCard({ label, value, hint, source, className }: StatCardProp
           </span>
         )}
       </div>
-      <p className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-ink-50">
+      <div className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-ink-50">
         {value}
-      </p>
+      </div>
       {hint && <p className="mt-1 text-xs text-ink-500">{hint}</p>}
     </div>
   );

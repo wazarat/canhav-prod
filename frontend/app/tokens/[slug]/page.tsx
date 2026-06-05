@@ -5,9 +5,11 @@ import { notFound } from "next/navigation";
 
 import { MarketStats, MarketStatsSkeleton } from "@/components/market/MarketStats";
 import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/OnchainPanel";
+import { TokenHeadlineStats } from "@/components/tokens/TokenHeadlineStats";
 import { TokenProfileCard } from "@/components/tokens/TokenProfileCard";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { StatGridSkeleton } from "@/components/ui/Skeletons";
 import { getApprovedTokenBySlug, getApprovedTokens, getEntityBySlug } from "@/lib/data";
 
 interface PageProps {
@@ -56,6 +58,10 @@ export default async function TokenProfilePage({ params }: PageProps) {
         }
         description={profile.description}
       />
+
+      <Suspense fallback={<StatGridSkeleton />}>
+        <TokenHeadlineStats profile={profile} />
+      </Suspense>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">

@@ -25,7 +25,7 @@ import { Card } from "@/components/ui/Card";
 import { getApprovedEntities, getApprovedEntityBySlug, getEntityMemberCoins } from "@/lib/data";
 import { getCoinLiveData } from "@/lib/server/coin";
 import type { EntityProfile } from "@/lib/types";
-import { formatUsdCompact } from "@/lib/utils";
+import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
 
 interface PageProps {
   params: { slug: string };
@@ -167,14 +167,24 @@ export default async function EntityProfilePage({ params }: PageProps) {
         <StatCard label={tvlLabel} value={formatUsdCompact(scale.tvlUsd)} hint="Latest data" source="Curated" />
         <StatCard
           label={usersLabel}
-          value={scale.users != null ? `${(scale.users / 1000).toFixed(0)}K+` : "—"}
+          value={scale.users != null ? formatUsersCompact(scale.users) : "—"}
           hint={labels.users ? undefined : "Depositors"}
           source="Curated"
         />
         <StatCard
           label={aprLabel}
-          value={scale.aprPct != null ? `${scale.aprPct.toFixed(2)}%` : "—"}
-          hint={scale.targetAprPct != null ? `Target ${scale.targetAprPct.toFixed(2)}%` : undefined}
+          value={
+            scale.marketCapUsd != null
+              ? formatUsdCompact(scale.marketCapUsd)
+              : scale.aprPct != null
+                ? `${scale.aprPct.toFixed(2)}%`
+                : "—"
+          }
+          hint={
+            scale.marketCapUsd == null && scale.targetAprPct != null
+              ? `Target ${scale.targetAprPct.toFixed(2)}%`
+              : undefined
+          }
           source="Curated"
         />
         <StatCard label={coinsLabel} value={`${profile.memberCoins.length}`} hint="Member products" />

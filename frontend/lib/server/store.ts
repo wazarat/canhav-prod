@@ -202,6 +202,7 @@ export async function readLiveStore(): Promise<LiveStore> {
           users: null,
           aprPct: null,
           targetAprPct: null,
+          marketCapUsd: null,
           loanPipelineUsd: null,
           partnerships: null,
         },

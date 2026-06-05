@@ -256,6 +256,7 @@ export interface CurrentScale {
   users: number | null;
   aprPct: number | null;
   targetAprPct: number | null;
+  marketCapUsd: number | null;
   loanPipelineUsd: number | null;
   partnerships: number | null;
 }

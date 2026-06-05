@@ -15,6 +15,15 @@ export const SITE = {
   },
 } as const;
 
+/** Format a user/depositor count compactly (125.5K, 1.2M). */
+export function formatUsersCompact(value: number | null | undefined): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return value.toLocaleString();
+}
+
 /** Format a large USD figure into a compact string ($1.2B, $340.0M, $12.3K). */
 export function formatUsdCompact(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return "—";

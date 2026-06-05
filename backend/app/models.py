@@ -398,6 +398,7 @@ class CurrentScale(BaseModel):
     users: Optional[int] = None
     aprPct: Optional[float] = None
     targetAprPct: Optional[float] = None
+    marketCapUsd: Optional[float] = None
     loanPipelineUsd: Optional[float] = None
     partnerships: Optional[int] = None
 

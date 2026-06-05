@@ -184,14 +184,23 @@ export async function getEntityBySlug(slug: string): Promise<EntityProfile | nul
 export async function getEntityMemberCoins(
   entity: EntityProfile,
 ): Promise<
-  { ref: EntityProfile["memberCoins"][number]; profile: StablecoinProfile | TokenProfile | null }[]
+  {
+    ref: EntityProfile["memberCoins"][number];
+    profile: StablecoinProfile | TokenProfile | RwaProfile | null;
+  }[]
 > {
-  const [stablecoins, tokens] = await Promise.all([getAllStablecoins(), getAllTokens()]);
+  const [stablecoins, tokens, rwas] = await Promise.all([
+    getAllStablecoins(),
+    getAllTokens(),
+    getAllRwas(),
+  ]);
   return entity.memberCoins.map((ref) => {
     const profile =
       ref.category === "Stablecoin"
         ? (stablecoins.find((p) => p.slug === ref.slug) ?? null)
-        : (tokens.find((p) => p.slug === ref.slug) ?? null);
+        : ref.category === "RWA"
+          ? (rwas.find((p) => p.slug === ref.slug) ?? null)
+          : (tokens.find((p) => p.slug === ref.slug) ?? null);
     return { ref, profile };
   });
 }

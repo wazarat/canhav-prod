@@ -44,7 +44,15 @@ export function MemberCoins({ coins }: { coins: CoinLiveData[] }) {
                 <span className="font-mono text-xs text-ink-400">{coin.symbol}</span>
               </div>
               <div className="flex flex-col items-end gap-1">
-                <Badge tone={coin.category === "Token" ? "neon" : "electric"}>
+                <Badge
+                  tone={
+                    coin.category === "Token"
+                      ? "neon"
+                      : coin.category === "RWA"
+                        ? "signal"
+                        : "electric"
+                  }
+                >
                   {coin.category}
                 </Badge>
                 {coin.subCategory && (
@@ -127,7 +135,15 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
                 {coin.symbol}
               </Badge>
               <div className="flex flex-wrap gap-1">
-                <Badge tone={coin.category === "Token" ? "neon" : "electric"}>
+                <Badge
+                  tone={
+                    coin.category === "Token"
+                      ? "neon"
+                      : coin.category === "RWA"
+                        ? "signal"
+                        : "electric"
+                  }
+                >
                   {coin.category}
                 </Badge>
                 {coin.subCategory && <Badge tone="neutral">{coin.subCategory}</Badge>}

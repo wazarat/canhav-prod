@@ -8,7 +8,7 @@ import {
 } from "@/lib/server/alchemy";
 import { coinIdForSlug, fetchMarketData, type MarketData } from "@/lib/server/coingecko";
 import { resolveEntityToken } from "@/lib/server/resolve";
-import type { StablecoinProfile, TokenProfile } from "@/lib/types";
+import type { RwaProfile, StablecoinProfile, TokenProfile } from "@/lib/types";
 
 /**
  * Serializable live snapshot for a single coin (USDai / sUSDai / CHIP), used to
@@ -33,7 +33,7 @@ export interface CoinLiveData {
   slug: string;
   name: string;
   symbol: string;
-  category: "Stablecoin" | "Token";
+  category: "Stablecoin" | "Token" | "RWA";
   /** Member-coin role label (e.g. "Yield-bearing synthetic dollar"). */
   role: string;
   subCategory: string | null;
@@ -61,7 +61,7 @@ function explorerLink(chains: string[], address: string | null): { url: string |
 }
 
 export async function getCoinLiveData(
-  profile: StablecoinProfile | TokenProfile,
+  profile: StablecoinProfile | TokenProfile | RwaProfile,
   role = "",
 ): Promise<CoinLiveData> {
   const token = await resolveEntityToken(profile);
@@ -88,7 +88,11 @@ export async function getCoinLiveData(
   const chains = profile.arbitrumPortalMetadata.chains ?? [];
   const explorer = explorerLink(chains, address);
   const profilePath =
-    profile.category === "Stablecoin" ? `/stablecoins/${profile.slug}` : `/tokens/${profile.slug}`;
+    profile.category === "Stablecoin"
+      ? `/stablecoins/${profile.slug}`
+      : profile.category === "RWA"
+        ? `/rwas/${profile.slug}`
+        : `/tokens/${profile.slug}`;
 
   return {
     slug: profile.slug,
@@ -96,7 +100,10 @@ export async function getCoinLiveData(
     symbol: profile.symbol,
     category: profile.category,
     role,
-    subCategory: profile.subCategory ?? null,
+    subCategory:
+      profile.category === "RWA"
+        ? (profile.assetClass ?? null)
+        : (profile.subCategory ?? null),
     description: profile.description,
     contractAddress: address,
     chains,

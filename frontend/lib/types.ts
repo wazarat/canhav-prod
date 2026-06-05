@@ -158,6 +158,8 @@ export interface RwaProfile {
   /** Resolved Arbitrum token/vault contract address(es) (CoinGecko, Step 4 B2). */
   contractAddress?: string | null;
   vaultAddresses?: string[] | null;
+  /** Slug of the parent umbrella Entity (e.g. "ondo-finance"). */
+  entitySlug?: string | null;
   totalValueLocked: TotalValueLocked;
   historicalTvlData: HistoricalTvlData;
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
@@ -259,7 +261,7 @@ export interface CurrentScale {
 }
 
 /** Which category partition a member coin lives in. */
-export type MemberCoinCategory = "Stablecoin" | "Token";
+export type MemberCoinCategory = "Stablecoin" | "Token" | "RWA";
 
 export interface MemberCoinRef {
   slug: string;

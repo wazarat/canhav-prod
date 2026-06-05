@@ -52,6 +52,36 @@ TARGETS: Dict[str, Tuple[str, str, str]] = {
     "franklin-templeton": ("Franklin Templeton", "BENJI", "Treasuries & Funds"),
 }
 
+# Extra RWA products tied to umbrella entities (slug -> spec).
+ENTITY_RWA_COINS: Dict[str, Dict[str, Dict[str, Optional[str]]]] = {
+    "pleasing-market": {
+        "pgold": {
+            "name": "PGOLD",
+            "symbol": "PGOLD",
+            "assetClass": "Multi-Asset",
+            "coingecko": "https://www.coingecko.com/en/coins/pleasing-gold",
+            "contractAddress": None,
+            "description": (
+                "Tokenized physical gold: 1 troy oz LBMA-certified gold per token with "
+                "physical redemption. Cross-chain via Chainlink CCIP."
+            ),
+        },
+    },
+    "ondo-finance": {
+        "ousg": {
+            "name": "OUSG",
+            "symbol": "OUSG",
+            "assetClass": "Treasuries & Funds",
+            "coingecko": "https://www.coingecko.com/en/coins/ousg",
+            "contractAddress": "0x1b19c19393e2d034d8ff31ff34c81252fcbbee92",
+            "description": (
+                "Tokenized short-term US Treasury fund interest for eligible investors. "
+                "Rule 506(c) / 3(c)(7) qualified access — not a stablecoin."
+            ),
+        },
+    },
+}
+
 DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
 DOWNLOADS_CSV = Path.home() / "Downloads" / "Arbitrum Ecosystem - scrape v2.csv"
 
@@ -128,6 +158,58 @@ def row_to_item(row: Dict[str, str], created_at: str) -> dict:
     }
 
 
+def entity_rwa_item(
+    slug: str,
+    spec: Dict[str, Optional[str]],
+    entity_slug: str,
+    parent_row: Optional[Dict[str, str]],
+    created_at: str,
+    *,
+    chains: Optional[List[str]] = None,
+    website: Optional[str] = None,
+    twitter: Optional[str] = None,
+    discord: Optional[str] = None,
+    github: Optional[str] = None,
+) -> dict:
+    """Build an RWA item for an umbrella entity (Pleasing Market, Ondo, etc.)."""
+    row = parent_row or {}
+    now = _now_iso()
+    return {
+        schema.PK: schema.category_pk(schema.CATEGORY_RWA),
+        schema.SK: schema.protocol_sk(slug),
+        "Category": schema.CATEGORY_RWA,
+        "Status": schema.STATUS_APPROVED,
+        "Name": spec["name"],
+        "Slug": slug,
+        "Symbol": spec["symbol"],
+        "AssetClass": spec.get("assetClass") or "Multi-Asset",
+        "Description": spec.get("description") or "",
+        "Website": website or _clean(row.get("Website")),
+        "Twitter": twitter or _clean(row.get("Twitter")),
+        "Discord": discord or _clean(row.get("Discord")),
+        "GitHub": github or _clean(row.get("GitHub")),
+        "CoinGecko": spec.get("coingecko"),
+        "AuditURL": _clean(row.get("Audit URL")),
+        "ContractAddress": spec.get("contractAddress"),
+        "EntitySlug": entity_slug,
+        "TotalValueLocked": {"value": None, "source": "alchemy", "updatedAt": None},
+        "HistoricalTvlData": {"points": [], "source": "dune", "updatedAt": None},
+        "ArbitrumPortalMetadata": {
+            "portalUrl": _clean(row.get("Portal URL")),
+            "logoUrl": _clean(row.get("Logo URL")),
+            "bannerUrl": _clean(row.get("Banner URL")),
+            "chains": chains or _split_chains(row.get("Chains")),
+            "subCategory": spec.get("assetClass") or "RWA",
+            "isLive": _as_bool(row.get("Is Live")) or bool(chains),
+            "isArbitrumNative": _as_bool(row.get("Is Arbitrum Native")),
+            "isPubliclyAudited": _as_bool(row.get("Is Publicly Audited")),
+            "foundedDate": _clean(row.get("Founded Date")),
+        },
+        "CreatedAt": created_at,
+        "UpdatedAt": now,
+    }
+
+
 def main(argv: List[str]) -> int:
     csv_path = resolve_csv_path(argv)
     if not csv_path.exists():
@@ -163,6 +245,47 @@ def main(argv: List[str]) -> int:
         repo.put_item(item)
         staged.append(slug)
 
+    # Entity-linked RWA products (PGOLD, OUSG, etc.).
+    entity_staged: List[str] = []
+    entity_rows: Dict[str, Dict[str, str]] = {}
+    with csv_path.open("r", encoding="utf-8", newline="") as fh:
+        for row in csv.DictReader(fh):
+            slug = (row.get("Slug") or "").strip()
+            if slug in ENTITY_RWA_COINS and slug not in entity_rows:
+                entity_rows[slug] = row
+
+    entity_defaults: Dict[str, Dict[str, object]] = {
+        "ondo-finance": {
+            "website": "https://ondo.finance",
+            "twitter": "https://x.com/OndoFinance",
+            "github": "https://github.com/ondo-finance",
+            "chains": ["Arbitrum One", "Ethereum"],
+        },
+    }
+
+    for entity_slug, coins in ENTITY_RWA_COINS.items():
+        parent_row = entity_rows.get(entity_slug)
+        defaults = entity_defaults.get(entity_slug, {})
+        for slug, spec in coins.items():
+            existing = repo.get_item(pk, schema.protocol_sk(slug))
+            created_at = (existing or {}).get("CreatedAt") or _now_iso()
+            row = parent_row or {}
+            repo.put_item(
+                entity_rwa_item(
+                    slug,
+                    spec,
+                    entity_slug,
+                    row,
+                    created_at,
+                    chains=defaults.get("chains") or None,
+                    website=defaults.get("website") or _clean(row.get("Website")),
+                    twitter=defaults.get("twitter") or _clean(row.get("Twitter")),
+                    discord=_clean(row.get("Discord")),
+                    github=defaults.get("github") or _clean(row.get("GitHub")),
+                )
+            )
+            entity_staged.append(slug)
+
     # --- Report ------------------------------------------------------------
     print(f"Source CSV : {csv_path}")
     print(f"Backend    : {type(repo).__name__}")
@@ -174,8 +297,21 @@ def main(argv: List[str]) -> int:
         if slug in staged:
             name, _, asset_class = TARGETS[slug]
             print(f"{schema.STATUS_PENDING:<18}{asset_class:<22}{name}")
+    for slug in entity_staged:
+        for entity_slug, coins in ENTITY_RWA_COINS.items():
+            if slug in coins:
+                spec = coins[slug]
+                print(
+                    f"{schema.STATUS_PENDING:<18}{spec.get('assetClass', 'RWA'):<22}"
+                    f"{spec['name']} ({entity_slug})"
+                )
+                break
     print("-" * 72)
-    print(f"Published {len(staged)} / {len(TARGETS)} target RWA protocols as APPROVED.")
+    entity_count = sum(len(c) for c in ENTITY_RWA_COINS.values())
+    print(
+        f"Published {len(staged)} / {len(TARGETS)} target RWA protocols "
+        f"+ {len(entity_staged)} entity RWA products as APPROVED."
+    )
 
     missing = [s for s in TARGETS if s not in staged]
     if missing:

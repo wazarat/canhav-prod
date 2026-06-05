@@ -407,7 +407,7 @@ class MemberCoinRef(BaseModel):
     name: str
     symbol: str
     # Which category partition the coin lives in.
-    category: Literal["Stablecoin", "Token"]
+    category: Literal["Stablecoin", "Token", "RWA"]
     role: str = ""
     subCategory: Optional[str] = None
 

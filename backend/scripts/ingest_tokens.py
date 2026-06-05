@@ -34,6 +34,8 @@ USD_AI_PARENT_SLUG = "usd-ai"
 JUPITER_PARENT_SLUG = "jupiter"
 ETHENA_PARENT_SLUG = "ethena"
 SKY_PARENT_SLUG = "sky"
+ONDO_FINANCE_PARENT_SLUG = "ondo-finance"
+AAVE_PARENT_SLUG = "aave"
 
 # slug -> spec. USD.AI tokens pull shared metadata from the Portal row; Jupiter
 # tokens are fully curated (Solana-native, no Arbitrum CSV row).
@@ -155,6 +157,80 @@ TOKENS: Dict[str, Dict[str, Optional[str]]] = {
         "twitter": "https://x.com/JupiterExchange",
         "discord": "https://discord.gg/jup",
         "github": "https://github.com/jup-ag",
+    },
+    "usdy": {
+        "name": "USDY",
+        "symbol": "USDY",
+        "tokenType": "Yield",
+        "subCategory": "Yield-generating Token",
+        "description": (
+            "Yield-bearing bearer note secured by short-term Treasuries and bank deposits. "
+            "NOT a stablecoin — value accrues via NAV/yield. Reg S (non-US persons); "
+            "24/7 mint/redeem for eligible users."
+        ),
+        "entitySlug": ONDO_FINANCE_PARENT_SLUG,
+        "coingecko": "https://www.coingecko.com/en/coins/ondo-us-dollar-yield",
+        "contractAddress": "0x35e050d3c0ec2d29d269a8ecea763a183bdf9a9d",
+        "csvParentSlug": None,
+        "chains": ["Arbitrum One", "Ethereum", "Mantle", "Solana"],
+        "website": "https://ondo.finance/usdy",
+        "twitter": "https://x.com/OndoFinance",
+        "discord": None,
+        "github": "https://github.com/ondo-finance",
+    },
+    "ondo-gov": {
+        "name": "ONDO",
+        "symbol": "ONDO",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": "Governance token for Ondo Finance protocol parameters and ecosystem.",
+        "entitySlug": ONDO_FINANCE_PARENT_SLUG,
+        "coingecko": "https://www.coingecko.com/en/coins/ondo-finance",
+        "contractAddress": "0xfaba6f8e4a5e8ab82f62fe7c39859fa577269be3",
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
+        "website": "https://ondo.finance",
+        "twitter": "https://x.com/OndoFinance",
+        "discord": None,
+        "github": "https://github.com/ondo-finance",
+    },
+    "aave-gov": {
+        "name": "AAVE",
+        "symbol": "AAVE",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Aave DAO governance token. Max supply 16M; tokenholders steer parameters, "
+            "listings, emissions, and buybacks."
+        ),
+        "entitySlug": AAVE_PARENT_SLUG,
+        "coingecko": "https://www.coingecko.com/en/coins/aave",
+        "contractAddress": "0xba5ddd1f9d7f570dc94a51479a000e3bce967196",
+        "csvParentSlug": AAVE_PARENT_SLUG,
+        "chains": None,
+        "website": None,
+        "twitter": None,
+        "discord": None,
+        "github": None,
+    },
+    "stkaave": {
+        "name": "stkAAVE",
+        "symbol": "stkAAVE",
+        "tokenType": "Yield",
+        "subCategory": "Yield-generating Token",
+        "description": (
+            "Staked AAVE in the legacy Safety Module. Superseded by Umbrella backstop; "
+            "positions remain on-chain on Ethereum."
+        ),
+        "entitySlug": AAVE_PARENT_SLUG,
+        "coingecko": "https://www.coingecko.com/en/coins/staked-aave",
+        "contractAddress": "0x4da27a545c0c5b758a6ba100e3a049001de870f5",
+        "csvParentSlug": AAVE_PARENT_SLUG,
+        "chains": ["Ethereum"],
+        "website": None,
+        "twitter": None,
+        "discord": None,
+        "github": None,
     },
 }
 

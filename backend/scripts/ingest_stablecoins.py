@@ -179,6 +179,46 @@ BATCH_ENTITY_COINS: Dict[str, Dict[str, Dict[str, str]]] = {
             "description": "Regulated pound e-money from Monerium hf.",
         },
     },
+    "pleasing-market": {
+        "usdpm": {
+            "name": "USDpm",
+            "symbol": "USDpm",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "description": (
+                "Synthetic USD stablecoin connecting on-chain liquidity to the Pleasing "
+                "gold ecosystem. Peg model and custody unverified — confirm from official docs."
+            ),
+        },
+    },
+    "aave": {
+        "gho": {
+            "name": "GHO",
+            "symbol": "GHO",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/gho",
+            "contractAddress": None,
+            "description": (
+                "Native Aave overcollateralized stablecoin minted by locking approved "
+                "collateral via Aave lending markets."
+            ),
+        },
+        "sgho": {
+            "name": "sGHO",
+            "symbol": "sGHO",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "description": (
+                "GHO savings product — yield-bearing wrapper, not the stablecoin itself. "
+                "New sGHO experience live May 2026; legacy savings rebranded StkGHO."
+            ),
+        },
+    },
     "stably": {
         "veusd": {
             "name": "VeUSD",
@@ -414,11 +454,14 @@ def main(argv: List[str]) -> int:
     # Collect matching rows by slug (CSV is the source of truth). The legacy
     # "usd-ai" row is captured to source the two USD.AI coins below.
     matched: Dict[str, Dict[str, str]] = {}
+    all_csv_rows: Dict[str, Dict[str, str]] = {}
     usd_ai_row: Optional[Dict[str, str]] = None
     with csv_path.open("r", encoding="utf-8", newline="") as fh:
         reader = csv.DictReader(fh)
         for row in reader:
             slug = (row.get("Slug") or "").strip()
+            if slug and slug not in all_csv_rows:
+                all_csv_rows[slug] = row
             if slug in TARGETS and slug not in matched:
                 matched[slug] = row
             if slug == USD_AI_PARENT_SLUG and usd_ai_row is None:
@@ -488,7 +531,7 @@ def main(argv: List[str]) -> int:
     # Batch entity extra stablecoins (Ethena, Sky, Monerium, Stably).
     batch_staged: List[str] = []
     for entity_slug, coins in BATCH_ENTITY_COINS.items():
-        parent_row = matched.get(entity_slug)
+        parent_row = matched.get(entity_slug) or all_csv_rows.get(entity_slug)
         for slug, spec in coins.items():
             existing = repo.get_item(pk, schema.protocol_sk(slug))
             created_at = (existing or {}).get("CreatedAt") or _now_iso()

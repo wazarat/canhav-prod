@@ -2,12 +2,12 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight } from "lucide-react";
 
 import { MarketStats, MarketStatsSkeleton } from "@/components/market/MarketStats";
 import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/OnchainPanel";
 import { TokenProfileCard } from "@/components/tokens/TokenProfileCard";
 import { Badge } from "@/components/ui/Badge";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { getApprovedTokenBySlug, getApprovedTokens, getEntityBySlug } from "@/lib/data";
 
 interface PageProps {
@@ -33,24 +33,15 @@ export default async function TokenProfilePage({ params }: PageProps) {
 
   return (
     <div className="container space-y-8 py-12">
-      <nav className="flex items-center gap-1.5 text-sm text-ink-300">
-        <Link href="/" className="transition-colors hover:text-ink-50">
-          Dashboard
-        </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-ink-500" />
-        <Link href="/tokens" className="transition-colors hover:text-ink-50">
-          Tokens
-        </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-ink-500" />
-        <span className="text-ink-100">{profile.name}</span>
-      </nav>
-
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-ink-50">
-              {profile.name}
-            </h1>
+      <PageHeader
+        breadcrumbs={[
+          { label: "Dashboard", href: "/" },
+          { label: "Tokens", href: "/tokens" },
+          { label: profile.name },
+        ]}
+        title={profile.name}
+        badges={
+          <>
             <Badge tone="neutral" className="font-mono">
               {profile.symbol}
             </Badge>
@@ -61,10 +52,10 @@ export default async function TokenProfilePage({ params }: PageProps) {
                 <Badge tone="electric">Part of {entity.name}</Badge>
               </Link>
             )}
-          </div>
-          <p className="max-w-2xl text-sm text-ink-300">{profile.description}</p>
-        </div>
-      </header>
+          </>
+        }
+        description={profile.description}
+      />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">

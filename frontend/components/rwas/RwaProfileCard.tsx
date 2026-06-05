@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
@@ -37,6 +38,19 @@ export function RwaProfileCard({ profile }: { profile: RwaProfile }) {
         <div className="pt-1">
           <MetaRow label="Asset class" value={<Badge tone="neon">{profile.assetClass}</Badge>} />
           <MetaRow label="Sub-category" value={meta.subCategory ?? "—"} />
+          {profile.entitySlug && (
+            <MetaRow
+              label="Issuer"
+              value={
+                <Link
+                  href={`/entities/${profile.entitySlug}`}
+                  className="text-electric-400 hover:underline"
+                >
+                  View entity
+                </Link>
+              }
+            />
+          )}
           <MetaRow label="Chains" value={meta.chains.length ? meta.chains.join(", ") : "—"} />
           <MetaRow
             label="Arbitrum native"

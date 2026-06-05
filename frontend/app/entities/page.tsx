@@ -1,7 +1,5 @@
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-
-import { EntityTable } from "@/components/entities/EntityTable";
+import { EntityTableWithFilter } from "@/components/entities/EntityTableWithFilter";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { getApprovedEntities } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
@@ -20,29 +18,39 @@ export default async function EntitiesPage() {
 
   return (
     <div className="container space-y-8 py-12">
-      <nav className="flex items-center gap-1.5 text-sm text-ink-300">
-        <Link href="/" className="transition-colors hover:text-ink-50">
-          Dashboard
-        </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-ink-500" />
-        <span className="text-ink-100">Entities</span>
-      </nav>
-
-      <header className="space-y-3">
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-ink-50">
-          Entities
-        </h1>
-        <p className="max-w-2xl text-sm text-ink-300">
-          Top-tier umbrella protocols that group several coins under one issuer — spanning
-          stablecoins, RWAs, and tokens.{" "}
-          <span className="font-medium text-ink-100">{profiles.length}</span> entities tracked.
-        </p>
-      </header>
+      <PageHeader
+        breadcrumbs={[
+          { label: "Dashboard", href: "/" },
+          { label: "Entities" },
+        ]}
+        title="Entities"
+        description={
+          <>
+            Umbrella protocols grouping stablecoins, RWAs, and tokens under one issuer.{" "}
+            <span className="font-medium text-ink-100">{profiles.length}</span> entities
+            tracked.
+          </>
+        }
+      />
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Tracked" value={`${profiles.length}`} hint="Entities in store" />
-        <StatCard label="Aggregate TVL" value={formatUsdCompact(aggregateTvl)} hint="Across entities" />
-        <StatCard label="Grouped coins" value={`${totalCoins}`} hint="Stablecoins + tokens" />
+        <StatCard
+          label="Aggregate TVL"
+          value={formatUsdCompact(aggregateTvl)}
+          hint="Across entities"
+          source="Store"
+        />
+        <StatCard
+          label="Tracked"
+          value={`${profiles.length}`}
+          hint="Entities in store"
+          source="Store"
+        />
+        <StatCard
+          label="Grouped coins"
+          value={`${totalCoins}`}
+          hint="Stablecoins + tokens + RWAs"
+        />
         <StatCard
           label="Avg coins"
           value={profiles.length ? String(Math.round(totalCoins / profiles.length)) : "—"}
@@ -50,7 +58,7 @@ export default async function EntitiesPage() {
         />
       </section>
 
-      <EntityTable profiles={profiles} emptyHint="No entities in the store yet." />
+      <EntityTableWithFilter profiles={profiles} emptyHint="No entities in the store yet." />
     </div>
   );
 }

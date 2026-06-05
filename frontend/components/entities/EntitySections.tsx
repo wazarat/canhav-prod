@@ -1,7 +1,8 @@
-import { ArrowUpRight, CircleHelp, ShieldAlert } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
+import { DataPanel } from "@/components/ui/DataPanel";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import type {
   EntityComponent,
@@ -13,13 +14,20 @@ import type {
   Partnership,
   TradFiRow,
 } from "@/lib/types";
-import { formatUsdCompact } from "@/lib/utils";
+import { cn, formatUsdCompact } from "@/lib/utils";
 
-/* Section heading shared across the editorial blocks. */
-function SectionHeading({ title, subtitle }: { title: string; subtitle?: string }) {
+function SectionHeading({
+  title,
+  subtitle,
+  id,
+}: {
+  title: string;
+  subtitle?: string;
+  id?: string;
+}) {
   return (
-    <div className="space-y-1">
-      <h2 className="font-display text-xl font-semibold tracking-tight text-ink-50">{title}</h2>
+    <div id={id} className="scroll-mt-24 space-y-1 border-b border-ink-800/60 pb-2">
+      <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">{title}</h2>
       {subtitle && <p className="text-sm text-ink-300">{subtitle}</p>}
     </div>
   );
@@ -28,22 +36,20 @@ function SectionHeading({ title, subtitle }: { title: string; subtitle?: string 
 export function ComponentsSection({ components }: { components: EntityComponent[] }) {
   if (!components.length) return null;
   const title =
-    components.length === 1
-      ? "Main component"
-      : `Main components (${components.length})`;
+    components.length === 1 ? "Main component" : `Main components (${components.length})`;
   return (
-    <section className="space-y-4">
+    <section id="overview" className="scroll-mt-24 space-y-4">
       <SectionHeading title={title} />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {components.map((c, i) => (
-          <Card key={c.name} className="space-y-2">
+          <Card key={c.name} className="space-y-2 p-5">
             <div className="flex items-center gap-2">
               <span className="grid h-7 w-7 place-items-center rounded-lg border border-electric-500/30 bg-electric-500/10 font-mono text-xs text-electric-400">
                 {i + 1}
               </span>
               <CardTitle className="text-base">{c.name}</CardTitle>
             </div>
-            <p className="text-sm text-ink-300">{c.description}</p>
+            <p className="text-sm leading-relaxed text-ink-300">{c.description}</p>
           </Card>
         ))}
       </div>
@@ -56,7 +62,7 @@ export function DifferentiatorSection({ differentiator }: { differentiator: stri
   return (
     <section className="space-y-4">
       <SectionHeading title="Differentiator" />
-      <Card className="border-l-2 border-l-electric-500/60">
+      <Card className="glass-strong border-l-2 border-l-electric-500/60 p-5">
         <p className="text-sm leading-relaxed text-ink-200">{differentiator}</p>
       </Card>
     </section>
@@ -65,21 +71,28 @@ export function DifferentiatorSection({ differentiator }: { differentiator: stri
 
 export function FaqSection({ faq }: { faq: FaqItem[] }) {
   if (!faq.length) return null;
-  // Pinned questions first, preserving order otherwise.
   const ordered = [...faq].sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
   return (
-    <section className="space-y-4">
+    <section id="faq" className="scroll-mt-24 space-y-4">
       <SectionHeading title="Commonly asked questions" />
-      <div className="space-y-3">
+      <div className="space-y-2">
         {ordered.map((f) => (
-          <Card key={f.question} className="space-y-2">
-            <div className="flex items-center gap-2">
-              <CircleHelp className="h-4 w-4 shrink-0 text-signal-400" />
-              <CardTitle className="text-base">{f.question}</CardTitle>
-              {f.pinned && <Badge tone="signal">Key</Badge>}
+          <details
+            key={f.question}
+            open={f.pinned}
+            className="group glass rounded-xl border border-ink-700/60"
+          >
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 [&::-webkit-details-marker]:hidden">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-ink-50">{f.question}</span>
+                {f.pinned && <Badge tone="signal">Key</Badge>}
+              </div>
+              <ChevronDown className="h-4 w-4 shrink-0 text-ink-400 transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="border-t border-ink-800/60 px-5 pb-4 pt-3">
+              <p className="text-sm leading-relaxed text-ink-300">{f.answer}</p>
             </div>
-            <p className="pl-6 text-sm leading-relaxed text-ink-300">{f.answer}</p>
-          </Card>
+          </details>
         ))}
       </div>
     </section>
@@ -89,43 +102,63 @@ export function FaqSection({ faq }: { faq: FaqItem[] }) {
 export function OrgStructureSection({ org }: { org: OrgUnit[] }) {
   if (!org.length) return null;
   return (
-    <section className="space-y-4">
+    <section id="org" className="scroll-mt-24 space-y-4">
       <SectionHeading title="Organizational structure" />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {org.map((o) => (
-          <Card key={o.name} className="space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <CardTitle className="text-base">{o.name}</CardTitle>
-              <Badge tone="neon">{o.role}</Badge>
-            </div>
-            <p className="text-sm leading-relaxed text-ink-300">{o.description}</p>
-          </Card>
-        ))}
-      </div>
+      <DataPanel title="Units & roles">
+        <ul className="divide-y divide-ink-800/60">
+          {org.map((o) => (
+            <li key={o.name} className="py-3 first:pt-0 last:pb-0">
+              <div className="flex items-start justify-between gap-2">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-ink-50">{o.name}</p>
+                  <p className="text-sm leading-relaxed text-ink-300">{o.description}</p>
+                </div>
+                <Badge tone="neon" className="shrink-0">
+                  {o.role}
+                </Badge>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </DataPanel>
     </section>
   );
+}
+
+function riskBorderTone(category: EntityRisk["category"]): string {
+  switch (category) {
+    case "Smart Contract":
+    case "Systemic":
+      return "border-l-rose-500/60";
+    case "Regulatory":
+    case "Governance":
+      return "border-l-amber-400/60";
+    default:
+      return "border-l-ink-600";
+  }
 }
 
 export function RisksSection({ risks }: { risks: EntityRisk[] }) {
   if (!risks.length) return null;
   return (
-    <section className="space-y-4">
+    <section id="risks" className="scroll-mt-24 space-y-4">
       <SectionHeading title="Risks identified" />
-      <Card className="space-y-3">
-        <ul className="space-y-3">
-          {risks.map((r, i) => (
-            <li key={i} className="flex gap-3">
-              <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
-              <div className="space-y-1">
-                <Badge tone="warning" className="w-fit">
-                  {r.category}
-                </Badge>
-                <p className="text-sm leading-relaxed text-ink-300">{r.description}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </Card>
+      <ul className="space-y-2">
+        {risks.map((r, i) => (
+          <li
+            key={i}
+            className={cn(
+              "glass rounded-xl border border-ink-700/60 border-l-2 p-4",
+              riskBorderTone(r.category),
+            )}
+          >
+            <Badge tone="warning" className="mb-2 w-fit">
+              {r.category}
+            </Badge>
+            <p className="text-sm leading-relaxed text-ink-300">{r.description}</p>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -133,28 +166,35 @@ export function RisksSection({ risks }: { risks: EntityRisk[] }) {
 export function EventsSection({ events }: { events: EntityEvent[] }) {
   if (!events.length) return null;
   return (
-    <section className="space-y-4">
-      <SectionHeading title="Timeline & news" subtitle="Key milestones in the entity's history." />
-      <div className="space-y-3">
+    <section id="timeline" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Timeline & news"
+        subtitle="Key milestones in the entity's history."
+      />
+      <div className="relative space-y-0 pl-6">
+        <div className="absolute bottom-2 left-[7px] top-2 w-px bg-ink-700/80" />
         {events.map((e) => (
-          <Card key={`${e.date}-${e.title}`} className="space-y-2">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <CardTitle className="text-base">{e.title}</CardTitle>
-              <Badge tone="neutral">{e.date}</Badge>
+          <div key={`${e.date}-${e.title}`} className="relative pb-6 last:pb-0">
+            <span className="absolute -left-6 top-1.5 h-3.5 w-3.5 rounded-full border-2 border-electric-500/50 bg-ink-950" />
+            <div className="space-y-2 rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-medium text-ink-50">{e.title}</p>
+                <Badge tone="neutral">{e.date}</Badge>
+              </div>
+              <p className="text-sm leading-relaxed text-ink-300">{e.description}</p>
+              {e.link && (
+                <a
+                  href={e.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-0.5 text-xs text-electric-400 hover:underline"
+                >
+                  Source
+                  <ArrowUpRight className="h-3 w-3" />
+                </a>
+              )}
             </div>
-            <p className="text-sm leading-relaxed text-ink-300">{e.description}</p>
-            {e.link && (
-              <a
-                href={e.link}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-0.5 text-xs text-electric-400 hover:underline"
-              >
-                source
-                <ArrowUpRight className="h-3 w-3" />
-              </a>
-            )}
-          </Card>
+          </div>
         ))}
       </div>
     </section>
@@ -164,7 +204,7 @@ export function EventsSection({ events }: { events: EntityEvent[] }) {
 export function InvestmentRoundsSection({ rounds }: { rounds: InvestmentRound[] }) {
   if (!rounds.length) return null;
   return (
-    <section className="space-y-4">
+    <section id="funding" className="scroll-mt-24 space-y-4">
       <SectionHeading title="Investment rounds" />
       <TableShell>
         <Table className="min-w-[640px]">
@@ -206,7 +246,7 @@ export function InvestmentRoundsSection({ rounds }: { rounds: InvestmentRound[] 
                       rel="noreferrer"
                       className="inline-flex items-center gap-0.5 text-xs text-electric-400 hover:underline"
                     >
-                      source
+                      Source
                       <ArrowUpRight className="h-3 w-3" />
                     </a>
                   ) : (
@@ -225,20 +265,28 @@ export function InvestmentRoundsSection({ rounds }: { rounds: InvestmentRound[] 
 export function PartnershipsSection({ partnerships }: { partnerships: Partnership[] }) {
   if (!partnerships.length) return null;
   return (
-    <section className="space-y-4">
+    <section id="partnerships" className="scroll-mt-24 space-y-4">
       <SectionHeading title="Partnerships" />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {partnerships.map((p) => (
-          <Card key={p.name} className="space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <CardTitle className="text-base">{p.name}</CardTitle>
-              {p.amountLabel && <Badge tone="positive">{p.amountLabel}</Badge>}
-            </div>
-            <p className="text-xs font-medium uppercase tracking-wider text-ink-400">{p.date}</p>
-            <p className="text-sm leading-relaxed text-ink-300">{p.description}</p>
-          </Card>
-        ))}
-      </div>
+      <DataPanel title="Active partnerships">
+        <ul className="divide-y divide-ink-800/60">
+          {partnerships.map((p) => (
+            <li key={p.name} className="py-3 first:pt-0 last:pb-0">
+              <div className="flex items-start justify-between gap-2">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-ink-50">{p.name}</p>
+                  <p className="text-xs text-ink-400">{p.date}</p>
+                  <p className="text-sm leading-relaxed text-ink-300">{p.description}</p>
+                </div>
+                {p.amountLabel && (
+                  <Badge tone="positive" className="shrink-0">
+                    {p.amountLabel}
+                  </Badge>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </DataPanel>
     </section>
   );
 }
@@ -251,18 +299,24 @@ export function TradFiComparisonSection({
   entityName?: string;
 }) {
   if (!rows.length) return null;
+  const similarityHeader = entityName
+    ? `Similarity to ${entityName}`
+    : "Similarity to entity";
   const subtitle = entityName
     ? `How ${entityName} maps onto established TradFi structures, and where it diverges.`
     : "How this entity maps onto established TradFi structures, and where it diverges.";
   return (
-    <section className="space-y-4">
-      <SectionHeading title="Similarity to traditional finance products" subtitle={subtitle} />
+    <section id="tradfi" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Similarity to traditional finance products"
+        subtitle={subtitle}
+      />
       <TableShell>
         <Table className="min-w-[720px]">
           <THead>
             <tr>
               <TH>TradFi product</TH>
-              <TH>Similarity to USD.AI</TH>
+              <TH>{similarityHeader}</TH>
               <TH>Key differences</TH>
             </tr>
           </THead>
@@ -279,4 +333,31 @@ export function TradFiComparisonSection({
       </TableShell>
     </section>
   );
+}
+
+/** Build section nav items based on which sections have content. */
+export function buildEntitySectionNav(profile: {
+  components: EntityComponent[];
+  faq: FaqItem[];
+  events: EntityEvent[];
+  orgStructure: OrgUnit[];
+  risks: EntityRisk[];
+  investmentRounds: InvestmentRound[];
+  partnerships: Partnership[];
+  tradFiComparison: TradFiRow[];
+  memberCoins: unknown[];
+}) {
+  const items: { id: string; label: string }[] = [];
+
+  if (profile.memberCoins.length) items.push({ id: "member-coins", label: "Member coins" });
+  if (profile.components.length) items.push({ id: "overview", label: "Overview" });
+  if (profile.faq.length) items.push({ id: "faq", label: "FAQ" });
+  if (profile.events.length) items.push({ id: "timeline", label: "Timeline" });
+  if (profile.orgStructure.length) items.push({ id: "org", label: "Org structure" });
+  if (profile.risks.length) items.push({ id: "risks", label: "Risks" });
+  if (profile.investmentRounds.length) items.push({ id: "funding", label: "Funding" });
+  if (profile.partnerships.length) items.push({ id: "partnerships", label: "Partnerships" });
+  if (profile.tradFiComparison.length) items.push({ id: "tradfi", label: "TradFi" });
+
+  return items;
 }

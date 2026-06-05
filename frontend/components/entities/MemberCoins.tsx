@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, ExternalLink, X } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Eye, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
+import { DataPanel, DataRow } from "@/components/ui/DataPanel";
 import type { CoinLiveData } from "@/lib/server/coin";
+import { categoryBadgeTone } from "@/lib/categoryTone";
 import {
   cn,
   formatNumberCompact,
@@ -16,71 +18,17 @@ import {
 } from "@/lib/utils";
 
 /**
- * Member-coin cards for an Entity. Each card opens a modal (not a new page)
- * showing the coin's live CoinGecko + Alchemy data, which was fetched
- * server-side and passed in as serializable props.
+ * Member-coin cards for an Entity. Card click navigates to full profile;
+ * "Quick view" opens modal with live CoinGecko + Alchemy data.
  */
 export function MemberCoins({ coins }: { coins: CoinLiveData[] }) {
   const [active, setActive] = useState<CoinLiveData | null>(null);
 
   return (
     <div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         {coins.map((coin) => (
-          <button
-            key={coin.slug}
-            type="button"
-            onClick={() => setActive(coin)}
-            className="group glass flex h-full flex-col gap-3 rounded-2xl border border-ink-700/60 p-5 text-left transition-all duration-200 hover:border-electric-500/50 hover:glow-ring"
-          >
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-display text-lg font-semibold tracking-tight text-ink-50">
-                    {coin.name}
-                  </span>
-                  <ArrowUpRight className="h-4 w-4 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-electric-400" />
-                </div>
-                <span className="font-mono text-xs text-ink-400">{coin.symbol}</span>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <Badge
-                  tone={
-                    coin.category === "Token"
-                      ? "neon"
-                      : coin.category === "RWA"
-                        ? "signal"
-                        : "electric"
-                  }
-                >
-                  {coin.category}
-                </Badge>
-                {coin.subCategory && (
-                  <Badge tone="neutral" className="text-[10px]">
-                    {coin.subCategory}
-                  </Badge>
-                )}
-              </div>
-            </div>
-            {coin.role && <p className="text-sm text-ink-300">{coin.role}</p>}
-            <div className="mt-auto flex items-center gap-4 pt-2 text-xs text-ink-300">
-              <span>
-                Price{" "}
-                <span className="font-mono text-ink-100">
-                  {coin.market?.currentPrice != null
-                    ? `$${coin.market.currentPrice.toLocaleString(undefined, { maximumFractionDigits: 4 })}`
-                    : "—"}
-                </span>
-              </span>
-              <span>
-                Mkt cap{" "}
-                <span className="font-mono text-ink-100">
-                  {formatUsdCompact(coin.market?.marketCap ?? null)}
-                </span>
-              </span>
-            </div>
-            <span className="text-xs font-medium text-electric-400">View live data →</span>
-          </button>
+          <MemberCoinCard key={coin.slug} coin={coin} onQuickView={() => setActive(coin)} />
         ))}
       </div>
 
@@ -96,8 +44,84 @@ function changeTone(value: number | null | undefined): "positive" | "danger" | "
   return "neutral";
 }
 
+function MemberCoinCard({
+  coin,
+  onQuickView,
+}: {
+  coin: CoinLiveData;
+  onQuickView: () => void;
+}) {
+  const change24h = coin.market?.priceChange24h;
+
+  return (
+    <div className="group glass flex h-full flex-col gap-3 rounded-2xl border border-ink-700/60 p-5 transition-all duration-200 hover:border-electric-500/50 hover:glow-ring">
+      <div className="flex items-start justify-between gap-2">
+        <Link href={coin.profilePath} className="min-w-0 flex-1 space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="font-display text-lg font-semibold tracking-tight text-ink-50 transition-colors group-hover:text-electric-400">
+              {coin.name}
+            </span>
+            <ArrowUpRight className="h-4 w-4 shrink-0 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-electric-400" />
+          </div>
+          <span className="font-mono text-xs text-ink-400">{coin.symbol}</span>
+        </Link>
+        <div className="flex flex-col items-end gap-1">
+          <Badge tone={categoryBadgeTone(coin.category)}>{coin.category}</Badge>
+          {coin.subCategory && (
+            <Badge tone="neutral" className="text-[10px]">
+              {coin.subCategory}
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      {coin.role && <p className="text-sm text-ink-300">{coin.role}</p>}
+
+      <div className="flex flex-wrap items-center gap-3 text-xs text-ink-300">
+        <span>
+          Price{" "}
+          <span className="font-mono text-ink-100">
+            {coin.market?.currentPrice != null
+              ? `$${coin.market.currentPrice.toLocaleString(undefined, { maximumFractionDigits: 4 })}`
+              : "—"}
+          </span>
+        </span>
+        {change24h != null && (
+          <Badge tone={changeTone(change24h)}>{formatPct(change24h)} 24h</Badge>
+        )}
+        <span>
+          Mkt cap{" "}
+          <span className="font-mono text-ink-100">
+            {formatUsdCompact(coin.market?.marketCap ?? null)}
+          </span>
+        </span>
+      </div>
+
+      <div className="mt-auto flex items-center justify-between gap-2 border-t border-ink-800/60 pt-3">
+        <Link
+          href={coin.profilePath}
+          className="inline-flex items-center gap-1 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
+        >
+          Full profile
+          <ArrowUpRight className="h-3 w-3" />
+        </Link>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            onQuickView();
+          }}
+          className="inline-flex items-center gap-1 rounded-lg border border-ink-700/60 bg-ink-900/40 px-2 py-1 text-xs text-ink-300 transition-colors hover:border-ink-600 hover:text-ink-100"
+        >
+          <Eye className="h-3 w-3" />
+          Quick view
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void }) {
-  // Close on Escape and lock background scroll while open.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -120,34 +144,19 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
       aria-label={`${coin.name} live data`}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
-      <div
-        className="absolute inset-0 bg-ink-950/80 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="glass relative z-10 max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-ink-700/70 p-6 animate-fade-in-up">
+      <div className="absolute inset-0 bg-ink-950/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="glass relative z-10 max-h-[85vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-ink-700/70 p-6 animate-fade-in-up">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h3 className="font-display text-xl font-semibold tracking-tight text-ink-50">
                 {coin.name}
               </h3>
               <Badge tone="neutral" className="font-mono">
                 {coin.symbol}
               </Badge>
-              <div className="flex flex-wrap gap-1">
-                <Badge
-                  tone={
-                    coin.category === "Token"
-                      ? "neon"
-                      : coin.category === "RWA"
-                        ? "signal"
-                        : "electric"
-                  }
-                >
-                  {coin.category}
-                </Badge>
-                {coin.subCategory && <Badge tone="neutral">{coin.subCategory}</Badge>}
-              </div>
+              <Badge tone={categoryBadgeTone(coin.category)}>{coin.category}</Badge>
+              {coin.subCategory && <Badge tone="neutral">{coin.subCategory}</Badge>}
             </div>
             {coin.role && <p className="text-sm text-ink-300">{coin.role}</p>}
           </div>
@@ -165,102 +174,101 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
           <p className="mt-4 text-sm leading-relaxed text-ink-300">{coin.description}</p>
         )}
 
-        {/* Market data (CoinGecko) */}
-        <Section title="Market" badge={m ? "CoinGecko · live" : "Not listed"}>
-          {m ? (
-            <div className="divide-y divide-ink-800/60">
-              <ModalRow
-                label="Price"
-                value={
-                  m.currentPrice === null
-                    ? "—"
-                    : `$${m.currentPrice.toLocaleString(undefined, { maximumFractionDigits: 6 })}`
-                }
-              />
-              <ModalRow label="Market cap" value={formatUsdCompact(m.marketCap)} />
-              <ModalRow
-                label="Rank"
-                value={m.marketCapRank === null ? "—" : `#${m.marketCapRank}`}
-              />
-              <ModalRow label="24h volume" value={formatUsdCompact(m.totalVolume)} />
-              <ModalRow label="Circulating" value={formatNumberCompact(m.circulatingSupply)} />
-              <ModalRow
-                label="24h change"
-                value={<Badge tone={changeTone(m.priceChange24h)}>{formatPct(m.priceChange24h)}</Badge>}
-              />
-              <ModalRow
-                label="7d change"
-                value={<Badge tone={changeTone(m.priceChange7d)}>{formatPct(m.priceChange7d)}</Badge>}
-              />
-              <ModalRow
-                label="ATH / ATL"
-                value={
-                  m.ath === null && m.atl === null
-                    ? "—"
-                    : `$${(m.ath ?? 0).toLocaleString(undefined, { maximumFractionDigits: 4 })} / $${(m.atl ?? 0).toLocaleString(undefined, { maximumFractionDigits: 4 })}`
-                }
-              />
-            </div>
-          ) : (
-            <p className="text-sm text-ink-300">
-              Not listed on CoinGecko yet, so live market data (price, market cap, volume)
-              isn&apos;t available.
-            </p>
-          )}
-        </Section>
+        <div className="mt-5 space-y-4">
+          <DataPanel title="Market" badge={m ? "CoinGecko · live" : "Not listed"}>
+            {m ? (
+              <>
+                <DataRow
+                  label="Price"
+                  value={
+                    m.currentPrice === null
+                      ? "—"
+                      : `$${m.currentPrice.toLocaleString(undefined, { maximumFractionDigits: 6 })}`
+                  }
+                />
+                <DataRow label="Market cap" value={formatUsdCompact(m.marketCap)} />
+                <DataRow
+                  label="Rank"
+                  value={m.marketCapRank === null ? "—" : `#${m.marketCapRank}`}
+                />
+                <DataRow label="24h volume" value={formatUsdCompact(m.totalVolume)} />
+                <DataRow label="Circulating" value={formatNumberCompact(m.circulatingSupply)} />
+                <DataRow
+                  label="24h change"
+                  value={<Badge tone={changeTone(m.priceChange24h)}>{formatPct(m.priceChange24h)}</Badge>}
+                />
+                <DataRow
+                  label="7d change"
+                  value={<Badge tone={changeTone(m.priceChange7d)}>{formatPct(m.priceChange7d)}</Badge>}
+                />
+                <DataRow
+                  label="ATH / ATL"
+                  value={
+                    m.ath === null && m.atl === null
+                      ? "—"
+                      : `$${(m.ath ?? 0).toLocaleString(undefined, { maximumFractionDigits: 4 })} / $${(m.atl ?? 0).toLocaleString(undefined, { maximumFractionDigits: 4 })}`
+                  }
+                />
+              </>
+            ) : (
+              <p className="text-sm text-ink-300">
+                Not listed on CoinGecko yet, so live market data isn&apos;t available.
+              </p>
+            )}
+          </DataPanel>
 
-        {/* On-chain data (Alchemy) */}
-        <Section
-          title="On-chain"
-          badge={
-            coin.contractAddress
-              ? coin.hasAlchemy
-                ? "Alchemy · live"
-                : "Alchemy key not set"
-              : "No public token"
-          }
-        >
-          {coin.contractAddress ? (
-            <div className="divide-y divide-ink-800/60">
-              <ModalRow
-                label="Circulating supply"
-                value={
-                  <span className="font-mono">
-                    {coin.onchain?.supply != null ? formatNumberCompact(coin.onchain.supply) : "—"}
-                    {coin.onchain?.symbol ? (
-                      <span className="ml-1 text-ink-300">{coin.onchain.symbol}</span>
-                    ) : null}
-                  </span>
-                }
-              />
-              <ModalRow label="Decimals" value={coin.onchain?.decimals ?? "—"} />
-              <ModalRow
-                label={coin.links.explorerLabel}
-                value={
-                  <a
-                    href={coin.links.explorer ?? "#"}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-mono text-electric-400 hover:underline"
-                  >
-                    {truncateAddress(coin.contractAddress)}
-                  </a>
-                }
-              />
-              <ModalRow
-                label="Last refreshed"
-                value={coin.onchain?.updatedAt ? timeAgo(coin.onchain.updatedAt) : "—"}
-              />
-            </div>
-          ) : (
-            <p className="text-sm text-ink-300">
-              No public token contract is mapped for this coin yet, so live on-chain supply
-              isn&apos;t available.
-            </p>
-          )}
-        </Section>
+          <DataPanel
+            title="On-chain"
+            badge={
+              coin.contractAddress
+                ? coin.hasAlchemy
+                  ? "Alchemy · live"
+                  : "Alchemy key not set"
+                : "No public token"
+            }
+          >
+            {coin.contractAddress ? (
+              <>
+                <DataRow
+                  label="Circulating supply"
+                  value={
+                    <span className="font-mono">
+                      {coin.onchain?.supply != null
+                        ? formatNumberCompact(coin.onchain.supply)
+                        : "—"}
+                      {coin.onchain?.symbol ? (
+                        <span className="ml-1 text-ink-300">{coin.onchain.symbol}</span>
+                      ) : null}
+                    </span>
+                  }
+                />
+                <DataRow label="Decimals" value={coin.onchain?.decimals ?? "—"} />
+                <DataRow
+                  label={coin.links.explorerLabel}
+                  value={
+                    <a
+                      href={coin.links.explorer ?? "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-electric-400 hover:underline"
+                    >
+                      {truncateAddress(coin.contractAddress)}
+                    </a>
+                  }
+                />
+                <DataRow
+                  label="Last refreshed"
+                  value={coin.onchain?.updatedAt ? timeAgo(coin.onchain.updatedAt) : "—"}
+                />
+              </>
+            ) : (
+              <p className="text-sm text-ink-300">
+                No public token contract is mapped for this coin yet.
+              </p>
+            )}
+          </DataPanel>
+        </div>
 
-        {/* Links */}
         <div className="mt-5 flex flex-wrap gap-2">
           <Link
             href={coin.profilePath}
@@ -274,35 +282,6 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
           <ModalLink label={coin.links.explorerLabel} href={coin.links.explorer} />
         </div>
       </div>
-    </div>
-  );
-}
-
-function Section({
-  title,
-  badge,
-  children,
-}: {
-  title: string;
-  badge: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="mt-5">
-      <div className="mb-2 flex items-center justify-between">
-        <h4 className="font-display text-sm font-semibold tracking-tight text-ink-100">{title}</h4>
-        <Badge tone={badge.includes("live") ? "signal" : "neutral"}>{badge}</Badge>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function ModalRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-4 py-2">
-      <span className="text-sm text-ink-300">{label}</span>
-      <span className="text-right text-sm font-medium text-ink-100">{value}</span>
     </div>
   );
 }

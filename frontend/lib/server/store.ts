@@ -42,7 +42,10 @@ function readItemsFromDisk(): Record<string, unknown>[] {
 
 async function readItems(): Promise<Record<string, unknown>[]> {
   if (hasUpstash()) {
-    return readAllItemsFromRedis();
+    const fromRedis = await readAllItemsFromRedis();
+    // Upstash creds are often set locally before the hash is seeded. Fall back to
+    // the on-disk store so dev isn't blank after demo overlays were removed.
+    if (fromRedis.length > 0) return fromRedis;
   }
   return readItemsFromDisk();
 }

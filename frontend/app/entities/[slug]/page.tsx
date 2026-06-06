@@ -15,14 +15,20 @@ import {
   TradFiComparisonSection,
   buildEntitySectionNav,
 } from "@/components/entities/EntitySections";
+import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
 import { MemberCoins } from "@/components/entities/MemberCoins";
+import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
+import { DemoDataBanner } from "@/components/MockDataBanner";
+import { SourcesFooter } from "@/components/shared/SourcesFooter";
+import { TokenomicsCard } from "@/components/shared/TokenomicsCard";
+import { TypedRiskList } from "@/components/shared/TypedRiskList";
 import { Badge } from "@/components/ui/Badge";
 import { DataPanel, DataRow, LinkRow } from "@/components/ui/DataPanel";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionNav } from "@/components/ui/SectionNav";
 import { StatCard } from "@/components/ui/StatCard";
 import { Card } from "@/components/ui/Card";
-import { getApprovedEntities, getApprovedEntityBySlug, getEntityMemberCoins } from "@/lib/data";
+import { getApprovedEntities, getApprovedEntityBySlug, getEntityMemberCoins, hasDemoData } from "@/lib/data";
 import { getCoinLiveData } from "@/lib/server/coin";
 import type { EntityProfile } from "@/lib/types";
 import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
@@ -117,6 +123,8 @@ export default async function EntityProfilePage({ params }: PageProps) {
 
   return (
     <div className="container space-y-8 py-12">
+      {hasDemoData(profile) && <DemoDataBanner />}
+
       <PageHeader
         breadcrumbs={[
           { label: "Dashboard", href: "/" },
@@ -209,19 +217,43 @@ export default async function EntityProfilePage({ params }: PageProps) {
             </Suspense>
           </section>
 
+          {profile.market && (
+            <EntityMarketCard market={profile.market} symbol={profile.symbol} />
+          )}
+
+          {profile.longDescription && (
+            <section className="space-y-2">
+              <div className="border-b border-ink-800/60 pb-2">
+                <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
+                  About
+                </h2>
+              </div>
+              <Card className="text-sm leading-relaxed text-ink-300">
+                {profile.longDescription}
+              </Card>
+            </section>
+          )}
+
           <div className="space-y-8">
             <ComponentsSection components={profile.components} />
             <DifferentiatorSection differentiator={profile.differentiator} />
             <FaqSection faq={profile.faq} />
-            <EventsSection events={profile.events} />
+            <EventsSection events={profile.timeline ?? profile.events} />
             <OrgStructureSection org={profile.orgStructure} />
-            <RisksSection risks={profile.risks} />
+            {profile.tokenomics && <TokenomicsCard tokenomics={profile.tokenomics} />}
+            {profile.typedRisks ? (
+              <TypedRiskList risks={profile.typedRisks} />
+            ) : (
+              <RisksSection risks={profile.risks} />
+            )}
             <InvestmentRoundsSection rounds={profile.investmentRounds} />
             <PartnershipsSection partnerships={profile.partnerships} />
             <TradFiComparisonSection
               rows={profile.tradFiComparison}
               entityName={profile.name}
             />
+            {profile.agentSkill && <AgentSkillCard skill={profile.agentSkill} />}
+            {profile.sources && <SourcesFooter sources={profile.sources} />}
           </div>
         </div>
 

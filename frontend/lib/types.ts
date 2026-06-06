@@ -168,6 +168,140 @@ export interface RwaProfile {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Shared demo / dashboard types (Jupiter, JLP, etc.)                         */
+/* -------------------------------------------------------------------------- */
+
+export type DataSource = "live" | "demo" | "derived";
+
+export interface Sourced<T> {
+  value: T;
+  /** "live" = fetched this render; "demo" = illustrative anchor; "derived" = computed. */
+  dataSource: DataSource;
+  /** Human label shown in tooltips, e.g. "CoinGecko (demo)". */
+  sourceLabel?: string;
+  updatedAt?: string | null;
+}
+
+export interface TokenMarket {
+  priceUsd: Sourced<number | null>;
+  marketCapUsd: Sourced<number | null>;
+  fdvUsd?: Sourced<number | null>;
+  volume24hUsd?: Sourced<number | null>;
+  circulatingSupply?: Sourced<number | null>;
+  totalSupply?: Sourced<number | null>;
+  maxSupply?: Sourced<number | null>;
+  high52w?: Sourced<number | null>;
+  low52w?: Sourced<number | null>;
+  change24hPct?: Sourced<number | null>;
+  holders?: Sourced<number | null>;
+}
+
+export interface PricePoint {
+  date: string;
+  price: number;
+}
+
+export interface PriceHistory {
+  points: PricePoint[];
+  dataSource: DataSource;
+  updatedAt: string | null;
+}
+
+export interface PoolAsset {
+  symbol: string;
+  name: string;
+  targetWeightPct: number;
+  currentWeightPct: number;
+  kind: "volatile" | "stable";
+  valueUsd: number;
+}
+
+export interface PoolComposition {
+  assets: PoolAsset[];
+  stablePct: number;
+  volatilePct: number;
+  aumUsd: number;
+  aumCapUsd: number | null;
+  utilizationPct: number;
+  dataSource: DataSource;
+  updatedAt: string | null;
+}
+
+export interface YieldMechanics {
+  currentApyPct: number;
+  apy7dPct?: number;
+  apy30dPct?: number;
+  feeShareToHoldersPct: number;
+  yieldSource: string;
+  isAutoCompounding: boolean;
+  emissionsBased: boolean;
+  payoutAsset: string;
+  apyHistory?: PricePoint[];
+  dataSource: DataSource;
+}
+
+export type RiskSeverity = "low" | "medium" | "high";
+
+export interface TypedRisk {
+  category: string;
+  severity: RiskSeverity;
+  description: string;
+}
+
+export interface SourceRef {
+  label: string;
+  url: string;
+}
+
+export interface Tokenomics {
+  maxSupply: number | null;
+  totalBurned?: number;
+  buybackPolicy?: string;
+  emissionsPolicy?: string;
+  distribution?: { bucket: string; pct: number }[];
+  notes?: string[];
+}
+
+export interface TradeConfig {
+  replicationBasket: { symbol: string; weightPct: number; gmxMarket: string }[];
+  chain: "arbitrum-sepolia";
+  chainId: 421614;
+  zeroDevEnabled: boolean;
+  gasSponsored: boolean;
+  mode: "demo" | "live";
+}
+
+export interface AgentSkillSection {
+  heading: string;
+  body: string;
+}
+
+export interface AgentSkillFact {
+  key: string;
+  value: string;
+}
+
+export interface AgentSkillAction {
+  name: string;
+  description: string;
+  signature: string;
+  readOnly: boolean;
+}
+
+export interface AgentSkill {
+  id: string;
+  title: string;
+  summary: string;
+  facts: AgentSkillFact[];
+  sections: AgentSkillSection[];
+  actions: AgentSkillAction[];
+  glossary?: { term: string; definition: string }[];
+  sources: SourceRef[];
+  version: string;
+  updatedAt: string;
+}
+
+/* -------------------------------------------------------------------------- */
 /* Tokens — governance / utility tokens (e.g. CHIP)                           */
 /* -------------------------------------------------------------------------- */
 
@@ -206,6 +340,17 @@ export interface TokenProfile {
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   createdAt: string;
   updatedAt: string;
+  longDescription?: string;
+  market?: TokenMarket;
+  priceHistory?: PriceHistory;
+  poolComposition?: PoolComposition;
+  yieldMechanics?: YieldMechanics;
+  typedRisks?: TypedRisk[];
+  tokenomics?: Tokenomics;
+  audits?: { firm: string; date: string; url: string | null }[];
+  sources?: SourceRef[];
+  tradeable?: TradeConfig;
+  agentSkill?: AgentSkill;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -336,4 +481,13 @@ export interface EntityProfile {
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   createdAt: string;
   updatedAt: string;
+  longDescription?: string;
+  market?: TokenMarket;
+  priceHistory?: PriceHistory;
+  tokenomics?: Tokenomics;
+  typedRisks?: TypedRisk[];
+  audits?: { firm: string; date: string; url: string | null }[];
+  sources?: SourceRef[];
+  timeline?: { date: string; title: string; description: string }[];
+  agentSkill?: AgentSkill;
 }

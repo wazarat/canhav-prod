@@ -1,4 +1,14 @@
 import { readLiveStore } from "@/lib/server/store";
+import {
+  applyCuratedEntity,
+  CURATED_PROFILE_NAMES,
+} from "@/lib/server/curatedEntity";
+import {
+  getAgentSkillById,
+  hasDemoData,
+  mergeAllDemoEntities,
+  mergeAllDemoTokens,
+} from "@/lib/demoData";
 import type {
   CategoryDef,
   EntityProfile,
@@ -6,6 +16,8 @@ import type {
   StablecoinProfile,
   TokenProfile,
 } from "@/lib/types";
+
+export { getAgentSkillById, hasDemoData };
 
 /**
  * Data accessors.
@@ -51,7 +63,10 @@ export async function getApprovedStablecoins(): Promise<StablecoinProfile[]> {
 export async function getApprovedStablecoinBySlug(
   slug: string,
 ): Promise<StablecoinProfile | null> {
-  return (await getAllStablecoins()).find((p) => p.slug === slug) ?? null;
+  const profile = (await getAllStablecoins()).find((p) => p.slug === slug) ?? null;
+  if (!profile) return null;
+  const curatedName = CURATED_PROFILE_NAMES[slug];
+  return curatedName ? { ...profile, name: curatedName } : profile;
 }
 
 export async function getStablecoinBySlug(slug: string): Promise<StablecoinProfile | null> {
@@ -142,7 +157,7 @@ export function tvlTrend(profile: RwaProfile): TvlTrend {
 
 export async function getAllTokens(): Promise<TokenProfile[]> {
   const { tokens } = await readLiveStore();
-  return [...tokens].sort((a, b) => a.name.localeCompare(b.name));
+  return mergeAllDemoTokens([...tokens]).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function getApprovedTokens(): Promise<TokenProfile[]> {
@@ -163,7 +178,9 @@ export async function getTokenBySlug(slug: string): Promise<TokenProfile | null>
 
 export async function getAllEntities(): Promise<EntityProfile[]> {
   const { entities } = await readLiveStore();
-  return [...entities].sort((a, b) => a.name.localeCompare(b.name));
+  return mergeAllDemoEntities([...entities])
+    .map((profile) => applyCuratedEntity(profile))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function getApprovedEntities(): Promise<EntityProfile[]> {
@@ -171,7 +188,8 @@ export async function getApprovedEntities(): Promise<EntityProfile[]> {
 }
 
 export async function getApprovedEntityBySlug(slug: string): Promise<EntityProfile | null> {
-  return (await getAllEntities()).find((p) => p.slug === slug) ?? null;
+  const profile = (await getAllEntities()).find((p) => p.slug === slug) ?? null;
+  return profile;
 }
 
 export async function getEntityBySlug(slug: string): Promise<EntityProfile | null> {

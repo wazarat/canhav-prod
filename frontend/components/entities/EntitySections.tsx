@@ -346,18 +346,28 @@ export function buildEntitySectionNav(profile: {
   partnerships: Partnership[];
   tradFiComparison: TradFiRow[];
   memberCoins: unknown[];
+  market?: unknown;
+  tokenomics?: unknown;
+  typedRisks?: unknown[];
+  timeline?: unknown[];
+  agentSkill?: unknown;
 }) {
   const items: { id: string; label: string }[] = [];
 
   if (profile.memberCoins.length) items.push({ id: "member-coins", label: "Member coins" });
+  if (profile.market) items.push({ id: "market", label: "Market" });
   if (profile.components.length) items.push({ id: "overview", label: "Overview" });
   if (profile.faq.length) items.push({ id: "faq", label: "FAQ" });
-  if (profile.events.length) items.push({ id: "timeline", label: "Timeline" });
+  if (profile.timeline?.length || profile.events.length)
+    items.push({ id: "timeline", label: "Timeline" });
   if (profile.orgStructure.length) items.push({ id: "org", label: "Org structure" });
-  if (profile.risks.length) items.push({ id: "risks", label: "Risks" });
+  if (profile.tokenomics) items.push({ id: "tokenomics", label: "Tokenomics" });
+  if (profile.typedRisks?.length) items.push({ id: "typed-risks", label: "Risks" });
+  else if (profile.risks.length) items.push({ id: "risks", label: "Risks" });
   if (profile.investmentRounds.length) items.push({ id: "funding", label: "Funding" });
   if (profile.partnerships.length) items.push({ id: "partnerships", label: "Partnerships" });
   if (profile.tradFiComparison.length) items.push({ id: "tradfi", label: "TradFi" });
+  if (profile.agentSkill) items.push({ id: "agent-skill", label: "Agent skill" });
 
   return items;
 }

@@ -197,7 +197,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         investmentRounds: item.InvestmentRounds ?? [],
         partnerships: item.Partnerships ?? [],
         scaleLabels: item.ScaleLabels ?? undefined,
-        currentScale: item.CurrentScale ?? {
+        currentScale: {
           tvlUsd: null,
           users: null,
           aprPct: null,
@@ -205,6 +205,7 @@ export async function readLiveStore(): Promise<LiveStore> {
           marketCapUsd: null,
           loanPipelineUsd: null,
           partnerships: null,
+          ...((item.CurrentScale as Record<string, unknown> | undefined) ?? {}),
         },
         memberCoins: item.MemberCoins ?? [],
         arbitrumPortalMetadata: item.ArbitrumPortalMetadata ?? {

@@ -27,13 +27,6 @@ export function Nav() {
             </Link>
           ))}
         </nav>
-
-        <div className="flex items-center gap-2">
-          <span className="hidden items-center gap-2 rounded-full border border-ink-800 bg-ink-900/60 px-3 py-1.5 text-xs font-medium text-ink-300 sm:inline-flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-signal-400 animate-pulse-soft" />
-            Arbitrum
-          </span>
-        </div>
       </div>
     </header>
   );

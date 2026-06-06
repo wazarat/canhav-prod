@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { Card, CardTitle } from "@/components/ui/Card";
+import { tradeDivider, tradeLabel, tradePanel } from "@/components/trade/tradeStyles";
 import { buildSeries } from "@/lib/trade/priceFeed";
 import { cn, formatPct } from "@/lib/utils";
 
@@ -14,9 +14,9 @@ const RANGE_CONFIG: Record<ChartRange, { points: number; stepMin: number }> = {
   "1M": { points: 180, stepMin: 240 },
 };
 
-const WIDTH = 720;
-const HEIGHT = 220;
-const COLOR = "#5C92FF";
+const WIDTH = 900;
+const HEIGHT = 320;
+const COLOR = "#3D7BFF";
 
 export function TradeChart() {
   const [range, setRange] = useState<ChartRange>("1D");
@@ -38,20 +38,20 @@ export function TradeChart() {
       : 0;
 
   return (
-    <Card className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <CardTitle>Price</CardTitle>
-        <div className="flex gap-1 rounded-full border border-ink-800/60 bg-ink-900/40 p-1">
+    <div className={cn(tradePanel, "flex h-full min-h-[360px] flex-col")}>
+      <div className={cn("flex items-center justify-between border-b px-4 py-2.5", tradeDivider)}>
+        <span className={tradeLabel}>Chart</span>
+        <div className="flex gap-0.5">
           {(["1D", "1W", "1M"] as ChartRange[]).map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => setRange(r)}
               className={cn(
-                "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                "rounded px-2.5 py-1 text-xs font-medium transition-colors",
                 range === r
-                  ? "bg-electric-500/15 text-electric-400"
-                  : "text-ink-400 hover:text-ink-100",
+                  ? "bg-white/[0.08] text-white"
+                  : "text-[#787B87] hover:text-[#A0A3AD]",
               )}
             >
               {r}
@@ -60,35 +60,37 @@ export function TradeChart() {
         </div>
       </div>
 
-      {!mounted || series.length < 2 ? (
-        <div className="grid h-[220px] place-items-center text-sm text-ink-400">Loading chart…</div>
-      ) : (
-        <ChartSvg series={series} deltaPct={deltaPct} range={range} />
-      )}
-    </Card>
+      <div className="relative flex-1 px-2 pb-2 pt-1">
+        {!mounted || series.length < 2 ? (
+          <div className="grid h-full min-h-[280px] place-items-center text-sm text-[#787B87]">
+            Loading chart…
+          </div>
+        ) : (
+          <ChartSvg series={series} deltaPct={deltaPct} />
+        )}
+      </div>
+    </div>
   );
 }
 
 function ChartSvg({
   series,
   deltaPct,
-  range,
 }: {
   series: { t: number; price: number }[];
   deltaPct: number;
-  range: ChartRange;
 }) {
-  const padX = 8;
-  const padY = 18;
-  const innerW = WIDTH - padX * 2;
+  const padX = 48;
+  const padY = 24;
+  const innerW = WIDTH - padX - 8;
   const innerH = HEIGHT - padY * 2;
 
   const values = series.map((p) => p.price);
   const dataMin = Math.min(...values);
   const dataMax = Math.max(...values);
   const spread = Math.max(dataMax - dataMin, 1e-9);
-  const min = dataMin - spread * 0.15;
-  const max = dataMax + spread * 0.15;
+  const min = dataMin - spread * 0.12;
+  const max = dataMax + spread * 0.12;
 
   const x = (i: number) => padX + (i / (series.length - 1)) * innerW;
   const y = (value: number) => padY + (1 - (value - min) / (max - min)) * innerH;
@@ -106,50 +108,60 @@ function ChartSvg({
     ` L ${x(series.length - 1).toFixed(2)} ${(HEIGHT - padY).toFixed(2)}` +
     ` L ${x(0).toFixed(2)} ${(HEIGHT - padY).toFixed(2)} Z`;
 
+  const gridLines = [0.25, 0.5, 0.75].map((pct) => {
+    const gy = padY + innerH * pct;
+    return (
+      <line
+        key={pct}
+        x1={padX}
+        y1={gy}
+        x2={WIDTH - 8}
+        y2={gy}
+        stroke="rgba(255,255,255,0.04)"
+        strokeWidth={1}
+      />
+    );
+  });
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       <svg
         role="img"
-        aria-label={`JLP price chart ${range}`}
+        aria-label="JLP price chart"
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         preserveAspectRatio="none"
         className="w-full"
         style={{ height: HEIGHT }}
       >
         <defs>
-          <linearGradient id="jlp-trade-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={COLOR} stopOpacity="0.28" />
+          <linearGradient id="jlp-gmx-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={COLOR} stopOpacity="0.2" />
             <stop offset="100%" stopColor={COLOR} stopOpacity="0" />
           </linearGradient>
         </defs>
-        <text x={padX} y={y(dataMax) - 5} fill="#7C8499" fontSize="11" fontFamily="monospace">
+        {gridLines}
+        <text x={4} y={y(dataMax) + 4} fill="#787B87" fontSize="10" fontFamily="monospace">
           ${dataMax.toFixed(4)}
         </text>
-        <text
-          x={padX}
-          y={HEIGHT - 4}
-          fill="#7C8499"
-          fontSize="11"
-          fontFamily="monospace"
-        >
+        <text x={4} y={y(dataMin) + 4} fill="#787B87" fontSize="10" fontFamily="monospace">
           ${dataMin.toFixed(4)}
         </text>
-        <path d={areaPath} fill="url(#jlp-trade-fill)" />
+        <path d={areaPath} fill="url(#jlp-gmx-fill)" />
         <path
           d={linePath}
           fill="none"
           stroke={COLOR}
-          strokeWidth={2}
+          strokeWidth={1.5}
           strokeLinejoin="round"
           strokeLinecap="round"
         />
       </svg>
-      <p className="text-right text-xs text-ink-400">
-        Period change{" "}
+      <p className="px-2 text-right text-[11px] text-[#787B87]">
+        Period{" "}
         <span
           className={cn(
-            "font-mono",
-            deltaPct >= 0 ? "text-emerald-400" : "text-rose-400",
+            "font-mono tabular-nums",
+            deltaPct >= 0 ? "text-[#0ECB81]" : "text-[#F6465D]",
           )}
         >
           {formatPct(deltaPct, 2)}

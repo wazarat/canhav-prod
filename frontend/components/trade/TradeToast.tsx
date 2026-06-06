@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { Card } from "@/components/ui/Card";
+import { tradePanel } from "@/components/trade/tradeStyles";
 
 interface TradeToastProps {
   message: string | null;
@@ -28,8 +28,10 @@ export function TradeToast({ message, onDismiss }: TradeToastProps) {
   if (!message || !visible) return null;
 
   return (
-    <Card className="fixed bottom-6 right-6 z-50 max-w-sm border border-emerald-500/30 bg-ink-900/95 py-4 shadow-xl">
-      <p className="text-sm font-medium text-emerald-300">{message}</p>
-    </Card>
+    <div
+      className={`${tradePanel} fixed bottom-6 right-6 z-50 max-w-sm border-[#0ECB81]/30 px-4 py-3 shadow-2xl`}
+    >
+      <p className="text-sm font-medium text-[#0ECB81]">{message}</p>
+    </div>
   );
 }

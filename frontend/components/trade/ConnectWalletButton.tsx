@@ -8,8 +8,12 @@ interface ConnectWalletButtonProps {
 
 export function ConnectWalletButton({ onConnect }: ConnectWalletButtonProps) {
   return (
-    <Button type="button" className="w-full" onClick={onConnect}>
-      Connect with Passkey (ZeroDev)
-    </Button>
+    <button
+      type="button"
+      onClick={onConnect}
+      className="w-full rounded bg-electric-500 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+    >
+      Connect Wallet
+    </button>
   );
 }

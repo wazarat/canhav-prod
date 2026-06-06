@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Badge } from "@/components/ui/Badge";
 import { JLP_MARKET } from "@/lib/trade/jlpMarket";
-import { cn, formatNumberCompact, formatPct } from "@/lib/utils";
+import { tradeDivider, tradeLabel, tradeMuted, tradePanel } from "@/components/trade/tradeStyles";
+import { cn, formatNumberCompact, formatPct, formatUsdCompact } from "@/lib/utils";
 
 interface TradePriceHeaderProps {
   mark: number;
@@ -24,40 +24,75 @@ export function TradePriceHeader({ mark }: TradePriceHeaderProps) {
   }, [mark]);
 
   const changePositive = JLP_MARKET.change24hPct >= 0;
+  const utilPct = (JLP_MARKET.aumUsd / JLP_MARKET.aumCapUsd) * 100;
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-end gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-ink-400">JLP / USD</p>
-          <p
-            className={cn(
-              "font-mono text-4xl font-semibold tracking-tight transition-colors duration-300",
-              flash === "up" && "text-emerald-400",
-              flash === "down" && "text-rose-400",
-              !flash && "text-ink-50",
-            )}
-            suppressHydrationWarning
-          >
-            ${mark.toFixed(4)}
-          </p>
+    <div className={cn(tradePanel, "flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3")}>
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded bg-gradient-to-br from-electric-600 to-neon-600 text-xs font-bold text-white">
+          JLP
         </div>
-        <Badge tone={changePositive ? "positive" : "danger"}>
-          {formatPct(JLP_MARKET.change24hPct, 2)} 24h
-        </Badge>
+        <div>
+          <p className="text-sm font-medium text-white">JLP / USD</p>
+          <p className={tradeMuted}>Jupiter Perps LP</p>
+        </div>
       </div>
-      <div className="flex flex-wrap gap-4 text-sm text-ink-300">
-        <span>
-          Virtual price anchor{" "}
-          <span className="font-mono text-ink-100">${JLP_MARKET.priceUsd.toFixed(2)}</span>
-        </span>
-        <span>
-          Holders{" "}
-          <span className="font-mono text-ink-100">
-            {formatNumberCompact(JLP_MARKET.holders)}
-          </span>
+
+      <div className="flex items-baseline gap-2">
+        <p
+          className={cn(
+            "font-mono text-2xl font-semibold tabular-nums transition-colors duration-300",
+            flash === "up" && "text-[#0ECB81]",
+            flash === "down" && "text-[#F6465D]",
+            !flash && "text-white",
+          )}
+          suppressHydrationWarning
+        >
+          ${mark.toFixed(4)}
+        </p>
+        <span
+          className={cn(
+            "font-mono text-sm tabular-nums",
+            changePositive ? "text-[#0ECB81]" : "text-[#F6465D]",
+          )}
+        >
+          {formatPct(JLP_MARKET.change24hPct, 2)}
         </span>
       </div>
+
+      <div className="hidden h-8 w-px bg-white/[0.08] sm:block" />
+
+      <div className="flex flex-wrap gap-x-5 gap-y-1">
+        <MarketStat label="AUM" value={formatUsdCompact(JLP_MARKET.aumUsd)} />
+        <MarketStat label="APY" value={`${JLP_MARKET.apyPct.toFixed(0)}%`} accent />
+        <MarketStat label="24h Fees" value={formatUsdCompact(JLP_MARKET.fees24hUsd)} />
+        <MarketStat label="Utilization" value={`${utilPct.toFixed(1)}%`} />
+        <MarketStat label="Holders" value={formatNumberCompact(JLP_MARKET.holders)} />
+      </div>
+    </div>
+  );
+}
+
+function MarketStat({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) {
+  return (
+    <div>
+      <p className={tradeLabel}>{label}</p>
+      <p
+        className={cn(
+          "font-mono text-sm tabular-nums",
+          accent ? "text-[#0ECB81]" : "text-[#EAECEF]",
+        )}
+      >
+        {value}
+      </p>
     </div>
   );
 }

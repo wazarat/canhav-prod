@@ -1,84 +1,90 @@
 "use client";
 
-import { Badge } from "@/components/ui/Badge";
-import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
+import { tradeDivider, tradePanel } from "@/components/trade/tradeStyles";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import { sepoliaExplorerTxHash } from "@/lib/demo/tradeDemo";
 import type { ActivityItem } from "@/lib/trade/types";
-import { truncateAddress } from "@/lib/utils";
+import { cn, truncateAddress } from "@/lib/utils";
 
 interface ActivityLogProps {
   activity: ActivityItem[];
+  embedded?: boolean;
 }
 
-const KIND_TONE = {
-  buy: "positive",
-  sell: "warning",
-  close: "neutral",
-} as const;
-
-export function ActivityLog({ activity }: ActivityLogProps) {
-  return (
-    <Card className="space-y-4">
-      <div>
-        <CardTitle>Activity</CardTitle>
-        <CardDescription>Your demo orders, newest first.</CardDescription>
+export function ActivityLog({ activity, embedded }: ActivityLogProps) {
+  if (activity.length === 0) {
+    return (
+      <div className={cn(!embedded && tradePanel, "px-4 py-8 text-center")}>
+        <p className="text-sm text-[#787B87]">No trade history</p>
       </div>
+    );
+  }
 
-      {activity.length === 0 ? (
-        <p className="text-sm text-ink-400">No activity yet.</p>
-      ) : (
-        <TableShell>
-          <Table>
-            <THead>
-              <TR>
-                <TH>When</TH>
-                <TH>Action</TH>
-                <TH className="text-right">JLP</TH>
-                <TH className="text-right">Price</TH>
-                <TH className="text-right">Value</TH>
-                <TH className="text-right">Fee</TH>
-                <TH>Tx</TH>
+  return (
+    <div className={cn(!embedded && tradePanel, "overflow-x-auto")}>
+      <TableShell>
+        <Table>
+          <THead>
+            <TR className={cn("border-b text-[11px] uppercase tracking-wide text-[#787B87]", tradeDivider)}>
+              <TH className="px-4 py-2.5">Time</TH>
+              <TH className="px-4 py-2.5">Action</TH>
+              <TH className="px-4 py-2.5 text-right">Size</TH>
+              <TH className="px-4 py-2.5 text-right">Price</TH>
+              <TH className="px-4 py-2.5 text-right">Value</TH>
+              <TH className="px-4 py-2.5 text-right">Fee</TH>
+              <TH className="px-4 py-2.5">Tx</TH>
+            </TR>
+          </THead>
+          <TBody>
+            {activity.map((item) => (
+              <TR key={item.id} className="border-b border-white/[0.04] text-[#EAECEF]">
+                <TD className="px-4 py-2.5 text-xs text-[#787B87]">
+                  {new Date(item.at).toLocaleString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </TD>
+                <TD className="px-4 py-2.5">
+                  <span
+                    className={cn(
+                      "text-xs font-medium uppercase",
+                      item.kind === "buy" && "text-[#0ECB81]",
+                      item.kind === "sell" && "text-[#F6465D]",
+                      item.kind === "close" && "text-[#A0A3AD]",
+                    )}
+                  >
+                    {item.kind}
+                  </span>
+                </TD>
+                <TD className="px-4 py-2.5 text-right font-mono tabular-nums">
+                  {item.jlp.toFixed(4)}
+                </TD>
+                <TD className="px-4 py-2.5 text-right font-mono tabular-nums">
+                  ${item.priceUsd.toFixed(4)}
+                </TD>
+                <TD className="px-4 py-2.5 text-right font-mono tabular-nums">
+                  ${item.valueUsd.toFixed(2)}
+                </TD>
+                <TD className="px-4 py-2.5 text-right font-mono tabular-nums text-[#787B87]">
+                  {item.feeUsd > 0 ? `$${item.feeUsd.toFixed(2)}` : "—"}
+                </TD>
+                <TD className="px-4 py-2.5">
+                  <a
+                    href={sepoliaExplorerTxHash(item.txHash)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-xs text-electric-400 hover:underline"
+                  >
+                    {truncateAddress(item.txHash)}
+                  </a>
+                </TD>
               </TR>
-            </THead>
-            <TBody>
-              {activity.map((item) => (
-                <TR key={item.id}>
-                  <TD className="text-xs text-ink-400">
-                    {new Date(item.at).toLocaleString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </TD>
-                  <TD>
-                    <Badge tone={KIND_TONE[item.kind]}>
-                      {item.kind.charAt(0).toUpperCase() + item.kind.slice(1)}
-                    </Badge>
-                  </TD>
-                  <TD className="text-right font-mono">{item.jlp.toFixed(4)}</TD>
-                  <TD className="text-right font-mono">${item.priceUsd.toFixed(4)}</TD>
-                  <TD className="text-right font-mono">${item.valueUsd.toFixed(2)}</TD>
-                  <TD className="text-right font-mono">
-                    {item.feeUsd > 0 ? `$${item.feeUsd.toFixed(2)}` : "—"}
-                  </TD>
-                  <TD>
-                    <a
-                      href={sepoliaExplorerTxHash(item.txHash)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-mono text-xs text-electric-400 hover:underline"
-                    >
-                      {truncateAddress(item.txHash)}
-                    </a>
-                  </TD>
-                </TR>
-              ))}
-            </TBody>
-          </Table>
-        </TableShell>
-      )}
-    </Card>
+            ))}
+          </TBody>
+        </Table>
+      </TableShell>
+    </div>
   );
 }

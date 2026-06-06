@@ -1,67 +1,49 @@
 "use client";
 
-import { Badge } from "@/components/ui/Badge";
-import { Card, CardTitle } from "@/components/ui/Card";
 import { JLP_MARKET } from "@/lib/trade/jlpMarket";
+import { tradeLabel, tradePanel, tradeMuted } from "@/components/trade/tradeStyles";
 import { cn } from "@/lib/utils";
 
-const VOLATILE_COLORS = [
-  "bg-electric-600",
-  "bg-electric-500",
-  "bg-electric-400",
-];
-const STABLE_COLORS = ["bg-signal-500", "bg-signal-400"];
+const WEIGHT_COLORS: Record<string, string> = {
+  SOL: "bg-[#9945FF]",
+  USDC: "bg-[#2775CA]",
+  BTC: "bg-[#F7931A]",
+  ETH: "bg-[#627EEA]",
+  USDT: "bg-[#26A17B]",
+};
 
 export function PoolCompositionBar() {
   const stablePct = JLP_MARKET.weights
     .filter((w) => w.kind === "stable")
     .reduce((s, w) => s + w.pct, 0);
-  const volatilePct = 100 - stablePct;
-
-  let volatileIdx = 0;
-  let stableIdx = 0;
 
   return (
-    <Card className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <CardTitle>Pool composition</CardTitle>
-        <Badge tone="neutral">
-          {stablePct}% stable / {volatilePct}% volatile
-        </Badge>
+    <div className={cn(tradePanel, "px-4 py-3")}>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <span className={tradeLabel}>Pool composition</span>
+        <span className={cn("text-xs", tradeMuted)}>
+          {stablePct}% stables · {100 - stablePct}% volatile
+        </span>
       </div>
-
-      <div className="flex h-3 overflow-hidden rounded-full">
-        {JLP_MARKET.weights.map((w) => {
-          const color =
-            w.kind === "volatile"
-              ? VOLATILE_COLORS[volatileIdx++ % VOLATILE_COLORS.length]
-              : STABLE_COLORS[stableIdx++ % STABLE_COLORS.length];
-          return (
-            <div
-              key={w.symbol}
-              className={cn(color, "transition-all")}
-              style={{ width: `${w.pct}%` }}
-              title={`${w.symbol} ${w.pct}%`}
-            />
-          );
-        })}
+      <div className="flex h-2 overflow-hidden rounded-sm">
+        {JLP_MARKET.weights.map((w) => (
+          <div
+            key={w.symbol}
+            className={cn(WEIGHT_COLORS[w.symbol] ?? "bg-ink-500", "transition-all")}
+            style={{ width: `${w.pct}%` }}
+            title={`${w.symbol} ${w.pct}%`}
+          />
+        ))}
       </div>
-
-      <div className="flex flex-wrap gap-x-4 gap-y-2">
-        {JLP_MARKET.weights.map((w, i) => {
-          const dot =
-            w.kind === "volatile"
-              ? VOLATILE_COLORS[i % VOLATILE_COLORS.length]
-              : STABLE_COLORS[i % STABLE_COLORS.length];
-          return (
-            <div key={w.symbol} className="flex items-center gap-2 text-sm">
-              <span className={cn("h-2 w-2 rounded-full", dot)} />
-              <span className="text-ink-200">{w.symbol}</span>
-              <span className="font-mono text-ink-400">{w.pct}%</span>
-            </div>
-          );
-        })}
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+        {JLP_MARKET.weights.map((w) => (
+          <div key={w.symbol} className="flex items-center gap-1.5 text-xs">
+            <span className={cn("h-2 w-2 rounded-sm", WEIGHT_COLORS[w.symbol])} />
+            <span className="text-[#A0A3AD]">{w.symbol}</span>
+            <span className="font-mono tabular-nums text-[#787B87]">{w.pct}%</span>
+          </div>
+        ))}
       </div>
-    </Card>
+    </div>
   );
 }

@@ -175,7 +175,7 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
         )}
 
         <div className="mt-5 space-y-4">
-          <DataPanel title="Market" badge={m ? (m.source === "curated" ? "Market data · live" : "CoinGecko · live") : "Not listed"}>
+          <DataPanel title="Market" badge={m ? "CoinGecko · live" : "Not listed"}>
             {m ? (
               <>
                 <DataRow

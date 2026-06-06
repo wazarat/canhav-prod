@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { coinIdForSlug, fetchMarketData } from "@/lib/server/coingecko";
-import { resolveMarketData } from "@/lib/server/curatedMarket";
 import type { TokenProfile } from "@/lib/types";
 import { formatPct, formatUsdCompact } from "@/lib/utils";
 
@@ -17,8 +16,7 @@ function changeTone(value: number | null): "positive" | "danger" | "neutral" {
 /** Headline market stats row for token detail pages (price, change, mkt cap, volume). */
 export async function TokenHeadlineStats({ profile }: { profile: TokenProfile }) {
   const coinId = coinIdForSlug(profile.slug);
-  const live = coinId ? await fetchMarketData(coinId, LIVE_REVALIDATE) : null;
-  const data = resolveMarketData(profile.slug, live);
+  const data = coinId ? await fetchMarketData(coinId, LIVE_REVALIDATE) : null;
 
   if (!data) return null;
 

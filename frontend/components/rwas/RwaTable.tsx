@@ -59,7 +59,7 @@ export function RwaTable({ profiles, showStatus = false, emptyHint }: RwaTablePr
           <tr>
             <TH>Protocol</TH>
             <TH>Asset class</TH>
-            <TH className="text-right">TVL (mock)</TH>
+            <TH className="text-right">TVL</TH>
             <TH>30d trend</TH>
             {showStatus && <TH>Status</TH>}
             <TH className="text-right">Links</TH>

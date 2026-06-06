@@ -1,8 +1,8 @@
 /**
  * Frontend data contract for CanHav Research.
  *
- * This shape intentionally mirrors the DynamoDB single-table item so the same
- * structure is used by the mock data today and by the live API (Step 4) later.
+ * This shape intentionally mirrors the DynamoDB single-table item stored in
+ * `backend/data/store.json` / Upstash Redis and read at runtime.
  *
  *   PK = `CATEGORY#<Category>`   SK = `PROTOCOL#<slug>`
  */
@@ -168,16 +168,15 @@ export interface RwaProfile {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Shared demo / dashboard types (Jupiter, JLP, etc.)                         */
+/* Shared sourced-value types (rich token/entity dashboards)                  */
 /* -------------------------------------------------------------------------- */
 
 export type DataSource = "live" | "demo" | "derived";
 
 export interface Sourced<T> {
   value: T;
-  /** "live" = fetched this render; "demo" = illustrative anchor; "derived" = computed. */
+  /** "live" = fetched this render; "derived" = computed from other live inputs. */
   dataSource: DataSource;
-  /** Human label shown in tooltips, e.g. "CoinGecko (demo)". */
   sourceLabel?: string;
   updatedAt?: string | null;
 }
@@ -262,15 +261,6 @@ export interface Tokenomics {
   notes?: string[];
 }
 
-export interface TradeConfig {
-  replicationBasket: { symbol: string; weightPct: number; gmxMarket: string }[];
-  chain: "arbitrum-sepolia";
-  chainId: 421614;
-  zeroDevEnabled: boolean;
-  gasSponsored: boolean;
-  mode: "demo" | "live";
-}
-
 export interface AgentSkillSection {
   heading: string;
   body: string;
@@ -349,7 +339,6 @@ export interface TokenProfile {
   tokenomics?: Tokenomics;
   audits?: { firm: string; date: string; url: string | null }[];
   sources?: SourceRef[];
-  tradeable?: TradeConfig;
   agentSkill?: AgentSkill;
 }
 

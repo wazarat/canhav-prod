@@ -194,7 +194,7 @@ export interface MarketData {
   volumeChange24h?: number | null;
   volToMktCapRatio?: number | null;
   liqToMktCapRatio?: number | null;
-  source: "coingecko" | "curated";
+  source: "coingecko";
 }
 
 function num(value: unknown): number | null {

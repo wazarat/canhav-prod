@@ -7,7 +7,6 @@ import {
   type MetricResult,
 } from "@/lib/server/alchemy";
 import { coinIdForSlug, fetchMarketData, type MarketData } from "@/lib/server/coingecko";
-import { resolveMarketData } from "@/lib/server/curatedMarket";
 import { resolveEntityToken } from "@/lib/server/resolve";
 import type { RwaProfile, StablecoinProfile, TokenProfile } from "@/lib/types";
 
@@ -77,7 +76,7 @@ export async function getCoinLiveData(
     address && hasAlchemy() ? fetchTokenMetadata(address) : Promise.resolve(null),
   ]);
 
-  const market = resolveMarketData(profile.slug, liveMarket);
+  const market = liveMarket;
 
   const onchain: CoinOnchain | null = address
     ? {

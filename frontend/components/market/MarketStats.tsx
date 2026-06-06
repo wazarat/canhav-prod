@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { coinIdForSlug, fetchMarketData } from "@/lib/server/coingecko";
-import { resolveMarketData } from "@/lib/server/curatedMarket";
 import type { RwaProfile, StablecoinProfile, TokenProfile } from "@/lib/types";
 import { formatNumberCompact, formatPct, formatUsdCompact } from "@/lib/utils";
 
@@ -34,9 +33,7 @@ function changeTone(value: number | null): "positive" | "danger" | "neutral" {
   return "neutral";
 }
 
-function marketBadge(slug: string, source: "coingecko" | "curated"): string {
-  if (source === "curated" && slug === "jlp") return "CoinMarketCap · live";
-  if (source === "curated") return "Market data · live";
+function marketBadge(): string {
   return "CoinGecko · live";
 }
 
@@ -59,8 +56,7 @@ export async function MarketStats({
 }) {
   const isStablecoin = profile.category === "Stablecoin";
   const coinId = coinIdForSlug(profile.slug);
-  const live = coinId ? await fetchMarketData(coinId, LIVE_REVALIDATE) : null;
-  const data = resolveMarketData(profile.slug, live);
+  const data = coinId ? await fetchMarketData(coinId, LIVE_REVALIDATE) : null;
 
   if (!data) {
     if (isStablecoin) return null;
@@ -69,8 +65,8 @@ export async function MarketStats({
     );
   }
 
-  const badgeLabel = marketBadge(profile.slug, data.source);
-  const badgeTone = data.source === "curated" ? "neutral" : "signal";
+  const badgeLabel = marketBadge();
+  const badgeTone = "signal" as const;
 
   return (
     <Card className="space-y-1 divide-y divide-ink-800/60">

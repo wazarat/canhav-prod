@@ -6,8 +6,10 @@ import { fetchPegHistory, fetchTvlHistory } from "@/lib/server/dune";
 import { resolveEntityToken } from "@/lib/server/resolve";
 import type {
   PegDataPoint,
+  PricePoint,
   RwaProfile,
   StablecoinProfile,
+  TokenProfile,
   TvlDataPoint,
 } from "@/lib/types";
 
@@ -38,6 +40,11 @@ export interface TvlSeries {
   source: SeriesSource;
 }
 
+export interface PriceSeries {
+  points: PricePoint[];
+  source: SeriesSource;
+}
+
 export async function resolvePegSeries(profile: StablecoinProfile): Promise<PegSeries> {
   const stored = profile.historicalPegData?.points ?? [];
   if (stored.length >= 2) return { points: stored, source: "dune" };
@@ -50,6 +57,20 @@ export async function resolvePegSeries(profile: StablecoinProfile): Promise<PegS
   if (coinId) {
     const vsCurrency = profile.pegTarget === "EUR" ? "eur" : "usd";
     const chart = await fetchMarketChart(coinId, DAYS, { vsCurrency, revalidate: LIVE_REVALIDATE });
+    if (chart && chart.prices.length >= 2) {
+      return { points: chart.prices, source: "coingecko" };
+    }
+  }
+  return { points: stored, source: null };
+}
+
+export async function resolvePriceSeries(profile: TokenProfile): Promise<PriceSeries> {
+  const stored = profile.priceHistory?.points ?? [];
+  if (stored.length >= 2) return { points: stored, source: "dune" };
+
+  const coinId = coinIdForSlug(profile.slug);
+  if (coinId) {
+    const chart = await fetchMarketChart(coinId, DAYS, { revalidate: LIVE_REVALIDATE });
     if (chart && chart.prices.length >= 2) {
       return { points: chart.prices, source: "coingecko" };
     }

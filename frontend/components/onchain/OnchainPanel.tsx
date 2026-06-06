@@ -48,6 +48,18 @@ function MetaRow({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+function isSolanaProfile(
+  profile: StablecoinProfile | RwaProfile | TokenProfile,
+): boolean {
+  return (profile.arbitrumPortalMetadata?.chains ?? []).some((c) =>
+    c.toLowerCase().includes("solana"),
+  );
+}
+
+function solscanToken(mint: string): string {
+  return `https://solscan.io/token/${mint}`;
+}
+
 /**
  * Live on-chain data for a stablecoin or RWA, sourced from Alchemy at render
  * time (cached for 5 min). Hidden entirely when no Arbitrum contract resolves.
@@ -57,6 +69,65 @@ export async function OnchainPanel({
 }: {
   profile: StablecoinProfile | RwaProfile | TokenProfile;
 }) {
+  const solanaMint = (profile.contractAddress || "").trim() || null;
+
+  if (isSolanaProfile(profile)) {
+    if (!solanaMint) {
+      return (
+        <Card className="space-y-2">
+          <div className="flex items-center justify-between">
+            <CardTitle>On-chain</CardTitle>
+            <Badge tone="neutral">Solana</Badge>
+          </div>
+          <p className="text-sm text-ink-300">
+            No public Solana mint is mapped for this asset yet.
+          </p>
+        </Card>
+      );
+    }
+
+    const supply =
+      profile.category === "Stablecoin" || profile.category === "Token"
+        ? profile.totalSupply.value
+        : null;
+    const updatedAt =
+      profile.category === "Stablecoin" || profile.category === "Token"
+        ? profile.totalSupply.updatedAt
+        : null;
+
+    return (
+      <Card className="space-y-4">
+        <div className="flex items-center justify-between">
+          <CardTitle>On-chain</CardTitle>
+          <Badge tone="signal">Solana · live</Badge>
+        </div>
+        <div className="space-y-1 divide-y divide-ink-800/60">
+          <MetaRow
+            label="Circulating supply"
+            value={supply != null ? formatNumberCompact(supply) : "—"}
+          />
+          <MetaRow
+            label="Token mint"
+            value={
+              <a
+                href={solscanToken(solanaMint)}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-electric-400 hover:underline"
+              >
+                {truncateAddress(solanaMint)}
+              </a>
+            }
+          />
+          <MetaRow
+            label="Last refreshed"
+            value={updatedAt ? timeAgo(updatedAt) : "—"}
+          />
+        </div>
+      </Card>
+    );
+  }
+
   const token = await resolveEntityToken(profile);
   // Supply-based categories (stablecoins, tokens) read totalSupply(); RWAs use a
   // priced TVL proxy.

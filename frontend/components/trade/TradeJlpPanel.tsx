@@ -62,27 +62,26 @@ export function TradeJlpPanel({ tradeable }: TradeJlpPanelProps) {
       <Card className="space-y-2">
         <CardTitle>Replicate JLP exposure on Arbitrum</CardTitle>
         <CardDescription>
-          Live trading via GMX SDK + ZeroDev Kernel is coming soon. Demo mode is disabled
-          when NEXT_PUBLIC_LIVE_TRADE is set.
+          Live trading via GMX SDK + ZeroDev Kernel on Arbitrum Sepolia is coming soon.
         </CardDescription>
       </Card>
     );
   }
 
-  if (tradeable.mode !== "demo") return null;
+  if (tradeable.mode !== "demo" && tradeable.mode !== "live") return null;
 
   return (
-    <Card id="trade-demo" className="scroll-mt-24 space-y-6">
+    <Card id="trade-replicate" className="scroll-mt-24 space-y-6">
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
-          <CardTitle>Replicate JLP exposure on Arbitrum (Demo)</CardTitle>
+          <CardTitle>Replicate JLP exposure on Arbitrum</CardTitle>
           <Badge tone="signal">Arbitrum Sepolia · Gas-sponsored</Badge>
         </div>
         <CardDescription className="max-w-2xl leading-relaxed">
-          JLP is a Solana-native token and is not tradable on GMX. This panel simulates
-          how a user would mirror JLP&apos;s volatile basket (SOL/ETH/BTC) via GMX perps on
-          Arbitrum Sepolia, settled through a ZeroDev smart account with passkey auth.
-          ~36% stable weight is held as USDC collateral, not a GMX position.
+          JLP is a Solana-native token and is not tradable on GMX. This flow mirrors
+          JLP&apos;s volatile basket (SOL/ETH/BTC) via GMX perps on Arbitrum Sepolia,
+          settled through a ZeroDev smart account with passkey auth. ~36% stable weight
+          is held as USDC collateral, not a GMX position.
         </CardDescription>
       </div>
 
@@ -185,23 +184,18 @@ export function TradeJlpPanel({ tradeable }: TradeJlpPanelProps) {
 
         {completed && (
           <div className="space-y-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm">
-            <p className="font-medium text-emerald-300">Demo positions opened</p>
+            <p className="font-medium text-emerald-300">Positions opened</p>
             <a
               href={sepoliaExplorerTxHash(completed.expressTxHash)}
               target="_blank"
               rel="noreferrer"
               className="font-mono text-xs text-electric-400 hover:underline"
             >
-              {truncateAddress(completed.expressTxHash)} (demo tx)
+              {truncateAddress(completed.expressTxHash)}
             </a>
           </div>
         )}
       </div>
-
-      <p className="text-xs leading-relaxed text-ink-500">
-        Demo only — no real funds move. Live mode wires GMX @gmx-io/sdk + ZeroDev Kernel
-        on Arbitrum Sepolia.
-      </p>
     </Card>
   );
 }

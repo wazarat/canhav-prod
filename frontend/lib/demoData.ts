@@ -1,17 +1,24 @@
 import { jlpToken } from "@/lib/mock/jlpMockData";
 import { jupToken } from "@/lib/mock/jupMockData";
+import { jupsolToken } from "@/lib/mock/jupsolMockData";
+import {
+  jljupusdStablecoin,
+  jupusdStablecoin,
+} from "@/lib/mock/jupiterStablecoinMocks";
 import { jupiterEntity } from "@/lib/mock/jupiterMockData";
 import type {
   AgentSkill,
   DataSource,
   EntityProfile,
   Sourced,
+  StablecoinProfile,
   TokenProfile,
 } from "@/lib/types";
 
-/** Demo profiles merged into store results when the live store lacks them. */
+/** Profiles merged into store results when the live store lacks them. */
 export const DEMO_ENTITIES: EntityProfile[] = [jupiterEntity];
-export const DEMO_TOKENS: TokenProfile[] = [jlpToken, jupToken];
+export const DEMO_TOKENS: TokenProfile[] = [jlpToken, jupToken, jupsolToken];
+export const DEMO_STABLECOINS: StablecoinProfile[] = [jupusdStablecoin, jljupusdStablecoin];
 
 function isSourced(value: unknown): value is Sourced<unknown> {
   return (
@@ -73,6 +80,24 @@ export function mergeDemoToken(
 
 export function mergeAllDemoEntities(storeItems: EntityProfile[]): EntityProfile[] {
   return DEMO_ENTITIES.reduce(mergeDemoEntity, [...storeItems]);
+}
+
+export function mergeDemoStablecoin(
+  storeItems: StablecoinProfile[],
+  demo: StablecoinProfile,
+): StablecoinProfile[] {
+  const idx = storeItems.findIndex((p) => p.slug === demo.slug);
+  if (idx === -1) return [...storeItems, demo];
+  const merged = { ...storeItems[idx], ...demo, slug: storeItems[idx].slug };
+  const next = [...storeItems];
+  next[idx] = merged;
+  return next;
+}
+
+export function mergeAllDemoStablecoins(
+  storeItems: StablecoinProfile[],
+): StablecoinProfile[] {
+  return DEMO_STABLECOINS.reduce(mergeDemoStablecoin, [...storeItems]);
 }
 
 export function mergeAllDemoTokens(storeItems: TokenProfile[]): TokenProfile[] {

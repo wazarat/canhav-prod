@@ -61,7 +61,7 @@ export default async function DashboardPage() {
         </span>
         <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight text-ink-50 md:text-5xl">
           A capital-markets terminal for the{" "}
-          <span className="text-gradient-brand">Arbitrum ecosystem</span>.
+          <span className="text-gradient-brand">DeFi ecosystem</span>.
         </h1>
         <p className="text-lg text-ink-300">
           Research-grade taxonomy and datasets across stablecoins, RWAs, entities, tokens, lending,

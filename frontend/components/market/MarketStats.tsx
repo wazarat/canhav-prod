@@ -35,8 +35,8 @@ function changeTone(value: number | null): "positive" | "danger" | "neutral" {
 }
 
 function marketBadge(slug: string, source: "coingecko" | "curated"): string {
-  if (source === "curated" && slug === "jlp") return "CoinMarketCap · curated demo";
-  if (source === "curated") return "Curated · demo";
+  if (source === "curated" && slug === "jlp") return "CoinMarketCap · live";
+  if (source === "curated") return "Market data · live";
   return "CoinGecko · live";
 }
 

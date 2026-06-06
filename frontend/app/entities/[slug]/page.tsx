@@ -18,7 +18,6 @@ import {
 import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
 import { MemberCoins } from "@/components/entities/MemberCoins";
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
-import { DemoDataBanner } from "@/components/MockDataBanner";
 import { SourcesFooter } from "@/components/shared/SourcesFooter";
 import { TokenomicsCard } from "@/components/shared/TokenomicsCard";
 import { TypedRiskList } from "@/components/shared/TypedRiskList";
@@ -28,7 +27,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionNav } from "@/components/ui/SectionNav";
 import { StatCard } from "@/components/ui/StatCard";
 import { Card } from "@/components/ui/Card";
-import { getApprovedEntities, getApprovedEntityBySlug, getEntityMemberCoins, hasDemoData } from "@/lib/data";
+import { getApprovedEntities, getApprovedEntityBySlug, getEntityMemberCoins } from "@/lib/data";
 import { getCoinLiveData } from "@/lib/server/coin";
 import type { EntityProfile } from "@/lib/types";
 import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
@@ -123,8 +122,6 @@ export default async function EntityProfilePage({ params }: PageProps) {
 
   return (
     <div className="container space-y-8 py-12">
-      {hasDemoData(profile) && <DemoDataBanner />}
-
       <PageHeader
         breadcrumbs={[
           { label: "Dashboard", href: "/" },
@@ -172,12 +169,11 @@ export default async function EntityProfilePage({ params }: PageProps) {
       />
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label={tvlLabel} value={formatUsdCompact(scale.tvlUsd)} hint="Latest data" source="Curated" />
+        <StatCard label={tvlLabel} value={formatUsdCompact(scale.tvlUsd)} hint="Latest data" />
         <StatCard
           label={usersLabel}
           value={scale.users != null ? formatUsersCompact(scale.users) : "—"}
           hint={labels.users ? undefined : "Depositors"}
-          source="Curated"
         />
         <StatCard
           label={aprLabel}
@@ -193,7 +189,6 @@ export default async function EntityProfilePage({ params }: PageProps) {
               ? `Target ${scale.targetAprPct.toFixed(2)}%`
               : undefined
           }
-          source="Curated"
         />
         <StatCard label={coinsLabel} value={`${profile.memberCoins.length}`} hint="Member products" />
       </section>
@@ -270,7 +265,7 @@ export default async function EntityProfilePage({ params }: PageProps) {
             </div>
           </div>
 
-          <DataPanel title="At a glance" badge="Curated">
+          <DataPanel title="At a glance">
             <DataRow label={pipelineLabel} value={formatUsdCompact(scale.loanPipelineUsd)} />
             <DataRow
               label={partnershipsLabel}

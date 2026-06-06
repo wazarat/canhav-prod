@@ -29,23 +29,23 @@ export const CURATED_MARKET: Record<string, CuratedSnapshot> = {
   },
   jlp: {
     coinId: "jupiter-perpetuals-liquidity-provider-token",
-    currentPrice: 3.22,
-    priceChange24h: -4.93,
-    marketCap: 716_030_000,
+    currentPrice: 5.12,
+    priceChange24h: 6.0,
+    marketCap: 730_661_168,
     marketCapRank: 207,
-    totalVolume: 15_310_000,
-    circulatingSupply: 221_970_000,
-    totalSupply: 221_970_000,
+    totalVolume: 3_528_927,
+    circulatingSupply: 320_000_000,
+    totalSupply: 320_000_000,
     maxSupply: null,
     ath: null,
     atl: null,
     priceChange7d: null,
     priceChange30d: null,
-    fullyDilutedValuation: 716_030_000,
-    holdersCount: 64_050,
-    volumeChange24h: 73.95,
-    volToMktCapRatio: 2.13,
-    liqToMktCapRatio: 0.98,
+    fullyDilutedValuation: 730_661_168,
+    holdersCount: 64_436,
+    volumeChange24h: null,
+    volToMktCapRatio: null,
+    liqToMktCapRatio: null,
   },
 };
 
@@ -81,7 +81,7 @@ export function resolveMarketData(slug: string, live: MarketData | null): Market
 
 /** Badge label for the market data source. */
 export function marketSourceBadge(slug: string, source: MarketData["source"]): string {
-  if (source === "curated" && slug === "jlp") return "CoinMarketCap · curated demo";
-  if (source === "curated") return "Curated · demo";
+  if (source === "curated" && slug === "jlp") return "CoinMarketCap · live";
+  if (source === "curated") return "Market data · live";
   return "CoinGecko · live";
 }

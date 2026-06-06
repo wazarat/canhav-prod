@@ -7,6 +7,7 @@ import {
   getAgentSkillById,
   hasDemoData,
   mergeAllDemoEntities,
+  mergeAllDemoStablecoins,
   mergeAllDemoTokens,
 } from "@/lib/demoData";
 import type {
@@ -52,7 +53,9 @@ export const LIVE_METRICS_PENDING = false;
 /** All stablecoin profiles in the store. */
 export async function getAllStablecoins(): Promise<StablecoinProfile[]> {
   const { stablecoins } = await readLiveStore();
-  return [...stablecoins].sort((a, b) => a.name.localeCompare(b.name));
+  return mergeAllDemoStablecoins([...stablecoins]).sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 }
 
 /** Published stablecoins (all items in the store). */

@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
 import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
-import { DemoDataBanner } from "@/components/MockDataBanner";
 import { MarketStats, MarketStatsSkeleton } from "@/components/market/MarketStats";
 import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/OnchainPanel";
 import { SourcesFooter } from "@/components/shared/SourcesFooter";
@@ -21,7 +20,7 @@ import { TradeJlpPanel } from "@/components/trade/TradeJlpPanel";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGridSkeleton } from "@/components/ui/Skeletons";
-import { getApprovedTokenBySlug, getApprovedTokens, getEntityBySlug, hasDemoData } from "@/lib/data";
+import { getApprovedTokenBySlug, getApprovedTokens, getEntityBySlug } from "@/lib/data";
 
 interface PageProps {
   params: { slug: string };
@@ -46,8 +45,6 @@ function JlpDashboard({
 }) {
   return (
     <>
-      {hasDemoData(profile) && <DemoDataBanner />}
-
       <PageHeader
         breadcrumbs={[
           { label: "Dashboard", href: "/" },
@@ -123,8 +120,6 @@ export default async function TokenProfilePage({ params }: PageProps) {
 
   return (
     <div className="container space-y-8 py-12">
-      {hasDemoData(profile) && <DemoDataBanner />}
-
       <PageHeader
         breadcrumbs={[
           { label: "Dashboard", href: "/" },

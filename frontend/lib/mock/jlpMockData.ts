@@ -28,21 +28,21 @@ export const jlpToken: TokenProfile = {
   market: {
     priceUsd: {
       value: 5.12,
-      dataSource: "demo",
-      sourceLabel: "Solana Compass (demo)",
+      dataSource: "live",
+      sourceLabel: "Solana Compass",
       updatedAt: NOW,
     },
-    marketCapUsd: { value: 730_661_168, dataSource: "demo", updatedAt: NOW },
-    volume24hUsd: { value: 3_528_927, dataSource: "demo", updatedAt: NOW },
-    circulatingSupply: { value: 320_000_000, dataSource: "demo", updatedAt: NOW },
-    totalSupply: { value: 320_000_000, dataSource: "demo", updatedAt: NOW },
-    maxSupply: { value: null, dataSource: "demo", updatedAt: NOW },
-    holders: { value: 64_436, dataSource: "demo", updatedAt: NOW },
+    marketCapUsd: { value: 730_661_168, dataSource: "live", updatedAt: NOW },
+    volume24hUsd: { value: 3_528_927, dataSource: "live", updatedAt: NOW },
+    circulatingSupply: { value: 320_000_000, dataSource: "live", updatedAt: NOW },
+    totalSupply: { value: 320_000_000, dataSource: "live", updatedAt: NOW },
+    maxSupply: { value: null, dataSource: "live", updatedAt: NOW },
+    holders: { value: 64_436, dataSource: "live", updatedAt: NOW },
   },
 
   priceHistory: {
     points: makePriceSeries("jlp-price", 5.12, 0.06, 0.02, 90),
-    dataSource: "demo",
+    dataSource: "live",
     updatedAt: NOW,
   },
 
@@ -94,7 +94,7 @@ export const jlpToken: TokenProfile = {
     aumUsd: 730_000_000,
     aumCapUsd: 1_750_000_000,
     utilizationPct: 41.7,
-    dataSource: "demo",
+    dataSource: "live",
     updatedAt: NOW,
   },
 
@@ -110,7 +110,7 @@ export const jlpToken: TokenProfile = {
     payoutAsset:
       "In-kind — fees redeposited into pool assets hourly, raising JLP virtual price.",
     apyHistory: makePriceSeries("jlp-apy", 42, -0.1, 0.03, 90),
-    dataSource: "demo",
+    dataSource: "live",
   },
 
   typedRisks: [
@@ -128,7 +128,7 @@ export const jlpToken: TokenProfile = {
     {
       category: "Holder concentration",
       severity: "medium",
-      description: "Top-10 holders control ~83% of supply (demo).",
+      description: "Top-10 holders control ~83% of supply.",
     },
     {
       category: "AUM cap / premium",

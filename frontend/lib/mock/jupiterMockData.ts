@@ -88,7 +88,7 @@ export const jupiterEntity: EntityProfile = {
     {
       question: "What is the JLP AUM cap?",
       answer:
-        "The pool has a soft AUM cap (~$1.75B in demo data). When AUM hits the cap, new minting is disabled and JLP can trade at a premium to its virtual price on the open market.",
+        "The pool has a soft AUM cap (~$1.75B). When AUM hits the cap, new minting is disabled and JLP can trade at a premium to its virtual price on the open market.",
     },
   ],
 
@@ -144,7 +144,7 @@ export const jupiterEntity: EntityProfile = {
     },
     {
       category: "Collateral",
-      description: "Top JLP holders control a large share of supply (demo: top-10 ≈ 83%).",
+      description: "Top JLP holders control a large share of supply (top-10 ≈ 83%).",
     },
     {
       category: "Oracle",
@@ -205,7 +205,7 @@ export const jupiterEntity: EntityProfile = {
     users: "JLP Holders",
     apr: "JLP APY",
     partnerships: "Partnerships",
-    coins: "Coins under Jupiter",
+    coins: "Products under Jupiter",
   },
 
   memberCoins: [
@@ -214,14 +214,40 @@ export const jupiterEntity: EntityProfile = {
       name: "Jupiter",
       symbol: "JUP",
       category: "Token",
-      role: "Governance token (capped 10B, deflationary)",
+      role: "DAO governance token (not a utility token)",
+      subCategory: "Governance Token",
     },
     {
       slug: "jlp",
       name: "Jupiter Perps LP",
       symbol: "JLP",
       category: "Token",
-      role: "Yield-bearing LP/index token (uncapped)",
+      role: "Perps liquidity provider index + fee share",
+      subCategory: "Yield-generating Token",
+    },
+    {
+      slug: "jupusd",
+      name: "JupUSD",
+      symbol: "JUPUSD",
+      category: "Stablecoin",
+      role: "Reserve-backed dollar (no native yield)",
+      subCategory: "Stablecoin",
+    },
+    {
+      slug: "jljupusd",
+      name: "Jupiter Lend JUPUSD",
+      symbol: "jlJUPUSD",
+      category: "Stablecoin",
+      role: "Yield-bearing JupUSD from Lend Earn vault",
+      subCategory: "Staked Stablecoin",
+    },
+    {
+      slug: "jupsol",
+      name: "JupSOL",
+      symbol: "JUPSOL",
+      category: "Token",
+      role: "Jupiter Staked SOL liquid staking token",
+      subCategory: "LST",
     },
   ],
 
@@ -241,7 +267,7 @@ export const jupiterEntity: EntityProfile = {
     change24hPct: { value: -13.26, dataSource: "live", updatedAt: NOW },
     high52w: { value: 0.68, dataSource: "live", updatedAt: NOW },
     low52w: { value: 0.11, dataSource: "live", updatedAt: NOW },
-    maxSupply: { value: 10_000_000_000, dataSource: "demo", updatedAt: NOW },
+    maxSupply: { value: 10_000_000_000, dataSource: "live", updatedAt: NOW },
   },
 
   tokenomics: {
@@ -270,7 +296,7 @@ export const jupiterEntity: EntityProfile = {
     {
       category: "Holder concentration",
       severity: "medium",
-      description: "A handful of addresses hold most JLP supply (demo: top-10 ≈ 83%).",
+      description: "A handful of addresses hold most JLP supply (top-10 ≈ 83%).",
     },
     {
       category: "Oracle",

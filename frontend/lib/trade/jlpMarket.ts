@@ -1,17 +1,18 @@
 import type { JlpMarket } from "./types";
 
+/** Market anchors aligned with CoinMarketCap (2026-06-05). */
 export const JLP_MARKET: JlpMarket = {
   symbol: "JLP",
   name: "Jupiter Perps LP",
   mint: "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4",
-  priceUsd: 5.12,
-  change24hPct: 0.43,
-  marketCapUsd: 730_661_168,
-  aumUsd: 730_000_000,
+  priceUsd: 3.24,
+  change24hPct: -3.91,
+  marketCapUsd: 720_870_000,
+  aumUsd: 720_870_000,
   aumCapUsd: 1_750_000_000,
-  apyPct: 42.0,
-  holders: 64_436,
-  fees24hUsd: 412_000,
+  apyPct: 8.31,
+  holders: 64_050,
+  volume24hUsd: 15_100_000,
   weights: [
     { symbol: "SOL", name: "Solana", pct: 44, kind: "volatile" },
     { symbol: "USDC", name: "USD Coin", pct: 27, kind: "stable" },

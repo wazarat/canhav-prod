@@ -77,13 +77,8 @@ export function TokenHeroStats({ profile }: TokenHeroStatsProps) {
       )}
       {yieldM && (
         <SourcedStat
-          label="Current APY"
-          value={`${yieldM.currentApyPct.toFixed(1)}%`}
-          hint={
-            yieldM.apy30dPct != null
-              ? `30d avg ${yieldM.apy30dPct.toFixed(1)}%`
-              : undefined
-          }
+          label="Current yield"
+          value={`${yieldM.currentApyPct.toFixed(2)}%`}
           dataSource={yieldM.dataSource}
         />
       )}

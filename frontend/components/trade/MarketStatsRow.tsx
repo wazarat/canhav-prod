@@ -10,9 +10,9 @@ export function MarketStatsRow() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <div className="glass rounded-2xl px-5 py-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-ink-300">AUM</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-ink-300">Market cap</p>
         <div className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-ink-50">
-          {formatUsdCompact(JLP_MARKET.aumUsd)}
+          {formatUsdCompact(JLP_MARKET.marketCapUsd)}
         </div>
         <p className="mt-1 text-xs text-ink-500">
           {utilPct.toFixed(1)}% of {formatUsdCompact(JLP_MARKET.aumCapUsd)} cap
@@ -25,11 +25,11 @@ export function MarketStatsRow() {
         </div>
       </div>
       <StatCard
-        label="APY"
-        value={`${JLP_MARKET.apyPct.toFixed(0)}%`}
-        hint="Real-yield (fees) — demo"
+        label="Yield"
+        value={`${JLP_MARKET.apyPct.toFixed(2)}%`}
+        hint="Real-yield from perp fees"
       />
-      <StatCard label="24h fees" value={formatUsdCompact(JLP_MARKET.fees24hUsd)} />
+      <StatCard label="24h volume" value={formatUsdCompact(JLP_MARKET.volume24hUsd)} />
       <StatCard label="Holders" value={formatNumberCompact(JLP_MARKET.holders)} />
     </div>
   );

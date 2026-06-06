@@ -23,7 +23,7 @@ export function JlpPoolComposition({ composition }: JlpPoolCompositionProps) {
         <div>
           <CardTitle>Pool composition</CardTitle>
           <CardDescription className="mt-1">
-            Target vs current weights across pool assets
+            Current weights across pool assets
           </CardDescription>
         </div>
         <DataSourceDot dataSource={composition.dataSource} />
@@ -50,8 +50,7 @@ export function JlpPoolComposition({ composition }: JlpPoolCompositionProps) {
           <THead>
             <TR>
               <TH>Asset</TH>
-              <TH className="text-right">Target</TH>
-              <TH className="text-right">Current</TH>
+              <TH className="text-right">Weight</TH>
               <TH className="text-right">Value</TH>
               <TH>Type</TH>
             </TR>
@@ -63,7 +62,6 @@ export function JlpPoolComposition({ composition }: JlpPoolCompositionProps) {
                   <span className="font-medium text-ink-100">{a.symbol}</span>
                   <span className="ml-2 text-xs text-ink-400">{a.name}</span>
                 </TD>
-                <TD className="text-right">{a.targetWeightPct}%</TD>
                 <TD className="text-right">{a.currentWeightPct}%</TD>
                 <TD className="text-right">{formatUsdCompact(a.valueUsd)}</TD>
                 <TD>

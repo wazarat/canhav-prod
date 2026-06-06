@@ -191,11 +191,11 @@ export const jupiterEntity: EntityProfile = {
   ],
 
   currentScale: {
-    tvlUsd: 730_000_000,
-    users: 64_400,
-    aprPct: 42.0,
-    targetAprPct: 60.0,
-    marketCapUsd: null,
+    tvlUsd: 720_870_000,
+    users: 64_050,
+    aprPct: 8.31,
+    targetAprPct: null,
+    marketCapUsd: 720_870_000,
     loanPipelineUsd: null,
     partnerships: 12,
   },
@@ -203,7 +203,7 @@ export const jupiterEntity: EntityProfile = {
   scaleLabels: {
     tvl: "JLP Pool AUM",
     users: "JLP Holders",
-    apr: "JLP APY",
+    apr: "JLP yield",
     partnerships: "Partnerships",
     coins: "Products under Jupiter",
   },

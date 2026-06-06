@@ -27,29 +27,11 @@ export function JlpYieldCard({ yieldMechanics: y }: JlpYieldCardProps) {
         {!y.emissionsBased && <Badge tone="neutral">No emissions</Badge>}
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <CardDescription>Current APY</CardDescription>
-          <p className="mt-1 font-display text-xl font-semibold text-ink-50">
-            {y.currentApyPct.toFixed(1)}%
-          </p>
-        </div>
-        {y.apy7dPct != null && (
-          <div>
-            <CardDescription>7d avg</CardDescription>
-            <p className="mt-1 font-display text-xl font-semibold text-ink-50">
-              {y.apy7dPct.toFixed(1)}%
-            </p>
-          </div>
-        )}
-        {y.apy30dPct != null && (
-          <div>
-            <CardDescription>30d avg</CardDescription>
-            <p className="mt-1 font-display text-xl font-semibold text-ink-50">
-              {y.apy30dPct.toFixed(1)}%
-            </p>
-          </div>
-        )}
+      <div>
+        <CardDescription>Current yield</CardDescription>
+        <p className="mt-1 font-display text-xl font-semibold text-ink-50">
+          {y.currentApyPct.toFixed(2)}%
+        </p>
       </div>
 
       <div className="rounded-lg border border-ink-800/60 bg-ink-900/40 px-4 py-3">
@@ -62,7 +44,7 @@ export function JlpYieldCard({ yieldMechanics: y }: JlpYieldCardProps) {
 
       {apyValues.length >= 2 && (
         <div className="space-y-1">
-          <CardDescription>90d APY trend</CardDescription>
+          <CardDescription>90d yield trend</CardDescription>
           <Sparkline id="jlp-apy-spark" values={apyValues} height={48} color="#34D399" />
         </div>
       )}

@@ -12,7 +12,7 @@ export interface JlpMarket {
   aumCapUsd: number;
   apyPct: number;
   holders: number;
-  fees24hUsd: number;
+  volume24hUsd: number;
   weights: { symbol: string; name: string; pct: number; kind: "stable" | "volatile" }[];
 }
 

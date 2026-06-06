@@ -24,7 +24,6 @@ export function TradePriceHeader({ mark }: TradePriceHeaderProps) {
   }, [mark]);
 
   const changePositive = JLP_MARKET.change24hPct >= 0;
-  const utilPct = (JLP_MARKET.aumUsd / JLP_MARKET.aumCapUsd) * 100;
 
   return (
     <div className={cn(tradePanel, "flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3")}>
@@ -48,7 +47,7 @@ export function TradePriceHeader({ mark }: TradePriceHeaderProps) {
           )}
           suppressHydrationWarning
         >
-          ${mark.toFixed(4)}
+          ${mark.toFixed(2)}
         </p>
         <span
           className={cn(
@@ -63,10 +62,9 @@ export function TradePriceHeader({ mark }: TradePriceHeaderProps) {
       <div className="hidden h-8 w-px bg-white/[0.08] sm:block" />
 
       <div className="flex flex-wrap gap-x-5 gap-y-1">
-        <MarketStat label="AUM" value={formatUsdCompact(JLP_MARKET.aumUsd)} />
-        <MarketStat label="APY" value={`${JLP_MARKET.apyPct.toFixed(0)}%`} accent />
-        <MarketStat label="24h Fees" value={formatUsdCompact(JLP_MARKET.fees24hUsd)} />
-        <MarketStat label="Utilization" value={`${utilPct.toFixed(1)}%`} />
+        <MarketStat label="Market cap" value={formatUsdCompact(JLP_MARKET.marketCapUsd)} />
+        <MarketStat label="24h volume" value={formatUsdCompact(JLP_MARKET.volume24hUsd)} />
+        <MarketStat label="Yield" value={`${JLP_MARKET.apyPct.toFixed(2)}%`} accent />
         <MarketStat label="Holders" value={formatNumberCompact(JLP_MARKET.holders)} />
       </div>
     </div>

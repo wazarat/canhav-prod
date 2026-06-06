@@ -27,21 +27,23 @@ export const jlpToken: TokenProfile = {
 
   market: {
     priceUsd: {
-      value: 5.12,
+      value: 3.24,
       dataSource: "live",
-      sourceLabel: "Solana Compass",
+      sourceLabel: "CoinMarketCap",
       updatedAt: NOW,
     },
-    marketCapUsd: { value: 730_661_168, dataSource: "live", updatedAt: NOW },
-    volume24hUsd: { value: 3_528_927, dataSource: "live", updatedAt: NOW },
-    circulatingSupply: { value: 320_000_000, dataSource: "live", updatedAt: NOW },
-    totalSupply: { value: 320_000_000, dataSource: "live", updatedAt: NOW },
+    marketCapUsd: { value: 720_870_000, dataSource: "live", updatedAt: NOW },
+    fdvUsd: { value: 720_870_000, dataSource: "live", updatedAt: NOW },
+    volume24hUsd: { value: 15_100_000, dataSource: "live", updatedAt: NOW },
+    change24hPct: { value: -3.91, dataSource: "live", updatedAt: NOW },
+    circulatingSupply: { value: 222_010_000, dataSource: "live", updatedAt: NOW },
+    totalSupply: { value: 222_010_000, dataSource: "live", updatedAt: NOW },
     maxSupply: { value: null, dataSource: "live", updatedAt: NOW },
-    holders: { value: 64_436, dataSource: "live", updatedAt: NOW },
+    holders: { value: 64_050, dataSource: "live", updatedAt: NOW },
   },
 
   priceHistory: {
-    points: makePriceSeries("jlp-price", 5.12, 0.06, 0.02, 90),
+    points: makePriceSeries("jlp-price", 3.24, -0.12, 0.025, 90),
     dataSource: "live",
     updatedAt: NOW,
   },
@@ -54,7 +56,7 @@ export const jlpToken: TokenProfile = {
         targetWeightPct: 44,
         currentWeightPct: 43.6,
         kind: "volatile",
-        valueUsd: 318_000_000,
+        valueUsd: 317_180_000,
       },
       {
         symbol: "BTC",
@@ -62,7 +64,7 @@ export const jlpToken: TokenProfile = {
         targetWeightPct: 11,
         currentWeightPct: 11.4,
         kind: "volatile",
-        valueUsd: 83_000_000,
+        valueUsd: 79_300_000,
       },
       {
         symbol: "ETH",
@@ -70,7 +72,7 @@ export const jlpToken: TokenProfile = {
         targetWeightPct: 9,
         currentWeightPct: 8.7,
         kind: "volatile",
-        valueUsd: 64_000_000,
+        valueUsd: 64_880_000,
       },
       {
         symbol: "USDC",
@@ -78,7 +80,7 @@ export const jlpToken: TokenProfile = {
         targetWeightPct: 27,
         currentWeightPct: 27.2,
         kind: "stable",
-        valueUsd: 199_000_000,
+        valueUsd: 194_630_000,
       },
       {
         symbol: "USDT",
@@ -86,22 +88,20 @@ export const jlpToken: TokenProfile = {
         targetWeightPct: 9,
         currentWeightPct: 9.1,
         kind: "stable",
-        valueUsd: 66_000_000,
+        valueUsd: 64_880_000,
       },
     ],
     stablePct: 36.3,
     volatilePct: 63.7,
-    aumUsd: 730_000_000,
+    aumUsd: 720_870_000,
     aumCapUsd: 1_750_000_000,
-    utilizationPct: 41.7,
+    utilizationPct: 41.2,
     dataSource: "live",
     updatedAt: NOW,
   },
 
   yieldMechanics: {
-    currentApyPct: 42.0,
-    apy7dPct: 39.5,
-    apy30dPct: 45.2,
+    currentApyPct: 8.31,
     feeShareToHoldersPct: 75,
     yieldSource:
       "Perp trading fees: open/close fees, borrow fees, price-impact, and swaps.",
@@ -109,7 +109,7 @@ export const jlpToken: TokenProfile = {
     emissionsBased: false,
     payoutAsset:
       "In-kind — fees redeposited into pool assets hourly, raising JLP virtual price.",
-    apyHistory: makePriceSeries("jlp-apy", 42, -0.1, 0.03, 90),
+    apyHistory: makePriceSeries("jlp-apy", 8.31, -0.04, 0.03, 90),
     dataSource: "live",
   },
 
@@ -278,7 +278,7 @@ export const jlpToken: TokenProfile = {
     updatedAt: NOW,
   },
 
-  totalSupply: { value: 320_000_000, source: "alchemy", updatedAt: NOW },
+  totalSupply: { value: 222_010_000, source: "alchemy", updatedAt: NOW },
   arbitrumPortalMetadata: {
     portalUrl: null,
     logoUrl: null,

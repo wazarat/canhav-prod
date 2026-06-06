@@ -16,8 +16,9 @@ import { PriceHistoryChart } from "@/components/tokens/PriceHistoryChart";
 import { TokenHeadlineStats } from "@/components/tokens/TokenHeadlineStats";
 import { TokenHeroStats } from "@/components/tokens/TokenHeroStats";
 import { TokenProfileCard } from "@/components/tokens/TokenProfileCard";
-import { TradeJlpPanel } from "@/components/trade/TradeJlpPanel";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGridSkeleton } from "@/components/ui/Skeletons";
 import { getApprovedTokenBySlug, getApprovedTokens, getEntityBySlug } from "@/lib/data";
@@ -67,6 +68,13 @@ function JlpDashboard({
           </>
         }
         description={profile.longDescription ?? profile.description}
+        actions={
+          profile.slug === "jlp" ? (
+            <Link href="/tokens/jlp/trade">
+              <Button>Trade JLP →</Button>
+            </Link>
+          ) : undefined
+        }
       />
 
       <TokenHeroStats profile={profile} />
@@ -85,7 +93,18 @@ function JlpDashboard({
           <Suspense fallback={<OnchainPanelSkeleton />}>
             <OnchainPanel profile={profile} />
           </Suspense>
-          {profile.tradeable && <TradeJlpPanel tradeable={profile.tradeable} />}
+          {profile.slug === "jlp" && (
+            <Card id="trade-replicate" className="scroll-mt-24 space-y-3">
+              <CardTitle>Trade JLP exposure</CardTitle>
+              <CardDescription>
+                Open the GMX-style trading terminal to buy, hold, and track JLP with live PnL
+                (demo — Arbitrum Sepolia).
+              </CardDescription>
+              <Link href="/tokens/jlp/trade">
+                <Button variant="outline">Open trading terminal →</Button>
+              </Link>
+            </Card>
+          )}
           {profile.agentSkill && <AgentSkillCard skill={profile.agentSkill} />}
           {profile.sources && <SourcesFooter sources={profile.sources} />}
         </div>

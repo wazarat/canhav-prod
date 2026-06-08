@@ -36,6 +36,11 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from app.db import get_repository, schema  # noqa: E402
 
+SCRIPTS_ROOT = Path(__file__).resolve().parent
+if str(SCRIPTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_ROOT))
+from classification import apply_coin_classification  # noqa: E402
+
 # CSV slug -> (display name, symbol/ticker, asset class). These are the exact
 # Phase-2 RWA targets; symbol + asset class are assigned here since the CSV has
 # no such columns (it labels every row "Real World Assets (RWAs)").
@@ -242,7 +247,7 @@ def main(argv: List[str]) -> int:
         existing = repo.get_item(pk, schema.protocol_sk(slug))
         created_at = (existing or {}).get("CreatedAt") or _now_iso()
         item = row_to_item(row, created_at)
-        repo.put_item(item)
+        repo.put_item(apply_coin_classification(item))
         staged.append(slug)
 
     # Entity-linked RWA products (PGOLD, OUSG, etc.).
@@ -271,17 +276,19 @@ def main(argv: List[str]) -> int:
             created_at = (existing or {}).get("CreatedAt") or _now_iso()
             row = parent_row or {}
             repo.put_item(
-                entity_rwa_item(
-                    slug,
-                    spec,
-                    entity_slug,
-                    row,
-                    created_at,
-                    chains=defaults.get("chains") or None,
-                    website=defaults.get("website") or _clean(row.get("Website")),
-                    twitter=defaults.get("twitter") or _clean(row.get("Twitter")),
-                    discord=_clean(row.get("Discord")),
-                    github=defaults.get("github") or _clean(row.get("GitHub")),
+                apply_coin_classification(
+                    entity_rwa_item(
+                        slug,
+                        spec,
+                        entity_slug,
+                        row,
+                        created_at,
+                        chains=defaults.get("chains") or None,
+                        website=defaults.get("website") or _clean(row.get("Website")),
+                        twitter=defaults.get("twitter") or _clean(row.get("Twitter")),
+                        discord=_clean(row.get("Discord")),
+                        github=defaults.get("github") or _clean(row.get("GitHub")),
+                    )
                 )
             )
             entity_staged.append(slug)

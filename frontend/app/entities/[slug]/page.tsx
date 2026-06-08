@@ -18,6 +18,7 @@ import {
 import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
 import { MemberCoins } from "@/components/entities/MemberCoins";
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
+import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { SourcesFooter } from "@/components/shared/SourcesFooter";
 import { TokenomicsCard } from "@/components/shared/TokenomicsCard";
@@ -241,6 +242,19 @@ export default async function EntityProfilePage({ params }: PageProps) {
           <div className="space-y-8">
             <ComponentsSection components={profile.components} />
             <DifferentiatorSection differentiator={profile.differentiator} />
+            {profile.offchainFacts && (
+              <section id="facts" className="scroll-mt-24 space-y-4">
+                <div className="border-b border-ink-800/60 pb-2">
+                  <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
+                    Key facts
+                  </h2>
+                  <p className="mt-1 text-sm text-ink-300">
+                    Curated off-chain facts with source + freshness.
+                  </p>
+                </div>
+                <OffchainFactsPanel facts={profile.offchainFacts} title="Off-chain facts" />
+              </section>
+            )}
             <FaqSection faq={profile.faq} />
             <EventsSection events={profile.timeline ?? profile.events} />
             <OrgStructureSection org={profile.orgStructure} />

@@ -107,6 +107,10 @@ function common(item: Record<string, any>) {
     auditUrl: item.AuditURL ?? null,
     contractAddress: item.ContractAddress ?? null,
     entitySlug: item.EntitySlug ?? null,
+    // Fine-grained classification + provenance (additive; absent on old records).
+    assetSubtype: item.AssetSubtype ?? null,
+    pegMechanism: item.PegMechanism ?? null,
+    offchainFacts: item.OffchainFacts ?? undefined,
     arbitrumPortalMetadata: item.ArbitrumPortalMetadata ?? {
       portalUrl: null,
       logoUrl: null,
@@ -175,6 +179,17 @@ export async function readLiveStore(): Promise<LiveStore> {
         tokenType: (item.TokenType ?? "Governance") as TokenProfile["tokenType"],
         subCategory: item.SubCategory ?? null,
         totalSupply: item.TotalSupply ?? { value: null, source: "alchemy", updatedAt: null },
+        // Rich detail-page fields (additive; surfaced when seeded, else undefined).
+        longDescription: item.LongDescription ?? undefined,
+        market: item.Market ?? undefined,
+        priceHistory: item.PriceHistory ?? undefined,
+        poolComposition: item.PoolComposition ?? undefined,
+        yieldMechanics: item.YieldMechanics ?? undefined,
+        typedRisks: item.TypedRisks ?? undefined,
+        tokenomics: item.Tokenomics ?? undefined,
+        audits: item.Audits ?? undefined,
+        sources: item.Sources ?? undefined,
+        agentSkill: item.AgentSkill ?? undefined,
       } as TokenProfile);
     } else if (item.Category === "Entity") {
       entities.push({
@@ -222,6 +237,17 @@ export async function readLiveStore(): Promise<LiveStore> {
           isPubliclyAudited: false,
           foundedDate: null,
         },
+        // Rich detail-page fields (additive; surfaced when seeded, else undefined).
+        longDescription: item.LongDescription ?? undefined,
+        market: item.Market ?? undefined,
+        priceHistory: item.PriceHistory ?? undefined,
+        tokenomics: item.Tokenomics ?? undefined,
+        typedRisks: item.TypedRisks ?? undefined,
+        audits: item.Audits ?? undefined,
+        sources: item.Sources ?? undefined,
+        offchainFacts: item.OffchainFacts ?? undefined,
+        timeline: item.Timeline ?? undefined,
+        agentSkill: item.AgentSkill ?? undefined,
         createdAt: String(item.CreatedAt ?? ""),
         updatedAt: String(item.UpdatedAt ?? ""),
       } as EntityProfile);

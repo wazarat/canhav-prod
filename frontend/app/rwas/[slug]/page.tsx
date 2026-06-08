@@ -8,6 +8,8 @@ import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/Onchain
 import { RwaHeadlineStats } from "@/components/rwas/RwaHeadlineStats";
 import { RwaProfileCard } from "@/components/rwas/RwaProfileCard";
 import { TvlHistorySection } from "@/components/rwas/TvlHistorySection";
+import { ClassificationChips } from "@/components/shared/ClassificationChips";
+import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -55,6 +57,10 @@ export default async function RwaProfilePage({ params }: PageProps) {
               {profile.symbol}
             </Badge>
             <Badge tone="neon">{profile.assetClass}</Badge>
+            <ClassificationChips
+              assetSubtype={profile.assetSubtype}
+              pegMechanism={profile.pegMechanism}
+            />
             <SecurityBadge
               info={deriveSecurityStatus({
                 isPubliclyAudited: profile.arbitrumPortalMetadata?.isPubliclyAudited,
@@ -88,6 +94,7 @@ export default async function RwaProfilePage({ params }: PageProps) {
 
         <div className="space-y-4">
           <RwaProfileCard profile={profile} />
+          <OffchainFactsPanel facts={profile.offchainFacts} />
           <Suspense fallback={<MarketStatsSkeleton />}>
             <MarketStats profile={profile} />
           </Suspense>

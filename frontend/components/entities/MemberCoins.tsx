@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowUpRight, ExternalLink, Eye, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
+import { ClassificationChips } from "@/components/shared/ClassificationChips";
 import { DataPanel, DataRow } from "@/components/ui/DataPanel";
 import type { CoinLiveData } from "@/lib/server/coin";
 import { categoryBadgeTone } from "@/lib/categoryTone";
@@ -76,6 +77,12 @@ function MemberCoinCard({
       </div>
 
       {coin.role && <p className="text-sm text-ink-300">{coin.role}</p>}
+
+      <ClassificationChips
+        assetSubtype={coin.assetSubtype}
+        pegMechanism={coin.pegMechanism}
+        size="xs"
+      />
 
       <div className="flex flex-wrap items-center gap-3 text-xs text-ink-300">
         <span>
@@ -159,6 +166,10 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
               {coin.subCategory && <Badge tone="neutral">{coin.subCategory}</Badge>}
             </div>
             {coin.role && <p className="text-sm text-ink-300">{coin.role}</p>}
+            <ClassificationChips
+              assetSubtype={coin.assetSubtype}
+              pegMechanism={coin.pegMechanism}
+            />
           </div>
           <button
             type="button"

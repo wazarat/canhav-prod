@@ -263,6 +263,179 @@ ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             },
         ],
         "events": [],
+        # Sourced milestone timeline (playbook §5). `status` separates what the
+        # protocol has executed/stated from forward design (theoretical) and our
+        # own inferred steps (canhav-inferred) — the UI renders these distinctly.
+        "timeline": [
+            {
+                "date": "2025-05-06",
+                "title": "Delphi Digital research report",
+                "description": (
+                    "Delphi publishes the 3-phase backing roadmap (T-bills -> mixed -> "
+                    "~100% hardware) framing USD.AI as AI-infra credit."
+                ),
+                "link": "https://members.delphidigital.io/reports/usd-ai-financing-the-future-of-ai-infra",
+                "status": "stated",
+            },
+            {
+                "date": "2025-08",
+                "title": "Permian Labs builds USD.AI",
+                "description": "GPU-collateralized lending model goes live, built by Permian Labs (Delaware).",
+                "link": "https://crypto-fundraising.info/projects/usd-ai-permian-labs/",
+                "status": "executed",
+            },
+            {
+                "date": "2025-10-15",
+                "title": "USDai launches on M^0",
+                "description": (
+                    "USDai launches on the M^0 stablecoin platform; CALIBER (UCC-7 warehouse "
+                    "receipts) + QEV redemption framework introduced."
+                ),
+                "link": "https://research.m0.org/research/usdai-uses-m0s-stablecoin-platform-to-launch-composable-synthetic-dollar",
+                "status": "executed",
+            },
+            {
+                "date": "2025-10/11",
+                "title": "Coinbase Ventures investment",
+                "description": "Coinbase Ventures invests in Permian Labs.",
+                "link": "https://usd.ai/insights/usdai-secures-coinbase-ventures-investment",
+                "status": "executed",
+            },
+            {
+                "date": "2025-12-18",
+                "title": "PayPal PYUSD partnership",
+                "description": (
+                    "4.5% incentive on up to $1B PYUSD deposits (~1yr program from Jan 2026); "
+                    ">$650M on-chain compute-backed at the time."
+                ),
+                "link": "https://usd.ai/insights/pyusd-paypal-usdai-integration",
+                "status": "executed",
+            },
+            {
+                "date": "2026-01-27",
+                "title": "USD.AI Foundation + $CHIP announced",
+                "description": (
+                    "USD.AI Foundation (Cayman) launches; $CHIP announced; $1.5B+ pipeline, "
+                    "first $100M GPU loans targeted Q1 2026."
+                ),
+                "link": "https://usd.ai/insights/usdai-foundation-chip",
+                "status": "executed",
+            },
+            {
+                "date": "2026-02-09",
+                "title": "CHIP ICO terms",
+                "description": (
+                    "$0.03/token, $300M FDV, 700M CHIP (7% supply), 100% unlock at TGE, on CoinList."
+                ),
+                "link": "https://usd.ai/insights/chip-ico-airdrop",
+                "status": "stated",
+            },
+            {
+                "date": "2026-02-18 → 02-27",
+                "title": "Allo Game S1 → CoinList ICO",
+                "description": "Allo Game S1 ends -> Level Up window -> CoinList ICO (Feb 22-27).",
+                "link": "https://usd.ai/insights/allo-game-to-flatiron-level-up-guide",
+                "status": "executed",
+            },
+            {
+                "date": "2026-04-22",
+                "title": "$CHIP live",
+                "description": (
+                    "$225M loans executed, >$1.2B approved facilities; sCHIP live; "
+                    "claim deadline May 30, 2026."
+                ),
+                "link": "https://usd.ai/insights/chip-is-live",
+                "status": "executed",
+            },
+            {
+                "date": "2026-06-17",
+                "title": "Protected $CHIP unlock (scheduled)",
+                "description": "Protected $CHIP unlock at YT maturity (settle $270M FDV).",
+                "link": "https://usd.ai/insights/chip-is-live",
+                "status": "stated",
+            },
+            {
+                "date": "2026-10-14",
+                "title": "Second YT maturity + Flatiron S2 end (scheduled)",
+                "description": "Second YT maturity ($190M FDV settle); Flatiron (Allo S2) season ends.",
+                "link": "https://usd.ai/insights/chip-is-live",
+                "status": "stated",
+            },
+            {
+                "date": "Phase 3 (design-stage)",
+                "title": "~100% hardware backing, ~20% APY",
+                "description": (
+                    "Delphi's terminal backing phase; depends on loan demand scaling — "
+                    "not reached (backing is still mixed T-bills + early loans)."
+                ),
+                "link": "https://members.delphidigital.io/reports/usd-ai-financing-the-future-of-ai-infra",
+                "status": "theoretical",
+            },
+            {
+                "date": "design-stage",
+                "title": "QEV as primary redemption path",
+                "description": (
+                    "Designed mechanism that 'becomes more relevant as USDai becomes more "
+                    "hardware-backed in stage 3' — not the live primary path yet."
+                ),
+                "link": "https://research.m0.org/research/usdai-uses-m0s-stablecoin-platform-to-launch-composable-synthetic-dollar",
+                "status": "theoretical",
+            },
+            {
+                "date": "target",
+                "title": "$2B+ pipeline -> realized loans",
+                "description": "Pipeline is not originated; only $225M actually executed as of Apr 2026.",
+                "link": "https://usd.ai/insights/chip-is-live",
+                "status": "theoretical",
+            },
+            {
+                "date": "2026-Q3 (estimate)",
+                "title": "[CanHav-inferred] Pipeline -> origination ramp",
+                "description": (
+                    "Inferred step closing the gap between >$1.2B approved facilities and "
+                    "$225M originated. USD.AI does not publish a per-facility drawdown "
+                    "schedule — this is CanHav's estimate, not a USD.AI commitment."
+                ),
+                "link": None,
+                "status": "canhav-inferred",
+            },
+        ],
+        # Curated, sourced off-chain facts (playbook §3 / §5).
+        "offchain_facts": [
+            {
+                "key": "icoTerms",
+                "value": (
+                    "$CHIP ICO: $0.03/token, $300M FDV, 700M CHIP (7% supply), 100% unlock "
+                    "at TGE, sold on CoinList."
+                ),
+                "freshness": "static",
+                "source": {"label": "USD.AI", "url": "https://usd.ai/insights/chip-ico-airdrop"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "orgStructure",
+                "value": (
+                    "USD.AI Foundation (Cayman) governs; Permian Labs (Delaware) builds the protocol."
+                ),
+                "freshness": "static",
+                "source": {"label": "USD.AI", "url": "https://usd.ai/insights/usdai-foundation-chip"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "backingRoadmap",
+                "value": (
+                    "Delphi 3-phase backing roadmap: T-bills -> mixed -> ~100% hardware. "
+                    "Terminal hardware-backed phase remains design-stage."
+                ),
+                "freshness": "static",
+                "source": {
+                    "label": "Delphi Digital",
+                    "url": "https://members.delphidigital.io/reports/usd-ai-financing-the-future-of-ai-infra",
+                },
+                "capturedAt": "2026-06-08",
+                "theoretical": True,
+            },
+        ],
         "investment_rounds": [
             {
                 "date": "Aug 2025",
@@ -818,6 +991,13 @@ def build_entity_item(
         "TradFiComparison": spec["tradfi_comparison"],
         "Risks": spec["risks"],
         "Events": spec["events"],
+        # Optional sourced milestone timeline (playbook §5); supersedes Events in
+        # the UI when present. Each entry may carry `link` + `status`
+        # (executed | stated | theoretical | canhav-inferred).
+        "Timeline": spec.get("timeline"),
+        # Optional curated off-chain facts (reg status, ratings, ICO terms) with
+        # freshness + source provenance (playbook §3).
+        "OffchainFacts": spec.get("offchain_facts"),
         "InvestmentRounds": spec["investment_rounds"],
         "Partnerships": spec["partnerships"],
         "CurrentScale": spec["current_scale"],

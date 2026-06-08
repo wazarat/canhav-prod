@@ -32,6 +32,11 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from app.db import get_repository, schema  # noqa: E402
 
+SCRIPTS_ROOT = Path(__file__).resolve().parent
+if str(SCRIPTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_ROOT))
+from classification import apply_coin_classification  # noqa: E402
+
 # CSV slug -> (display name, symbol, peg target). These are the exact Phase-1
 # targets; symbols/peg targets are added here since the CSV has no such columns.
 #
@@ -487,7 +492,7 @@ def main(argv: List[str]) -> int:
                 item["Description"] = patch["description"]
             if patch.get("contractAddress"):
                 item["ContractAddress"] = patch["contractAddress"]
-        repo.put_item(item)
+        repo.put_item(apply_coin_classification(item))
         staged.append(slug)
 
     # USD.AI coins (USDai + sUSDai), derived from the shared "usd-ai" row.
@@ -497,7 +502,11 @@ def main(argv: List[str]) -> int:
             existing = repo.get_item(pk, schema.protocol_sk(slug))
             created_at = (existing or {}).get("CreatedAt") or _now_iso()
             repo.put_item(
-                entity_coin_item(slug, USD_AI_COINS[slug], USD_AI_PARENT_SLUG, usd_ai_row, created_at)
+                apply_coin_classification(
+                    entity_coin_item(
+                        slug, USD_AI_COINS[slug], USD_AI_PARENT_SLUG, usd_ai_row, created_at
+                    )
+                )
             )
             usd_ai_staged.append(slug)
     else:
@@ -513,17 +522,19 @@ def main(argv: List[str]) -> int:
         existing = repo.get_item(pk, schema.protocol_sk(slug))
         created_at = (existing or {}).get("CreatedAt") or _now_iso()
         repo.put_item(
-            entity_coin_item(
-                slug,
-                JUPITER_COINS[slug],
-                JUPITER_PARENT_SLUG,
-                None,
-                created_at,
-                chains=["Solana"],
-                website="https://jup.ag",
-                twitter="https://x.com/JupiterExchange",
-                discord="https://discord.gg/jup",
-                github="https://github.com/jup-ag",
+            apply_coin_classification(
+                entity_coin_item(
+                    slug,
+                    JUPITER_COINS[slug],
+                    JUPITER_PARENT_SLUG,
+                    None,
+                    created_at,
+                    chains=["Solana"],
+                    website="https://jup.ag",
+                    twitter="https://x.com/JupiterExchange",
+                    discord="https://discord.gg/jup",
+                    github="https://github.com/jup-ag",
+                )
             )
         )
         jupiter_staged.append(slug)
@@ -537,16 +548,18 @@ def main(argv: List[str]) -> int:
             created_at = (existing or {}).get("CreatedAt") or _now_iso()
             row = parent_row or {}
             repo.put_item(
-                entity_coin_item(
-                    slug,
-                    spec,
-                    entity_slug,
-                    row,
-                    created_at,
-                    website=_clean(row.get("Website")),
-                    twitter=_clean(row.get("Twitter")),
-                    discord=_clean(row.get("Discord")),
-                    github=_clean(row.get("GitHub")),
+                apply_coin_classification(
+                    entity_coin_item(
+                        slug,
+                        spec,
+                        entity_slug,
+                        row,
+                        created_at,
+                        website=_clean(row.get("Website")),
+                        twitter=_clean(row.get("Twitter")),
+                        discord=_clean(row.get("Discord")),
+                        github=_clean(row.get("GitHub")),
+                    )
                 )
             )
             batch_staged.append(slug)

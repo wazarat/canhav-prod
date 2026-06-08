@@ -30,6 +30,11 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from app.db import get_repository, schema  # noqa: E402
 
+SCRIPTS_ROOT = Path(__file__).resolve().parent
+if str(SCRIPTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_ROOT))
+from classification import apply_coin_classification  # noqa: E402
+
 USD_AI_PARENT_SLUG = "usd-ai"
 JUPITER_PARENT_SLUG = "jupiter"
 ETHENA_PARENT_SLUG = "ethena"
@@ -331,7 +336,7 @@ def main(argv: List[str]) -> int:
         parent_row = csv_rows.get(csv_parent) if csv_parent else None
         existing = repo.get_item(pk, schema.protocol_sk(slug))
         created_at = (existing or {}).get("CreatedAt") or _now_iso()
-        repo.put_item(token_item(slug, parent_row, created_at))
+        repo.put_item(apply_coin_classification(token_item(slug, parent_row, created_at)))
         staged.append(slug)
 
     print(f"Source CSV : {csv_path if csv_path.exists() else '(none — usd.ai defaults)'}")

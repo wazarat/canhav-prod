@@ -95,6 +95,10 @@ export interface StablecoinProfile {
   pegTarget: PegTarget;
   /** Optional sub-classification (e.g. "Staked Stablecoin"). */
   subCategory?: StablecoinSubCategory | null;
+  /** Fine-grained economic classification (additive; layered on subCategory). */
+  assetSubtype?: AssetSubtype | null;
+  /** How the peg is actually held (additive; powers depeg-risk reasoning). */
+  pegMechanism?: PegMechanism | null;
   description: string;
   website: string | null;
   twitter: string | null;
@@ -109,6 +113,8 @@ export interface StablecoinProfile {
   totalSupply: TotalSupply;
   historicalPegData: HistoricalPegData;
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
+  /** Curated off-chain facts (reg status, rating, attestation) with provenance. */
+  offchainFacts?: OffchainFact[];
   createdAt: string;
   updatedAt: string;
 }
@@ -165,6 +171,10 @@ export interface RwaProfile {
   status: ApprovalStatus;
   /** Derived underlying-asset classification. */
   assetClass: RwaAssetClass;
+  /** Fine-grained economic classification (additive; layered on assetClass). */
+  assetSubtype?: AssetSubtype | null;
+  /** How the underlying value is backed (additive; e.g. rwa-collateral). */
+  pegMechanism?: PegMechanism | null;
   description: string;
   website: string | null;
   twitter: string | null;
@@ -180,6 +190,8 @@ export interface RwaProfile {
   totalValueLocked: TotalValueLocked;
   historicalTvlData: HistoricalTvlData;
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
+  /** Curated off-chain facts (issuer, custody, gating) with provenance. */
+  offchainFacts?: OffchainFact[];
   createdAt: string;
   updatedAt: string;
 }
@@ -269,6 +281,77 @@ export interface SourceRef {
   url: string;
 }
 
+/* -------------------------------------------------------------------------- */
+/* Fine-grained economic classification (additive, layered on TokenType)      */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Fine-grained economic classification, layered ON TOP of the coarse
+ * `TokenType` / `StablecoinSubCategory`. Optional everywhere: old records (no
+ * `assetSubtype`) keep working and the UI falls back to the coarse taxonomy.
+ * This is what lets the agent reason about *what a token actually is* — a flat
+ * fiat stablecoin vs a synthetic dollar vs an RWA claim.
+ */
+export type AssetSubtype =
+  // --- dollar-like ---
+  | "fiat-stablecoin" // TUSD, USDpm, SD, GHO, USDS — flat 1:1, reserve-backed
+  | "synthetic-dollar" // USDe (Ethena), USDai — peg via hedge / overcollateral
+  | "e-money" // EURe, GBPe, Monerium USDe, ISKe — regulated EMI, legal e-money
+  | "yield-bearing-stable" // sUSDe, sUSDS, USDY, rUSDY, stkGHO — accrues yield, ~$1 ref
+  | "rwa-backed-stable" // USDtb — backed by tokenized treasuries (BUIDL)
+  // --- governance / risk ---
+  | "governance" // AAVE, ENA, JUP, ONDO, SKY, CHIP
+  | "staked-governance" // stkAAVE, sENA — governance staked as backstop
+  | "insurance-firstloss" // sCHIP, stkABPT — slashed first on default
+  // --- receipts / derivatives ---
+  | "lp-receipt" // JLP, aTokens (aUSDC/aUSDT/aWETH) — claim on a pool
+  | "lst" // JupSOL — liquid staking token
+  | "institutional-gated" // iUSDe, OUSG — KYC / accredited-only wrapper
+  // --- real-world ---
+  | "tokenized-commodity" // PGOLD, (Stably Gold) — 1 unit = 1 physical unit
+  | "tokenized-equity" // Ondo GM (TSLA/SPY/QQQ/NVDA)
+  | "tokenized-treasury" // OUSG, USDY underlying
+  // --- lifecycle ---
+  | "legacy" // DAI, MKR, USDSC — superseded but still live
+  | "conceptual"; // announced, not shipped
+
+/** How a "stable" thing actually stays stable — the agent's depeg-risk lens. */
+export type PegMechanism =
+  | "fiat-reserve" // TUSD, USDpm, SD, EURe — 1:1 cash/T-bill in escrow/EMI
+  | "overcollateralized" // GHO, USDS, DAI — minted against crypto collateral
+  | "delta-neutral-hedge" // USDe (Ethena) — long spot + short perp
+  | "rwa-collateral" // USDtb, USDai — tokenized treasuries / PYUSD reserve
+  | "algorithmic-rebase" // rUSDY — balance rebases daily
+  | "none"; // governance / commodity / equity tokens
+
+/* -------------------------------------------------------------------------- */
+/* Off-chain facts with explicit freshness provenance                         */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Freshness class for an off-chain fact, so the agent/UI never present a stale
+ * static fact as if it were live.
+ */
+export type Freshness =
+  | "live" // re-fetched every render / on a short cron (price, supply, APY snapshot)
+  | "semi-live" // refreshed on a daily/weekly cron (proposals, attestation date, AUM)
+  | "static"; // captured once, manually curated (reg status, audit firm, founding date)
+
+/**
+ * A single curated off-chain fact (regulatory status, rating, audit firm, ICO
+ * terms, etc.) carrying its own provenance + freshness so it is self-describing.
+ */
+export interface OffchainFact {
+  key: string;
+  value: string;
+  freshness: Freshness;
+  source: SourceRef;
+  /** ISO date — when WE recorded it. */
+  capturedAt: string;
+  /** Marks forward-looking / design-stage facts (playbook §5.2). */
+  theoretical?: boolean;
+}
+
 export interface Tokenomics {
   maxSupply: number | null;
   totalBurned?: number;
@@ -333,6 +416,10 @@ export interface TokenProfile {
   tokenType: TokenType;
   /** Optional sub-classification (e.g. "Governance Token", "LST"). */
   subCategory?: TokenSubCategory | null;
+  /** Fine-grained economic classification (additive; layered on subCategory). */
+  assetSubtype?: AssetSubtype | null;
+  /** Peg/backing mechanism where relevant (additive; "none" for pure gov tokens). */
+  pegMechanism?: PegMechanism | null;
   description: string;
   website: string | null;
   twitter: string | null;
@@ -356,6 +443,8 @@ export interface TokenProfile {
   tokenomics?: Tokenomics;
   audits?: { firm: string; date: string; url: string | null }[];
   sources?: SourceRef[];
+  /** Curated off-chain facts (reg status, rating, ICO terms) with provenance. */
+  offchainFacts?: OffchainFact[];
   agentSkill?: AgentSkill;
 }
 
@@ -448,6 +537,23 @@ export interface EntityEvent {
   link?: string | null;
 }
 
+/**
+ * Confidence/lifecycle status for a timeline milestone (playbook §5). Lets the
+ * UI render executed/stated milestones solid (with a source) and theoretical /
+ * CanHav-inferred items muted, and lets the agent qualify them aloud.
+ */
+export type TimelineStatus = "executed" | "stated" | "theoretical" | "canhav-inferred";
+
+export interface TimelineEntry {
+  date: string;
+  title: string;
+  description: string;
+  /** Primary source for stated/executed milestones. */
+  link?: string | null;
+  /** Defaults to "stated" when omitted; theoretical/inferred render muted. */
+  status?: TimelineStatus;
+}
+
 /** Optional display labels for entity headline stat cards. */
 export interface ScaleLabels {
   tvl?: string;
@@ -494,6 +600,9 @@ export interface EntityProfile {
   typedRisks?: TypedRisk[];
   audits?: { firm: string; date: string; url: string | null }[];
   sources?: SourceRef[];
-  timeline?: { date: string; title: string; description: string }[];
+  /** Curated off-chain facts (reg status, ratings, org structure) with provenance. */
+  offchainFacts?: OffchainFact[];
+  /** Sourced milestone timeline; supersedes `events` when present (playbook §5). */
+  timeline?: TimelineEntry[];
   agentSkill?: AgentSkill;
 }

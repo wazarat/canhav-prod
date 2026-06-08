@@ -17,6 +17,23 @@ import { appendMemory, getMemory, markSkillStudied } from "@/lib/agent/memory";
 import { getAgentSkillById } from "@/lib/agent/skills";
 import { fetchRecentTransfers, fetchTokenMetadata, fetchTotalSupply } from "@/lib/server/alchemy";
 import { fetchPegHistory, fetchTvlHistory } from "@/lib/server/dune";
+import type { OffchainFact } from "@/lib/types";
+
+/**
+ * Compact off-chain facts for agent consumption: drop the nested source object
+ * down to its label/url and surface the freshness + theoretical flags so the
+ * model can qualify a fact ("curated, may be stale") instead of stating it flat.
+ */
+function compactFacts(facts: OffchainFact[] | undefined) {
+  return (facts ?? []).map((f) => ({
+    key: f.key,
+    value: f.value,
+    freshness: f.freshness,
+    source: f.source?.label ?? null,
+    sourceUrl: f.source?.url ?? null,
+    theoretical: f.theoretical ?? false,
+  }));
+}
 
 /**
  * The CanHav research agent's toolset.
@@ -81,6 +98,14 @@ async function execGetEntity(a: Args<"research_getEntity">) {
       role: c.role,
     })),
     scale: p.currentScale,
+    offchainFacts: compactFacts(p.offchainFacts),
+    // Status-tagged so the agent distinguishes executed/stated milestones from
+    // forward-looking (theoretical) and CanHav-inferred steps.
+    timeline: (p.timeline ?? []).map((t) => ({
+      date: t.date,
+      title: t.title,
+      status: t.status ?? "stated",
+    })),
     summary: `Read entity ${p.name} (${p.memberCoins.length} member coins).`,
   };
 }
@@ -96,11 +121,14 @@ async function execGetStablecoin(a: Args<"research_getStablecoin">) {
     symbol: p.symbol,
     pegTarget: p.pegTarget,
     subCategory: p.subCategory ?? null,
+    assetSubtype: p.assetSubtype ?? null,
+    pegMechanism: p.pegMechanism ?? null,
     description: p.description,
     totalSupply: p.totalSupply.value,
     latestPeg,
+    offchainFacts: compactFacts(p.offchainFacts),
     contractAddress: p.contractAddress ?? null,
-    summary: `Read stablecoin ${p.name} (peg ${p.pegTarget}).`,
+    summary: `Read stablecoin ${p.name} (peg ${p.pegTarget}${p.assetSubtype ? `, ${p.assetSubtype}` : ""}).`,
   };
 }
 
@@ -114,10 +142,13 @@ async function execGetToken(a: Args<"research_getToken">) {
     symbol: p.symbol,
     tokenType: p.tokenType,
     subCategory: p.subCategory ?? null,
+    assetSubtype: p.assetSubtype ?? null,
+    pegMechanism: p.pegMechanism ?? null,
     description: p.description,
     priceUsd: p.market?.priceUsd?.value ?? null,
     marketCapUsd: p.market?.marketCapUsd?.value ?? null,
     totalSupply: p.totalSupply.value,
+    offchainFacts: compactFacts(p.offchainFacts),
     contractAddress: p.contractAddress ?? null,
     summary: `Read token ${p.name} (${p.tokenType}).`,
   };
@@ -133,8 +164,11 @@ async function execGetRwa(a: Args<"research_getRwa">) {
     name: p.name,
     symbol: p.symbol,
     assetClass: p.assetClass,
+    assetSubtype: p.assetSubtype ?? null,
+    pegMechanism: p.pegMechanism ?? null,
     description: p.description,
     tvlUsd: latestTvl,
+    offchainFacts: compactFacts(p.offchainFacts),
     summary: `Read RWA ${p.name} (${p.assetClass}).`,
   };
 }

@@ -8,6 +8,8 @@ import { MarketStats, MarketStatsSkeleton } from "@/components/market/MarketStat
 import { PegHistorySection } from "@/components/stablecoins/PegHistorySection";
 import { ProfileCard } from "@/components/stablecoins/ProfileCard";
 import { StablecoinHeadlineStats } from "@/components/stablecoins/StablecoinHeadlineStats";
+import { ClassificationChips } from "@/components/shared/ClassificationChips";
+import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -58,6 +60,10 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
               {profile.pegTarget} peg
             </Badge>
             {profile.subCategory && <Badge tone="neutral">{profile.subCategory}</Badge>}
+            <ClassificationChips
+              assetSubtype={profile.assetSubtype}
+              pegMechanism={profile.pegMechanism}
+            />
             <SecurityBadge
               info={deriveSecurityStatus({
                 isPubliclyAudited: profile.arbitrumPortalMetadata?.isPubliclyAudited,
@@ -91,6 +97,7 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
 
         <div className="space-y-4">
           <ProfileCard profile={profile} />
+          <OffchainFactsPanel facts={profile.offchainFacts} />
           <Suspense fallback={<MarketStatsSkeleton />}>
             <MarketStats profile={profile} />
           </Suspense>

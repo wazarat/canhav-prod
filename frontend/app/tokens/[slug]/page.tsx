@@ -13,6 +13,8 @@ import { JlpYieldCard } from "@/components/tokens/JlpYieldCard";
 import { TokenHeadlineStats } from "@/components/tokens/TokenHeadlineStats";
 import { TokenPriceHistorySection } from "@/components/tokens/TokenPriceHistorySection";
 import { TokenProfileCard } from "@/components/tokens/TokenProfileCard";
+import { ClassificationChips } from "@/components/shared/ClassificationChips";
+import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
@@ -59,6 +61,10 @@ export default async function TokenProfilePage({ params }: PageProps) {
             </Badge>
             <Badge tone="neon">{profile.tokenType}</Badge>
             {profile.subCategory && <Badge tone="neutral">{profile.subCategory}</Badge>}
+            <ClassificationChips
+              assetSubtype={profile.assetSubtype}
+              pegMechanism={profile.pegMechanism}
+            />
             <SecurityBadge
               info={deriveSecurityStatus({
                 isPubliclyAudited: profile.arbitrumPortalMetadata?.isPubliclyAudited,
@@ -108,6 +114,7 @@ export default async function TokenProfilePage({ params }: PageProps) {
             <JlpYieldCard yieldMechanics={profile.yieldMechanics} />
           )}
           <TokenProfileCard profile={profile} />
+          <OffchainFactsPanel facts={profile.offchainFacts} />
           <Suspense fallback={<MarketStatsSkeleton />}>
             <MarketStats profile={profile} />
           </Suspense>

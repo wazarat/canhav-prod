@@ -8,7 +8,7 @@ import {
 } from "@/lib/server/alchemy";
 import { coinIdForSlug, fetchMarketData, type MarketData } from "@/lib/server/coingecko";
 import { resolveEntityToken } from "@/lib/server/resolve";
-import type { RwaProfile, StablecoinProfile, TokenProfile } from "@/lib/types";
+import type { AssetSubtype, PegMechanism, RwaProfile, StablecoinProfile, TokenProfile } from "@/lib/types";
 
 /**
  * Serializable live snapshot for a single coin (USDai / sUSDai / CHIP), used to
@@ -37,6 +37,9 @@ export interface CoinLiveData {
   /** Member-coin role label (e.g. "Yield-bearing synthetic dollar"). */
   role: string;
   subCategory: string | null;
+  /** Fine-grained economic classification (additive; null on old records). */
+  assetSubtype: AssetSubtype | null;
+  pegMechanism: PegMechanism | null;
   description: string;
   contractAddress: string | null;
   chains: string[];
@@ -106,6 +109,8 @@ export async function getCoinLiveData(
       profile.category === "RWA"
         ? (profile.assetClass ?? null)
         : (profile.subCategory ?? null),
+    assetSubtype: profile.assetSubtype ?? null,
+    pegMechanism: profile.pegMechanism ?? null,
     description: profile.description,
     contractAddress: address,
     chains,

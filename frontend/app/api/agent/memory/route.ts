@@ -39,19 +39,34 @@ export async function POST(req: Request) {
 
   const agentId = (typeof body.agentId === "string" && body.agentId) || DEMO_AGENT_ID;
   const skillId = typeof body.skillId === "string" ? body.skillId : null;
+  const action = typeof body.action === "string" ? body.action : "seed";
 
-  await seedAgentProfile({
-    agentId,
-    name: typeof body.name === "string" && body.name ? body.name : "Sandbox Researcher",
-    skillId,
-  });
-  if (skillId) await markSkillStudied(agentId, skillId);
-
-  const text =
-    typeof body.fact === "string" && body.fact.trim()
-      ? body.fact.trim()
-      : `Checkpoint ${new Date().toISOString()} — CanHav agent memory persists across sessions.`;
-  const seededFact = await appendMemory(agentId, { text, source: "seed" });
+  let seededFact = null;
+  if (action === "studySkill") {
+    if (!skillId) {
+      return NextResponse.json({ error: "skillId required for studySkill." }, { status: 400 });
+    }
+    await markSkillStudied(agentId, skillId);
+  } else if (action === "remember") {
+    const text = typeof body.fact === "string" ? body.fact.trim() : "";
+    if (!text) {
+      return NextResponse.json({ error: "fact required for remember." }, { status: 400 });
+    }
+    seededFact = await appendMemory(agentId, { text, source: "manual" });
+  } else {
+    // "seed": create/refresh a demo profile + append a sample fact.
+    await seedAgentProfile({
+      agentId,
+      name: typeof body.name === "string" && body.name ? body.name : "Sandbox Researcher",
+      skillId,
+    });
+    if (skillId) await markSkillStudied(agentId, skillId);
+    const text =
+      typeof body.fact === "string" && body.fact.trim()
+        ? body.fact.trim()
+        : `Checkpoint ${new Date().toISOString()} — CanHav agent memory persists across sessions.`;
+    seededFact = await appendMemory(agentId, { text, source: "seed" });
+  }
 
   const snapshot = await getAgentSnapshot(agentId);
   return NextResponse.json({ agentId, persistent: hasUpstash(), seededFact, ...snapshot });

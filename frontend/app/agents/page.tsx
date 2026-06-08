@@ -8,13 +8,18 @@ import {
   CircleDashed,
   ScrollText,
   ArrowRight,
+  Bot,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { getAgentSkills } from "@/lib/agent/skills";
+import { listAgents } from "@/lib/agent/memory";
 import { MemoryInspector } from "@/components/agent/MemoryInspector";
+import { ToolPlayground } from "@/components/agent/ToolPlayground";
+import { AgentChat } from "@/components/agent/AgentChat";
+import { PasskeySpawnButton } from "@/components/agent/PasskeySpawnButton";
 
 export const metadata = {
   title: "Agent Lab",
@@ -61,7 +66,7 @@ function CapabilityItem({ row }: { row: CapabilityRow }) {
 
 export default async function AgentsPage() {
   const status = agentConfigStatus();
-  const skills = await getAgentSkills();
+  const [skills, agents] = await Promise.all([getAgentSkills(), listAgents()]);
 
   const rows: CapabilityRow[] = [
     {
@@ -147,7 +152,51 @@ export default async function AgentsPage() {
         </p>
       </Card>
 
+      {agents.length > 0 && (
+        <Card className="space-y-4">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">
+            <div>
+              <CardTitle className="text-base">Your agents</CardTitle>
+              <CardDescription className="mt-1">
+                Open an agent&apos;s home to chat, watch it work, and grow its memory.
+              </CardDescription>
+            </div>
+            <Badge tone="neutral">{agents.length}</Badge>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {agents.map((agent) => (
+              <Link
+                key={agent.agentId}
+                href={`/agents/${encodeURIComponent(agent.agentId)}`}
+                className="group flex items-start gap-3 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-3 transition-colors hover:border-electric-500/40 hover:bg-ink-900/60"
+              >
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-ink-700/80 bg-ink-900/60 text-electric-400">
+                  <Bot className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-ink-100">{agent.name}</p>
+                  <p className="mt-0.5 font-mono text-[10px] text-ink-500">
+                    agent {agent.agentId}
+                    {agent.onChain ? " · on-chain" : " · local"}
+                  </p>
+                </div>
+                <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-ink-500 transition-colors group-hover:text-electric-400" />
+              </Link>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      <PasskeySpawnButton
+        skills={skills.map((s) => ({ id: s.id, title: s.title }))}
+        zerodevConfigured={status.zerodev}
+      />
+
+      <AgentChat agentId="sandbox" llmConfigured={status.openai} />
+
       <MemoryInspector />
+
+      <ToolPlayground />
 
       <Card className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">

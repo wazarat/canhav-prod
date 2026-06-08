@@ -53,15 +53,72 @@ import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = BACKEND_ROOT.parent
 DEFAULT_STORE = BACKEND_ROOT / "data" / "store.json"
 DEFAULT_KEY = "canhav:store"
+DEFAULT_ENV_FILES = (
+    REPO_ROOT / "frontend" / ".env.local",
+    REPO_ROOT / "frontend" / ".env.production.local",
+)
 
 # Legacy fields to remove from production so it mirrors the current local store
 # (the combined "usd-ai" stablecoin was superseded by USDai + sUSDai).
 LEGACY_FIELDS = ["CATEGORY#Stablecoin|PROTOCOL#usd-ai"]
+
+
+def _strip_quotes(value: str) -> str:
+    value = value.strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        return value[1:-1]
+    return value
+
+
+def load_env_file(path: Path) -> None:
+    """Best-effort load of KEY=VALUE lines into os.environ (only if unset)."""
+    if not path.is_file():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        trimmed = line.strip()
+        if not trimmed or trimmed.startswith("#") or "=" not in trimmed:
+            continue
+        key, _, raw = trimmed.partition("=")
+        key = key.strip()
+        if not key or key in os.environ:
+            continue
+        os.environ[key] = _strip_quotes(raw)
+
+
+def credential_status() -> Tuple[Optional[str], Optional[str], str]:
+    """Return (url, token, human-readable status)."""
+    url = rest_url()
+    token = rest_token()
+    if url and token:
+        return url, token, "ok"
+    empty_keys = []
+    for path in DEFAULT_ENV_FILES:
+        if not path.is_file():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            trimmed = line.strip()
+            if not trimmed or trimmed.startswith("#") or "=" not in trimmed:
+                continue
+            key, _, raw = trimmed.partition("=")
+            key = key.strip()
+            if key not in (
+                "KV_REST_API_URL",
+                "KV_REST_API_TOKEN",
+                "UPSTASH_REDIS_REST_URL",
+                "UPSTASH_REDIS_REST_TOKEN",
+            ):
+                continue
+            if not _strip_quotes(raw):
+                empty_keys.append(f"{key} (in {path.name})")
+    if empty_keys:
+        return url, token, "empty_placeholders:" + ",".join(empty_keys)
+    return url, token, "missing"
 
 
 def rest_url() -> Optional[str]:
@@ -126,15 +183,26 @@ def main(argv: List[str]) -> int:
     )
     args = parser.parse_args(argv[1:])
 
-    url, token = rest_url(), rest_token()
+    for env_path in DEFAULT_ENV_FILES:
+        load_env_file(env_path)
+
+    url, token, cred_state = credential_status()
     if not args.dry_run and (not url or not token):
-        raise SystemExit(
-            "ERROR: Upstash REST credentials missing. Set KV_REST_API_URL + "
-            "KV_REST_API_TOKEN (Vercel integration) or UPSTASH_REDIS_REST_URL + "
-            "UPSTASH_REDIS_REST_TOKEN.\n"
-            "Tip: `vercel env pull frontend/.env.local` then export them, or copy "
-            "from the Upstash console."
+        msg = (
+            "ERROR: Upstash REST credentials missing or empty.\n"
+            "Vercel's Upstash integration often writes empty placeholders to "
+            "`.env.local` on `vercel env pull` — secrets only exist at runtime on Vercel.\n\n"
+            "Fix (pick one):\n"
+            "  1. Upstash console → your database → REST API → copy URL + token, then:\n"
+            "       export KV_REST_API_URL=... KV_REST_API_TOKEN=...\n"
+            "       python3 backend/scripts/sync_to_upstash.py --replace\n"
+            "  2. After deploying to canhav-prod-bvf7, push via the seed API (no Upstash creds locally):\n"
+            "       APPROVAL_TOKEN=<token> ./scripts/push-store-prod.sh\n"
+            "       (defaults to https://canhav-prod-bvf7.vercel.app)\n"
         )
+        if cred_state.startswith("empty_placeholders"):
+            msg += f"\nDetected empty vars: {cred_state.split(':', 1)[1]}\n"
+        raise SystemExit(msg)
 
     items = load_items(Path(args.store).expanduser())
     key = store_key()

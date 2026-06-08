@@ -151,4 +151,5 @@ PY
 
 echo ""
 echo "Done. Frontend reads Redis live — no redeploy required."
-echo "Verify a page, e.g. https://canhav-prod-bvf7.vercel.app/entities/usd-ai"
+echo "Project: https://vercel.com/wazarats-projects/canhav-prod-bvf7"
+echo "Verify:  https://canhav-prod-bvf7.vercel.app/entities/usd-ai"

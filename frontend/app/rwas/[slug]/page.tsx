@@ -8,10 +8,12 @@ import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/Onchain
 import { RwaHeadlineStats } from "@/components/rwas/RwaHeadlineStats";
 import { RwaProfileCard } from "@/components/rwas/RwaProfileCard";
 import { TvlHistorySection } from "@/components/rwas/TvlHistorySection";
+import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
 import { getApprovedRwas, getApprovedRwaBySlug, getEntityBySlug } from "@/lib/data";
+import { deriveSecurityStatus } from "@/lib/security";
 
 interface PageProps {
   params: { slug: string };
@@ -53,6 +55,12 @@ export default async function RwaProfilePage({ params }: PageProps) {
               {profile.symbol}
             </Badge>
             <Badge tone="neon">{profile.assetClass}</Badge>
+            <SecurityBadge
+              info={deriveSecurityStatus({
+                isPubliclyAudited: profile.arbitrumPortalMetadata?.isPubliclyAudited,
+                auditUrl: profile.auditUrl,
+              })}
+            />
             {entity && (
               <Link href={`/entities/${entity.slug}`}>
                 <Badge tone="electric">Part of {entity.name}</Badge>

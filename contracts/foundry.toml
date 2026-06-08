@@ -1,0 +1,21 @@
+[profile.default]
+src = "src"
+out = "out"
+test = "test"
+script = "script"
+# OpenZeppelin is installed git-free via npm (see package.json); Foundry resolves
+# it from node_modules. NO `forge install` git submodules (honors the no-git rule).
+libs = ["node_modules"]
+solc = "0.8.28"
+optimizer = true
+optimizer_runs = 200
+# Shanghai is broadly supported on Arbitrum; avoids relying on Cancun-only opcodes.
+evm_version = "shanghai"
+remappings = ["@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/"]
+
+# Arbitrum Sepolia is the ONLY supported network (testnet only).
+[rpc_endpoints]
+arbitrum_sepolia = "${ARBITRUM_SEPOLIA_RPC_URL}"
+
+[etherscan]
+arbitrum_sepolia = { key = "${ARBISCAN_API_KEY}", chain = 421614, url = "https://api-sepolia.arbiscan.io/api" }

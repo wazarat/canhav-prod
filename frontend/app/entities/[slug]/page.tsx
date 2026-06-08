@@ -18,6 +18,7 @@ import {
 import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
 import { MemberCoins } from "@/components/entities/MemberCoins";
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
+import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { SourcesFooter } from "@/components/shared/SourcesFooter";
 import { TokenomicsCard } from "@/components/shared/TokenomicsCard";
 import { TypedRiskList } from "@/components/shared/TypedRiskList";
@@ -28,6 +29,7 @@ import { SectionNav } from "@/components/ui/SectionNav";
 import { StatCard } from "@/components/ui/StatCard";
 import { Card } from "@/components/ui/Card";
 import { getApprovedEntities, getApprovedEntityBySlug, getEntityMemberCoins } from "@/lib/data";
+import { deriveSecurityStatus } from "@/lib/security";
 import { getCoinLiveData } from "@/lib/server/coin";
 import type { EntityProfile } from "@/lib/types";
 import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
@@ -133,6 +135,12 @@ export default async function EntityProfilePage({ params }: PageProps) {
           <>
             <Badge tone="neon">Entity</Badge>
             <Badge tone="neutral">{profile.memberCoins.length} coins</Badge>
+            <SecurityBadge
+              info={deriveSecurityStatus({
+                isPubliclyAudited: profile.arbitrumPortalMetadata?.isPubliclyAudited,
+                audits: profile.audits,
+              })}
+            />
           </>
         }
         description={

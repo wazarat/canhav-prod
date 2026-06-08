@@ -1,0 +1,26 @@
+{
+  "name": "canhav-agent-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CanHav Research — ERC-8004 + ZeroDev agent execution service (Arbitrum Sepolia testnet only)",
+  "main": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "spawn": "tsx src/cli/spawn.ts"
+  },
+  "dependencies": {
+    "@zerodev/ecdsa-validator": "^5.4.9",
+    "@zerodev/passkey-validator": "^5.6.0",
+    "@zerodev/permissions": "^5.6.3",
+    "@zerodev/sdk": "^5.5.10",
+    "viem": "^2.52.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

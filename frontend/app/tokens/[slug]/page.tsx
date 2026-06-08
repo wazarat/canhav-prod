@@ -13,11 +13,13 @@ import { JlpYieldCard } from "@/components/tokens/JlpYieldCard";
 import { TokenHeadlineStats } from "@/components/tokens/TokenHeadlineStats";
 import { TokenPriceHistorySection } from "@/components/tokens/TokenPriceHistorySection";
 import { TokenProfileCard } from "@/components/tokens/TokenProfileCard";
+import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGridSkeleton } from "@/components/ui/Skeletons";
 import { getApprovedTokenBySlug, getApprovedTokens, getEntityBySlug } from "@/lib/data";
+import { deriveSecurityStatus } from "@/lib/security";
 
 interface PageProps {
   params: { slug: string };
@@ -57,6 +59,13 @@ export default async function TokenProfilePage({ params }: PageProps) {
             </Badge>
             <Badge tone="neon">{profile.tokenType}</Badge>
             {profile.subCategory && <Badge tone="neutral">{profile.subCategory}</Badge>}
+            <SecurityBadge
+              info={deriveSecurityStatus({
+                isPubliclyAudited: profile.arbitrumPortalMetadata?.isPubliclyAudited,
+                auditUrl: profile.auditUrl,
+                audits: profile.audits,
+              })}
+            />
             {entity && (
               <Link href={`/entities/${entity.slug}`}>
                 <Badge tone="electric">Part of {entity.name}</Badge>

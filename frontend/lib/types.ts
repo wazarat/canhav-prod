@@ -9,6 +9,23 @@
 
 export type ApprovalStatus = "PENDING_APPROVAL" | "APPROVED";
 
+/**
+ * OZ-derived security posture shown on every protocol page. This is the
+ * human-facing twin of the on-chain `SecurityRegistry` allowlist that gates
+ * ERC-8004 agents (see `agent-service` / `contracts`). Today it is derived from
+ * the existing audit metadata; once the registry is deployed it will be backed
+ * by on-chain status + Arbiscan source verification.
+ */
+export type SecurityStatus = "verified" | "audited" | "unverified";
+
+export interface SecurityInfo {
+  status: SecurityStatus;
+  /** Public audit link, when one is on file. */
+  auditUrl: string | null;
+  /** Provenance note for the badge tooltip. */
+  source: string;
+}
+
 export type PegTarget = "USD" | "EUR" | "GBP";
 
 /** Top-level taxonomy categories. */

@@ -1,0 +1,15 @@
+{
+  "name": "canhav-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CanHav Research — ERC-8004 agent registries (OpenZeppelin) on Arbitrum Sepolia",
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test -vvv",
+    "fmt": "forge fmt",
+    "deploy:arbitrum-sepolia": "forge script script/Deploy.s.sol:Deploy --rpc-url arbitrum_sepolia --broadcast --verify"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.1.0"
+  }
+}

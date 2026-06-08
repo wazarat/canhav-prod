@@ -8,10 +8,12 @@ import { MarketStats, MarketStatsSkeleton } from "@/components/market/MarketStat
 import { PegHistorySection } from "@/components/stablecoins/PegHistorySection";
 import { ProfileCard } from "@/components/stablecoins/ProfileCard";
 import { StablecoinHeadlineStats } from "@/components/stablecoins/StablecoinHeadlineStats";
+import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
 import { getApprovedStablecoinBySlug, getApprovedStablecoins, getEntityBySlug } from "@/lib/data";
+import { deriveSecurityStatus } from "@/lib/security";
 
 interface PageProps {
   params: { slug: string };
@@ -56,6 +58,12 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
               {profile.pegTarget} peg
             </Badge>
             {profile.subCategory && <Badge tone="neutral">{profile.subCategory}</Badge>}
+            <SecurityBadge
+              info={deriveSecurityStatus({
+                isPubliclyAudited: profile.arbitrumPortalMetadata?.isPubliclyAudited,
+                auditUrl: profile.auditUrl,
+              })}
+            />
             {entity && (
               <Link href={`/entities/${entity.slug}`}>
                 <Badge tone="neon">Part of {entity.name}</Badge>

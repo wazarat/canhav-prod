@@ -1,0 +1,14 @@
+# Foundry
+out/
+cache/
+broadcast/
+.gas-snapshot
+
+# npm (OpenZeppelin is installed git-free)
+node_modules/
+package-lock.json
+
+# env / secrets
+.env
+.env.*
+!.env.example

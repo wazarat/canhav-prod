@@ -29,6 +29,7 @@ import { SectionNav } from "@/components/ui/SectionNav";
 import { StatCard } from "@/components/ui/StatCard";
 import { Card } from "@/components/ui/Card";
 import { getApprovedEntities, getApprovedEntityBySlug, getEntityMemberCoins } from "@/lib/data";
+import { buildSkillFromEntity } from "@/lib/agent/skills";
 import { deriveSecurityStatus } from "@/lib/security";
 import { getCoinLiveData } from "@/lib/server/coin";
 import type { EntityProfile } from "@/lib/types";
@@ -255,7 +256,7 @@ export default async function EntityProfilePage({ params }: PageProps) {
               rows={profile.tradFiComparison}
               entityName={profile.name}
             />
-            {profile.agentSkill && <AgentSkillCard skill={profile.agentSkill} />}
+            <AgentSkillCard skill={profile.agentSkill ?? buildSkillFromEntity(profile)} />
             {profile.sources && <SourcesFooter sources={profile.sources} />}
           </div>
         </div>

@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: "/stablecoins", label: "Stablecoins" },
   { href: "/rwas", label: "RWAs" },
   { href: "/tokens", label: "Tokens" },
+  { href: "/agents", label: "Agents" },
 ];
 
 export function Nav() {

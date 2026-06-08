@@ -59,6 +59,15 @@ function getRedis(): Redis {
   return _redis;
 }
 
+/**
+ * Shared Upstash client accessor for other server-only modules (e.g. the agent
+ * memory layer). Throws if credentials are missing — callers should guard with
+ * {@link hasUpstash} and fall back accordingly.
+ */
+export function getRedisClient(): Redis {
+  return getRedis();
+}
+
 /** Normalize a hash value that may be a JSON string or an already-parsed object. */
 function parseItem(value: unknown): Record<string, any> | null {
   if (value == null) return null;

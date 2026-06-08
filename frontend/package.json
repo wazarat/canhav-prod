@@ -11,13 +11,19 @@
     "seed:upstash": "node scripts/seed-upstash.mjs"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.68",
     "@upstash/redis": "^1.38.0",
+    "@zerodev/passkey-validator": "^5.6.0",
+    "@zerodev/webauthn-key": "^5.5.0",
+    "ai": "^6.0.197",
+    "canhav-agent-service": "file:../agent-service",
     "clsx": "2.1.1",
     "lucide-react": "0.468.0",
     "next": "14.2.35",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "tailwind-merge": "2.5.5"
+    "tailwind-merge": "2.5.5",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "20.17.10",

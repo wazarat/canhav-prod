@@ -34,6 +34,8 @@ venv/
 
 # Local data store (file-backed LocalAdapter; production uses Upstash Redis)
 backend/data/store.json
+# Agent memory fallback (offline dev only; production uses Upstash Redis)
+backend/data/agent-store.json
 
 # OS / editor
 .DS_Store

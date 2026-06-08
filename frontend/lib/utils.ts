@@ -40,6 +40,26 @@ export function formatPeg(value: number | null | undefined): string {
   return value.toFixed(4);
 }
 
+/** Currency symbol for a stablecoin peg target (USD/EUR/GBP/AUD/CAD/HKD/ISK). */
+export function pegSymbol(pegTarget: string | null | undefined): string {
+  switch (pegTarget) {
+    case "EUR":
+      return "€";
+    case "GBP":
+      return "£";
+    case "AUD":
+      return "A$";
+    case "CAD":
+      return "C$";
+    case "HKD":
+      return "HK$";
+    case "ISK":
+      return "kr";
+    default:
+      return "$";
+  }
+}
+
 /** Format a large bare number compactly (1.2B, 340.0M, 12.3K) — no currency. */
 export function formatNumberCompact(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return "—";

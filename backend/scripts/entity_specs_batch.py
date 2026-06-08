@@ -259,7 +259,119 @@ BATCH_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "role": "Governance token",
                 "subCategory": "Governance Token",
             },
+            {
+                "slug": "sena",
+                "name": "sENA",
+                "symbol": "sENA",
+                "category": "Token",
+                "role": "Staked ENA — fee sharing + airdrop multipliers",
+                "subCategory": "Yield-generating Token",
+            },
+            {
+                "slug": "iusde",
+                "name": "iUSDe",
+                "symbol": "iUSDe",
+                "category": "Token",
+                "role": "Institutional TradFi-wrapped sUSDe (KYC-gated)",
+                "subCategory": "Yield-generating Token",
+            },
         ],
+        "timeline": [
+            {
+                "date": "2024-02",
+                "title": "USDe mainnet launch",
+                "description": "Ethena launches USDe, a delta-hedged synthetic dollar ('Internet Bond').",
+                "link": "https://ethena.fi",
+                "status": "executed",
+            },
+            {
+                "date": "2024-04-02",
+                "title": "ENA token + Binance Launchpool airdrop",
+                "description": "ENA governance token launches with a Binance Launchpool distribution.",
+                "link": "https://ethena.fi",
+                "status": "executed",
+            },
+            {
+                "date": "2024-12",
+                "title": "USDtb launches (BUIDL-backed)",
+                "description": (
+                    "Ethena introduces USDtb, a Treasury-backed dollar using BlackRock's BUIDL "
+                    "as a non-hedged reserve leg distinct from synthetic USDe."
+                ),
+                "link": "https://ethena.fi",
+                "status": "executed",
+            },
+            {
+                "date": "2025",
+                "title": "sENA staking + iUSDe institutional wrapper",
+                "description": (
+                    "Staked ENA (sENA) and the institutional iUSDe wrapper are introduced; the "
+                    "governance fee-switch framework is formalized."
+                ),
+                "link": "https://ethena.fi",
+                "status": "stated",
+            },
+            {
+                "date": "design-stage",
+                "title": "Protocol fee switch to sENA",
+                "description": (
+                    "Routing of protocol revenue to sENA stakers is governance-gated on "
+                    "risk-committee thresholds — not yet fully activated."
+                ),
+                "link": "https://docs.ethena.fi",
+                "status": "theoretical",
+            },
+        ],
+        "offchain_facts": [
+            {
+                "key": "custody",
+                "value": (
+                    "Backing assets are held with off-exchange settlement providers (e.g. Copper, "
+                    "Ceffu, Fireblocks); delta-neutral hedges run on centralized perp venues."
+                ),
+                "freshness": "semi-live",
+                "source": {"label": "Ethena docs", "url": "https://docs.ethena.fi"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "feeSwitch",
+                "value": (
+                    "ENA governance can activate a fee switch sharing protocol revenue with sENA "
+                    "stakers once reserve-fund and USDe-supply thresholds are met."
+                ),
+                "freshness": "static",
+                "source": {"label": "Ethena", "url": "https://ethena.fi"},
+                "capturedAt": "2026-06-08",
+                "theoretical": True,
+            },
+            {
+                "key": "reserveDiversification",
+                "value": (
+                    "USDtb diversifies reserves into BlackRock's BUIDL tokenized T-bill fund as a "
+                    "stable, non-hedged backing leg."
+                ),
+                "freshness": "static",
+                "source": {"label": "Ethena", "url": "https://ethena.fi"},
+                "capturedAt": "2026-06-08",
+            },
+        ],
+        "tokenomics": {
+            "maxSupply": 15_000_000_000,
+            "buybackPolicy": (
+                "Governance-gated fee switch can route protocol revenue to sENA stakers "
+                "(not a token buyback/burn)."
+            ),
+            "distribution": [
+                {"bucket": "Ecosystem development & airdrops", "pct": 30},
+                {"bucket": "Core contributors", "pct": 30},
+                {"bucket": "Investors", "pct": 25},
+                {"bucket": "Foundation", "pct": 15},
+            ],
+            "notes": [
+                "15B ENA max supply.",
+                "sENA captures fee sharing (once enabled) plus airdrop-campaign multipliers.",
+            ],
+        },
         "portal_defaults": {
             "chains": ["Arbitrum One", "Ethereum"],
             "subCategory": "Entity",
@@ -525,7 +637,78 @@ BATCH_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "role": "Governance token (MKR successor)",
                 "subCategory": "Governance Token",
             },
+            {
+                "slug": "mkr",
+                "name": "MKR",
+                "symbol": "MKR",
+                "category": "Token",
+                "role": "Legacy Maker governance (1:24,000 → SKY)",
+                "subCategory": "Governance Token",
+            },
         ],
+        "timeline": [
+            {
+                "date": "2024-08-27",
+                "title": "MakerDAO rebrands to Sky",
+                "description": "USDS and the SKY governance token launch; DAI and MKR remain live for legacy users.",
+                "link": "https://sky.money",
+                "status": "executed",
+            },
+            {
+                "date": "2024-09",
+                "title": "Sky Savings Rate / sUSDS live",
+                "description": "sUSDS gives instant, no-lockup yield via the governance-set Sky Savings Rate.",
+                "link": "https://sky.money",
+                "status": "executed",
+            },
+            {
+                "date": "2024",
+                "title": "S&P assigns USDS a 'B-' assessment",
+                "description": "S&P Global publishes a 'B-' stablecoin stability assessment for USDS.",
+                "link": "https://sky.money",
+                "status": "stated",
+            },
+            {
+                "date": "ongoing",
+                "title": "Sky Star / agent ecosystem",
+                "description": "Allocator-driven deployment via the Sky Agent Network (e.g. Spark).",
+                "link": "https://sky.money",
+                "status": "executed",
+            },
+        ],
+        "offchain_facts": [
+            {
+                "key": "migration",
+                "value": "USDS upgrades 1:1 from DAI; legacy MKR converts to SKY at 1:24,000.",
+                "freshness": "static",
+                "source": {"label": "Sky", "url": "https://sky.money"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "savingsRate",
+                "value": "The Sky Savings Rate (accrued by sUSDS) is set by governance and earned non-custodially.",
+                "freshness": "semi-live",
+                "source": {"label": "Sky", "url": "https://sky.money"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "rating",
+                "value": "S&P Global assigned USDS a 'B-' stablecoin stability assessment.",
+                "freshness": "static",
+                "source": {"label": "Sky", "url": "https://sky.money"},
+                "capturedAt": "2026-06-08",
+            },
+        ],
+        "tokenomics": {
+            "maxSupply": None,
+            "buybackPolicy": (
+                "Smart Burn Engine deploys protocol surplus to buy back and burn governance tokens."
+            ),
+            "notes": [
+                "1 MKR converts to 24,000 SKY.",
+                "USDS migrates 1:1 from DAI; supply is governance-managed (no fixed cap).",
+            ],
+        },
         "portal_defaults": {
             "chains": ["Arbitrum One", "Ethereum"],
             "subCategory": "Entity",
@@ -721,6 +904,79 @@ BATCH_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "role": "Regulated pound e-money",
                 "subCategory": "Stablecoin",
             },
+            {
+                "slug": "monerium-usde",
+                "name": "Monerium USD (USDe)",
+                "symbol": "USDe",
+                "category": "Stablecoin",
+                "role": "Regulated USD e-money (distinct from Ethena USDe)",
+                "subCategory": "Stablecoin",
+            },
+            {
+                "slug": "iske",
+                "name": "ISKe",
+                "symbol": "ISKe",
+                "category": "Stablecoin",
+                "role": "Regulated Icelandic króna e-money",
+                "subCategory": "Stablecoin",
+            },
+            {
+                "slug": "true",
+                "name": "TRUE",
+                "symbol": "TRUE",
+                "category": "Token",
+                "role": "Crypto-asset identifier (utility, not yield)",
+                "subCategory": "Utility Token",
+            },
+        ],
+        "timeline": [
+            {
+                "date": "2019",
+                "title": "First licensed e-money issuer on blockchain",
+                "description": "Monerium hf is authorized as an EEA e-money institution issuing on-chain e-money.",
+                "link": "https://monerium.com",
+                "status": "executed",
+            },
+            {
+                "date": "2022 → 2024",
+                "title": "Multi-chain e-money rollout",
+                "description": "EURe and GBPe deployed across Ethereum, Gnosis, Polygon and Arbitrum via Web3 IBAN.",
+                "link": "https://monerium.com",
+                "status": "executed",
+            },
+            {
+                "date": "ongoing",
+                "title": "MiCA alignment for e-money tokens",
+                "description": "Monerium aligns its tokens with the EU MiCA framework for e-money tokens (EMTs).",
+                "link": "https://monerium.com",
+                "status": "stated",
+            },
+        ],
+        "offchain_facts": [
+            {
+                "key": "license",
+                "value": (
+                    "Monerium hf is a licensed EMI in the EEA; its tokens are legal e-money "
+                    "redeemable at par via Web3 IBAN and banking rails."
+                ),
+                "freshness": "static",
+                "source": {"label": "Monerium", "url": "https://monerium.com"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "coverage",
+                "value": "EURe, GBPe, USDe and ISKe are issued across Ethereum, Gnosis, Polygon and Arbitrum.",
+                "freshness": "semi-live",
+                "source": {"label": "Monerium", "url": "https://monerium.com"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "mica",
+                "value": "Monerium aligns its e-money tokens with the EU MiCA framework for EMTs.",
+                "freshness": "static",
+                "source": {"label": "Monerium", "url": "https://monerium.com"},
+                "capturedAt": "2026-06-08",
+            },
         ],
         "portal_defaults": {
             "chains": ["Arbitrum One", "Ethereum", "Polygon", "Gnosis"],
@@ -886,6 +1142,80 @@ BATCH_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "category": "Stablecoin",
                 "role": "Fiat-backed USD stablecoin",
                 "subCategory": "Stablecoin",
+            },
+            {
+                "slug": "tgbp",
+                "name": "TrueGBP",
+                "symbol": "TGBP",
+                "category": "Stablecoin",
+                "role": "Tokenized British Pound (UK on/off-ramps)",
+                "subCategory": "Stablecoin",
+            },
+            {
+                "slug": "taud",
+                "name": "TrueAUD",
+                "symbol": "TAUD",
+                "category": "Stablecoin",
+                "role": "Tokenized Australian Dollar (regional FX)",
+                "subCategory": "Stablecoin",
+            },
+            {
+                "slug": "tcad",
+                "name": "TrueCAD",
+                "symbol": "TCAD",
+                "category": "Stablecoin",
+                "role": "Tokenized Canadian Dollar",
+                "subCategory": "Stablecoin",
+            },
+            {
+                "slug": "thkd",
+                "name": "TrueHKD",
+                "symbol": "THKD",
+                "category": "Stablecoin",
+                "role": "Tokenized Hong Kong Dollar",
+                "subCategory": "Stablecoin",
+            },
+        ],
+        "timeline": [
+            {
+                "date": "2018-03",
+                "title": "TUSD launches with live attestations",
+                "description": "TrustToken launches TrueUSD, an early fiat-backed stablecoin with third-party attestations.",
+                "link": "https://tusd.io",
+                "status": "executed",
+            },
+            {
+                "date": "2019",
+                "title": "TrueCurrencies expand beyond USD",
+                "description": "TGBP, TAUD, TCAD and THKD launch as fiat-pegged e-money cousins of TUSD.",
+                "link": "https://tusd.io",
+                "status": "executed",
+            },
+            {
+                "date": "2023",
+                "title": "Chainlink Proof of Reserve",
+                "description": "TUSD integrates Chainlink Proof of Reserve on top of daily reserve attestations.",
+                "link": "https://tusd.io",
+                "status": "executed",
+            },
+        ],
+        "offchain_facts": [
+            {
+                "key": "attestation",
+                "value": "Daily third-party reserve attestations plus Chainlink Proof of Reserve verify backing on-chain.",
+                "freshness": "semi-live",
+                "source": {"label": "TrueUSD", "url": "https://tusd.io"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "multiCurrency",
+                "value": (
+                    "Beyond TUSD, TrustToken issued TrueGBP, TrueAUD, TrueCAD and TrueHKD as "
+                    "fiat-pegged tokens for local-currency markets."
+                ),
+                "freshness": "static",
+                "source": {"label": "TrueUSD", "url": "https://tusd.io"},
+                "capturedAt": "2026-06-08",
             },
         ],
         "portal_defaults": {
@@ -1073,6 +1403,75 @@ BATCH_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "category": "Stablecoin",
                 "role": "VeChain USD stablecoin (Prime Trust issued)",
                 "subCategory": "Stablecoin",
+            },
+            {
+                "slug": "usdsc",
+                "name": "USDS Classic (USDSC)",
+                "symbol": "USDSC",
+                "category": "Stablecoin",
+                "role": "Deprecated legacy Stably USD (low liquidity)",
+                "subCategory": "Stablecoin",
+            },
+            {
+                "slug": "stably-gold",
+                "name": "Stably Gold",
+                "symbol": "XAUs",
+                "category": "RWA",
+                "role": "Roadmap tokenized gold (conceptual)",
+                "subCategory": "Multi-Asset",
+            },
+        ],
+        "timeline": [
+            {
+                "date": "2018",
+                "title": "Stably founded",
+                "description": "Wyoming-based Stably launches as a stablecoin-as-a-service and fiat-ramp provider.",
+                "link": "https://stably.io",
+                "status": "executed",
+            },
+            {
+                "date": "2021 → 2022",
+                "title": "Partner tokens issued",
+                "description": "Stably issues partner stablecoins such as VeUSD on VeChain via regulated trustees (Prime Trust).",
+                "link": "https://stably.io",
+                "status": "executed",
+            },
+            {
+                "date": "ongoing",
+                "title": "Rebrand to unified Stably Dollar (SD)",
+                "description": "The original USDS token is deprecated to USDSC as Stably consolidates around the Stably Dollar.",
+                "link": "https://stably.io",
+                "status": "stated",
+            },
+        ],
+        "offchain_facts": [
+            {
+                "key": "model",
+                "value": (
+                    "Stably provides stablecoin-as-a-service and fiat on/off-ramps; partner tokens "
+                    "are issued through regulated trustees."
+                ),
+                "freshness": "static",
+                "source": {"label": "Stably", "url": "https://stably.io"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "legacy",
+                "value": (
+                    "The original USDS token is deprecated to USDSC (very low liquidity) after the "
+                    "rebrand to the unified Stably Dollar (SD)."
+                ),
+                "freshness": "static",
+                "source": {"label": "Stably", "url": "https://stably.io"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "tokenizedGold",
+                "value": "A tokenized-gold product appears on Stably's roadmap; treat as forward-looking until confirmed live.",
+                "freshness": "static",
+                "source": {"label": "Stably", "url": "https://stably.io"},
+                "capturedAt": "2026-06-08",
+                "theoretical": True,
             },
         ],
         "portal_defaults": {

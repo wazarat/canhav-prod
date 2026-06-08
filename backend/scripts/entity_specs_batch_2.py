@@ -222,6 +222,45 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "subCategory": "Stablecoin",
             },
         ],
+        "timeline": [
+            {
+                "date": "2023-11-01",
+                "title": "Pleasing Market founded",
+                "description": "Pleasing Market launches tokenized LBMA-certified gold (PGOLD) and the USDpm dollar.",
+                "link": "https://www.pleasingmarket.com/",
+                "status": "executed",
+            },
+            {
+                "date": "ongoing",
+                "title": "Chainlink CCIP + Data Streams integration",
+                "description": "Cross-chain transfers use Chainlink CCIP; pricing uses Chainlink Data Streams.",
+                "link": "https://pleasing.gitbook.io/docs",
+                "status": "executed",
+            },
+        ],
+        "offchain_facts": [
+            {
+                "key": "assetModel",
+                "value": (
+                    "PGOLD represents 1 troy oz of LBMA-certified gold with physical redemption "
+                    "(Hong Kong, expanding across APAC/Dubai); distributed cross-chain via Chainlink CCIP."
+                ),
+                "freshness": "static",
+                "source": {"label": "Pleasing Market docs", "url": "https://pleasing.gitbook.io/docs"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "pegCaveat",
+                "value": (
+                    "USDpm's peg mechanism and custody are not independently verified here — "
+                    "confirm against official documentation before relying on it."
+                ),
+                "freshness": "static",
+                "source": {"label": "Pleasing Market", "url": "https://www.pleasingmarket.com/"},
+                "capturedAt": "2026-06-08",
+                "theoretical": True,
+            },
+        ],
         "portal_defaults": {
             "chains": ["Arbitrum One"],
             "subCategory": "Entity",
@@ -468,12 +507,28 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "subCategory": "Yield-generating Token",
             },
             {
+                "slug": "rusdy",
+                "name": "rUSDY",
+                "symbol": "rUSDY",
+                "category": "Stablecoin",
+                "role": "Rebasing USDY — $1 price, balance grows with yield",
+                "subCategory": "Staked Stablecoin",
+            },
+            {
                 "slug": "ousg",
                 "name": "OUSG",
                 "symbol": "OUSG",
                 "category": "RWA",
                 "role": "Tokenized US Treasury fund interest",
                 "subCategory": "Treasuries & Funds",
+            },
+            {
+                "slug": "ondo-gm",
+                "name": "Ondo Global Markets",
+                "symbol": "GM",
+                "category": "RWA",
+                "role": "Tokenized US equities/ETFs (TSLA/SPY/QQQ/NVDA)",
+                "subCategory": "Tokenized Equities",
             },
             {
                 "slug": "ondo-gov",
@@ -484,6 +539,69 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "subCategory": "Governance Token",
             },
         ],
+        "timeline": [
+            {
+                "date": "2023",
+                "title": "USDY launches (Reg S)",
+                "description": "Ondo issues USDY, a yield-bearing tokenized note backed by short-term Treasuries under a Reg S wrapper.",
+                "link": "https://ondo.finance",
+                "status": "executed",
+            },
+            {
+                "date": "2024-01-18",
+                "title": "ONDO governance token launch",
+                "description": "ONDO becomes transferable and the protocol's governance token goes live.",
+                "link": "https://ondo.finance",
+                "status": "executed",
+            },
+            {
+                "date": "2024",
+                "title": "OUSG institutional access",
+                "description": "OUSG offers tokenized US Treasury fund exposure to eligible investors under Rule 506(c)/3(c)(7).",
+                "link": "https://ondo.finance",
+                "status": "executed",
+            },
+            {
+                "date": "2025",
+                "title": "Ondo Global Markets launches",
+                "description": "Tokenized US equities/ETFs (TSLA, SPY, QQQ, NVDA) come on-chain for 24/7 trading and DeFi composability.",
+                "link": "https://ondo.finance",
+                "status": "executed",
+            },
+        ],
+        "offchain_facts": [
+            {
+                "key": "legalWrappers",
+                "value": (
+                    "USDY uses a Reg S wrapper; OUSG uses Rule 506(c)/3(c)(7). Access is legally "
+                    "gated to eligible investors — these are securities, not stablecoins."
+                ),
+                "freshness": "static",
+                "source": {"label": "Ondo Finance", "url": "https://ondo.finance"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "globalMarkets",
+                "value": (
+                    "Ondo Global Markets tokenizes US equities and ETFs (e.g. TSLA, SPY, QQQ, NVDA) "
+                    "1:1 against custodied shares for 24/7 on-chain trading."
+                ),
+                "freshness": "semi-live",
+                "source": {"label": "Ondo Finance", "url": "https://ondo.finance"},
+                "capturedAt": "2026-06-08",
+            },
+        ],
+        "tokenomics": {
+            "maxSupply": 10_000_000_000,
+            "emissionsPolicy": (
+                "Large allocations to ecosystem growth and protocol development vest over multi-year "
+                "schedules; governance directs treasury deployment."
+            ),
+            "notes": [
+                "10B ONDO max supply.",
+                "ONDO is governance only — product yields accrue to USDY/OUSG holders, not ONDO.",
+            ],
+        },
         "portal_defaults": {
             "chains": ["Arbitrum One", "Ethereum"],
             "subCategory": "Entity",
@@ -748,7 +866,113 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "role": "Legacy Safety Module staked AAVE",
                 "subCategory": "Yield-generating Token",
             },
+            {
+                "slug": "stkgho",
+                "name": "stkGHO",
+                "symbol": "stkGHO",
+                "category": "Stablecoin",
+                "role": "Staked GHO backstop (Safety Module / Umbrella)",
+                "subCategory": "Staked Stablecoin",
+            },
+            {
+                "slug": "ausdc",
+                "name": "Aave aUSDC",
+                "symbol": "aUSDC",
+                "category": "Token",
+                "role": "Interest-bearing USDC deposit receipt",
+                "subCategory": "Yield-generating Token",
+            },
+            {
+                "slug": "ausdt",
+                "name": "Aave aUSDT",
+                "symbol": "aUSDT",
+                "category": "Token",
+                "role": "Interest-bearing USDT deposit receipt",
+                "subCategory": "Yield-generating Token",
+            },
+            {
+                "slug": "aweth",
+                "name": "Aave aWETH",
+                "symbol": "aWETH",
+                "category": "Token",
+                "role": "Interest-bearing WETH deposit receipt",
+                "subCategory": "Yield-generating Token",
+            },
+            {
+                "slug": "stkabpt",
+                "name": "stkABPT",
+                "symbol": "stkABPT",
+                "category": "Token",
+                "role": "Staked AAVE/wstETH LP backstop (first-loss)",
+                "subCategory": "Yield-generating Token",
+            },
         ],
+        "timeline": [
+            {
+                "date": "2020-10",
+                "title": "LEND → AAVE migration",
+                "description": "LEND migrates to AAVE at 100:1, fixing a 16M max supply and launching the Aave governance token.",
+                "link": "https://aave.com",
+                "status": "executed",
+            },
+            {
+                "date": "2022",
+                "title": "GHO stablecoin launches",
+                "description": "Aave introduces GHO, a native overcollateralized stablecoin minted against Aave collateral.",
+                "link": "https://aave.com",
+                "status": "executed",
+            },
+            {
+                "date": "2025",
+                "title": "Aavenomics + Umbrella go live",
+                "description": "Protocol revenue funds AAVE buybacks (~$50M/yr scale); Umbrella replaces the legacy Safety Module.",
+                "link": "https://aave.com",
+                "status": "executed",
+            },
+            {
+                "date": "2026",
+                "title": "sGHO savings + Aave V4 direction",
+                "description": "A new sGHO savings experience ships and governance advances Aave V4 (e.g. deployment on Arc).",
+                "link": "https://aave.com",
+                "status": "stated",
+            },
+        ],
+        "offchain_facts": [
+            {
+                "key": "buyback",
+                "value": (
+                    "Aavenomics directs protocol revenue to recurring AAVE buybacks (~$1M/week, "
+                    "~$50M/yr scale) alongside the Umbrella safety backstop."
+                ),
+                "freshness": "semi-live",
+                "source": {"label": "Aave", "url": "https://aave.com"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "safetyModule",
+                "value": (
+                    "Umbrella replaces the legacy Safety Module; stkGHO and stkABPT absorb first-loss "
+                    "to cover protocol shortfalls and bad debt."
+                ),
+                "freshness": "static",
+                "source": {"label": "Aave", "url": "https://aave.com"},
+                "capturedAt": "2026-06-08",
+            },
+        ],
+        "tokenomics": {
+            "maxSupply": 16_000_000,
+            "buybackPolicy": (
+                "Aavenomics buys back AAVE with protocol revenue (~$1M/week, ~$50M/yr scale)."
+            ),
+            "distribution": [
+                {"bucket": "Migrated from LEND (100:1)", "pct": 77},
+                {"bucket": "Ecosystem reserve", "pct": 23},
+            ],
+            "notes": [
+                "16M AAVE max supply.",
+                "stkAAVE/stkGHO/stkABPT provide Safety Module / Umbrella first-loss capital.",
+            ],
+        },
         "portal_defaults": {
             "chains": ["Arbitrum One"],
             "subCategory": "Entity",

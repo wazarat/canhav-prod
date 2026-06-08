@@ -183,6 +183,49 @@ BATCH_ENTITY_COINS: Dict[str, Dict[str, Dict[str, str]]] = {
             "contractAddress": None,
             "description": "Regulated pound e-money from Monerium hf.",
         },
+        "monerium-usde": {
+            "name": "Monerium USD (USDe)",
+            "symbol": "USDe",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://monerium.com",
+            "description": (
+                "Monerium's regulated US-dollar e-money, redeemable 1:1 via Web3 IBAN "
+                "and banking rails. Strictly distinct from Ethena's synthetic USDe — same "
+                "ticker, different issuer and mechanism."
+            ),
+        },
+        "iske": {
+            "name": "ISKe",
+            "symbol": "ISKe",
+            "pegTarget": schema.PEG_ISK,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://monerium.com",
+            "description": (
+                "Regulated Icelandic króna e-money from Monerium hf, redeemable at par "
+                "via SEPA/IBAN rails. No native yield (EEA e-money mandate)."
+            ),
+        },
+    },
+    "ondo-finance": {
+        "rusdy": {
+            "name": "rUSDY",
+            "symbol": "rUSDY",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/rebasing-ondo-us-dollar-yield",
+            "contractAddress": None,
+            "website": "https://ondo.finance/usdy",
+            "description": (
+                "Rebasing version of USDY favored by DeFi apps: the price stays pegged to "
+                "$1.00 while the wallet balance rebases up daily to reflect accrued "
+                "short-term-Treasury yield. A yield asset, not a flat fiat stablecoin."
+            ),
+        },
     },
     "pleasing-market": {
         "usdpm": {
@@ -223,6 +266,20 @@ BATCH_ENTITY_COINS: Dict[str, Dict[str, Dict[str, str]]] = {
                 "New sGHO experience live May 2026; legacy savings rebranded StkGHO."
             ),
         },
+        "stkgho": {
+            "name": "stkGHO",
+            "symbol": "stkGHO",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "description": (
+                "Staked GHO in the Aave Safety Module / Umbrella backstop. Protects the "
+                "protocol against severe liquidity shortfalls and bad debt, earning AAVE or "
+                "secondary incentive rewards plus a GHO borrow-rate discount. The legacy "
+                "staked-GHO position, distinct from the newer sGHO savings experience."
+            ),
+        },
     },
     "stably": {
         "veusd": {
@@ -235,6 +292,67 @@ BATCH_ENTITY_COINS: Dict[str, Dict[str, Dict[str, str]]] = {
             "description": (
                 "VeChain USD stablecoin developed by Stably, issued by Prime Trust."
             ),
+        },
+        "usdsc": {
+            "name": "USDS Classic (USDSC)",
+            "symbol": "USDSC",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/stably",
+            "contractAddress": None,
+            "description": (
+                "Deprecated legacy version of Stably's original USDS token, kept for "
+                "backward compatibility and trading with very low liquidity after the "
+                "rebrand to the unified Stably Dollar (SD)."
+            ),
+        },
+    },
+    "trueusd": {
+        "tgbp": {
+            "name": "TrueGBP",
+            "symbol": "TGBP",
+            "pegTarget": schema.PEG_GBP,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://tusd.io",
+            "description": (
+                "Tokenized British Pound from TrustToken. Offers localized fiat "
+                "on/off-ramps for UK markets so users avoid USD conversion fees."
+            ),
+        },
+        "taud": {
+            "name": "TrueAUD",
+            "symbol": "TAUD",
+            "pegTarget": schema.PEG_AUD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://tusd.io",
+            "description": (
+                "Tokenized Australian Dollar from TrustToken. Facilitates regional trade, "
+                "FX hedging, and localized margin lending."
+            ),
+        },
+        "tcad": {
+            "name": "TrueCAD",
+            "symbol": "TCAD",
+            "pegTarget": schema.PEG_CAD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://tusd.io",
+            "description": "Tokenized Canadian Dollar from TrustToken.",
+        },
+        "thkd": {
+            "name": "TrueHKD",
+            "symbol": "THKD",
+            "pegTarget": schema.PEG_HKD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://tusd.io",
+            "description": "Tokenized Hong Kong Dollar from TrustToken.",
         },
     },
 }
@@ -555,7 +673,7 @@ def main(argv: List[str]) -> int:
                         entity_slug,
                         row,
                         created_at,
-                        website=_clean(row.get("Website")),
+                        website=_clean(row.get("Website")) or spec.get("website"),
                         twitter=_clean(row.get("Twitter")),
                         discord=_clean(row.get("Discord")),
                         github=_clean(row.get("GitHub")),

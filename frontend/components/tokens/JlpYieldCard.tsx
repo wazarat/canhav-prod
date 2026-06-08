@@ -22,7 +22,11 @@ export function JlpYieldCard({ yieldMechanics: y }: JlpYieldCardProps) {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Badge tone="positive">Real yield</Badge>
+        {y.emissionsBased ? (
+          <Badge tone="warning">Incentivized</Badge>
+        ) : (
+          <Badge tone="positive">Real yield</Badge>
+        )}
         {y.isAutoCompounding && <Badge tone="electric">Auto-compounding</Badge>}
         {!y.emissionsBased && <Badge tone="neutral">No emissions</Badge>}
       </div>
@@ -35,10 +39,16 @@ export function JlpYieldCard({ yieldMechanics: y }: JlpYieldCardProps) {
       </div>
 
       <div className="rounded-lg border border-ink-800/60 bg-ink-900/40 px-4 py-3">
-        <p className="text-xs text-ink-400">Fee share to holders</p>
-        <p className="mt-0.5 text-sm font-medium text-ink-100">
-          {y.feeShareToHoldersPct}% of perp fees
-        </p>
+        {y.feeShareToHoldersPct > 0 ? (
+          <>
+            <p className="text-xs text-ink-400">Fee share to holders</p>
+            <p className="mt-0.5 text-sm font-medium text-ink-100">
+              {y.feeShareToHoldersPct}% of protocol fees
+            </p>
+          </>
+        ) : (
+          <p className="text-xs text-ink-400">Payout</p>
+        )}
         <p className="mt-2 text-xs leading-relaxed text-ink-400">{y.payoutAsset}</p>
       </div>
 

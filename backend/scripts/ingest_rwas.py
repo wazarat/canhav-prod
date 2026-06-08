@@ -84,6 +84,34 @@ ENTITY_RWA_COINS: Dict[str, Dict[str, Dict[str, Optional[str]]]] = {
                 "Rule 506(c) / 3(c)(7) qualified access — not a stablecoin."
             ),
         },
+        "ondo-gm": {
+            "name": "Ondo Global Markets",
+            "symbol": "GM",
+            "assetClass": "Tokenized Equities",
+            "coingecko": None,
+            "contractAddress": None,
+            "description": (
+                "Ondo Global Markets tokenizes US stocks and ETFs (e.g. TSLA, SPY, QQQ, "
+                "NVDA) 1:1 against shares custodied with a registered broker-dealer. Each "
+                "token tracks its underlying's price for 24/7 on-chain trading and DeFi "
+                "composability under Reg S / Rule 506(c) access; the platform surpassed "
+                "$1B in assets shortly after launch."
+            ),
+        },
+    },
+    "stably": {
+        "stably-gold": {
+            "name": "Stably Gold",
+            "symbol": "XAUs",
+            "assetClass": "Multi-Asset",
+            "coingecko": None,
+            "contractAddress": None,
+            "description": (
+                "Planned tokenized-gold product on Stably's stablecoin-as-a-service "
+                "roadmap, intended to represent allocated physical gold. Forward-looking "
+                "and not yet independently confirmed as live — treat as conceptual."
+            ),
+        },
     },
 }
 
@@ -265,6 +293,10 @@ def main(argv: List[str]) -> int:
             "twitter": "https://x.com/OndoFinance",
             "github": "https://github.com/ondo-finance",
             "chains": ["Arbitrum One", "Ethereum"],
+        },
+        "stably": {
+            "website": "https://stably.io",
+            "twitter": "https://x.com/StablyHQ",
         },
     }
 

@@ -1,4 +1,5 @@
 import type { PegDataPoint, PegTarget } from "@/lib/types";
+import { pegSymbol } from "@/lib/utils";
 
 interface PegVarianceChartProps {
   points: PegDataPoint[];
@@ -61,7 +62,7 @@ export function PegVarianceChart({
 
   const pegY = y(1);
   const last = points[points.length - 1];
-  const symbol = pegTarget === "EUR" ? "€" : "$";
+  const symbol = pegSymbol(pegTarget);
 
   return (
     <svg

@@ -69,6 +69,12 @@ VALID_STATUSES = (STATUS_PENDING, STATUS_APPROVED)
 PEG_USD = "USD"
 PEG_EUR = "EUR"
 PEG_GBP = "GBP"
+# Foreign-FX pegs for multi-currency e-money / fiat stablecoins (TrueCurrencies,
+# Monerium ISKe). The frontend `PegTarget` union mirrors this set.
+PEG_AUD = "AUD"
+PEG_CAD = "CAD"
+PEG_HKD = "HKD"
+PEG_ISK = "ISK"
 
 
 def category_pk(category: str) -> str:

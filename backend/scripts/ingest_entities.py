@@ -436,6 +436,17 @@ ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "theoretical": True,
             },
         ],
+        "tokenomics": {
+            "maxSupply": 10_000_000_000,
+            "emissionsPolicy": (
+                "ICO sold 700M CHIP (7% of supply) at $0.03 (≈$300M FDV) with 100% unlock at TGE; "
+                "remaining supply held across foundation, ecosystem and contributors."
+            ),
+            "notes": [
+                "10B CHIP total supply.",
+                "sCHIP (staked CHIP) is the protocol's first-loss insurance capital.",
+            ],
+        },
         "investment_rounds": [
             {
                 "date": "Aug 2025",
@@ -586,6 +597,14 @@ ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "category": "Token",
                 "role": "Governance token",
                 "subCategory": "Governance Token",
+            },
+            {
+                "slug": "schip",
+                "name": "sCHIP",
+                "symbol": "sCHIP",
+                "category": "Token",
+                "role": "Staked CHIP — first-loss insurance capital",
+                "subCategory": "Yield-generating Token",
             },
         ],
         "portal_defaults": {
@@ -945,6 +964,62 @@ ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "subCategory": "LST",
             },
         ],
+        "timeline": [
+            {
+                "date": "2024-01-31",
+                "title": "JUP genesis launch + first Jupuary airdrop",
+                "description": "Jupiter launches the JUP token with its inaugural community 'Jupuary' airdrop.",
+                "link": "https://jup.ag",
+                "status": "executed",
+            },
+            {
+                "date": "2025",
+                "title": "JUP buyback program",
+                "description": "Jupiter commits 50% of protocol fees to JUP buybacks held in the Litterbox Trust.",
+                "link": "https://jup.ag",
+                "status": "executed",
+            },
+            {
+                "date": "2025 → 2026",
+                "title": "JupUSD launches (built with Ethena)",
+                "description": "Jupiter introduces JupUSD, a reserve-backed Solana dollar (≈90% USDtb + USDC buffer).",
+                "link": "https://jup.ag",
+                "status": "stated",
+            },
+        ],
+        "offchain_facts": [
+            {
+                "key": "supplyCap",
+                "value": "JUP is capped at 10B tokens with 50% allocated to the community.",
+                "freshness": "static",
+                "source": {"label": "Jupiter", "url": "https://jup.ag"},
+                "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "buybacks",
+                "value": (
+                    "Jupiter directs 50% of protocol fees to JUP buybacks held in the Litterbox "
+                    "Trust with a 3-year lock."
+                ),
+                "freshness": "semi-live",
+                "source": {"label": "Jupiter", "url": "https://jup.ag"},
+                "capturedAt": "2026-06-08",
+            },
+        ],
+        "tokenomics": {
+            "maxSupply": 10_000_000_000,
+            "buybackPolicy": (
+                "50% of protocol fees buy back JUP into the Litterbox Trust (3-year lock)."
+            ),
+            "distribution": [
+                {"bucket": "Community", "pct": 50},
+                {"bucket": "Team & strategic reserves", "pct": 50},
+            ],
+            "notes": [
+                "10B JUP max supply.",
+                "Half of supply is reserved for the community (airdrops, incentives, treasury).",
+            ],
+        },
         "portal_defaults": {
             "chains": ["Solana"],
             "subCategory": "Entity",
@@ -998,6 +1073,16 @@ def build_entity_item(
         # Optional curated off-chain facts (reg status, ratings, ICO terms) with
         # freshness + source provenance (playbook §3).
         "OffchainFacts": spec.get("offchain_facts"),
+        # Optional rich detail-page overlays (additive; the frontend reader maps
+        # these PascalCase keys and falls back to undefined when absent).
+        "Tokenomics": spec.get("tokenomics"),
+        "LongDescription": spec.get("long_description"),
+        "Market": spec.get("market"),
+        "PriceHistory": spec.get("price_history"),
+        "TypedRisks": spec.get("typed_risks"),
+        "Audits": spec.get("audits"),
+        "Sources": spec.get("sources"),
+        "AgentSkill": spec.get("agent_skill"),
         "InvestmentRounds": spec["investment_rounds"],
         "Partnerships": spec["partnerships"],
         "CurrentScale": spec["current_scale"],

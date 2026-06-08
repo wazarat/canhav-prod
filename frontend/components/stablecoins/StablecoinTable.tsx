@@ -6,7 +6,7 @@ import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import { latestPegPrice, pegDeviationBps, pegHealth } from "@/lib/data";
 import type { StablecoinProfile } from "@/lib/types";
-import { cn, formatPeg, formatUsdCompact } from "@/lib/utils";
+import { cn, formatPeg, formatUsdCompact, pegSymbol } from "@/lib/utils";
 
 interface StablecoinTableProps {
   profiles: StablecoinProfile[];
@@ -25,8 +25,7 @@ function PegCell({ profile }: { profile: StablecoinProfile }) {
   const latest = latestPegPrice(profile);
   const bps = pegDeviationBps(profile);
   const health = pegHealth(profile);
-  const symbol =
-    profile.pegTarget === "EUR" ? "€" : profile.pegTarget === "GBP" ? "£" : "$";
+  const symbol = pegSymbol(profile.pegTarget);
   return (
     <div className="flex flex-col gap-1">
       <span className="font-mono text-ink-50">
@@ -67,11 +66,9 @@ export function StablecoinTable({ profiles, showStatus = false, emptyHint }: Sta
           {profiles.map((p) => {
             const supply = p.totalSupply.value;
             const supplyLabel =
-              p.pegTarget === "EUR" && supply !== null
-                ? `€${formatUsdCompact(supply).slice(1)}`
-                : p.pegTarget === "GBP" && supply !== null
-                  ? `£${formatUsdCompact(supply).slice(1)}`
-                  : formatUsdCompact(supply);
+              p.pegTarget !== "USD" && supply !== null
+                ? `${pegSymbol(p.pegTarget)}${formatUsdCompact(supply).slice(1)}`
+                : formatUsdCompact(supply);
             return (
               <TR key={p.slug}>
                 <TD>

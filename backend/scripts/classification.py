@@ -59,10 +59,23 @@ CLASSIFICATION: Dict[str, Dict[str, str]] = {
     "usdpm": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
     "gho": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "overcollateralized"},
     "sgho": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "overcollateralized"},
+    "stkgho": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "overcollateralized"},
     "jupusd": {"AssetSubtype": "rwa-backed-stable", "PegMechanism": "rwa-collateral"},
     "jljupusd": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "rwa-collateral"},
     "usdai": {"AssetSubtype": "synthetic-dollar", "PegMechanism": "rwa-collateral"},
     "susdai": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "rwa-collateral"},
+    # TrueUSD foreign-FX e-money cousins (escrow-backed fiat, non-USD pegs).
+    "tgbp": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    "taud": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    "tcad": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    "thkd": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    # Monerium regulated e-money (USD + ISK), distinct from Ethena's USDe.
+    "monerium-usde": {"AssetSubtype": "e-money", "PegMechanism": "fiat-reserve"},
+    "iske": {"AssetSubtype": "e-money", "PegMechanism": "fiat-reserve"},
+    # Ondo rebasing yield dollar — price stays $1, balance rebases daily.
+    "rusdy": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "algorithmic-rebase"},
+    # Stably's deprecated original token, kept live for backward compatibility.
+    "usdsc": {"AssetSubtype": "legacy", "PegMechanism": "fiat-reserve"},
     # --- Tokens ---
     "chip": {"AssetSubtype": "governance", "PegMechanism": "none"},
     "jup": {"AssetSubtype": "governance", "PegMechanism": "none"},
@@ -73,7 +86,20 @@ CLASSIFICATION: Dict[str, Dict[str, str]] = {
     "ondo-gov": {"AssetSubtype": "governance", "PegMechanism": "none"},
     "aave-gov": {"AssetSubtype": "governance", "PegMechanism": "none"},
     "stkaave": {"AssetSubtype": "staked-governance", "PegMechanism": "none"},
+    "ausdc": {"AssetSubtype": "lp-receipt", "PegMechanism": "none"},
+    "ausdt": {"AssetSubtype": "lp-receipt", "PegMechanism": "none"},
+    "aweth": {"AssetSubtype": "lp-receipt", "PegMechanism": "none"},
+    "stkabpt": {"AssetSubtype": "insurance-firstloss", "PegMechanism": "none"},
     "usdy": {"AssetSubtype": "tokenized-treasury", "PegMechanism": "rwa-collateral"},
+    # Ethena institutional wrapper + staked governance.
+    "iusde": {"AssetSubtype": "institutional-gated", "PegMechanism": "none"},
+    "sena": {"AssetSubtype": "staked-governance", "PegMechanism": "none"},
+    # Sky legacy Maker governance token (1:24,000 -> SKY).
+    "mkr": {"AssetSubtype": "legacy", "PegMechanism": "none"},
+    # USD.AI staked-CHIP insurance / first-loss capital.
+    "schip": {"AssetSubtype": "insurance-firstloss", "PegMechanism": "none"},
+    # NB: Monerium `true` (digital identifier / utility) has no clean AssetSubtype
+    # bucket, so it is intentionally left unmapped (assetSubtype stays null).
     # --- RWAs (only the ones that map cleanly to the AssetSubtype union) ---
     "pgold": {"AssetSubtype": "tokenized-commodity", "PegMechanism": "rwa-collateral"},
     "ousg": {"AssetSubtype": "institutional-gated", "PegMechanism": "rwa-collateral"},
@@ -81,6 +107,10 @@ CLASSIFICATION: Dict[str, Dict[str, str]] = {
     "dinari": {"AssetSubtype": "tokenized-equity", "PegMechanism": "rwa-collateral"},
     "arcton": {"AssetSubtype": "tokenized-equity", "PegMechanism": "rwa-collateral"},
     "aryze": {"AssetSubtype": "rwa-backed-stable", "PegMechanism": "rwa-collateral"},
+    # Ondo Global Markets tokenized US equities/ETFs (TSLA/SPY/QQQ/NVDA).
+    "ondo-gm": {"AssetSubtype": "tokenized-equity", "PegMechanism": "rwa-collateral"},
+    # Stably's roadmap tokenized gold (conceptual — see ingest_rwas description).
+    "stably-gold": {"AssetSubtype": "tokenized-commodity", "PegMechanism": "rwa-collateral"},
 }
 
 
@@ -173,6 +203,46 @@ COIN_OFFCHAIN_FACTS: Dict[str, List[Dict[str, Any]]] = {
             "semi-live",
             "USD.AI docs",
             "https://docs.usd.ai/",
+        ),
+    ],
+    "susde": [
+        _fact(
+            "yieldSource",
+            "sUSDe accrues Ethena protocol revenue — perpetual funding/basis on the "
+            "delta-neutral hedge plus yield on liquid stablecoin reserves.",
+            "semi-live",
+            "Ethena docs",
+            "https://docs.ethena.fi",
+        ),
+    ],
+    "susds": [
+        _fact(
+            "yieldSource",
+            "sUSDS accrues the governance-set Sky Savings Rate via a compounding "
+            "exchange rate; no lockup.",
+            "semi-live",
+            "Sky",
+            "https://sky.money",
+        ),
+    ],
+    "sgho": [
+        _fact(
+            "yieldSource",
+            "sGHO is Aave's GHO savings wrapper; the savings rate is funded by GHO "
+            "borrow interest and set by Aave governance.",
+            "semi-live",
+            "Aave",
+            "https://aave.com",
+        ),
+    ],
+    "stkgho": [
+        _fact(
+            "yieldSource",
+            "stkGHO earns Safety Module / Umbrella rewards plus a GHO borrow-rate "
+            "discount in exchange for backstopping the protocol (slashable).",
+            "semi-live",
+            "Aave",
+            "https://aave.com",
         ),
     ],
 }

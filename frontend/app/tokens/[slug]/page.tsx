@@ -16,6 +16,7 @@ import { TokenProfileCard } from "@/components/tokens/TokenProfileCard";
 import { ClassificationChips } from "@/components/shared/ClassificationChips";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
+import { TokenomicsCard } from "@/components/shared/TokenomicsCard";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -102,6 +103,7 @@ export default async function TokenProfilePage({ params }: PageProps) {
             <JlpPoolComposition composition={profile.poolComposition} />
           )}
           {profile.poolComposition && <AumGauge composition={profile.poolComposition} />}
+          {profile.tokenomics && <TokenomicsCard tokenomics={profile.tokenomics} />}
           {profile.typedRisks && <TypedRiskList risks={profile.typedRisks} />}
           <Suspense fallback={<OnchainPanelSkeleton />}>
             <OnchainPanel profile={profile} />

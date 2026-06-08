@@ -26,7 +26,7 @@ export interface SecurityInfo {
   source: string;
 }
 
-export type PegTarget = "USD" | "EUR" | "GBP";
+export type PegTarget = "USD" | "EUR" | "GBP" | "AUD" | "CAD" | "HKD" | "ISK";
 
 /** Top-level taxonomy categories. */
 export type CategorySlug =

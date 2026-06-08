@@ -77,6 +77,23 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   "estate-protocol": null,
   "florence-finance": null,
   "franklin-templeton": "franklin-templeton-benji",
+  // Data-expansion coins. Most are low-liquidity / unlisted / institutional-gated,
+  // so they map to null (live overlay simply skips them). Only confident ids set.
+  sena: "ethena-staked-ena",
+  iusde: null,
+  mkr: "maker",
+  schip: null,
+  true: null,
+  tgbp: null,
+  taud: null,
+  tcad: null,
+  thkd: null,
+  "monerium-usde": null,
+  iske: null,
+  rusdy: null,
+  usdsc: null,
+  "ondo-gm": null,
+  "stably-gold": null,
 };
 
 export interface TokenResolution {

@@ -2,7 +2,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { coinIdForSlug, fetchMarketData } from "@/lib/server/coingecko";
 import { latestPrice, pegDeviationBps, pegHealth, resolvePegSeries } from "@/lib/server/series";
 import type { StablecoinProfile } from "@/lib/types";
-import { formatPeg, formatUsdCompact } from "@/lib/utils";
+import { formatPeg, formatUsdCompact, pegSymbol } from "@/lib/utils";
 
 const LIVE_REVALIDATE = 300;
 
@@ -23,7 +23,7 @@ export async function StablecoinHeadlineStats({ profile }: { profile: Stablecoin
   const latest = latestPrice(points);
   const bps = pegDeviationBps(points);
   const health = pegHealth(points);
-  const symbol = profile.pegTarget === "EUR" ? "€" : "$";
+  const symbol = pegSymbol(profile.pegTarget);
 
   return (
     <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">

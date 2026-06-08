@@ -55,13 +55,35 @@ export async function resolvePegSeries(profile: StablecoinProfile): Promise<PegS
 
   const coinId = coinIdForSlug(profile.slug);
   if (coinId) {
-    const vsCurrency = profile.pegTarget === "EUR" ? "eur" : "usd";
+    const vsCurrency = pegVsCurrency(profile.pegTarget);
     const chart = await fetchMarketChart(coinId, DAYS, { vsCurrency, revalidate: LIVE_REVALIDATE });
     if (chart && chart.prices.length >= 2) {
       return { points: chart.prices, source: "coingecko" };
     }
   }
   return { points: stored, source: null };
+}
+
+/**
+ * CoinGecko `vs_currency` for a peg target. Maps the fiat pegs CoinGecko's free
+ * tier supports; falls back to USD for anything else (a coin pegged to an
+ * unsupported currency typically has no CoinGecko id, so the chart is skipped).
+ */
+function pegVsCurrency(pegTarget: StablecoinProfile["pegTarget"]): string {
+  switch (pegTarget) {
+    case "EUR":
+      return "eur";
+    case "GBP":
+      return "gbp";
+    case "AUD":
+      return "aud";
+    case "CAD":
+      return "cad";
+    case "HKD":
+      return "hkd";
+    default:
+      return "usd";
+  }
 }
 
 export async function resolvePriceSeries(profile: TokenProfile): Promise<PriceSeries> {

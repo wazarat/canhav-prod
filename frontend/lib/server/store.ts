@@ -189,6 +189,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         tokenomics: item.Tokenomics ?? undefined,
         audits: item.Audits ?? undefined,
         sources: item.Sources ?? undefined,
+        offchainFacts: item.OffchainFacts ?? undefined,
         agentSkill: item.AgentSkill ?? undefined,
       } as TokenProfile);
     } else if (item.Category === "Entity") {

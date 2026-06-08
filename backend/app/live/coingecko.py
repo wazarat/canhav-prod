@@ -84,6 +84,22 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     "estate-protocol": None,
     "florence-finance": None,
     "franklin-templeton": "franklin-templeton-benji",
+    # Data-expansion coins (kept in sync with frontend/lib/server/coingecko.ts).
+    "sena": "ethena-staked-ena",
+    "iusde": None,
+    "mkr": "maker",
+    "schip": None,
+    "true": None,
+    "tgbp": None,
+    "taud": None,
+    "tcad": None,
+    "thkd": None,
+    "monerium-usde": None,
+    "iske": None,
+    "rusdy": None,
+    "usdsc": None,
+    "ondo-gm": None,
+    "stably-gold": None,
 }
 
 

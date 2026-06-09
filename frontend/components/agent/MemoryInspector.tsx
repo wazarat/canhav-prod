@@ -26,9 +26,9 @@ function level(memoryCount: number, skillCount: number): number {
   return Math.max(1, Math.floor(score / 5) + 1);
 }
 
-const AGENT_ID = "sandbox";
+const DEFAULT_AGENT_ID = "sandbox";
 
-export function MemoryInspector() {
+export function MemoryInspector({ agentId = DEFAULT_AGENT_ID }: { agentId?: string }) {
   const [data, setData] = useState<MemorySnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -36,7 +36,9 @@ export function MemoryInspector() {
 
   const refresh = useCallback(async () => {
     try {
-      const res = await fetch(`/api/agent/memory?agentId=${AGENT_ID}`, { cache: "no-store" });
+      const res = await fetch(`/api/agent/memory?agentId=${encodeURIComponent(agentId)}`, {
+        cache: "no-store",
+      });
       if (!res.ok) throw new Error(`status ${res.status}`);
       setData((await res.json()) as MemorySnapshot);
       setError(null);
@@ -45,7 +47,7 @@ export function MemoryInspector() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [agentId]);
 
   useEffect(() => {
     void refresh();
@@ -57,7 +59,7 @@ export function MemoryInspector() {
       const res = await fetch("/api/agent/memory", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agentId: AGENT_ID }),
+        body: JSON.stringify({ agentId }),
       });
       if (!res.ok) throw new Error(`status ${res.status}`);
       setData((await res.json()) as MemorySnapshot);
@@ -67,7 +69,7 @@ export function MemoryInspector() {
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [agentId]);
 
   const memoryCount = data?.memory.length ?? 0;
   const skillCount = data?.studiedSkills.length ?? 0;

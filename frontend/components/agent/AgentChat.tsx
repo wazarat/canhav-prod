@@ -49,18 +49,56 @@ const SUGGESTIONS = [
 ];
 
 export function AgentChat({
-  agentId = "sandbox",
+  agentId,
   llmConfigured,
+  conversationId: conversationIdProp = null,
+  initialMessages = [],
+  onConversationChange,
+  onMessageComplete,
 }: {
-  agentId?: string;
+  agentId: string;
   llmConfigured: boolean;
+  conversationId?: string | null;
+  initialMessages?: UIMessage[];
+  onConversationChange?: (id: string) => void;
+  onMessageComplete?: () => void;
 }) {
+  const conversationIdRef = useRef<string | null>(conversationIdProp);
+  conversationIdRef.current = conversationIdProp;
+
   const [transport] = useState(
-    () => new DefaultChatTransport({ api: "/api/agent", body: { agentId } }),
+    () =>
+      new DefaultChatTransport({
+        api: "/api/agent",
+        body: () => ({
+          agentId,
+          conversationId: conversationIdRef.current,
+        }),
+        fetch: async (input, init) => {
+          const res = await fetch(input, init);
+          const newId = res.headers.get("X-Conversation-Id");
+          if (newId && newId !== conversationIdRef.current) {
+            conversationIdRef.current = newId;
+            onConversationChange?.(newId);
+          }
+          return res;
+        },
+      }),
   );
-  const { messages, sendMessage, status, error } = useChat({ transport });
+
+  const chatOptions = useMemo(
+    () => ({
+      transport,
+      ...(initialMessages.length > 0 ? { messages: initialMessages } : {}),
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- remount via parent key when conversation changes
+    [transport],
+  );
+
+  const { messages, sendMessage, status, error } = useChat(chatOptions);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const prevStatus = useRef(status);
 
   const busy = status === "submitted" || status === "streaming";
   const steps = useMemo(() => extractSteps(messages as UIMessage[]), [messages]);
@@ -68,6 +106,13 @@ export function AgentChat({
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (prevStatus.current !== "ready" && status === "ready" && messages.length > 0) {
+      onMessageComplete?.();
+    }
+    prevStatus.current = status;
+  }, [status, messages.length, onMessageComplete]);
 
   function submit(text: string) {
     const trimmed = text.trim();
@@ -90,8 +135,7 @@ export function AgentChat({
         </div>
         <p className="text-sm text-ink-300">
           Set <code className="font-mono text-ink-100">OPENAI_API_KEY</code> to enable the research
-          agent. The tools, memory, and skills above all work without it — the chat just needs a
-          model to reason with.
+          agent.
         </p>
       </div>
     );
@@ -117,7 +161,7 @@ export function AgentChat({
           {messages.length === 0 ? (
             <div className="space-y-3 py-4">
               <p className="text-sm text-ink-400">
-                Ask about anything CanHav tracks. The agent answers only from its tools.
+                Ask about anything CanHav tracks. Chats are saved to your account.
               </p>
               <div className="flex flex-wrap gap-2">
                 {SUGGESTIONS.map((s) => (
@@ -169,7 +213,7 @@ export function AgentChat({
 
         {error && (
           <p className="mb-2 text-xs text-rose-300">
-            {error.message || "Something went wrong. Check that OPENAI_API_KEY is set."}
+            {error.message || "Something went wrong."}
           </p>
         )}
 

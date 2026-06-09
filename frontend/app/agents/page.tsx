@@ -15,11 +15,14 @@ import { Badge } from "@/components/ui/Badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { getAgentSkills } from "@/lib/agent/skills";
-import { listAgents } from "@/lib/agent/memory";
 import { MemoryInspector } from "@/components/agent/MemoryInspector";
 import { ToolPlayground } from "@/components/agent/ToolPlayground";
-import { AgentChat } from "@/components/agent/AgentChat";
+import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
 import { PasskeySpawnButton } from "@/components/agent/PasskeySpawnButton";
+import { getSession } from "@/lib/auth/session";
+import { listUserAgentIds } from "@/lib/auth/users";
+import { getAgentProfile } from "@/lib/agent/memory";
+import { userAgentId } from "@/lib/agent/user-agent";
 
 export const metadata = {
   title: "Agent Lab",
@@ -66,7 +69,19 @@ function CapabilityItem({ row }: { row: CapabilityRow }) {
 
 export default async function AgentsPage() {
   const status = agentConfigStatus();
-  const [skills, agents] = await Promise.all([getAgentSkills(), listAgents()]);
+  const session = getSession();
+  const defaultAgentId = session ? userAgentId(session.userId) : "sandbox";
+
+  const [skills, userAgentIds] = await Promise.all([
+    getAgentSkills(),
+    session ? listUserAgentIds(session.userId) : Promise.resolve([] as string[]),
+  ]);
+
+  const userAgents = (
+    await Promise.all([defaultAgentId, ...userAgentIds].map((id) => getAgentProfile(id)))
+  ).filter((p): p is NonNullable<typeof p> => Boolean(p));
+  const agentsById = new Map(userAgents.map((a) => [a.agentId, a]));
+  const agents = [...agentsById.values()].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 
   const rows: CapabilityRow[] = [
     {
@@ -93,7 +108,7 @@ export default async function AgentsPage() {
       ready: status.zerodev,
       readyHint: "Agents can mint a passkey-owned ERC-8004 identity (gas sponsored).",
       pendingHint:
-        "Deploy the registries + create a ZeroDev project, then set ZERODEV_RPC, IDENTITY_REGISTRY_ADDRESS, SECURITY_REGISTRY_ADDRESS.",
+        "Deploy the registries + create a ZeroDev project, then set ZERODEV_RPC, IDENTITY_REGISTRY_ADDRESS, SECURITY_REGISTRY_ADDRESS, and NEXT_PUBLIC_ZERODEV_PASSKEY_SERVER.",
     },
   ];
 
@@ -192,9 +207,9 @@ export default async function AgentsPage() {
         zerodevConfigured={status.zerodev}
       />
 
-      <AgentChat agentId="sandbox" llmConfigured={status.openai} />
+      <AgentLabPanel agentId={defaultAgentId} llmConfigured={status.openai} />
 
-      <MemoryInspector />
+      <MemoryInspector agentId={defaultAgentId} />
 
       <ToolPlayground />
 

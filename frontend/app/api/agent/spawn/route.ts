@@ -3,6 +3,9 @@ import { NextResponse } from "next/server";
 import { hasZeroDev } from "@/lib/agent/config";
 import { markSkillStudied, seedAgentProfile } from "@/lib/agent/memory";
 import { getAgentSkillById } from "@/lib/agent/skills";
+import { reconstructWebAuthnKey } from "@/lib/auth/webauthn";
+import { getSession } from "@/lib/auth/session";
+import { linkAgentToUser } from "@/lib/auth/users";
 import { readSecret } from "@/lib/server/env";
 
 /**
@@ -44,29 +47,15 @@ function hydrateEnvFromSecrets(): void {
   }
 }
 
-interface SerializedWebAuthnKey {
-  pubX: string;
-  pubY: string;
-  authenticatorId: string;
-  authenticatorIdHash: string;
-  rpID: string;
-}
-
-function reconstructWebAuthnKey(raw: unknown) {
-  const k = raw as Partial<SerializedWebAuthnKey> | undefined;
-  if (!k || k.pubX == null || k.pubY == null || !k.authenticatorId || !k.authenticatorIdHash || !k.rpID) {
-    return null;
-  }
-  return {
-    pubX: BigInt(k.pubX),
-    pubY: BigInt(k.pubY),
-    authenticatorId: k.authenticatorId,
-    authenticatorIdHash: k.authenticatorIdHash as `0x${string}`,
-    rpID: k.rpID,
-  };
-}
-
 export async function POST(req: Request) {
+  const session = getSession();
+  if (!session) {
+    return NextResponse.json(
+      { ok: false, error: "Sign in with your passkey before launching an agent." },
+      { status: 401 },
+    );
+  }
+
   if (!hasZeroDev()) {
     return NextResponse.json(
       {
@@ -119,6 +108,7 @@ export async function POST(req: Request) {
       onChain: true,
     });
     await markSkillStudied(agentId, skillId);
+    await linkAgentToUser(session.userId, agentId);
 
     return NextResponse.json({ ok: true, agentId, agentAddress, agentURI, arbiscanUrl });
   } catch (e) {

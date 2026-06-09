@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AlertTriangle, Fingerprint, Loader2, Rocket } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
@@ -34,8 +35,9 @@ export function PasskeySpawnButton({
   const [phase, setPhase] = useState<"idle" | "passkey" | "minting">("idle");
   const [error, setError] = useState<string | null>(null);
   const [identity, setIdentity] = useState<AgentIdentity | null>(null);
+  const router = useRouter();
 
-  const configured = zerodevConfigured && Boolean(PASSKEY_SERVER);
+  const configured = zerodevConfigured;
   const busy = phase !== "idle";
 
   async function launch() {
@@ -82,6 +84,7 @@ export function PasskeySpawnButton({
         skillTitle: skill.title,
         onChain: true,
       });
+      router.push(`/agents/${encodeURIComponent(data.agentId)}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Passkey ceremony failed.");
     } finally {

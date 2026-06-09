@@ -36,6 +36,9 @@ venv/
 backend/data/store.json
 # Agent memory fallback (offline dev only; production uses Upstash Redis)
 backend/data/agent-store.json
+# Passkey user + conversation fallbacks (offline dev only)
+backend/data/user-store.json
+backend/data/conversation-store.json
 
 # OS / editor
 .DS_Store

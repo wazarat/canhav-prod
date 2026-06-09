@@ -3,26 +3,24 @@ import { convertToModelMessages, stepCountIs, streamText, type UIMessage } from 
 import { NextResponse } from "next/server";
 
 import { agentModel, hasOpenAI } from "@/lib/agent/config";
+import {
+  createConversation,
+  saveConversationMessages,
+} from "@/lib/agent/conversations";
 import { appendRun, getMemory, getStudiedSkills, type AgentToolCall } from "@/lib/agent/memory";
+import { userAgentId } from "@/lib/agent/user-agent";
 import { buildAgentTools } from "@/lib/agent/tools";
+import { getSession } from "@/lib/auth/session";
 
 /**
  * The CanHav research agent loop.
  *
- * A streaming OpenAI agent that may take up to 8 tool steps per turn, reasoning
- * only over CanHav's own data via the tools in lib/agent/tools.ts. It is primed
- * with the agent's durable memory + studied skills, and on finish it records the
- * run (question, tool steps, answer, learned facts) so the agent visibly grows.
- *
- * Returns 503 { configured: false } when OPENAI_API_KEY is unset — the chat UI
- * shows a clean "not configured" banner and everything else keeps working.
+ * Requires passkey session. Persists chat history per user in Upstash.
  */
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
-
-const DEMO_AGENT_ID = "sandbox";
 
 const SYSTEM_PROMPT = `You are the CanHav research agent — a financial-intelligence analyst for the Arbitrum ecosystem.
 
@@ -57,6 +55,14 @@ function uiMessageText(message: UIMessage | undefined): string {
 }
 
 export async function POST(req: Request) {
+  const session = getSession();
+  if (!session) {
+    return NextResponse.json(
+      { error: "Sign in with your passkey to use the research agent." },
+      { status: 401 },
+    );
+  }
+
   if (!hasOpenAI()) {
     return NextResponse.json(
       { configured: false, error: "OPENAI_API_KEY not set." },
@@ -64,7 +70,7 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { messages?: UIMessage[]; agentId?: string } = {};
+  let body: { messages?: UIMessage[]; agentId?: string; conversationId?: string } = {};
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -72,7 +78,20 @@ export async function POST(req: Request) {
   }
 
   const messages = body.messages ?? [];
-  const agentId = typeof body.agentId === "string" && body.agentId ? body.agentId : DEMO_AGENT_ID;
+  const agentId =
+    typeof body.agentId === "string" && body.agentId
+      ? body.agentId
+      : userAgentId(session.userId);
+
+  let conversationId =
+    typeof body.conversationId === "string" && body.conversationId
+      ? body.conversationId
+      : null;
+
+  if (!conversationId) {
+    const created = await createConversation(session.userId, agentId);
+    conversationId = created.id;
+  }
 
   const [memory, studied] = await Promise.all([getMemory(agentId), getStudiedSkills(agentId)]);
   const memoryBlock = memory.length ? memory.map((f) => `- ${f.text}`).join("\n") : "(nothing yet)";
@@ -80,6 +99,7 @@ export async function POST(req: Request) {
   const system = `${SYSTEM_PROMPT}\n\n--- Durable memory (what you already learned) ---\n${memoryBlock}\n\nSkills studied: ${studiedBlock}`;
 
   const modelMessages = await convertToModelMessages(messages);
+  const activeConversationId = conversationId;
 
   const result = streamText({
     model: openai(agentModel()),
@@ -112,11 +132,19 @@ export async function POST(req: Request) {
             .map((t) => t.summary)
             .filter(Boolean),
         });
+        await saveConversationMessages(
+          session.userId,
+          activeConversationId,
+          messages,
+          event.text,
+        );
       } catch {
         // run logging is best-effort; never fail the response over it
       }
     },
   });
 
-  return result.toUIMessageStreamResponse();
+  const response = result.toUIMessageStreamResponse();
+  response.headers.set("X-Conversation-Id", activeConversationId);
+  return response;
 }

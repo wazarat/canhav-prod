@@ -32,16 +32,22 @@ export function agentModel(): string {
   return readSecret("OPENAI_AGENT_MODEL") ?? DEFAULT_AGENT_MODEL;
 }
 
+/** Whether the ZeroDev passkey server URL is exposed to the client. */
+export function hasPasskeyServer(): boolean {
+  const url = process.env.NEXT_PUBLIC_ZERODEV_PASSKEY_SERVER?.trim();
+  return Boolean(url);
+}
+
 /**
- * Whether the on-chain identity stack is provisioned: a ZeroDev project RPC plus
- * both deployed registry addresses. The spawn route also needs these in the
- * actual process env (agent-service `loadConfig` reads `process.env`).
+ * Whether the on-chain identity stack is provisioned: a ZeroDev project RPC,
+ * both deployed registry addresses, and the client passkey server URL.
  */
 export function hasZeroDev(): boolean {
   return Boolean(
     readSecret("ZERODEV_RPC") &&
       readSecret("IDENTITY_REGISTRY_ADDRESS") &&
-      readSecret("SECURITY_REGISTRY_ADDRESS"),
+      readSecret("SECURITY_REGISTRY_ADDRESS") &&
+      hasPasskeyServer(),
   );
 }
 
@@ -52,8 +58,10 @@ export interface AgentConfigStatus {
   openai: boolean;
   /** Persistent memory store (Upstash) is configured; false uses local fallback. */
   upstash: boolean;
-  /** On-chain ERC-8004 registration is configured. */
+  /** On-chain ERC-8004 registration is configured (RPC + registries + passkey server). */
   zerodev: boolean;
+  /** ZeroDev passkey server URL is set for client WebAuthn ceremonies. */
+  passkeyServer: boolean;
   /** The only chain agents touch. */
   chain: typeof AGENT_CHAIN;
   /** Resolved model id (informational; reflects OPENAI_AGENT_MODEL or default). */
@@ -66,6 +74,7 @@ export function agentConfigStatus(): AgentConfigStatus {
     openai: hasOpenAI(),
     upstash: hasUpstash(),
     zerodev: hasZeroDev(),
+    passkeyServer: hasPasskeyServer(),
     chain: AGENT_CHAIN,
     model: agentModel(),
   };

@@ -43,6 +43,9 @@ export function PasskeyAuthGate({
         mode: mode === "register" ? WebAuthnMode.Register : WebAuthnMode.Login,
       });
 
+      // SDK returns rpID as "" — use the ceremony hostname for server validation.
+      const rpID = webAuthnKey.rpID || window.location.hostname;
+
       const res = await fetch("/api/auth/passkey", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -53,7 +56,7 @@ export function PasskeyAuthGate({
             pubY: webAuthnKey.pubY.toString(),
             authenticatorId: webAuthnKey.authenticatorId,
             authenticatorIdHash: webAuthnKey.authenticatorIdHash,
-            rpID: webAuthnKey.rpID,
+            rpID,
           },
         }),
       });

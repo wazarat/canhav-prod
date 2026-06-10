@@ -59,6 +59,7 @@ export function PasskeySpawnButton({
 
       // 2) Hand the public key to the server bridge to mint the ERC-8004 identity.
       setPhase("minting");
+      const rpID = webAuthnKey.rpID || window.location.hostname;
       const res = await fetch("/api/agent/spawn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -69,7 +70,7 @@ export function PasskeySpawnButton({
             pubY: webAuthnKey.pubY.toString(),
             authenticatorId: webAuthnKey.authenticatorId,
             authenticatorIdHash: webAuthnKey.authenticatorIdHash,
-            rpID: webAuthnKey.rpID,
+            rpID,
           },
         }),
       });

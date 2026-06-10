@@ -39,6 +39,7 @@ export function PasskeyAuthGate({
       const webAuthnKey = await toWebAuthnKey({
         passkeyName: "CanHav Research",
         passkeyServerUrl: PASSKEY_SERVER,
+        rpID: window.location.hostname,
         mode: mode === "register" ? WebAuthnMode.Register : WebAuthnMode.Login,
       });
 

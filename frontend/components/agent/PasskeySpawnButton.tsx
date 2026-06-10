@@ -53,6 +53,7 @@ export function PasskeySpawnButton({
       const webAuthnKey = await toWebAuthnKey({
         passkeyName: `CanHav · ${skill.title}`,
         passkeyServerUrl: PASSKEY_SERVER,
+        rpID: window.location.hostname,
         mode: WebAuthnMode.Register,
       });
 

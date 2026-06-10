@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AlertTriangle, Fingerprint, Loader2, LogIn, UserPlus } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
+import { resolvePasskeyRpId } from "@/lib/auth/passkey-rp";
 
 const PASSKEY_SERVER = process.env.NEXT_PUBLIC_ZERODEV_PASSKEY_SERVER;
 
@@ -36,15 +37,16 @@ export function PasskeyAuthGate({
 
     try {
       const { toWebAuthnKey, WebAuthnMode } = await import("@zerodev/webauthn-key");
+      const rpId = resolvePasskeyRpId();
       const webAuthnKey = await toWebAuthnKey({
         passkeyName: "CanHav Research",
         passkeyServerUrl: PASSKEY_SERVER,
-        rpID: window.location.hostname,
+        rpID: rpId,
         mode: mode === "register" ? WebAuthnMode.Register : WebAuthnMode.Login,
       });
 
-      // SDK returns rpID as "" — use the ceremony hostname for server validation.
-      const rpID = webAuthnKey.rpID || window.location.hostname;
+      // SDK returns rpID as "" — use the resolved RP ID for server validation.
+      const rpID = webAuthnKey.rpID || rpId;
 
       const res = await fetch("/api/auth/passkey", {
         method: "POST",

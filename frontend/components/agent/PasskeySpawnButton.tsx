@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, Fingerprint, Loader2, Rocket } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
+import { resolvePasskeyRpId } from "@/lib/auth/passkey-rp";
 import { AgentIdentityCard, type AgentIdentity } from "./AgentIdentityCard";
 
 interface SkillOption {
@@ -53,16 +54,17 @@ export function PasskeySpawnButton({
       //    WebAuthn SDK never weighs down the initial bundle or SSR.
       setPhase("passkey");
       const { toWebAuthnKey, WebAuthnMode } = await import("@zerodev/webauthn-key");
+      const rpId = resolvePasskeyRpId();
       const webAuthnKey = await toWebAuthnKey({
         passkeyName: `CanHav · ${skill.title}`,
         passkeyServerUrl: PASSKEY_SERVER,
-        rpID: window.location.hostname,
+        rpID: rpId,
         mode: WebAuthnMode.Register,
       });
 
       // 2) Hand the public key to the server bridge to mint the ERC-8004 identity.
       setPhase("minting");
-      const rpID = webAuthnKey.rpID || window.location.hostname;
+      const rpID = webAuthnKey.rpID || rpId;
       const res = await fetch("/api/agent/spawn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

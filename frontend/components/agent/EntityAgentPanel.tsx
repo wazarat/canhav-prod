@@ -10,14 +10,17 @@ import { PasskeySpawnButton } from "@/components/agent/PasskeySpawnButton";
 interface ForEntityResponse {
   authenticated?: boolean;
   agentId?: string | null;
+  onChain?: boolean;
 }
 
 /**
- * The project-page entry point into the agent. Resolves the logged-in wallet's
- * agent for THIS entity:
- *   - signed out         -> link to /agents to sign in with a passkey
- *   - signed in, has one  -> "Open the {entity} agent" -> /agents/[agentId]
- *   - signed in, no agent -> launch one pre-bound to this project (ERC-8004)
+ * The project-page agent creation + status surface. The actual chatbot lives in
+ * the right-side {@link EntityAgentDock}; this panel handles the lifecycle:
+ *   - signed out                     -> sign in with a passkey
+ *   - signed in, no agent yet         -> mint ONE ERC-8004 agent for this entity
+ *   - signed in, minted agent on-chain -> "agent is live" (chat is docked right)
+ *
+ * Agent creation lives ONLY here (one per entity); the Agents tab is a roster.
  */
 export function EntityAgentPanel({
   entitySlug,
@@ -35,6 +38,7 @@ export function EntityAgentPanel({
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [agentId, setAgentId] = useState<string | null>(null);
+  const [onChain, setOnChain] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -46,6 +50,7 @@ export function EntityAgentPanel({
         if (!active) return;
         setAuthenticated(Boolean(data.authenticated));
         setAgentId(data.agentId ?? null);
+        setOnChain(Boolean(data.onChain));
       } finally {
         if (active) setLoading(false);
       }
@@ -54,6 +59,8 @@ export function EntityAgentPanel({
       active = false;
     };
   }, [entitySlug]);
+
+  const minted = Boolean(agentId && onChain);
 
   return (
     <section id="agent" className="scroll-mt-24 space-y-4">
@@ -66,8 +73,9 @@ export function EntityAgentPanel({
           </Badge>
         </h2>
         <p className="mt-1 text-sm text-ink-300">
-          A passkey-owned AI agent that lives on {entityName} and answers from its
-          stablecoins, tokens, and RWAs — with its own on-chain ERC-8004 identity.
+          Mint one passkey-owned AI agent for {entityName}. It gets its own on-chain
+          ERC-8004 identity (scannable on Arbiscan) and answers from this entity&apos;s
+          stablecoins, tokens, and RWAs — and follows you onto those product pages.
         </p>
       </div>
 
@@ -79,7 +87,7 @@ export function EntityAgentPanel({
         ) : !authenticated ? (
           <div className="space-y-3">
             <p className="text-sm text-ink-300">
-              Sign in with your passkey to launch or open the {entityName} research agent.
+              Sign in with your passkey to create the {entityName} research agent.
             </p>
             <Link
               href="/agents"
@@ -88,14 +96,18 @@ export function EntityAgentPanel({
               <LogIn className="h-4 w-4" /> Sign in to Agents
             </Link>
           </div>
-        ) : agentId ? (
+        ) : minted ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm text-ink-200">
               <Fingerprint className="h-4 w-4 text-electric-400" />
-              You have an agent for this project.
+              Your {entityName} agent is live on-chain (ERC-8004).
             </div>
+            <p className="text-xs text-ink-400">
+              Chat with it in the docked panel on the right — it carries over to{" "}
+              {entityName}&apos;s stablecoin, RWA, and token pages too.
+            </p>
             <Link
-              href={`/agents/${encodeURIComponent(agentId)}`}
+              href={`/agents/${encodeURIComponent(agentId as string)}`}
               className="group inline-flex items-center gap-1.5 rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-2 text-sm font-medium text-electric-300 transition-colors hover:bg-electric-500/20"
             >
               Open the {entityName} agent

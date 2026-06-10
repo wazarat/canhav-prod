@@ -14,6 +14,8 @@ import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
+import { EntityAgentDock } from "@/components/agent/EntityAgentDock";
+import { agentConfigStatus } from "@/lib/agent/config";
 import { getApprovedRwas, getApprovedRwaBySlug, getEntityBySlug } from "@/lib/data";
 import { deriveSecurityStatus } from "@/lib/security";
 
@@ -41,6 +43,7 @@ export default async function RwaProfilePage({ params }: PageProps) {
   const profile = await getApprovedRwaBySlug(params.slug);
   if (!profile) notFound();
   const entity = profile.entitySlug ? await getEntityBySlug(profile.entitySlug) : null;
+  const agentStatus = agentConfigStatus();
 
   return (
     <div className="container space-y-8 py-12">
@@ -93,6 +96,13 @@ export default async function RwaProfilePage({ params }: PageProps) {
         </div>
 
         <div className="space-y-4">
+          {profile.entitySlug && (
+            <EntityAgentDock
+              entitySlug={profile.entitySlug}
+              entityName={entity?.name}
+              llmConfigured={agentStatus.llm}
+            />
+          )}
           <RwaProfileCard profile={profile} />
           <OffchainFactsPanel facts={profile.offchainFacts} />
           <Suspense fallback={<MarketStatsSkeleton />}>

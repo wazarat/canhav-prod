@@ -40,6 +40,15 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
   const agentCardUrl = profile.agentAddress
     ? `/api/agent/by-address/${profile.agentAddress}/agent-card`
     : null;
+  // Arbiscan-first: a direct link to the minted ERC-721 token on the registry,
+  // plus the platform's own on-chain verification endpoint.
+  const registry = verification?.registry ?? null;
+  const isMinted = profile.onChain && /^\d+$/.test(profile.agentId);
+  const tokenUrl =
+    registry && isMinted
+      ? `https://sepolia.arbiscan.io/token/${registry}?a=${profile.agentId}`
+      : null;
+  const verifyUrl = isMinted ? `/api/agent/${encodeURIComponent(agentId)}/verify` : null;
 
   return (
     <div className="container space-y-8 py-12">
@@ -97,21 +106,24 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
           <div className="flex flex-wrap items-start gap-3 rounded-xl border border-ink-700/80 bg-ink-900/40 px-4 py-3">
             <Rocket className="mt-0.5 h-4 w-4 shrink-0 text-electric-400" />
             <p className="text-sm text-ink-300">
-              This agent is <span className="font-medium text-ink-100">local only</span> — chat
-              works, but it is not registered on ERC-8004 and will not appear on{" "}
-              <a
-                href="https://8004scan.io"
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium text-electric-400 hover:text-electric-300"
-              >
-                8004scan
-              </a>
-              .{" "}
-              <Link href="/agents" className="font-medium text-electric-400 hover:text-electric-300">
-                Launch an on-chain identity
-              </Link>{" "}
-              from the Agents roster to mint on Arbitrum Sepolia.
+              This agent is <span className="font-medium text-ink-100">local only</span> — it has
+              no ERC-8004 token yet, so there is nothing to scan on Arbiscan.{" "}
+              {profile.entitySlug ? (
+                <Link
+                  href={`/entities/${profile.entitySlug}`}
+                  className="font-medium text-electric-400 hover:text-electric-300"
+                >
+                  Create its on-chain identity on the {profile.entitySlug} page
+                </Link>
+              ) : (
+                <Link
+                  href="/entities"
+                  className="font-medium text-electric-400 hover:text-electric-300"
+                >
+                  Open an entity page
+                </Link>
+              )}{" "}
+              to mint a passkey-owned ERC-8004 token on Arbitrum Sepolia.
             </p>
           </div>
         )}
@@ -129,11 +141,13 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
                 agentAddress: profile.agentAddress,
                 agentURI: profile.agentURI,
                 arbiscanUrl,
+                tokenUrl,
                 skillTitle: profile.name,
                 onChain: profile.onChain,
               }}
               verification={verification}
               agentCardUrl={agentCardUrl}
+              verifyUrl={verifyUrl}
             />
           )}
           <AgentMemoryPanel memory={memory} studiedSkills={studiedSkills} />

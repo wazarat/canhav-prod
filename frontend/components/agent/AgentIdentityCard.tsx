@@ -4,6 +4,7 @@ import {
   FileJson,
   Fingerprint,
   Hash,
+  ScanLine,
   ShieldCheck,
   Wallet,
 } from "lucide-react";
@@ -17,7 +18,10 @@ export interface AgentIdentity {
   agentId: string;
   agentAddress: string;
   agentURI?: string | null;
+  /** Arbiscan link to the agent's smart-account address. */
   arbiscanUrl?: string | null;
+  /** Arbiscan link to the minted ERC-721 token on the IdentityRegistry. */
+  tokenUrl?: string | null;
   skillTitle?: string | null;
   onChain?: boolean;
 }
@@ -40,10 +44,13 @@ export function AgentIdentityCard({
   identity,
   verification,
   agentCardUrl,
+  verifyUrl,
 }: {
   identity: AgentIdentity;
   verification?: AgentVerification;
   agentCardUrl?: string | null;
+  /** The platform's own on-chain verification endpoint ("scan it on the platform"). */
+  verifyUrl?: string | null;
 }) {
   const security: SecurityInfo = identity.onChain
     ? {
@@ -120,15 +127,18 @@ export function AgentIdentityCard({
         <p className="text-xs text-ink-500">On-chain check unavailable: {verification.error}</p>
       )}
 
+      {/* Arbiscan-first: scan the token + smart account on Arbitrum Sepolia, plus
+          the platform's own on-chain verification. 8004scan is demoted to an
+          optional secondary link (it only indexes the canonical registry). */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        {scanUrl && (
+        {identity.tokenUrl && (
           <a
-            href={scanUrl}
+            href={identity.tokenUrl}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
           >
-            View on 8004scan <ExternalLink className="h-3.5 w-3.5" />
+            <ScanLine className="h-3.5 w-3.5" /> Scan token #{identity.agentId} on Arbiscan
           </a>
         )}
         {identity.arbiscanUrl && (
@@ -138,7 +148,17 @@ export function AgentIdentityCard({
             rel="noreferrer"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
           >
-            View on Arbiscan <ExternalLink className="h-3.5 w-3.5" />
+            Smart account on Arbiscan <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        )}
+        {verifyUrl && (
+          <a
+            href={verifyUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
+          >
+            <ShieldCheck className="h-3.5 w-3.5" /> Verify on CanHav
           </a>
         )}
         {agentCardUrl && (
@@ -146,9 +166,19 @@ export function AgentIdentityCard({
             href={agentCardUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-400 transition-colors hover:text-ink-200"
           >
-            <FileJson className="h-3.5 w-3.5" /> View agent card
+            <FileJson className="h-3.5 w-3.5" /> Agent card
+          </a>
+        )}
+        {scanUrl && (
+          <a
+            href={scanUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-500 transition-colors hover:text-ink-300"
+          >
+            8004scan <ExternalLink className="h-3.5 w-3.5" />
           </a>
         )}
       </div>

@@ -52,6 +52,48 @@ function hydrateEnvFromSecrets(): void {
   }
 }
 
+/**
+ * Turn a raw spawn/ZeroDev failure into a clean, actionable message instead of
+ * dumping the verbose viem RPC error (calldata, user-op, etc.) at the user.
+ *
+ * The most common failure is the ZeroDev paymaster returning `403 Unauthorized`
+ * on `pm_getPaymasterStubData` — that is gas sponsorship being rejected (no
+ * active gas policy for Arbitrum Sepolia, sponsorship disabled, or exhausted
+ * testnet credits), NOT a bug in the mint calldata.
+ */
+function describeSpawnError(e: unknown): { message: string; code?: string } {
+  const raw = e instanceof Error ? e.message : String(e ?? "");
+  const haystack = raw.toLowerCase();
+  const looksLikePaymasterAuth =
+    haystack.includes("getpaymasterstubdata") ||
+    haystack.includes("getpaymasterdata") ||
+    haystack.includes("wapk") ||
+    (haystack.includes("paymaster") && haystack.includes("unauthorized")) ||
+    ((haystack.includes("status: 403") || haystack.includes("status 403")) &&
+      haystack.includes("zerodev"));
+
+  if (looksLikePaymasterAuth) {
+    return {
+      code: "paymaster_unauthorized",
+      message:
+        "Gas sponsorship was rejected by ZeroDev (paymaster 403). Add an active gas " +
+        "policy for Arbitrum Sepolia (chain 421614) in your ZeroDev dashboard and confirm " +
+        "the project still has testnet credits, then mint again.",
+    };
+  }
+
+  if (haystack.includes("missing required env var") || haystack.includes("zerodev_rpc")) {
+    return {
+      code: "not_configured",
+      message:
+        "On-chain identity is not fully configured — set ZERODEV_RPC, " +
+        "IDENTITY_REGISTRY_ADDRESS, and SECURITY_REGISTRY_ADDRESS for this environment.",
+    };
+  }
+
+  return { message: raw || "Spawn failed." };
+}
+
 export async function POST(req: Request) {
   const session = getSession();
   if (!session) {
@@ -104,6 +146,7 @@ export async function POST(req: Request) {
   if (existingAgentId) {
     const existing = await getAgentProfile(existingAgentId);
     if (existing) {
+      const reusedRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
       return NextResponse.json({
         ok: true,
         reused: true,
@@ -113,6 +156,10 @@ export async function POST(req: Request) {
         arbiscanUrl: existing.agentAddress
           ? `https://sepolia.arbiscan.io/address/${existing.agentAddress}`
           : null,
+        tokenUrl:
+          reusedRegistry && /^\d+$/.test(existing.agentId)
+            ? `https://sepolia.arbiscan.io/token/${reusedRegistry}?a=${existing.agentId}`
+            : null,
       });
     }
   }
@@ -141,6 +188,11 @@ export async function POST(req: Request) {
     const agentAddress = result.agentAddress;
     const agentURI = result.agentURI;
     const arbiscanUrl = `https://sepolia.arbiscan.io/address/${agentAddress}`;
+    // Arbiscan-first: a direct link to the minted ERC-721 token on the registry.
+    const registry = readSecret("IDENTITY_REGISTRY_ADDRESS");
+    const tokenUrl = registry
+      ? `https://sepolia.arbiscan.io/token/${registry}?a=${agentId}`
+      : null;
 
     await seedAgentProfile({
       agentId,
@@ -157,11 +209,9 @@ export async function POST(req: Request) {
     await linkAgentToUser(session.userId, agentId);
     await setUserEntityAgent(session.userId, entitySlug, agentId);
 
-    return NextResponse.json({ ok: true, agentId, agentAddress, agentURI, arbiscanUrl });
+    return NextResponse.json({ ok: true, agentId, agentAddress, agentURI, arbiscanUrl, tokenUrl });
   } catch (e) {
-    return NextResponse.json(
-      { ok: false, error: e instanceof Error ? e.message : "Spawn failed." },
-      { status: 500 },
-    );
+    const { message, code } = describeSpawnError(e);
+    return NextResponse.json({ ok: false, error: message, code }, { status: 500 });
   }
 }

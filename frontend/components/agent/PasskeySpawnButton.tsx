@@ -20,7 +20,9 @@ interface SpawnResponse {
   agentAddress?: string;
   agentURI?: string;
   arbiscanUrl?: string;
+  tokenUrl?: string;
   error?: string;
+  code?: string;
 }
 
 const PASSKEY_SERVER = process.env.NEXT_PUBLIC_ZERODEV_PASSKEY_SERVER;
@@ -89,6 +91,7 @@ export function PasskeySpawnButton({
         agentAddress: data.agentAddress,
         agentURI: data.agentURI ?? null,
         arbiscanUrl: data.arbiscanUrl ?? null,
+        tokenUrl: data.tokenUrl ?? null,
         skillTitle: skill.title,
         onChain: true,
       });
@@ -103,7 +106,10 @@ export function PasskeySpawnButton({
   if (identity) {
     return (
       <div className="space-y-3">
-        <AgentIdentityCard identity={identity} />
+        <AgentIdentityCard
+          identity={identity}
+          verifyUrl={`/api/agent/${encodeURIComponent(identity.agentId)}/verify`}
+        />
         <button
           type="button"
           onClick={() => setIdentity(null)}
@@ -181,7 +187,12 @@ export function PasskeySpawnButton({
         </>
       )}
 
-      {error && <p className="text-xs text-rose-300">{error}</p>}
+      {error && (
+        <div className="flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-rose-300" />
+          <p className="text-xs leading-relaxed text-rose-200">{error}</p>
+        </div>
+      )}
     </div>
   );
 }

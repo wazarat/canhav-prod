@@ -21,6 +21,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGridSkeleton } from "@/components/ui/Skeletons";
+import { EntityAgentDock } from "@/components/agent/EntityAgentDock";
+import { agentConfigStatus } from "@/lib/agent/config";
 import { getApprovedTokenBySlug, getApprovedTokens, getEntityBySlug } from "@/lib/data";
 import { deriveSecurityStatus } from "@/lib/security";
 
@@ -45,6 +47,7 @@ export default async function TokenProfilePage({ params }: PageProps) {
   if (!profile) notFound();
 
   const entity = profile.entitySlug ? await getEntityBySlug(profile.entitySlug) : null;
+  const agentStatus = agentConfigStatus();
 
   return (
     <div className="container space-y-8 py-12">
@@ -112,6 +115,13 @@ export default async function TokenProfilePage({ params }: PageProps) {
         </div>
 
         <div className="space-y-4">
+          {profile.entitySlug && (
+            <EntityAgentDock
+              entitySlug={profile.entitySlug}
+              entityName={entity?.name}
+              llmConfigured={agentStatus.llm}
+            />
+          )}
           {profile.yieldMechanics && (
             <JlpYieldCard yieldMechanics={profile.yieldMechanics} />
           )}

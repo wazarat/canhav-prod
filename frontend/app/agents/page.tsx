@@ -18,7 +18,6 @@ import { getAgentSkills } from "@/lib/agent/skills";
 import { MemoryInspector } from "@/components/agent/MemoryInspector";
 import { ToolPlayground } from "@/components/agent/ToolPlayground";
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
-import { PasskeySpawnButton } from "@/components/agent/PasskeySpawnButton";
 import { getSession } from "@/lib/auth/session";
 import { listUserAgentIds } from "@/lib/auth/users";
 import { getAgentProfile, type AgentProfile } from "@/lib/agent/memory";
@@ -153,10 +152,14 @@ export default async function AgentsPage() {
           <Badge tone="signal">Arbitrum Sepolia · Testnet</Badge>
         </div>
         <p className="max-w-2xl text-sm leading-relaxed text-ink-300">
-          Turn CanHav research into an AI agent: it studies protocol skills, answers only from
-          CanHav&apos;s own data, remembers what it learns, and can register an on-chain{" "}
-          <span className="font-medium text-ink-100">ERC-8004</span> identity through a passkey
-          smart account. All agent activity is testnet-only.
+          Your roster of CanHav research agents. Each agent lives on a project (an entity),
+          answers only from CanHav&apos;s own data, remembers what it learns, and carries its own
+          on-chain <span className="font-medium text-ink-100">ERC-8004</span> identity through a
+          passkey smart account. Launch a new agent from any{" "}
+          <Link href="/entities" className="font-medium text-electric-400 hover:text-electric-300">
+            entity page
+          </Link>
+          . All agent activity is testnet-only.
         </p>
       </header>
 
@@ -247,10 +250,25 @@ export default async function AgentsPage() {
         </Card>
       )}
 
-      <PasskeySpawnButton
-        skills={skills.map((s) => ({ id: s.id, title: s.title }))}
-        zerodevConfigured={status.zerodev}
-      />
+      <Card className="space-y-3">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">
+          <div>
+            <CardTitle className="text-base">Launch an agent</CardTitle>
+            <CardDescription className="mt-1">
+              Agents are created on a project. Open an entity and mint its agent there —
+              one ERC-8004 agent per entity, scannable on Arbiscan.
+            </CardDescription>
+          </div>
+          <Badge tone="neutral">one per entity</Badge>
+        </div>
+        <Link
+          href="/entities"
+          className="group inline-flex items-center gap-1.5 rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-2 text-sm font-medium text-electric-300 transition-colors hover:bg-electric-500/20"
+        >
+          Browse entities to launch an agent
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      </Card>
 
       <AgentLabPanel agentId={defaultAgentId} llmConfigured={status.llm} />
 

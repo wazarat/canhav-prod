@@ -25,8 +25,15 @@ import { getSession } from "@/lib/auth/session";
  */
 
 export const runtime = "nodejs";
-export const maxDuration = 300;
+// Vercel Hobby (free) plan caps function duration at 60s. Keep it at the ceiling
+// so the research loop has the most room; the loop self-aborts a few seconds
+// earlier (AGENT_TIME_BUDGET_MS) to flush a partial answer instead of being
+// hard-killed by the platform mid-stream.
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
+
+/** Stop the agent loop this many ms before the platform's hard kill. */
+const AGENT_TIME_BUDGET_MS = (maxDuration - 6) * 1000;
 
 const SYSTEM_PROMPT = `You are the CanHav research agent — a financial-intelligence analyst for the Arbitrum ecosystem.
 
@@ -143,13 +150,24 @@ export async function POST(req: Request) {
   }
   const activeConversationId = conversationId;
 
+  // Time budget: abort a few seconds before the 60s platform limit so the stream
+  // ends gracefully (partial answer + run logging) instead of a hard 500. Also
+  // aborts if the client disconnects.
+  const budget = new AbortController();
+  const killTimer = setTimeout(() => budget.abort(), AGENT_TIME_BUDGET_MS);
+  budget.signal.addEventListener("abort", () => clearTimeout(killTimer), { once: true });
+  if (req.signal.aborted) budget.abort();
+  else req.signal.addEventListener("abort", () => budget.abort(), { once: true });
+
   const result = streamText({
     model: resolveAgentModel(),
     system,
     messages: modelMessages,
     tools: buildAgentTools(agentId, scope),
     stopWhen: stepCountIs(8),
+    abortSignal: budget.signal,
     onFinish: async (event) => {
+      clearTimeout(killTimer);
       try {
         const toolCalls: AgentToolCall[] = [];
         for (const step of event.steps) {
@@ -250,6 +268,12 @@ function friendlyError(error: unknown): string {
   const message =
     collectErrorText(error) || (error instanceof Error ? error.message : String(error ?? ""));
 
+  // The loop self-aborts ~6s before the 60s Hobby-plan limit (see
+  // AGENT_TIME_BUDGET_MS). Surface that as a clear "too long" message rather than
+  // the generic fallback so users know to narrow the question.
+  if (/\bAbort(ed|Error)?\b|TimeoutError|timed? ?out|operation was aborted/i.test(message)) {
+    return "The research took longer than the 60s limit and was stopped early. Try a more specific question (e.g. one entity or metric at a time).";
+  }
   if (/insufficient_quota|exceeded your current quota|billing|\b429\b|\b402\b/i.test(message)) {
     return "The research agent's model provider is out of quota. Add credits to your OpenAI key or set AI_GATEWAY_API_KEY to route through the Vercel AI Gateway.";
   }

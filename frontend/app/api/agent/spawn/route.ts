@@ -24,7 +24,9 @@ import { readSecret } from "@/lib/server/env";
  */
 
 export const runtime = "nodejs";
-export const maxDuration = 300;
+// Vercel Hobby (free) plan caps function duration at 60s. The passkey → ZeroDev
+// sponsored mint is a single user-op and completes well within this.
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 const REGISTRY_ENV = [

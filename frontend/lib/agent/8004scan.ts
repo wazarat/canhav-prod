@@ -1,4 +1,4 @@
-import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/config";
+import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
 
 /** Whether `agentId` is a minted ERC-721 tokenId (numeric). */
 export function isOnChainTokenId(agentId: string): boolean {

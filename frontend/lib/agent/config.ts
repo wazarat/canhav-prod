@@ -21,8 +21,7 @@ import { hasUpstash } from "@/lib/server/redis";
  * same convention the Alchemy/Dune/CoinGecko overlays already use.
  */
 
-export const AGENT_CHAIN = "arbitrum-sepolia" as const;
-export const ARBITRUM_SEPOLIA_CHAIN_ID = 421614 as const;
+export { AGENT_CHAIN, ARBITRUM_SEPOLIA_CHAIN_ID } from "./chain";
 export const DEFAULT_AGENT_MODEL = "gpt-4o-mini" as const;
 
 /** Whether a direct OpenAI key is configured for the reasoning loop. */

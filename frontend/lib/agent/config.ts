@@ -6,6 +6,8 @@ import type { LanguageModel } from "ai";
 import { readSecret } from "@/lib/server/env";
 import { hasUpstash } from "@/lib/server/redis";
 
+import { AGENT_CHAIN } from "./chain";
+
 /**
  * Server-only configuration probes for the CanHav AI agent layer (Pillar 2).
  *

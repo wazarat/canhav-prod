@@ -39,6 +39,12 @@ export interface AgentSkill {
  * scaffold we inline it as a base64 data URI so the metadata is fully on-chain;
  * production may host it on IPFS/HTTPS instead.
  */
+export interface AgentProductRef {
+  slug: string;
+  symbol: string;
+  category: string;
+}
+
 export interface AgentRegistrationFile {
   name: string;
   description: string;
@@ -46,6 +52,10 @@ export interface AgentRegistrationFile {
   version: string;
   /** Read/research vs write/execute capabilities derived from the skill. */
   capabilities: string[];
+  /** The Entity ("project") this agent is bound to (slug). */
+  entity?: string;
+  /** Member products (stablecoins/tokens/RWAs) the agent is scoped to. */
+  associatedProducts?: AgentProductRef[];
   /** Optional service endpoints the agent exposes. */
   endpoints?: string[];
   createdAt: string;

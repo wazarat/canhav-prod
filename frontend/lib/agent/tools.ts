@@ -14,6 +14,7 @@ import {
   getApprovedTokens,
 } from "@/lib/data";
 import { appendMemory, getMemory, markSkillStudied } from "@/lib/agent/memory";
+import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-binding";
 import { getAgentSkillById } from "@/lib/agent/skills";
 import { fetchRecentTransfers, fetchTokenMetadata, fetchTotalSupply } from "@/lib/server/alchemy";
 import { fetchPegHistory, fetchTvlHistory } from "@/lib/server/dune";
@@ -263,12 +264,29 @@ async function execRecall(agentId: string) {
   };
 }
 
+async function execScope(scope: AgentScope) {
+  const binding = scope.entitySlug ? await resolveEntityBinding(scope.entitySlug) : null;
+  if (!binding) {
+    return {
+      bound: false,
+      summary: "This is a general research agent — not bound to a specific project.",
+    };
+  }
+  return {
+    bound: true,
+    entity: binding.entitySlug,
+    entityName: binding.entityName,
+    products: binding.associatedProducts,
+    summary: `Scoped to ${binding.entityName} (${binding.associatedProducts.length} member product(s)).`,
+  };
+}
+
 /* -------------------------------------------------------------------------- */
 /* AI SDK tool definitions (used by the streamText loop)                      */
 /* -------------------------------------------------------------------------- */
 
-export function buildAgentTools(agentId: string) {
-  return {
+export function buildAgentTools(agentId: string, scope?: AgentScope) {
+  const base = {
     research_getEntity: tool({
       description: "Read a CanHav umbrella entity (issuer) profile by slug.",
       inputSchema: schemas.research_getEntity,
@@ -321,6 +339,20 @@ export function buildAgentTools(agentId: string) {
       execute: () => execRecall(agentId),
     }),
   };
+
+  if (scope?.entitySlug) {
+    return {
+      ...base,
+      agent_scope: tool({
+        description:
+          "Return this agent's bound project (entity) and its member products (stablecoins/tokens/RWAs). Call this first to orient before researching.",
+        inputSchema: z.object({}),
+        execute: () => execScope(scope),
+      }),
+    };
+  }
+
+  return base;
 }
 
 /* -------------------------------------------------------------------------- */

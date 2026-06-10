@@ -417,6 +417,7 @@ export function buildEntitySectionNav(profile: {
   const items: { id: string; label: string }[] = [];
 
   if (profile.memberCoins.length) items.push({ id: "member-coins", label: "Member coins" });
+  items.push({ id: "agent", label: "Agent" });
   if (profile.market) items.push({ id: "market", label: "Market" });
   if (profile.components.length) items.push({ id: "overview", label: "Overview" });
   if (profile.offchainFacts?.length) items.push({ id: "facts", label: "Key facts" });

@@ -27,9 +27,12 @@ const PASSKEY_SERVER = process.env.NEXT_PUBLIC_ZERODEV_PASSKEY_SERVER;
 export function PasskeySpawnButton({
   skills,
   zerodevConfigured,
+  entitySlug,
 }: {
   skills: SkillOption[];
   zerodevConfigured: boolean;
+  /** When set, the agent is launched pre-bound to this project (Entity). */
+  entitySlug?: string;
 }) {
   const [skillId, setSkillId] = useState(skills[0]?.id ?? "");
   const [phase, setPhase] = useState<"idle" | "passkey" | "minting">("idle");
@@ -65,6 +68,7 @@ export function PasskeySpawnButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           skillId,
+          entitySlug: entitySlug ?? skillId,
           webAuthnKey: {
             pubX: webAuthnKey.pubX.toString(),
             pubY: webAuthnKey.pubY.toString(),

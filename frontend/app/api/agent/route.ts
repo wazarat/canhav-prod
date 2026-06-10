@@ -1,13 +1,19 @@
-import { openai } from "@ai-sdk/openai";
 import { convertToModelMessages, stepCountIs, streamText, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
 
-import { agentModel, hasOpenAI } from "@/lib/agent/config";
+import { hasLLM, resolveAgentModel } from "@/lib/agent/config";
 import {
   createConversation,
   saveConversationMessages,
 } from "@/lib/agent/conversations";
-import { appendRun, getMemory, getStudiedSkills, type AgentToolCall } from "@/lib/agent/memory";
+import {
+  appendRun,
+  getAgentProfile,
+  getMemory,
+  getStudiedSkills,
+  type AgentToolCall,
+} from "@/lib/agent/memory";
+import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-binding";
 import { userAgentId } from "@/lib/agent/user-agent";
 import { buildAgentTools } from "@/lib/agent/tools";
 import { getSession } from "@/lib/auth/session";
@@ -63,9 +69,12 @@ export async function POST(req: Request) {
     );
   }
 
-  if (!hasOpenAI()) {
+  if (!hasLLM()) {
     return NextResponse.json(
-      { configured: false, error: "OPENAI_API_KEY not set." },
+      {
+        configured: false,
+        error: "No LLM provider configured. Set OPENAI_API_KEY or AI_GATEWAY_API_KEY.",
+      },
       { status: 503 },
     );
   }
@@ -93,19 +102,40 @@ export async function POST(req: Request) {
     conversationId = created.id;
   }
 
-  const [memory, studied] = await Promise.all([getMemory(agentId), getStudiedSkills(agentId)]);
+  const [memory, studied, profile] = await Promise.all([
+    getMemory(agentId),
+    getStudiedSkills(agentId),
+    getAgentProfile(agentId),
+  ]);
   const memoryBlock = memory.length ? memory.map((f) => `- ${f.text}`).join("\n") : "(nothing yet)";
   const studiedBlock = studied.length ? studied.join(", ") : "(none yet)";
-  const system = `${SYSTEM_PROMPT}\n\n--- Durable memory (what you already learned) ---\n${memoryBlock}\n\nSkills studied: ${studiedBlock}`;
+
+  // Bind the agent to its project (Entity) so it defaults to that entity + its
+  // member products without the user re-specifying slugs.
+  let scope: AgentScope | undefined;
+  let projectBlock = "";
+  if (profile?.entitySlug) {
+    const binding = await resolveEntityBinding(profile.entitySlug);
+    if (binding) {
+      scope = binding.scope;
+      const products =
+        binding.associatedProducts
+          .map((p) => `${p.symbol} (${p.category}, slug: ${p.slug})`)
+          .join("; ") || "none tracked";
+      projectBlock = `\n\n--- This agent's project ---\nThis agent lives on the ${binding.entityName} entity. Default to ${binding.entityName} and its member products unless the user explicitly asks about something else.\nMember products: ${products}`;
+    }
+  }
+
+  const system = `${SYSTEM_PROMPT}\n\n--- Durable memory (what you already learned) ---\n${memoryBlock}\n\nSkills studied: ${studiedBlock}${projectBlock}`;
 
   const modelMessages = await convertToModelMessages(messages);
   const activeConversationId = conversationId;
 
   const result = streamText({
-    model: openai(agentModel()),
+    model: resolveAgentModel(),
     system,
     messages: modelMessages,
-    tools: buildAgentTools(agentId),
+    tools: buildAgentTools(agentId, scope),
     stopWhen: stepCountIs(8),
     onFinish: async (event) => {
       try {
@@ -144,7 +174,23 @@ export async function POST(req: Request) {
     },
   });
 
-  const response = result.toUIMessageStreamResponse();
+  const response = result.toUIMessageStreamResponse({ onError: friendlyError });
   response.headers.set("X-Conversation-Id", activeConversationId);
   return response;
+}
+
+/**
+ * Map raw provider stream errors to actionable, user-facing copy. The most
+ * common one in this project is OpenAI `insufficient_quota` — surfacing the raw
+ * billing JSON in the chat is confusing, so we translate it.
+ */
+function friendlyError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  if (/insufficient_quota|exceeded your current quota|billing|\b429\b|\b402\b/i.test(message)) {
+    return "The research agent's model provider is out of quota. Add credits to your OpenAI key or set AI_GATEWAY_API_KEY to route through the Vercel AI Gateway.";
+  }
+  if (/api key|unauthorized|\b401\b/i.test(message)) {
+    return "The research agent's model provider rejected the API key. Check OPENAI_API_KEY / AI_GATEWAY_API_KEY.";
+  }
+  return "The research agent hit an unexpected error. Please try again.";
 }

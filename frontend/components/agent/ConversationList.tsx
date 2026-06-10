@@ -17,11 +17,14 @@ export function ConversationList({
   onSelect,
   onNew,
   refreshKey,
+  agentId,
 }: {
   activeId: string | null;
   onSelect: (id: string) => void;
   onNew: () => void;
   refreshKey?: number;
+  /** Scope the chat list to one agent/project. */
+  agentId?: string;
 }) {
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,14 +32,17 @@ export function ConversationList({
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/agent/conversations");
+      const url = agentId
+        ? `/api/agent/conversations?agentId=${encodeURIComponent(agentId)}`
+        : "/api/agent/conversations";
+      const res = await fetch(url);
       if (!res.ok) return;
       const data = (await res.json()) as { conversations?: ConversationSummary[] };
       setConversations(data.conversations ?? []);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [agentId]);
 
   useEffect(() => {
     void load();

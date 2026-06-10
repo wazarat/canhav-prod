@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, CircleDot, Sparkles } from "lucide-react";
 
-import { AgentChat } from "@/components/agent/AgentChat";
+import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
 import { AgentIdentityCard } from "@/components/agent/AgentIdentityCard";
 import { AgentMemoryPanel } from "@/components/agent/AgentMemoryPanel";
 import { SkillShelf } from "@/components/agent/SkillShelf";
@@ -64,13 +64,30 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
         </div>
         <p className="font-mono text-xs text-ink-500">
           agent {profile.agentId}
+          {profile.entitySlug ? ` · project ${profile.entitySlug}` : ""}
           {profile.skillId ? ` · skill ${profile.skillId}` : ""}
         </p>
+        {profile.entitySlug && (
+          <p className="text-sm text-ink-300">
+            <Link
+              href={`/entities/${profile.entitySlug}`}
+              className="font-medium text-electric-400 hover:text-electric-300"
+            >
+              {profile.name.replace(/ — Research Skill$/, "")}
+            </Link>
+            {profile.associatedProducts.length > 0 && (
+              <span className="text-ink-400">
+                {" "}
+                · scoped to {profile.associatedProducts.map((p) => p.symbol).join(", ")}
+              </span>
+            )}
+          </p>
+        )}
       </header>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <AgentChat agentId={agentId} llmConfigured={status.openai} />
+          <AgentLabPanel agentId={agentId} llmConfigured={status.llm} />
         </div>
         <div className="space-y-6">
           {profile.agentAddress && (

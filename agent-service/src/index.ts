@@ -11,6 +11,7 @@ export type {
   AgentSkillAction,
   AgentSkillFact,
   AgentSkillSection,
+  AgentProductRef,
   AgentRegistrationFile,
   ScopedAction,
 } from "./types";

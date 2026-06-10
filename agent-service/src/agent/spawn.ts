@@ -1,8 +1,15 @@
-import { decodeEventLog, encodeFunctionData, getAddress, type Address, type Log } from "viem";
+import {
+  decodeEventLog,
+  encodeFunctionData,
+  getAddress,
+  stringToHex,
+  type Address,
+  type Log,
+} from "viem";
 import type { WebAuthnKey } from "@zerodev/webauthn-key";
 
 import type { AgentServiceConfig } from "../config";
-import type { AgentSkill } from "../types";
+import type { AgentProductRef, AgentSkill } from "../types";
 import { identityRegistryAbi } from "../abi/registries";
 import { createPasskeyKernelAccount, type AgentKernelAccount } from "../zerodev/account";
 import { buildAgentRegistrationFile, toAgentURI } from "./registration";
@@ -13,6 +20,12 @@ export interface SpawnParams {
   skill: AgentSkill;
   /** Passkey public key from the client-side WebAuthn ceremony (no seed phrase). */
   webAuthnKey: WebAuthnKey;
+  /** Salt for the agent's distinct smart-account address (one per project). */
+  index?: bigint;
+  /** The Entity ("project") slug this agent is bound to. */
+  entity?: string;
+  /** Member products the agent is scoped to (written on-chain as metadata). */
+  associatedProducts?: AgentProductRef[];
 }
 
 export interface SpawnResult {
@@ -31,18 +44,29 @@ export interface SpawnResult {
  *   4. return the minted `agentId`.
  */
 export async function spawnAgentFromSkill(params: SpawnParams): Promise<SpawnResult> {
-  const { cfg, skill, webAuthnKey } = params;
+  const { cfg, skill, webAuthnKey, index, entity, associatedProducts } = params;
 
-  const account = await createPasskeyKernelAccount(cfg, webAuthnKey);
+  const account = await createPasskeyKernelAccount(cfg, webAuthnKey, index);
 
-  const registrationFile = buildAgentRegistrationFile(skill);
+  const registrationFile = buildAgentRegistrationFile(skill, { entity, associatedProducts });
   const agentURI = toAgentURI(registrationFile);
 
-  const data = encodeFunctionData({
-    abi: identityRegistryAbi,
-    functionName: "register",
-    args: [agentURI],
-  });
+  // Write the project binding on-chain as ERC-8004 metadata when present, using
+  // the register(agentURI, MetadataEntry[]) overload. Falls back to the plain
+  // register(agentURI) when the agent is a general (unbound) research agent.
+  const metadata = buildMetadataEntries(entity, associatedProducts);
+  const data =
+    metadata.length > 0
+      ? encodeFunctionData({
+          abi: identityRegistryAbi,
+          functionName: "register",
+          args: [agentURI, metadata],
+        })
+      : encodeFunctionData({
+          abi: identityRegistryAbi,
+          functionName: "register",
+          args: [agentURI],
+        });
 
   const userOpHash = await account.kernelClient.sendUserOperation({
     account: account.account,
@@ -52,6 +76,22 @@ export async function spawnAgentFromSkill(params: SpawnParams): Promise<SpawnRes
 
   const agentId = parseRegisteredAgentId(receipt.logs, cfg.identityRegistry);
   return { agentId, agentAddress: account.address, agentURI, account };
+}
+
+/** Build ERC-8004 MetadataEntry[] (key/bytes) for the agent's project binding. */
+function buildMetadataEntries(
+  entity: string | undefined,
+  associatedProducts: AgentProductRef[] | undefined,
+): { key: string; value: `0x${string}` }[] {
+  const entries: { key: string; value: `0x${string}` }[] = [];
+  if (entity) {
+    entries.push({ key: "entity", value: stringToHex(entity) });
+  }
+  if (associatedProducts && associatedProducts.length > 0) {
+    const csv = associatedProducts.map((p) => p.symbol).join(",");
+    entries.push({ key: "products", value: stringToHex(csv) });
+  }
+  return entries;
 }
 
 /** Extract the minted agentId from the IdentityRegistry `Registered` event. */

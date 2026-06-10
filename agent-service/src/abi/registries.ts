@@ -13,6 +13,23 @@ export const identityRegistryAbi = [
   },
   {
     type: "function",
+    name: "register",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "agentURI", type: "string" },
+      {
+        name: "metadata",
+        type: "tuple[]",
+        components: [
+          { name: "key", type: "string" },
+          { name: "value", type: "bytes" },
+        ],
+      },
+    ],
+    outputs: [{ name: "agentId", type: "uint256" }],
+  },
+  {
+    type: "function",
     name: "totalAgents",
     stateMutability: "view",
     inputs: [],

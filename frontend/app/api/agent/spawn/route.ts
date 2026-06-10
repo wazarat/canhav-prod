@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 
 import { hasZeroDev } from "@/lib/agent/config";
-import { markSkillStudied, seedAgentProfile } from "@/lib/agent/memory";
+import { deriveAccountIndex } from "@/lib/agent/account-index";
+import { resolveEntityBinding } from "@/lib/agent/entity-binding";
+import { getAgentProfile, markSkillStudied, seedAgentProfile } from "@/lib/agent/memory";
 import { getAgentSkillById } from "@/lib/agent/skills";
 import { reconstructWebAuthnKey } from "@/lib/auth/webauthn";
 import { getSession } from "@/lib/auth/session";
-import { linkAgentToUser } from "@/lib/auth/users";
+import { getUserEntityAgent, linkAgentToUser, setUserEntityAgent } from "@/lib/auth/users";
 import { readSecret } from "@/lib/server/env";
 
 /**
@@ -66,7 +68,7 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { skillId?: string; webAuthnKey?: unknown } = {};
+  let body: { skillId?: string; entitySlug?: string; webAuthnKey?: unknown } = {};
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -87,12 +89,46 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: `Unknown skill "${skillId}".` }, { status: 404 });
   }
 
+  // Skills are 1:1 with Entities, so the project slug defaults to the skill id.
+  const entitySlug =
+    typeof body.entitySlug === "string" && body.entitySlug ? body.entitySlug : skillId;
+  const binding = await resolveEntityBinding(entitySlug);
+  const associatedProducts = binding?.associatedProducts ?? [];
+
+  // Idempotency: one agent per (wallet, project). If the wallet already has an
+  // agent for this entity, return it instead of minting a duplicate identity.
+  const existingAgentId = await getUserEntityAgent(session.userId, entitySlug);
+  if (existingAgentId) {
+    const existing = await getAgentProfile(existingAgentId);
+    if (existing) {
+      return NextResponse.json({
+        ok: true,
+        reused: true,
+        agentId: existing.agentId,
+        agentAddress: existing.agentAddress,
+        agentURI: existing.agentURI,
+        arbiscanUrl: existing.agentAddress
+          ? `https://sepolia.arbiscan.io/address/${existing.agentAddress}`
+          : null,
+      });
+    }
+  }
+
+  const accountIndex = deriveAccountIndex(session.userId, entitySlug);
+
   hydrateEnvFromSecrets();
 
   try {
     const svc = await import("canhav-agent-service");
     const cfg = svc.loadConfig();
-    const result = await svc.spawnAgentFromSkill({ cfg, skill, webAuthnKey });
+    const result = await svc.spawnAgentFromSkill({
+      cfg,
+      skill,
+      webAuthnKey,
+      index: BigInt(accountIndex),
+      entity: binding?.entitySlug ?? entitySlug,
+      associatedProducts,
+    });
 
     const agentId = result.agentId.toString();
     const agentAddress = result.agentAddress;
@@ -103,12 +139,16 @@ export async function POST(req: Request) {
       agentId,
       name: skill.title,
       skillId,
+      entitySlug,
+      associatedProducts,
+      accountIndex,
       agentAddress,
       agentURI,
       onChain: true,
     });
     await markSkillStudied(agentId, skillId);
     await linkAgentToUser(session.userId, agentId);
+    await setUserEntityAgent(session.userId, entitySlug, agentId);
 
     return NextResponse.json({ ok: true, agentId, agentAddress, agentURI, arbiscanUrl });
   } catch (e) {

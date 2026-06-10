@@ -1,11 +1,22 @@
-import type { AgentRegistrationFile, AgentSkill } from "../types";
+import type { AgentProductRef, AgentRegistrationFile, AgentSkill } from "../types";
+
+export interface RegistrationBinding {
+  /** The Entity ("project") slug this agent is bound to. */
+  entity?: string;
+  /** Member products the agent is scoped to. */
+  associatedProducts?: AgentProductRef[];
+}
 
 /**
  * Build an ERC-8004 agent registration file from a CanHav skill. Capabilities
  * are derived from the skill's actions: read-only actions become research
- * capabilities; write actions become execution capabilities.
+ * capabilities; write actions become execution capabilities. The optional
+ * `binding` records the agent's project (Entity) + member products on-chain.
  */
-export function buildAgentRegistrationFile(skill: AgentSkill): AgentRegistrationFile {
+export function buildAgentRegistrationFile(
+  skill: AgentSkill,
+  binding?: RegistrationBinding,
+): AgentRegistrationFile {
   const capabilities = skill.actions.map(
     (a) => `${a.readOnly ? "research" : "execute"}:${a.name}`,
   );
@@ -15,6 +26,8 @@ export function buildAgentRegistrationFile(skill: AgentSkill): AgentRegistration
     skillId: skill.id,
     version: skill.version,
     capabilities,
+    ...(binding?.entity ? { entity: binding.entity } : {}),
+    ...(binding?.associatedProducts ? { associatedProducts: binding.associatedProducts } : {}),
     createdAt: new Date().toISOString(),
   };
 }

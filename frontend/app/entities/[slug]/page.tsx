@@ -18,6 +18,8 @@ import {
 import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
 import { MemberCoins } from "@/components/entities/MemberCoins";
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
+import { EntityAgentPanel } from "@/components/agent/EntityAgentPanel";
+import { agentConfigStatus } from "@/lib/agent/config";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { SourcesFooter } from "@/components/shared/SourcesFooter";
@@ -108,6 +110,8 @@ export default async function EntityProfilePage({ params }: PageProps) {
   const profile = await getApprovedEntityBySlug(params.slug);
   if (!profile) notFound();
 
+  const agentStatus = agentConfigStatus();
+  const entitySkill = profile.agentSkill ?? buildSkillFromEntity(profile);
   const scale = profile.currentScale;
   const labels = profile.scaleLabels ?? {};
   const tvlLabel = labels.tvl ?? "Total deposits / TVL";
@@ -270,7 +274,14 @@ export default async function EntityProfilePage({ params }: PageProps) {
               rows={profile.tradFiComparison}
               entityName={profile.name}
             />
-            <AgentSkillCard skill={profile.agentSkill ?? buildSkillFromEntity(profile)} />
+            <EntityAgentPanel
+              entitySlug={profile.slug}
+              entityName={profile.name}
+              skill={{ id: entitySkill.id, title: entitySkill.title }}
+              zerodevConfigured={agentStatus.zerodev}
+              llmConfigured={agentStatus.llm}
+            />
+            <AgentSkillCard skill={entitySkill} />
             {profile.sources && <SourcesFooter sources={profile.sources} />}
           </div>
         </div>

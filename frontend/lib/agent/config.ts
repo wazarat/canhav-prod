@@ -1,5 +1,8 @@
 import "server-only";
 
+import { openai } from "@ai-sdk/openai";
+import type { LanguageModel } from "ai";
+
 import { readSecret } from "@/lib/server/env";
 import { hasUpstash } from "@/lib/server/redis";
 
@@ -22,14 +25,60 @@ export const AGENT_CHAIN = "arbitrum-sepolia" as const;
 export const ARBITRUM_SEPOLIA_CHAIN_ID = 421614 as const;
 export const DEFAULT_AGENT_MODEL = "gpt-4o-mini" as const;
 
-/** Whether an OpenAI key is configured for the reasoning loop. */
+/** Whether a direct OpenAI key is configured for the reasoning loop. */
 export function hasOpenAI(): boolean {
   return Boolean(readSecret("OPENAI_API_KEY"));
 }
 
-/** The OpenAI model the agent loop should use (override via OPENAI_AGENT_MODEL). */
+/**
+ * Whether a Vercel AI Gateway key is configured. The gateway gives provider
+ * failover + spend controls and lets us route around a drained OpenAI quota
+ * without code changes (a `provider/model` string is resolved through it).
+ */
+export function hasGateway(): boolean {
+  return Boolean(readSecret("AI_GATEWAY_API_KEY"));
+}
+
+/** Whether ANY LLM provider is configured (gateway preferred, else OpenAI). */
+export function hasLLM(): boolean {
+  return hasGateway() || hasOpenAI();
+}
+
+/** Which provider the agent loop resolves to. */
+export function agentProvider(): "gateway" | "openai" | "none" {
+  if (hasGateway()) return "gateway";
+  if (hasOpenAI()) return "openai";
+  return "none";
+}
+
+/** The model the agent loop should use (override via OPENAI_AGENT_MODEL). */
 export function agentModel(): string {
   return readSecret("OPENAI_AGENT_MODEL") ?? DEFAULT_AGENT_MODEL;
+}
+
+/** Mirror a secret from backend/.env into process.env so provider SDKs see it. */
+function hydrateEnv(name: string): void {
+  if (!process.env[name]) {
+    const value = readSecret(name);
+    if (value) process.env[name] = value;
+  }
+}
+
+/**
+ * Resolve the AI SDK model for the chat loop. Prefers the Vercel AI Gateway when
+ * `AI_GATEWAY_API_KEY` is set (a `provider/model` string routes through it),
+ * otherwise falls back to the direct OpenAI provider. Either path keeps the
+ * `streamText` call site unchanged.
+ */
+export function resolveAgentModel(): LanguageModel {
+  const model = agentModel();
+  if (hasGateway()) {
+    hydrateEnv("AI_GATEWAY_API_KEY");
+    // Gateway expects a fully-qualified `provider/model` id.
+    return model.includes("/") ? model : `openai/${model}`;
+  }
+  hydrateEnv("OPENAI_API_KEY");
+  return openai(model);
 }
 
 /** Whether the ZeroDev passkey server URL is exposed to the client. */
@@ -54,8 +103,12 @@ export function hasZeroDev(): boolean {
 export { hasUpstash };
 
 export interface AgentConfigStatus {
-  /** LLM reasoning loop is configured. */
+  /** A direct OpenAI key is configured. */
   openai: boolean;
+  /** Whether ANY LLM provider (gateway or OpenAI) is configured. */
+  llm: boolean;
+  /** Which provider the loop resolves to. */
+  provider: "gateway" | "openai" | "none";
   /** Persistent memory store (Upstash) is configured; false uses local fallback. */
   upstash: boolean;
   /** On-chain ERC-8004 registration is configured (RPC + registries + passkey server). */
@@ -72,6 +125,8 @@ export interface AgentConfigStatus {
 export function agentConfigStatus(): AgentConfigStatus {
   return {
     openai: hasOpenAI(),
+    llm: hasLLM(),
+    provider: agentProvider(),
     upstash: hasUpstash(),
     zerodev: hasZeroDev(),
     passkeyServer: hasPasskeyServer(),

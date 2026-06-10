@@ -21,7 +21,8 @@ import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
 import { PasskeySpawnButton } from "@/components/agent/PasskeySpawnButton";
 import { getSession } from "@/lib/auth/session";
 import { listUserAgentIds } from "@/lib/auth/users";
-import { getAgentProfile } from "@/lib/agent/memory";
+import { getAgentProfile, type AgentProfile } from "@/lib/agent/memory";
+import { getApprovedEntities } from "@/lib/data";
 import { userAgentId } from "@/lib/agent/user-agent";
 
 export const metadata = {
@@ -83,14 +84,34 @@ export default async function AgentsPage() {
   const agentsById = new Map(userAgents.map((a) => [a.agentId, a]));
   const agents = [...agentsById.values()].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 
+  // Group agents by project (Entity). Unbound agents fall into "General research".
+  const entities = await getApprovedEntities();
+  const entityNameBySlug = new Map(entities.map((e) => [e.slug, e.name]));
+  const projectGroups = new Map<
+    string,
+    { key: string; label: string; slug: string | null; agents: AgentProfile[] }
+  >();
+  for (const agent of agents) {
+    const key = agent.entitySlug ?? "__general__";
+    const label = agent.entitySlug
+      ? (entityNameBySlug.get(agent.entitySlug) ?? agent.entitySlug)
+      : "General research";
+    if (!projectGroups.has(key)) {
+      projectGroups.set(key, { key, label, slug: agent.entitySlug, agents: [] });
+    }
+    projectGroups.get(key)!.agents.push(agent);
+  }
+  const groups = [...projectGroups.values()];
+
   const rows: CapabilityRow[] = [
     {
       key: "openai",
       icon: BrainCircuit,
-      label: "Reasoning (OpenAI)",
-      ready: status.openai,
-      readyHint: `LLM research loop active · model ${status.model}.`,
-      pendingHint: "Set OPENAI_API_KEY to enable the research agent's chat + tool loop.",
+      label: "Reasoning (LLM)",
+      ready: status.llm,
+      readyHint: `LLM research loop active · model ${status.model} · via ${status.provider}.`,
+      pendingHint:
+        "Set OPENAI_API_KEY (or AI_GATEWAY_API_KEY for failover) to enable the research agent's chat + tool loop.",
     },
     {
       key: "upstash",
@@ -168,35 +189,59 @@ export default async function AgentsPage() {
       </Card>
 
       {agents.length > 0 && (
-        <Card className="space-y-4">
+        <Card className="space-y-5">
           <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">
             <div>
               <CardTitle className="text-base">Your agents</CardTitle>
               <CardDescription className="mt-1">
-                Open an agent&apos;s home to chat, watch it work, and grow its memory.
+                Each agent lives on a project and answers from that entity&apos;s products.
               </CardDescription>
             </div>
             <Badge tone="neutral">{agents.length}</Badge>
           </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {agents.map((agent) => (
-              <Link
-                key={agent.agentId}
-                href={`/agents/${encodeURIComponent(agent.agentId)}`}
-                className="group flex items-start gap-3 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-3 transition-colors hover:border-electric-500/40 hover:bg-ink-900/60"
-              >
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-ink-700/80 bg-ink-900/60 text-electric-400">
-                  <Bot className="h-4 w-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-ink-100">{agent.name}</p>
-                  <p className="mt-0.5 font-mono text-[10px] text-ink-500">
-                    agent {agent.agentId}
-                    {agent.onChain ? " · on-chain" : " · local"}
-                  </p>
+          <div className="space-y-5">
+            {groups.map((group) => (
+              <div key={group.key} className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-400">
+                    {group.label}
+                  </h3>
+                  {group.slug && (
+                    <Link
+                      href={`/entities/${group.slug}`}
+                      className="text-[10px] font-medium text-electric-400 transition-colors hover:text-electric-300"
+                    >
+                      View project
+                    </Link>
+                  )}
                 </div>
-                <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-ink-500 transition-colors group-hover:text-electric-400" />
-              </Link>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {group.agents.map((agent) => (
+                    <Link
+                      key={agent.agentId}
+                      href={`/agents/${encodeURIComponent(agent.agentId)}`}
+                      className="group flex items-start gap-3 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-3 transition-colors hover:border-electric-500/40 hover:bg-ink-900/60"
+                    >
+                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-ink-700/80 bg-ink-900/60 text-electric-400">
+                        <Bot className="h-4 w-4" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-ink-100">{agent.name}</p>
+                        {agent.associatedProducts.length > 0 && (
+                          <p className="mt-0.5 truncate text-[11px] text-ink-400">
+                            {agent.associatedProducts.map((p) => p.symbol).join(" · ")}
+                          </p>
+                        )}
+                        <p className="mt-0.5 font-mono text-[10px] text-ink-500">
+                          agent {agent.agentId}
+                          {agent.onChain ? " · on-chain" : " · local"}
+                        </p>
+                      </div>
+                      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-ink-500 transition-colors group-hover:text-electric-400" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </Card>
@@ -207,7 +252,7 @@ export default async function AgentsPage() {
         zerodevConfigured={status.zerodev}
       />
 
-      <AgentLabPanel agentId={defaultAgentId} llmConfigured={status.openai} />
+      <AgentLabPanel agentId={defaultAgentId} llmConfigured={status.llm} />
 
       <MemoryInspector agentId={defaultAgentId} />
 

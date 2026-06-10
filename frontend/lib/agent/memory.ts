@@ -46,10 +46,23 @@ export interface AgentMemoryFact {
   source?: string | null;
 }
 
+/** A member product (stablecoin / token / RWA) this agent is scoped to. */
+export interface AgentProductRef {
+  slug: string;
+  symbol: string;
+  category: "Stablecoin" | "Token" | "RWA";
+}
+
 export interface AgentProfile {
   agentId: string;
   name: string;
   skillId: string | null;
+  /** The Entity ("project") this agent lives on. Null = general research agent. */
+  entitySlug: string | null;
+  /** Member products of the bound entity, denormalized for fast scoping. */
+  associatedProducts: AgentProductRef[];
+  /** Deterministic salt used for this agent's ZeroDev sub-account (per project). */
+  accountIndex: number | null;
   agentAddress: string | null;
   agentURI: string | null;
   /** Whether an ERC-8004 identity was minted on-chain for this agent. */
@@ -138,17 +151,31 @@ function writeFile(store: FileStore): void {
 /* Profile                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/** Backfill defaults for profiles persisted before the project-binding fields. */
+function normalizeProfile(profile: AgentProfile | null): AgentProfile | null {
+  if (!profile) return null;
+  return {
+    ...profile,
+    entitySlug: profile.entitySlug ?? null,
+    associatedProducts: profile.associatedProducts ?? [],
+    accountIndex: profile.accountIndex ?? null,
+  };
+}
+
 export async function getAgentProfile(agentId: string): Promise<AgentProfile | null> {
   if (hasUpstash()) {
-    return coerce<AgentProfile>(await getRedisClient().get(key.profile(agentId)));
+    return normalizeProfile(coerce<AgentProfile>(await getRedisClient().get(key.profile(agentId))));
   }
-  return readFile().profiles[agentId] ?? null;
+  return normalizeProfile(readFile().profiles[agentId] ?? null);
 }
 
 export interface SeedProfileInput {
   agentId: string;
   name: string;
   skillId?: string | null;
+  entitySlug?: string | null;
+  associatedProducts?: AgentProductRef[];
+  accountIndex?: number | null;
   agentAddress?: string | null;
   agentURI?: string | null;
   onChain?: boolean;
@@ -161,6 +188,10 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
     agentId: input.agentId,
     name: input.name || existing?.name || "CanHav Agent",
     skillId: input.skillId ?? existing?.skillId ?? null,
+    entitySlug: input.entitySlug ?? existing?.entitySlug ?? null,
+    associatedProducts:
+      input.associatedProducts ?? existing?.associatedProducts ?? [],
+    accountIndex: input.accountIndex ?? existing?.accountIndex ?? null,
     agentAddress: input.agentAddress ?? existing?.agentAddress ?? null,
     agentURI: input.agentURI ?? existing?.agentURI ?? null,
     onChain: input.onChain ?? existing?.onChain ?? false,
@@ -189,9 +220,9 @@ export async function listAgents(): Promise<AgentProfile[]> {
       .filter((p): p is AgentProfile => Boolean(p))
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   }
-  return Object.values(readFile().profiles).sort((a, b) =>
-    b.updatedAt.localeCompare(a.updatedAt),
-  );
+  return Object.values(readFile().profiles)
+    .map((p) => normalizeProfile(p)!)
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 /* -------------------------------------------------------------------------- */

@@ -22,6 +22,8 @@ const USER_INDEX = "user:index";
 const key = {
   profile: (userId: string) => `user:${userId}:profile`,
   agents: (userId: string) => `user:${userId}:agents`,
+  entityAgent: (userId: string, entitySlug: string) =>
+    `user:${userId}:entity:${entitySlug}:agent`,
 };
 
 function nowIso(): string {
@@ -43,6 +45,8 @@ function coerce<T>(value: unknown): T | null {
 interface FileUserStore {
   profiles: Record<string, UserProfile>;
   agents: Record<string, string[]>;
+  /** `${userId}|${entitySlug}` -> agentId */
+  entityAgents: Record<string, string>;
 }
 
 function filePath(): string {
@@ -52,9 +56,13 @@ function filePath(): string {
 function readFile(): FileUserStore {
   try {
     const parsed = JSON.parse(readFileSync(filePath(), "utf-8")) as Partial<FileUserStore>;
-    return { profiles: parsed.profiles ?? {}, agents: parsed.agents ?? {} };
+    return {
+      profiles: parsed.profiles ?? {},
+      agents: parsed.agents ?? {},
+      entityAgents: parsed.entityAgents ?? {},
+    };
   } catch {
-    return { profiles: {}, agents: {} };
+    return { profiles: {}, agents: {}, entityAgents: {} };
   }
 }
 
@@ -131,4 +139,32 @@ export async function listUserAgentIds(userId: string): Promise<string[]> {
     return ((await getRedisClient().smembers(key.agents(userId))) as string[] | null) ?? [];
   }
   return readFile().agents[userId] ?? [];
+}
+
+/** Record which agent this wallet uses for a given project (Entity slug). */
+export async function setUserEntityAgent(
+  userId: string,
+  entitySlug: string,
+  agentId: string,
+): Promise<void> {
+  if (!userId || !entitySlug || !agentId) return;
+  if (hasUpstash()) {
+    await getRedisClient().set(key.entityAgent(userId, entitySlug), agentId);
+  } else {
+    const store = readFile();
+    store.entityAgents[`${userId}|${entitySlug}`] = agentId;
+    writeFile(store);
+  }
+}
+
+/** Resolve the wallet's agent for a project (Entity slug), or null. */
+export async function getUserEntityAgent(
+  userId: string,
+  entitySlug: string,
+): Promise<string | null> {
+  if (!userId || !entitySlug) return null;
+  if (hasUpstash()) {
+    return ((await getRedisClient().get(key.entityAgent(userId, entitySlug))) as string | null) ?? null;
+  }
+  return readFile().entityAgents[`${userId}|${entitySlug}`] ?? null;
 }

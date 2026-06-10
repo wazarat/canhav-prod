@@ -44,6 +44,7 @@ export function AgentLabPanel({
         onSelect={selectConversation}
         onNew={startNewChat}
         refreshKey={listRefresh}
+        agentId={agentId}
       />
       <AgentChat
         key={chatKey}

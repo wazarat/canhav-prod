@@ -47,10 +47,17 @@ export type AgentKernelAccount = ReturnType<typeof assembleAgentAccount>;
  * validator — no seed phrase anywhere. The `webAuthnKey` is produced by the
  * client-side passkey ceremony and passed in. Used by `spawn` to mint the
  * ERC-8004 identity under the owner's passkey.
+ *
+ * `index` salts the counterfactual address so a single passkey can own MANY
+ * distinct agents — one per project (Entity) — each with its OWN address and
+ * its own ERC-8004 tokenId. The caller derives `index` deterministically from
+ * (userId, entitySlug), so re-spawning the same project agent is idempotent
+ * (same address, no duplicate identity).
  */
 export async function createPasskeyKernelAccount(
   cfg: AgentServiceConfig,
   webAuthnKey: WebAuthnKey,
+  index?: bigint,
 ): Promise<AgentKernelAccount> {
   const client = publicClient(cfg);
   const passkeyValidator = await toPasskeyValidator(client, {
@@ -64,6 +71,7 @@ export async function createPasskeyKernelAccount(
     entryPoint,
     kernelVersion,
     plugins: { sudo: passkeyValidator },
+    ...(index !== undefined ? { index } : {}),
   });
 
   return assembleAgentAccount(account, cfg);

@@ -5,25 +5,20 @@ import { cn } from "@/lib/utils";
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <Link href="/" className={cn("group inline-flex items-center gap-2.5", className)}>
-      <span className="relative inline-block h-8 w-8">
+    <Link href="/" className={cn("group inline-flex items-center gap-2", className)}>
+      <span className="relative inline-block h-7 w-7">
         <Image
           src="/mark.svg"
           alt="CanHav"
-          width={32}
-          height={32}
+          width={28}
+          height={28}
           priority
-          className="h-8 w-8 object-contain"
+          className="h-7 w-7 object-contain"
         />
         <span className="absolute -inset-1 -z-10 rounded-lg bg-electric-500/20 blur-md" />
       </span>
-      <span className="flex flex-col leading-none">
-        <span className="font-display text-sm font-semibold tracking-tight text-ink-50">
-          CanHav
-        </span>
-        <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-ink-300">
-          Research
-        </span>
+      <span className="font-display text-base font-semibold tracking-tight text-ink-50">
+        CanHav Research
       </span>
     </Link>
   );

@@ -227,6 +227,14 @@ export default async function EntityProfilePage({ params }: PageProps) {
             </Suspense>
           </section>
 
+          <EntityAgentPanel
+            entitySlug={profile.slug}
+            entityName={profile.name}
+            skill={{ id: entitySkill.id, title: entitySkill.title }}
+            zerodevConfigured={agentStatus.zerodev}
+            llmConfigured={agentStatus.llm}
+          />
+
           {profile.market && (
             <EntityMarketCard market={profile.market} symbol={profile.symbol} />
           )}
@@ -274,13 +282,6 @@ export default async function EntityProfilePage({ params }: PageProps) {
             <TradFiComparisonSection
               rows={profile.tradFiComparison}
               entityName={profile.name}
-            />
-            <EntityAgentPanel
-              entitySlug={profile.slug}
-              entityName={profile.name}
-              skill={{ id: entitySkill.id, title: entitySkill.title }}
-              zerodevConfigured={agentStatus.zerodev}
-              llmConfigured={agentStatus.llm}
             />
             <AgentSkillCard skill={entitySkill} />
             {profile.sources && <SourcesFooter sources={profile.sources} />}

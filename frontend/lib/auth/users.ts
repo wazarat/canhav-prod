@@ -12,6 +12,17 @@ import { userAgentId } from "@/lib/agent/user-agent";
 export interface UserProfile {
   userId: string;
   authenticatorId: string;
+  /**
+   * Human-readable name the user is identified by (captured on first passkey
+   * login). The passkey is the wallet/login; this is the thin profile layer on
+   * top — no second auth provider. Null until the user provides one.
+   */
+  displayName: string | null;
+  /**
+   * The user's primary smart-account (wallet) address. Optional — derived later
+   * (e.g. via SIWE + ERC-1271 wallet-proof, see note below) or backfilled.
+   */
+  address: string | null;
   createdAt: string;
   updatedAt: string;
   lastLoginAt: string;
@@ -76,25 +87,40 @@ function writeFile(store: FileUserStore): void {
   }
 }
 
+/** Backfill the profile fields added after the first release (name/address). */
+function normalizeUserProfile(profile: UserProfile | null): UserProfile | null {
+  if (!profile) return null;
+  return {
+    ...profile,
+    displayName: profile.displayName ?? null,
+    address: profile.address ?? null,
+  };
+}
+
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   if (hasUpstash()) {
-    return coerce<UserProfile>(await getRedisClient().get(key.profile(userId)));
+    return normalizeUserProfile(coerce<UserProfile>(await getRedisClient().get(key.profile(userId))));
   }
-  return readFile().profiles[userId] ?? null;
+  return normalizeUserProfile(readFile().profiles[userId] ?? null);
 }
 
 /**
  * Upsert a user after passkey register/login and ensure their default research
- * agent profile exists.
+ * agent profile exists. `displayName`/`address` are preserved across logins
+ * (only overwritten when a non-empty value is supplied).
  */
 export async function upsertUserFromPasskey(input: {
   userId: string;
   authenticatorId: string;
+  displayName?: string | null;
+  address?: string | null;
 }): Promise<UserProfile> {
   const existing = await getUserProfile(input.userId);
   const profile: UserProfile = {
     userId: input.userId,
     authenticatorId: input.authenticatorId,
+    displayName: (input.displayName?.trim() || existing?.displayName) ?? null,
+    address: (input.address?.trim() || existing?.address) ?? null,
     createdAt: existing?.createdAt ?? nowIso(),
     updatedAt: nowIso(),
     lastLoginAt: nowIso(),
@@ -119,6 +145,41 @@ export async function upsertUserFromPasskey(input: {
   });
 
   return profile;
+}
+
+/**
+ * Update mutable profile fields (the human name, and optionally the proven
+ * wallet address). Returns null if the user doesn't exist yet.
+ *
+ * NOTE (auth roadmap): the passkey → ZeroDev Kernel account is the only login.
+ * To cryptographically PROVE the wallet owns this session (not just trust the
+ * HMAC cookie), the next layer is SIWE (EIP-4361) verified via ERC-1271 (smart
+ * account signatures) — at which point `address` is set from the proven signer.
+ * ENS / subnames can later supply a human-readable on-chain identifier. Both are
+ * additive and out of scope for this layer.
+ */
+export async function updateUserProfile(
+  userId: string,
+  patch: { displayName?: string | null; address?: string | null },
+): Promise<UserProfile | null> {
+  const existing = await getUserProfile(userId);
+  if (!existing) return null;
+  const updated: UserProfile = {
+    ...existing,
+    displayName:
+      patch.displayName !== undefined ? (patch.displayName?.trim() || null) : existing.displayName,
+    address: patch.address !== undefined ? (patch.address?.trim() || null) : existing.address,
+    updatedAt: nowIso(),
+  };
+
+  if (hasUpstash()) {
+    await getRedisClient().set(key.profile(userId), JSON.stringify(updated));
+  } else {
+    const store = readFile();
+    store.profiles[userId] = updated;
+    writeFile(store);
+  }
+  return updated;
 }
 
 export async function linkAgentToUser(userId: string, agentId: string): Promise<void> {

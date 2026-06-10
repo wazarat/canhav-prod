@@ -285,58 +285,78 @@ async function execScope(scope: AgentScope) {
 /* AI SDK tool definitions (used by the streamText loop)                      */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Wrap a tool executor so it NEVER throws into the `streamText` loop. A thrown
+ * tool (a malformed/partial record, an upstream blip) otherwise surfaces as a
+ * raw stream error and shows the generic "hit an unexpected error" message.
+ * Instead we log it server-side and return a soft `{ found:false, error }` the
+ * model can read and explain, keeping the research pillar degrading gracefully.
+ */
+function safe<T extends (...args: never[]) => Promise<unknown>>(label: string, fn: T): T {
+  const wrapped = async (...args: Parameters<T>) => {
+    try {
+      return await fn(...args);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error(`[agent.tool] ${label} failed:`, msg);
+      return { found: false, error: msg, summary: `${label} unavailable: ${msg}` };
+    }
+  };
+  return wrapped as unknown as T;
+}
+
 export function buildAgentTools(agentId: string, scope?: AgentScope) {
   const base = {
     research_getEntity: tool({
       description: "Read a CanHav umbrella entity (issuer) profile by slug.",
       inputSchema: schemas.research_getEntity,
-      execute: execGetEntity,
+      execute: safe("research_getEntity", execGetEntity),
     }),
     research_getStablecoin: tool({
       description: "Read a stablecoin profile (peg target, supply, peg history) by slug.",
       inputSchema: schemas.research_getStablecoin,
-      execute: execGetStablecoin,
+      execute: safe("research_getStablecoin", execGetStablecoin),
     }),
     research_getToken: tool({
       description: "Read a governance/utility/yield/LST token profile by slug.",
       inputSchema: schemas.research_getToken,
-      execute: execGetToken,
+      execute: safe("research_getToken", execGetToken),
     }),
     research_getRwa: tool({
       description: "Read a real-world-asset (RWA) protocol profile by slug.",
       inputSchema: schemas.research_getRwa,
-      execute: execGetRwa,
+      execute: safe("research_getRwa", execGetRwa),
     }),
     research_listByCategory: tool({
       description: "List all CanHav profiles in a category (entities/stablecoins/rwas/tokens).",
       inputSchema: schemas.research_listByCategory,
-      execute: execList,
+      execute: safe("research_listByCategory", execList),
     }),
     research_getHistory: tool({
       description: "Fetch historical peg (stablecoin) or TVL (RWA) series for a slug.",
       inputSchema: schemas.research_getHistory,
-      execute: execHistory,
+      execute: safe("research_getHistory", execHistory),
     }),
     chain_readLive: tool({
       description: "Read live on-chain supply + metadata for a token contract (Arbitrum).",
       inputSchema: schemas.chain_readLive,
-      execute: execChainReadLive,
+      execute: safe("chain_readLive", execChainReadLive),
     }),
     skill_load: tool({
       description: "Load a CanHav AgentSkill by id and mark it studied for this agent.",
       inputSchema: schemas.skill_load,
-      execute: (a: Args<"skill_load">) => execSkillLoad(agentId, a),
+      execute: safe("skill_load", (a: Args<"skill_load">) => execSkillLoad(agentId, a)),
     }),
     memory_remember: tool({
       description:
         "Persist a durable, reusable fact so the agent learns over time (deduped).",
       inputSchema: schemas.memory_remember,
-      execute: (a: Args<"memory_remember">) => execRemember(agentId, a),
+      execute: safe("memory_remember", (a: Args<"memory_remember">) => execRemember(agentId, a)),
     }),
     memory_recall: tool({
       description: "Recall everything this agent has learned so far.",
       inputSchema: schemas.memory_recall,
-      execute: () => execRecall(agentId),
+      execute: safe("memory_recall", () => execRecall(agentId)),
     }),
   };
 
@@ -347,7 +367,7 @@ export function buildAgentTools(agentId: string, scope?: AgentScope) {
         description:
           "Return this agent's bound project (entity) and its member products (stablecoins/tokens/RWAs). Call this first to orient before researching.",
         inputSchema: z.object({}),
-        execute: () => execScope(scope),
+        execute: safe("agent_scope", () => execScope(scope)),
       }),
     };
   }

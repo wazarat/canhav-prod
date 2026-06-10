@@ -26,6 +26,11 @@ export interface SpawnParams {
   entity?: string;
   /** Member products the agent is scoped to (written on-chain as metadata). */
   associatedProducts?: AgentProductRef[];
+  /**
+   * Public base URL of the CanHav app. When set, the minted `tokenURI` points at
+   * the hosted, discoverable agent card instead of the on-chain data URI.
+   */
+  baseUrl?: string;
 }
 
 export interface SpawnResult {
@@ -44,12 +49,14 @@ export interface SpawnResult {
  *   4. return the minted `agentId`.
  */
 export async function spawnAgentFromSkill(params: SpawnParams): Promise<SpawnResult> {
-  const { cfg, skill, webAuthnKey, index, entity, associatedProducts } = params;
+  const { cfg, skill, webAuthnKey, index, entity, associatedProducts, baseUrl } = params;
 
   const account = await createPasskeyKernelAccount(cfg, webAuthnKey, index);
 
   const registrationFile = buildAgentRegistrationFile(skill, { entity, associatedProducts });
-  const agentURI = toAgentURI(registrationFile);
+  // Prefer the hosted, discoverable agent card (address is known pre-mint); the
+  // helper falls back to the on-chain data URI when no baseUrl is provided.
+  const agentURI = toAgentURI(registrationFile, { baseUrl, address: account.address });
 
   // Write the project binding on-chain as ERC-8004 metadata when present, using
   // the register(agentURI, MetadataEntry[]) overload. Falls back to the plain

@@ -1,4 +1,12 @@
-import { ExternalLink, Fingerprint, Hash, Wallet } from "lucide-react";
+import {
+  AlertTriangle,
+  ExternalLink,
+  FileJson,
+  Fingerprint,
+  Hash,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react";
 
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
@@ -13,11 +21,29 @@ export interface AgentIdentity {
   onChain?: boolean;
 }
 
+/** Result of the on-chain read (lib/agent/onchain.ts) for the live badge. */
+export interface AgentVerification {
+  verified: boolean;
+  configured: boolean;
+  owner?: string | null;
+  tokenURI?: string | null;
+  arbiscanUrl?: string | null;
+  error?: string;
+}
+
 function shortAddr(addr: string): string {
   return addr.length > 12 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
 }
 
-export function AgentIdentityCard({ identity }: { identity: AgentIdentity }) {
+export function AgentIdentityCard({
+  identity,
+  verification,
+  agentCardUrl,
+}: {
+  identity: AgentIdentity;
+  verification?: AgentVerification;
+  agentCardUrl?: string | null;
+}) {
   const security: SecurityInfo = identity.onChain
     ? {
         status: "verified",
@@ -29,6 +55,13 @@ export function AgentIdentityCard({ identity }: { identity: AgentIdentity }) {
         auditUrl: null,
         source: "Not yet minted on-chain",
       };
+
+  // Live verification (ownerOf matches the agent's smart account) takes priority
+  // over the stored `onChain` flag when available.
+  const ownershipMismatch =
+    verification?.configured === true &&
+    Boolean(verification?.owner) &&
+    verification?.verified === false;
 
   return (
     <div className="glass space-y-4 rounded-2xl p-6">
@@ -46,7 +79,17 @@ export function AgentIdentityCard({ identity }: { identity: AgentIdentity }) {
         </div>
         <div className="flex items-center gap-2">
           <Badge tone="signal">Arbitrum Sepolia</Badge>
-          <SecurityBadge info={security} />
+          {verification?.verified ? (
+            <Badge tone="positive">
+              <ShieldCheck className="h-3 w-3" /> Verified on-chain
+            </Badge>
+          ) : ownershipMismatch ? (
+            <Badge tone="warning">
+              <AlertTriangle className="h-3 w-3" /> Owner mismatch
+            </Badge>
+          ) : (
+            <SecurityBadge info={security} />
+          )}
         </div>
       </div>
 
@@ -65,16 +108,37 @@ export function AgentIdentityCard({ identity }: { identity: AgentIdentity }) {
         </div>
       </dl>
 
-      {identity.arbiscanUrl && (
-        <a
-          href={identity.arbiscanUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
-        >
-          View on Arbiscan <ExternalLink className="h-3.5 w-3.5" />
-        </a>
+      {verification?.verified && (
+        <p className="text-xs text-emerald-300/90">
+          {`ownerOf(#${identity.agentId}) matches this smart account on Arbitrum Sepolia.`}
+        </p>
       )}
+      {verification && !verification.verified && verification.configured && verification.error && (
+        <p className="text-xs text-ink-500">On-chain check unavailable: {verification.error}</p>
+      )}
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        {identity.arbiscanUrl && (
+          <a
+            href={identity.arbiscanUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
+          >
+            View on Arbiscan <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        )}
+        {agentCardUrl && (
+          <a
+            href={agentCardUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
+          >
+            <FileJson className="h-3.5 w-3.5" /> View agent card
+          </a>
+        )}
+      </div>
     </div>
   );
 }

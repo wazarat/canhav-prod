@@ -225,6 +225,18 @@ export async function listAgents(): Promise<AgentProfile[]> {
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
+/**
+ * Resolve an agent profile by its smart-account address (case-insensitive). The
+ * agent roster is tiny, so a scan is fine; powers the address-based agent-card
+ * route whose URL is stable and known before the ERC-8004 tokenId is minted.
+ */
+export async function getAgentByAddress(address: string): Promise<AgentProfile | null> {
+  if (!address) return null;
+  const target = address.toLowerCase();
+  const all = await listAgents();
+  return all.find((p) => (p.agentAddress ?? "").toLowerCase() === target) ?? null;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Runs                                                                       */
 /* -------------------------------------------------------------------------- */

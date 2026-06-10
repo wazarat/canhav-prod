@@ -128,7 +128,19 @@ export async function POST(req: Request) {
 
   const system = `${SYSTEM_PROMPT}\n\n--- Durable memory (what you already learned) ---\n${memoryBlock}\n\nSkills studied: ${studiedBlock}${projectBlock}`;
 
-  const modelMessages = await convertToModelMessages(messages);
+  // `ai@6` throws here if the incoming UIMessage[] from @ai-sdk/react doesn't
+  // match the shape it expects. Guard it so a bad history returns a clean 400
+  // ("start a new chat") instead of an unhandled 500.
+  let modelMessages;
+  try {
+    modelMessages = await convertToModelMessages(messages);
+  } catch (e) {
+    console.error("[agent] convertToModelMessages failed:", e);
+    return NextResponse.json(
+      { error: "Could not read the chat history. Start a new chat." },
+      { status: 400 },
+    );
+  }
   const activeConversationId = conversationId;
 
   const result = streamText({
@@ -180,17 +192,72 @@ export async function POST(req: Request) {
 }
 
 /**
+ * Flatten an error into a single searchable string. The AI SDK (`ai@6`) wraps
+ * provider failures so the actionable text (e.g. OpenAI `insufficient_quota`) is
+ * often NOT on `error.message` but nested under `cause`, `statusCode`,
+ * `responseBody`, or `data`. We walk those known fields (bounded depth, cycle
+ * guarded) so the classifier below matches the real cause instead of falling
+ * through to the generic message.
+ */
+function collectErrorText(error: unknown): string {
+  const seen = new Set<unknown>();
+  const parts: string[] = [];
+  const push = (v: unknown) => {
+    if (typeof v === "string") parts.push(v);
+    else if (typeof v === "number" || typeof v === "boolean") parts.push(String(v));
+  };
+  const walk = (err: unknown, depth: number): void => {
+    if (depth > 4 || err == null || seen.has(err)) return;
+    if (typeof err !== "object") {
+      push(err);
+      return;
+    }
+    seen.add(err);
+    const obj = err as Record<string, unknown>;
+    push(obj.message);
+    push(obj.statusCode);
+    push(obj.status);
+    push(obj.code);
+    push(obj.type);
+    push(obj.reason);
+    push(obj.name);
+    for (const key of ["responseBody", "data", "body", "error", "value"]) {
+      const v = obj[key];
+      if (typeof v === "string") push(v);
+      else if (v && typeof v === "object") walk(v, depth + 1);
+    }
+    walk(obj.cause, depth + 1);
+  };
+  walk(error, 0);
+  return parts.join(" ");
+}
+
+/**
  * Map raw provider stream errors to actionable, user-facing copy. The most
  * common one in this project is OpenAI `insufficient_quota` — surfacing the raw
  * billing JSON in the chat is confusing, so we translate it.
+ *
+ * Logs the raw error server-side first (the user still sees friendly text); that
+ * log line is the actual fault and is what to grep for in Vercel logs. Outside
+ * production we also echo the real message into the chat to speed up diagnosis.
  */
 function friendlyError(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error ?? "");
+  console.error("[agent] stream error:", error);
+  if (error instanceof Error && error.stack) {
+    console.error("[agent] stack:", error.stack);
+  }
+
+  const message =
+    collectErrorText(error) || (error instanceof Error ? error.message : String(error ?? ""));
+
   if (/insufficient_quota|exceeded your current quota|billing|\b429\b|\b402\b/i.test(message)) {
     return "The research agent's model provider is out of quota. Add credits to your OpenAI key or set AI_GATEWAY_API_KEY to route through the Vercel AI Gateway.";
   }
-  if (/api key|unauthorized|\b401\b/i.test(message)) {
+  if (/api[_ -]?key|unauthorized|invalid_api_key|\b401\b/i.test(message)) {
     return "The research agent's model provider rejected the API key. Check OPENAI_API_KEY / AI_GATEWAY_API_KEY.";
+  }
+  if (process.env.NODE_ENV !== "production" && message) {
+    return `Agent error: ${message}`;
   }
   return "The research agent hit an unexpected error. Please try again.";
 }

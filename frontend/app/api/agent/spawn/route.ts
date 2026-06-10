@@ -118,6 +118,10 @@ export async function POST(req: Request) {
 
   hydrateEnvFromSecrets();
 
+  // The deployment origin: lets the mint point tokenURI at this app's hosted,
+  // discoverable agent card instead of the on-chain data URI fallback.
+  const baseUrl = new URL(req.url).origin;
+
   try {
     const svc = await import("canhav-agent-service");
     const cfg = svc.loadConfig();
@@ -128,6 +132,7 @@ export async function POST(req: Request) {
       index: BigInt(accountIndex),
       entity: binding?.entitySlug ?? entitySlug,
       associatedProducts,
+      baseUrl,
     });
 
     const agentId = result.agentId.toString();

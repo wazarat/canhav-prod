@@ -18,6 +18,7 @@ interface AuthResponse {
 export interface SessionInfo {
   userId: string;
   agentId: string;
+  displayName?: string | null;
 }
 
 export function PasskeyAuthGate({
@@ -29,6 +30,7 @@ export function PasskeyAuthGate({
 }) {
   const [phase, setPhase] = useState<"idle" | "register" | "login">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState("");
 
   async function authenticate(mode: "register" | "login") {
     if (!PASSKEY_SERVER) return;
@@ -53,6 +55,7 @@ export function PasskeyAuthGate({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mode,
+          displayName: displayName.trim() || undefined,
           webAuthnKey: {
             pubX: webAuthnKey.pubX.toString(),
             pubY: webAuthnKey.pubY.toString(),
@@ -72,12 +75,17 @@ export function PasskeyAuthGate({
         authenticated?: boolean;
         userId?: string;
         agentId?: string;
+        profile?: { displayName?: string | null } | null;
       };
       if (!session.authenticated || !session.userId || !session.agentId) {
         throw new Error("Session could not be established.");
       }
 
-      onAuthenticated({ userId: session.userId, agentId: session.agentId });
+      onAuthenticated({
+        userId: session.userId,
+        agentId: session.agentId,
+        displayName: session.profile?.displayName ?? null,
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Passkey authentication failed.");
     } finally {
@@ -111,6 +119,23 @@ export function PasskeyAuthGate({
           </div>
         ) : (
           <div className="flex flex-col gap-3">
+            <label className="space-y-1.5">
+              <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
+                Your name <span className="text-ink-600">(optional)</span>
+              </span>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="e.g. Ada Lovelace"
+                maxLength={80}
+                disabled={phase !== "idle"}
+                className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm text-ink-100 placeholder:text-ink-600 transition-colors focus:border-electric-500/50 focus:outline-none disabled:opacity-50"
+              />
+              <span className="text-[10px] text-ink-500">
+                Identifies you across your wallet and the agents you create.
+              </span>
+            </label>
             <button
               type="button"
               onClick={() => authenticate("login")}

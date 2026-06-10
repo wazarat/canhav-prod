@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { mode?: string; webAuthnKey?: unknown } = {};
+  let body: { mode?: string; webAuthnKey?: unknown; displayName?: unknown } = {};
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -39,10 +39,14 @@ export async function POST(req: Request) {
     );
   }
 
+  const displayName =
+    typeof body.displayName === "string" ? body.displayName.trim().slice(0, 80) : null;
+
   const userId = userIdFromWebAuthnKey(webAuthnKey);
   const profile = await upsertUserFromPasskey({
     userId,
     authenticatorId: webAuthnKey.authenticatorId,
+    displayName,
   });
 
   const token = createSessionToken(userId);

@@ -9,6 +9,7 @@ import { SkillShelf } from "@/components/agent/SkillShelf";
 import { Badge } from "@/components/ui/Badge";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { agentLevel, getAgentSnapshot } from "@/lib/agent/memory";
+import { verifyAgentOnChain } from "@/lib/agent/onchain";
 import { getAgentSkills } from "@/lib/agent/skills";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +30,15 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
   const level = agentLevel(memory.length, studiedSkills.length);
   const arbiscanUrl = profile.agentAddress
     ? `https://sepolia.arbiscan.io/address/${profile.agentAddress}`
+    : null;
+
+  // Verify the ERC-8004 identity on-chain (ownerOf matches the smart account)
+  // for the live "Verified on-chain" badge. Only attempt it for minted agents.
+  const verification = profile.onChain
+    ? await verifyAgentOnChain(agentId, profile.agentAddress)
+    : undefined;
+  const agentCardUrl = profile.agentAddress
+    ? `/api/agent/by-address/${profile.agentAddress}/agent-card`
     : null;
 
   return (
@@ -100,6 +110,8 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
                 skillTitle: profile.name,
                 onChain: profile.onChain,
               }}
+              verification={verification}
+              agentCardUrl={agentCardUrl}
             />
           )}
           <AgentMemoryPanel memory={memory} studiedSkills={studiedSkills} />

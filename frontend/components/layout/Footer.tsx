@@ -7,8 +7,8 @@ export function Footer() {
         <div className="space-y-2">
           <Logo />
           <p className="max-w-md text-sm text-ink-300">
-            Arbitrum ecosystem intelligence. Research-grade datasets, gated by an explicit
-            approval workflow.
+            Arbitrum ecosystem intelligence. Research-grade datasets, curated from the
+            Arbitrum Portal and refreshed daily.
           </p>
         </div>
         <div className="text-xs text-ink-500">

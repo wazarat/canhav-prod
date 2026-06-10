@@ -8,6 +8,7 @@ import { AlertTriangle, Bot, Send, Sparkles, User } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { AgentActivityFeed, type ActivityStep } from "./AgentActivityFeed";
+import { AgentMessageContent } from "./AgentMessageContent";
 
 interface UIPart {
   type: string;
@@ -198,7 +199,11 @@ export function AgentChat({
                         : "border border-ink-800/60 bg-ink-900/40 text-ink-100",
                     )}
                   >
-                    {text || (m.role === "assistant" && busy ? "…" : "")}
+                    {text ? (
+                      <AgentMessageContent role={m.role} text={text} />
+                    ) : m.role === "assistant" && busy ? (
+                      "…"
+                    ) : null}
                   </div>
                   {isUser && (
                     <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-ink-700/80 bg-ink-900/60 text-ink-300">

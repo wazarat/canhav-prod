@@ -8,6 +8,7 @@ import {
   Wallet,
 } from "lucide-react";
 
+import { scan8004AgentUrl } from "@/lib/agent/8004scan";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
 import type { SecurityInfo } from "@/lib/types";
@@ -62,6 +63,8 @@ export function AgentIdentityCard({
     verification?.configured === true &&
     Boolean(verification?.owner) &&
     verification?.verified === false;
+
+  const scanUrl = identity.onChain ? scan8004AgentUrl(identity.agentId) : null;
 
   return (
     <div className="glass space-y-4 rounded-2xl p-6">
@@ -118,6 +121,16 @@ export function AgentIdentityCard({
       )}
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        {scanUrl && (
+          <a
+            href={scanUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
+          >
+            View on 8004scan <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        )}
         {identity.arbiscanUrl && (
           <a
             href={identity.arbiscanUrl}

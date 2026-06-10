@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { ERC8004_REGISTRATION_TYPE, canhavPublicOrigin } from "@/lib/agent/public-url";
 import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/config";
 import { resolveEntityBinding } from "@/lib/agent/entity-binding";
 import { getAgentByAddress } from "@/lib/agent/memory";
@@ -37,7 +38,7 @@ export async function GET(req: Request, { params }: { params: { address: string 
     );
   }
 
-  const origin = new URL(req.url).origin;
+  const origin = canhavPublicOrigin(new URL(req.url).origin);
   const registry = readSecret("IDENTITY_REGISTRY_ADDRESS");
   const isMinted = profile.onChain && /^\d+$/.test(profile.agentId);
 
@@ -45,11 +46,29 @@ export async function GET(req: Request, { params }: { params: { address: string 
   const entityName = binding?.entityName ?? "General research";
   const categories = new Set(profile.associatedProducts.map((p) => p.category));
 
+  const webUri = `${origin}/agents/${profile.agentId}`;
+  const verifyUri = `${origin}/api/agent/${profile.agentId}/verify`;
+
+  const endpoints = [
+    { name: "web", uri: webUri },
+    { name: "verify", uri: verifyUri },
+  ];
+
+  const services = [
+    { name: "web", endpoint: webUri },
+    { name: "verify", endpoint: verifyUri },
+    ...(profile.agentAddress
+      ? [{ name: "agentWallet", endpoint: profile.agentAddress }]
+      : []),
+  ];
+
   const card = {
+    type: ERC8004_REGISTRATION_TYPE,
     name: `CanHav · ${entityName} Research Agent`,
     description: profile.entitySlug
       ? `Research-only ERC-8004 agent bound to the ${entityName} entity on the CanHav platform (Arbitrum ecosystem intelligence).`
       : "Research-only ERC-8004 agent on the CanHav platform (Arbitrum ecosystem intelligence).",
+    image: `${origin}/logo.svg`,
     // CAIP-10 registry reference — what indexers/other agents read for portability.
     registrations:
       isMinted && registry
@@ -60,10 +79,8 @@ export async function GET(req: Request, { params }: { params: { address: string 
             },
           ]
         : [],
-    endpoints: [
-      { name: "web", uri: `${origin}/agents/${profile.agentId}` },
-      { name: "verify", uri: `${origin}/api/agent/${profile.agentId}/verify` },
-    ],
+    services,
+    endpoints,
     capabilities: capabilitiesFor(categories),
     entity: profile.entitySlug,
     associatedProducts: profile.associatedProducts,

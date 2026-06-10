@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight, CircleDot, Sparkles } from "lucide-react";
+import { ChevronRight, CircleDot, Rocket, Sparkles } from "lucide-react";
 
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
 import { AgentIdentityCard } from "@/components/agent/AgentIdentityCard";
@@ -92,6 +92,28 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
               </span>
             )}
           </p>
+        )}
+        {!profile.onChain && (
+          <div className="flex flex-wrap items-start gap-3 rounded-xl border border-ink-700/80 bg-ink-900/40 px-4 py-3">
+            <Rocket className="mt-0.5 h-4 w-4 shrink-0 text-electric-400" />
+            <p className="text-sm text-ink-300">
+              This agent is <span className="font-medium text-ink-100">local only</span> — chat
+              works, but it is not registered on ERC-8004 and will not appear on{" "}
+              <a
+                href="https://8004scan.io"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-electric-400 hover:text-electric-300"
+              >
+                8004scan
+              </a>
+              .{" "}
+              <Link href="/agents" className="font-medium text-electric-400 hover:text-electric-300">
+                Launch an on-chain identity
+              </Link>{" "}
+              from the Agents roster to mint on Arbitrum Sepolia.
+            </p>
+          </div>
         )}
       </header>
 

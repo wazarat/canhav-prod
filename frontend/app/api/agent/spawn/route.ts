@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { hasZeroDev } from "@/lib/agent/config";
 import { deriveAccountIndex } from "@/lib/agent/account-index";
+import { canhavPublicOrigin } from "@/lib/agent/public-url";
 import { resolveEntityBinding } from "@/lib/agent/entity-binding";
 import { getAgentProfile, markSkillStudied, seedAgentProfile } from "@/lib/agent/memory";
 import { getAgentSkillById } from "@/lib/agent/skills";
@@ -120,9 +121,8 @@ export async function POST(req: Request) {
 
   hydrateEnvFromSecrets();
 
-  // The deployment origin: lets the mint point tokenURI at this app's hosted,
-  // discoverable agent card instead of the on-chain data URI fallback.
-  const baseUrl = new URL(req.url).origin;
+  // Prefer CANHAV_PUBLIC_URL so tokenURI stays on the stable apex (canhav.co).
+  const baseUrl = canhavPublicOrigin(new URL(req.url).origin);
 
   try {
     const svc = await import("canhav-agent-service");

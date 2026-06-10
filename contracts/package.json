@@ -7,7 +7,9 @@
     "build": "forge build",
     "test": "forge test -vvv",
     "fmt": "forge fmt",
-    "deploy:arbitrum-sepolia": "forge script script/Deploy.s.sol:Deploy --rpc-url arbitrum_sepolia --broadcast --verify"
+    "check:deployer": "bash scripts/check-deployer.sh",
+    "deploy:arbitrum-sepolia": "bash scripts/check-deployer.sh && forge script script/Deploy.s.sol:Deploy --rpc-url arbitrum_sepolia --broadcast --slow",
+    "deploy:arbitrum-sepolia:verify": "bash scripts/check-deployer.sh && forge script script/Deploy.s.sol:Deploy --rpc-url arbitrum_sepolia --broadcast --slow --verify"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.1.0"

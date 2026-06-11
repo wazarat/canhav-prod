@@ -101,6 +101,11 @@ export interface TokenResolution {
   address: string | null;
   decimals: number | null;
   priceUsd: number | null;
+  /** Market fields parsed from the same /coins/{id} payload (no extra call). */
+  marketCapUsd: number | null;
+  volume24hUsd: number | null;
+  change24hPct: number | null;
+  fdvUsd: number | null;
   source: "coingecko";
 }
 
@@ -163,14 +168,33 @@ export async function resolveCoin(
     }
   }
 
-  let priceUsd: number | null = null;
   const market = data.market_data;
-  const cur = market && typeof market === "object" ? market.current_price : null;
-  if (cur && typeof cur === "object" && typeof cur.usd === "number") {
-    priceUsd = cur.usd;
-  }
+  const m = market && typeof market === "object" ? market : null;
+  const usd = (obj: unknown): number | null =>
+    obj && typeof obj === "object" && typeof (obj as any).usd === "number"
+      ? (obj as any).usd
+      : null;
 
-  return { coinId, address, decimals, priceUsd, source: "coingecko" };
+  const priceUsd = m ? usd(m.current_price) : null;
+  const marketCapUsd = m ? usd(m.market_cap) : null;
+  const volume24hUsd = m ? usd(m.total_volume) : null;
+  const fdvUsd = m ? usd(m.fully_diluted_valuation) : null;
+  const change24hPct =
+    m && typeof m.price_change_percentage_24h === "number"
+      ? m.price_change_percentage_24h
+      : null;
+
+  return {
+    coinId,
+    address,
+    decimals,
+    priceUsd,
+    marketCapUsd,
+    volume24hUsd,
+    change24hPct,
+    fdvUsd,
+    source: "coingecko",
+  };
 }
 
 /** Resolve via the curated COINGECKO_IDS map; null if unmapped. */

@@ -16,9 +16,10 @@ import {
 import { appendMemory, getMemory, markSkillStudied } from "@/lib/agent/memory";
 import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-binding";
 import { getAgentSkillById } from "@/lib/agent/skills";
+import { fetchReserveRatesForSlug } from "@/lib/server/aave";
 import { fetchRecentTransfers, fetchTokenMetadata, fetchTotalSupply } from "@/lib/server/alchemy";
 import { fetchPegHistory, fetchTvlHistory } from "@/lib/server/dune";
-import type { OffchainFact } from "@/lib/types";
+import type { LendingMarket, OffchainFact } from "@/lib/types";
 
 /**
  * Compact off-chain facts for agent consumption: drop the nested source object
@@ -34,6 +35,19 @@ function compactFacts(facts: OffchainFact[] | undefined) {
     sourceUrl: f.source?.url ?? null,
     theoretical: f.theoretical ?? false,
   }));
+}
+
+/** Compact Aave V3 lending rates for agent consumption (null when not a reserve). */
+function compactLendingMarket(market: LendingMarket | null | undefined) {
+  if (!market) return null;
+  return {
+    supplyApyPct: market.supplyApyPct,
+    variableBorrowApyPct: market.variableBorrowApyPct,
+    utilizationPct: market.utilizationPct,
+    underlyingSymbol: market.underlyingSymbol ?? null,
+    source: market.source,
+    updatedAt: market.updatedAt,
+  };
 }
 
 /**
@@ -64,6 +78,9 @@ const schemas = {
   chain_readLive: z.object({
     address: z.string().describe("Token contract address (Arbitrum)."),
     decimals: z.number().int().optional(),
+  }),
+  chain_readAaveRates: z.object({
+    slug: z.string().describe("Aave reserve member-coin slug: gho, ausdc, ausdt, or aweth."),
   }),
   skill_load: z.object({ skillId: z.string().describe("Skill id (entity slug).") }),
   memory_remember: z.object({
@@ -129,6 +146,7 @@ async function execGetStablecoin(a: Args<"research_getStablecoin">) {
     latestPeg,
     offchainFacts: compactFacts(p.offchainFacts),
     contractAddress: p.contractAddress ?? null,
+    lendingMarket: compactLendingMarket(p.lendingMarket),
     summary: `Read stablecoin ${p.name} (peg ${p.pegTarget}${p.assetSubtype ? `, ${p.assetSubtype}` : ""}).`,
   };
 }
@@ -151,6 +169,15 @@ async function execGetToken(a: Args<"research_getToken">) {
     totalSupply: p.totalSupply.value,
     offchainFacts: compactFacts(p.offchainFacts),
     contractAddress: p.contractAddress ?? null,
+    yieldMechanics: p.yieldMechanics
+      ? {
+          currentApyPct: p.yieldMechanics.currentApyPct,
+          yieldSource: p.yieldMechanics.yieldSource,
+          emissionsBased: p.yieldMechanics.emissionsBased,
+          dataSource: p.yieldMechanics.dataSource,
+        }
+      : null,
+    lendingMarket: compactLendingMarket(p.lendingMarket),
     summary: `Read token ${p.name} (${p.tokenType}).`,
   };
 }
@@ -227,6 +254,27 @@ async function execChainReadLive(a: Args<"chain_readLive">) {
       supply.value !== null
         ? `On-chain supply for ${meta?.symbol ?? a.address}: ${supply.value}.`
         : `No live on-chain data for ${a.address} (Alchemy not configured?).`,
+  };
+}
+
+async function execChainReadAaveRates(a: Args<"chain_readAaveRates">) {
+  const rates = await fetchReserveRatesForSlug(a.slug);
+  if (!rates || rates.supplyApyPct === null) {
+    return {
+      found: false,
+      slug: a.slug,
+      summary: `No live Aave reserve rates for "${a.slug}" (not an Aave reserve, or Alchemy not configured).`,
+    };
+  }
+  return {
+    found: true,
+    slug: a.slug,
+    underlyingSymbol: rates.underlyingSymbol,
+    supplyApyPct: rates.supplyApyPct,
+    variableBorrowApyPct: rates.variableBorrowApyPct,
+    utilizationPct: rates.utilizationPct,
+    updatedAt: rates.updatedAt,
+    summary: `Aave V3 ${rates.underlyingSymbol ?? a.slug}: supply ${rates.supplyApyPct.toFixed(2)}% APY, borrow ${rates.variableBorrowApyPct?.toFixed(2) ?? "—"}%.`,
   };
 }
 
@@ -342,6 +390,12 @@ export function buildAgentTools(agentId: string, scope?: AgentScope) {
       inputSchema: schemas.chain_readLive,
       execute: safe("chain_readLive", execChainReadLive),
     }),
+    chain_readAaveRates: tool({
+      description:
+        "Read fresh, live Aave V3 supply/borrow APY + utilization for a reserve member coin (gho, ausdc, ausdt, aweth) on-chain via Alchemy.",
+      inputSchema: schemas.chain_readAaveRates,
+      execute: safe("chain_readAaveRates", execChainReadAaveRates),
+    }),
     skill_load: tool({
       description: "Load a CanHav AgentSkill by id and mark it studied for this agent.",
       inputSchema: schemas.skill_load,
@@ -397,6 +451,11 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
     description: "Live on-chain supply/metadata for a contract.",
     sample: { address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" },
   },
+  {
+    name: "chain_readAaveRates",
+    description: "Live Aave V3 supply/borrow APY + utilization for a reserve coin.",
+    sample: { slug: "gho" },
+  },
   { name: "skill_load", description: "Load + study an AgentSkill by id.", sample: { skillId: "jupiter" } },
   {
     name: "memory_remember",
@@ -450,6 +509,9 @@ export async function runTool(
       break;
     case "chain_readLive":
       out = await execChainReadLive(a as Args<"chain_readLive">);
+      break;
+    case "chain_readAaveRates":
+      out = await execChainReadAaveRates(a as Args<"chain_readAaveRates">);
       break;
     case "skill_load":
       out = await execSkillLoad(agentId, a as Args<"skill_load">);

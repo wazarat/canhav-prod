@@ -41,7 +41,7 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from app.config import get_env, load_env  # noqa: E402
 from app.db import get_repository, schema  # noqa: E402
-from app.live import alchemy, coingecko, rwa_registry  # noqa: E402
+from app.live import aave, alchemy, coingecko, rwa_registry  # noqa: E402
 
 
 def _now_iso() -> str:
@@ -163,6 +163,56 @@ def main(argv: List[str]) -> int:
 
     print("-" * 78)
     print(f"{'Resolved/updated' if not args.dry_run else 'Would update'}: {updated} item(s).")
+
+    # --- Aave V3 lending rates (on-chain via Alchemy) ---------------------
+    # Mirrors the canonical TS cron (frontend/app/api/cron/refresh): reserve
+    # coins get a LendingMarket, aTokens also get a live YieldMechanics, and the
+    # Aave entity's headline APR is derived from the GHO supply APY.
+    aave_updated = 0
+    if has_alchemy:
+        for item in items:
+            slug = _slug_of(item)
+            category = item.get("Category")
+            if slug in aave.AAVE_RESERVES:
+                rates = aave.fetch_reserve_rates_for_slug(slug)
+                if rates and rates["supplyApyPct"] is not None:
+                    if not args.dry_run:
+                        item["LendingMarket"] = dict(rates)
+                        if slug in aave.ATOKEN_SLUGS:
+                            underlying = slug[1:].upper()
+                            item["YieldMechanics"] = {
+                                "currentApyPct": rates["supplyApyPct"],
+                                "feeShareToHoldersPct": 0,
+                                "yieldSource": (
+                                    f"Aave V3 supply APY on {underlying} "
+                                    "(interest paid by borrowers)"
+                                ),
+                                "isAutoCompounding": True,
+                                "emissionsBased": False,
+                                "payoutAsset": (
+                                    "Accrues continuously into the aToken balance "
+                                    "(redeemable for the underlying + interest)"
+                                ),
+                                "dataSource": "live",
+                            }
+                        item["UpdatedAt"] = _now_iso()
+                        repo.put_item(item)
+                    aave_updated += 1
+            elif category == schema.CATEGORY_ENTITY and slug == "aave":
+                gho = aave.fetch_reserve_rates_for_slug("gho")
+                if gho and gho["supplyApyPct"] is not None and not args.dry_run:
+                    scale = dict(item.get("CurrentScale") or {})
+                    scale["aprPct"] = gho["supplyApyPct"]
+                    item["CurrentScale"] = scale
+                    labels = dict(item.get("ScaleLabels") or {})
+                    labels["apr"] = "GHO supply APY"
+                    item["ScaleLabels"] = labels
+                    item["UpdatedAt"] = _now_iso()
+                    repo.put_item(item)
+                    aave_updated += 1
+    if aave_updated:
+        print(f"Aave rates : refreshed {aave_updated} item(s) (supply/borrow APY).")
+
     print("History (peg/TVL series) left untouched — Dune is wired but not active yet.")
 
     return 0

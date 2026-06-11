@@ -115,6 +115,8 @@ export interface StablecoinProfile {
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Curated off-chain facts (reg status, rating, attestation) with provenance. */
   offchainFacts?: OffchainFact[];
+  /** Live Aave V3 lending rates when this coin is an Aave reserve (e.g. GHO). */
+  lendingMarket?: LendingMarket | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -266,6 +268,22 @@ export interface YieldMechanics {
   payoutAsset: string;
   apyHistory?: PricePoint[];
   dataSource: DataSource;
+}
+
+/**
+ * Live lending-market rates for a reserve, read on-chain via Alchemy from Aave
+ * V3 (`AaveProtocolDataProvider.getReserveData`). Supply/borrow APY are the
+ * ray rates converted to compounded-per-second percentages; `utilizationPct` is
+ * borrowed / supplied. Populated by the cron refresh; `null`s when unavailable.
+ */
+export interface LendingMarket {
+  supplyApyPct: number | null;
+  variableBorrowApyPct: number | null;
+  utilizationPct: number | null;
+  /** Underlying reserve symbol the rates are for (e.g. "GHO", "USDC"). */
+  underlyingSymbol?: string | null;
+  source: "aave";
+  updatedAt: string | null;
 }
 
 export type RiskSeverity = "low" | "medium" | "high";
@@ -439,6 +457,8 @@ export interface TokenProfile {
   priceHistory?: PriceHistory;
   poolComposition?: PoolComposition;
   yieldMechanics?: YieldMechanics;
+  /** Live Aave V3 lending rates when this token is an Aave reserve (e.g. aUSDC). */
+  lendingMarket?: LendingMarket | null;
   typedRisks?: TypedRisk[];
   tokenomics?: Tokenomics;
   audits?: { firm: string; date: string; url: string | null }[];

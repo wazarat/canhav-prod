@@ -102,6 +102,11 @@ function MemberCoinCard({
             {formatUsdCompact(coin.market?.marketCap ?? null)}
           </span>
         </span>
+        {coin.lendingMarket?.supplyApyPct != null && (
+          <Badge tone="positive">
+            {coin.lendingMarket.supplyApyPct.toFixed(2)}% supply APY
+          </Badge>
+        )}
       </div>
 
       <div className="mt-auto flex items-center justify-between gap-2 border-t border-ink-800/60 pt-3">
@@ -278,6 +283,35 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
               </p>
             )}
           </DataPanel>
+
+          {coin.lendingMarket && (
+            <DataPanel title="Aave V3 lending" badge="On-chain · live">
+              <DataRow
+                label="Supply APY"
+                value={
+                  coin.lendingMarket.supplyApyPct != null
+                    ? `${coin.lendingMarket.supplyApyPct.toFixed(2)}%`
+                    : "—"
+                }
+              />
+              <DataRow
+                label="Borrow APY (variable)"
+                value={
+                  coin.lendingMarket.variableBorrowApyPct != null
+                    ? `${coin.lendingMarket.variableBorrowApyPct.toFixed(2)}%`
+                    : "—"
+                }
+              />
+              <DataRow
+                label="Utilization"
+                value={
+                  coin.lendingMarket.utilizationPct != null
+                    ? `${coin.lendingMarket.utilizationPct.toFixed(2)}%`
+                    : "—"
+                }
+              />
+            </DataPanel>
+          )}
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">

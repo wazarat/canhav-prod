@@ -14,6 +14,7 @@ import { TokenHeadlineStats } from "@/components/tokens/TokenHeadlineStats";
 import { TokenPriceHistorySection } from "@/components/tokens/TokenPriceHistorySection";
 import { TokenProfileCard } from "@/components/tokens/TokenProfileCard";
 import { ClassificationChips } from "@/components/shared/ClassificationChips";
+import { LendingMarketCard } from "@/components/shared/LendingMarketCard";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { TokenomicsCard } from "@/components/shared/TokenomicsCard";
@@ -125,6 +126,7 @@ export default async function TokenProfilePage({ params }: PageProps) {
           {profile.yieldMechanics && (
             <JlpYieldCard yieldMechanics={profile.yieldMechanics} />
           )}
+          {profile.lendingMarket && <LendingMarketCard market={profile.lendingMarket} />}
           <TokenProfileCard profile={profile} />
           <OffchainFactsPanel facts={profile.offchainFacts} />
           <Suspense fallback={<MarketStatsSkeleton />}>

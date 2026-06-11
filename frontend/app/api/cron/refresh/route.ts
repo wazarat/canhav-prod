@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
+import { fetchReserveRatesForSlug, isAaveReserveSlug } from "@/lib/server/aave";
 import { fetchTotalSupply, fetchTotalValueLocked } from "@/lib/server/alchemy";
-import { resolveForSlug, COINGECKO_IDS } from "@/lib/server/coingecko";
+import { resolveForSlug, COINGECKO_IDS, type TokenResolution } from "@/lib/server/coingecko";
 import { hasUpstash, putItem, readAllItemsFromRedis } from "@/lib/server/redis";
 import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
 
@@ -44,6 +45,28 @@ function authorized(req: Request): boolean {
   return auth === `Bearer ${secret}`;
 }
 
+// Member coins whose live yield comes from an Aave V3 reserve. aTokens
+// (aUSDC/aUSDT/aWETH) also get a live YieldMechanics so the existing token UI
+// lights up; GHO (a stablecoin) surfaces rates via its LendingMarket card.
+const AAVE_ATOKEN_SLUGS = new Set(["ausdc", "ausdt", "aweth"]);
+
+/** Build a live TokenMarket block from a CoinGecko resolution (no extra call). */
+function buildTokenMarket(r: TokenResolution) {
+  const sourced = (value: number | null) => ({
+    value,
+    dataSource: "live" as const,
+    sourceLabel: "CoinGecko",
+    updatedAt: nowIso(),
+  });
+  return {
+    priceUsd: sourced(r.priceUsd),
+    marketCapUsd: sourced(r.marketCapUsd),
+    volume24hUsd: sourced(r.volume24hUsd),
+    change24hPct: sourced(r.change24hPct),
+    fdvUsd: sourced(r.fdvUsd),
+  };
+}
+
 export async function GET(req: Request): Promise<NextResponse> {
   if (!authorized(req)) {
     // 500 if the secret isn't configured at all; 401 otherwise.
@@ -79,10 +102,11 @@ export async function GET(req: Request): Promise<NextResponse> {
     let address: string | null = null;
     let decimals: number | null = null;
     let priceUsd: number | null = null;
+    let resolution: TokenResolution | null = null;
 
     // 1. CoinGecko resolution (only when a coin id is mapped — saves the round-trip).
     if (COINGECKO_IDS[slug]) {
-      const resolution = await resolveForSlug(slug);
+      resolution = await resolveForSlug(slug);
       await sleep(COINGECKO_DELAY_MS);
       if (resolution) {
         address = resolution.address;
@@ -121,6 +145,12 @@ export async function GET(req: Request): Promise<NextResponse> {
       item.VaultAddresses = [address];
     }
 
+    // Persist the CoinGecko market block on token profiles so it lives in the
+    // store (agent-readable) instead of only being fetched at render time.
+    if (category === CATEGORY_TOKEN && resolution && resolution.priceUsd !== null) {
+      item.Market = buildTokenMarket(resolution);
+    }
+
     let mutated = true;
     if (!hasAlchemy) {
       row.note = "address persisted; ALCHEMY_API_KEY missing (metric skipped)";
@@ -149,6 +179,62 @@ export async function GET(req: Request): Promise<NextResponse> {
     results.push(row);
   }
 
+  // --- Aave V3 lending rates (on-chain via Alchemy) -------------------------
+  // Runs as its own pass so it isn't gated by CoinGecko address resolution
+  // (aTokens like aUSDC have no CoinGecko mapping). Reserve coins get a
+  // LendingMarket; aTokens also get a live YieldMechanics; the Aave entity's
+  // headline APR is derived from the GHO supply APY.
+  const aaveResults: { slug: string; supplyApyPct: number | null; borrowApyPct: number | null }[] =
+    [];
+  if (hasAlchemy) {
+    for (const item of items) {
+      const slug: string = item.Slug || "";
+      const category: string = item.Category || "";
+
+      if (isAaveReserveSlug(slug)) {
+        const rates = await fetchReserveRatesForSlug(slug);
+        if (rates && rates.supplyApyPct !== null) {
+          item.LendingMarket = { ...rates };
+          if (AAVE_ATOKEN_SLUGS.has(slug)) {
+            const underlying = rates.underlyingSymbol ?? slug.replace(/^a/, "").toUpperCase();
+            item.YieldMechanics = {
+              currentApyPct: rates.supplyApyPct,
+              feeShareToHoldersPct: 0,
+              yieldSource: `Aave V3 supply APY on ${underlying} (interest paid by borrowers)`,
+              isAutoCompounding: true,
+              emissionsBased: false,
+              payoutAsset:
+                "Accrues continuously into the aToken balance (redeemable for the underlying + interest)",
+              dataSource: "live",
+            };
+          }
+          item.UpdatedAt = nowIso();
+          await putItem(item);
+          updated += 1;
+          if (slug) touchedSlugs.push({ category, slug });
+          aaveResults.push({
+            slug,
+            supplyApyPct: rates.supplyApyPct,
+            borrowApyPct: rates.variableBorrowApyPct,
+          });
+        }
+      } else if (category === "Entity" && slug === "aave") {
+        const gho = await fetchReserveRatesForSlug("gho");
+        if (gho && gho.supplyApyPct !== null) {
+          item.CurrentScale = { ...(item.CurrentScale ?? {}), aprPct: gho.supplyApyPct };
+          item.ScaleLabels = { ...(item.ScaleLabels ?? {}), apr: "GHO supply APY" };
+          item.UpdatedAt = nowIso();
+          await putItem(item);
+          updated += 1;
+          aaveResults.push({ slug: "aave", supplyApyPct: gho.supplyApyPct, borrowApyPct: null });
+        }
+      }
+    }
+  }
+
+  // NOTE: peg/TVL history (HistoricalPegData / HistoricalTvlData) is still left
+  // untouched — Dune is wired but inactive until saved query IDs are provided.
+
   // Refresh public surfaces + each touched detail page.
   revalidatePath("/");
   revalidatePath("/entities");
@@ -174,5 +260,6 @@ export async function GET(req: Request): Promise<NextResponse> {
     total: items.length,
     updated,
     results,
+    aave: aaveResults,
   });
 }

@@ -154,6 +154,7 @@ export async function readLiveStore(): Promise<LiveStore> {
           source: "dune",
           updatedAt: null,
         },
+        lendingMarket: item.LendingMarket ?? undefined,
       } as StablecoinProfile);
     } else if (item.Category === "RWA") {
       rwas.push({
@@ -185,6 +186,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         priceHistory: item.PriceHistory ?? undefined,
         poolComposition: item.PoolComposition ?? undefined,
         yieldMechanics: item.YieldMechanics ?? undefined,
+        lendingMarket: item.LendingMarket ?? undefined,
         typedRisks: item.TypedRisks ?? undefined,
         tokenomics: item.Tokenomics ?? undefined,
         audits: item.Audits ?? undefined,

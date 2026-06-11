@@ -49,6 +49,17 @@ class HistoricalPegData(BaseModel):
     updatedAt: Optional[str] = None
 
 
+class LendingMarket(BaseModel):
+    """Live Aave V3 reserve rates (on-chain via Alchemy). See app/live/aave.py."""
+
+    supplyApyPct: Optional[float] = None
+    variableBorrowApyPct: Optional[float] = None
+    utilizationPct: Optional[float] = None
+    underlyingSymbol: Optional[str] = None
+    source: Literal["aave"] = "aave"
+    updatedAt: Optional[str] = None
+
+
 class ArbitrumPortalMetadata(BaseModel):
     portalUrl: Optional[str] = None
     logoUrl: Optional[str] = None
@@ -81,6 +92,7 @@ class StablecoinProfile(BaseModel):
     entitySlug: Optional[str] = None
     totalSupply: TotalSupply = Field(default_factory=TotalSupply)
     historicalPegData: HistoricalPegData = Field(default_factory=HistoricalPegData)
+    lendingMarket: Optional[LendingMarket] = None
     arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
         default_factory=ArbitrumPortalMetadata
     )
@@ -111,6 +123,7 @@ class StablecoinProfile(BaseModel):
             "EntitySlug": self.entitySlug,
             "TotalSupply": self.totalSupply.model_dump(),
             "HistoricalPegData": self.historicalPegData.model_dump(),
+            "LendingMarket": self.lendingMarket.model_dump() if self.lendingMarket else None,
             "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
             "CreatedAt": self.createdAt,
             "UpdatedAt": self.updatedAt,
@@ -137,6 +150,9 @@ class StablecoinProfile(BaseModel):
             entitySlug=item.get("EntitySlug"),
             totalSupply=TotalSupply(**(item.get("TotalSupply") or {})),
             historicalPegData=HistoricalPegData(**(item.get("HistoricalPegData") or {})),
+            lendingMarket=LendingMarket(**item["LendingMarket"])
+            if item.get("LendingMarket")
+            else None,
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
                 **(item.get("ArbitrumPortalMetadata") or {})
             ),
@@ -291,6 +307,7 @@ class TokenProfile(BaseModel):
     # Slug of the parent umbrella Entity (e.g. "usd-ai").
     entitySlug: Optional[str] = None
     totalSupply: TotalSupply = Field(default_factory=TotalSupply)
+    lendingMarket: Optional[LendingMarket] = None
     arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
         default_factory=ArbitrumPortalMetadata
     )
@@ -318,6 +335,7 @@ class TokenProfile(BaseModel):
             "ContractAddress": self.contractAddress,
             "EntitySlug": self.entitySlug,
             "TotalSupply": self.totalSupply.model_dump(),
+            "LendingMarket": self.lendingMarket.model_dump() if self.lendingMarket else None,
             "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
             "CreatedAt": self.createdAt,
             "UpdatedAt": self.updatedAt,
@@ -342,6 +360,9 @@ class TokenProfile(BaseModel):
             contractAddress=item.get("ContractAddress"),
             entitySlug=item.get("EntitySlug"),
             totalSupply=TotalSupply(**(item.get("TotalSupply") or {})),
+            lendingMarket=LendingMarket(**item["LendingMarket"])
+            if item.get("LendingMarket")
+            else None,
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
                 **(item.get("ArbitrumPortalMetadata") or {})
             ),

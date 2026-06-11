@@ -8,7 +8,14 @@ import {
 } from "@/lib/server/alchemy";
 import { coinIdForSlug, fetchMarketData, type MarketData } from "@/lib/server/coingecko";
 import { resolveEntityToken } from "@/lib/server/resolve";
-import type { AssetSubtype, PegMechanism, RwaProfile, StablecoinProfile, TokenProfile } from "@/lib/types";
+import type {
+  AssetSubtype,
+  LendingMarket,
+  PegMechanism,
+  RwaProfile,
+  StablecoinProfile,
+  TokenProfile,
+} from "@/lib/types";
 
 /**
  * Serializable live snapshot for a single coin (USDai / sUSDai / CHIP), used to
@@ -47,6 +54,8 @@ export interface CoinLiveData {
   hasAlchemy: boolean;
   market: MarketData | null;
   onchain: CoinOnchain | null;
+  /** Live Aave V3 reserve rates when this coin is an Aave reserve, else null. */
+  lendingMarket: LendingMarket | null;
   links: {
     website: string | null;
     coingecko: string | null;
@@ -90,6 +99,9 @@ export async function getCoinLiveData(
       }
     : null;
 
+  const lendingMarket =
+    "lendingMarket" in profile ? (profile.lendingMarket ?? null) : null;
+
   const chains = profile.arbitrumPortalMetadata.chains ?? [];
   const explorer = explorerLink(chains, address);
   const profilePath =
@@ -118,6 +130,7 @@ export async function getCoinLiveData(
     hasAlchemy: hasAlchemy(),
     market,
     onchain,
+    lendingMarket,
     links: {
       website: profile.website,
       coingecko: profile.coingecko,

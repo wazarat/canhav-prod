@@ -9,6 +9,7 @@ import { PegHistorySection } from "@/components/stablecoins/PegHistorySection";
 import { ProfileCard } from "@/components/stablecoins/ProfileCard";
 import { StablecoinHeadlineStats } from "@/components/stablecoins/StablecoinHeadlineStats";
 import { ClassificationChips } from "@/components/shared/ClassificationChips";
+import { LendingMarketCard } from "@/components/shared/LendingMarketCard";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
@@ -107,6 +108,7 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
             />
           )}
           <ProfileCard profile={profile} />
+          {profile.lendingMarket && <LendingMarketCard market={profile.lendingMarket} />}
           <OffchainFactsPanel facts={profile.offchainFacts} />
           <Suspense fallback={<MarketStatsSkeleton />}>
             <MarketStats profile={profile} />

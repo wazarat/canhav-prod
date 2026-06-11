@@ -211,6 +211,11 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, agentId, agentAddress, agentURI, arbiscanUrl, tokenUrl });
   } catch (e) {
+    // Log the verbatim failure so the TRUE paymaster reason (e.g. `Unauthorized:
+    // wapk` vs `did not match any gas sponsoring policies` vs a request-limit
+    // hit) is visible in Vercel function logs — the user-facing message below is
+    // deliberately generic and hardcodes "403", which hides which failure it is.
+    console.error("[agent/spawn] mint failed:", e instanceof Error ? e.stack ?? e.message : e);
     const { message, code } = describeSpawnError(e);
     return NextResponse.json({ ok: false, error: message, code }, { status: 500 });
   }

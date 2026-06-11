@@ -168,8 +168,10 @@ def main(argv: List[str]) -> int:
     # Mirrors the canonical TS cron (frontend/app/api/cron/refresh): reserve
     # coins get a LendingMarket, aTokens also get a live YieldMechanics, and the
     # Aave entity's headline APR is derived from the GHO supply APY.
+    # Runs regardless of has_alchemy: aave.py falls back to a public Arbitrum RPC
+    # when no key is set, so live rates still resolve.
     aave_updated = 0
-    if has_alchemy:
+    if aave.has_aave():
         for item in items:
             slug = _slug_of(item)
             category = item.get("Category")

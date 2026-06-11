@@ -122,6 +122,40 @@ export default async function EntityProfilePage({ params }: PageProps) {
   const partnershipsLabel = labels.partnerships ?? "Partnerships";
   const coinsLabel = labels.coins ?? `Coins under ${profile.name}`;
 
+  // Only render stat tiles that actually have data — no blank "—" placeholders.
+  const aprValue =
+    scale.marketCapUsd != null
+      ? formatUsdCompact(scale.marketCapUsd)
+      : scale.aprPct != null
+        ? `${scale.aprPct.toFixed(2)}%`
+        : null;
+  const statCards: { label: string; value: string; hint?: string }[] = [];
+  if (scale.tvlUsd != null) {
+    statCards.push({ label: tvlLabel, value: formatUsdCompact(scale.tvlUsd), hint: "Latest data" });
+  }
+  if (scale.users != null) {
+    statCards.push({
+      label: usersLabel,
+      value: formatUsersCompact(scale.users),
+      hint: labels.users ? undefined : "Depositors",
+    });
+  }
+  if (aprValue != null) {
+    statCards.push({
+      label: aprLabel,
+      value: aprValue,
+      hint:
+        scale.marketCapUsd == null && scale.targetAprPct != null
+          ? `Target ${scale.targetAprPct.toFixed(2)}%`
+          : undefined,
+    });
+  }
+  statCards.push({
+    label: coinsLabel,
+    value: `${profile.memberCoins.length}`,
+    hint: "Member products",
+  });
+
   const sectionNavItems = buildEntitySectionNav(profile);
 
   const ctaClass =
@@ -184,28 +218,9 @@ export default async function EntityProfilePage({ params }: PageProps) {
       />
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label={tvlLabel} value={formatUsdCompact(scale.tvlUsd)} hint="Latest data" />
-        <StatCard
-          label={usersLabel}
-          value={scale.users != null ? formatUsersCompact(scale.users) : "—"}
-          hint={labels.users ? undefined : "Depositors"}
-        />
-        <StatCard
-          label={aprLabel}
-          value={
-            scale.marketCapUsd != null
-              ? formatUsdCompact(scale.marketCapUsd)
-              : scale.aprPct != null
-                ? `${scale.aprPct.toFixed(2)}%`
-                : "—"
-          }
-          hint={
-            scale.marketCapUsd == null && scale.targetAprPct != null
-              ? `Target ${scale.targetAprPct.toFixed(2)}%`
-              : undefined
-          }
-        />
-        <StatCard label={coinsLabel} value={`${profile.memberCoins.length}`} hint="Member products" />
+        {statCards.map((s) => (
+          <StatCard key={s.label} label={s.label} value={s.value} hint={s.hint} />
+        ))}
       </section>
 
       {/* Mobile section nav */}
@@ -308,19 +323,18 @@ export default async function EntityProfilePage({ params }: PageProps) {
           </div>
 
           <DataPanel title="At a glance">
-            <DataRow label={pipelineLabel} value={formatUsdCompact(scale.loanPipelineUsd)} />
-            <DataRow
-              label={partnershipsLabel}
-              value={scale.partnerships != null ? `${scale.partnerships}+` : "—"}
-            />
-            <DataRow
-              label="Member coins"
-              value={
-                profile.memberCoins.length
-                  ? profile.memberCoins.map((c) => c.symbol).join(", ")
-                  : "—"
-              }
-            />
+            {scale.loanPipelineUsd != null && (
+              <DataRow label={pipelineLabel} value={formatUsdCompact(scale.loanPipelineUsd)} />
+            )}
+            {scale.partnerships != null && (
+              <DataRow label={partnershipsLabel} value={`${scale.partnerships}+`} />
+            )}
+            {profile.memberCoins.length > 0 && (
+              <DataRow
+                label="Member coins"
+                value={profile.memberCoins.map((c) => c.symbol).join(", ")}
+              />
+            )}
           </DataPanel>
 
           <DataPanel title="Links">

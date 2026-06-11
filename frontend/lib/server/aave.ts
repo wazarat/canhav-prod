@@ -29,6 +29,10 @@ const DATA_PROVIDER: Address = "0x243Aa95cAC2a25651eda86e80bEe66114413c43b";
 const POOL: Address = "0x794a61358D6845594F94dc1DB02A252b5b4814aD";
 
 const DEFAULT_BASE_URL = "https://arb-mainnet.g.alchemy.com/v2";
+// Used only when no ALCHEMY_API_KEY is configured. Aave reads are a handful of
+// cheap view calls, so a public RPC keeps live rates working out of the box
+// (e.g. local dev) without a key. Production with a key always prefers Alchemy.
+const PUBLIC_FALLBACK_RPC = "https://arbitrum-one.publicnode.com";
 
 // Compounded-per-second ray rate -> APY %. RAY = 1e27, matching Aave's docs.
 const RAY = 1e27;
@@ -93,26 +97,26 @@ const DATA_PROVIDER_ABI = [
   },
 ] as const;
 
-function rpcUrl(): string | null {
+function rpcUrl(): string {
   const key = readSecret("ALCHEMY_API_KEY");
-  if (!key) return null;
-  const base = readSecret("ALCHEMY_ARBITRUM_BASE_URL") || DEFAULT_BASE_URL;
-  return `${base.replace(/\/$/, "")}/${key}`;
+  if (key) {
+    const base = readSecret("ALCHEMY_ARBITRUM_BASE_URL") || DEFAULT_BASE_URL;
+    return `${base.replace(/\/$/, "")}/${key}`;
+  }
+  return PUBLIC_FALLBACK_RPC;
 }
 
 let client: ReturnType<typeof createPublicClient> | null = null;
 
 function getClient(): ReturnType<typeof createPublicClient> | null {
   if (client) return client;
-  const url = rpcUrl();
-  if (!url) return null;
-  client = createPublicClient({ chain: arbitrum, transport: http(url) });
+  client = createPublicClient({ chain: arbitrum, transport: http(rpcUrl()) });
   return client;
 }
 
-/** Whether an Alchemy key is configured (cheap guard before reading rates). */
+/** Aave rates are always readable (Alchemy when keyed, else a public RPC). */
 export function hasAave(): boolean {
-  return Boolean(rpcUrl());
+  return true;
 }
 
 function rayRateToApyPct(rateRay: bigint): number {

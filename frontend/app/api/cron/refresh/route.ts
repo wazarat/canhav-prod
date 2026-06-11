@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { fetchReserveRatesForSlug, isAaveReserveSlug } from "@/lib/server/aave";
+import { fetchReserveRatesForSlug, hasAave, isAaveReserveSlug } from "@/lib/server/aave";
 import { fetchTotalSupply, fetchTotalValueLocked } from "@/lib/server/alchemy";
 import { resolveForSlug, COINGECKO_IDS, type TokenResolution } from "@/lib/server/coingecko";
 import { hasUpstash, putItem, readAllItemsFromRedis } from "@/lib/server/redis";
@@ -186,7 +186,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   // headline APR is derived from the GHO supply APY.
   const aaveResults: { slug: string; supplyApyPct: number | null; borrowApyPct: number | null }[] =
     [];
-  if (hasAlchemy) {
+  if (hasAave()) {
     for (const item of items) {
       const slug: string = item.Slug || "";
       const category: string = item.Category || "";

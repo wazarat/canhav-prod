@@ -29,6 +29,9 @@ from ..config import get_env
 # AaveV3Arbitrum.AAVE_PROTOCOL_DATA_PROVIDER
 DATA_PROVIDER = "0x243Aa95cAC2a25651eda86e80bEe66114413c43b"
 DEFAULT_BASE_URL = "https://arb-mainnet.g.alchemy.com/v2"
+# Used only when no ALCHEMY_API_KEY is set: a public Arbitrum RPC so live Aave
+# rates still resolve (a few cheap view calls). Alchemy is preferred when keyed.
+PUBLIC_FALLBACK_RPC = "https://arbitrum-one.publicnode.com"
 # keccak256("getReserveData(address)")[:4]
 SELECTOR_GET_RESERVE_DATA = "0x35ea6a75"
 
@@ -61,12 +64,17 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
-def _rpc_url() -> Optional[str]:
+def _rpc_url() -> str:
     key = get_env("ALCHEMY_API_KEY")
     if not key:
-        return None
+        return PUBLIC_FALLBACK_RPC
     base = get_env("ALCHEMY_ARBITRUM_BASE_URL", DEFAULT_BASE_URL) or DEFAULT_BASE_URL
     return f"{base.rstrip('/')}/{key}"
+
+
+def has_aave() -> bool:
+    """Aave rates are always readable (Alchemy when keyed, else a public RPC)."""
+    return True
 
 
 def _eth_call(url: str, to: str, data: str, *, timeout: float = 20.0) -> Optional[str]:
@@ -79,7 +87,11 @@ def _eth_call(url: str, to: str, data: str, *, timeout: float = 20.0) -> Optiona
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json", "Accept": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "canhav-research/1.0",
+        },
         method="POST",
     )
     try:

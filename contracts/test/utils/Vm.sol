@@ -10,6 +10,8 @@ pragma solidity ^0.8.20;
  */
 interface Vm {
     function addr(uint256 privateKey) external pure returns (address);
+    function sign(uint256 privateKey, bytes32 digest) external pure returns (uint8 v, bytes32 r, bytes32 s);
+    function warp(uint256 newTimestamp) external;
     function envUint(string calldata name) external view returns (uint256);
     function envOr(string calldata name, address defaultValue) external view returns (address);
     function prank(address sender) external;

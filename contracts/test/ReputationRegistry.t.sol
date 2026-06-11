@@ -34,13 +34,13 @@ contract ReputationRegistryTest is CanHavTest {
 
     function test_giveFeedback_invalidDecimalsReverts() public {
         vm.prank(client);
-        vm.expectRevert(ReputationRegistry.InvalidDecimals.selector);
+        vm.expectRevert(abi.encodeWithSelector(ReputationRegistry.InvalidDecimals.selector, uint8(19)));
         reputation.giveFeedback(agentId, 95, 19, "quality", "", "", "", bytes32(0));
     }
 
     function test_giveFeedback_unknownAgentReverts() public {
         vm.prank(client);
-        vm.expectRevert(ReputationRegistry.NonexistentAgent.selector);
+        vm.expectRevert(abi.encodeWithSelector(ReputationRegistry.NonexistentAgent.selector, uint256(404)));
         reputation.giveFeedback(404, 1, 0, "", "", "", "", bytes32(0));
     }
 

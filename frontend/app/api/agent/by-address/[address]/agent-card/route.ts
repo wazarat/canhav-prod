@@ -4,6 +4,7 @@ import { ERC8004_REGISTRATION_TYPE, canhavPublicOrigin } from "@/lib/agent/publi
 import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/config";
 import { resolveEntityBinding } from "@/lib/agent/entity-binding";
 import { getAgentByAddress } from "@/lib/agent/memory";
+import { readAgentWallet } from "@/lib/agent/onchain";
 import { readSecret } from "@/lib/server/env";
 
 /**
@@ -12,9 +13,9 @@ import { readSecret } from "@/lib/server/env";
  * The address is known before the ERC-8004 tokenId is minted, so the mint can
  * point `tokenURI` here (see agent-service `toAgentURI`). Indexers and other
  * agents discover a CanHav agent by reading `tokenURI(agentId)` and fetching
- * this card — it carries the conventional keys ecosystem tooling expects:
- * `registrations` with a CAIP-10 `agentRegistry` (`eip155:421614:<registry>`),
- * `endpoints`, `capabilities`, `entity`, `associatedProducts`, and `trustModels`.
+ * this card — it carries the canonical ERC-8004 keys ecosystem tooling expects:
+ * `type`, `services`, `registrations` with a CAIP-10 `agentRegistry`
+ * (`eip155:421614:<registry>`), `supportedTrust`, and `x402Support`.
  */
 
 export const runtime = "nodejs";
@@ -49,16 +50,28 @@ export async function GET(req: Request, { params }: { params: { address: string 
   const webUri = `${origin}/agents/${profile.agentId}`;
   const verifyUri = `${origin}/api/agent/${profile.agentId}/verify`;
 
-  const endpoints = [
-    { name: "web", uri: webUri },
-    { name: "verify", uri: verifyUri },
-  ];
+  // On-chain verified payment wallet (ERC-8004 reserved key). Bound during spawn
+  // via a signed setAgentWallet; zero/absent until the binding lands on-chain.
+  const verifiedWallet = isMinted ? await readAgentWallet(profile.agentId) : null;
+  const walletVerified = Boolean(
+    verifiedWallet &&
+      profile.agentAddress &&
+      verifiedWallet.toLowerCase() === profile.agentAddress.toLowerCase(),
+  );
 
+  // Canonical ERC-8004 `services` (web/verify, the agent's skills via OASF, and
+  // the verified wallet advertised as a CAIP-10 endpoint).
   const services = [
     { name: "web", endpoint: webUri },
     { name: "verify", endpoint: verifyUri },
-    ...(profile.agentAddress
-      ? [{ name: "agentWallet", endpoint: profile.agentAddress }]
+    { name: "OASF", endpoint: webUri, skills: capabilitiesFor(categories) },
+    ...(verifiedWallet
+      ? [
+          {
+            name: "agentWallet",
+            endpoint: `eip155:${ARBITRUM_SEPOLIA_CHAIN_ID}:${verifiedWallet}`,
+          },
+        ]
       : []),
   ];
 
@@ -69,6 +82,9 @@ export async function GET(req: Request, { params }: { params: { address: string 
       ? `Research-only ERC-8004 agent bound to the ${entityName} entity on the CanHav platform (Arbitrum ecosystem intelligence).`
       : "Research-only ERC-8004 agent on the CanHav platform (Arbitrum ecosystem intelligence).",
     image: `${origin}/logo.svg`,
+    services,
+    x402Support: false,
+    active: true,
     // CAIP-10 registry reference — what indexers/other agents read for portability.
     registrations:
       isMinted && registry
@@ -79,15 +95,14 @@ export async function GET(req: Request, { params }: { params: { address: string 
             },
           ]
         : [],
-    services,
-    endpoints,
-    capabilities: capabilitiesFor(categories),
+    supportedTrust: ["reputation"],
+    // CanHav extensions (indexers ignore unknown keys).
     entity: profile.entitySlug,
     associatedProducts: profile.associatedProducts,
     smartAccount: profile.agentAddress,
+    agentWallet: verifiedWallet,
+    walletVerified,
     chain: { caip2: `eip155:${ARBITRUM_SEPOLIA_CHAIN_ID}`, name: "arbitrum-sepolia" },
-    trustModels: ["reputation"],
-    x402: { supported: false },
     createdAt: profile.createdAt,
     updatedAt: profile.updatedAt,
   };

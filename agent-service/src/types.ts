@@ -45,19 +45,54 @@ export interface AgentProductRef {
   category: string;
 }
 
+/** A single ERC-8004 service entry (A2A, MCP, OASF, web, email, ...). */
+export interface AgentService {
+  name: string;
+  endpoint: string;
+  version?: string;
+  /** OPTIONAL OASF skills carried by this service. */
+  skills?: string[];
+  /** OPTIONAL OASF domains carried by this service. */
+  domains?: string[];
+}
+
+/** An on-chain registration reference (CAIP-10 registry + agentId). */
+export interface AgentRegistration {
+  agentId: number | string;
+  agentRegistry: string;
+}
+
+/**
+ * Canonical ERC-8004 agent registration file shape. The `type`, `name`,
+ * `description`, `services`, `registrations`, and `supportedTrust` fields follow
+ * the spec; `skillId`/`version`/`entity`/`associatedProducts` are CanHav
+ * extensions carried alongside (allowed — indexers ignore unknown keys).
+ */
 export interface AgentRegistrationFile {
+  /** Canonical EIP-8004 registration file type URI. */
+  type: string;
   name: string;
   description: string;
-  skillId: string;
-  version: string;
-  /** Read/research vs write/execute capabilities derived from the skill. */
-  capabilities: string[];
-  /** The Entity ("project") this agent is bound to (slug). */
+  /** Image URL for ERC-721 app compatibility. */
+  image?: string;
+  /** Service endpoints the agent exposes (REQUIRED, may be empty for fallback). */
+  services: AgentService[];
+  /** Whether the agent supports x402 pay-per-use commerce. */
+  x402Support: boolean;
+  /** Whether the agent is currently active. */
+  active?: boolean;
+  /** On-chain registrations (CAIP-10 registry references). */
+  registrations?: AgentRegistration[];
+  /** Trust models the agent supports (reputation, crypto-economic, ...). */
+  supportedTrust: string[];
+  /** CanHav extension: the source skill id. */
+  skillId?: string;
+  /** CanHav extension: the source skill version. */
+  version?: string;
+  /** CanHav extension: the Entity ("project") this agent is bound to (slug). */
   entity?: string;
-  /** Member products (stablecoins/tokens/RWAs) the agent is scoped to. */
+  /** CanHav extension: member products the agent is scoped to. */
   associatedProducts?: AgentProductRef[];
-  /** Optional service endpoints the agent exposes. */
-  endpoints?: string[];
   createdAt: string;
 }
 

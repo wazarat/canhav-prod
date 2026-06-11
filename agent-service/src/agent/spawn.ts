@@ -1,18 +1,36 @@
 import {
+  createPublicClient,
   decodeEventLog,
   encodeFunctionData,
   getAddress,
+  http,
   stringToHex,
   type Address,
+  type Hex,
   type Log,
 } from "viem";
 import type { WebAuthnKey } from "@zerodev/webauthn-key";
 
-import type { AgentServiceConfig } from "../config";
+import { chain, type AgentServiceConfig } from "../config";
 import type { AgentProductRef, AgentSkill } from "../types";
 import { identityRegistryAbi } from "../abi/registries";
 import { createPasskeyKernelAccount, type AgentKernelAccount } from "../zerodev/account";
 import { buildAgentRegistrationFile, toAgentURI } from "./registration";
+
+/** EIP-712 domain name/version of the ERC-8004 IdentityRegistry (reference impl). */
+const WALLET_BINDING_DOMAIN_NAME = "ERC8004IdentityRegistry";
+const WALLET_BINDING_DOMAIN_VERSION = "1";
+/** Seconds added to the chain timestamp for the wallet-binding deadline (< 5 min). */
+const WALLET_BINDING_TTL_SECONDS = 240n;
+
+const agentWalletSetTypes = {
+  AgentWalletSet: [
+    { name: "agentId", type: "uint256" },
+    { name: "newWallet", type: "address" },
+    { name: "owner", type: "address" },
+    { name: "deadline", type: "uint256" },
+  ],
+} as const;
 
 export interface SpawnParams {
   cfg: AgentServiceConfig;
@@ -38,6 +56,10 @@ export interface SpawnResult {
   agentAddress: Address;
   agentURI: string;
   account: AgentKernelAccount;
+  /** The verified ERC-8004 `agentWallet` (== `agentAddress` on success), else null. */
+  agentWallet: Address | null;
+  /** Whether the signed wallet binding (setAgentWallet) landed on-chain. */
+  walletVerified: boolean;
 }
 
 /**
@@ -46,7 +68,9 @@ export interface SpawnResult {
  *   2. build the ERC-8004 registration file from the skill,
  *   3. mint the on-chain identity via `IdentityRegistry.register(agentURI)`
  *      (gas sponsored by the ZeroDev paymaster),
- *   4. return the minted `agentId`.
+ *   4. cryptographically bind the smart account to the identity via a signed
+ *      `setAgentWallet` (ERC-1271), proving the account controls the identity,
+ *   5. return the minted `agentId` and verified wallet.
  */
 export async function spawnAgentFromSkill(params: SpawnParams): Promise<SpawnResult> {
   const { cfg, skill, webAuthnKey, index, entity, associatedProducts, baseUrl } = params;
@@ -82,21 +106,84 @@ export async function spawnAgentFromSkill(params: SpawnParams): Promise<SpawnRes
   const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
 
   const agentId = parseRegisteredAgentId(receipt.logs, cfg.identityRegistry);
-  return { agentId, agentAddress: account.address, agentURI, account };
+
+  // The first userOp deploys the smart account, so its ERC-1271 isValidSignature
+  // is live for the wallet-binding proof. Best-effort: a successful mint is kept
+  // even if the binding userOp fails (e.g. transient paymaster issue).
+  const walletVerified = await bindAgentWallet(cfg, account, agentId);
+
+  return {
+    agentId,
+    agentAddress: account.address,
+    agentURI,
+    account,
+    agentWallet: walletVerified ? account.address : null,
+    walletVerified,
+  };
+}
+
+/**
+ * Bind the agent's ZeroDev smart account to its identity by signing the
+ * ERC-8004 `AgentWalletSet` typed data (ERC-1271 via the kernel account) and
+ * submitting `setAgentWallet`. Returns whether the binding landed on-chain.
+ */
+async function bindAgentWallet(
+  cfg: AgentServiceConfig,
+  account: AgentKernelAccount,
+  agentId: bigint,
+): Promise<boolean> {
+  try {
+    const publicClient = createPublicClient({ chain, transport: http(cfg.rpcUrl) });
+    const block = await publicClient.getBlock();
+    const deadline = block.timestamp + WALLET_BINDING_TTL_SECONDS;
+    const wallet = account.address;
+
+    const signature = (await account.account.signTypedData({
+      domain: {
+        name: WALLET_BINDING_DOMAIN_NAME,
+        version: WALLET_BINDING_DOMAIN_VERSION,
+        chainId: cfg.chainId,
+        verifyingContract: cfg.identityRegistry,
+      },
+      types: agentWalletSetTypes,
+      primaryType: "AgentWalletSet",
+      message: { agentId, newWallet: wallet, owner: wallet, deadline },
+    })) as Hex;
+
+    const data = encodeFunctionData({
+      abi: identityRegistryAbi,
+      functionName: "setAgentWallet",
+      args: [agentId, wallet, deadline, signature],
+    });
+
+    const opHash = await account.kernelClient.sendUserOperation({
+      account: account.account,
+      calls: [{ to: cfg.identityRegistry, data }],
+    });
+    await account.kernelClient.waitForUserOperationReceipt({ hash: opHash });
+    return true;
+  } catch (e) {
+    // Non-fatal: the identity is minted; the wallet can be re-verified later.
+    console.error(
+      "[spawn] setAgentWallet binding failed:",
+      e instanceof Error ? e.message : e,
+    );
+    return false;
+  }
 }
 
 /** Build ERC-8004 MetadataEntry[] (key/bytes) for the agent's project binding. */
 function buildMetadataEntries(
   entity: string | undefined,
   associatedProducts: AgentProductRef[] | undefined,
-): { key: string; value: `0x${string}` }[] {
-  const entries: { key: string; value: `0x${string}` }[] = [];
+): { metadataKey: string; metadataValue: `0x${string}` }[] {
+  const entries: { metadataKey: string; metadataValue: `0x${string}` }[] = [];
   if (entity) {
-    entries.push({ key: "entity", value: stringToHex(entity) });
+    entries.push({ metadataKey: "entity", metadataValue: stringToHex(entity) });
   }
   if (associatedProducts && associatedProducts.length > 0) {
     const csv = associatedProducts.map((p) => p.symbol).join(",");
-    entries.push({ key: "products", value: stringToHex(csv) });
+    entries.push({ metadataKey: "products", metadataValue: stringToHex(csv) });
   }
   return entries;
 }

@@ -1,4 +1,8 @@
-import type { AgentProductRef, AgentRegistrationFile, AgentSkill } from "../types";
+import type { AgentProductRef, AgentRegistrationFile, AgentService, AgentSkill } from "../types";
+
+/** Canonical EIP-8004 registration file type URI. */
+export const ERC8004_REGISTRATION_TYPE =
+  "https://eips.ethereum.org/EIPS/eip-8004#registration-v1" as const;
 
 export interface RegistrationBinding {
   /** The Entity ("project") slug this agent is bound to. */
@@ -8,24 +12,39 @@ export interface RegistrationBinding {
 }
 
 /**
- * Build an ERC-8004 agent registration file from a CanHav skill. Capabilities
- * are derived from the skill's actions: read-only actions become research
- * capabilities; write actions become execution capabilities. The optional
+ * Build a canonical ERC-8004 agent registration file from a CanHav skill. The
+ * skill's actions are surfaced as OASF `skills` on a service entry (read-only
+ * actions become `research:*`, write actions become `execute:*`). The optional
  * `binding` records the agent's project (Entity) + member products on-chain.
+ *
+ * This is the fully on-chain `data:` URI fallback; the hosted agent card
+ * (preferred tokenURI) carries the richer web/verify service endpoints.
  */
 export function buildAgentRegistrationFile(
   skill: AgentSkill,
   binding?: RegistrationBinding,
 ): AgentRegistrationFile {
-  const capabilities = skill.actions.map(
+  const skills = skill.actions.map(
     (a) => `${a.readOnly ? "research" : "execute"}:${a.name}`,
   );
+  const services: AgentService[] = [
+    {
+      name: "OASF",
+      endpoint: `urn:canhav:skill:${skill.id}`,
+      version: skill.version,
+      skills,
+    },
+  ];
   return {
+    type: ERC8004_REGISTRATION_TYPE,
     name: skill.title,
     description: skill.summary,
+    services,
+    x402Support: false,
+    active: true,
+    supportedTrust: ["reputation"],
     skillId: skill.id,
     version: skill.version,
-    capabilities,
     ...(binding?.entity ? { entity: binding.entity } : {}),
     ...(binding?.associatedProducts ? { associatedProducts: binding.associatedProducts } : {}),
     createdAt: new Date().toISOString(),

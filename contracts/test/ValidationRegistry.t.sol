@@ -41,7 +41,7 @@ contract ValidationRegistryTest is CanHavTest {
         vm.prank(owner);
         validation.validationRequest(validator, agentId, "ipfs://req", REQ);
         vm.prank(owner);
-        vm.expectRevert(ValidationRegistry.NotValidator.selector);
+        vm.expectRevert(abi.encodeWithSelector(ValidationRegistry.NotValidator.selector, REQ, owner));
         validation.validationResponse(REQ, 100, "ipfs://resp", bytes32(0), "passed");
     }
 
@@ -49,7 +49,7 @@ contract ValidationRegistryTest is CanHavTest {
         vm.prank(owner);
         validation.validationRequest(validator, agentId, "ipfs://req", REQ);
         vm.prank(owner);
-        vm.expectRevert(ValidationRegistry.DuplicateRequest.selector);
+        vm.expectRevert(abi.encodeWithSelector(ValidationRegistry.DuplicateRequest.selector, REQ));
         validation.validationRequest(validator, agentId, "ipfs://req", REQ);
     }
 }

@@ -65,6 +65,8 @@ export interface AgentProfile {
   accountIndex: number | null;
   agentAddress: string | null;
   agentURI: string | null;
+  /** Verified ERC-8004 `agentWallet` (signed binding); null until verified/cleared. */
+  agentWallet: string | null;
   /** Whether an ERC-8004 identity was minted on-chain for this agent. */
   onChain: boolean;
   chain: typeof AGENT_CHAIN;
@@ -159,6 +161,7 @@ function normalizeProfile(profile: AgentProfile | null): AgentProfile | null {
     entitySlug: profile.entitySlug ?? null,
     associatedProducts: profile.associatedProducts ?? [],
     accountIndex: profile.accountIndex ?? null,
+    agentWallet: profile.agentWallet ?? null,
   };
 }
 
@@ -178,6 +181,7 @@ export interface SeedProfileInput {
   accountIndex?: number | null;
   agentAddress?: string | null;
   agentURI?: string | null;
+  agentWallet?: string | null;
   onChain?: boolean;
 }
 
@@ -194,6 +198,7 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
     accountIndex: input.accountIndex ?? existing?.accountIndex ?? null,
     agentAddress: input.agentAddress ?? existing?.agentAddress ?? null,
     agentURI: input.agentURI ?? existing?.agentURI ?? null,
+    agentWallet: input.agentWallet ?? existing?.agentWallet ?? null,
     onChain: input.onChain ?? existing?.onChain ?? false,
     chain: AGENT_CHAIN,
     createdAt: existing?.createdAt ?? nowIso(),

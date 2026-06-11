@@ -32,6 +32,13 @@ const identityReadAbi = [
     inputs: [{ name: "tokenId", type: "uint256" }],
     outputs: [{ name: "", type: "string" }],
   },
+  {
+    type: "function",
+    name: "getAgentWallet",
+    stateMutability: "view",
+    inputs: [{ name: "agentId", type: "uint256" }],
+    outputs: [{ name: "", type: "address" }],
+  },
 ] as const;
 
 const DEFAULT_RPC = "https://sepolia-rollup.arbitrum.io/rpc";
@@ -136,5 +143,36 @@ export async function verifyAgentOnChain(
     return { ...base, owner: ownerStr, tokenURI, verified };
   } catch (e) {
     return { ...base, error: e instanceof Error ? e.message : "On-chain read failed." };
+  }
+}
+
+/**
+ * Read the ERC-8004 reserved `agentWallet` for a minted agent. Returns the
+ * checksummed wallet address, or `null` when unconfigured, not minted, unset
+ * (zero address), or unreadable. Powers the "wallet verified" badge.
+ */
+export async function readAgentWallet(agentId: string): Promise<string | null> {
+  const registry = registryAddress();
+  if (!registry) return null;
+
+  let tokenId: bigint;
+  try {
+    tokenId = BigInt(agentId);
+  } catch {
+    return null;
+  }
+
+  try {
+    const client = createPublicClient({ chain: arbitrumSepolia, transport: http(rpcUrl()) });
+    const wallet = await client.readContract({
+      address: registry,
+      abi: identityReadAbi,
+      functionName: "getAgentWallet",
+      args: [tokenId],
+    });
+    const walletStr = getAddress(wallet);
+    return walletStr === "0x0000000000000000000000000000000000000000" ? null : walletStr;
+  } catch {
+    return null;
   }
 }

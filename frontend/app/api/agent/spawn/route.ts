@@ -201,6 +201,8 @@ export async function POST(req: Request) {
       ? `https://sepolia.arbiscan.io/token/${registry}?a=${agentId}`
       : null;
 
+    const agentWallet = result.walletVerified ? result.agentWallet : null;
+
     await seedAgentProfile({
       agentId,
       name: skill.title,
@@ -210,13 +212,23 @@ export async function POST(req: Request) {
       accountIndex,
       agentAddress,
       agentURI,
+      agentWallet,
       onChain: true,
     });
     await markSkillStudied(agentId, skillId);
     await linkAgentToUser(session.userId, agentId);
     await setUserEntityAgent(session.userId, entitySlug, agentId);
 
-    return NextResponse.json({ ok: true, agentId, agentAddress, agentURI, arbiscanUrl, tokenUrl });
+    return NextResponse.json({
+      ok: true,
+      agentId,
+      agentAddress,
+      agentURI,
+      arbiscanUrl,
+      tokenUrl,
+      agentWallet,
+      walletVerified: result.walletVerified,
+    });
   } catch (e) {
     // Log the verbatim failure so the TRUE paymaster reason (e.g. `Unauthorized:
     // wapk` vs `did not match any gas sponsoring policies` vs a request-limit

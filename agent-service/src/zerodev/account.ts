@@ -7,8 +7,8 @@ import {
   type CreateKernelAccountReturnType,
 } from "@zerodev/sdk";
 import { getEntryPoint, KERNEL_V3_1 } from "@zerodev/sdk/constants";
-import { PasskeyValidatorContractVersion, toPasskeyValidator } from "@zerodev/passkey-validator";
-import type { WebAuthnKey } from "@zerodev/webauthn-key";
+import type { Signer } from "@zerodev/sdk/types";
+import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
 import { toPermissionValidator } from "@zerodev/permissions";
 import { toECDSASigner } from "@zerodev/permissions/signers";
 import { CallPolicyVersion, toCallPolicy } from "@zerodev/permissions/policies";
@@ -17,15 +17,6 @@ import { chain, type AgentServiceConfig } from "../config";
 
 const entryPoint = getEntryPoint("0.7");
 const kernelVersion = KERNEL_V3_1;
-
-// Passkey validator contract version compatible with Kernel v3.1.
-//
-// MUST be the PATCHED validator: ZeroDev's paymaster refuses to sponsor
-// userOps validated by the older UNPATCHED passkey validators (0.0.1 /
-// 0.0.2), returning `403 Unauthorized: wapk` on pm_getPaymasterStubData.
-// Only the patched 0.0.3 validator (0x7ab16Ff3…9e69, supported by Kernel
-// 0.3.0–0.3.3) is sponsorable. Verified by replaying the live RPC.
-const PASSKEY_CONTRACT_VERSION = PasskeyValidatorContractVersion.V0_0_3_PATCHED;
 
 function publicClient(cfg: AgentServiceConfig) {
   return createPublicClient({ chain, transport: http(cfg.rpcUrl) });
@@ -49,34 +40,37 @@ function assembleAgentAccount(account: CreateKernelAccountReturnType, cfg: Agent
 export type AgentKernelAccount = ReturnType<typeof assembleAgentAccount>;
 
 /**
- * Create a kernel smart account whose ROOT authority is a **passkey** (WebAuthn)
- * validator — no seed phrase anywhere. The `webAuthnKey` is produced by the
- * client-side passkey ceremony and passed in. Used by `spawn` to mint the
- * ERC-8004 identity under the owner's passkey.
+ * Create a kernel smart account whose ROOT authority is an **ECDSA signer** —
+ * the user's self-custodial embedded wallet (e.g. a Privy social-login wallet),
+ * passed in as a viem account / wallet client / EIP-1193 provider. No seed
+ * phrase is ever handled by CanHav; the key stays in the wallet provider's TEE.
  *
- * `index` salts the counterfactual address so a single passkey can own MANY
+ * Using the ECDSA validator (instead of the older passkey validator) also keeps
+ * userOps sponsorable — ZeroDev's paymaster refuses to sponsor the unpatched
+ * passkey validator contracts, which surfaced as `403 Unauthorized: wapk`.
+ *
+ * `index` salts the counterfactual address so a single login can own MANY
  * distinct agents — one per project (Entity) — each with its OWN address and
  * its own ERC-8004 tokenId. The caller derives `index` deterministically from
  * (userId, entitySlug), so re-spawning the same project agent is idempotent
  * (same address, no duplicate identity).
  */
-export async function createPasskeyKernelAccount(
+export async function createEcdsaKernelAccount(
   cfg: AgentServiceConfig,
-  webAuthnKey: WebAuthnKey,
+  signer: Signer,
   index?: bigint,
 ): Promise<AgentKernelAccount> {
   const client = publicClient(cfg);
-  const passkeyValidator = await toPasskeyValidator(client, {
-    webAuthnKey,
+  const ecdsaValidator = await signerToEcdsaValidator(client, {
+    signer,
     entryPoint,
     kernelVersion,
-    validatorContractVersion: PASSKEY_CONTRACT_VERSION,
   });
 
   const account = await createKernelAccount(client, {
     entryPoint,
     kernelVersion,
-    plugins: { sudo: passkeyValidator },
+    plugins: { sudo: ecdsaValidator },
     ...(index !== undefined ? { index } : {}),
   });
 
@@ -84,8 +78,8 @@ export async function createPasskeyKernelAccount(
 }
 
 export interface ScopedSessionParams {
-  /** Passkey public key (root authority that approves the session). */
-  webAuthnKey: WebAuthnKey;
+  /** Root authority (the user's embedded wallet) that approves the session. */
+  signer: Signer;
   /** Session-key private key (the scoped, throwaway executor key). */
   sessionPrivateKey: Hex;
   /** Contracts the session key is permitted to call (on-chain scoping). */
@@ -93,10 +87,11 @@ export interface ScopedSessionParams {
 }
 
 /**
- * Create a kernel smart account with the passkey as `sudo` (root) and a **scoped
- * session key** as the `regular` validator. The session key can only call the
- * `allowedTargets` (a `toCallPolicy` restriction), giving the "passkey-approved
- * session" the user described — still no seed phrase. Used by `execute`.
+ * Create a kernel smart account with the user's ECDSA signer as `sudo` (root)
+ * and a **scoped session key** as the `regular` validator. The session key can
+ * only call the `allowedTargets` (a `toCallPolicy` restriction), giving the
+ * "owner-approved session" the agent executes under — still no seed phrase.
+ * Used by `execute`.
  */
 export async function createScopedSessionKernelAccount(
   cfg: AgentServiceConfig,
@@ -104,11 +99,10 @@ export async function createScopedSessionKernelAccount(
 ): Promise<AgentKernelAccount> {
   const client = publicClient(cfg);
 
-  const passkeyValidator = await toPasskeyValidator(client, {
-    webAuthnKey: params.webAuthnKey,
+  const sudoValidator = await signerToEcdsaValidator(client, {
+    signer: params.signer,
     entryPoint,
     kernelVersion,
-    validatorContractVersion: PASSKEY_CONTRACT_VERSION,
   });
 
   const sessionKeySigner = await toECDSASigner({
@@ -131,7 +125,7 @@ export async function createScopedSessionKernelAccount(
   const account = await createKernelAccount(client, {
     entryPoint,
     kernelVersion,
-    plugins: { sudo: passkeyValidator, regular: sessionKeyValidator },
+    plugins: { sudo: sudoValidator, regular: sessionKeyValidator },
   });
 
   return assembleAgentAccount(account, cfg);

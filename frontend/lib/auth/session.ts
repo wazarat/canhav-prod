@@ -26,7 +26,7 @@ function sign(payload: string): string {
   return createHmac("sha256", sessionSecret()).update(payload).digest("base64url");
 }
 
-/** Issue a signed session token for a passkey user id. */
+/** Issue a signed session token for a Privy user id (DID). */
 export function createSessionToken(userId: string): string {
   const payload: SessionPayload = {
     userId,

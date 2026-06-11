@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
-import type { WebAuthnKey } from "@zerodev/webauthn-key";
+import type { Hex } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 
 import { loadConfig } from "../config";
 import { spawnAgentFromSkill } from "../agent/spawn";
@@ -8,11 +9,12 @@ import type { AgentSkill } from "../types";
 /**
  * Example CLI: spawn an agent from a skill JSON file.
  *
- *   WEBAUTHN_KEY_JSON='{...}' npm run spawn -- ./skill.json
+ *   AGENT_SIGNER_PRIVATE_KEY=0x... npm run spawn -- ./skill.json
  *
- * The passkey (`WEBAUTHN_KEY_JSON`) is produced by the client-side WebAuthn
- * ceremony and passed in; there is no seed phrase. bigint fields (`pubX`,
- * `pubY`) arrive as strings in JSON and are coerced here.
+ * In the app the signer is the user's self-custodial embedded wallet (a Privy
+ * social-login wallet) and minting runs in the browser. For local CLI testing
+ * only, a throwaway private key stands in for that signer — never use a key
+ * with real funds, and only on Arbitrum Sepolia (the pinned testnet).
  */
 async function main(): Promise<void> {
   const skillPath = process.argv[2];
@@ -21,19 +23,14 @@ async function main(): Promise<void> {
   }
   const skill = JSON.parse(readFileSync(skillPath, "utf8")) as AgentSkill;
 
-  const webAuthnKeyJson = process.env.WEBAUTHN_KEY_JSON;
-  if (!webAuthnKeyJson) {
-    throw new Error("Set WEBAUTHN_KEY_JSON (from the client-side passkey ceremony).");
+  const privateKey = process.env.AGENT_SIGNER_PRIVATE_KEY;
+  if (!privateKey) {
+    throw new Error("Set AGENT_SIGNER_PRIVATE_KEY (a testnet-only throwaway key for CLI spawns).");
   }
-  const raw = JSON.parse(webAuthnKeyJson) as Record<string, unknown>;
-  const webAuthnKey: WebAuthnKey = {
-    ...(raw as unknown as WebAuthnKey),
-    pubX: BigInt(String(raw.pubX)),
-    pubY: BigInt(String(raw.pubY)),
-  };
+  const signer = privateKeyToAccount(privateKey as Hex);
 
   const cfg = loadConfig();
-  const result = await spawnAgentFromSkill({ cfg, skill, webAuthnKey });
+  const result = await spawnAgentFromSkill({ cfg, skill, signer });
   console.log(`Spawned ERC-8004 agent #${result.agentId.toString()} at ${result.agentAddress}`);
   console.log(`agentURI: ${result.agentURI.slice(0, 64)}...`);
 }

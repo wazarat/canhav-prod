@@ -9,12 +9,12 @@ import {
   type Hex,
   type Log,
 } from "viem";
-import type { WebAuthnKey } from "@zerodev/webauthn-key";
+import type { Signer } from "@zerodev/sdk/types";
 
 import { chain, type AgentServiceConfig } from "../config";
 import type { AgentProductRef, AgentSkill } from "../types";
 import { identityRegistryAbi } from "../abi/registries";
-import { createPasskeyKernelAccount, type AgentKernelAccount } from "../zerodev/account";
+import { createEcdsaKernelAccount, type AgentKernelAccount } from "../zerodev/account";
 import { buildAgentRegistrationFile, toAgentURI } from "./registration";
 
 /** EIP-712 domain name/version of the ERC-8004 IdentityRegistry (reference impl). */
@@ -36,8 +36,8 @@ export interface SpawnParams {
   cfg: AgentServiceConfig;
   /** The CanHav skill the agent is spun up from. */
   skill: AgentSkill;
-  /** Passkey public key from the client-side WebAuthn ceremony (no seed phrase). */
-  webAuthnKey: WebAuthnKey;
+  /** The owner's self-custodial signer (e.g. Privy embedded wallet; no seed phrase). */
+  signer: Signer;
   /** Salt for the agent's distinct smart-account address (one per project). */
   index?: bigint;
   /** The Entity ("project") slug this agent is bound to. */
@@ -64,7 +64,8 @@ export interface SpawnResult {
 
 /**
  * Spin up an agent from a CanHav skill:
- *   1. create the agent's ZeroDev kernel account (passkey root, no seed phrase),
+ *   1. create the agent's ZeroDev kernel account (ECDSA root = the owner's
+ *      embedded social-login wallet, no seed phrase),
  *   2. build the ERC-8004 registration file from the skill,
  *   3. mint the on-chain identity via `IdentityRegistry.register(agentURI)`
  *      (gas sponsored by the ZeroDev paymaster),
@@ -73,9 +74,9 @@ export interface SpawnResult {
  *   5. return the minted `agentId` and verified wallet.
  */
 export async function spawnAgentFromSkill(params: SpawnParams): Promise<SpawnResult> {
-  const { cfg, skill, webAuthnKey, index, entity, associatedProducts, baseUrl } = params;
+  const { cfg, skill, signer, index, entity, associatedProducts, baseUrl } = params;
 
-  const account = await createPasskeyKernelAccount(cfg, webAuthnKey, index);
+  const account = await createEcdsaKernelAccount(cfg, signer, index);
 
   const registrationFile = buildAgentRegistrationFile(skill, { entity, associatedProducts });
   // Prefer the hosted, discoverable agent card (address is known pre-mint); the

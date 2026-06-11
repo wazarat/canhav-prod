@@ -10,17 +10,18 @@ import { seedAgentProfile } from "@/lib/agent/memory";
 import { userAgentId } from "@/lib/agent/user-agent";
 
 export interface UserProfile {
+  /** Stable user id = the Privy DID (e.g. `did:privy:...`) from social login. */
   userId: string;
-  authenticatorId: string;
+  /** Linked email captured from the Privy account, when available. */
+  email: string | null;
   /**
-   * Human-readable name the user is identified by (captured on first passkey
-   * login). The passkey is the wallet/login; this is the thin profile layer on
-   * top — no second auth provider. Null until the user provides one.
+   * Human-readable name the user is identified by. Privy social login is the
+   * wallet/login; this is the thin profile layer on top. Null until provided.
    */
   displayName: string | null;
   /**
-   * The user's primary smart-account (wallet) address. Optional — derived later
-   * (e.g. via SIWE + ERC-1271 wallet-proof, see note below) or backfilled.
+   * The user's canonical ZeroDev Kernel smart-account (wallet) address, derived
+   * from their Privy embedded signer (index 0). Null until first derived.
    */
   address: string | null;
   createdAt: string;
@@ -87,11 +88,12 @@ function writeFile(store: FileUserStore): void {
   }
 }
 
-/** Backfill the profile fields added after the first release (name/address). */
+/** Backfill optional profile fields (email/name/address). */
 function normalizeUserProfile(profile: UserProfile | null): UserProfile | null {
   if (!profile) return null;
   return {
     ...profile,
+    email: profile.email ?? null,
     displayName: profile.displayName ?? null,
     address: profile.address ?? null,
   };
@@ -105,20 +107,20 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 }
 
 /**
- * Upsert a user after passkey register/login and ensure their default research
- * agent profile exists. `displayName`/`address` are preserved across logins
- * (only overwritten when a non-empty value is supplied).
+ * Upsert a user after a verified Privy social login and ensure their default
+ * research agent profile exists. `email`/`displayName`/`address` are preserved
+ * across logins (only overwritten when a non-empty value is supplied).
  */
-export async function upsertUserFromPasskey(input: {
+export async function upsertUserFromPrivy(input: {
   userId: string;
-  authenticatorId: string;
+  email?: string | null;
   displayName?: string | null;
   address?: string | null;
 }): Promise<UserProfile> {
   const existing = await getUserProfile(input.userId);
   const profile: UserProfile = {
     userId: input.userId,
-    authenticatorId: input.authenticatorId,
+    email: (input.email?.trim() || existing?.email) ?? null,
     displayName: (input.displayName?.trim() || existing?.displayName) ?? null,
     address: (input.address?.trim() || existing?.address) ?? null,
     createdAt: existing?.createdAt ?? nowIso(),
@@ -151,12 +153,11 @@ export async function upsertUserFromPasskey(input: {
  * Update mutable profile fields (the human name, and optionally the proven
  * wallet address). Returns null if the user doesn't exist yet.
  *
- * NOTE (auth roadmap): the passkey → ZeroDev Kernel account is the only login.
- * To cryptographically PROVE the wallet owns this session (not just trust the
- * HMAC cookie), the next layer is SIWE (EIP-4361) verified via ERC-1271 (smart
- * account signatures) — at which point `address` is set from the proven signer.
- * ENS / subnames can later supply a human-readable on-chain identifier. Both are
- * additive and out of scope for this layer.
+ * NOTE: login is a Privy social login → self-custodial embedded wallet →
+ * ZeroDev Kernel account. The session cookie is minted only after the Privy
+ * access token is verified server-side (see lib/auth/privy.ts), so the cookie is
+ * backed by a real, verified identity. `address` holds the canonical Kernel
+ * smart account derived from the embedded signer.
  */
 export async function updateUserProfile(
   userId: string,

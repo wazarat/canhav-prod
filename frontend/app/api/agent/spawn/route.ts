@@ -12,9 +12,9 @@ import { readSecret } from "@/lib/server/env";
 /**
  * ERC-8004 spawn persistence bridge.
  *
- * Minting runs in the **browser** (PasskeySpawnButton + spawn-client.ts) because
- * passkey userOp signatures need WebAuthn (`window`). This route only persists a
- * successful client mint into agent memory and links it to the signed-in user.
+ * Minting runs in the **browser** (LaunchAgentButton + spawn-client.ts) because
+ * the user's embedded-wallet signer lives client-side. This route only persists
+ * a successful client mint into agent memory and links it to the signed-in user.
  */
 
 export const runtime = "nodejs";
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
   const session = getSession();
   if (!session) {
     return NextResponse.json(
-      { ok: false, error: "Sign in with your passkey before launching an agent." },
+      { ok: false, error: "Sign in before launching an agent." },
       { status: 401 },
     );
   }
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
       {
         ok: false,
         error:
-          "Mint must complete in the browser (passkey signing). Retry “Mint with your passkey”.",
+          "Mint must complete in the browser (wallet signing). Retry “Mint with your wallet”.",
       },
       { status: 400 },
     );

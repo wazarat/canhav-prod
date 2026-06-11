@@ -7,7 +7,7 @@ import { createHash } from "node:crypto";
  *
  * Each agent a wallet creates lives on a distinct Entity ("project") and gets
  * its OWN smart-account address. The index salts the counterfactual address, so:
- *   - different projects under the same passkey  -> different addresses, and
+ *   - different projects under the same wallet   -> different addresses, and
  *   - re-spawning the SAME project               -> the SAME address (idempotent
  *     mint, no duplicate identities).
  *

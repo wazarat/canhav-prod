@@ -123,7 +123,7 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
                   Open an entity page
                 </Link>
               )}{" "}
-              to mint a passkey-owned ERC-8004 token on Arbitrum Sepolia.
+              to mint a wallet-owned ERC-8004 token on Arbitrum Sepolia.
             </p>
           </div>
         )}

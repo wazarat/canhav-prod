@@ -1,6 +1,6 @@
 "use client";
 
-import type { WebAuthnKey } from "@zerodev/webauthn-key";
+import type { Signer } from "@zerodev/sdk/types";
 
 import type { AgentProductRef, AgentSkill } from "canhav-agent-service";
 
@@ -40,12 +40,13 @@ export interface ClientMintResult {
 }
 
 /**
- * Mint an ERC-8004 identity in the browser. Passkey userOp signatures require
- * WebAuthn (`window`); this must NOT run on the Vercel server.
+ * Mint an ERC-8004 identity in the browser. The signer is the user's Privy
+ * embedded wallet (keys live in Privy's TEE); userOp signing requires that
+ * in-browser signer, so this must NOT run on the Vercel server.
  */
 export async function mintAgentOnClient(params: {
   skill: AgentSkill;
-  webAuthnKey: WebAuthnKey;
+  signer: Signer;
   accountIndex: number;
   entitySlug: string;
   associatedProducts: AgentProductRef[];
@@ -63,7 +64,7 @@ export async function mintAgentOnClient(params: {
   const result = await svc.spawnAgentFromSkill({
     cfg,
     skill: params.skill,
-    webAuthnKey: params.webAuthnKey,
+    signer: params.signer,
     index: BigInt(params.accountIndex),
     entity: params.entitySlug,
     associatedProducts: params.associatedProducts,

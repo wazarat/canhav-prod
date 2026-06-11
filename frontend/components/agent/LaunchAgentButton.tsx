@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Fingerprint, Loader2, Rocket } from "lucide-react";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { AlertTriangle, Loader2, LogIn, Rocket, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { mintAgentOnClient, type SpawnPreflightResponse } from "@/lib/agent/spawn-client";
+import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
 import type { AgentProductRef, AgentSkill } from "canhav-agent-service";
-import { resolvePasskeyRpId } from "@/lib/auth/passkey-rp";
+import type { Signer } from "@zerodev/sdk/types";
 import { AgentIdentityCard, type AgentIdentity } from "./AgentIdentityCard";
 
 interface SkillOption {
@@ -27,9 +29,7 @@ interface SpawnResponse {
   code?: string;
 }
 
-const PASSKEY_SERVER = process.env.NEXT_PUBLIC_ZERODEV_PASSKEY_SERVER;
-
-export function PasskeySpawnButton({
+export function LaunchAgentButton({
   skills,
   zerodevConfigured,
   entitySlug,
@@ -40,10 +40,13 @@ export function PasskeySpawnButton({
   entitySlug?: string;
 }) {
   const [skillId, setSkillId] = useState(skills[0]?.id ?? "");
-  const [phase, setPhase] = useState<"idle" | "passkey" | "minting">("idle");
+  const [phase, setPhase] = useState<"idle" | "wallet" | "minting">("idle");
   const [error, setError] = useState<string | null>(null);
   const [identity, setIdentity] = useState<AgentIdentity | null>(null);
   const router = useRouter();
+
+  const { ready, authenticated, login } = usePrivy();
+  const { wallets } = useWallets();
 
   const configured = zerodevConfigured;
   const busy = phase !== "idle";
@@ -51,26 +54,37 @@ export function PasskeySpawnButton({
   async function launch() {
     setError(null);
     const skill = skills.find((s) => s.id === skillId);
-    if (!skill || !PASSKEY_SERVER) return;
+    if (!skill) return;
+
+    // The owner mints with their existing self-custodial wallet — prompt the
+    // social login if the Privy session isn't live (e.g. it expired while the
+    // CanHav cookie is still valid).
+    if (!authenticated) {
+      login();
+      return;
+    }
 
     try {
-      // 1) Client-side passkey ceremony (no seed phrase). Loaded on demand so the
-      //    WebAuthn SDK never weighs down the initial bundle or SSR.
-      //
-      //    Use Login (not Register): the owner reaches this button already signed
-      //    in with a passkey, so we reuse that EXISTING credential to own the
-      //    agent. Registering here instead would mint a brand-new throwaway
-      //    passkey on every click (passkey sprawl) and detach the agent from the
-      //    user's wallet. One passkey owns many agents — one per project — via the
-      //    server-derived account index.
-      setPhase("passkey");
-      const { toWebAuthnKey, WebAuthnMode } = await import("@zerodev/webauthn-key");
-      const rpId = resolvePasskeyRpId();
-      const webAuthnKey = await toWebAuthnKey({
-        passkeyName: `CanHav · ${skill.title}`,
-        passkeyServerUrl: PASSKEY_SERVER,
-        rpID: rpId,
-        mode: WebAuthnMode.Login,
+      // 1) Resolve the user's Privy embedded wallet and build a viem signer from
+      //    its EIP-1193 provider. Keys stay in Privy's TEE; this signer drives
+      //    the ZeroDev Kernel account's ECDSA validator.
+      setPhase("wallet");
+      const embedded = wallets.find((w) => w.walletClientType === "privy");
+      if (!embedded) {
+        throw new Error("Your embedded wallet isn't ready yet — try again in a moment.");
+      }
+      try {
+        await embedded.switchChain(ARBITRUM_SEPOLIA_CHAIN_ID);
+      } catch {
+        // Non-fatal: the kernel client pins Arbitrum Sepolia regardless.
+      }
+      const provider = await embedded.getEthereumProvider();
+      const { createWalletClient, custom } = await import("viem");
+      const { arbitrumSepolia } = await import("viem/chains");
+      const signer: Signer = createWalletClient({
+        account: embedded.address as `0x${string}`,
+        chain: arbitrumSepolia,
+        transport: custom(provider),
       });
 
       // 2) Preflight: reuse check + mint config (userOp signing stays in-browser).
@@ -104,10 +118,10 @@ export function PasskeySpawnButton({
         throw new Error("Spawn preflight missing mint parameters.");
       }
 
-      // 3) Mint in the browser (passkey signs userOps via WebAuthn).
+      // 3) Mint in the browser (the embedded wallet signs userOps).
       const mintResult = await mintAgentOnClient({
         skill: preflight.skill as AgentSkill,
-        webAuthnKey,
+        signer,
         accountIndex: preflight.accountIndex,
         entitySlug: entitySlug ?? skillId,
         associatedProducts: (preflight.associatedProducts as AgentProductRef[]) ?? [],
@@ -115,7 +129,7 @@ export function PasskeySpawnButton({
         baseUrl: preflight.baseUrl,
       });
 
-      // 4) Persist the minted identity server-side (no passkey signing on Vercel).
+      // 4) Persist the minted identity server-side (no signing on Vercel).
       const res = await fetch("/api/agent/spawn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -140,7 +154,7 @@ export function PasskeySpawnButton({
       });
       router.push(`/agents/${encodeURIComponent(data.agentId)}`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Passkey ceremony failed.");
+      setError(e instanceof Error ? e.message : "Minting failed.");
     } finally {
       setPhase("idle");
     }
@@ -173,7 +187,7 @@ export function PasskeySpawnButton({
             Launch agent
           </h3>
           <p className="mt-1 text-sm text-ink-300">
-            Mint an on-chain ERC-8004 identity owned by your existing passkey.
+            Mint an on-chain ERC-8004 identity owned by your self-custodial wallet.
           </p>
         </div>
         {!configured && (
@@ -188,9 +202,10 @@ export function PasskeySpawnButton({
           Deploy the registries, create a ZeroDev project, then set{" "}
           <code className="font-mono text-ink-200">ZERODEV_RPC</code>,{" "}
           <code className="font-mono text-ink-200">IDENTITY_REGISTRY_ADDRESS</code>,{" "}
-          <code className="font-mono text-ink-200">SECURITY_REGISTRY_ADDRESS</code> and{" "}
-          <code className="font-mono text-ink-200">NEXT_PUBLIC_ZERODEV_PASSKEY_SERVER</code>. The
-          full passkey → mint flow is wired and ready.
+          <code className="font-mono text-ink-200">SECURITY_REGISTRY_ADDRESS</code> and the{" "}
+          <code className="font-mono text-ink-200">NEXT_PUBLIC_PRIVY_APP_ID</code> /{" "}
+          <code className="font-mono text-ink-200">PRIVY_APP_SECRET</code> pair. The full social
+          login → mint flow is wired and ready.
         </p>
       ) : (
         <>
@@ -213,19 +228,23 @@ export function PasskeySpawnButton({
           <button
             type="button"
             onClick={launch}
-            disabled={busy || !skillId}
+            disabled={busy || !skillId || !ready}
             className="inline-flex items-center gap-1.5 rounded-lg border border-neon-500/40 bg-neon-500/10 px-3 py-2 text-sm font-medium text-neon-400 transition-colors hover:bg-neon-500/20 disabled:opacity-50"
           >
             {busy ? (
               <Loader2 className="h-4 w-4 animate-spin" />
+            ) : authenticated ? (
+              <Wallet className="h-4 w-4" />
             ) : (
-              <Fingerprint className="h-4 w-4" />
+              <LogIn className="h-4 w-4" />
             )}
-            {phase === "passkey"
-              ? "Approve passkey…"
+            {phase === "wallet"
+              ? "Approve in your wallet…"
               : phase === "minting"
                 ? "Minting identity…"
-                : "Mint with your passkey"}
+                : authenticated
+                  ? "Mint with your wallet"
+                  : "Sign in to mint"}
           </button>
         </>
       )}

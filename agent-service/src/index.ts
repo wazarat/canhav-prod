@@ -19,7 +19,7 @@ export type {
 
 export { buildAgentRegistrationFile, toAgentURI } from "./agent/registration";
 export {
-  createPasskeyKernelAccount,
+  createEcdsaKernelAccount,
   createScopedSessionKernelAccount,
   type AgentKernelAccount,
   type ScopedSessionParams,

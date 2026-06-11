@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Session-gated spawn preflight. Returns mint parameters for the browser path
- * (passkey userOp signing requires `window`) or an existing agent for reuse.
+ * (the embedded-wallet signer lives client-side) or an existing agent for reuse.
  */
 export async function GET(req: Request) {
   const session = getSession();

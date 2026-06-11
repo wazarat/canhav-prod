@@ -5,6 +5,7 @@ import { Background } from "@/components/layout/Background";
 import { Footer } from "@/components/layout/Footer";
 import { Nav } from "@/components/layout/Nav";
 import { SITE } from "@/lib/utils";
+import { Providers } from "./providers";
 
 import "./globals.css";
 
@@ -67,12 +68,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${sans.variable} ${display.variable} ${mono.variable} dark`}>
       <body className="min-h-screen antialiased">
-        <Background />
-        <div className="relative flex min-h-screen flex-col">
-          <Nav />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
+        <Providers>
+          <Background />
+          <div className="relative flex min-h-screen flex-col">
+            <Nav />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );

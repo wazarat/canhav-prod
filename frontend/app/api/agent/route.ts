@@ -21,7 +21,7 @@ import { getSession } from "@/lib/auth/session";
 /**
  * The CanHav research agent loop.
  *
- * Requires passkey session. Persists chat history per user in Upstash.
+ * Requires a signed-in session. Persists chat history per user in Upstash.
  */
 
 export const runtime = "nodejs";
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
   const session = getSession();
   if (!session) {
     return NextResponse.json(
-      { error: "Sign in with your passkey to use the research agent." },
+      { error: "Sign in to use the research agent." },
       { status: 401 },
     );
   }

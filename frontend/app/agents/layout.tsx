@@ -18,7 +18,7 @@ export default async function AgentsLayout({ children }: { children: React.React
     : null;
 
   return (
-    <AgentsShell initialSession={initialSession} passkeyConfigured={status.passkeyServer}>
+    <AgentsShell initialSession={initialSession} privyConfigured={status.privy}>
       {children}
     </AgentsShell>
   );

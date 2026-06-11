@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Bot, Fingerprint, Loader2, LogIn } from "lucide-react";
+import { ArrowRight, Bot, Loader2, LogIn, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
-import { PasskeySpawnButton } from "@/components/agent/PasskeySpawnButton";
+import { LaunchAgentButton } from "@/components/agent/LaunchAgentButton";
 
 interface ForEntityResponse {
   authenticated?: boolean;
@@ -16,7 +16,7 @@ interface ForEntityResponse {
 /**
  * The project-page agent creation + status surface. The actual chatbot lives in
  * the right-side {@link EntityAgentDock}; this panel handles the lifecycle:
- *   - signed out                     -> sign in with a passkey
+ *   - signed out                     -> sign in with a social login
  *   - signed in, no agent yet         -> mint ONE ERC-8004 agent for this entity
  *   - signed in, minted agent on-chain -> "agent is live" (chat is docked right)
  *
@@ -73,8 +73,8 @@ export function EntityAgentPanel({
           </Badge>
         </h2>
         <p className="mt-1 text-sm text-ink-300">
-          Mint one passkey-owned AI agent for {entityName}. It gets its own on-chain
-          ERC-8004 identity (scannable on Arbiscan) and answers from this entity&apos;s
+          Mint one AI agent for {entityName}, owned by your self-custodial wallet. It gets its own
+          on-chain ERC-8004 identity (scannable on Arbiscan) and answers from this entity&apos;s
           stablecoins, tokens, and RWAs — and follows you onto those product pages.
         </p>
       </div>
@@ -87,7 +87,7 @@ export function EntityAgentPanel({
         ) : !authenticated ? (
           <div className="space-y-3">
             <p className="text-sm text-ink-300">
-              Sign in with your passkey to create the {entityName} research agent.
+              Sign in with Google or email to create the {entityName} research agent.
             </p>
             <Link
               href="/agents"
@@ -99,7 +99,7 @@ export function EntityAgentPanel({
         ) : minted ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm text-ink-200">
-              <Fingerprint className="h-4 w-4 text-electric-400" />
+              <Wallet className="h-4 w-4 text-electric-400" />
               Your {entityName} agent is live on-chain (ERC-8004).
             </div>
             <p className="text-xs text-ink-400">
@@ -120,7 +120,7 @@ export function EntityAgentPanel({
             )}
           </div>
         ) : (
-          <PasskeySpawnButton
+          <LaunchAgentButton
             skills={[skill]}
             zerodevConfigured={zerodevConfigured}
             entitySlug={entitySlug}

@@ -126,9 +126,9 @@ export default async function AgentsPage() {
       icon: Fingerprint,
       label: "On-chain identity (ZeroDev + ERC-8004)",
       ready: status.zerodev,
-      readyHint: "Agents can mint a passkey-owned ERC-8004 identity (gas sponsored).",
+      readyHint: "Agents can mint a wallet-owned ERC-8004 identity (gas sponsored).",
       pendingHint:
-        "Deploy the registries + create a ZeroDev project, then set ZERODEV_RPC, IDENTITY_REGISTRY_ADDRESS, SECURITY_REGISTRY_ADDRESS, and NEXT_PUBLIC_ZERODEV_PASSKEY_SERVER.",
+        "Deploy the registries + create a ZeroDev project, then set ZERODEV_RPC, IDENTITY_REGISTRY_ADDRESS, SECURITY_REGISTRY_ADDRESS, NEXT_PUBLIC_PRIVY_APP_ID, and PRIVY_APP_SECRET.",
     },
   ];
 
@@ -155,7 +155,7 @@ export default async function AgentsPage() {
           Your roster of CanHav research agents. Each agent lives on a project (an entity),
           answers only from CanHav&apos;s own data, remembers what it learns, and carries its own
           on-chain <span className="font-medium text-ink-100">ERC-8004</span> identity through a
-          passkey smart account. Launch a new agent from any{" "}
+          self-custodial smart account. Launch a new agent from any{" "}
           <Link href="/entities" className="font-medium text-electric-400 hover:text-electric-300">
             entity page
           </Link>

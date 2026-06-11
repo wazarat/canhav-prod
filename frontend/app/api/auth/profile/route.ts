@@ -5,8 +5,8 @@ import { getUserProfile, updateUserProfile } from "@/lib/auth/users";
 
 /**
  * Read or update the signed-in user's thin profile (the human-readable name on
- * top of their passkey wallet). The passkey/ZeroDev account remains the only
- * login — this just lets users be identified by name.
+ * top of their self-custodial wallet). Privy social login → ZeroDev account
+ * remains the only login — this just lets users be identified by name.
  */
 
 export const runtime = "nodejs";
@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const session = getSession();
   if (!session) {
-    return NextResponse.json({ error: "Sign in with your passkey." }, { status: 401 });
+    return NextResponse.json({ error: "Sign in to continue." }, { status: 401 });
   }
   const profile = await getUserProfile(session.userId);
   return NextResponse.json({ profile });
@@ -24,7 +24,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const session = getSession();
   if (!session) {
-    return NextResponse.json({ error: "Sign in with your passkey." }, { status: 401 });
+    return NextResponse.json({ error: "Sign in to continue." }, { status: 401 });
   }
 
   let body: { displayName?: unknown } = {};

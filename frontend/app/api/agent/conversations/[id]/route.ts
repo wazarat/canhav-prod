@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const session = getSession();
   if (!session) {
-    return NextResponse.json({ error: "Sign in with your passkey to access chats." }, { status: 401 });
+    return NextResponse.json({ error: "Sign in to access chats." }, { status: 401 });
   }
 
   const conversationId = decodeURIComponent(params.id);

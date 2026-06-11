@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 function unauthorized() {
-  return NextResponse.json({ error: "Sign in with your passkey to access chats." }, { status: 401 });
+  return NextResponse.json({ error: "Sign in to access chats." }, { status: 401 });
 }
 
 export async function GET(req: Request) {

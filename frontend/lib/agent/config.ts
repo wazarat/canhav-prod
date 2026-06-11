@@ -82,22 +82,26 @@ export function resolveAgentModel(): LanguageModel {
   return openai(model);
 }
 
-/** Whether the ZeroDev passkey server URL is exposed to the client. */
-export function hasPasskeyServer(): boolean {
-  const url = process.env.NEXT_PUBLIC_ZERODEV_PASSKEY_SERVER?.trim();
-  return Boolean(url);
+/**
+ * Whether Privy social login is configured: the public app id (client provider)
+ * and the server secret (access-token verification). Both are required for the
+ * end-to-end login + smart-account signer flow.
+ */
+export function hasPrivy(): boolean {
+  return Boolean(readSecret("NEXT_PUBLIC_PRIVY_APP_ID") && readSecret("PRIVY_APP_SECRET"));
 }
 
 /**
  * Whether the on-chain identity stack is provisioned: a ZeroDev project RPC,
- * both deployed registry addresses, and the client passkey server URL.
+ * both deployed registry addresses, and Privy social login (the smart-account
+ * signer that mints + owns the ERC-8004 identity).
  */
 export function hasZeroDev(): boolean {
   return Boolean(
     readSecret("ZERODEV_RPC") &&
       readSecret("IDENTITY_REGISTRY_ADDRESS") &&
       readSecret("SECURITY_REGISTRY_ADDRESS") &&
-      hasPasskeyServer(),
+      hasPrivy(),
   );
 }
 
@@ -240,10 +244,10 @@ export interface AgentConfigStatus {
   provider: "gateway" | "openai" | "none";
   /** Persistent memory store (Upstash) is configured; false uses local fallback. */
   upstash: boolean;
-  /** On-chain ERC-8004 registration is configured (RPC + registries + passkey server). */
+  /** On-chain ERC-8004 registration is configured (RPC + registries + Privy). */
   zerodev: boolean;
-  /** ZeroDev passkey server URL is set for client WebAuthn ceremonies. */
-  passkeyServer: boolean;
+  /** Privy social login is configured (app id + server secret). */
+  privy: boolean;
   /**
    * Masked ZeroDev project the running deployment resolves (first 8 chars of the
    * project UUID, e.g. `"0988370e"`), or `"set:unparseable"` / `null`. Surfaces a
@@ -266,7 +270,7 @@ export function agentConfigStatus(): AgentConfigStatus {
     provider: agentProvider(),
     upstash: hasUpstash(),
     zerodev: hasZeroDev(),
-    passkeyServer: hasPasskeyServer(),
+    privy: hasPrivy(),
     zerodevProject: maskedZeroDevProject(),
     zerodevChain: parseZeroDevRpc().chainId,
     chain: AGENT_CHAIN,

@@ -409,6 +409,66 @@ export interface AgentSkill {
   updatedAt: string;
 }
 
+/** Where a skill came from: auto-derived from an entity, or written by a user. */
+export type SkillOrigin = "entity-derived" | "user-authored";
+
+/** Whether a user skill is visible to other users' agents in discovery. */
+export type SkillVisibility = "private" | "discoverable";
+
+/**
+ * A user-authored skill — the same machine-readable knowledge bundle as
+ * {@link AgentSkill}, plus authorship + visibility. Attaching one to an agent is
+ * "training". Every `actions[]` entry MUST be a read-only research action
+ * (enforced by `validateUserSkill`); discoverable skills can be sold to other
+ * agents as a typed StrategyPacket via x402.
+ */
+export interface UserSkill extends AgentSkill {
+  /** Privy user id (DID) of the author. */
+  authorUserId: string;
+  origin: SkillOrigin;
+  visibility: SkillVisibility;
+  createdAt: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Agent-to-agent collaboration (x402) — the ONLY objects agents exchange.    */
+/* No free-form agent chat: a buyer sends a typed StrategyRequest and receives */
+/* a typed StrategyPacket. Both are research-only knowledge transfers.         */
+/* -------------------------------------------------------------------------- */
+
+/** A buyer agent's typed request for a seller's discoverable skill. */
+export interface StrategyRequest {
+  /** The discoverable user-skill id being requested. */
+  skillId: string;
+  /** The buyer's agent id (for on-chain attestation). */
+  fromAgentId: string;
+  /** A bounded, typed objective — what the buyer wants to learn (not a chat). */
+  objective: string;
+  /** Optional structured constraints. */
+  constraints?: {
+    /** Soft cap on the size of the returned packet. */
+    maxAnswerTokens?: number;
+  };
+}
+
+/** A seller agent's typed deliverable, derived from its UserSkill. */
+export interface StrategyPacket {
+  skillId: string;
+  /** The seller agent id that produced it. */
+  producedByAgentId: string;
+  title: string;
+  summary: string;
+  /** Ordered, actionable research steps distilled from the skill. */
+  steps: string[];
+  facts: AgentSkillFact[];
+  sources: SourceRef[];
+  /** keccak256 of the skill Markdown — MUST match the advertised `skillHash:<id>`. */
+  skillHash: `0x${string}`;
+  /** The settling USDC transfer tx hash (x402 payment reference). */
+  paymentRef: string;
+  issuedAt: string;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Tokens — governance / utility tokens (e.g. CHIP)                           */
 /* -------------------------------------------------------------------------- */

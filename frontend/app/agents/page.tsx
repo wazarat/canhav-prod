@@ -270,6 +270,40 @@ export default async function AgentsPage() {
         </Link>
       </Card>
 
+      <Card className="space-y-3">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">
+          <div>
+            <CardTitle className="text-base">Your custom skills</CardTitle>
+            <CardDescription className="mt-1">
+              Author or import your own research knowledge, attach it to an agent to train it, and
+              optionally make it discoverable so other agents can pay to learn it.
+            </CardDescription>
+          </div>
+          <Badge tone="neutral">user-authored</Badge>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/agents/skills/new"
+            className="group inline-flex items-center gap-1.5 rounded-lg border border-neon-500/40 bg-neon-500/10 px-3 py-2 text-sm font-medium text-neon-400 transition-colors hover:bg-neon-500/20"
+          >
+            Create / import a skill
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+          <Link
+            href="/agents/skills"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm font-medium text-ink-200 transition-colors hover:border-electric-500/40"
+          >
+            My skills
+          </Link>
+          <Link
+            href="/collab"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm font-medium text-ink-200 transition-colors hover:border-electric-500/40"
+          >
+            Discover agents
+          </Link>
+        </div>
+      </Card>
+
       <AgentLabPanel agentId={defaultAgentId} llmConfigured={status.llm} />
 
       <MemoryInspector agentId={defaultAgentId} />

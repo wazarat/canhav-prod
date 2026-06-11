@@ -27,4 +27,9 @@ export {
 export { spawnAgentFromSkill, type SpawnParams, type SpawnResult } from "./agent/spawn";
 export { executeScopedAction, type ExecuteResult } from "./agent/execute";
 export { assertTargetAllowed, isTargetAllowed, GateError } from "./security/gate";
-export { identityRegistryAbi, securityRegistryAbi } from "./abi/registries";
+export {
+  identityRegistryAbi,
+  securityRegistryAbi,
+  collabRegistryAbi,
+  reputationRegistryAbi,
+} from "./abi/registries";

@@ -69,6 +69,10 @@ export interface AgentProfile {
   agentWallet: string | null;
   /** Whether an ERC-8004 identity was minted on-chain for this agent. */
   onChain: boolean;
+  /** Owner opt-in: only discoverable agents appear in collaboration search. */
+  discoverable: boolean;
+  /** Price (testnet USDC) the agent charges per StrategyPacket. Null = default. */
+  collabPriceUsdc: string | null;
   chain: typeof AGENT_CHAIN;
   createdAt: string;
   updatedAt: string;
@@ -87,6 +91,9 @@ const key = {
   runs: (id: string) => `agent:${id}:runs`,
   memory: (id: string) => `agent:${id}:memory`,
   skills: (id: string) => `agent:${id}:skills`,
+  attachedSkills: (id: string) => `agent:${id}:attached-skills`,
+  skillHash: (id: string, skillId: string) => `agent:${id}:skillhash:${skillId}`,
+  skillAgents: (skillId: string) => `skill:${skillId}:agents`,
 };
 
 function nowIso(): string {
@@ -119,6 +126,12 @@ interface FileStore {
   runs: Record<string, AgentRun[]>;
   memory: Record<string, AgentMemoryFact[]>;
   skills: Record<string, string[]>;
+  /** agentId -> attached user-skill ids (the skills the agent advertises). */
+  attachedSkills?: Record<string, string[]>;
+  /** `${agentId}|${skillId}` -> integrity hash of the advertised skill. */
+  skillHashes?: Record<string, string>;
+  /** skillId -> agentIds advertising it (reverse index for discovery). */
+  skillAgents?: Record<string, string[]>;
 }
 
 function filePath(): string {
@@ -133,9 +146,20 @@ function readFile(): FileStore {
       runs: parsed.runs ?? {},
       memory: parsed.memory ?? {},
       skills: parsed.skills ?? {},
+      attachedSkills: parsed.attachedSkills ?? {},
+      skillHashes: parsed.skillHashes ?? {},
+      skillAgents: parsed.skillAgents ?? {},
     };
   } catch {
-    return { profiles: {}, runs: {}, memory: {}, skills: {} };
+    return {
+      profiles: {},
+      runs: {},
+      memory: {},
+      skills: {},
+      attachedSkills: {},
+      skillHashes: {},
+      skillAgents: {},
+    };
   }
 }
 
@@ -162,6 +186,8 @@ function normalizeProfile(profile: AgentProfile | null): AgentProfile | null {
     associatedProducts: profile.associatedProducts ?? [],
     accountIndex: profile.accountIndex ?? null,
     agentWallet: profile.agentWallet ?? null,
+    discoverable: profile.discoverable ?? false,
+    collabPriceUsdc: profile.collabPriceUsdc ?? null,
   };
 }
 
@@ -183,6 +209,8 @@ export interface SeedProfileInput {
   agentURI?: string | null;
   agentWallet?: string | null;
   onChain?: boolean;
+  discoverable?: boolean;
+  collabPriceUsdc?: string | null;
 }
 
 /** Create or update an agent profile and register it in the index. */
@@ -200,6 +228,8 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
     agentURI: input.agentURI ?? existing?.agentURI ?? null,
     agentWallet: input.agentWallet ?? existing?.agentWallet ?? null,
     onChain: input.onChain ?? existing?.onChain ?? false,
+    discoverable: input.discoverable ?? existing?.discoverable ?? false,
+    collabPriceUsdc: input.collabPriceUsdc ?? existing?.collabPriceUsdc ?? null,
     chain: AGENT_CHAIN,
     createdAt: existing?.createdAt ?? nowIso(),
     updatedAt: nowIso(),
@@ -215,6 +245,25 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
     writeFile(store);
   }
   return profile;
+}
+
+/**
+ * Owner opt-in toggle: flip whether the agent is discoverable for collaboration
+ * and (optionally) set its per-StrategyPacket price. Returns null if unknown.
+ */
+export async function setAgentDiscoverability(
+  agentId: string,
+  discoverable: boolean,
+  collabPriceUsdc?: string | null,
+): Promise<AgentProfile | null> {
+  const existing = await getAgentProfile(agentId);
+  if (!existing) return null;
+  return seedAgentProfile({
+    agentId,
+    name: existing.name,
+    discoverable,
+    collabPriceUsdc: collabPriceUsdc !== undefined ? collabPriceUsdc : existing.collabPriceUsdc,
+  });
 }
 
 export async function listAgents(): Promise<AgentProfile[]> {
@@ -324,6 +373,62 @@ export async function getStudiedSkills(agentId: string): Promise<string[]> {
     return ((await getRedisClient().smembers(key.skills(agentId))) as string[] | null) ?? [];
   }
   return readFile().skills[agentId] ?? [];
+}
+
+/* -------------------------------------------------------------------------- */
+/* Attached user skills (the supply an agent advertises for collaboration)    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Record that an agent advertises a user-authored skill, storing the skill's
+ * integrity hash and maintaining the reverse skill->agents index used by
+ * discovery. Idempotent.
+ */
+export async function attachSkillToAgent(
+  agentId: string,
+  skillId: string,
+  skillHash: string,
+): Promise<void> {
+  if (!agentId || !skillId) return;
+  if (hasUpstash()) {
+    const redis = getRedisClient();
+    await redis.sadd(key.attachedSkills(agentId), skillId);
+    await redis.set(key.skillHash(agentId, skillId), skillHash);
+    await redis.sadd(key.skillAgents(skillId), agentId);
+  } else {
+    const store = readFile();
+    const attached = new Set(store.attachedSkills?.[agentId] ?? []);
+    attached.add(skillId);
+    store.attachedSkills = { ...(store.attachedSkills ?? {}), [agentId]: [...attached] };
+    store.skillHashes = { ...(store.skillHashes ?? {}), [`${agentId}|${skillId}`]: skillHash };
+    const agentsForSkill = new Set(store.skillAgents?.[skillId] ?? []);
+    agentsForSkill.add(agentId);
+    store.skillAgents = { ...(store.skillAgents ?? {}), [skillId]: [...agentsForSkill] };
+    writeFile(store);
+  }
+}
+
+export async function getAttachedSkillIds(agentId: string): Promise<string[]> {
+  if (hasUpstash()) {
+    return ((await getRedisClient().smembers(key.attachedSkills(agentId))) as string[] | null) ?? [];
+  }
+  return readFile().attachedSkills?.[agentId] ?? [];
+}
+
+export async function getAgentSkillHash(agentId: string, skillId: string): Promise<string | null> {
+  if (hasUpstash()) {
+    return ((await getRedisClient().get(key.skillHash(agentId, skillId))) as string | null) ?? null;
+  }
+  return readFile().skillHashes?.[`${agentId}|${skillId}`] ?? null;
+}
+
+/** Agents that advertise a given user-skill id (reverse index for discovery). */
+export async function getAgentsForSkill(skillId: string): Promise<string[]> {
+  if (!skillId) return [];
+  if (hasUpstash()) {
+    return ((await getRedisClient().smembers(key.skillAgents(skillId))) as string[] | null) ?? [];
+  }
+  return readFile().skillAgents?.[skillId] ?? [];
 }
 
 /* -------------------------------------------------------------------------- */

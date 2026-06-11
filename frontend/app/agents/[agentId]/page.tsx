@@ -5,12 +5,17 @@ import { ChevronRight, CircleDot, Rocket, Sparkles } from "lucide-react";
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
 import { AgentIdentityCard } from "@/components/agent/AgentIdentityCard";
 import { AgentMemoryPanel } from "@/components/agent/AgentMemoryPanel";
+import { AttachSkillPanel } from "@/components/agent/AttachSkillPanel";
+import { CollabSettingsPanel } from "@/components/agent/CollabSettingsPanel";
 import { SkillShelf } from "@/components/agent/SkillShelf";
 import { Badge } from "@/components/ui/Badge";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { agentLevel, getAgentSnapshot } from "@/lib/agent/memory";
 import { verifyAgentOnChain } from "@/lib/agent/onchain";
 import { getAgentSkills } from "@/lib/agent/skills";
+import { getSession } from "@/lib/auth/session";
+import { listUserAgentIds } from "@/lib/auth/users";
+import { userAgentId } from "@/lib/agent/user-agent";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +31,13 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
 
   const { profile, memory, studiedSkills } = snapshot;
   if (!profile) notFound();
+
+  // Only the owner can attach skills / toggle discoverability.
+  const session = getSession();
+  const ownedIds = session
+    ? new Set([userAgentId(session.userId), ...(await listUserAgentIds(session.userId))])
+    : new Set<string>();
+  const isOwner = ownedIds.has(agentId);
 
   const level = agentLevel(memory.length, studiedSkills.length);
   const arbiscanUrl = profile.agentAddress
@@ -156,6 +168,16 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
             allSkills={skills.map((s) => ({ id: s.id, title: s.title }))}
             studied={studiedSkills}
           />
+          {isOwner && (
+            <>
+              <AttachSkillPanel agentId={agentId} onChain={profile.onChain} />
+              <CollabSettingsPanel
+                agentId={agentId}
+                discoverable={profile.discoverable}
+                collabPriceUsdc={profile.collabPriceUsdc}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>

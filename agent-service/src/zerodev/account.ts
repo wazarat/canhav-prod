@@ -19,7 +19,13 @@ const entryPoint = getEntryPoint("0.7");
 const kernelVersion = KERNEL_V3_1;
 
 // Passkey validator contract version compatible with Kernel v3.1.
-const PASSKEY_CONTRACT_VERSION = PasskeyValidatorContractVersion.V0_0_2_UNPATCHED;
+//
+// MUST be the PATCHED validator: ZeroDev's paymaster refuses to sponsor
+// userOps validated by the older UNPATCHED passkey validators (0.0.1 /
+// 0.0.2), returning `403 Unauthorized: wapk` on pm_getPaymasterStubData.
+// Only the patched 0.0.3 validator (0x7ab16Ff3…9e69, supported by Kernel
+// 0.3.0–0.3.3) is sponsorable. Verified by replaying the live RPC.
+const PASSKEY_CONTRACT_VERSION = PasskeyValidatorContractVersion.V0_0_3_PATCHED;
 
 function publicClient(cfg: AgentServiceConfig) {
   return createPublicClient({ chain, transport: http(cfg.rpcUrl) });

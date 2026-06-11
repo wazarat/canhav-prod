@@ -56,10 +56,13 @@ function hydrateEnvFromSecrets(): void {
  * Turn a raw spawn/ZeroDev failure into a clean, actionable message instead of
  * dumping the verbose viem RPC error (calldata, user-op, etc.) at the user.
  *
- * The most common failure is the ZeroDev paymaster returning `403 Unauthorized`
- * on `pm_getPaymasterStubData` — that is gas sponsorship being rejected (no
- * active gas policy for Arbitrum Sepolia, sponsorship disabled, or exhausted
- * testnet credits), NOT a bug in the mint calldata.
+ * The ZeroDev paymaster can return `403 Unauthorized` on
+ * `pm_getPaymasterStubData`. We confirmed via live RPC replay that this is
+ * NOT (necessarily) a missing gas policy or exhausted credits: ZeroDev refuses
+ * to sponsor userOps validated by the older UNPATCHED passkey validators,
+ * returning the literal body `Unauthorized: wapk`. The account builder now
+ * pins the PATCHED validator (V0_0_3_PATCHED), so a recurrence most likely
+ * means a real policy/credit issue — but flag the validator version too.
  */
 function describeSpawnError(e: unknown): { message: string; code?: string } {
   const raw = e instanceof Error ? e.message : String(e ?? "");
@@ -73,12 +76,16 @@ function describeSpawnError(e: unknown): { message: string; code?: string } {
       haystack.includes("zerodev"));
 
   if (looksLikePaymasterAuth) {
+    const wapk = haystack.includes("wapk");
     return {
       code: "paymaster_unauthorized",
-      message:
-        "Gas sponsorship was rejected by ZeroDev (paymaster 403). Add an active gas " +
-        "policy for Arbitrum Sepolia (chain 421614) in your ZeroDev dashboard and confirm " +
-        "the project still has testnet credits, then mint again.",
+      message: wapk
+        ? "Gas sponsorship was rejected by ZeroDev (paymaster 403 \"wapk\"). This means the " +
+          "passkey validator contract is not sponsorable — the deployment must use the patched " +
+          "validator (PasskeyValidatorContractVersion.V0_0_3_PATCHED). Redeploy with the fix, then mint again."
+        : "Gas sponsorship was rejected by ZeroDev (paymaster 403). Add an active gas " +
+          "policy for Arbitrum Sepolia (chain 421614) in your ZeroDev dashboard and confirm " +
+          "the project still has testnet credits, then mint again.",
     };
   }
 

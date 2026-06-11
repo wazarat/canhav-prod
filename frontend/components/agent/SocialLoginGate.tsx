@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { usePrivy } from "@privy-io/react-auth";
+import { useLogin, usePrivy } from "@privy-io/react-auth";
 import { Loader2, LogIn } from "lucide-react";
 
 export interface SessionInfo {
@@ -22,7 +22,15 @@ export function SocialLoginGate({
 }: {
   onAuthenticated: (session: SessionInfo) => void;
 }) {
-  const { ready, authenticated, user, login, getAccessToken } = usePrivy();
+  const { ready, authenticated, user, getAccessToken } = usePrivy();
+  const { login } = useLogin({
+    onError: (code) => {
+      setPhase("idle");
+      setError(
+        `Privy sign-in failed (${code}). If this persists, check the Privy dashboard: Allowed origins include this site, Google + email login are enabled, embedded wallets are on, and Arbitrum Sepolia (421614) is added as a chain.`,
+      );
+    },
+  });
   const [displayName, setDisplayName] = useState("");
   const [phase, setPhase] = useState<"idle" | "connecting" | "establishing">("idle");
   const [error, setError] = useState<string | null>(null);

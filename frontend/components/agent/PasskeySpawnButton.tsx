@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, Fingerprint, Loader2, Rocket } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
+import { mintAgentOnClient, type SpawnPreflightResponse } from "@/lib/agent/spawn-client";
+import type { AgentProductRef, AgentSkill } from "canhav-agent-service";
 import { resolvePasskeyRpId } from "@/lib/auth/passkey-rp";
 import { AgentIdentityCard, type AgentIdentity } from "./AgentIdentityCard";
 
@@ -71,27 +73,61 @@ export function PasskeySpawnButton({
         mode: WebAuthnMode.Login,
       });
 
-      // 2) Hand the public key to the server bridge to mint the ERC-8004 identity.
+      // 2) Preflight: reuse check + mint config (userOp signing stays in-browser).
       setPhase("minting");
-      const rpID = webAuthnKey.rpID || rpId;
+      const preflightRes = await fetch(
+        `/api/agent/spawn/preflight?skillId=${encodeURIComponent(skillId)}&entitySlug=${encodeURIComponent(entitySlug ?? skillId)}`,
+      );
+      const preflight = (await preflightRes.json()) as SpawnPreflightResponse;
+      if (!preflightRes.ok || !preflight.configured) {
+        throw new Error(preflight.error ?? `Preflight failed (status ${preflightRes.status}).`);
+      }
+      if (preflight.reused && preflight.agentId && preflight.agentAddress) {
+        setIdentity({
+          agentId: preflight.agentId,
+          agentAddress: preflight.agentAddress,
+          agentURI: preflight.agentURI ?? null,
+          arbiscanUrl: preflight.arbiscanUrl ?? null,
+          tokenUrl: preflight.tokenUrl ?? null,
+          skillTitle: skill.title,
+          onChain: true,
+        });
+        router.push(`/agents/${encodeURIComponent(preflight.agentId)}`);
+        return;
+      }
+      if (
+        preflight.accountIndex == null ||
+        !preflight.mintConfig ||
+        !preflight.baseUrl ||
+        !preflight.skill
+      ) {
+        throw new Error("Spawn preflight missing mint parameters.");
+      }
+
+      // 3) Mint in the browser (passkey signs userOps via WebAuthn).
+      const mintResult = await mintAgentOnClient({
+        skill: preflight.skill as AgentSkill,
+        webAuthnKey,
+        accountIndex: preflight.accountIndex,
+        entitySlug: entitySlug ?? skillId,
+        associatedProducts: (preflight.associatedProducts as AgentProductRef[]) ?? [],
+        mintConfig: preflight.mintConfig,
+        baseUrl: preflight.baseUrl,
+      });
+
+      // 4) Persist the minted identity server-side (no passkey signing on Vercel).
       const res = await fetch("/api/agent/spawn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           skillId,
           entitySlug: entitySlug ?? skillId,
-          webAuthnKey: {
-            pubX: webAuthnKey.pubX.toString(),
-            pubY: webAuthnKey.pubY.toString(),
-            authenticatorId: webAuthnKey.authenticatorId,
-            authenticatorIdHash: webAuthnKey.authenticatorIdHash,
-            rpID,
-          },
+          mintResult,
         }),
       });
       const data = (await res.json()) as SpawnResponse;
       if (!res.ok || !data.ok || !data.agentId || !data.agentAddress) {
-        throw new Error(data.error ?? `Spawn failed (status ${res.status}).`);
+        throw new Error(data.error ?? `Spawn persist failed (status ${res.status}).`);
       }
       setIdentity({
         agentId: data.agentId,

@@ -3,6 +3,7 @@ export {
   chain,
   assertArbitrumSepolia,
   loadConfig,
+  createConfig,
   type AgentServiceConfig,
 } from "./config";
 

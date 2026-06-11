@@ -49,8 +49,7 @@ export function assertArbitrumSepolia(chainId: number): void {
 
 /** Build the service config from the environment, asserting the chain pin. */
 export function loadConfig(): AgentServiceConfig {
-  const cfg: AgentServiceConfig = {
-    chainId: chain.id,
+  return createConfig({
     zerodevRpc: required("ZERODEV_RPC"),
     rpcUrl:
       optional("ARBITRUM_SEPOLIA_RPC_URL") ??
@@ -59,6 +58,20 @@ export function loadConfig(): AgentServiceConfig {
     identityRegistry: required("IDENTITY_REGISTRY_ADDRESS") as Address,
     securityRegistry: required("SECURITY_REGISTRY_ADDRESS") as Address,
     arbiscanApiKey: optional("ARBISCAN_API_KEY"),
+  });
+}
+
+/** Build config from explicit values (browser mint path — no process.env required). */
+export function createConfig(
+  params: Omit<AgentServiceConfig, "chainId"> & { chainId?: number },
+): AgentServiceConfig {
+  const cfg: AgentServiceConfig = {
+    chainId: params.chainId ?? chain.id,
+    zerodevRpc: params.zerodevRpc,
+    rpcUrl: params.rpcUrl,
+    identityRegistry: params.identityRegistry,
+    securityRegistry: params.securityRegistry,
+    arbiscanApiKey: params.arbiscanApiKey,
   };
   assertArbitrumSepolia(cfg.chainId);
   return cfg;

@@ -54,6 +54,13 @@ export function PasskeySpawnButton({
     try {
       // 1) Client-side passkey ceremony (no seed phrase). Loaded on demand so the
       //    WebAuthn SDK never weighs down the initial bundle or SSR.
+      //
+      //    Use Login (not Register): the owner reaches this button already signed
+      //    in with a passkey, so we reuse that EXISTING credential to own the
+      //    agent. Registering here instead would mint a brand-new throwaway
+      //    passkey on every click (passkey sprawl) and detach the agent from the
+      //    user's wallet. One passkey owns many agents — one per project — via the
+      //    server-derived account index.
       setPhase("passkey");
       const { toWebAuthnKey, WebAuthnMode } = await import("@zerodev/webauthn-key");
       const rpId = resolvePasskeyRpId();
@@ -61,7 +68,7 @@ export function PasskeySpawnButton({
         passkeyName: `CanHav · ${skill.title}`,
         passkeyServerUrl: PASSKEY_SERVER,
         rpID: rpId,
-        mode: WebAuthnMode.Register,
+        mode: WebAuthnMode.Login,
       });
 
       // 2) Hand the public key to the server bridge to mint the ERC-8004 identity.
@@ -130,7 +137,7 @@ export function PasskeySpawnButton({
             Launch agent
           </h3>
           <p className="mt-1 text-sm text-ink-300">
-            Register a passkey-owned agent with an on-chain ERC-8004 identity.
+            Mint an on-chain ERC-8004 identity owned by your existing passkey.
           </p>
         </div>
         {!configured && (
@@ -182,7 +189,7 @@ export function PasskeySpawnButton({
               ? "Approve passkey…"
               : phase === "minting"
                 ? "Minting identity…"
-                : "Create passkey & mint"}
+                : "Mint with your passkey"}
           </button>
         </>
       )}

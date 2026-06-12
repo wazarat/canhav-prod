@@ -10,6 +10,7 @@ import {
 import { getAgentProfile, getAgentsForSkill } from "@/lib/agent/memory";
 import { readAgentWallet } from "@/lib/agent/onchain";
 import { buildStrategyPacket } from "@/lib/agent/strategyPacket";
+import { generateTailoredBrief } from "@/lib/agent/tailoredBrief";
 import { getUserSkill } from "@/lib/server/userSkills";
 import {
   releasePaymentRef,
@@ -141,6 +142,17 @@ export async function POST(req: Request) {
     paymentRef: payment,
     maxAnswerTokens: body.constraints?.maxAnswerTokens,
   });
+
+  // Objective-aware addendum from the seller's unique training (config +
+  // knowledge + memory). The base packet and its skillHash stay untouched;
+  // degrades to base-packet-only when no LLM key or no objective was given.
+  if (body.objective?.trim()) {
+    packet.tailoredBrief = await generateTailoredBrief({
+      sellerAgentId: toAgentId,
+      skillTitle: skill.title,
+      objective: body.objective,
+    });
+  }
 
   return NextResponse.json({
     ok: true,

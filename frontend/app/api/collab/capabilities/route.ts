@@ -29,6 +29,8 @@ export async function GET() {
         walletVerified: a.walletVerified,
         x402: a.x402,
         reputationScore: a.reputationScore,
+        // Specialization signals so buyers pick on substance, not just price.
+        specialization: a.specialization,
       })),
     })),
   });

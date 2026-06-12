@@ -451,6 +451,23 @@ export interface StrategyRequest {
   };
 }
 
+/**
+ * Optional objective-aware addendum to a StrategyPacket: a bounded brief the
+ * SELLER agent generates from its own unique training (framework config,
+ * knowledge base, memory) for the buyer's stated objective. Clearly labeled,
+ * carries its own provenance, and is EXCLUDED from the `skillHash` integrity
+ * check (which covers only the deterministic base packet).
+ */
+export interface TailoredBrief {
+  /** The buyer's objective this brief answers. */
+  objective: string;
+  /** Bounded markdown brief (research-only, no advice). */
+  brief: string;
+  /** What the seller agent drew on (knowledge docs, memory). */
+  basedOn: SourceRef[];
+  generatedAt: string;
+}
+
 /** A seller agent's typed deliverable, derived from its UserSkill. */
 export interface StrategyPacket {
   skillId: string;
@@ -467,6 +484,78 @@ export interface StrategyPacket {
   /** The settling USDC transfer tx hash (x402 payment reference). */
   paymentRef: string;
   issuedAt: string;
+  /** Objective-aware seller addendum (null when no LLM key / no objective). */
+  tailoredBrief?: TailoredBrief | null;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Data frames — user-pinned compositions of EXISTING read-only metrics       */
+/* (no new data sources; every kind maps 1:1 to a fetcher we already run).    */
+/* -------------------------------------------------------------------------- */
+
+/** One metric inside a data frame. Each kind resolves via an existing fetcher. */
+export type DataFrameMetric =
+  /** Stablecoin peg series (lib/server/series.ts → dune/coingecko). */
+  | { kind: "peg"; slug: string }
+  /** RWA TVL series (lib/server/series.ts → dune/coingecko). */
+  | { kind: "tvl"; slug: string }
+  /** Token USD price series (lib/server/series.ts → coingecko). */
+  | { kind: "price"; slug: string }
+  /** Live on-chain total supply (lib/server/alchemy.ts). */
+  | { kind: "supply"; address: string; decimals?: number | null; label?: string }
+  /** Live Aave V3 reserve rates (lib/server/aave.ts): gho, ausdc, ausdt, aweth. */
+  | { kind: "aaveRates"; slug: string };
+
+export type DataFrameWindow = "7d" | "30d" | "90d";
+
+/**
+ * A user-pinned "focus dataset" their agent should always be able to pull for
+ * its entity — e.g. "JLP liquidity health" = price + supply over 30d. Stored
+ * per agent; resolved on demand by the `frame_load` tool.
+ */
+export interface DataFrame {
+  id: string;
+  agentId: string;
+  title: string;
+  metrics: DataFrameMetric[];
+  window: DataFrameWindow;
+  notes?: string;
+  createdAt: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Custom tools — owner-configured, READ-ONLY data feeds from a typed catalog */
+/* (users never write code; each kind wraps an existing gated fetcher).       */
+/* -------------------------------------------------------------------------- */
+
+export type CustomToolTemplate =
+  /** Latest results of a saved Dune query the owner curates. */
+  | { kind: "duneQuery"; queryId: number; title: string; description: string }
+  /** Live CoinGecko market snapshot for a coin id (price/mcap/volume). */
+  | { kind: "coingeckoMarket"; coinId: string; title: string; description: string }
+  /** Live on-chain total supply + metadata for a token contract (Alchemy). */
+  | {
+      kind: "alchemyTokenSupply";
+      address: string;
+      decimals?: number | null;
+      title: string;
+      description: string;
+    }
+  /** A JSON endpoint on an ALLOWLISTED host (HTTPS, size-capped, server-side). */
+  | { kind: "httpJson"; url: string; jsonPath?: string; title: string; description: string };
+
+/**
+ * An owner-configured read-only tool attached to one agent. The `description`
+ * is what the LLM sees when deciding to call it, so it should say what the
+ * data is and when to use it.
+ */
+export interface CustomTool {
+  id: string;
+  agentId: string;
+  ownerUserId: string;
+  template: CustomToolTemplate;
+  enabled: boolean;
+  createdAt: string;
 }
 
 /* -------------------------------------------------------------------------- */

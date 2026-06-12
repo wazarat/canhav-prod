@@ -7,13 +7,21 @@ import { recordReputation } from "@/lib/agent/reputation";
 import { getSession } from "@/lib/auth/session";
 import { listUserAgentIds } from "@/lib/auth/users";
 import { userAgentId } from "@/lib/agent/user-agent";
+import { listCollabExchanges } from "@/lib/server/collabLog";
+import { tryConsumeRatingRef } from "@/lib/server/collabPayments";
 import { readSecret } from "@/lib/server/env";
 
 /**
- * Buyer feedback after a completed exchange. Always updates the fast Redis read
- * model (which powers discovery ranking). When the on-chain reputation hook is
- * enabled (COLLAB_REPUTATION_ENABLED=1), also returns params for a client-signed
- * ReputationRegistry.giveFeedback — otherwise that step stays flag-off.
+ * Buyer feedback after a completed exchange — EXCHANGE-VERIFIED reputation.
+ * A rating must carry the `paymentRef` of a settled exchange in `collab:log`
+ * for this exact buyer/seller pair, and each paymentRef can be rated once.
+ * This closes the unverified-reputation gap: discovery ranking now reflects
+ * real, paid collaboration quality.
+ *
+ * Always updates the fast Redis read model (which powers discovery ranking).
+ * When the on-chain reputation hook is enabled (COLLAB_REPUTATION_ENABLED=1),
+ * also returns params for a client-signed ReputationRegistry.giveFeedback —
+ * otherwise that step stays flag-off.
  */
 
 export const runtime = "nodejs";
@@ -25,7 +33,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });
   }
 
-  let body: { toAgentId?: string; fromAgentId?: string; rating?: number } = {};
+  let body: {
+    toAgentId?: string;
+    fromAgentId?: string;
+    rating?: number;
+    paymentRef?: string;
+  } = {};
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -34,18 +47,50 @@ export async function POST(req: Request) {
 
   const toAgentId = (body.toAgentId ?? "").trim();
   const fromAgentId = (body.fromAgentId ?? "").trim();
+  const paymentRef = (body.paymentRef ?? "").trim();
   const rating = Number(body.rating);
-  if (!toAgentId || !Number.isFinite(rating) || rating < 1 || rating > 5) {
+  if (!toAgentId || !fromAgentId || !Number.isFinite(rating) || rating < 1 || rating > 5) {
     return NextResponse.json(
-      { ok: false, error: "toAgentId and a rating between 1 and 5 are required." },
+      { ok: false, error: "toAgentId, fromAgentId and a rating between 1 and 5 are required." },
+      { status: 400 },
+    );
+  }
+  if (!paymentRef) {
+    return NextResponse.json(
+      { ok: false, error: "paymentRef of the settled exchange is required to rate." },
       { status: 400 },
     );
   }
 
   // Only an owner of the buyer agent can rate (prevents ballot stuffing).
   const ownedIds = new Set([userAgentId(session.userId), ...(await listUserAgentIds(session.userId))]);
-  if (fromAgentId && !ownedIds.has(fromAgentId)) {
+  if (!ownedIds.has(fromAgentId)) {
     return NextResponse.json({ ok: false, error: "Buyer agent isn't yours." }, { status: 403 });
+  }
+
+  // Exchange-verified: the paymentRef must belong to a settled exchange in
+  // collab:log for THIS buyer/seller pair.
+  const exchanges = await listCollabExchanges(200);
+  const exchange = exchanges.find(
+    (e) =>
+      e.paymentRef.toLowerCase() === paymentRef.toLowerCase() &&
+      e.toAgentId === toAgentId &&
+      e.fromAgentId === fromAgentId,
+  );
+  if (!exchange) {
+    return NextResponse.json(
+      { ok: false, error: "No settled exchange found for this paymentRef and agent pair." },
+      { status: 403 },
+    );
+  }
+
+  // One rating per settled exchange.
+  const fresh = await tryConsumeRatingRef(paymentRef, `${fromAgentId}|${toAgentId}|${rating}`);
+  if (!fresh) {
+    return NextResponse.json(
+      { ok: false, error: "This exchange was already rated." },
+      { status: 409 },
+    );
   }
 
   const summary = await recordReputation(toAgentId, rating);

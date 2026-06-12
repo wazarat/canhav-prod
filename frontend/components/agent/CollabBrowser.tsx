@@ -18,6 +18,17 @@ import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 import type { StrategyPacket } from "@/lib/types";
 import type { Signer } from "@zerodev/sdk/types";
 
+interface ProviderSpecialization {
+  focusAreas: string[];
+  riskLens: string | null;
+  entitySlug: string | null;
+  level: number;
+  knowledgeDocs: number;
+  dataFrames: number;
+  customTools: number;
+  exchangeCount: number;
+}
+
 interface Provider {
   agentId: string;
   ownerHandle: string;
@@ -25,6 +36,7 @@ interface Provider {
   walletVerified: boolean;
   x402: { price: string; asset: string; decimals: number };
   reputationScore: number | null;
+  specialization?: ProviderSpecialization | null;
 }
 
 interface Service {
@@ -204,10 +216,12 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
   }
 
   async function rate(stars: number) {
-    if (!selection || ratingBusy) return;
+    if (!selection || !packet || ratingBusy) return;
     setRating(stars);
     setRatingBusy(true);
     try {
+      // Exchange-verified: the paymentRef ties this rating to the settled
+      // exchange, and the server allows one rating per exchange.
       const res = await fetch("/api/collab/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -215,10 +229,17 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
           toAgentId: selection.provider.agentId,
           fromAgentId: buyerAgentId,
           rating: stars,
+          paymentRef: packet.paymentRef,
         }),
       });
-      const data = (await res.json()) as { ok?: boolean; onChain?: FeedbackParams | null };
-      if (res.ok && data.ok) {
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        onChain?: FeedbackParams | null;
+      };
+      if (!res.ok || !data.ok) {
+        setNotice(data.error ?? "Rating was not accepted.");
+      } else {
         setNotice(`Thanks — rated ${stars}/5.`);
         if (data.onChain) {
           try {
@@ -323,6 +344,42 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
                             <span className="text-amber-300">wallet unverified</span>
                           )}
                         </p>
+                        {p.specialization && (
+                          <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-ink-400">
+                            <span className="rounded border border-electric-500/30 bg-electric-500/10 px-1.5 py-0.5 text-electric-300">
+                              L{p.specialization.level}
+                            </span>
+                            {p.specialization.entitySlug && (
+                              <span className="rounded border border-ink-700 px-1.5 py-0.5">
+                                {p.specialization.entitySlug}
+                              </span>
+                            )}
+                            {p.specialization.focusAreas.slice(0, 3).map((f) => (
+                              <span key={f} className="rounded border border-ink-700 px-1.5 py-0.5">
+                                {f}
+                              </span>
+                            ))}
+                            {p.specialization.riskLens && (
+                              <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-amber-300">
+                                {p.specialization.riskLens} lens
+                              </span>
+                            )}
+                            {(p.specialization.knowledgeDocs > 0 ||
+                              p.specialization.dataFrames > 0 ||
+                              p.specialization.customTools > 0) && (
+                              <span>
+                                {p.specialization.knowledgeDocs} docs · {p.specialization.dataFrames}{" "}
+                                frames · {p.specialization.customTools} tools
+                              </span>
+                            )}
+                            {p.specialization.exchangeCount > 0 && (
+                              <span className="text-neon-400">
+                                {p.specialization.exchangeCount} exchange
+                                {p.specialization.exchangeCount === 1 ? "" : "s"}
+                              </span>
+                            )}
+                          </p>
+                        )}
                       </div>
                       <button
                         type="button"
@@ -436,6 +493,22 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
                 <li key={i}>{s}</li>
               ))}
             </ol>
+          )}
+          {packet.tailoredBrief && (
+            <div className="space-y-2 rounded-xl border border-electric-500/30 bg-electric-500/5 p-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-electric-300">
+                Tailored for your objective
+              </p>
+              <p className="text-xs italic text-ink-400">“{packet.tailoredBrief.objective}”</p>
+              <p className="whitespace-pre-wrap text-sm text-ink-200">
+                {packet.tailoredBrief.brief}
+              </p>
+              {packet.tailoredBrief.basedOn.length > 0 && (
+                <p className="text-[10px] text-ink-500">
+                  Based on: {packet.tailoredBrief.basedOn.map((s) => s.label).join(" · ")}
+                </p>
+              )}
+            </div>
           )}
           <p className="font-mono text-[10px] text-ink-500">
             skillHash {packet.skillHash.slice(0, 14)}… · paymentRef {packet.paymentRef.slice(0, 14)}…

@@ -167,6 +167,28 @@ async function fetchSeries(config: DuneQueryConfig, days: number): Promise<{ dat
   return normalizeRows(rows, config, days);
 }
 
+/**
+ * Daily series for an ARBITRARY saved query id (user-configured custom agent
+ * tools). Same auth, caching, and fail-soft behavior as the curated fetchers.
+ */
+export async function fetchDuneQuerySeries(
+  queryId: number,
+  days = 30,
+): Promise<{ date: string; value: number }[]> {
+  if (!Number.isInteger(queryId) || queryId <= 0) return [];
+  return fetchSeries({ queryId }, days);
+}
+
+/**
+ * Latest raw rows for an arbitrary saved query (capped) — for custom tools
+ * whose query is not a daily time series.
+ */
+export async function fetchDuneLatestRows(queryId: number, maxRows = 20): Promise<Row[]> {
+  if (!hasDune() || !Number.isInteger(queryId) || queryId <= 0) return [];
+  const rows = await getLatestResults(queryId);
+  return rows.slice(0, maxRows);
+}
+
 /** Daily peg-price series for a stablecoin slug (≈1.0 for a healthy peg). */
 export async function fetchPegHistory(slug: string, days = 30): Promise<PegDataPoint[]> {
   const config = DUNE_QUERY_IDS[slug]?.peg;

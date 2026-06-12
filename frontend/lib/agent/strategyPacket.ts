@@ -19,6 +19,16 @@ export function strategyPacketToMarkdown(packet: StrategyPacket): string {
     lines.push("", "## Sources");
     for (const s of packet.sources) lines.push(`- [${s.label}](${s.url})`);
   }
+  if (packet.tailoredBrief) {
+    lines.push("", `## Tailored brief (for objective: ${packet.tailoredBrief.objective})`);
+    lines.push(packet.tailoredBrief.brief);
+    if (packet.tailoredBrief.basedOn.length) {
+      lines.push(
+        "",
+        `_Based on: ${packet.tailoredBrief.basedOn.map((s) => s.label).join("; ")}_`,
+      );
+    }
+  }
   return lines.join("\n");
 }
 

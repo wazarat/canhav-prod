@@ -1,7 +1,7 @@
 import "server-only";
 
 import { openai } from "@ai-sdk/openai";
-import type { LanguageModel } from "ai";
+import type { EmbeddingModel, LanguageModel } from "ai";
 
 import { readSecret } from "@/lib/server/env";
 import { hasUpstash } from "@/lib/server/redis";
@@ -80,6 +80,40 @@ export function resolveAgentModel(): LanguageModel {
   }
   hydrateEnv("OPENAI_API_KEY");
   return openai(model);
+}
+
+export const DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small" as const;
+
+/** Embedding model id (override via OPENAI_EMBEDDING_MODEL). */
+export function embeddingModel(): string {
+  return readSecret("OPENAI_EMBEDDING_MODEL") ?? DEFAULT_EMBEDDING_MODEL;
+}
+
+/**
+ * Whether vector embeddings are available (the knowledge layer falls back to
+ * keyword retrieval when this is false — it never hard-fails).
+ */
+export function hasEmbeddings(): boolean {
+  return hasLLM();
+}
+
+/**
+ * Resolve the AI SDK embedding model for the knowledge layer, mirroring
+ * `resolveAgentModel`: Vercel AI Gateway when configured (string id), else the
+ * direct OpenAI provider. Returns null when no provider is configured so
+ * callers can degrade to keyword search.
+ */
+export function resolveEmbeddingModel(): EmbeddingModel | null {
+  const model = embeddingModel();
+  if (hasGateway()) {
+    hydrateEnv("AI_GATEWAY_API_KEY");
+    return model.includes("/") ? model : `openai/${model}`;
+  }
+  if (hasOpenAI()) {
+    hydrateEnv("OPENAI_API_KEY");
+    return openai.textEmbeddingModel(model);
+  }
+  return null;
 }
 
 /**
@@ -242,6 +276,8 @@ export interface AgentConfigStatus {
   llm: boolean;
   /** Which provider the loop resolves to. */
   provider: "gateway" | "openai" | "none";
+  /** Vector embeddings available for the knowledge layer (else keyword search). */
+  embeddings: boolean;
   /** Persistent memory store (Upstash) is configured; false uses local fallback. */
   upstash: boolean;
   /** On-chain ERC-8004 registration is configured (RPC + registries + Privy). */
@@ -268,6 +304,7 @@ export function agentConfigStatus(): AgentConfigStatus {
     openai: hasOpenAI(),
     llm: hasLLM(),
     provider: agentProvider(),
+    embeddings: hasEmbeddings(),
     upstash: hasUpstash(),
     zerodev: hasZeroDev(),
     privy: hasPrivy(),

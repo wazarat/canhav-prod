@@ -13,7 +13,10 @@ import {
   getApprovedTokenBySlug,
   getApprovedTokens,
 } from "@/lib/data";
-import { appendMemory, getMemory, markSkillStudied } from "@/lib/agent/memory";
+import { appendMemory, getDataFrame, getMemory, markSkillStudied } from "@/lib/agent/memory";
+import { buildCustomTools, executeCustomTool, listCustomTools } from "@/lib/agent/customTools";
+import { resolveDataFrame } from "@/lib/agent/dataframes";
+import { searchKnowledge } from "@/lib/agent/knowledge";
 import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-binding";
 import { getAgentSkillById } from "@/lib/agent/skills";
 import { fetchReserveRatesForSlug } from "@/lib/server/aave";
@@ -88,6 +91,13 @@ const schemas = {
     source: z.string().optional(),
   }),
   memory_recall: z.object({}),
+  frame_load: z.object({
+    frameId: z.string().describe("Id of a pinned data frame (listed in the system prompt)."),
+  }),
+  knowledge_search: z.object({
+    query: z.string().describe("What to look for in the owner's uploaded knowledge."),
+    k: z.number().int().min(1).max(8).optional().describe("Max passages to return (default 4)."),
+  }),
 };
 
 type Args<K extends keyof typeof schemas> = z.infer<(typeof schemas)[K]>;
@@ -303,6 +313,37 @@ async function execRemember(agentId: string, a: Args<"memory_remember">) {
   };
 }
 
+async function execFrameLoad(agentId: string, a: Args<"frame_load">) {
+  const frame = await getDataFrame(agentId, a.frameId);
+  if (!frame) {
+    return { found: false, summary: `No pinned data frame "${a.frameId}" on this agent.` };
+  }
+  const resolved = await resolveDataFrame(frame);
+  return { found: true, ...resolved };
+}
+
+async function execKnowledgeSearch(agentId: string, a: Args<"knowledge_search">) {
+  const hits = await searchKnowledge(agentId, a.query, a.k ?? 4);
+  if (!hits.length) {
+    return {
+      found: false,
+      hits: [],
+      summary: `No knowledge passages matched "${a.query}".`,
+    };
+  }
+  return {
+    found: true,
+    hits: hits.map((h) => ({
+      content: h.content,
+      docTitle: h.docTitle,
+      sourceLabel: h.sourceLabel,
+      sourceUrl: h.sourceUrl,
+      similarity: h.score,
+    })),
+    summary: `Found ${hits.length} knowledge passage(s) for "${a.query}" (top: ${hits[0].docTitle}).`,
+  };
+}
+
 async function execRecall(agentId: string) {
   const facts = await getMemory(agentId);
   return {
@@ -353,7 +394,7 @@ function safe<T extends (...args: never[]) => Promise<unknown>>(label: string, f
   return wrapped as unknown as T;
 }
 
-export function buildAgentTools(agentId: string, scope?: AgentScope) {
+export async function buildAgentTools(agentId: string, scope?: AgentScope) {
   const base = {
     research_getEntity: tool({
       description: "Read a CanHav umbrella entity (issuer) profile by slug.",
@@ -412,11 +453,35 @@ export function buildAgentTools(agentId: string, scope?: AgentScope) {
       inputSchema: schemas.memory_recall,
       execute: safe("memory_recall", () => execRecall(agentId)),
     }),
+    frame_load: tool({
+      description:
+        "Load a data frame the owner pinned for this agent: fresh, cited values for its metrics (peg/TVL/price/supply/Aave rates). Call this FIRST when the user asks about a pinned frame's metrics.",
+      inputSchema: schemas.frame_load,
+      execute: safe("frame_load", (a: Args<"frame_load">) => execFrameLoad(agentId, a)),
+    }),
+    knowledge_search: tool({
+      description:
+        "Search the owner's uploaded knowledge documents for relevant passages. Call this FIRST when a question may be covered by the owner's docs, and cite each passage's sourceLabel/sourceUrl for any fact you use.",
+      inputSchema: schemas.knowledge_search,
+      execute: safe("knowledge_search", (a: Args<"knowledge_search">) =>
+        execKnowledgeSearch(agentId, a),
+      ),
+    }),
   };
+
+  // Owner-configured custom tools (typed read-only catalog). Fails soft: a
+  // storage hiccup must never take down the base research toolset.
+  let custom: Awaited<ReturnType<typeof buildCustomTools>> = {};
+  try {
+    custom = await buildCustomTools(agentId);
+  } catch (e) {
+    console.error("[agent.tools] buildCustomTools failed:", e instanceof Error ? e.message : e);
+  }
 
   if (scope?.entitySlug) {
     return {
       ...base,
+      ...custom,
       agent_scope: tool({
         description:
           "Return this agent's bound project (entity) and its member products (stablecoins/tokens/RWAs). Call this first to orient before researching.",
@@ -426,7 +491,7 @@ export function buildAgentTools(agentId: string, scope?: AgentScope) {
     };
   }
 
-  return base;
+  return { ...base, ...custom };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -463,6 +528,16 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
     sample: { fact: "JLP yield is fee-based, not emissions." },
   },
   { name: "memory_recall", description: "Recall learned facts.", sample: {} },
+  {
+    name: "frame_load",
+    description: "Resolve a pinned data frame to fresh, cited metric values.",
+    sample: { frameId: "frame_abc123" },
+  },
+  {
+    name: "knowledge_search",
+    description: "Search the owner's uploaded knowledge for relevant passages.",
+    sample: { query: "yield sustainability", k: 4 },
+  },
 ];
 
 export interface RunToolResult {
@@ -478,6 +553,21 @@ export async function runTool(
   name: string,
   rawArgs: unknown,
 ): Promise<RunToolResult> {
+  // Owner-configured custom tools run by their `custom_<id>` name (no args).
+  if (name.startsWith("custom_")) {
+    const toolId = name.slice("custom_".length);
+    const custom = (await listCustomTools(agentId)).find((t) => t.id === toolId);
+    if (!custom) return { ok: false, error: `Unknown custom tool "${name}".` };
+    try {
+      const { summary, ...rest } = (await executeCustomTool(custom.template)) as {
+        summary?: string;
+      } & Record<string, unknown>;
+      return { ok: true, summary, result: rest };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : String(e) };
+    }
+  }
+
   const schema = (schemas as Record<string, z.ZodTypeAny>)[name];
   if (!schema) return { ok: false, error: `Unknown tool "${name}".` };
 
@@ -521,6 +611,12 @@ export async function runTool(
       break;
     case "memory_recall":
       out = await execRecall(agentId);
+      break;
+    case "frame_load":
+      out = await execFrameLoad(agentId, a as Args<"frame_load">);
+      break;
+    case "knowledge_search":
+      out = await execKnowledgeSearch(agentId, a as Args<"knowledge_search">);
       break;
     default:
       return { ok: false, error: `Unhandled tool "${name}".` };

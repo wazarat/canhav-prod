@@ -6,6 +6,9 @@ import path from "node:path";
 import { repoRoot } from "@/lib/server/env";
 import { getRedisClient, hasUpstash } from "@/lib/server/redis";
 
+import { sanitizeAgentConfig, type AgentConfig } from "@/lib/agent/agentConfig";
+import type { DataFrame } from "@/lib/types";
+
 /**
  * Agent memory layer (no Supabase).
  *
@@ -73,6 +76,8 @@ export interface AgentProfile {
   discoverable: boolean;
   /** Price (testnet USDC) the agent charges per StrategyPacket. Null = default. */
   collabPriceUsdc: string | null;
+  /** Owner-tunable framework (focus, instructions, style). Null = defaults. */
+  config: AgentConfig | null;
   chain: typeof AGENT_CHAIN;
   createdAt: string;
   updatedAt: string;
@@ -94,6 +99,7 @@ const key = {
   attachedSkills: (id: string) => `agent:${id}:attached-skills`,
   skillHash: (id: string, skillId: string) => `agent:${id}:skillhash:${skillId}`,
   skillAgents: (skillId: string) => `skill:${skillId}:agents`,
+  frames: (id: string) => `agent:${id}:frames`,
 };
 
 function nowIso(): string {
@@ -132,6 +138,8 @@ interface FileStore {
   skillHashes?: Record<string, string>;
   /** skillId -> agentIds advertising it (reverse index for discovery). */
   skillAgents?: Record<string, string[]>;
+  /** agentId -> pinned data frames. */
+  frames?: Record<string, DataFrame[]>;
 }
 
 function filePath(): string {
@@ -149,6 +157,7 @@ function readFile(): FileStore {
       attachedSkills: parsed.attachedSkills ?? {},
       skillHashes: parsed.skillHashes ?? {},
       skillAgents: parsed.skillAgents ?? {},
+      frames: parsed.frames ?? {},
     };
   } catch {
     return {
@@ -159,6 +168,7 @@ function readFile(): FileStore {
       attachedSkills: {},
       skillHashes: {},
       skillAgents: {},
+      frames: {},
     };
   }
 }
@@ -188,6 +198,7 @@ function normalizeProfile(profile: AgentProfile | null): AgentProfile | null {
     agentWallet: profile.agentWallet ?? null,
     discoverable: profile.discoverable ?? false,
     collabPriceUsdc: profile.collabPriceUsdc ?? null,
+    config: profile.config ? sanitizeAgentConfig(profile.config) : null,
   };
 }
 
@@ -211,6 +222,7 @@ export interface SeedProfileInput {
   onChain?: boolean;
   discoverable?: boolean;
   collabPriceUsdc?: string | null;
+  config?: AgentConfig | null;
 }
 
 /** Create or update an agent profile and register it in the index. */
@@ -230,6 +242,7 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
     onChain: input.onChain ?? existing?.onChain ?? false,
     discoverable: input.discoverable ?? existing?.discoverable ?? false,
     collabPriceUsdc: input.collabPriceUsdc ?? existing?.collabPriceUsdc ?? null,
+    config: input.config !== undefined ? input.config : (existing?.config ?? null),
     chain: AGENT_CHAIN,
     createdAt: existing?.createdAt ?? nowIso(),
     updatedAt: nowIso(),
@@ -264,6 +277,19 @@ export async function setAgentDiscoverability(
     discoverable,
     collabPriceUsdc: collabPriceUsdc !== undefined ? collabPriceUsdc : existing.collabPriceUsdc,
   });
+}
+
+/**
+ * Owner-only: persist the agent's framework config (already sanitized by the
+ * route). Returns null if the agent doesn't exist.
+ */
+export async function setAgentConfig(
+  agentId: string,
+  config: AgentConfig | null,
+): Promise<AgentProfile | null> {
+  const existing = await getAgentProfile(agentId);
+  if (!existing) return null;
+  return seedAgentProfile({ agentId, name: existing.name, config });
 }
 
 export async function listAgents(): Promise<AgentProfile[]> {
@@ -432,6 +458,61 @@ export async function getAgentsForSkill(skillId: string): Promise<string[]> {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Data frames (user-pinned metric compositions; resolved by frame_load)      */
+/* -------------------------------------------------------------------------- */
+
+/** Per-agent cap — frames render into the system prompt, so keep them bounded. */
+export const MAX_DATA_FRAMES = 10;
+
+export async function listDataFrames(agentId: string): Promise<DataFrame[]> {
+  if (hasUpstash()) {
+    const raw = await getRedisClient().get(key.frames(agentId));
+    return coerce<DataFrame[]>(raw) ?? [];
+  }
+  return readFile().frames?.[agentId] ?? [];
+}
+
+async function writeDataFrames(agentId: string, frames: DataFrame[]): Promise<void> {
+  if (hasUpstash()) {
+    await getRedisClient().set(key.frames(agentId), JSON.stringify(frames));
+  } else {
+    const store = readFile();
+    store.frames = { ...(store.frames ?? {}), [agentId]: frames };
+    writeFile(store);
+  }
+}
+
+/**
+ * Insert or replace (by id) a pinned data frame. Returns null when the cap is
+ * hit for a NEW frame (replacing an existing one is always allowed).
+ */
+export async function saveDataFrame(agentId: string, frame: DataFrame): Promise<DataFrame | null> {
+  const frames = await listDataFrames(agentId);
+  const idx = frames.findIndex((f) => f.id === frame.id);
+  if (idx >= 0) {
+    frames[idx] = frame;
+  } else {
+    if (frames.length >= MAX_DATA_FRAMES) return null;
+    frames.push(frame);
+  }
+  await writeDataFrames(agentId, frames);
+  return frame;
+}
+
+export async function deleteDataFrame(agentId: string, frameId: string): Promise<boolean> {
+  const frames = await listDataFrames(agentId);
+  const next = frames.filter((f) => f.id !== frameId);
+  if (next.length === frames.length) return false;
+  await writeDataFrames(agentId, next);
+  return true;
+}
+
+export async function getDataFrame(agentId: string, frameId: string): Promise<DataFrame | null> {
+  const frames = await listDataFrames(agentId);
+  return frames.find((f) => f.id === frameId) ?? null;
+}
+
+/* -------------------------------------------------------------------------- */
 /* Aggregates                                                                 */
 /* -------------------------------------------------------------------------- */
 
@@ -449,7 +530,32 @@ export async function getAgentSnapshot(agentId: string): Promise<AgentSnapshot> 
  * Derive a playful "researcher level" from how much the agent has learned.
  * Memory facts count 1 each, studied skills count 3 each.
  */
-export function agentLevel(memoryCount: number, skillCount: number): number {
-  const score = memoryCount + skillCount * 3;
+/** Enrichment counts that feed the agent's level (the training gamification). */
+export interface AgentEnrichmentCounts {
+  frames?: number;
+  knowledgeDocs?: number;
+  customTools?: number;
+  /** Memory facts tagged source "owner-correction". */
+  corrections?: number;
+}
+
+/**
+ * Level = f(learned facts, studied skills, enrichment). Each enrichment action
+ * (pin a frame, upload a doc, add a tool, correct an answer) visibly moves the
+ * level, so owners see the agent grow as they train it.
+ */
+export function agentLevel(
+  memoryCount: number,
+  skillCount: number,
+  enrichment?: AgentEnrichmentCounts,
+): number {
+  const e = enrichment ?? {};
+  const score =
+    memoryCount +
+    skillCount * 3 +
+    (e.frames ?? 0) * 2 +
+    (e.knowledgeDocs ?? 0) * 2 +
+    (e.customTools ?? 0) * 2 +
+    (e.corrections ?? 0);
   return Math.max(1, Math.floor(score / 5) + 1);
 }

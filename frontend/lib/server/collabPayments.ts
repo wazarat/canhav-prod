@@ -138,6 +138,7 @@ function safeAddr(value: string): string | null {
 /* -------------------------------------------------------------------------- */
 
 const refKey = (txHash: string) => `collab:payref:${txHash.toLowerCase()}`;
+const ratingKey = (txHash: string) => `collab:ratingref:${txHash.toLowerCase()}`;
 
 function filePath(): string {
   return path.join(repoRoot(), "backend", "data", "collab-payrefs.json");
@@ -167,6 +168,23 @@ function writeRefs(store: Record<string, string>): void {
  */
 export async function tryConsumePaymentRef(txHash: string, meta: string): Promise<boolean> {
   const k = refKey(txHash);
+  if (hasUpstash()) {
+    const res = await getRedisClient().set(k, meta, { nx: true });
+    return res === "OK";
+  }
+  const store = readRefs();
+  if (store[k]) return false;
+  store[k] = meta;
+  writeRefs(store);
+  return true;
+}
+
+/**
+ * Atomically claim a payment reference for RATING purposes — each settled
+ * exchange yields at most one reputation rating (prevents repeat-rating spam).
+ */
+export async function tryConsumeRatingRef(txHash: string, meta: string): Promise<boolean> {
+  const k = ratingKey(txHash);
   if (hasUpstash()) {
     const res = await getRedisClient().set(k, meta, { nx: true });
     return res === "OK";

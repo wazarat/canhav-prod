@@ -11,9 +11,13 @@ import {
   getAgentProfile,
   getMemory,
   getStudiedSkills,
+  listDataFrames,
   type AgentToolCall,
 } from "@/lib/agent/memory";
+import { listCustomTools } from "@/lib/agent/customTools";
 import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-binding";
+import { listKnowledgeDocs } from "@/lib/agent/knowledge";
+import { buildSystemPrompt } from "@/lib/agent/prompt";
 import { userAgentId } from "@/lib/agent/user-agent";
 import { buildAgentTools } from "@/lib/agent/tools";
 import { getSession } from "@/lib/auth/session";
@@ -34,18 +38,6 @@ export const dynamic = "force-dynamic";
 
 /** Stop the agent loop this many ms before the platform's hard kill. */
 const AGENT_TIME_BUDGET_MS = (maxDuration - 6) * 1000;
-
-const SYSTEM_PROMPT = `You are the CanHav research agent — a financial-intelligence analyst for the Arbitrum ecosystem.
-
-Rules:
-- Answer ONLY from CanHav's own data, fetched through your tools. Never invent numbers, addresses, or facts.
-- If a tool returns nothing (e.g. no profile, or "Dune query not configured"), say so plainly instead of guessing.
-- Be precise about taxonomy: clearly distinguish stablecoins (peg-targeting), yield/LST tokens, governance/utility tokens, and RWAs (tokenized off-chain assets).
-- You are research-only. You never trade, transact, or give financial advice — you summarize what CanHav tracks.
-- When you learn a durable, reusable fact about a protocol, call memory_remember so you retain it across sessions. Recall with memory_recall when helpful.
-- Prefer concrete tool calls over speculation. Cite the protocol/slug you read. Keep answers tight and skimmable.
-- Use markdown (bold, bullet lists, links) for structure; avoid deep heading stacks.
-- All on-chain activity is Arbitrum Sepolia testnet.`;
 
 interface MinimalToolResult {
   toolName: string;
@@ -110,13 +102,14 @@ export async function POST(req: Request) {
     conversationId = created.id;
   }
 
-  const [memory, studied, profile] = await Promise.all([
+  const [memory, studied, profile, frames, knowledgeDocs, customTools] = await Promise.all([
     getMemory(agentId),
     getStudiedSkills(agentId),
     getAgentProfile(agentId),
+    listDataFrames(agentId),
+    listKnowledgeDocs(agentId),
+    listCustomTools(agentId),
   ]);
-  const memoryBlock = memory.length ? memory.map((f) => `- ${f.text}`).join("\n") : "(nothing yet)";
-  const studiedBlock = studied.length ? studied.join(", ") : "(none yet)";
 
   // Bind the agent to its project (Entity) so it defaults to that entity + its
   // member products without the user re-specifying slugs.
@@ -134,7 +127,17 @@ export async function POST(req: Request) {
     }
   }
 
-  const system = `${SYSTEM_PROMPT}\n\n--- Durable memory (what you already learned) ---\n${memoryBlock}\n\nSkills studied: ${studiedBlock}${projectBlock}`;
+  const system = buildSystemPrompt({
+    memory,
+    studiedSkills: studied,
+    projectBlock,
+    config: profile?.config ?? null,
+    frames: frames.map((f) => ({ id: f.id, title: f.title, window: f.window })),
+    knowledgeDocs: knowledgeDocs.map((d) => ({ title: d.title })),
+    customTools: customTools
+      .filter((t) => t.enabled)
+      .map((t) => ({ name: `custom_${t.id}`, description: t.template.title })),
+  });
 
   // `ai@6` throws here if the incoming UIMessage[] from @ai-sdk/react doesn't
   // match the shape it expects. Guard it so a bad history returns a clean 400
@@ -164,7 +167,7 @@ export async function POST(req: Request) {
     model: resolveAgentModel(),
     system,
     messages: modelMessages,
-    tools: buildAgentTools(agentId, scope),
+    tools: await buildAgentTools(agentId, scope),
     stopWhen: stepCountIs(8),
     abortSignal: budget.signal,
     onFinish: async (event) => {

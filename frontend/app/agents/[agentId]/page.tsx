@@ -2,15 +2,29 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, CircleDot, Rocket, Sparkles } from "lucide-react";
 
+import { AgentFrameworkPanel } from "@/components/agent/AgentFrameworkPanel";
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
+import { AgentSuggestions } from "@/components/agent/AgentSuggestions";
 import { AgentIdentityCard } from "@/components/agent/AgentIdentityCard";
 import { AgentMemoryPanel } from "@/components/agent/AgentMemoryPanel";
 import { AttachSkillPanel } from "@/components/agent/AttachSkillPanel";
 import { CollabSettingsPanel } from "@/components/agent/CollabSettingsPanel";
 import { SkillShelf } from "@/components/agent/SkillShelf";
 import { Badge } from "@/components/ui/Badge";
-import { agentConfigStatus } from "@/lib/agent/config";
-import { agentLevel, getAgentSnapshot } from "@/lib/agent/memory";
+import { CustomToolsPanel } from "@/components/agent/CustomToolsPanel";
+import { DataFramesPanel } from "@/components/agent/DataFramesPanel";
+import { KnowledgePanel } from "@/components/agent/KnowledgePanel";
+import { agentConfigStatus, hasEmbeddings } from "@/lib/agent/config";
+import {
+  CUSTOM_TOOL_LIMITS,
+  customToolHttpAllowlist,
+  listCustomTools,
+} from "@/lib/agent/customTools";
+import { frameMetricOptionsForProducts } from "@/lib/agent/dataframes";
+import { KNOWLEDGE_LIMITS, knowledgeUrlAllowlist, listKnowledgeDocs } from "@/lib/agent/knowledge";
+import { agentLevel, getAgentSnapshot, listDataFrames, MAX_DATA_FRAMES } from "@/lib/agent/memory";
+import { OWNER_CORRECTION_SOURCE } from "@/lib/agent/prompt";
+import { buildAgentSuggestions, type AgentSuggestion } from "@/lib/agent/suggestions";
 import { verifyAgentOnChain } from "@/lib/agent/onchain";
 import { getAgentSkills } from "@/lib/agent/skills";
 import { getSession } from "@/lib/auth/session";
@@ -39,7 +53,27 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
     : new Set<string>();
   const isOwner = ownedIds.has(agentId);
 
-  const level = agentLevel(memory.length, studiedSkills.length);
+  // Enrichment state feeds the level for everyone; the editing surfaces
+  // (options + suggestions) are owner-only.
+  const [frames, knowledgeDocs, customTools] = await Promise.all([
+    listDataFrames(agentId),
+    listKnowledgeDocs(agentId),
+    listCustomTools(agentId),
+  ]);
+  const [frameOptions, suggestions] = isOwner
+    ? await Promise.all([
+        frameMetricOptionsForProducts(profile.associatedProducts),
+        buildAgentSuggestions(agentId, profile),
+      ])
+    : [[], [] as AgentSuggestion[]];
+
+  const corrections = memory.filter((f) => f.source === OWNER_CORRECTION_SOURCE).length;
+  const level = agentLevel(memory.length, studiedSkills.length, {
+    frames: frames.length,
+    knowledgeDocs: knowledgeDocs.length,
+    customTools: customTools.length,
+    corrections,
+  });
   const arbiscanUrl = profile.agentAddress
     ? `https://sepolia.arbiscan.io/address/${profile.agentAddress}`
     : null;
@@ -141,6 +175,10 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
         )}
       </header>
 
+      {isOwner && suggestions.length > 0 && (
+        <AgentSuggestions agentId={agentId} suggestions={suggestions} />
+      )}
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <AgentLabPanel agentId={agentId} llmConfigured={status.llm} />
@@ -170,6 +208,34 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
           />
           {isOwner && (
             <>
+              <div id="panel-framework">
+                <AgentFrameworkPanel agentId={agentId} config={profile.config} />
+              </div>
+              <div id="panel-frames">
+                <DataFramesPanel
+                  agentId={agentId}
+                  frames={frames}
+                  options={frameOptions}
+                  max={MAX_DATA_FRAMES}
+                />
+              </div>
+              <div id="panel-knowledge">
+                <KnowledgePanel
+                  agentId={agentId}
+                  docs={knowledgeDocs}
+                  max={KNOWLEDGE_LIMITS.docsMax}
+                  embeddings={hasEmbeddings()}
+                  urlIngestionEnabled={knowledgeUrlAllowlist().length > 0}
+                />
+              </div>
+              <div id="panel-custom-tools">
+                <CustomToolsPanel
+                  agentId={agentId}
+                  tools={customTools}
+                  max={CUSTOM_TOOL_LIMITS.toolsMax}
+                  httpEnabled={customToolHttpAllowlist().length > 0}
+                />
+              </div>
               <AttachSkillPanel agentId={agentId} onChain={profile.onChain} />
               <CollabSettingsPanel
                 agentId={agentId}

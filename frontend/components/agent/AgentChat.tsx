@@ -3,7 +3,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { AlertTriangle, Bot, Send, Sparkles, User } from "lucide-react";
+import {
+  AlertTriangle,
+  Bot,
+  Check,
+  Send,
+  Sparkles,
+  ThumbsDown,
+  ThumbsUp,
+  User,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
@@ -101,6 +110,42 @@ export function AgentChat({
   const scrollRef = useRef<HTMLDivElement>(null);
   const prevStatus = useRef(status);
 
+  // Refinement loop: thumbs up/down per assistant message; thumbs-down opens an
+  // optional correction box that is stored as durable "owner-correction" memory.
+  const [feedbackState, setFeedbackState] = useState<Record<string, "up" | "down" | "saved">>({});
+  const [correctingId, setCorrectingId] = useState<string | null>(null);
+  const [correctionText, setCorrectionText] = useState("");
+
+  /** The user question that preceded an assistant message (for correction context). */
+  function questionFor(messageId: string): string {
+    const list = messages as UIMessage[];
+    const idx = list.findIndex((m) => m.id === messageId);
+    for (let i = idx - 1; i >= 0; i--) {
+      if (list[i].role === "user") return messageText(list[i]);
+    }
+    return "";
+  }
+
+  async function sendFeedback(messageId: string, verdict: "up" | "down", correction?: string) {
+    setFeedbackState((s) => ({ ...s, [messageId]: verdict }));
+    try {
+      const res = await fetch(`/api/agent/${encodeURIComponent(agentId)}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          verdict,
+          correction: correction || undefined,
+          question: questionFor(messageId) || undefined,
+        }),
+      });
+      if (res.ok && correction) {
+        setFeedbackState((s) => ({ ...s, [messageId]: "saved" }));
+      }
+    } catch {
+      // Feedback is best-effort; never disrupt the chat.
+    }
+  }
+
   const busy = status === "submitted" || status === "streaming";
   const steps = useMemo(() => extractSteps(messages as UIMessage[]), [messages]);
 
@@ -181,6 +226,8 @@ export function AgentChat({
             (messages as UIMessage[]).map((m) => {
               const text = messageText(m);
               const isUser = m.role === "user";
+              const verdict = feedbackState[m.id];
+              const showFeedback = !isUser && Boolean(text) && !busy;
               return (
                 <div
                   key={m.id}
@@ -191,19 +238,91 @@ export function AgentChat({
                       <Sparkles className="h-3.5 w-3.5" />
                     </span>
                   )}
-                  <div
-                    className={cn(
-                      "max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-                      isUser
-                        ? "bg-electric-500/15 text-ink-50"
-                        : "border border-ink-800/60 bg-ink-900/40 text-ink-100",
+                  <div className={cn("max-w-[80%] space-y-1", isUser && "flex flex-col items-end")}>
+                    <div
+                      className={cn(
+                        "whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+                        isUser
+                          ? "bg-electric-500/15 text-ink-50"
+                          : "border border-ink-800/60 bg-ink-900/40 text-ink-100",
+                      )}
+                    >
+                      {text ? (
+                        <AgentMessageContent role={m.role} text={text} />
+                      ) : m.role === "assistant" && busy ? (
+                        "…"
+                      ) : null}
+                    </div>
+                    {showFeedback && (
+                      <div className="flex items-center gap-2 pl-1">
+                        {verdict === "saved" ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] text-signal-300">
+                            <Check className="h-3 w-3" /> Correction saved — the agent will
+                            remember.
+                          </span>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              aria-label="Good answer"
+                              onClick={() => sendFeedback(m.id, "up")}
+                              disabled={Boolean(verdict)}
+                              className={cn(
+                                "transition-colors disabled:opacity-60",
+                                verdict === "up"
+                                  ? "text-signal-300"
+                                  : "text-ink-500 hover:text-signal-300",
+                              )}
+                            >
+                              <ThumbsUp className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Bad answer — correct it"
+                              onClick={() => {
+                                setFeedbackState((s) => ({ ...s, [m.id]: "down" }));
+                                setCorrectingId(m.id);
+                                setCorrectionText("");
+                              }}
+                              className={cn(
+                                "transition-colors",
+                                verdict === "down"
+                                  ? "text-rose-300"
+                                  : "text-ink-500 hover:text-rose-300",
+                              )}
+                            >
+                              <ThumbsDown className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     )}
-                  >
-                    {text ? (
-                      <AgentMessageContent role={m.role} text={text} />
-                    ) : m.role === "assistant" && busy ? (
-                      "…"
-                    ) : null}
+                    {correctingId === m.id && verdict !== "saved" && (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (!correctionText.trim()) return;
+                          void sendFeedback(m.id, "down", correctionText.trim());
+                          setCorrectingId(null);
+                        }}
+                        className="flex w-full items-center gap-1.5"
+                      >
+                        <input
+                          value={correctionText}
+                          onChange={(e) => setCorrectionText(e.target.value.slice(0, 400))}
+                          placeholder="What should it have said?"
+                          autoFocus
+                          className="min-w-0 flex-1 rounded-lg border border-ink-700 bg-ink-900/60 px-2.5 py-1.5 text-xs text-ink-100 outline-none focus:border-electric-500/60"
+                        />
+                        <button
+                          type="submit"
+                          disabled={!correctionText.trim()}
+                          className="shrink-0 rounded-lg border border-electric-500/40 bg-electric-500/10 px-2 py-1.5 text-[11px] font-medium text-electric-300 transition-colors hover:bg-electric-500/20 disabled:opacity-50"
+                        >
+                          Teach
+                        </button>
+                      </form>
+                    )}
                   </div>
                   {isUser && (
                     <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-ink-700/80 bg-ink-900/60 text-ink-300">

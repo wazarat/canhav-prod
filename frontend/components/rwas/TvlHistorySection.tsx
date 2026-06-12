@@ -18,6 +18,7 @@ const TREND_LABEL = {
 
 const SOURCE_LABEL: Record<string, string> = {
   dune: "Dune",
+  defillama: "DeFi Llama",
   coingecko: "CoinGecko (market cap proxy)",
 };
 

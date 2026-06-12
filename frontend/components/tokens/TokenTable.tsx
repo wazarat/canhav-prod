@@ -5,6 +5,41 @@ import { Badge } from "@/components/ui/Badge";
 import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import type { EntityProfile, TokenProfile } from "@/lib/types";
+import { cn, formatPct, formatUsdCompact } from "@/lib/utils";
+
+function formatPrice(value: number | null | undefined): string {
+  if (value === null || value === undefined) return "—";
+  if (value >= 1_000) return `$${value.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+  if (value >= 1) return `$${value.toFixed(2)}`;
+  return `$${value.toFixed(4)}`;
+}
+
+function MarketCells({ profile }: { profile: TokenProfile }) {
+  const market = profile.market;
+  const price = market?.priceUsd?.value ?? null;
+  const mcap = market?.marketCapUsd?.value ?? null;
+  const change = market?.change24hPct?.value ?? null;
+  return (
+    <>
+      <TD className="text-right font-mono text-ink-50">{formatPrice(price)}</TD>
+      <TD className="text-right font-mono text-ink-50">{formatUsdCompact(mcap)}</TD>
+      <TD className="text-right">
+        {change === null ? (
+          <span className="text-ink-400">—</span>
+        ) : (
+          <span
+            className={cn(
+              "font-mono text-xs",
+              change > 0 ? "text-signal-400" : change < 0 ? "text-red-400" : "text-ink-200",
+            )}
+          >
+            {formatPct(change)}
+          </span>
+        )}
+      </TD>
+    </>
+  );
+}
 
 interface TokenTableProps {
   profiles: TokenProfile[];
@@ -37,6 +72,9 @@ export function TokenTable({
             <TH>Token</TH>
             <TH>Type</TH>
             <TH>Issuer</TH>
+            <TH className="text-right">Price</TH>
+            <TH className="text-right">Market cap</TH>
+            <TH className="text-right">24h</TH>
             {showStatus && <TH>Status</TH>}
             <TH className="text-right">Links</TH>
           </tr>
@@ -79,6 +117,7 @@ export function TokenTable({
                   <span className="text-ink-400">—</span>
                 )}
               </TD>
+              <MarketCells profile={p} />
               {showStatus && (
                 <TD>
                   <StatusPill status={p.status} />

@@ -313,12 +313,31 @@ export function buildSkillFromStablecoin(profile: StablecoinProfile): PlatformSk
   ];
   if (profile.subCategory) facts.push({ key: "subCategory", value: profile.subCategory });
   if (profile.pegMechanism) facts.push({ key: "pegMechanism", value: profile.pegMechanism });
+  // Issuer-reported backing mechanism (DeFi Llama) when the curated one is absent.
+  if (!profile.pegMechanism && profile.issuanceMeta?.pegMechanism) {
+    facts.push({ key: "pegMechanism", value: profile.issuanceMeta.pegMechanism });
+  }
   const supply = compactNumber(profile.totalSupply.value);
   if (supply) facts.push({ key: "circulatingSupply", value: supply });
+  if (profile.chainDistribution?.chains.length) {
+    facts.push({
+      key: "chainFootprint",
+      value: profile.chainDistribution.chains
+        .slice(0, 5)
+        .map((c) => `${c.chain} ${compactNumber(c.value) ?? c.value}`)
+        .join(" · "),
+    });
+  }
   if (profile.entitySlug) facts.push({ key: "parentEntity", value: profile.entitySlug });
 
   const sections: AgentSkillSection[] = [];
   if (profile.description) sections.push({ heading: "Overview", body: profile.description });
+  if (profile.issuanceMeta?.mintRedeemDescription) {
+    sections.push({
+      heading: "Mint / redeem",
+      body: profile.issuanceMeta.mintRedeemDescription,
+    });
+  }
   if (profile.lendingMarket) {
     sections.push({
       heading: "Lending market",
@@ -351,6 +370,15 @@ export function buildSkillFromRwa(profile: RwaProfile): PlatformSkill {
   ];
   const tvl = compactUsd(profile.totalValueLocked.value);
   if (tvl) facts.push({ key: "tvl", value: tvl });
+  if (profile.chainDistribution?.chains.length) {
+    facts.push({
+      key: "tvlByChain",
+      value: profile.chainDistribution.chains
+        .slice(0, 5)
+        .map((c) => `${c.chain} ${compactUsd(c.value) ?? c.value}`)
+        .join(" · "),
+    });
+  }
   if (profile.entitySlug) facts.push({ key: "parentEntity", value: profile.entitySlug });
 
   const sections: AgentSkillSection[] = [];

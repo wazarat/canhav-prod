@@ -18,6 +18,7 @@ import { LendingMarketCard } from "@/components/shared/LendingMarketCard";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { TokenomicsCard } from "@/components/shared/TokenomicsCard";
+import { UnlistedMarketNotice } from "@/components/shared/UnlistedMarketNotice";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -86,6 +87,8 @@ export default async function TokenProfilePage({ params }: PageProps) {
         }
         description={profile.longDescription ?? profile.description}
       />
+
+      <UnlistedMarketNotice profile={profile} />
 
       <Suspense fallback={<StatGridSkeleton />}>
         <TokenHeadlineStats profile={profile} />

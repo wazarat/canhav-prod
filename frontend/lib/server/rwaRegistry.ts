@@ -38,6 +38,14 @@ export const RWA_ADDRESSES: Record<string, RwaTokenEntry> = {
     pegged: true,
     note: "BENJI money-market fund token on Arbitrum One; TVL = on-chain supply x $1.00.",
   },
+  // Pleasing Gold (PGOLD) — Arbitrum One. Verified: CoinGecko
+  // platforms["arbitrum-one"] for pleasing-gold. No fixed price (tracks gold
+  // spot), so the TVL proxy still needs the live CoinGecko price; this entry
+  // pins the address so the on-chain panels survive a CoinGecko lookup miss.
+  pgold: {
+    address: "0x3e76bb02286bfeaa89dd35f11253f2cbce634f91",
+    note: "PGOLD tokenized gold on Arbitrum One; price resolved live via CoinGecko.",
+  },
 };
 
 export function rwaTokenForSlug(slug: string): RwaTokenEntry | null {

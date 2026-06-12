@@ -21,7 +21,7 @@ import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-bindin
 import { getAgentSkillById } from "@/lib/agent/skills";
 import { fetchReserveRatesForSlug } from "@/lib/server/aave";
 import { fetchRecentTransfers, fetchTokenMetadata, fetchTotalSupply } from "@/lib/server/alchemy";
-import { fetchPegHistory, fetchTvlHistory } from "@/lib/server/dune";
+import { resolvePegSeries, resolveTvlSeries } from "@/lib/server/series";
 import type { LendingMarket, OffchainFact } from "@/lib/types";
 
 /**
@@ -154,6 +154,14 @@ async function execGetStablecoin(a: Args<"research_getStablecoin">) {
     description: p.description,
     totalSupply: p.totalSupply.value,
     latestPeg,
+    chainDistribution: p.chainDistribution?.chains ?? null,
+    issuance: p.issuanceMeta
+      ? {
+          pegMechanism: p.issuanceMeta.pegMechanism,
+          mintRedeem: p.issuanceMeta.mintRedeemDescription,
+          auditLinks: p.issuanceMeta.auditLinks,
+        }
+      : null,
     offchainFacts: compactFacts(p.offchainFacts),
     contractAddress: p.contractAddress ?? null,
     lendingMarket: compactLendingMarket(p.lendingMarket),
@@ -206,6 +214,7 @@ async function execGetRwa(a: Args<"research_getRwa">) {
     pegMechanism: p.pegMechanism ?? null,
     description: p.description,
     tvlUsd: latestTvl,
+    tvlByChain: p.chainDistribution?.chains ?? null,
     offchainFacts: compactFacts(p.offchainFacts),
     summary: `Read RWA ${p.name} (${p.assetClass}).`,
   };
@@ -230,17 +239,51 @@ async function execList(a: Args<"research_listByCategory">) {
 }
 
 async function execHistory(a: Args<"research_getHistory">) {
-  const points =
-    a.metric === "peg" ? await fetchPegHistory(a.slug) : await fetchTvlHistory(a.slug);
+  // Same resolver chain as the detail-page charts: stored history (written by
+  // the daily cron) -> Dune (if configured) -> DeFi Llama -> CoinGecko.
+  let points: { date: string; price?: number; value?: number }[] = [];
+  let source: string | null = null;
+  if (a.metric === "peg") {
+    const profile = await getApprovedStablecoinBySlug(a.slug);
+    if (!profile) {
+      return {
+        slug: a.slug,
+        metric: a.metric,
+        available: false,
+        count: 0,
+        points: [],
+        summary: `No stablecoin found for slug "${a.slug}".`,
+      };
+    }
+    const series = await resolvePegSeries(profile);
+    points = series.points;
+    source = series.source;
+  } else {
+    const profile = await getApprovedRwaBySlug(a.slug);
+    if (!profile) {
+      return {
+        slug: a.slug,
+        metric: a.metric,
+        available: false,
+        count: 0,
+        points: [],
+        summary: `No RWA found for slug "${a.slug}".`,
+      };
+    }
+    const series = await resolveTvlSeries(profile);
+    points = series.points;
+    source = series.source;
+  }
   return {
     slug: a.slug,
     metric: a.metric,
     available: points.length > 0,
     count: points.length,
+    source,
     points: points.slice(-30),
     summary: points.length
-      ? `Pulled ${points.length} ${a.metric} points for ${a.slug}.`
-      : `No ${a.metric} history for ${a.slug} (Dune query not configured).`,
+      ? `Pulled ${points.length} ${a.metric} points for ${a.slug} (source: ${source}).`
+      : `No ${a.metric} history available for ${a.slug} from any source (Dune/DeFi Llama/CoinGecko).`,
   };
 }
 

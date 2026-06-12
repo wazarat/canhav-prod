@@ -57,19 +57,46 @@ export interface PegDataPoint {
   price: number;
 }
 
-/** On-chain circulating supply (source: Alchemy, Step 4). */
+/** On-chain circulating supply (Alchemy eth_call, or DeFi Llama fallback). */
 export interface TotalSupply {
   /** Circulating supply in token units, or null until the live overlay runs. */
   value: number | null;
-  source: "alchemy";
+  source: "alchemy" | "defillama" | "coingecko";
   /** ISO timestamp of the last refresh, or null if never. */
   updatedAt: string | null;
 }
 
-/** Macro peg history wrapper (source: Dune, Step 4). */
+/** Macro peg history wrapper (DeFi Llama, CoinGecko, or a curated Dune query). */
 export interface HistoricalPegData {
   points: PegDataPoint[];
-  source: "dune";
+  source: "dune" | "defillama" | "coingecko";
+  updatedAt: string | null;
+}
+
+/** Latest circulating supply / TVL on one chain (source: DeFi Llama). */
+export interface ChainSupply {
+  chain: string;
+  /** Circulating supply (peg-target units) or TVL (USD) on that chain. */
+  value: number;
+}
+
+/** Cross-chain footprint of a stablecoin or RWA protocol (source: DeFi Llama). */
+export interface ChainDistribution {
+  chains: ChainSupply[];
+  /** Unit of `value`: peg-target units (supply) or USD (tvl). */
+  unit: "supply" | "usd";
+  source: "defillama";
+  updatedAt: string | null;
+}
+
+/** Issuance metadata for a stablecoin (source: DeFi Llama asset detail). */
+export interface IssuanceMeta {
+  /** e.g. "fiat-backed" | "crypto-backed" | "algorithmic". */
+  pegMechanism: string | null;
+  /** How units are minted/redeemed, per the issuer. */
+  mintRedeemDescription: string | null;
+  auditLinks: string[];
+  source: "defillama";
   updatedAt: string | null;
 }
 
@@ -112,6 +139,10 @@ export interface StablecoinProfile {
   entitySlug?: string | null;
   totalSupply: TotalSupply;
   historicalPegData: HistoricalPegData;
+  /** Cross-chain circulating footprint (DeFi Llama; written by the cron). */
+  chainDistribution?: ChainDistribution | null;
+  /** Issuance metadata: peg mechanism, mint/redeem, audits (DeFi Llama). */
+  issuanceMeta?: IssuanceMeta | null;
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Curated off-chain facts (reg status, rating, attestation) with provenance. */
   offchainFacts?: OffchainFact[];
@@ -148,19 +179,19 @@ export interface TvlDataPoint {
   value: number;
 }
 
-/** On-chain total value locked / AUM (source: Alchemy, Step 4). */
+/** Total value locked / AUM (Alchemy supply x price, DeFi Llama, or CG mcap). */
 export interface TotalValueLocked {
   /** TVL in USD, or null until the live overlay runs. */
   value: number | null;
-  source: "alchemy";
+  source: "alchemy" | "defillama" | "coingecko";
   /** ISO timestamp of the last refresh, or null if never. */
   updatedAt: string | null;
 }
 
-/** Macro TVL history wrapper (source: Dune, Step 4). */
+/** Macro TVL history wrapper (DeFi Llama, CoinGecko, or a curated Dune query). */
 export interface HistoricalTvlData {
   points: TvlDataPoint[];
-  source: "dune";
+  source: "dune" | "defillama" | "coingecko";
   updatedAt: string | null;
 }
 
@@ -191,6 +222,8 @@ export interface RwaProfile {
   entitySlug?: string | null;
   totalValueLocked: TotalValueLocked;
   historicalTvlData: HistoricalTvlData;
+  /** Cross-chain TVL footprint (DeFi Llama; written by the cron). */
+  chainDistribution?: ChainDistribution | null;
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Curated off-chain facts (issuer, custody, gating) with provenance. */
   offchainFacts?: OffchainFact[];

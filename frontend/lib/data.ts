@@ -113,7 +113,10 @@ export async function getRwaBySlug(slug: string): Promise<RwaProfile | null> {
 
 export function latestTvl(profile: RwaProfile): number | null {
   const points = profile.historicalTvlData.points;
-  return points.length ? points[points.length - 1].value : null;
+  if (points.length) return points[points.length - 1].value;
+  // Fall back to the cron-written live TVL (Alchemy / DeFi Llama / CoinGecko)
+  // so the table column and the page aggregate can never disagree.
+  return profile.totalValueLocked.value;
 }
 
 /** Percentage change in TVL across the available series (first → last). */

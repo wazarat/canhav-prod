@@ -8,9 +8,11 @@ import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/Onchain
 import { RwaHeadlineStats } from "@/components/rwas/RwaHeadlineStats";
 import { RwaProfileCard } from "@/components/rwas/RwaProfileCard";
 import { TvlHistorySection } from "@/components/rwas/TvlHistorySection";
+import { ChainDistributionCard } from "@/components/shared/ChainDistributionCard";
 import { ClassificationChips } from "@/components/shared/ClassificationChips";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
+import { UnlistedMarketNotice } from "@/components/shared/UnlistedMarketNotice";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
@@ -80,6 +82,8 @@ export default async function RwaProfilePage({ params }: PageProps) {
         description={profile.description}
       />
 
+      <UnlistedMarketNotice profile={profile} />
+
       <Suspense fallback={<StatGridSkeleton />}>
         <RwaHeadlineStats profile={profile} />
       </Suspense>
@@ -93,6 +97,8 @@ export default async function RwaProfilePage({ params }: PageProps) {
           <Suspense fallback={<OnchainPanelSkeleton />}>
             <OnchainPanel profile={profile} />
           </Suspense>
+
+          <ChainDistributionCard distribution={profile.chainDistribution} />
         </div>
 
         <div className="space-y-4">

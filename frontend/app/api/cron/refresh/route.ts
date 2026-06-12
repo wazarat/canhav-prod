@@ -3,9 +3,22 @@ import { revalidatePath } from "next/cache";
 
 import { fetchReserveRatesForSlug, hasAave, isAaveReserveSlug } from "@/lib/server/aave";
 import { fetchTotalSupply, fetchTotalValueLocked } from "@/lib/server/alchemy";
-import { resolveForSlug, COINGECKO_IDS, type TokenResolution } from "@/lib/server/coingecko";
+import {
+  resolveForSlug,
+  coinIdForSlug,
+  fetchMarketChart,
+  COINGECKO_IDS,
+  type TokenResolution,
+} from "@/lib/server/coingecko";
+import {
+  fetchLlamaProtocolTvl,
+  fetchLlamaStablecoin,
+  fetchLlamaStablecoinCharts,
+} from "@/lib/server/defillama";
 import { hasUpstash, putItem, readAllItemsFromRedis } from "@/lib/server/redis";
 import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
+import { pegVsCurrency } from "@/lib/server/series";
+import type { StablecoinProfile } from "@/lib/types";
 
 /**
  * Live-metrics refresh — Vercel Cron entrypoint (replaces the Render job).
@@ -13,8 +26,14 @@ import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
  * TS port of `backend/scripts/refresh_live.py`. For each protocol it resolves the
  * Arbitrum contract address + USD price via CoinGecko, then reads on-chain
  * supply via Alchemy (stablecoins -> TotalSupply; RWAs -> TVL proxy), and writes
- * the result back to the Upstash store. History series (peg/TVL) are left
- * untouched (Dune still stubbed).
+ * the result back to the Upstash store.
+ *
+ * A second, keyless DeFi Llama pass then fills what CoinGecko/Alchemy can't:
+ *   - HistoricalPegData (peg-price series; previously always empty)
+ *   - HistoricalTvlData (protocol TVL series, Arbitrum slice preferred)
+ *   - TotalSupply / TotalValueLocked fallbacks for unlisted coins
+ *     (e.g. Monerium EURe, Pleasing USD)
+ *   - ChainDistribution + IssuanceMeta (peg mechanism, mint/redeem, audits)
  *
  * Scheduled daily by `vercel.json` crons. Vercel attaches
  * `Authorization: Bearer ${CRON_SECRET}` to cron invocations; we require it so
@@ -23,12 +42,13 @@ import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const CATEGORY_STABLECOIN = "Stablecoin";
 const CATEGORY_RWA = "RWA";
 const CATEGORY_TOKEN = "Token";
 const COINGECKO_DELAY_MS = 1_500; // free-tier etiquette between lookups
+const HISTORY_DAYS = 90; // stored peg/TVL history window
 
 function nowIso(): string {
   return new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
@@ -64,7 +84,162 @@ function buildTokenMarket(r: TokenResolution) {
     volume24hUsd: sourced(r.volume24hUsd),
     change24hPct: sourced(r.change24hPct),
     fdvUsd: sourced(r.fdvUsd),
+    circulatingSupply: sourced(r.circulatingSupply),
+    totalSupply: sourced(r.totalSupplyUnits),
+    maxSupply: sourced(r.maxSupply),
   };
+}
+
+/**
+ * DeFi Llama enrichment for a stablecoin item. Runs whether or not an Arbitrum
+ * address resolved (this is the recovery path for unlisted coins). Writes:
+ * peg history, cross-chain distribution, issuance metadata, and a circulating
+ * supply fallback when Alchemy produced nothing.
+ */
+async function refreshStablecoinExtras(item: Record<string, any>, slug: string): Promise<boolean> {
+  let mutated = false;
+
+  const asset = await fetchLlamaStablecoin(slug);
+  if (asset) {
+    if (asset.chainCirculating.length > 0) {
+      item.ChainDistribution = {
+        chains: asset.chainCirculating.map((c) => ({ chain: c.chain, value: c.circulating })),
+        unit: "supply",
+        source: "defillama",
+        updatedAt: nowIso(),
+      };
+      mutated = true;
+    }
+    if (asset.pegMechanism || asset.mintRedeemDescription || asset.auditLinks.length > 0) {
+      item.IssuanceMeta = {
+        pegMechanism: asset.pegMechanism,
+        mintRedeemDescription: asset.mintRedeemDescription,
+        auditLinks: asset.auditLinks,
+        source: "defillama",
+        updatedAt: nowIso(),
+      };
+      mutated = true;
+    }
+    // Supply fallback: only when Alchemy has never produced a value (or a
+    // previous Llama fallback is being refreshed). Alchemy stays preferred.
+    const current = item.TotalSupply ?? {};
+    if (
+      asset.totalCirculating !== null &&
+      (current.value == null || current.source === "defillama")
+    ) {
+      item.TotalSupply = {
+        value: asset.totalCirculating,
+        source: "defillama",
+        updatedAt: nowIso(),
+      };
+      mutated = true;
+    }
+  }
+
+  // Peg history: Llama's USD ratio for USD-pegged coins; CoinGecko market_chart
+  // in the peg currency otherwise (e.g. EURe charted vs EUR).
+  const charts = await fetchLlamaStablecoinCharts(slug, HISTORY_DAYS);
+  if (charts && charts.pegPrice.length >= 2) {
+    item.HistoricalPegData = {
+      points: charts.pegPrice.map((p) => ({ date: p.date, price: p.value })),
+      source: "defillama",
+      updatedAt: nowIso(),
+    };
+    mutated = true;
+  } else {
+    const coinId = coinIdForSlug(slug);
+    if (coinId) {
+      const vsCurrency = pegVsCurrency((item.PegTarget ?? "USD") as StablecoinProfile["pegTarget"]);
+      const chart = await fetchMarketChart(coinId, HISTORY_DAYS, { vsCurrency });
+      await sleep(COINGECKO_DELAY_MS);
+      if (chart && chart.prices.length >= 2) {
+        item.HistoricalPegData = {
+          points: chart.prices,
+          source: "coingecko",
+          updatedAt: nowIso(),
+        };
+        mutated = true;
+      }
+    }
+  }
+
+  return mutated;
+}
+
+/**
+ * DeFi Llama enrichment for an RWA item: TVL history (Arbitrum slice
+ * preferred), cross-chain TVL distribution, and TVL fallbacks (Llama latest ->
+ * CoinGecko market cap) when the Alchemy supply x price proxy produced nothing.
+ */
+async function refreshRwaExtras(
+  item: Record<string, any>,
+  slug: string,
+  resolution: TokenResolution | null,
+): Promise<boolean> {
+  let mutated = false;
+
+  const llama = await fetchLlamaProtocolTvl(slug, HISTORY_DAYS);
+  if (llama && llama.points.length >= 2) {
+    item.HistoricalTvlData = {
+      points: llama.points,
+      source: "defillama",
+      updatedAt: nowIso(),
+    };
+    if (llama.chainTvls.length > 0) {
+      item.ChainDistribution = {
+        chains: llama.chainTvls.map((c) => ({ chain: c.chain, value: c.tvlUsd })),
+        unit: "usd",
+        source: "defillama",
+        updatedAt: nowIso(),
+      };
+    }
+    const current = item.TotalValueLocked ?? {};
+    if (current.value == null || current.source === "defillama") {
+      item.TotalValueLocked = {
+        value: llama.points[llama.points.length - 1].value,
+        source: "defillama",
+        updatedAt: nowIso(),
+      };
+    }
+    mutated = true;
+  } else {
+    // CoinGecko market cap as the TVL proxy for tokenized assets Llama doesn't
+    // track per-protocol (e.g. PGOLD, OUSG).
+    const coinId = coinIdForSlug(slug);
+    if (coinId) {
+      const chart = await fetchMarketChart(coinId, HISTORY_DAYS);
+      await sleep(COINGECKO_DELAY_MS);
+      if (chart && chart.marketCaps.length >= 2) {
+        item.HistoricalTvlData = {
+          points: chart.marketCaps,
+          source: "coingecko",
+          updatedAt: nowIso(),
+        };
+        const current = item.TotalValueLocked ?? {};
+        if (current.value == null || current.source !== "alchemy") {
+          item.TotalValueLocked = {
+            value: chart.marketCaps[chart.marketCaps.length - 1].value,
+            source: "coingecko",
+            updatedAt: nowIso(),
+          };
+        }
+        mutated = true;
+      }
+    }
+  }
+
+  // Last resort: the spot market cap from the resolution pass (single point).
+  const current = item.TotalValueLocked ?? {};
+  if (current.value == null && resolution && resolution.marketCapUsd !== null) {
+    item.TotalValueLocked = {
+      value: resolution.marketCapUsd,
+      source: "coingecko",
+      updatedAt: nowIso(),
+    };
+    mutated = true;
+  }
+
+  return mutated;
 }
 
 export async function GET(req: Request): Promise<NextResponse> {
@@ -129,45 +304,69 @@ export async function GET(req: Request): Promise<NextResponse> {
       }
     }
 
-    if (!address) {
-      if (!row.note) {
-        row.note = COINGECKO_IDS[slug]
-          ? "resolved coin, but no Arbitrum address"
-          : "no CoinGecko mapping or registry entry";
-      }
-      results.push(row);
-      continue;
-    }
-
-    row.address = address;
-    item.ContractAddress = address;
-    if (category === CATEGORY_RWA) {
-      item.VaultAddresses = [address];
-    }
+    let mutated = false;
 
     // Persist the CoinGecko market block on token profiles so it lives in the
     // store (agent-readable) instead of only being fetched at render time.
+    // Independent of address resolution: Solana-side tokens (JUP, JLP) have
+    // market data but no Arbitrum contract.
     if (category === CATEGORY_TOKEN && resolution && resolution.priceUsd !== null) {
       item.Market = buildTokenMarket(resolution);
+      mutated = true;
+      if (row.metric === null) row.metric = resolution.priceUsd;
+      if (!row.note) row.note = "market block";
     }
 
-    let mutated = true;
-    if (!hasAlchemy) {
-      row.note = "address persisted; ALCHEMY_API_KEY missing (metric skipped)";
-    } else if (category === CATEGORY_STABLECOIN || category === CATEGORY_TOKEN) {
-      // Tokens, like stablecoins, expose circulating supply.
-      const result = await fetchTotalSupply(address, decimals);
-      item.TotalSupply = { ...result };
-      row.metric = result.value;
-      row.note = result.value !== null ? "TotalSupply" : "supply call failed";
+    if (address) {
+      row.address = address;
+      item.ContractAddress = address;
+      mutated = true;
+      if (category === CATEGORY_RWA) {
+        item.VaultAddresses = [address];
+      }
+
+      if (!hasAlchemy) {
+        row.note = "address persisted; ALCHEMY_API_KEY missing (metric skipped)";
+      } else if (category === CATEGORY_STABLECOIN || category === CATEGORY_TOKEN) {
+        // Tokens, like stablecoins, expose circulating supply. Never overwrite
+        // a good value (e.g. a Llama fallback) with a failed call's null.
+        const result = await fetchTotalSupply(address, decimals);
+        if (result.value !== null || (item.TotalSupply?.value ?? null) === null) {
+          item.TotalSupply = { ...result };
+        }
+        row.metric = result.value;
+        row.note = result.value !== null ? "TotalSupply" : "supply call failed";
+      } else if (category === CATEGORY_RWA) {
+        const result = await fetchTotalValueLocked([{ address, decimals, priceUsd }]);
+        if (result.value !== null || (item.TotalValueLocked?.value ?? null) === null) {
+          item.TotalValueLocked = { ...result };
+        }
+        row.metric = result.value;
+        row.note = result.value !== null ? "TotalValueLocked" : "TVL calc failed";
+      }
+    } else if (!row.note) {
+      row.note = COINGECKO_IDS[slug]
+        ? "resolved coin, but no Arbitrum address"
+        : "no CoinGecko mapping or registry entry";
+    }
+
+    // DeFi Llama enrichment — runs whether or not an address resolved, so
+    // unlisted coins (Monerium EURe, Pleasing USD) and protocol TVL histories
+    // are recovered from Llama's keyless APIs.
+    if (category === CATEGORY_STABLECOIN) {
+      const extra = await refreshStablecoinExtras(item, slug);
+      if (extra) {
+        mutated = true;
+        row.note = row.note ? `${row.note}; llama extras` : "llama extras";
+        if (row.metric === null) row.metric = item.TotalSupply?.value ?? null;
+      }
     } else if (category === CATEGORY_RWA) {
-      const result = await fetchTotalValueLocked([{ address, decimals, priceUsd }]);
-      item.TotalValueLocked = { ...result };
-      row.metric = result.value;
-      row.note = result.value !== null ? "TotalValueLocked" : "TVL calc failed";
-    } else {
-      mutated = false;
-      row.note = `unknown category: ${category}`;
+      const extra = await refreshRwaExtras(item, slug, resolution);
+      if (extra) {
+        mutated = true;
+        row.note = row.note ? `${row.note}; llama extras` : "llama extras";
+        if (row.metric === null) row.metric = item.TotalValueLocked?.value ?? null;
+      }
     }
 
     if (mutated) {
@@ -231,9 +430,6 @@ export async function GET(req: Request): Promise<NextResponse> {
       }
     }
   }
-
-  // NOTE: peg/TVL history (HistoricalPegData / HistoricalTvlData) is still left
-  // untouched — Dune is wired but inactive until saved query IDs are provided.
 
   // Refresh public surfaces + each touched detail page.
   revalidatePath("/");

@@ -2,6 +2,10 @@ import "server-only";
 
 import { fetchTotalValueLocked } from "@/lib/server/alchemy";
 import { coinIdForSlug, fetchMarketChart } from "@/lib/server/coingecko";
+import {
+  fetchLlamaProtocolTvl,
+  fetchLlamaStablecoinCharts,
+} from "@/lib/server/defillama";
 import { fetchPegHistory, fetchTvlHistory } from "@/lib/server/dune";
 import { resolveEntityToken } from "@/lib/server/resolve";
 import type {
@@ -17,18 +21,20 @@ import type {
  * Resolve the historical series powering the detail-page charts, live on render.
  *
  * Source precedence (best first):
- *   1. Stored history on the profile (authoritative, written by the Dune-backed
- *      refresh) — `source: "dune"`.
- *   2. A live, cached CoinGecko market_chart fallback — `source: "coingecko"`.
+ *   1. Stored history on the profile (written by the daily cron refresh from
+ *      DeFi Llama / CoinGecko, or a curated Dune query).
+ *   2. A live Dune fetch when a saved query id is mapped for the slug.
+ *   3. A live, cached DeFi Llama fetch (peg price / protocol TVL).
+ *   4. A live, cached CoinGecko market_chart fallback.
  *
- * Phase 3 inserts a live Dune fetch between (1) and (2). Returns `source: null`
- * with no points when nothing resolves, so the chart shows its empty state.
+ * Returns `source: null` with no points when nothing resolves, so the chart
+ * shows its empty state.
  */
 
 const LIVE_REVALIDATE = 300;
 const DAYS = 30;
 
-export type SeriesSource = "dune" | "coingecko" | null;
+export type SeriesSource = "dune" | "defillama" | "coingecko" | null;
 
 export interface PegSeries {
   points: PegDataPoint[];
@@ -47,11 +53,23 @@ export interface PriceSeries {
 
 export async function resolvePegSeries(profile: StablecoinProfile): Promise<PegSeries> {
   const stored = profile.historicalPegData?.points ?? [];
-  if (stored.length >= 2) return { points: stored, source: "dune" };
+  if (stored.length >= 2) {
+    return { points: stored, source: profile.historicalPegData?.source ?? "dune" };
+  }
 
   // Live Dune (authoritative) when a saved query id is mapped for this slug.
   const dune = await fetchPegHistory(profile.slug, DAYS);
   if (dune.length >= 2) return { points: dune, source: "dune" };
+
+  // DeFi Llama peg price (USD value / circulating units) — USD-pegged only;
+  // for other pegs the ratio conflates the FX rate, so CoinGecko handles them.
+  const llama = await fetchLlamaStablecoinCharts(profile.slug, DAYS, LIVE_REVALIDATE);
+  if (llama && llama.pegPrice.length >= 2) {
+    return {
+      points: llama.pegPrice.map((p) => ({ date: p.date, price: p.value })),
+      source: "defillama",
+    };
+  }
 
   const coinId = coinIdForSlug(profile.slug);
   if (coinId) {
@@ -68,8 +86,9 @@ export async function resolvePegSeries(profile: StablecoinProfile): Promise<PegS
  * CoinGecko `vs_currency` for a peg target. Maps the fiat pegs CoinGecko's free
  * tier supports; falls back to USD for anything else (a coin pegged to an
  * unsupported currency typically has no CoinGecko id, so the chart is skipped).
+ * Exported for the cron refresh, which persists the same series to the store.
  */
-function pegVsCurrency(pegTarget: StablecoinProfile["pegTarget"]): string {
+export function pegVsCurrency(pegTarget: StablecoinProfile["pegTarget"]): string {
   switch (pegTarget) {
     case "EUR":
       return "eur";
@@ -102,11 +121,19 @@ export async function resolvePriceSeries(profile: TokenProfile): Promise<PriceSe
 
 export async function resolveTvlSeries(profile: RwaProfile): Promise<TvlSeries> {
   const stored = profile.historicalTvlData?.points ?? [];
-  if (stored.length >= 2) return { points: stored, source: "dune" };
+  if (stored.length >= 2) {
+    return { points: stored, source: profile.historicalTvlData?.source ?? "dune" };
+  }
 
   // Live Dune (authoritative) when a saved query id is mapped for this slug.
   const dune = await fetchTvlHistory(profile.slug, DAYS);
   if (dune.length >= 2) return { points: dune, source: "dune" };
+
+  // DeFi Llama protocol TVL (Arbitrum slice preferred).
+  const llama = await fetchLlamaProtocolTvl(profile.slug, DAYS, LIVE_REVALIDATE);
+  if (llama && llama.points.length >= 2) {
+    return { points: llama.points, source: "defillama" };
+  }
 
   const coinId = coinIdForSlug(profile.slug);
   if (coinId) {

@@ -26,11 +26,11 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   // Stablecoins
   ethena: "ethena-usde",
   susde: "ethena-staked-usde",
-  usdtb: null,
+  usdtb: "usdtb", // Ethena USDtb (Ethereum/Solana only — market data, no Arbitrum address)
   ena: "ethena",
   "inverse-finance": "dola-usd",
   monerium: "monerium-eur-money",
-  gbpe: null,
+  gbpe: "monerium-gbp-emoney", // Gnosis only — market data, no Arbitrum address
   sky: "usds",
   susds: "susds",
   dai: "dai",
@@ -51,6 +51,8 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   jupsol: "jupiter-staked-sol",
   jupusd: "jupusd",
   jljupusd: null,
+  // Pleasing USD — not yet live on CoinGecko (verified 2026-06-12); supply +
+  // peg history come from DeFi Llama instead (lib/server/defillama.ts, id 341).
   usdpm: null,
   gho: "gho",
   sgho: null,
@@ -106,6 +108,10 @@ export interface TokenResolution {
   volume24hUsd: number | null;
   change24hPct: number | null;
   fdvUsd: number | null;
+  circulatingSupply: number | null;
+  /** Total supply in token units (named to avoid clashing with the store's TotalSupply). */
+  totalSupplyUnits: number | null;
+  maxSupply: number | null;
   source: "coingecko";
 }
 
@@ -183,6 +189,8 @@ export async function resolveCoin(
     m && typeof m.price_change_percentage_24h === "number"
       ? m.price_change_percentage_24h
       : null;
+  const supply = (value: unknown): number | null =>
+    typeof value === "number" && Number.isFinite(value) ? value : null;
 
   return {
     coinId,
@@ -193,6 +201,9 @@ export async function resolveCoin(
     volume24hUsd,
     change24hPct,
     fdvUsd,
+    circulatingSupply: m ? supply(m.circulating_supply) : null,
+    totalSupplyUnits: m ? supply(m.total_supply) : null,
+    maxSupply: m ? supply(m.max_supply) : null,
     source: "coingecko",
   };
 }

@@ -57,7 +57,7 @@ export function StablecoinTable({ profiles, showStatus = false, emptyHint }: Sta
             <TH>Symbol</TH>
             <TH>Peg</TH>
             <TH className="text-right">Circulating supply</TH>
-            <TH>Deviation</TH>
+            <TH>Peg target</TH>
             {showStatus && <TH>Status</TH>}
             <TH className="text-right">Links</TH>
           </tr>

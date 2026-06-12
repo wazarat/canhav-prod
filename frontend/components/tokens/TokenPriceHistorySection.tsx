@@ -5,6 +5,7 @@ import type { TokenProfile } from "@/lib/types";
 
 const SOURCE_LABEL: Record<string, string> = {
   dune: "Dune",
+  defillama: "DeFi Llama",
   coingecko: "CoinGecko",
 };
 

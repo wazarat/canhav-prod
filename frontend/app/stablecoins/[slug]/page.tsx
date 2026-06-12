@@ -5,13 +5,16 @@ import { notFound } from "next/navigation";
 
 import { OnchainPanel, OnchainPanelSkeleton } from "@/components/onchain/OnchainPanel";
 import { MarketStats, MarketStatsSkeleton } from "@/components/market/MarketStats";
+import { IssuanceMetaCard } from "@/components/stablecoins/IssuanceMetaCard";
 import { PegHistorySection } from "@/components/stablecoins/PegHistorySection";
 import { ProfileCard } from "@/components/stablecoins/ProfileCard";
 import { StablecoinHeadlineStats } from "@/components/stablecoins/StablecoinHeadlineStats";
+import { ChainDistributionCard } from "@/components/shared/ChainDistributionCard";
 import { ClassificationChips } from "@/components/shared/ClassificationChips";
 import { LendingMarketCard } from "@/components/shared/LendingMarketCard";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
+import { UnlistedMarketNotice } from "@/components/shared/UnlistedMarketNotice";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
@@ -84,6 +87,8 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
         description={profile.description}
       />
 
+      <UnlistedMarketNotice profile={profile} />
+
       <Suspense fallback={<StatGridSkeleton />}>
         <StablecoinHeadlineStats profile={profile} />
       </Suspense>
@@ -97,10 +102,16 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
           <Suspense fallback={<OnchainPanelSkeleton />}>
             <OnchainPanel profile={profile} />
           </Suspense>
+
+          <ChainDistributionCard
+            distribution={profile.chainDistribution}
+            symbol={profile.symbol}
+          />
         </div>
 
         <div className="space-y-4">
           <ProfileCard profile={profile} />
+          <IssuanceMetaCard meta={profile.issuanceMeta} />
           {profile.lendingMarket && <LendingMarketCard market={profile.lendingMarket} />}
           <OffchainFactsPanel facts={profile.offchainFacts} />
           <Suspense fallback={<MarketStatsSkeleton />}>

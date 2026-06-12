@@ -154,6 +154,8 @@ export async function readLiveStore(): Promise<LiveStore> {
           source: "dune",
           updatedAt: null,
         },
+        chainDistribution: item.ChainDistribution ?? undefined,
+        issuanceMeta: item.IssuanceMeta ?? undefined,
         lendingMarket: item.LendingMarket ?? undefined,
       } as StablecoinProfile);
     } else if (item.Category === "RWA") {
@@ -172,6 +174,7 @@ export async function readLiveStore(): Promise<LiveStore> {
           source: "dune",
           updatedAt: null,
         },
+        chainDistribution: item.ChainDistribution ?? undefined,
       } as RwaProfile);
     } else if (item.Category === "Token") {
       tokens.push({

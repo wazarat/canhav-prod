@@ -15,12 +15,13 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const skill = await getAgentSkillById(params.id);
+  const skill = await getAgentSkillById(decodeURIComponent(params.id));
   return { title: skill ? skill.title : "Skill not found" };
 }
 
 export default async function SkillPage({ params }: { params: { id: string } }) {
-  const skill = await getAgentSkillById(params.id);
+  // Product skill ids are namespaced ("stablecoin:usdc") and arrive URL-encoded.
+  const skill = await getAgentSkillById(decodeURIComponent(params.id));
   if (!skill) notFound();
 
   const md = skillToMarkdown(skill);

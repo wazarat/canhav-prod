@@ -19,7 +19,7 @@ import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
 import { MemberCoins } from "@/components/entities/MemberCoins";
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
 import { EntityAgentPanel } from "@/components/agent/EntityAgentPanel";
-import { EntityAgentDock } from "@/components/agent/EntityAgentDock";
+import { FloatingResearchChat } from "@/components/agent/FloatingResearchChat";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
@@ -304,12 +304,6 @@ export default async function EntityProfilePage({ params }: PageProps) {
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-          <EntityAgentDock
-            entitySlug={profile.slug}
-            entityName={profile.name}
-            llmConfigured={agentStatus.llm}
-          />
-
           <div className="hidden lg:block">
             <SectionNav items={sectionNavItems} />
           </div>
@@ -351,6 +345,12 @@ export default async function EntityProfilePage({ params }: PageProps) {
           </DataPanel>
         </aside>
       </div>
+
+      <FloatingResearchChat
+        entitySlug={profile.slug}
+        entityName={profile.name}
+        llmConfigured={agentStatus.llm}
+      />
     </div>
   );
 }

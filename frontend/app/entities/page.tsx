@@ -1,6 +1,8 @@
+import { FloatingResearchChat } from "@/components/agent/FloatingResearchChat";
 import { EntityTableWithFilter } from "@/components/entities/EntityTableWithFilter";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
+import { agentConfigStatus } from "@/lib/agent/config";
 import { getApprovedEntities } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
 
@@ -12,6 +14,7 @@ export const revalidate = 300;
 
 export default async function EntitiesPage() {
   const profiles = await getApprovedEntities();
+  const agentStatus = agentConfigStatus();
 
   const aggregateTvl = profiles.reduce((sum, p) => sum + (p.currentScale.tvlUsd ?? 0), 0);
   const totalCoins = profiles.reduce((sum, p) => sum + p.memberCoins.length, 0);
@@ -59,6 +62,8 @@ export default async function EntitiesPage() {
       </section>
 
       <EntityTableWithFilter profiles={profiles} emptyHint="No entities in the store yet." />
+
+      <FloatingResearchChat llmConfigured={agentStatus.llm} />
     </div>
   );
 }

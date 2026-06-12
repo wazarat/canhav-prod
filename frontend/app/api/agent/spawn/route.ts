@@ -3,7 +3,13 @@ import { NextResponse } from "next/server";
 import { hasZeroDev } from "@/lib/agent/config";
 import { deriveAccountIndex } from "@/lib/agent/account-index";
 import { resolveEntityBinding } from "@/lib/agent/entity-binding";
-import { getAgentProfile, markSkillStudied, seedAgentProfile } from "@/lib/agent/memory";
+import {
+  getAgentProfile,
+  isAgentCategory,
+  markSkillStudied,
+  seedAgentProfile,
+  type AgentCategory,
+} from "@/lib/agent/memory";
 import { getAgentSkillById } from "@/lib/agent/skills";
 import { getSession } from "@/lib/auth/session";
 import { getUserEntityAgent, linkAgentToUser, setUserEntityAgent } from "@/lib/auth/users";
@@ -69,6 +75,9 @@ export async function POST(req: Request) {
     skillId?: string;
     entitySlug?: string;
     mintResult?: unknown;
+    name?: unknown;
+    category?: unknown;
+    extraSkillIds?: unknown;
   } = {};
   try {
     body = (await req.json()) as typeof body;
@@ -80,6 +89,13 @@ export async function POST(req: Request) {
   if (!skillId) {
     return NextResponse.json({ ok: false, error: "skillId is required." }, { status: 400 });
   }
+
+  const customName =
+    typeof body.name === "string" && body.name.trim() ? body.name.trim().slice(0, 60) : null;
+  const category: AgentCategory | null = isAgentCategory(body.category) ? body.category : null;
+  const extraSkillIds = Array.isArray(body.extraSkillIds)
+    ? body.extraSkillIds.filter((s): s is string => typeof s === "string" && s.length > 0)
+    : [];
 
   if (!isMintResult(body.mintResult)) {
     return NextResponse.json(
@@ -136,7 +152,8 @@ export async function POST(req: Request) {
 
   await seedAgentProfile({
     agentId,
-    name: skill.title,
+    name: customName ?? skill.title,
+    category,
     skillId,
     entitySlug,
     associatedProducts,
@@ -147,6 +164,14 @@ export async function POST(req: Request) {
     onChain: true,
   });
   await markSkillStudied(agentId, skillId);
+
+  // Any additional platform skills the owner selected at creation are studied
+  // immediately (unknown ids are skipped — never block a successful mint).
+  for (const extraId of extraSkillIds) {
+    if (extraId === skillId) continue;
+    const extra = await getAgentSkillById(extraId);
+    if (extra) await markSkillStudied(agentId, extraId);
+  }
   await linkAgentToUser(session.userId, agentId);
   await setUserEntityAgent(session.userId, entitySlug, agentId);
 

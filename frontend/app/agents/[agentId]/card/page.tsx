@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { buildAgentCard } from "@/lib/agent/agentCard";
+import { agentCategoryLabel } from "@/lib/agent/categories";
 import { getAgentSnapshot } from "@/lib/agent/memory";
 import { Badge } from "@/components/ui/Badge";
 
@@ -65,6 +66,9 @@ export default async function AgentCardPage({
             {card.name}
           </h1>
           <Badge tone="signal">ERC-8004</Badge>
+          {agentCategoryLabel(profile.category) && (
+            <Badge tone="neutral">{agentCategoryLabel(profile.category)}</Badge>
+          )}
           {card.x402Support && <Badge tone="neon">x402 collab</Badge>}
         </div>
         <p className="text-sm leading-relaxed text-ink-300">{card.description}</p>

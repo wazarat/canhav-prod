@@ -1,16 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { AlertTriangle, Loader2, LogIn, Rocket, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
+import { AGENT_CATEGORIES, type AgentCategory } from "@/lib/agent/categories";
 import { mintAgentOnClient, type SpawnPreflightResponse } from "@/lib/agent/spawn-client";
 import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
+import { cn } from "@/lib/utils";
 import type { AgentProductRef, AgentSkill } from "canhav-agent-service";
 import type { Signer } from "@zerodev/sdk/types";
 import { AgentIdentityCard, type AgentIdentity } from "./AgentIdentityCard";
+import { SkillPicker, type SkillPickerOption } from "./SkillPicker";
 
 interface SkillOption {
   id: string;
@@ -40,6 +43,10 @@ export function LaunchAgentButton({
   entitySlug?: string;
 }) {
   const [skillId, setSkillId] = useState(skills[0]?.id ?? "");
+  const [agentName, setAgentName] = useState("");
+  const [category, setCategory] = useState<AgentCategory | null>(null);
+  const [catalog, setCatalog] = useState<SkillPickerOption[]>([]);
+  const [extraSkillIds, setExtraSkillIds] = useState<string[]>([]);
   const [phase, setPhase] = useState<"idle" | "wallet" | "minting">("idle");
   const [error, setError] = useState<string | null>(null);
   const [identity, setIdentity] = useState<AgentIdentity | null>(null);
@@ -50,6 +57,38 @@ export function LaunchAgentButton({
 
   const configured = zerodevConfigured;
   const busy = phase !== "idle";
+
+  // Full platform skill catalog (entities + stablecoins + RWAs + tokens) so
+  // the owner can hand the new agent extra knowledge at creation.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/agent/skills");
+        if (!res.ok) return;
+        const data = (await res.json()) as { skills?: SkillPickerOption[] };
+        if (active && data.skills) setCatalog(data.skills);
+      } catch {
+        // Catalog is optional sugar — the bound entity skill still works.
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // The bound entity skill is always part of the selection and can't be removed.
+  const pickerSelection = useMemo(
+    () => [skillId, ...extraSkillIds.filter((id) => id !== skillId)],
+    [skillId, extraSkillIds],
+  );
+
+  function toggleExtraSkill(id: string) {
+    if (id === skillId) return;
+    setExtraSkillIds((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
+    );
+  }
 
   async function launch() {
     setError(null);
@@ -137,6 +176,9 @@ export function LaunchAgentButton({
           skillId,
           entitySlug: entitySlug ?? skillId,
           mintResult,
+          name: agentName.trim() || undefined,
+          category: category ?? undefined,
+          extraSkillIds,
         }),
       });
       const data = (await res.json()) as SpawnResponse;
@@ -210,20 +252,86 @@ export function LaunchAgentButton({
       ) : (
         <>
           <label className="block space-y-1.5">
-            <span className="text-xs font-medium uppercase tracking-wider text-ink-400">Skill</span>
-            <select
-              value={skillId}
-              onChange={(e) => setSkillId(e.target.value)}
+            <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
+              Agent name
+            </span>
+            <input
+              type="text"
+              value={agentName}
+              onChange={(e) => setAgentName(e.target.value)}
+              maxLength={60}
+              placeholder='Name your agent (e.g. "Peg Sentinel")'
               disabled={busy}
-              className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm text-ink-100 outline-none focus:border-electric-500/60 disabled:opacity-50"
-            >
-              {skills.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.title}
-                </option>
-              ))}
-            </select>
+              className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm text-ink-100 placeholder:text-ink-500 outline-none focus:border-electric-500/60 disabled:opacity-50"
+            />
           </label>
+
+          <div className="space-y-1.5">
+            <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
+              Category
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {AGENT_CATEGORIES.map((c) => {
+                const active = category === c.id;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setCategory(active ? null : c.id)}
+                    disabled={busy}
+                    title={c.description}
+                    className={cn(
+                      "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50",
+                      active
+                        ? "border-electric-500/60 bg-electric-500/15 text-electric-300"
+                        : "border-ink-700 bg-ink-900/60 text-ink-300 hover:border-electric-500/40 hover:text-ink-100",
+                    )}
+                  >
+                    {c.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {skills.length > 1 && (
+            <label className="block space-y-1.5">
+              <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
+                Core skill
+              </span>
+              <select
+                value={skillId}
+                onChange={(e) => setSkillId(e.target.value)}
+                disabled={busy}
+                className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm text-ink-100 outline-none focus:border-electric-500/60 disabled:opacity-50"
+              >
+                {skills.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+
+          {catalog.length > 0 && (
+            <div className="space-y-1.5">
+              <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
+                Skills
+              </span>
+              <p className="text-xs text-ink-500">
+                The project&apos;s core skill is included. Add knowledge from other entities,
+                stablecoins, RWAs, and tokens — the agent studies everything you select.
+              </p>
+              <SkillPicker
+                options={catalog}
+                selected={pickerSelection}
+                onToggle={toggleExtraSkill}
+                lockedIds={[skillId]}
+                disabled={busy}
+              />
+            </div>
+          )}
 
           <button
             type="button"

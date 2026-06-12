@@ -13,8 +13,9 @@ import {
 
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
+import { agentCategoryLabel } from "@/lib/agent/categories";
 import { agentConfigStatus } from "@/lib/agent/config";
-import { getAgentSkills } from "@/lib/agent/skills";
+import { getAgentSkills, SKILL_GROUPS, type PlatformSkill } from "@/lib/agent/skills";
 import { MemoryInspector } from "@/components/agent/MemoryInspector";
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
 import { getSession } from "@/lib/auth/session";
@@ -228,7 +229,14 @@ export default async function AgentsPage() {
                         <Bot className="h-4 w-4" />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-ink-100">{agent.name}</p>
+                        <span className="flex items-center gap-2">
+                          <p className="truncate text-sm font-medium text-ink-100">{agent.name}</p>
+                          {agentCategoryLabel(agent.category) && (
+                            <Badge tone="signal" className="shrink-0">
+                              {agentCategoryLabel(agent.category)}
+                            </Badge>
+                          )}
+                        </span>
                         {agent.associatedProducts.length > 0 && (
                           <p className="mt-0.5 truncate text-[11px] text-ink-400">
                             {agent.associatedProducts.map((p) => p.symbol).join(" · ")}
@@ -328,26 +336,44 @@ export default async function AgentsPage() {
         {skills.length === 0 ? (
           <p className="text-sm text-ink-400">No skills yet — seed entities into the store.</p>
         ) : (
-          <div className="grid gap-2 sm:grid-cols-2">
-            {skills.map((skill) => (
-              <Link
-                key={skill.id}
-                href={`/agents/skills/${skill.id}`}
-                className="group flex items-start gap-3 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-3 transition-colors hover:border-electric-500/40 hover:bg-ink-900/60"
-              >
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-ink-700/80 bg-ink-900/60 text-ink-300">
-                  <ScrollText className="h-4 w-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-ink-100">{skill.title}</p>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-ink-400">{skill.summary}</p>
-                  <p className="mt-1 font-mono text-[10px] text-ink-500">
-                    {skill.facts.length} facts · {skill.actions.length} actions
-                  </p>
+          <div className="space-y-5">
+            {SKILL_GROUPS.map((group) => {
+              const groupSkills = skills.filter((s: PlatformSkill) => s.group === group.id);
+              if (groupSkills.length === 0) return null;
+              return (
+                <div key={group.id} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-400">
+                      {group.label}
+                    </h3>
+                    <span className="font-mono text-[10px] text-ink-500">
+                      {groupSkills.length}
+                    </span>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {groupSkills.map((skill) => (
+                      <Link
+                        key={skill.id}
+                        href={`/agents/skills/${encodeURIComponent(skill.id)}`}
+                        className="group flex items-start gap-3 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-3 transition-colors hover:border-electric-500/40 hover:bg-ink-900/60"
+                      >
+                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-ink-700/80 bg-ink-900/60 text-ink-300">
+                          <ScrollText className="h-4 w-4" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-ink-100">{skill.title}</p>
+                          <p className="mt-0.5 line-clamp-2 text-xs text-ink-400">{skill.summary}</p>
+                          <p className="mt-1 font-mono text-[10px] text-ink-500">
+                            {skill.facts.length} facts · {skill.actions.length} actions
+                          </p>
+                        </div>
+                        <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-ink-500 transition-colors group-hover:text-electric-400" />
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-                <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-ink-500 transition-colors group-hover:text-electric-400" />
-              </Link>
-            ))}
+              );
+            })}
           </div>
         )}
       </Card>

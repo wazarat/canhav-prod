@@ -4,6 +4,7 @@ import { ChevronRight, CircleDot, Rocket, Sparkles } from "lucide-react";
 
 import { AgentFrameworkPanel } from "@/components/agent/AgentFrameworkPanel";
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
+import { AgentNameEditor } from "@/components/agent/AgentNameEditor";
 import { AgentSuggestions } from "@/components/agent/AgentSuggestions";
 import { AgentIdentityCard } from "@/components/agent/AgentIdentityCard";
 import { AgentMemoryPanel } from "@/components/agent/AgentMemoryPanel";
@@ -114,9 +115,12 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
 
       <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-ink-50">
-            {profile.name}
-          </h1>
+          <AgentNameEditor
+            agentId={agentId}
+            name={profile.name}
+            category={profile.category}
+            isOwner={isOwner}
+          />
           <Badge tone="neon">
             <Sparkles className="h-3 w-3" /> Level {level}
           </Badge>
@@ -217,7 +221,12 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
           <AgentMemoryPanel memory={memory} studiedSkills={studiedSkills} />
           <SkillShelf
             agentId={agentId}
-            allSkills={skills.map((s) => ({ id: s.id, title: s.title }))}
+            allSkills={skills.map((s) => ({
+              id: s.id,
+              title: s.title,
+              summary: s.summary,
+              group: s.group,
+            }))}
             studied={studiedSkills}
           />
           {isOwner && (

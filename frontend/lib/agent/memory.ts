@@ -8,6 +8,7 @@ import { getRedisClient, hasUpstash } from "@/lib/server/redis";
 
 import { agentOfferHash } from "@/lib/agent/agentOffer";
 import { sanitizeAgentConfig, type AgentConfig } from "@/lib/agent/agentConfig";
+import { isAgentCategory, type AgentCategory } from "@/lib/agent/categories";
 import type { DataFrame } from "@/lib/types";
 
 /**
@@ -27,6 +28,9 @@ import type { DataFrame } from "@/lib/types";
  */
 
 export const AGENT_CHAIN = "arbitrum-sepolia" as const;
+
+// Re-exported so server callers can keep importing from the memory layer.
+export { AGENT_CATEGORIES, isAgentCategory, type AgentCategory } from "@/lib/agent/categories";
 
 export interface AgentToolCall {
   name: string;
@@ -60,6 +64,8 @@ export interface AgentProductRef {
 export interface AgentProfile {
   agentId: string;
   name: string;
+  /** Owner-chosen research category (one of five). Null = uncategorized. */
+  category: AgentCategory | null;
   skillId: string | null;
   /** The Entity ("project") this agent lives on. Null = general research agent. */
   entitySlug: string | null;
@@ -198,6 +204,7 @@ function normalizeProfile(profile: AgentProfile | null): AgentProfile | null {
   if (!profile) return null;
   return {
     ...profile,
+    category: isAgentCategory(profile.category) ? profile.category : null,
     entitySlug: profile.entitySlug ?? null,
     associatedProducts: profile.associatedProducts ?? [],
     accountIndex: profile.accountIndex ?? null,
@@ -218,6 +225,7 @@ export async function getAgentProfile(agentId: string): Promise<AgentProfile | n
 export interface SeedProfileInput {
   agentId: string;
   name: string;
+  category?: AgentCategory | null;
   skillId?: string | null;
   entitySlug?: string | null;
   associatedProducts?: AgentProductRef[];
@@ -237,6 +245,7 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
   const profile: AgentProfile = {
     agentId: input.agentId,
     name: input.name || existing?.name || "CanHav Agent",
+    category: input.category !== undefined ? input.category : (existing?.category ?? null),
     skillId: input.skillId ?? existing?.skillId ?? null,
     entitySlug: input.entitySlug ?? existing?.entitySlug ?? null,
     associatedProducts:
@@ -264,6 +273,23 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
     writeFile(store);
   }
   return profile;
+}
+
+/**
+ * Owner-only: rename an agent and/or set its research category. Returns null
+ * if the agent doesn't exist.
+ */
+export async function setAgentIdentity(
+  agentId: string,
+  updates: { name?: string; category?: AgentCategory | null },
+): Promise<AgentProfile | null> {
+  const existing = await getAgentProfile(agentId);
+  if (!existing) return null;
+  return seedAgentProfile({
+    agentId,
+    name: updates.name?.trim() || existing.name,
+    category: updates.category !== undefined ? updates.category : existing.category,
+  });
 }
 
 /**

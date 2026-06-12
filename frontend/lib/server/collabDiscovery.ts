@@ -34,6 +34,8 @@ import { getUserSkill } from "@/lib/server/userSkills";
 export interface DiscoverySpecialization {
   focusAreas: string[];
   riskLens: string | null;
+  /** Owner-chosen agent research category (stablecoins / rwas / governance / yield / risks). */
+  category: string | null;
   entitySlug: string | null;
   level: number;
   knowledgeDocs: number;
@@ -125,6 +127,7 @@ async function buildAgentEntry(
     specialization: {
       focusAreas: profile.config?.focusAreas ?? [],
       riskLens: profile.config?.riskLens ?? null,
+      category: profile.category,
       entitySlug: profile.entitySlug,
       level,
       knowledgeDocs: docs.length,

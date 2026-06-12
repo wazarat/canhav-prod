@@ -2,8 +2,10 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 import { MockDataBanner } from "@/components/MockDataBanner";
+import { FloatingResearchChat } from "@/components/agent/FloatingResearchChat";
 import { RwaTable } from "@/components/rwas/RwaTable";
 import { StatCard } from "@/components/ui/StatCard";
+import { agentConfigStatus } from "@/lib/agent/config";
 import { getApprovedRwas, LIVE_METRICS_PENDING } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
 
@@ -50,6 +52,8 @@ export default async function RwasPage() {
       </section>
 
       <RwaTable profiles={profiles} emptyHint="No RWA protocols in the store yet." />
+
+      <FloatingResearchChat llmConfigured={agentConfigStatus().llm} />
     </div>
   );
 }

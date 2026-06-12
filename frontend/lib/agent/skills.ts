@@ -1,6 +1,15 @@
 import "server-only";
 
-import { getApprovedEntities, getApprovedEntityBySlug } from "@/lib/data";
+import {
+  getApprovedEntities,
+  getApprovedEntityBySlug,
+  getApprovedRwaBySlug,
+  getApprovedRwas,
+  getApprovedStablecoinBySlug,
+  getApprovedStablecoins,
+  getApprovedTokenBySlug,
+  getApprovedTokens,
+} from "@/lib/data";
 import { deriveSecurityStatus } from "@/lib/security";
 import type {
   AgentSkill,
@@ -8,7 +17,10 @@ import type {
   AgentSkillFact,
   AgentSkillSection,
   EntityProfile,
+  RwaProfile,
   SourceRef,
+  StablecoinProfile,
+  TokenProfile,
 } from "@/lib/types";
 
 /**
@@ -16,9 +28,15 @@ import type {
  *
  * A skill is the machine-readable knowledge bundle a user turns into an agent
  * (the ERC-8004 registration file is derived from it, see agent-service). The
- * store does not seed skills today, so we derive one deterministically from each
- * umbrella Entity profile already in the store. Deterministic = safe to
+ * store does not seed skills today, so we derive one deterministically from
+ * each approved profile already in the store: umbrella Entities AND their
+ * member products (stablecoins, RWAs, tokens). Deterministic = safe to
  * prerender / ISR (no Date.now()).
+ *
+ * Skill ids: entity skills keep the bare entity slug (backward compatible with
+ * minted agents whose skillId === entitySlug); product skills are namespaced
+ * (`stablecoin:{slug}` / `rwa:{slug}` / `token:{slug}`) so product slugs can
+ * never collide with entity slugs.
  *
  * Actions are all read-only `research:*` capabilities — they map 1:1 to the
  * research tools the agent loop exposes (lib/agent/tools.ts), and the platform
@@ -27,9 +45,29 @@ import type {
 
 const SKILL_VERSION = "1.0.0";
 
+/** Which catalog surface a platform skill was derived from. */
+export type SkillGroup = "entity" | "stablecoin" | "rwa" | "token";
+
+/** A platform-derived skill plus the catalog group it belongs to. */
+export interface PlatformSkill extends AgentSkill {
+  group: SkillGroup;
+}
+
+export const SKILL_GROUPS: { id: SkillGroup; label: string }[] = [
+  { id: "entity", label: "Entities" },
+  { id: "stablecoin", label: "Stablecoins" },
+  { id: "rwa", label: "RWAs" },
+  { id: "token", label: "Tokens" },
+];
+
 /** Stable skill id for an entity-derived skill (also the [id] route param). */
 export function entitySkillId(slug: string): string {
   return slug;
+}
+
+/** Namespaced skill id for a product-derived skill. */
+export function productSkillId(group: Exclude<SkillGroup, "entity">, slug: string): string {
+  return `${group}:${slug}`;
 }
 
 function compactUsd(value: number | null | undefined): string | null {
@@ -191,9 +229,10 @@ const GLOSSARY: { term: string; definition: string }[] = [
 ];
 
 /** Deterministically derive an AgentSkill from an umbrella Entity profile. */
-export function buildSkillFromEntity(profile: EntityProfile): AgentSkill {
+export function buildSkillFromEntity(profile: EntityProfile): PlatformSkill {
   return {
     id: entitySkillId(profile.slug),
+    group: "entity",
     title: `${profile.name} — Research Skill`,
     summary: profile.tagline || profile.description,
     facts: buildFacts(profile),
@@ -206,14 +245,222 @@ export function buildSkillFromEntity(profile: EntityProfile): AgentSkill {
   };
 }
 
-/** All entity-derived skills, sorted by title. */
-export async function getAgentSkills(): Promise<AgentSkill[]> {
+/* -------------------------------------------------------------------------- */
+/* Product-derived skills (stablecoins / RWAs / tokens)                       */
+/* -------------------------------------------------------------------------- */
+
+function productSources(profile: {
+  website: string | null;
+  twitter: string | null;
+  coingecko: string | null;
+  auditUrl: string | null;
+}): SourceRef[] {
+  const sources: SourceRef[] = [];
+  if (profile.website) sources.push({ label: "Website", url: profile.website });
+  if (profile.coingecko) sources.push({ label: "CoinGecko", url: profile.coingecko });
+  if (profile.auditUrl) sources.push({ label: "Audit", url: profile.auditUrl });
+  if (profile.twitter) sources.push({ label: "Twitter", url: profile.twitter });
+  return sources;
+}
+
+function productActions(
+  tool: "research_getStablecoin" | "research_getRwa" | "research_getToken",
+  slug: string,
+  historyMetric: "peg" | "tvl" | null,
+): AgentSkillAction[] {
+  const actions: AgentSkillAction[] = [
+    {
+      name: "getProfile",
+      description: `Read the CanHav profile for this protocol.`,
+      signature: `${tool}({ slug: "${slug}" })`,
+      readOnly: true,
+    },
+    {
+      name: "readLiveMetrics",
+      description: "Read live on-chain supply / metadata for the contract (Arbitrum).",
+      signature: `chain_readLive({ address: "0x..." })`,
+      readOnly: true,
+    },
+  ];
+  if (historyMetric) {
+    actions.push({
+      name: "getHistory",
+      description: `Pull the historical ${historyMetric} series.`,
+      signature: `research_getHistory({ slug: "${slug}", metric: "${historyMetric}" })`,
+      readOnly: true,
+    });
+  }
+  return actions;
+}
+
+function commonProductFacts(meta: {
+  chains: string[];
+  isArbitrumNative: boolean;
+}): AgentSkillFact[] {
+  return [
+    { key: "arbitrumNative", value: meta.isArbitrumNative ? "yes" : "no" },
+    { key: "chains", value: meta.chains.length ? meta.chains.join(", ") : "unspecified" },
+  ];
+}
+
+/** Deterministically derive an AgentSkill from a stablecoin profile. */
+export function buildSkillFromStablecoin(profile: StablecoinProfile): PlatformSkill {
+  const facts: AgentSkillFact[] = [
+    { key: "category", value: "Stablecoin" },
+    { key: "symbol", value: profile.symbol || "—" },
+    { key: "pegTarget", value: profile.pegTarget },
+    ...commonProductFacts(profile.arbitrumPortalMetadata),
+  ];
+  if (profile.subCategory) facts.push({ key: "subCategory", value: profile.subCategory });
+  if (profile.pegMechanism) facts.push({ key: "pegMechanism", value: profile.pegMechanism });
+  const supply = compactNumber(profile.totalSupply.value);
+  if (supply) facts.push({ key: "circulatingSupply", value: supply });
+  if (profile.entitySlug) facts.push({ key: "parentEntity", value: profile.entitySlug });
+
+  const sections: AgentSkillSection[] = [];
+  if (profile.description) sections.push({ heading: "Overview", body: profile.description });
+  if (profile.lendingMarket) {
+    sections.push({
+      heading: "Lending market",
+      body: "This coin is an active Aave V3 reserve — supply/borrow rates are readable live.",
+    });
+  }
+
+  return {
+    id: productSkillId("stablecoin", profile.slug),
+    group: "stablecoin",
+    title: `${profile.name} (${profile.symbol}) — Stablecoin Skill`,
+    summary: profile.description.slice(0, 200),
+    facts,
+    sections,
+    actions: productActions("research_getStablecoin", profile.slug, "peg"),
+    glossary: GLOSSARY,
+    sources: productSources(profile),
+    version: SKILL_VERSION,
+    updatedAt: profile.updatedAt || profile.createdAt || "",
+  };
+}
+
+/** Deterministically derive an AgentSkill from an RWA profile. */
+export function buildSkillFromRwa(profile: RwaProfile): PlatformSkill {
+  const facts: AgentSkillFact[] = [
+    { key: "category", value: "RWA" },
+    { key: "symbol", value: profile.symbol || "—" },
+    { key: "assetClass", value: profile.assetClass },
+    ...commonProductFacts(profile.arbitrumPortalMetadata),
+  ];
+  const tvl = compactUsd(profile.totalValueLocked.value);
+  if (tvl) facts.push({ key: "tvl", value: tvl });
+  if (profile.entitySlug) facts.push({ key: "parentEntity", value: profile.entitySlug });
+
+  const sections: AgentSkillSection[] = [];
+  if (profile.description) sections.push({ heading: "Overview", body: profile.description });
+
+  return {
+    id: productSkillId("rwa", profile.slug),
+    group: "rwa",
+    title: `${profile.name} — RWA Skill`,
+    summary: profile.description.slice(0, 200),
+    facts,
+    sections,
+    actions: productActions("research_getRwa", profile.slug, "tvl"),
+    glossary: GLOSSARY,
+    sources: productSources(profile),
+    version: SKILL_VERSION,
+    updatedAt: profile.updatedAt || profile.createdAt || "",
+  };
+}
+
+/** Deterministically derive an AgentSkill from a token profile. */
+export function buildSkillFromToken(profile: TokenProfile): PlatformSkill {
+  const facts: AgentSkillFact[] = [
+    { key: "category", value: "Token" },
+    { key: "symbol", value: profile.symbol || "—" },
+    { key: "tokenType", value: profile.tokenType },
+    ...commonProductFacts(profile.arbitrumPortalMetadata),
+  ];
+  if (profile.subCategory) facts.push({ key: "subCategory", value: profile.subCategory });
+  const supply = compactNumber(profile.totalSupply.value);
+  if (supply) facts.push({ key: "circulatingSupply", value: supply });
+  const mcap = compactUsd(profile.market?.marketCapUsd?.value ?? null);
+  if (mcap) facts.push({ key: "marketCap", value: mcap });
+  if (profile.entitySlug) facts.push({ key: "parentEntity", value: profile.entitySlug });
+
+  const sections: AgentSkillSection[] = [];
+  const overview = [profile.description, profile.longDescription].filter(Boolean).join("\n\n");
+  if (overview) sections.push({ heading: "Overview", body: overview });
+  if (profile.typedRisks?.length) {
+    sections.push({
+      heading: "Risks",
+      body: profile.typedRisks.map((r) => `- ${r.category}: ${r.description}`).join("\n"),
+    });
+  }
+
+  return {
+    id: productSkillId("token", profile.slug),
+    group: "token",
+    title: `${profile.name} (${profile.symbol}) — Token Skill`,
+    summary: profile.description.slice(0, 200),
+    facts,
+    sections,
+    actions: productActions("research_getToken", profile.slug, null),
+    glossary: GLOSSARY,
+    sources: productSources(profile),
+    version: SKILL_VERSION,
+    updatedAt: profile.updatedAt || profile.createdAt || "",
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Catalog                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/** All platform skills (entities + stablecoins + RWAs + tokens), grouped order. */
+export async function getAgentSkills(): Promise<PlatformSkill[]> {
+  const [entities, stablecoins, rwas, tokens] = await Promise.all([
+    getApprovedEntities(),
+    getApprovedStablecoins(),
+    getApprovedRwas(),
+    getApprovedTokens(),
+  ]);
+  const byTitle = (a: PlatformSkill, b: PlatformSkill) => a.title.localeCompare(b.title);
+  return [
+    ...entities.map(buildSkillFromEntity).sort(byTitle),
+    ...stablecoins.map(buildSkillFromStablecoin).sort(byTitle),
+    ...rwas.map(buildSkillFromRwa).sort(byTitle),
+    ...tokens.map(buildSkillFromToken).sort(byTitle),
+  ];
+}
+
+/** Entity-derived skills only (the mintable, agent-binding skills). */
+export async function getEntityAgentSkills(): Promise<PlatformSkill[]> {
   const entities = await getApprovedEntities();
   return entities.map(buildSkillFromEntity).sort((a, b) => a.title.localeCompare(b.title));
 }
 
-/** Resolve a single skill by id (entity slug). Returns null if not found. */
-export async function getAgentSkillById(id: string): Promise<AgentSkill | null> {
+/**
+ * Resolve a single platform skill by id. Bare ids are entity slugs (legacy);
+ * `stablecoin:` / `rwa:` / `token:` prefixes resolve product skills.
+ */
+export async function getAgentSkillById(id: string): Promise<PlatformSkill | null> {
+  const sep = id.indexOf(":");
+  if (sep > 0) {
+    const group = id.slice(0, sep);
+    const slug = id.slice(sep + 1);
+    if (group === "stablecoin") {
+      const profile = await getApprovedStablecoinBySlug(slug);
+      return profile ? buildSkillFromStablecoin(profile) : null;
+    }
+    if (group === "rwa") {
+      const profile = await getApprovedRwaBySlug(slug);
+      return profile ? buildSkillFromRwa(profile) : null;
+    }
+    if (group === "token") {
+      const profile = await getApprovedTokenBySlug(slug);
+      return profile ? buildSkillFromToken(profile) : null;
+    }
+    return null;
+  }
   const entity = await getApprovedEntityBySlug(id);
   return entity ? buildSkillFromEntity(entity) : null;
 }

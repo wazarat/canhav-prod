@@ -238,12 +238,20 @@ export function AgentChat({
                       <Sparkles className="h-3.5 w-3.5" />
                     </span>
                   )}
-                  <div className={cn("max-w-[80%] space-y-1", isUser && "flex flex-col items-end")}>
+                  <div
+                    className={cn(
+                      "min-w-0 space-y-1",
+                      isUser ? "flex max-w-[80%] flex-col items-end" : "max-w-[92%] flex-1",
+                    )}
+                  >
+                    {/* No whitespace-pre-wrap on assistant bubbles: markdown owns
+                        the layout, and pre-wrap doubles every blank line the LLM
+                        emits between blocks. User text keeps it (plain text). */}
                     <div
                       className={cn(
-                        "whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+                        "rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
                         isUser
-                          ? "bg-electric-500/15 text-ink-50"
+                          ? "whitespace-pre-wrap bg-electric-500/15 text-ink-50"
                           : "border border-ink-800/60 bg-ink-900/40 text-ink-100",
                       )}
                     >

@@ -14,11 +14,12 @@ interface ForEntityResponse {
 }
 
 /**
- * The project-page agent creation + status surface. The actual chatbot lives in
- * the right-side {@link EntityAgentDock}; this panel handles the lifecycle:
+ * The project-page agent creation + status surface. The actual chatbot is the
+ * floating {@link FloatingResearchChat} widget (bottom-right); this panel
+ * handles the lifecycle:
  *   - signed out                     -> sign in with a social login
  *   - signed in, no agent yet         -> mint ONE ERC-8004 agent for this entity
- *   - signed in, minted agent on-chain -> "agent is live" (chat is docked right)
+ *   - signed in, minted agent on-chain -> "agent is live" (chat floats bottom-right)
  *
  * Agent creation lives ONLY here (one per entity); the Agents tab is a roster.
  */
@@ -103,7 +104,7 @@ export function EntityAgentPanel({
               Your {entityName} agent is live on-chain (ERC-8004).
             </div>
             <p className="text-xs text-ink-400">
-              Chat with it in the docked panel on the right — it carries over to{" "}
+              Chat with it from the floating chat button (bottom-right) — it carries over to{" "}
               {entityName}&apos;s stablecoin, RWA, and token pages too.
             </p>
             <Link

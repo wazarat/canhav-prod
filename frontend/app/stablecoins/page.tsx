@@ -2,8 +2,10 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 import { MockDataBanner } from "@/components/MockDataBanner";
+import { FloatingResearchChat } from "@/components/agent/FloatingResearchChat";
 import { StablecoinTable } from "@/components/stablecoins/StablecoinTable";
 import { StatCard } from "@/components/ui/StatCard";
+import { agentConfigStatus } from "@/lib/agent/config";
 import { getApprovedStablecoins, LIVE_METRICS_PENDING, pegDeviationBps } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
 
@@ -59,6 +61,8 @@ export default async function StablecoinsPage() {
       </section>
 
       <StablecoinTable profiles={profiles} emptyHint="No stablecoins in the store yet." />
+
+      <FloatingResearchChat llmConfigured={agentConfigStatus().llm} />
     </div>
   );
 }

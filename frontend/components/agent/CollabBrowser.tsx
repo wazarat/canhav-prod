@@ -30,6 +30,7 @@ interface AgentListing {
   specialization?: {
     focusAreas: string[];
     riskLens: string | null;
+    category?: string | null;
     entitySlug: string | null;
     level: number;
     knowledgeDocs: number;
@@ -311,6 +312,11 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
                       <span className="rounded border border-electric-500/30 bg-electric-500/10 px-1.5 py-0.5 text-electric-300">
                         L{a.specialization.level}
                       </span>
+                      {a.specialization.category && (
+                        <span className="rounded border border-signal-400/40 bg-signal-400/10 px-1.5 py-0.5 text-signal-400">
+                          {a.specialization.category}
+                        </span>
+                      )}
                       {a.specialization.entitySlug && (
                         <span className="rounded border border-ink-700 px-1.5 py-0.5">
                           {a.specialization.entitySlug}

@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { arbitrumSepolia } from "viem/chains";
 
+import { ResearchChatProvider } from "@/components/agent/research-chat-context";
+
 /**
  * Privy social-login provider. Each user gets a self-custodial embedded wallet
  * (2-of-3 Shamir + TEE) from a social login; that wallet is the ECDSA root of
@@ -16,7 +18,11 @@ import { arbitrumSepolia } from "viem/chains";
 const PRIVY_APP_ID = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
 
 export function Providers({ children }: { children: ReactNode }) {
-  if (!PRIVY_APP_ID) return <>{children}</>;
+  const shell = (
+    <ResearchChatProvider>{children}</ResearchChatProvider>
+  );
+
+  if (!PRIVY_APP_ID) return shell;
 
   return (
     <PrivyProvider
@@ -36,7 +42,7 @@ export function Providers({ children }: { children: ReactNode }) {
         },
       }}
     >
-      {children}
+      {shell}
     </PrivyProvider>
   );
 }

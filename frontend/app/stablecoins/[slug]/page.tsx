@@ -15,7 +15,7 @@ import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
-import { FloatingResearchChat } from "@/components/agent/FloatingResearchChat";
+import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { getApprovedStablecoinBySlug, getApprovedStablecoins, getEntityBySlug } from "@/lib/data";
 import { deriveSecurityStatus } from "@/lib/security";
@@ -109,11 +109,7 @@ export default async function StablecoinProfilePage({ params }: PageProps) {
         </div>
       </div>
 
-      <FloatingResearchChat
-        entitySlug={profile.entitySlug}
-        entityName={entity?.name}
-        llmConfigured={agentStatus.llm}
-      />
+      <ResearchChatScope entitySlug={profile.entitySlug} entityName={entity?.name} />
     </div>
   );
 }

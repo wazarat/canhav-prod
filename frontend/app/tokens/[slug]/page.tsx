@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGridSkeleton } from "@/components/ui/Skeletons";
-import { FloatingResearchChat } from "@/components/agent/FloatingResearchChat";
+import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { getApprovedTokenBySlug, getApprovedTokens, getEntityBySlug } from "@/lib/data";
 import { deriveSecurityStatus } from "@/lib/security";
@@ -128,11 +128,7 @@ export default async function TokenProfilePage({ params }: PageProps) {
         </div>
       </div>
 
-      <FloatingResearchChat
-        entitySlug={profile.entitySlug}
-        entityName={entity?.name}
-        llmConfigured={agentStatus.llm}
-      />
+      <ResearchChatScope entitySlug={profile.entitySlug} entityName={entity?.name} />
     </div>
   );
 }

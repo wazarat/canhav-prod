@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { AlertTriangle, Loader2, LogIn, Rocket, Wallet } from "lucide-react";
 
@@ -12,7 +11,10 @@ import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
 import { cn } from "@/lib/utils";
 import type { AgentProductRef, AgentSkill } from "canhav-agent-service";
 import type { Signer } from "@zerodev/sdk/types";
-import { AgentIdentityCard, type AgentIdentity } from "./AgentIdentityCard";
+import {
+  ENTITY_AGENT_MINTED_EVENT,
+  openResearchChat,
+} from "./research-chat-context";
 import { SkillPicker, type SkillPickerOption } from "./SkillPicker";
 
 interface SkillOption {
@@ -49,8 +51,6 @@ export function LaunchAgentButton({
   const [extraSkillIds, setExtraSkillIds] = useState<string[]>([]);
   const [phase, setPhase] = useState<"idle" | "wallet" | "minting">("idle");
   const [error, setError] = useState<string | null>(null);
-  const [identity, setIdentity] = useState<AgentIdentity | null>(null);
-  const router = useRouter();
 
   const { ready, authenticated, login } = usePrivy();
   const { wallets } = useWallets();
@@ -136,16 +136,8 @@ export function LaunchAgentButton({
         throw new Error(preflight.error ?? `Preflight failed (status ${preflightRes.status}).`);
       }
       if (preflight.reused && preflight.agentId && preflight.agentAddress) {
-        setIdentity({
-          agentId: preflight.agentId,
-          agentAddress: preflight.agentAddress,
-          agentURI: preflight.agentURI ?? null,
-          arbiscanUrl: preflight.arbiscanUrl ?? null,
-          tokenUrl: preflight.tokenUrl ?? null,
-          skillTitle: skill.title,
-          onChain: true,
-        });
-        router.push(`/agents/${encodeURIComponent(preflight.agentId)}`);
+        window.dispatchEvent(new CustomEvent(ENTITY_AGENT_MINTED_EVENT));
+        openResearchChat();
         return;
       }
       if (
@@ -185,39 +177,13 @@ export function LaunchAgentButton({
       if (!res.ok || !data.ok || !data.agentId || !data.agentAddress) {
         throw new Error(data.error ?? `Spawn persist failed (status ${res.status}).`);
       }
-      setIdentity({
-        agentId: data.agentId,
-        agentAddress: data.agentAddress,
-        agentURI: data.agentURI ?? null,
-        arbiscanUrl: data.arbiscanUrl ?? null,
-        tokenUrl: data.tokenUrl ?? null,
-        skillTitle: skill.title,
-        onChain: true,
-      });
-      router.push(`/agents/${encodeURIComponent(data.agentId)}`);
+      window.dispatchEvent(new CustomEvent(ENTITY_AGENT_MINTED_EVENT));
+      openResearchChat();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Minting failed.");
     } finally {
       setPhase("idle");
     }
-  }
-
-  if (identity) {
-    return (
-      <div className="space-y-3">
-        <AgentIdentityCard
-          identity={identity}
-          verifyUrl={`/api/agent/${encodeURIComponent(identity.agentId)}/verify`}
-        />
-        <button
-          type="button"
-          onClick={() => setIdentity(null)}
-          className="text-xs font-medium text-ink-400 transition-colors hover:text-ink-100"
-        >
-          Launch another agent
-        </button>
-      </div>
-    );
   }
 
   return (

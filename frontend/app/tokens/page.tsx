@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
-import { FloatingResearchChat } from "@/components/agent/FloatingResearchChat";
+import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { TokenTable } from "@/components/tokens/TokenTable";
 import { StatCard } from "@/components/ui/StatCard";
-import { agentConfigStatus } from "@/lib/agent/config";
 import { getApprovedEntities, getApprovedTokens } from "@/lib/data";
 
 export const metadata = {
@@ -47,7 +46,7 @@ export default async function TokensPage() {
 
       <TokenTable profiles={profiles} entities={entities} emptyHint="No tokens in the store yet." />
 
-      <FloatingResearchChat llmConfigured={agentConfigStatus().llm} />
+      <ResearchChatScope />
     </div>
   );
 }

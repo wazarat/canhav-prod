@@ -6,6 +6,7 @@ import { ArrowRight, Bot, Loader2, LogIn, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { LaunchAgentButton } from "@/components/agent/LaunchAgentButton";
+import { ENTITY_AGENT_MINTED_EVENT } from "@/components/agent/research-chat-context";
 
 interface ForEntityResponse {
   authenticated?: boolean;
@@ -43,7 +44,9 @@ export function EntityAgentPanel({
 
   useEffect(() => {
     let active = true;
-    (async () => {
+
+    async function loadAgent() {
+      setLoading(true);
       try {
         const res = await fetch(`/api/agent/for-entity?slug=${encodeURIComponent(entitySlug)}`);
         if (!res.ok) return;
@@ -55,9 +58,18 @@ export function EntityAgentPanel({
       } finally {
         if (active) setLoading(false);
       }
-    })();
+    }
+
+    loadAgent();
+
+    function onMinted() {
+      loadAgent();
+    }
+    window.addEventListener(ENTITY_AGENT_MINTED_EVENT, onMinted);
+
     return () => {
       active = false;
+      window.removeEventListener(ENTITY_AGENT_MINTED_EVENT, onMinted);
     };
   }, [entitySlug]);
 
@@ -104,15 +116,15 @@ export function EntityAgentPanel({
               Your {entityName} agent is live on-chain (ERC-8004).
             </div>
             <p className="text-xs text-ink-400">
-              Chat with it from the floating chat button (bottom-right) — it carries over to{" "}
-              {entityName}&apos;s stablecoin, RWA, and token pages too.
+              Use the floating chat (bottom-right) to talk to your agent — the conversation
+              carries over to {entityName}&apos;s stablecoin, RWA, and token pages.
             </p>
             <Link
               href={`/agents/${encodeURIComponent(agentId as string)}`}
-              className="group inline-flex items-center gap-1.5 rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-2 text-sm font-medium text-electric-300 transition-colors hover:bg-electric-500/20"
+              className="group inline-flex items-center gap-1.5 text-xs font-medium text-ink-400 transition-colors hover:text-electric-300"
             >
-              Open the {entityName} agent
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              Agent settings & memory
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </Link>
             {!llmConfigured && (
               <p className="text-xs text-amber-300/80">

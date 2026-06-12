@@ -19,7 +19,7 @@ import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
 import { MemberCoins } from "@/components/entities/MemberCoins";
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
 import { EntityAgentPanel } from "@/components/agent/EntityAgentPanel";
-import { FloatingResearchChat } from "@/components/agent/FloatingResearchChat";
+import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
@@ -346,11 +346,7 @@ export default async function EntityProfilePage({ params }: PageProps) {
         </aside>
       </div>
 
-      <FloatingResearchChat
-        entitySlug={profile.slug}
-        entityName={profile.name}
-        llmConfigured={agentStatus.llm}
-      />
+      <ResearchChatScope entitySlug={profile.slug} entityName={profile.name} />
     </div>
   );
 }

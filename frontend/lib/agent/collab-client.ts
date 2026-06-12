@@ -37,14 +37,16 @@ export interface SellerQuote {
 
 /** Ask the seller route for its 402 challenge (no payment) to learn payTo + amount. */
 export async function getSellerQuote(params: {
-  skillId: string;
   toAgentId: string;
-  fromAgentId: string;
+  fromAgentId?: string;
 }): Promise<SellerQuote> {
   const res = await fetch("/api/collab/strategy", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ skillId: params.skillId, toAgentId: params.toAgentId }),
+    body: JSON.stringify({
+      toAgentId: params.toAgentId,
+      fromAgentId: params.fromAgentId,
+    }),
   });
   // Expect HTTP 402 with the challenge body.
   const data = (await res.json()) as {

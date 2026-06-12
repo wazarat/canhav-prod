@@ -11,6 +11,7 @@ import { AttachSkillPanel } from "@/components/agent/AttachSkillPanel";
 import { CollabSettingsPanel } from "@/components/agent/CollabSettingsPanel";
 import { SkillShelf } from "@/components/agent/SkillShelf";
 import { Badge } from "@/components/ui/Badge";
+import { AgentToolPanel } from "@/components/agent/AgentToolPanel";
 import { CustomToolsPanel } from "@/components/agent/CustomToolsPanel";
 import { DataFramesPanel } from "@/components/agent/DataFramesPanel";
 import { KnowledgePanel } from "@/components/agent/KnowledgePanel";
@@ -83,9 +84,10 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
   const verification = profile.onChain
     ? await verifyAgentOnChain(agentId, profile.agentAddress)
     : undefined;
-  const agentCardUrl = profile.agentAddress
+  const agentCardJsonUrl = profile.agentAddress
     ? `/api/agent/by-address/${profile.agentAddress}/agent-card`
     : null;
+  const cardPageUrl = `/agents/${encodeURIComponent(agentId)}/card`;
   // Arbiscan-first: a direct link to the minted ERC-721 token on the registry,
   // plus the platform's own on-chain verification endpoint.
   const registry = verification?.registry ?? null;
@@ -196,9 +198,21 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
                 onChain: profile.onChain,
               }}
               verification={verification}
-              agentCardUrl={agentCardUrl}
+              agentCardUrl={agentCardJsonUrl}
+              cardPageUrl={cardPageUrl}
               verifyUrl={verifyUrl}
             />
+          )}
+          {isOwner && (
+            <div id="panel-tools">
+              <AgentToolPanel
+                agentId={agentId}
+                entitySlug={profile.entitySlug}
+                entityName={profile.name.replace(/ — Research Skill$/, "")}
+                associatedProducts={profile.associatedProducts}
+                frames={frames.map((f) => ({ id: f.id, title: f.title }))}
+              />
+            </div>
           )}
           <AgentMemoryPanel memory={memory} studiedSkills={studiedSkills} />
           <SkillShelf

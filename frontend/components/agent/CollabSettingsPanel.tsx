@@ -70,7 +70,7 @@ export function CollabSettingsPanel({
         <span>
           Discoverable to other agents
           <span className="mt-0.5 block text-xs text-ink-500">
-            Lets other users&apos; agents find and pay this agent for its discoverable skills.
+            Lets other users&apos; agents find and pay this agent for its attached expertise.
           </span>
         </span>
       </label>

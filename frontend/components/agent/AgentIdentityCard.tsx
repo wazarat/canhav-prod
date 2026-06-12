@@ -44,11 +44,15 @@ export function AgentIdentityCard({
   identity,
   verification,
   agentCardUrl,
+  cardPageUrl,
   verifyUrl,
 }: {
   identity: AgentIdentity;
   verification?: AgentVerification;
+  /** Raw JSON agent-card API (developers / indexers). */
   agentCardUrl?: string | null;
+  /** Human-readable identity card page. */
+  cardPageUrl?: string | null;
   /** The platform's own on-chain verification endpoint ("scan it on the platform"). */
   verifyUrl?: string | null;
 }) {
@@ -161,14 +165,22 @@ export function AgentIdentityCard({
             <ShieldCheck className="h-3.5 w-3.5" /> Verify on CanHav
           </a>
         )}
+        {cardPageUrl && (
+          <a
+            href={cardPageUrl}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
+          >
+            <FileJson className="h-3.5 w-3.5" /> View identity card
+          </a>
+        )}
         {agentCardUrl && (
           <a
             href={agentCardUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-400 transition-colors hover:text-ink-200"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-500 transition-colors hover:text-ink-300"
           >
-            <FileJson className="h-3.5 w-3.5" /> Agent card
+            JSON API <ExternalLink className="h-3.5 w-3.5" />
           </a>
         )}
         {scanUrl && (

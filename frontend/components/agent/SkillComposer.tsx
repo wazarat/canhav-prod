@@ -27,7 +27,6 @@ export function SkillComposer() {
   const [facts, setFacts] = useState<Pair[]>([{ a: "", b: "" }]);
   const [sections, setSections] = useState<Pair[]>([{ a: "", b: "" }]);
   const [sources, setSources] = useState<Pair[]>([{ a: "", b: "" }]);
-  const [visibility, setVisibility] = useState<"private" | "discoverable">("private");
 
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
@@ -83,7 +82,7 @@ export function SkillComposer() {
       const res = await fetch("/api/collab/skills", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...draft, visibility }),
+        body: JSON.stringify({ ...draft, visibility: "private" }),
       });
       const data = (await res.json()) as { ok?: boolean; error?: string; errors?: string[] };
       if (!res.ok || !data.ok) {
@@ -183,22 +182,6 @@ export function SkillComposer() {
         setRows={setSources}
         disabled={busy}
       />
-
-      <div className="flex flex-wrap items-center gap-4 border-t border-ink-800/60 pt-4">
-        <label className="flex items-center gap-2 text-sm text-ink-200">
-          <input
-            type="checkbox"
-            checked={visibility === "discoverable"}
-            onChange={(e) => setVisibility(e.target.checked ? "discoverable" : "private")}
-            disabled={busy}
-            className="h-4 w-4 rounded border-ink-600 bg-ink-900"
-          />
-          Make discoverable to other agents
-        </label>
-        <span className="text-xs text-ink-500">
-          Discoverable skills can be requested (and paid for) by other users&apos; agents via x402.
-        </span>
-      </div>
 
       {errors.length > 0 && (
         <div className="space-y-1 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5">

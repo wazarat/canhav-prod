@@ -3,7 +3,6 @@ import { ChevronRight, Plus, ScrollText } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
-import { SkillVisibilityToggle } from "@/components/agent/SkillVisibilityToggle";
 import { getSession } from "@/lib/auth/session";
 import { listUserSkillsByAuthor } from "@/lib/server/userSkills";
 
@@ -31,8 +30,8 @@ export default async function MySkillsPage() {
           </h1>
           <p className="max-w-2xl text-sm leading-relaxed text-ink-300">
             Custom research knowledge you authored. Attach a skill to an agent (from the agent page)
-            to train it. Make a skill discoverable to let other users&apos; agents request it via
-            x402.
+            to train it. Enable collaboration on the agent to sell its bundled expertise to other
+            agents via x402.
           </p>
         </div>
         <Link
@@ -47,7 +46,8 @@ export default async function MySkillsPage() {
         <Card className="space-y-2">
           <CardTitle className="text-base">No custom skills yet</CardTitle>
           <CardDescription>
-            Author or import your first skill to train an agent on knowledge it can use and sell.
+            Author or import your first skill to train an agent on knowledge it can use and bundle
+            into collaboration offers.
           </CardDescription>
         </Card>
       ) : (
@@ -68,10 +68,7 @@ export default async function MySkillsPage() {
                   {skill.facts.length} facts · {skill.sections.length} sections ·{" "}
                   {skill.sources.length} sources
                 </span>
-                <div className="flex items-center gap-2">
-                  <Badge tone="neutral">user-authored</Badge>
-                  <SkillVisibilityToggle skillId={skill.id} visibility={skill.visibility} />
-                </div>
+                <Badge tone="neutral">private · training</Badge>
               </div>
             </Card>
           ))}

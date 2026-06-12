@@ -16,7 +16,6 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { getAgentSkills } from "@/lib/agent/skills";
 import { MemoryInspector } from "@/components/agent/MemoryInspector";
-import { ToolPlayground } from "@/components/agent/ToolPlayground";
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
 import { getSession } from "@/lib/auth/session";
 import { listUserAgentIds } from "@/lib/auth/users";
@@ -275,8 +274,8 @@ export default async function AgentsPage() {
           <div>
             <CardTitle className="text-base">Your custom skills</CardTitle>
             <CardDescription className="mt-1">
-              Author or import your own research knowledge, attach it to an agent to train it, and
-              optionally make it discoverable so other agents can pay to learn it.
+              Author or import your own research knowledge and attach it to an agent to train it.
+              Enable collaboration on the agent to sell its bundled expertise.
             </CardDescription>
           </div>
           <Badge tone="neutral">user-authored</Badge>
@@ -308,7 +307,13 @@ export default async function AgentsPage() {
 
       <MemoryInspector agentId={defaultAgentId} />
 
-      <ToolPlayground />
+      <Card className="space-y-2">
+        <CardTitle className="text-base">Inspect live data</CardTitle>
+        <CardDescription>
+          Open one of your agents to run entity-scoped research tools against live CanHav data — no
+          LLM required.
+        </CardDescription>
+      </Card>
 
       <Card className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">

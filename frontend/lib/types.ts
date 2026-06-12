@@ -418,9 +418,8 @@ export type SkillVisibility = "private" | "discoverable";
 /**
  * A user-authored skill — the same machine-readable knowledge bundle as
  * {@link AgentSkill}, plus authorship + visibility. Attaching one to an agent is
- * "training". Every `actions[]` entry MUST be a read-only research action
- * (enforced by `validateUserSkill`); discoverable skills can be sold to other
- * agents as a typed StrategyPacket via x402.
+ * "training". Private skills are bundled into the agent's discoverable offer
+ * when the agent owner opts into collaboration.
  */
 export interface UserSkill extends AgentSkill {
   /** Privy user id (DID) of the author. */
@@ -436,10 +435,10 @@ export interface UserSkill extends AgentSkill {
 /* a typed StrategyPacket. Both are research-only knowledge transfers.         */
 /* -------------------------------------------------------------------------- */
 
-/** A buyer agent's typed request for a seller's discoverable skill. */
+/** A buyer agent's typed request for a discoverable seller agent's bundled offer. */
 export interface StrategyRequest {
-  /** The discoverable user-skill id being requested. */
-  skillId: string;
+  /** The seller agent id being requested. */
+  toAgentId: string;
   /** The buyer's agent id (for on-chain attestation). */
   fromAgentId: string;
   /** A bounded, typed objective — what the buyer wants to learn (not a chat). */

@@ -42,8 +42,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid skill.", errors: result.errors }, { status: 400 });
   }
 
-  const visibility: SkillVisibility =
-    (body as { visibility?: string })?.visibility === "discoverable" ? "discoverable" : "private";
+  const visibility: SkillVisibility = "private";
 
   const skill = await saveUserSkill({
     authorUserId: session.userId,

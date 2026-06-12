@@ -6,6 +6,7 @@ import path from "node:path";
 import { repoRoot } from "@/lib/server/env";
 import { getRedisClient, hasUpstash } from "@/lib/server/redis";
 
+import { agentOfferHash } from "@/lib/agent/agentOffer";
 import { sanitizeAgentConfig, type AgentConfig } from "@/lib/agent/agentConfig";
 import type { DataFrame } from "@/lib/types";
 
@@ -99,6 +100,7 @@ const key = {
   attachedSkills: (id: string) => `agent:${id}:attached-skills`,
   skillHash: (id: string, skillId: string) => `agent:${id}:skillhash:${skillId}`,
   skillAgents: (skillId: string) => `skill:${skillId}:agents`,
+  offerHash: (id: string) => `agent:${id}:offerHash`,
   frames: (id: string) => `agent:${id}:frames`,
 };
 
@@ -138,6 +140,8 @@ interface FileStore {
   skillHashes?: Record<string, string>;
   /** skillId -> agentIds advertising it (reverse index for discovery). */
   skillAgents?: Record<string, string[]>;
+  /** agentId -> bundled offer integrity hash. */
+  offerHashes?: Record<string, string>;
   /** agentId -> pinned data frames. */
   frames?: Record<string, DataFrame[]>;
 }
@@ -157,6 +161,7 @@ function readFile(): FileStore {
       attachedSkills: parsed.attachedSkills ?? {},
       skillHashes: parsed.skillHashes ?? {},
       skillAgents: parsed.skillAgents ?? {},
+      offerHashes: parsed.offerHashes ?? {},
       frames: parsed.frames ?? {},
     };
   } catch {
@@ -168,6 +173,7 @@ function readFile(): FileStore {
       attachedSkills: {},
       skillHashes: {},
       skillAgents: {},
+      offerHashes: {},
       frames: {},
     };
   }
@@ -406,9 +412,8 @@ export async function getStudiedSkills(agentId: string): Promise<string[]> {
 /* -------------------------------------------------------------------------- */
 
 /**
- * Record that an agent advertises a user-authored skill, storing the skill's
- * integrity hash and maintaining the reverse skill->agents index used by
- * discovery. Idempotent.
+ * Record that an agent has a user-authored skill attached for training and
+ * bundled collaboration offers. Recomputes the agent's offer hash. Idempotent.
  */
 export async function attachSkillToAgent(
   agentId: string,
@@ -432,6 +437,31 @@ export async function attachSkillToAgent(
     store.skillAgents = { ...(store.skillAgents ?? {}), [skillId]: [...agentsForSkill] };
     writeFile(store);
   }
+  await refreshAgentOfferHash(agentId);
+}
+
+/** Recompute and persist the bundled offer hash after attach/detach. */
+export async function refreshAgentOfferHash(agentId: string): Promise<`0x${string}` | null> {
+  const hash = await agentOfferHash(agentId);
+  if (hasUpstash()) {
+    const redis = getRedisClient();
+    if (hash) await redis.set(key.offerHash(agentId), hash);
+    else await redis.del(key.offerHash(agentId));
+  } else {
+    const store = readFile();
+    if (!store.offerHashes) store.offerHashes = {};
+    if (hash) store.offerHashes[agentId] = hash;
+    else delete store.offerHashes[agentId];
+    writeFile(store);
+  }
+  return hash;
+}
+
+export async function getStoredAgentOfferHash(agentId: string): Promise<string | null> {
+  if (hasUpstash()) {
+    return ((await getRedisClient().get(key.offerHash(agentId))) as string | null) ?? null;
+  }
+  return readFile().offerHashes?.[agentId] ?? null;
 }
 
 export async function getAttachedSkillIds(agentId: string): Promise<string[]> {

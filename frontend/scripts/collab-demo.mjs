@@ -6,14 +6,13 @@
  * idempotent example so you can see the whole lifecycle without minting real
  * agents:
  *
- *   1. Two users (Alice, Bob) each author one discoverable, read-only skill.
- *   2. Each user's single-entity agent is seeded as discoverable and advertises
- *      its skill (skill -> agent reverse index, on-chain flag, price).
- *   3. A strategy exchange is run BOTH ways (Alice's agent buys Bob's skill and
- *      vice-versa): an off-chain collab-log entry + a buyer rating each.
+ *   1. Two users (Alice, Bob) each author one private skill (training artifact).
+ *   2. Each skill is attached to the user's agent; agents are discoverable with
+ *      a bundled offer hash (merged attached skills — no per-skill marketplace).
+ *   3. A strategy exchange is run BOTH ways (Alice's agent buys Bob's bundled
+ *      offer and vice-versa): off-chain collab-log entry + buyer rating each.
  *   4. OPTIONAL on-chain attestation: if PRIVATE_KEY + COLLAB_REGISTRY_ADDRESS
- *      (+ an RPC) are set, each exchange is also written to CollabRegistry so the
- *      observer feed shows real `CollabRecorded` events.
+ *      (+ an RPC) are set, each exchange is also written to CollabRegistry.
  *
  * Storage mirrors the app exactly: Upstash Redis when KV creds are present,
  * else the gitignored local JSON files under `backend/data/`.
@@ -105,7 +104,7 @@ function makeSkill(id, authorUserId, title, summary, facts, sections, sources) {
     glossary: [],
     origin: "user-authored",
     authorUserId,
-    visibility: "discoverable",
+    visibility: "private",
     version: "1.0.0",
     createdAt: nowIso(),
     updatedAt: nowIso(),
@@ -195,8 +194,71 @@ const agentB = {
   updatedAt: nowIso(),
 };
 
-const hashA = keccak256(toBytes(JSON.stringify(skillA)));
-const hashB = keccak256(toBytes(JSON.stringify(skillB)));
+function offerSkillId(agentId) {
+  return `offer:${agentId}`;
+}
+
+/** Mirrors lib/agent/skillExport.ts skillToMarkdown for integrity hashes. */
+function skillToMarkdown(skill) {
+  const lines = [
+    `# ${skill.title}`,
+    "",
+    `> ${skill.summary}`,
+    "",
+    `- **ID:** ${skill.id}`,
+    `- **Version:** ${skill.version}`,
+    `- **Updated:** ${skill.updatedAt}`,
+    "",
+    "## Facts",
+    "",
+    ...skill.facts.map((f) => `- **${f.key}:** ${f.value}`),
+    "",
+    "## Sections",
+    "",
+    ...skill.sections.flatMap((s) => [`### ${s.heading}`, "", s.body, ""]),
+    "## Actions",
+    "",
+    ...skill.actions.map(
+      (a) =>
+        `- **${a.name}** (${a.readOnly ? "read-only" : "write"}): ${a.description}\n  \`${a.signature}\``,
+    ),
+  ];
+  if (skill.glossary?.length) {
+    lines.push("", "## Glossary", "");
+    skill.glossary.forEach((g) => lines.push(`- **${g.term}:** ${g.definition}`));
+  }
+  if (skill.sources.length) {
+    lines.push("", "## Sources", "");
+    skill.sources.forEach((s) => lines.push(`- [${s.label}](${s.url})`));
+  }
+  return lines.join("\n");
+}
+
+/** Mirrors lib/agent/agentOffer.ts buildAgentOfferSkill for a single attached skill. */
+function buildAgentOfferSkill(profile, userSkill) {
+  const entityLabel = profile.entitySlug ? ` (${profile.entitySlug})` : "";
+  return {
+    id: offerSkillId(profile.agentId),
+    title: `${profile.name} — bundled expertise`,
+    summary: userSkill.summary,
+    facts: userSkill.facts,
+    sections: userSkill.sections.map((s) => ({
+      heading: `${userSkill.title}: ${s.heading}`,
+      body: s.body,
+    })),
+    actions: [],
+    sources: userSkill.sources,
+    version: "1.0.0",
+    updatedAt: profile.updatedAt,
+  };
+}
+
+function agentOfferHash(profile, userSkill) {
+  return keccak256(toBytes(skillToMarkdown(buildAgentOfferSkill(profile, userSkill))));
+}
+
+const offerHashA = agentOfferHash(agentA, skillA);
+const offerHashB = agentOfferHash(agentB, skillB);
 
 /** Deterministic stand-in payment refs so re-runs dedupe in the feed. */
 const refAtoB = keccak256(toBytes(`demo:${agentA.agentId}->${agentB.agentId}`));
@@ -206,8 +268,8 @@ const exchanges = [
   {
     fromAgentId: agentA.agentId,
     toAgentId: agentB.agentId,
-    skillId: skillB.id,
-    skillHash: hashB,
+    skillId: offerSkillId(agentB.agentId),
+    skillHash: offerHashB,
     paymentRef: refAtoB,
     amount: PRICE,
     at: nowIso(),
@@ -216,8 +278,8 @@ const exchanges = [
   {
     fromAgentId: agentB.agentId,
     toAgentId: agentA.agentId,
-    skillId: skillA.id,
-    skillHash: hashA,
+    skillId: offerSkillId(agentA.agentId),
+    skillHash: offerHashA,
     paymentRef: refBtoA,
     amount: PRICE,
     at: nowIso(),
@@ -246,18 +308,17 @@ async function seedRedis() {
     await r.set(`userskill:${skill.id}`, JSON.stringify(skill));
     await r.sadd("userskill:index", skill.id);
     await r.sadd(`user:${skill.authorUserId}:authored-skills`, skill.id);
-    await r.sadd("skill:discoverable", skill.id);
   }
 
-  for (const { profile, skill, hash } of [
-    { profile: agentA, skill: skillA, hash: hashA },
-    { profile: agentB, skill: skillB, hash: hashB },
+  for (const { profile, skill, offerHash } of [
+    { profile: agentA, skill: skillA, offerHash: offerHashA },
+    { profile: agentB, skill: skillB, offerHash: offerHashB },
   ]) {
     await r.set(`agent:${profile.agentId}:profile`, JSON.stringify(profile));
     await r.sadd("agent:index", profile.agentId);
     await r.sadd(`agent:${profile.agentId}:attached-skills`, skill.id);
     await r.sadd(`agent:${profile.agentId}:skills`, skill.id);
-    await r.set(`agent:${profile.agentId}:skillhash:${skill.id}`, hash);
+    await r.set(`agent:${profile.agentId}:offerHash`, offerHash);
     await r.sadd(`skill:${skill.id}:agents`, profile.agentId);
   }
 
@@ -296,16 +357,16 @@ function seedFiles() {
   store.profiles ||= {};
   store.skills ||= {};
   store.attachedSkills ||= {};
-  store.skillHashes ||= {};
+  store.offerHashes ||= {};
   store.skillAgents ||= {};
-  for (const { profile, skill, hash } of [
-    { profile: agentA, skill: skillA, hash: hashA },
-    { profile: agentB, skill: skillB, hash: hashB },
+  for (const { profile, skill, offerHash } of [
+    { profile: agentA, skill: skillA, offerHash: offerHashA },
+    { profile: agentB, skill: skillB, offerHash: offerHashB },
   ]) {
     store.profiles[profile.agentId] = profile;
     store.attachedSkills[profile.agentId] = [skill.id];
     store.skills[profile.agentId] = [skill.id];
-    store.skillHashes[`${profile.agentId}|${skill.id}`] = hash;
+    store.offerHashes[profile.agentId] = offerHash;
     store.skillAgents[skill.id] = [profile.agentId];
   }
   writeJsonFile("agent-store.json", store);
@@ -386,10 +447,14 @@ async function main() {
   else seedFiles();
 
   console.log("Seeded:");
-  console.log(`  • skill ${skillA.id} (${skillA.title}) — discoverable, author ${ALICE}`);
-  console.log(`  • skill ${skillB.id} (${skillB.title}) — discoverable, author ${BOB}`);
-  console.log(`  • agent ${agentA.agentId} "${agentA.name}" advertises ${skillA.id} @ ${PRICE} USDC`);
-  console.log(`  • agent ${agentB.agentId} "${agentB.name}" advertises ${skillB.id} @ ${PRICE} USDC`);
+  console.log(`  • skill ${skillA.id} (${skillA.title}) — private, author ${ALICE}`);
+  console.log(`  • skill ${skillB.id} (${skillB.title}) — private, author ${BOB}`);
+  console.log(
+    `  • agent ${agentA.agentId} "${agentA.name}" discoverable with bundled offer @ ${PRICE} USDC`,
+  );
+  console.log(
+    `  • agent ${agentB.agentId} "${agentB.name}" discoverable with bundled offer @ ${PRICE} USDC`,
+  );
   console.log("");
   console.log("Exchanges (off-chain log + reputation):");
   for (const ex of exchanges) {

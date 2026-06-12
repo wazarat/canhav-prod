@@ -18,42 +18,30 @@ import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 import type { StrategyPacket } from "@/lib/types";
 import type { Signer } from "@zerodev/sdk/types";
 
-interface ProviderSpecialization {
-  focusAreas: string[];
-  riskLens: string | null;
-  entitySlug: string | null;
-  level: number;
-  knowledgeDocs: number;
-  dataFrames: number;
-  customTools: number;
-  exchangeCount: number;
-}
-
-interface Provider {
+interface AgentListing {
   agentId: string;
+  agentName: string;
   ownerHandle: string;
   agentWallet: string | null;
   walletVerified: boolean;
+  attachedSkillTitles: string[];
   x402: { price: string; asset: string; decimals: number };
   reputationScore: number | null;
-  specialization?: ProviderSpecialization | null;
-}
-
-interface Service {
-  skillId: string;
-  title: string;
-  summary: string;
-  providers: Provider[];
+  specialization?: {
+    focusAreas: string[];
+    riskLens: string | null;
+    entitySlug: string | null;
+    level: number;
+    knowledgeDocs: number;
+    dataFrames: number;
+    customTools: number;
+    exchangeCount: number;
+  } | null;
 }
 
 interface BuyerAgent {
   agentId: string;
   name: string;
-}
-
-interface Selection {
-  service: Service;
-  provider: Provider;
 }
 
 type Phase = "idle" | "preflight" | "quoting" | "paying" | "settling" | "recording" | "done";
@@ -62,9 +50,9 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
   const { authenticated, login } = usePrivy();
   const { wallets } = useWallets();
 
-  const [services, setServices] = useState<Service[] | null>(null);
+  const [agents, setAgents] = useState<AgentListing[] | null>(null);
   const [buyerAgentId, setBuyerAgentId] = useState(buyerAgents[0]?.agentId ?? "");
-  const [selection, setSelection] = useState<Selection | null>(null);
+  const [selection, setSelection] = useState<AgentListing | null>(null);
   const [objective, setObjective] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -79,24 +67,13 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
       try {
         const res = await fetch("/api/collab/discover");
         if (!res.ok) {
-          if (active) setServices([]);
+          if (active) setAgents([]);
           return;
         }
-        const data = (await res.json()) as {
-          capabilities?: { skill: { id: string; title: string; summary: string }; agents: Provider[] }[];
-        };
-        if (active) {
-          setServices(
-            (data.capabilities ?? []).map((c) => ({
-              skillId: c.skill.id,
-              title: c.skill.title,
-              summary: c.skill.summary,
-              providers: c.agents,
-            })),
-          );
-        }
+        const data = (await res.json()) as { agents?: AgentListing[] };
+        if (active) setAgents(data.agents ?? []);
       } catch {
-        if (active) setServices([]);
+        if (active) setAgents([]);
       }
     })();
     return () => {
@@ -133,9 +110,8 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
     setPacket(null);
     setRating(0);
 
-    const { service, provider } = selection;
+    const seller = selection;
     try {
-      // 1) Preflight (buyer agent mint params).
       setPhase("preflight");
       const pfRes = await fetch(
         `/api/collab/request/preflight?agentId=${encodeURIComponent(buyerAgentId)}`,
@@ -150,15 +126,12 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
         throw new Error(pf.error ?? "Buyer preflight failed.");
       }
 
-      // 2) Seller quote (authoritative payTo + amount).
       setPhase("quoting");
       const quote: SellerQuote = await getSellerQuote({
-        skillId: service.skillId,
-        toAgentId: provider.agentId,
+        toAgentId: seller.agentId,
         fromAgentId: buyerAgentId,
       });
 
-      // 3) Sign + send the USDC transfer userOp.
       setPhase("paying");
       const signer = await buildSigner();
       const { txHash } = await payStrategy({
@@ -168,14 +141,12 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
         quote,
       });
 
-      // 4) Complete the x402 exchange + ingest.
       setPhase("settling");
       const reqRes = await fetch("/api/collab/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          skillId: service.skillId,
-          toAgentId: provider.agentId,
+          toAgentId: seller.agentId,
           fromAgentId: buyerAgentId,
           objective: objective.trim() || undefined,
           paymentRef: txHash,
@@ -192,7 +163,6 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
       }
       setPacket(reqData.packet);
 
-      // 5) Best-effort on-chain attestation.
       if (reqData.record) {
         try {
           setPhase("recording");
@@ -220,13 +190,11 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
     setRating(stars);
     setRatingBusy(true);
     try {
-      // Exchange-verified: the paymentRef ties this rating to the settled
-      // exchange, and the server allows one rating per exchange.
       const res = await fetch("/api/collab/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          toAgentId: selection.provider.agentId,
+          toAgentId: selection.agentId,
           fromAgentId: buyerAgentId,
           rating: stars,
           paymentRef: packet.paymentRef,
@@ -272,7 +240,6 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
 
   return (
     <div className="space-y-6">
-      {/* Buyer agent selector */}
       <div className="glass space-y-2 rounded-2xl p-6">
         <label className="block space-y-1.5">
           <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
@@ -293,118 +260,90 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
         </label>
       </div>
 
-      {/* Marketplace */}
       <div className="glass space-y-4 rounded-2xl p-6">
         <div className="flex items-center gap-2 border-b border-ink-800/60 pb-3">
           <Search className="h-4 w-4 text-electric-400" />
           <h3 className="font-display text-base font-semibold tracking-tight text-ink-50">
-            Discoverable skills
+            Discoverable agents
           </h3>
         </div>
-        {services === null ? (
+        {agents === null ? (
           <p className="flex items-center gap-2 text-sm text-ink-500">
             <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading…
           </p>
-        ) : services.length === 0 ? (
+        ) : agents.length === 0 ? (
           <p className="text-sm text-ink-400">
-            No discoverable skills yet. Make one of your skills discoverable and attach it to an
-            on-chain agent to list it here.
+            No discoverable agents yet. Attach skills to your agent, then enable collaboration on
+            the agent page to list it here.
           </p>
         ) : (
           <div className="space-y-3">
-            {services.map((service) => (
-              <div key={service.skillId} className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
-                <p className="text-sm font-medium text-ink-100">{service.title}</p>
-                <p className="mt-0.5 line-clamp-2 text-xs text-ink-400">{service.summary}</p>
-                <div className="mt-3 space-y-2">
-                  {service.providers.map((p) => (
-                    <div
-                      key={p.agentId}
-                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-ink-800/60 bg-ink-950/40 px-3 py-2"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-xs font-medium text-ink-200">
-                          {p.ownerHandle}{" "}
-                          <span className="font-mono text-ink-500">· {p.agentId}</span>
-                        </p>
-                        <p className="mt-0.5 flex items-center gap-2 text-[10px] text-ink-500">
-                          <span>
-                            {p.x402.price} USDC
-                          </span>
-                          {p.reputationScore != null && (
-                            <span className="flex items-center gap-0.5 text-amber-300">
-                              <Star className="h-3 w-3" /> {p.reputationScore}
-                            </span>
-                          )}
-                          {p.walletVerified ? (
-                            <span className="flex items-center gap-0.5 text-emerald-300">
-                              <Wallet className="h-3 w-3" /> verified
-                            </span>
-                          ) : (
-                            <span className="text-amber-300">wallet unverified</span>
-                          )}
-                        </p>
-                        {p.specialization && (
-                          <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-ink-400">
-                            <span className="rounded border border-electric-500/30 bg-electric-500/10 px-1.5 py-0.5 text-electric-300">
-                              L{p.specialization.level}
-                            </span>
-                            {p.specialization.entitySlug && (
-                              <span className="rounded border border-ink-700 px-1.5 py-0.5">
-                                {p.specialization.entitySlug}
-                              </span>
-                            )}
-                            {p.specialization.focusAreas.slice(0, 3).map((f) => (
-                              <span key={f} className="rounded border border-ink-700 px-1.5 py-0.5">
-                                {f}
-                              </span>
-                            ))}
-                            {p.specialization.riskLens && (
-                              <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-amber-300">
-                                {p.specialization.riskLens} lens
-                              </span>
-                            )}
-                            {(p.specialization.knowledgeDocs > 0 ||
-                              p.specialization.dataFrames > 0 ||
-                              p.specialization.customTools > 0) && (
-                              <span>
-                                {p.specialization.knowledgeDocs} docs · {p.specialization.dataFrames}{" "}
-                                frames · {p.specialization.customTools} tools
-                              </span>
-                            )}
-                            {p.specialization.exchangeCount > 0 && (
-                              <span className="text-neon-400">
-                                {p.specialization.exchangeCount} exchange
-                                {p.specialization.exchangeCount === 1 ? "" : "s"}
-                              </span>
-                            )}
-                          </p>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        disabled={busy || !p.walletVerified || p.agentId === buyerAgentId}
-                        onClick={() => {
-                          setSelection({ service, provider: p });
-                          setPacket(null);
-                          setError(null);
-                          setNotice(null);
-                          setPhase("idle");
-                        }}
-                        className="rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-1.5 text-xs font-medium text-electric-300 transition-colors hover:bg-electric-500/20 disabled:opacity-40"
-                      >
-                        {p.agentId === buyerAgentId ? "your agent" : "Request"}
-                      </button>
-                    </div>
-                  ))}
+            {agents.map((a) => (
+              <div
+                key={a.agentId}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-ink-100">{a.agentName}</p>
+                  <p className="mt-0.5 font-mono text-[10px] text-ink-500">{a.agentId}</p>
+                  {a.attachedSkillTitles.length > 0 && (
+                    <p className="mt-1 text-xs text-ink-400">
+                      Expertise: {a.attachedSkillTitles.join(" · ")}
+                    </p>
+                  )}
+                  <p className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-ink-500">
+                    <span>{a.x402.price} USDC</span>
+                    {a.reputationScore != null && (
+                      <span className="flex items-center gap-0.5 text-amber-300">
+                        <Star className="h-3 w-3" /> {a.reputationScore}
+                      </span>
+                    )}
+                    {a.walletVerified ? (
+                      <span className="flex items-center gap-0.5 text-emerald-300">
+                        <Wallet className="h-3 w-3" /> verified
+                      </span>
+                    ) : (
+                      <span className="text-amber-300">wallet unverified</span>
+                    )}
+                  </p>
+                  {a.specialization && (
+                    <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-ink-400">
+                      <span className="rounded border border-electric-500/30 bg-electric-500/10 px-1.5 py-0.5 text-electric-300">
+                        L{a.specialization.level}
+                      </span>
+                      {a.specialization.entitySlug && (
+                        <span className="rounded border border-ink-700 px-1.5 py-0.5">
+                          {a.specialization.entitySlug}
+                        </span>
+                      )}
+                      {a.specialization.focusAreas.slice(0, 3).map((f) => (
+                        <span key={f} className="rounded border border-ink-700 px-1.5 py-0.5">
+                          {f}
+                        </span>
+                      ))}
+                    </p>
+                  )}
                 </div>
+                <button
+                  type="button"
+                  disabled={busy || !a.walletVerified || a.agentId === buyerAgentId}
+                  onClick={() => {
+                    setSelection(a);
+                    setPacket(null);
+                    setError(null);
+                    setNotice(null);
+                    setPhase("idle");
+                  }}
+                  className="rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-1.5 text-xs font-medium text-electric-300 transition-colors hover:bg-electric-500/20 disabled:opacity-40"
+                >
+                  {a.agentId === buyerAgentId ? "your agent" : "Request"}
+                </button>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Human approval */}
       {selection && (
         <div className="glass space-y-4 rounded-2xl border border-electric-500/30 p-6">
           <h3 className="font-display text-base font-semibold tracking-tight text-ink-50">
@@ -412,16 +351,25 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
           </h3>
           <div className="space-y-1 text-sm text-ink-300">
             <p>
-              Skill: <span className="text-ink-100">{selection.service.title}</span>
+              Agent: <span className="text-ink-100">{selection.agentName}</span>{" "}
+              <span className="font-mono text-ink-500">({selection.agentId})</span>
             </p>
             <p>
-              Seller: <span className="text-ink-100">{selection.provider.ownerHandle}</span>{" "}
-              <span className="font-mono text-ink-500">({selection.provider.agentId})</span>
+              Expertise:{" "}
+              <span className="text-ink-100">
+                {selection.attachedSkillTitles.length} attached skill
+                {selection.attachedSkillTitles.length === 1 ? "" : "s"}
+              </span>
+              {selection.attachedSkillTitles.length > 0 && (
+                <span className="mt-0.5 block text-xs text-ink-400">
+                  {selection.attachedSkillTitles.join(" · ")}
+                </span>
+              )}
             </p>
             <p>
               Price:{" "}
               <span className="font-medium text-neon-400">
-                {selection.provider.x402.price} testnet USDC
+                {selection.x402.price} testnet USDC
               </span>
             </p>
           </div>
@@ -456,7 +404,7 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
                       ? "Settling…"
                       : phase === "recording"
                         ? "Attesting on-chain…"
-                        : `Approve & pay ${selection.provider.x402.price} USDC`}
+                        : `Approve & pay ${selection.x402.price} USDC`}
             </button>
             <button
               type="button"
@@ -480,7 +428,6 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
         </div>
       )}
 
-      {/* Result */}
       {packet && (
         <div className="glass space-y-3 rounded-2xl p-6">
           <h3 className="font-display text-base font-semibold tracking-tight text-ink-50">
@@ -503,15 +450,10 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
               <p className="whitespace-pre-wrap text-sm text-ink-200">
                 {packet.tailoredBrief.brief}
               </p>
-              {packet.tailoredBrief.basedOn.length > 0 && (
-                <p className="text-[10px] text-ink-500">
-                  Based on: {packet.tailoredBrief.basedOn.map((s) => s.label).join(" · ")}
-                </p>
-              )}
             </div>
           )}
           <p className="font-mono text-[10px] text-ink-500">
-            skillHash {packet.skillHash.slice(0, 14)}… · paymentRef {packet.paymentRef.slice(0, 14)}…
+            offerHash {packet.skillHash.slice(0, 14)}… · paymentRef {packet.paymentRef.slice(0, 14)}…
           </p>
           <div className="flex items-center gap-2 border-t border-ink-800/60 pt-3">
             <span className="text-xs text-ink-400">Rate this strategy:</span>

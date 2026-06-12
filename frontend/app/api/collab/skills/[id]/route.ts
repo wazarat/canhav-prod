@@ -5,8 +5,8 @@ import { getUserSkill, setUserSkillVisibility } from "@/lib/server/userSkills";
 
 /**
  * Single user-authored skill.
- *   GET   -> read it (any signed-in user; needed by buyers verifying a packet).
- *   PATCH -> owner-only: flip visibility (private <-> discoverable).
+ *   GET -> read it (any signed-in user).
+ *   PATCH -> deprecated; skills are always private (attach to agent for collab).
  */
 
 export const runtime = "nodejs";
@@ -35,9 +35,12 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  if (body.visibility !== "private" && body.visibility !== "discoverable") {
+  if (body.visibility === "discoverable") {
     return NextResponse.json(
-      { error: "visibility must be 'private' or 'discoverable'." },
+      {
+        error:
+          "Skills are private training artifacts. Enable collaboration on the agent that has this skill attached.",
+      },
       { status: 400 },
     );
   }
@@ -45,7 +48,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const updated = await setUserSkillVisibility(
     decodeURIComponent(params.id),
     session.userId,
-    body.visibility,
+    "private",
   );
   if (!updated) {
     return NextResponse.json({ error: "Skill not found or not yours." }, { status: 404 });

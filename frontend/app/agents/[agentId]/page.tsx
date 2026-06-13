@@ -218,6 +218,12 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
         />
       )}
 
+      {isOwner && (
+        <div id="panel-dune">
+          <DunePublishPanel agentId={agentId} config={profile.config} />
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <AgentLabPanel agentId={agentId} llmConfigured={status.llm} />
@@ -267,9 +273,6 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
             <>
               <div id="panel-framework">
                 <AgentFrameworkPanel agentId={agentId} config={profile.config} />
-              </div>
-              <div id="panel-dune">
-                <DunePublishPanel agentId={agentId} config={profile.config} />
               </div>
               <div id="panel-frames">
                 <DataFramesPanel

@@ -202,3 +202,131 @@ export async function fetchTvlHistory(slug: string, days = 30): Promise<TvlDataP
   if (!config) return [];
   return (await fetchSeries(config, days)).map((p) => ({ date: p.date, value: p.value }));
 }
+
+/* -------------------------------------------------------------------------- */
+/* Write path — agent verdict rows (Dune Tables / Uploads API)                */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Off-chain "judgment" the agent publishes back to Dune so a dashboard can
+ * overlay the agent's verdict on the existing on-chain chart. This is the only
+ * write surface in the otherwise read-only Dune client.
+ *
+ * Feasibility: the Uploads API (create + insert) is available on Dune's Free
+ * plan (create = 10 credits; insert >= 1 credit). The `DUNE_API_KEY` must have
+ * Read/Write scope. Gated behind `DUNE_WRITE_ENABLED === "1"` so it lands dark.
+ */
+
+export const VERDICT_TABLE = "canhav_agent_verdicts";
+
+/** Columns of `dune.{namespace}.canhav_agent_verdicts` (must match on insert). */
+const VERDICT_SCHEMA: { name: string; type: string }[] = [
+  { name: "ts", type: "timestamp" },
+  { name: "agent_id", type: "varchar" },
+  { name: "asset", type: "varchar" },
+  { name: "signal", type: "varchar" },
+  { name: "severity", type: "varchar" },
+  { name: "rationale", type: "varchar" },
+  { name: "confidence", type: "double" },
+  { name: "source_refs", type: "varchar" },
+];
+
+export interface AgentVerdict {
+  ts: string;
+  agent_id: string;
+  asset: string;
+  signal: string;
+  severity: "low" | "medium" | "high";
+  rationale: string;
+  confidence: number;
+  source_refs: string;
+}
+
+/** Dune team handle / namespace the verdict table lives under. */
+export function duneNamespace(): string {
+  return readSecret("DUNE_NAMESPACE") ?? "canhav";
+}
+
+/** True only when a key is set AND writes are explicitly enabled (land-dark flag). */
+export function hasDuneWrite(): boolean {
+  return hasDune() && readSecret("DUNE_WRITE_ENABLED") === "1";
+}
+
+// Per-process guard so we attempt the (credit-charging) create at most once.
+let verdictTableEnsured = false;
+
+/**
+ * Create the verdict table once. Idempotent: a fresh create succeeds; an
+ * "already exists" failure is treated as success so we never re-spend the
+ * 10-credit create. Fails soft (returns false) on any other error.
+ */
+export async function ensureVerdictTable(): Promise<boolean> {
+  if (verdictTableEnsured) return true;
+  const headers = authHeaders();
+  if (!headers) return false;
+  try {
+    const res = await fetch(`${DUNE_BASE}/uploads`, {
+      method: "POST",
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        namespace: duneNamespace(),
+        table_name: VERDICT_TABLE,
+        is_private: false,
+        schema: VERDICT_SCHEMA,
+      }),
+      cache: "no-store",
+    });
+    if (res.ok) {
+      verdictTableEnsured = true;
+      return true;
+    }
+    const text = await res.text().catch(() => "");
+    if (/exist/i.test(text)) {
+      verdictTableEnsured = true;
+      return true;
+    }
+    console.error(`[dune] ensureVerdictTable failed (${res.status}): ${text.slice(0, 200)}`);
+    return false;
+  } catch (e) {
+    console.error("[dune] ensureVerdictTable error:", e instanceof Error ? e.message : e);
+    return false;
+  }
+}
+
+/**
+ * Append one verdict row to the table via the Uploads insert endpoint. Uses
+ * NDJSON (one JSON object per line) so values with commas/quotes/newlines are
+ * encoded safely — no hand-rolled CSV escaping. Fails soft (returns false).
+ * Callers should `ensureVerdictTable()` first.
+ */
+export async function insertVerdict(v: AgentVerdict): Promise<boolean> {
+  if (!hasDuneWrite()) return false;
+  const headers = authHeaders();
+  if (!headers) return false;
+  const line = JSON.stringify({
+    ts: v.ts,
+    agent_id: v.agent_id,
+    asset: v.asset,
+    signal: v.signal,
+    severity: v.severity,
+    rationale: v.rationale,
+    confidence: v.confidence,
+    source_refs: v.source_refs,
+  });
+  try {
+    const res = await fetch(`${DUNE_BASE}/uploads/${duneNamespace()}/${VERDICT_TABLE}/insert`, {
+      method: "POST",
+      headers: { ...headers, "Content-Type": "application/x-ndjson" },
+      body: `${line}\n`,
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.error(`[dune] insertVerdict failed (${res.status}): ${text.slice(0, 200)}`);
+    }
+    return res.ok;
+  } catch (e) {
+    console.error("[dune] insertVerdict error:", e instanceof Error ? e.message : e);
+    return false;
+  }
+}

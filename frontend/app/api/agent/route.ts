@@ -21,6 +21,7 @@ import { buildSystemPrompt } from "@/lib/agent/prompt";
 import { userAgentId } from "@/lib/agent/user-agent";
 import { buildAgentTools } from "@/lib/agent/tools";
 import { getSession } from "@/lib/auth/session";
+import { hasDuneWrite } from "@/lib/server/dune";
 
 /**
  * The CanHav research agent loop.
@@ -137,6 +138,7 @@ export async function POST(req: Request) {
     customTools: customTools
       .filter((t) => t.enabled)
       .map((t) => ({ name: `custom_${t.id}`, description: t.template.title })),
+    dunePublishEnabled: hasDuneWrite() && Boolean(profile?.config?.publishToDune),
   });
 
   // `ai@6` throws here if the incoming UIMessage[] from @ai-sdk/react doesn't
@@ -167,7 +169,7 @@ export async function POST(req: Request) {
     model: resolveAgentModel(),
     system,
     messages: modelMessages,
-    tools: await buildAgentTools(agentId, scope),
+    tools: await buildAgentTools(agentId, scope, session.userId),
     stopWhen: stepCountIs(8),
     abortSignal: budget.signal,
     onFinish: async (event) => {

@@ -58,6 +58,8 @@ export interface SystemPromptInput {
   knowledgeDocs?: PromptKnowledgeDocRef[];
   /** Enabled owner-configured custom tools. */
   customTools?: PromptCustomToolRef[];
+  /** True when the gated dune_publishVerdict tool is available this session. */
+  dunePublishEnabled?: boolean;
 }
 
 export function buildSystemPrompt(input: SystemPromptInput): string {
@@ -101,6 +103,10 @@ export function buildSystemPrompt(input: SystemPromptInput): string {
     prompt += `\n\n--- Owner custom data feeds ---\nThe owner configured extra read-only data tools for this agent:\n${input.customTools
       .map((t) => `- ${t.name}: ${t.description}`)
       .join("\n")}\nUse them when relevant.`;
+  }
+
+  if (input.dunePublishEnabled) {
+    prompt += `\n\n--- Publishing verdicts to Dune ---\nThe owner enabled dune_publishVerdict for this agent. First read the on-chain context (research_getHistory or the owner's Dune feeds), then call dune_publishVerdict ONLY when you reach an off-chain judgment Dune cannot natively produce (an explained risk verdict, not a number Dune already has). Keep the rationale to one sentence and set confidence honestly. Never publish raw chain data.`;
   }
 
   return prompt;

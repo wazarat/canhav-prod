@@ -11,6 +11,7 @@ import { AgentMemoryPanel } from "@/components/agent/AgentMemoryPanel";
 import { AgentPerformanceCard } from "@/components/agent/AgentPerformanceCard";
 import { AttachSkillPanel } from "@/components/agent/AttachSkillPanel";
 import { CollabSettingsPanel } from "@/components/agent/CollabSettingsPanel";
+import { DunePublishPanel } from "@/components/agent/DunePublishPanel";
 import { PublishAgentCard } from "@/components/agent/PublishAgentCard";
 import { SkillShelf } from "@/components/agent/SkillShelf";
 import { Badge } from "@/components/ui/Badge";
@@ -266,6 +267,9 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
             <>
               <div id="panel-framework">
                 <AgentFrameworkPanel agentId={agentId} config={profile.config} />
+              </div>
+              <div id="panel-dune">
+                <DunePublishPanel agentId={agentId} config={profile.config} />
               </div>
               <div id="panel-frames">
                 <DataFramesPanel

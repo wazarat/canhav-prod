@@ -31,6 +31,10 @@ export interface AgentConfig {
   preferredSources: string[];
   /** Owner vocabulary the agent should adopt. */
   glossary: AgentGlossaryEntry[];
+  /** Owner opt-in: allow this agent to publish risk verdicts to Dune. */
+  publishToDune: boolean;
+  /** Optional link to the Dune dashboard that overlays this agent's verdicts. */
+  duneDashboardUrl: string;
 }
 
 /** Hard caps that keep the rendered prompt block bounded. */
@@ -43,6 +47,7 @@ export const AGENT_CONFIG_LIMITS = {
   glossaryMax: 12,
   glossaryTermMaxChars: 40,
   glossaryDefinitionMaxChars: 200,
+  duneDashboardUrlMaxChars: 300,
 } as const;
 
 export function defaultAgentConfig(): AgentConfig {
@@ -53,6 +58,8 @@ export function defaultAgentConfig(): AgentConfig {
     outputStyle: "brief",
     preferredSources: [],
     glossary: [],
+    publishToDune: false,
+    duneDashboardUrl: "",
   };
 }
 
@@ -116,7 +123,20 @@ export function sanitizeAgentConfig(input: unknown): AgentConfig {
       L.preferredSourceMaxChars,
     ),
     glossary,
+    publishToDune: cfg.publishToDune === true,
+    duneDashboardUrl: sanitizeHttpsUrl(cfg.duneDashboardUrl, L.duneDashboardUrlMaxChars),
   };
+}
+
+/** Accept only an https:// URL (clamped); anything else becomes "". */
+function sanitizeHttpsUrl(value: unknown, maxChars: number): string {
+  const raw = clampString(value, maxChars);
+  if (!raw) return "";
+  try {
+    return new URL(raw).protocol === "https:" ? raw : "";
+  } catch {
+    return "";
+  }
 }
 
 /** True when the config differs from the untouched default (worth rendering). */
@@ -128,7 +148,9 @@ export function hasMeaningfulConfig(config: AgentConfig | null | undefined): boo
     config.riskLens !== "neutral" ||
     config.outputStyle !== "brief" ||
     config.preferredSources.length > 0 ||
-    config.glossary.length > 0
+    config.glossary.length > 0 ||
+    config.publishToDune ||
+    config.duneDashboardUrl.length > 0
   );
 }
 

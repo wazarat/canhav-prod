@@ -1,6 +1,6 @@
 import "server-only";
 
-import { tool } from "ai";
+import { tool, type ToolSet } from "ai";
 import { z } from "zod";
 
 import {
@@ -16,11 +16,13 @@ import {
 import { appendMemory, getDataFrame, getMemory, markSkillStudied } from "@/lib/agent/memory";
 import { buildCustomTools, executeCustomTool, listCustomTools } from "@/lib/agent/customTools";
 import { resolveDataFrame } from "@/lib/agent/dataframes";
+import { canPublishVerdict, claimVerdictSlot } from "@/lib/agent/dunePublish";
 import { searchKnowledge } from "@/lib/agent/knowledge";
 import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-binding";
 import { getAgentSkillById } from "@/lib/agent/skills";
 import { fetchReserveRatesForSlug } from "@/lib/server/aave";
 import { fetchRecentTransfers, fetchTokenMetadata, fetchTotalSupply } from "@/lib/server/alchemy";
+import { ensureVerdictTable, hasDuneWrite, insertVerdict } from "@/lib/server/dune";
 import { resolvePegSeries, resolveTvlSeries } from "@/lib/server/series";
 import type { LendingMarket, OffchainFact } from "@/lib/types";
 
@@ -97,6 +99,26 @@ const schemas = {
   knowledge_search: z.object({
     query: z.string().describe("What to look for in the owner's uploaded knowledge."),
     k: z.number().int().min(1).max(8).optional().describe("Max passages to return (default 4)."),
+  }),
+  dune_publishVerdict: z.object({
+    asset: z.string().min(1).max(40).describe("Asset the verdict is about, e.g. 'sUSDe'."),
+    signal: z
+      .string()
+      .min(1)
+      .max(60)
+      .describe("Short machine-readable signal, e.g. 'yield_compression'."),
+    severity: z.enum(["low", "medium", "high"]).describe("Severity of the signal."),
+    rationale: z
+      .string()
+      .min(1)
+      .max(500)
+      .describe("One-sentence, off-chain explanation Dune can't natively produce."),
+    confidence: z.number().min(0).max(1).describe("Confidence in the verdict, 0..1."),
+    source_refs: z
+      .string()
+      .max(300)
+      .optional()
+      .describe("Semicolon-separated source labels the verdict relies on."),
   }),
 };
 
@@ -413,6 +435,53 @@ async function execScope(scope: AgentScope) {
   };
 }
 
+async function execPublishVerdict(
+  agentId: string,
+  ownerUserId: string | null | undefined,
+  a: Args<"dune_publishVerdict">,
+) {
+  const gate = await canPublishVerdict(agentId, ownerUserId);
+  if (!gate.ok) {
+    return { published: false, reason: gate.reason, summary: `Did not publish to Dune: ${gate.reason}` };
+  }
+  // One verdict per asset per cooldown window — don't spam inserts / credits.
+  const claimed = await claimVerdictSlot(agentId, a.asset);
+  if (!claimed) {
+    return {
+      published: false,
+      reason: "cooldown",
+      summary: `Skipped Dune publish for ${a.asset}: a verdict was published for it recently.`,
+    };
+  }
+  const ensured = await ensureVerdictTable();
+  if (!ensured) {
+    return {
+      published: false,
+      reason: "table",
+      summary: "Could not prepare the Dune verdict table (check the key's Read/Write scope).",
+    };
+  }
+  const published = await insertVerdict({
+    ts: new Date().toISOString(),
+    agent_id: agentId,
+    asset: a.asset,
+    signal: a.signal,
+    severity: a.severity,
+    rationale: a.rationale,
+    confidence: a.confidence,
+    source_refs: a.source_refs ?? "",
+  });
+  return {
+    published,
+    asset: a.asset,
+    signal: a.signal,
+    severity: a.severity,
+    summary: published
+      ? `Published a ${a.severity} verdict for ${a.asset} (${a.signal}) to Dune.`
+      : `Dune insert failed for ${a.asset} (${a.signal}).`,
+  };
+}
+
 /* -------------------------------------------------------------------------- */
 /* AI SDK tool definitions (used by the streamText loop)                      */
 /* -------------------------------------------------------------------------- */
@@ -437,7 +506,11 @@ function safe<T extends (...args: never[]) => Promise<unknown>>(label: string, f
   return wrapped as unknown as T;
 }
 
-export async function buildAgentTools(agentId: string, scope?: AgentScope) {
+export async function buildAgentTools(
+  agentId: string,
+  scope?: AgentScope,
+  ownerUserId?: string | null,
+) {
   const base = {
     research_getEntity: tool({
       description: "Read a CanHav umbrella entity (issuer) profile by slug.",
@@ -521,20 +594,31 @@ export async function buildAgentTools(agentId: string, scope?: AgentScope) {
     console.error("[agent.tools] buildCustomTools failed:", e instanceof Error ? e.message : e);
   }
 
-  if (scope?.entitySlug) {
-    return {
-      ...base,
-      ...custom,
-      agent_scope: tool({
-        description:
-          "Return this agent's bound project (entity) and its member products (stablecoins/tokens/RWAs). Call this first to orient before researching.",
-        inputSchema: z.object({}),
-        execute: safe("agent_scope", () => execScope(scope)),
-      }),
-    };
+  const tools: ToolSet = { ...base, ...custom };
+
+  // The single write tool — only present when writes are enabled in this
+  // environment, so non-configured deployments are byte-for-byte unchanged.
+  if (hasDuneWrite()) {
+    tools.dune_publishVerdict = tool({
+      description:
+        "Publish an off-chain risk verdict row to this agent's Dune table so a dashboard can overlay it on the on-chain chart. Only call AFTER reading the on-chain context, and only for a judgment Dune can't natively produce (e.g. an explained risk verdict). Requires the owner to have enabled publishing for this agent.",
+      inputSchema: schemas.dune_publishVerdict,
+      execute: safe("dune_publishVerdict", (a: Args<"dune_publishVerdict">) =>
+        execPublishVerdict(agentId, ownerUserId, a),
+      ),
+    });
   }
 
-  return { ...base, ...custom };
+  if (scope?.entitySlug) {
+    tools.agent_scope = tool({
+      description:
+        "Return this agent's bound project (entity) and its member products (stablecoins/tokens/RWAs). Call this first to orient before researching.",
+      inputSchema: z.object({}),
+      execute: safe("agent_scope", () => execScope(scope)),
+    });
+  }
+
+  return tools;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -581,6 +665,19 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
     description: "Search the owner's uploaded knowledge for relevant passages.",
     sample: { query: "yield sustainability", k: 4 },
   },
+  {
+    name: "dune_publishVerdict",
+    description:
+      "Publish an off-chain risk verdict to the agent's Dune table (gated: write-enabled env + owner opt-in + ownership).",
+    sample: {
+      asset: "sUSDe",
+      signal: "yield_compression",
+      severity: "medium",
+      rationale: "APY fell as perp funding turned negative; not a solvency event.",
+      confidence: 0.78,
+      source_refs: "funding_feed; ethena_gov_post",
+    },
+  },
 ];
 
 export interface RunToolResult {
@@ -595,6 +692,7 @@ export async function runTool(
   agentId: string,
   name: string,
   rawArgs: unknown,
+  ownerUserId?: string | null,
 ): Promise<RunToolResult> {
   // Owner-configured custom tools run by their `custom_<id>` name (no args).
   if (name.startsWith("custom_")) {
@@ -660,6 +758,9 @@ export async function runTool(
       break;
     case "knowledge_search":
       out = await execKnowledgeSearch(agentId, a as Args<"knowledge_search">);
+      break;
+    case "dune_publishVerdict":
+      out = await execPublishVerdict(agentId, ownerUserId, a as Args<"dune_publishVerdict">);
       break;
     default:
       return { ok: false, error: `Unhandled tool "${name}".` };

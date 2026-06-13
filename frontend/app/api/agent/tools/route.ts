@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { runTool, TOOL_CATALOG } from "@/lib/agent/tools";
+import { getSession } from "@/lib/auth/session";
 
 /**
  * Tool playground (no LLM).
@@ -34,6 +35,9 @@ export async function POST(req: Request) {
   }
   const agentId = typeof body.agentId === "string" && body.agentId ? body.agentId : DEMO_AGENT_ID;
 
-  const out = await runTool(agentId, name, body.args ?? {});
+  // Owner context lets the gated write tool (dune_publishVerdict) verify
+  // ownership; read-only tools ignore it.
+  const ownerUserId = getSession()?.userId ?? null;
+  const out = await runTool(agentId, name, body.args ?? {}, ownerUserId);
   return NextResponse.json(out, { status: out.ok ? 200 : 400 });
 }

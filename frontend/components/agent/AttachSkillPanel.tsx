@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { GraduationCap, Loader2, Plus } from "lucide-react";
@@ -31,6 +31,10 @@ interface AttachResponse {
  */
 export function AttachSkillPanel({ agentId, onChain }: { agentId: string; onChain: boolean }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // Set when the user just created a skill from this panel ("?skill=<id>").
+  const preselectSkillId = searchParams.get("skill");
+  const createSkillHref = `/agents/skills/new?agent=${encodeURIComponent(agentId)}`;
   const { authenticated, login } = usePrivy();
   const { wallets } = useWallets();
 
@@ -50,7 +54,14 @@ export function AttachSkillPanel({ agentId, onChain }: { agentId: string; onChai
         if (active) {
           const list = (data.skills ?? []).map((s) => ({ id: s.id, title: s.title }));
           setSkills(list);
-          setPick(list[0]?.id ?? "");
+          // Preselect a just-created skill when returning from the composer.
+          const preselected = preselectSkillId
+            ? list.find((s) => s.id === preselectSkillId)
+            : undefined;
+          setPick(preselected?.id ?? list[0]?.id ?? "");
+          if (preselected) {
+            setNotice(`"${preselected.title}" is ready — click Attach to train this agent on it.`);
+          }
         }
       } catch {
         if (active) setSkills([]);
@@ -59,7 +70,7 @@ export function AttachSkillPanel({ agentId, onChain }: { agentId: string; onChai
     return () => {
       active = false;
     };
-  }, []);
+  }, [preselectSkillId]);
 
   async function attach() {
     if (!pick) return;
@@ -126,11 +137,19 @@ export function AttachSkillPanel({ agentId, onChain }: { agentId: string; onChai
 
   return (
     <div className="glass space-y-4 rounded-2xl p-6">
-      <div className="flex items-center gap-2 border-b border-ink-800/60 pb-3">
-        <GraduationCap className="h-4 w-4 text-neon-400" />
-        <h3 className="font-display text-base font-semibold tracking-tight text-ink-50">
-          Train on a custom skill
-        </h3>
+      <div className="flex items-center justify-between gap-2 border-b border-ink-800/60 pb-3">
+        <div className="flex items-center gap-2">
+          <GraduationCap className="h-4 w-4 text-neon-400" />
+          <h3 className="font-display text-base font-semibold tracking-tight text-ink-50">
+            Add a skill you created to this agent
+          </h3>
+        </div>
+        <Link
+          href={createSkillHref}
+          className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-electric-400 transition-colors hover:text-electric-300"
+        >
+          <Plus className="h-3.5 w-3.5" /> Create a skill
+        </Link>
       </div>
 
       {skills === null ? (
@@ -140,10 +159,7 @@ export function AttachSkillPanel({ agentId, onChain }: { agentId: string; onChai
       ) : skills.length === 0 ? (
         <p className="text-sm text-ink-400">
           You haven&apos;t authored any skills yet.{" "}
-          <Link
-            href="/agents/skills/new"
-            className="font-medium text-electric-400 hover:text-electric-300"
-          >
+          <Link href={createSkillHref} className="font-medium text-electric-400 hover:text-electric-300">
             Create or import one
           </Link>{" "}
           to train this agent.

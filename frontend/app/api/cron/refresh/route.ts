@@ -431,6 +431,40 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
   }
 
+  // --- Entity headline TVL aggregation --------------------------------------
+  // A few entities ship with CurrentScale.tvlUsd = null (e.g. Monerium, Pleasing
+  // Market). Derive it from the member-coin metrics refreshed above so the value
+  // is persisted and agent-readable. Curated static seeds are left untouched.
+  const memberMetricUsd = (ref: { category?: string; slug?: string }): number | null => {
+    const member = items.find(
+      (it) => String(it.Slug ?? "") === String(ref.slug ?? "") && it.Category === ref.category,
+    );
+    if (!member) return null;
+    if (ref.category === CATEGORY_STABLECOIN) return member.TotalSupply?.value ?? null;
+    if (ref.category === CATEGORY_RWA) return member.TotalValueLocked?.value ?? null;
+    if (ref.category === CATEGORY_TOKEN) return member.Market?.marketCapUsd?.value ?? null;
+    return null;
+  };
+  for (const item of items) {
+    if (item.Category !== "Entity") continue;
+    if ((item.CurrentScale?.tvlUsd ?? null) != null) continue;
+    const members: { category?: string; slug?: string }[] = item.MemberCoins ?? [];
+    let total = 0;
+    let found = false;
+    for (const ref of members) {
+      const value = memberMetricUsd(ref);
+      if (value != null && value > 0) {
+        total += value;
+        found = true;
+      }
+    }
+    if (!found) continue;
+    item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd: total };
+    item.UpdatedAt = nowIso();
+    await putItem(item);
+    updated += 1;
+  }
+
   // Refresh public surfaces + each touched detail page.
   revalidatePath("/");
   revalidatePath("/entities");

@@ -66,6 +66,20 @@ export function collabRegistryAddress(): string | null {
   return readSecret("COLLAB_REGISTRY_ADDRESS");
 }
 
+/**
+ * The deployed CollabAgreement contract address, or null when unconfigured.
+ * When set, agreements are anchored on-chain at seller approval and each period
+ * records its interaction on-chain; when unset, off-chain enforcement stands in.
+ */
+export function collabAgreementAddress(): string | null {
+  return readSecret("COLLAB_AGREEMENT_ADDRESS");
+}
+
+/** Whether the on-chain CollabAgreement contract is provisioned. */
+export function hasCollabAgreement(): boolean {
+  return Boolean(collabAgreementAddress());
+}
+
 export function reputationRegistryAddress(): string | null {
   return readSecret("REPUTATION_REGISTRY_ADDRESS");
 }

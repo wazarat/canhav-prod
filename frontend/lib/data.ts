@@ -170,11 +170,63 @@ export async function getAllEntities(): Promise<EntityProfile[]> {
 }
 
 export async function getApprovedEntities(): Promise<EntityProfile[]> {
-  return getAllEntities();
+  const store = await readLiveStore();
+  const entities = [...store.entities].sort((a, b) => a.name.localeCompare(b.name));
+  return enrichEntitiesWithTvl(entities, store);
 }
 
 export async function getApprovedEntityBySlug(slug: string): Promise<EntityProfile | null> {
-  return (await getAllEntities()).find((p) => p.slug === slug) ?? null;
+  const store = await readLiveStore();
+  const entity = store.entities.find((p) => p.slug === slug) ?? null;
+  if (!entity) return null;
+  return enrichEntitiesWithTvl([entity], store)[0] ?? entity;
+}
+
+/**
+ * Entity headline TVL is a curated static seed for most entities, but a few ship
+ * with `tvlUsd: null` (e.g. Monerium, Pleasing Market). When it's missing we
+ * derive it from the entity's member coins already in the store — no network, so
+ * it self-heals offline and in production:
+ *   - Stablecoin: circulating supply (peg-target units, treated ~ USD)
+ *   - RWA:        total value locked (USD)
+ *   - Token:      market cap (USD)
+ * Curated seeds are never overwritten, and entities whose members aren't tracked
+ * by any source (e.g. Stably) keep their honest empty state (null).
+ */
+function enrichEntitiesWithTvl(
+  entities: EntityProfile[],
+  store: { stablecoins: StablecoinProfile[]; rwas: RwaProfile[]; tokens: TokenProfile[] },
+): EntityProfile[] {
+  if (!entities.some((e) => e.currentScale.tvlUsd == null)) return entities;
+
+  const stablecoinBySlug = new Map(store.stablecoins.map((p) => [p.slug, p]));
+  const rwaBySlug = new Map(store.rwas.map((p) => [p.slug, p]));
+  const tokenBySlug = new Map(store.tokens.map((p) => [p.slug, p]));
+
+  const memberValueUsd = (ref: EntityProfile["memberCoins"][number]): number | null => {
+    if (ref.category === "Stablecoin") {
+      return stablecoinBySlug.get(ref.slug)?.totalSupply?.value ?? null;
+    }
+    if (ref.category === "RWA") {
+      return rwaBySlug.get(ref.slug)?.totalValueLocked?.value ?? null;
+    }
+    return tokenBySlug.get(ref.slug)?.market?.marketCapUsd?.value ?? null;
+  };
+
+  return entities.map((entity) => {
+    if (entity.currentScale.tvlUsd != null) return entity;
+    let total = 0;
+    let found = false;
+    for (const ref of entity.memberCoins) {
+      const value = memberValueUsd(ref);
+      if (value != null && value > 0) {
+        total += value;
+        found = true;
+      }
+    }
+    if (!found) return entity;
+    return { ...entity, currentScale: { ...entity.currentScale, tvlUsd: total } };
+  });
 }
 
 export async function getEntityBySlug(slug: string): Promise<EntityProfile | null> {

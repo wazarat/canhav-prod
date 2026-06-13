@@ -11,6 +11,7 @@ import { AgentMemoryPanel } from "@/components/agent/AgentMemoryPanel";
 import { AgentPerformanceCard } from "@/components/agent/AgentPerformanceCard";
 import { AttachSkillPanel } from "@/components/agent/AttachSkillPanel";
 import { CollabSettingsPanel } from "@/components/agent/CollabSettingsPanel";
+import { PublishAgentCard } from "@/components/agent/PublishAgentCard";
 import { SkillShelf } from "@/components/agent/SkillShelf";
 import { Badge } from "@/components/ui/Badge";
 import { AgentToolPanel } from "@/components/agent/AgentToolPanel";
@@ -29,6 +30,7 @@ import {
   agentLevel,
   confirmAgentOnChain,
   getAgentSnapshot,
+  getAttachedSkillIds,
   listDataFrames,
   MAX_DATA_FRAMES,
 } from "@/lib/agent/memory";
@@ -69,12 +71,13 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
     listKnowledgeDocs(agentId),
     listCustomTools(agentId),
   ]);
-  const [frameOptions, suggestions] = isOwner
+  const [frameOptions, suggestions, attachedSkillIds] = isOwner
     ? await Promise.all([
         frameMetricOptionsForProducts(profile.associatedProducts),
         buildAgentSuggestions(agentId, profile),
+        getAttachedSkillIds(agentId),
       ])
-    : [[], [] as AgentSuggestion[]];
+    : [[], [] as AgentSuggestion[], [] as string[]];
 
   const corrections = memory.filter((f) => f.source === OWNER_CORRECTION_SOURCE).length;
   const level = agentLevel(memory.length, studiedSkills.length, {
@@ -204,6 +207,16 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
         <AgentSuggestions agentId={agentId} suggestions={suggestions} />
       )}
 
+      {isOwner && (
+        <PublishAgentCard
+          agentId={agentId}
+          minted={isMinted}
+          hasSkill={attachedSkillIds.length > 0}
+          discoverable={profile.discoverable}
+          collabPriceUsdc={profile.collabPriceUsdc}
+        />
+      )}
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <AgentLabPanel agentId={agentId} llmConfigured={status.llm} />
@@ -279,11 +292,11 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
                   httpEnabled={customToolHttpAllowlist().length > 0}
                 />
               </div>
-              <AttachSkillPanel agentId={agentId} onChain={profile.onChain} />
+              <div id="panel-attach-skill">
+                <AttachSkillPanel agentId={agentId} onChain={profile.onChain} />
+              </div>
               <CollabSettingsPanel
                 agentId={agentId}
-                discoverable={profile.discoverable}
-                collabPriceUsdc={profile.collabPriceUsdc}
                 description={profile.description}
                 collabMaxUnits={profile.collabMaxUnits}
               />

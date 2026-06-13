@@ -45,6 +45,20 @@ function changeTone(value: number | null | undefined): "positive" | "danger" | "
   return "neutral";
 }
 
+/**
+ * Whether a coin has any usable live market data (price or market cap). Coins
+ * that are not yet launched / not listed yet (e.g. sGHO) have none, and we label
+ * them explicitly instead of rendering bare "—" placeholders.
+ */
+function hasMarketData(coin: CoinLiveData): boolean {
+  return coin.market != null && (coin.market.currentPrice != null || coin.market.marketCap != null);
+}
+
+/** Explicit empty-state copy for a coin with no live market data. */
+function missingDataLabel(coin: CoinLiveData): string {
+  return coin.isLive ? "Data not available" : "Not launched yet";
+}
+
 function MemberCoinCard({
   coin,
   onQuickView,
@@ -53,6 +67,7 @@ function MemberCoinCard({
   onQuickView: () => void;
 }) {
   const change24h = coin.market?.priceChange24h;
+  const marketDataPresent = hasMarketData(coin);
 
   return (
     <div className="group glass flex h-full flex-col gap-3 rounded-2xl border border-ink-700/60 p-5 transition-all duration-200 hover:border-electric-500/50 hover:glow-ring">
@@ -85,23 +100,29 @@ function MemberCoinCard({
       />
 
       <div className="flex flex-wrap items-center gap-3 text-xs text-ink-300">
-        <span>
-          Price{" "}
-          <span className="font-mono text-ink-100">
-            {coin.market?.currentPrice != null
-              ? `$${coin.market.currentPrice.toLocaleString(undefined, { maximumFractionDigits: 4 })}`
-              : "—"}
-          </span>
-        </span>
-        {change24h != null && (
-          <Badge tone={changeTone(change24h)}>{formatPct(change24h)} 24h</Badge>
+        {marketDataPresent ? (
+          <>
+            <span>
+              Price{" "}
+              <span className="font-mono text-ink-100">
+                {coin.market?.currentPrice != null
+                  ? `$${coin.market.currentPrice.toLocaleString(undefined, { maximumFractionDigits: 4 })}`
+                  : "—"}
+              </span>
+            </span>
+            {change24h != null && (
+              <Badge tone={changeTone(change24h)}>{formatPct(change24h)} 24h</Badge>
+            )}
+            <span>
+              Mkt cap{" "}
+              <span className="font-mono text-ink-100">
+                {formatUsdCompact(coin.market?.marketCap ?? null)}
+              </span>
+            </span>
+          </>
+        ) : (
+          <Badge tone="neutral">{missingDataLabel(coin)}</Badge>
         )}
-        <span>
-          Mkt cap{" "}
-          <span className="font-mono text-ink-100">
-            {formatUsdCompact(coin.market?.marketCap ?? null)}
-          </span>
-        </span>
         {coin.lendingMarket?.supplyApyPct != null && (
           <Badge tone="positive">
             {coin.lendingMarket.supplyApyPct.toFixed(2)}% supply APY
@@ -191,7 +212,10 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
         )}
 
         <div className="mt-5 space-y-4">
-          <DataPanel title="Market" badge={m ? "CoinGecko · live" : "Not listed"}>
+          <DataPanel
+            title="Market"
+            badge={m ? "CoinGecko · live" : coin.isLive ? "Data not available" : "Not launched"}
+          >
             {m ? (
               <>
                 <DataRow
@@ -228,7 +252,9 @@ function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () => void 
               </>
             ) : (
               <p className="text-sm text-ink-300">
-                Not listed on CoinGecko yet, so live market data isn&apos;t available.
+                {coin.isLive
+                  ? "Not listed on CoinGecko yet, so live market data isn't available."
+                  : "This coin hasn't launched yet, so there's no market data to show."}
               </p>
             )}
           </DataPanel>

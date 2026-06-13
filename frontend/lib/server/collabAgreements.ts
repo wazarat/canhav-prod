@@ -36,6 +36,24 @@ export type AgreementStatus =
   | "cancelled"
   | "completed";
 
+/** Whether the collaboration is a single task or a recurring engagement. */
+export type AgreementMode = "one_time" | "recurring";
+
+/** Recurring cadence — drives the on-chain-enforced cooldown between periods. */
+export type AgreementCadence = "none" | "daily" | "weekly" | "monthly";
+
+/** Cadence -> seconds between allowed check-ins (the cooldown the contract enforces). */
+export const CADENCE_COOLDOWN_SECONDS: Record<AgreementCadence, number> = {
+  none: 0,
+  daily: 86_400,
+  weekly: 604_800,
+  monthly: 2_592_000,
+};
+
+export function cooldownForCadence(cadence: AgreementCadence): number {
+  return CADENCE_COOLDOWN_SECONDS[cadence] ?? 0;
+}
+
 export interface CollabAgreement {
   agreementId: string;
   buyerAgentId: string;
@@ -49,11 +67,15 @@ export interface CollabAgreement {
   objective: string;
   /** The agreed per-interaction ceiling (data slices / units). */
   maxUnitsPerInteraction: number;
-  /** Number of allowed interactions (installments). */
+  /** Number of allowed interactions (installments / periods / check-ins). */
   totalInstallments: number;
+  /** One-time task vs a recurring engagement. */
+  mode: AgreementMode;
+  /** Recurring cadence (daily/weekly/monthly); "none" for one-time. */
+  cadence: AgreementCadence;
   /** Human USDC price the buyer pays per interaction. */
   pricePerInstallmentUsdc: string;
-  /** Minimum seconds between interactions (anti-extraction throttle). */
+  /** Minimum seconds between interactions (anti-extraction throttle; derived from cadence). */
   cooldownSeconds: number;
   consumedUnits: number;
   interactionCount: number;
@@ -116,15 +138,39 @@ function writeFileStore(store: FileStore): void {
 
 function coerce(value: unknown): CollabAgreement | null {
   if (value == null) return null;
-  if (typeof value === "object") return value as CollabAgreement;
+  if (typeof value === "object") return withDefaults(value as CollabAgreement);
   if (typeof value === "string") {
     try {
-      return JSON.parse(value) as CollabAgreement;
+      return withDefaults(JSON.parse(value) as CollabAgreement);
     } catch {
       return null;
     }
   }
   return null;
+}
+
+/**
+ * Backfill mode/cadence on legacy records (written before recurring tasks
+ * existed) so the rest of the app can rely on the fields being present.
+ */
+function withDefaults(agreement: CollabAgreement): CollabAgreement {
+  if (agreement.mode && agreement.cadence) return agreement;
+  const mode: AgreementMode =
+    agreement.mode ?? (agreement.totalInstallments > 1 ? "recurring" : "one_time");
+  const cadence: AgreementCadence = agreement.cadence ?? "none";
+  return { ...agreement, mode, cadence };
+}
+
+/**
+ * When the next check-in is allowed, or null if it's available now (first
+ * period, no cooldown, or the agreement isn't active). Drives the UI countdown.
+ */
+export function nextDueAt(agreement: CollabAgreement): string | null {
+  if (agreement.status !== "active") return null;
+  if (!agreement.lastInteractionAt || agreement.cooldownSeconds <= 0) return null;
+  return new Date(
+    Date.parse(agreement.lastInteractionAt) + agreement.cooldownSeconds * 1000,
+  ).toISOString();
 }
 
 async function persist(agreement: CollabAgreement, isNew: boolean): Promise<void> {
@@ -151,7 +197,8 @@ export async function getAgreement(agreementId: string): Promise<CollabAgreement
   if (hasUpstash()) {
     return coerce(await getRedisClient().get(aKey(agreementId)));
   }
-  return readFileStore().agreements[agreementId] ?? null;
+  const stored = readFileStore().agreements[agreementId];
+  return stored ? withDefaults(stored) : null;
 }
 
 async function getMany(ids: string[]): Promise<CollabAgreement[]> {
@@ -175,7 +222,7 @@ export async function listAgreementsForUser(userId: string): Promise<UserAgreeme
     const sellerIds = ((await redis.smembers(sellerIndexKey(userId))) as string[] | null) ?? [];
     return { asBuyer: await getMany(buyerIds), asSeller: await getMany(sellerIds) };
   }
-  const all = Object.values(readFileStore().agreements);
+  const all = Object.values(readFileStore().agreements).map(withDefaults);
   return {
     asBuyer: all
       .filter((a) => a.buyerUserId === userId)
@@ -199,6 +246,11 @@ export interface ProposeAgreementInput {
   maxUnitsPerInteraction: number;
   totalInstallments: number;
   pricePerInstallmentUsdc: string;
+  /** One-time task vs recurring engagement (defaults derived from installments). */
+  mode?: AgreementMode;
+  /** Recurring cadence; ignored for one-time. */
+  cadence?: AgreementCadence;
+  /** Only used as a fallback when mode is recurring but cadence is "none". */
   cooldownSeconds?: number;
 }
 
@@ -206,6 +258,29 @@ export async function proposeAgreement(
   input: ProposeAgreementInput,
 ): Promise<CollabAgreement> {
   const now = nowIso();
+
+  const requestedInstallments = clampInt(input.totalInstallments, 1, HARD_MAX_INSTALLMENTS);
+  // Default the shape from the installment count when the caller didn't say.
+  let mode: AgreementMode = input.mode ?? (requestedInstallments > 1 ? "recurring" : "one_time");
+  let cadence: AgreementCadence = input.cadence ?? "none";
+  let totalInstallments = requestedInstallments;
+  let cooldownSeconds: number;
+
+  if (mode === "one_time") {
+    // A single task: exactly one period, no cadence/cooldown.
+    totalInstallments = 1;
+    cadence = "none";
+    cooldownSeconds = 0;
+  } else {
+    // Recurring: the cadence drives the enforced cooldown between check-ins. If a
+    // cadence wasn't chosen, fall back to the explicit cooldown (legacy callers).
+    mode = "recurring";
+    cooldownSeconds =
+      cadence === "none"
+        ? clampInt(input.cooldownSeconds ?? DEFAULT_COOLDOWN_SECONDS, 0, 86_400)
+        : cooldownForCadence(cadence);
+  }
+
   const agreement: CollabAgreement = {
     agreementId: newAgreementId(),
     buyerAgentId: input.buyerAgentId,
@@ -216,9 +291,11 @@ export async function proposeAgreement(
     sellerAgentName: input.sellerAgentName,
     objective: input.objective.slice(0, MAX_OBJECTIVE_LEN),
     maxUnitsPerInteraction: clampInt(input.maxUnitsPerInteraction, 1, HARD_MAX_UNITS),
-    totalInstallments: clampInt(input.totalInstallments, 1, HARD_MAX_INSTALLMENTS),
+    totalInstallments,
+    mode,
+    cadence,
     pricePerInstallmentUsdc: input.pricePerInstallmentUsdc,
-    cooldownSeconds: clampInt(input.cooldownSeconds ?? DEFAULT_COOLDOWN_SECONDS, 0, 86_400),
+    cooldownSeconds,
     consumedUnits: 0,
     interactionCount: 0,
     lastInteractionAt: null,

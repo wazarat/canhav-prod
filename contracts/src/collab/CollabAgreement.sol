@@ -36,6 +36,20 @@ contract CollabAgreement {
         Cancelled
     }
 
+    /// @notice Single task vs a recurring engagement (the human-chosen shape).
+    enum Mode {
+        OneTime,
+        Recurring
+    }
+
+    /// @notice Recurring cadence; informs the cooldown the buyer agreed to.
+    enum Cadence {
+        None,
+        Daily,
+        Weekly,
+        Monthly
+    }
+
     struct Agreement {
         uint256 buyerAgentId;
         uint256 sellerAgentId;
@@ -49,6 +63,8 @@ contract CollabAgreement {
         uint64 expiry;
         address establisher;
         Status status;
+        Mode mode;
+        Cadence cadence;
     }
 
     mapping(bytes32 => Agreement) private _agreements;
@@ -75,7 +91,9 @@ contract CollabAgreement {
         uint256 pricePerInstallment,
         uint64 minInteractionInterval,
         uint64 expiry,
-        address establisher
+        address establisher,
+        Mode mode,
+        Cadence cadence
     );
 
     event InteractionRecorded(
@@ -108,7 +126,9 @@ contract CollabAgreement {
         uint32 installments,
         uint256 pricePerInstallment,
         uint64 minInteractionInterval,
-        uint64 expiry
+        uint64 expiry,
+        Mode mode,
+        Cadence cadence
     ) external returns (bytes32 agreementId) {
         if (maxUnitsPerInteraction == 0) revert ZeroMaxUnits();
         if (installments == 0) revert ZeroInstallments();
@@ -129,7 +149,9 @@ contract CollabAgreement {
             lastInteractionAt: 0,
             expiry: expiry,
             establisher: msg.sender,
-            status: Status.Active
+            status: Status.Active,
+            mode: mode,
+            cadence: cadence
         });
         _count += 1;
 
@@ -142,7 +164,9 @@ contract CollabAgreement {
             pricePerInstallment,
             minInteractionInterval,
             expiry,
-            msg.sender
+            msg.sender,
+            mode,
+            cadence
         );
     }
 
@@ -205,7 +229,9 @@ contract CollabAgreement {
             uint64 lastInteractionAt,
             uint64 expiry,
             address establisher,
-            Status status
+            Status status,
+            Mode mode,
+            Cadence cadence
         )
     {
         Agreement storage a = _agreements[agreementId];
@@ -221,7 +247,9 @@ contract CollabAgreement {
             a.lastInteractionAt,
             a.expiry,
             a.establisher,
-            a.status
+            a.status,
+            a.mode,
+            a.cadence
         );
     }
 

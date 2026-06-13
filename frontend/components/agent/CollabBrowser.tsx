@@ -26,10 +26,14 @@ import { AGENT_CATEGORIES } from "@/lib/agent/categories";
 import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
 import {
   claimCredits,
+  establishAgreementOnChain,
   getSellerQuote,
   payStrategy,
   recordCollabOnChain,
+  recordInteractionOnChain,
   submitFeedbackOnChain,
+  type AgreementInteractionParams,
+  type EstablishParams,
   type FeedbackParams,
   type RecordParams,
   type SellerQuote,
@@ -38,6 +42,9 @@ import { AgentInteractionTheater, type TheaterSettlement } from "@/components/ag
 import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 import type { StrategyPacket } from "@/lib/types";
 import type { Signer } from "@zerodev/sdk/types";
+
+type AgreementMode = "one_time" | "recurring";
+type AgreementCadence = "none" | "daily" | "weekly" | "monthly";
 
 interface Agreement {
   agreementId: string;
@@ -48,12 +55,34 @@ interface Agreement {
   objective: string;
   maxUnitsPerInteraction: number;
   totalInstallments: number;
+  mode: AgreementMode;
+  cadence: AgreementCadence;
   pricePerInstallmentUsdc: string;
   cooldownSeconds: number;
   consumedUnits: number;
   interactionCount: number;
   lastInteractionAt: string | null;
+  onChainAgreementId: string | null;
   status: "proposed" | "active" | "rejected" | "cancelled" | "completed";
+}
+
+const CADENCE_LABEL: Record<AgreementCadence, string> = {
+  none: "one-time",
+  daily: "daily",
+  weekly: "weekly",
+  monthly: "monthly",
+};
+
+/** Short human countdown, e.g. "2d 3h" or "ready now". */
+function formatCountdown(msRemaining: number): string {
+  if (msRemaining <= 0) return "ready now";
+  const totalMinutes = Math.ceil(msRemaining / 60_000);
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
 }
 
 interface SellerCreator {
@@ -155,7 +184,15 @@ function nextClaimLabel(unix: number): string {
   return `in ${Math.ceil(secs / 86_400)}d`;
 }
 
-type Phase = "idle" | "preflight" | "quoting" | "paying" | "settling" | "recording" | "done";
+type Phase =
+  | "idle"
+  | "preflight"
+  | "anchoring"
+  | "quoting"
+  | "paying"
+  | "settling"
+  | "recording"
+  | "done";
 
 export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
   const { authenticated, login } = usePrivy();
@@ -359,8 +396,42 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
         fromAgentId: buyerAgentId,
       });
 
-      setPhase("paying");
       const signer = await buildSigner();
+
+      // Lazily anchor the agreement on-chain (CollabAgreement.establish) before
+      // the first paid period. Best-effort: off-chain enforcement stands in when
+      // the contract isn't deployed or an agent isn't minted.
+      if (agreement && !agreement.onChainAgreementId) {
+        try {
+          const anchorRes = await fetch(
+            `/api/collab/agreements/${encodeURIComponent(agreement.agreementId)}/anchor`,
+          );
+          const anchor = (await anchorRes.json()) as {
+            configured?: boolean;
+            establish?: EstablishParams;
+          };
+          if (anchorRes.ok && anchor.configured && anchor.establish) {
+            setPhase("anchoring");
+            const { onChainAgreementId, txHash: establishTx } = await establishAgreementOnChain({
+              signer,
+              establish: anchor.establish,
+            });
+            await fetch(
+              `/api/collab/agreements/${encodeURIComponent(agreement.agreementId)}/anchor`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ onChainAgreementId, establishTx }),
+              },
+            );
+            agreement.onChainAgreementId = onChainAgreementId;
+          }
+        } catch {
+          /* non-fatal: continue with off-chain enforcement */
+        }
+      }
+
+      setPhase("paying");
       const { txHash } = await payStrategy({
         signer,
         accountIndex: pf.accountIndex,
@@ -386,6 +457,7 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
         ok?: boolean;
         packet?: StrategyPacket;
         record?: RecordParams | null;
+        agreementRecord?: AgreementInteractionParams | null;
         settlement?: TheaterSettlement | null;
         error?: string;
       };
@@ -400,6 +472,15 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
           setPhase("recording");
           const { txHash: recordHash } = await recordCollabOnChain({ signer, record: reqData.record });
           setRecordTx(recordHash);
+          // Per-period agreement write (CollabAgreement.recordInteraction), so the
+          // cap/cadence are enforced on-chain alongside the collab attestation.
+          if (reqData.agreementRecord) {
+            try {
+              await recordInteractionOnChain({ signer, interaction: reqData.agreementRecord });
+            } catch {
+              /* non-fatal: the collab attestation above is already on-chain */
+            }
+          }
           setNotice("Exchange complete and saved to a verifiable record.");
         } catch (e) {
           setNotice(
@@ -425,6 +506,8 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
     objective: string;
     maxUnitsPerInteraction: number;
     totalInstallments: number;
+    mode: AgreementMode;
+    cadence: AgreementCadence;
   }) {
     if (!buyerAgentId) return { ok: false, error: "Pick a buyer agent first." };
     const res = await fetch("/api/collab/agreements", {
@@ -984,12 +1067,20 @@ function AgreementsPanel({
               className="rounded-xl border border-amber-400/30 bg-amber-400/5 px-4 py-3"
             >
               <p className="text-sm text-ink-100">
-                <span className="font-medium">{a.buyerAgentName}</span> wants up to{" "}
-                {a.maxUnitsPerInteraction} units/interaction × {a.totalInstallments} installments
+                <span className="font-medium">{a.buyerAgentName}</span> wants{" "}
+                {a.mode === "recurring"
+                  ? `${a.totalInstallments} ${CADENCE_LABEL[a.cadence]} check-ins`
+                  : "a one-time task"}{" "}
+                · up to {a.maxUnitsPerInteraction} units/interaction
               </p>
               <p className="mt-0.5 text-xs italic text-ink-400">“{a.objective}”</p>
               <p className="mt-0.5 text-[11px] text-ink-500">
-                {a.pricePerInstallmentUsdc} credits / installment · {a.cooldownSeconds}s cooldown
+                {a.pricePerInstallmentUsdc} credits / {a.mode === "recurring" ? "check-in" : "task"}
+                {a.mode === "recurring" ? ` · ${CADENCE_LABEL[a.cadence]} cadence` : ""}
+              </p>
+              <p className="mt-0.5 text-[10px] text-ink-500">
+                Each {a.mode === "recurring" ? "check-in" : "task"} delivers a fresh report and is
+                recorded on-chain.
               </p>
               <div className="mt-2 flex gap-2">
                 <button
@@ -1025,6 +1116,7 @@ function AgreementsPanel({
               ? Date.parse(a.lastInteractionAt) + a.cooldownSeconds * 1000
               : 0;
             const cooling = Date.now() < cooldownUntil;
+            const periodWord = a.mode === "recurring" ? "check-in" : "task";
             return (
               <div
                 key={a.agreementId}
@@ -1043,7 +1135,12 @@ function AgreementsPanel({
                   </span>
                 </div>
                 <p className="mt-0.5 text-xs italic text-ink-400">“{a.objective}”</p>
-                {/* Installment progress */}
+                <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-ink-500">
+                  {a.mode === "recurring"
+                    ? `Recurring · ${CADENCE_LABEL[a.cadence]} · ${a.totalInstallments} check-ins`
+                    : "One-time task"}
+                </p>
+                {/* Period progress */}
                 <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-ink-800">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-electric-500 to-neon-400 transition-all"
@@ -1051,9 +1148,14 @@ function AgreementsPanel({
                   />
                 </div>
                 <p className="mt-1 text-[11px] text-ink-500">
-                  {a.interactionCount}/{a.totalInstallments} installments · {a.consumedUnits} units
+                  {a.interactionCount}/{a.totalInstallments} {periodWord}s · {a.consumedUnits} units
                   consumed · ≤ {a.maxUnitsPerInteraction}/interaction
                 </p>
+                {a.status === "active" && cooling && (
+                  <p className="mt-1 text-[11px] text-amber-300">
+                    Next {periodWord} in {formatCountdown(cooldownUntil - Date.now())}
+                  </p>
+                )}
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {a.status === "active" && (
                     <button
@@ -1066,8 +1168,8 @@ function AgreementsPanel({
                       {remaining <= 0
                         ? "Completed"
                         : cooling
-                          ? "Cooling down…"
-                          : `Run installment (${a.pricePerInstallmentUsdc} credits)`}
+                          ? `Next in ${formatCountdown(cooldownUntil - Date.now())}`
+                          : `Run ${periodWord} (${a.pricePerInstallmentUsdc} credits)`}
                     </button>
                   )}
                   <button
@@ -1101,6 +1203,8 @@ function SellerDetailModal({
     objective: string;
     maxUnitsPerInteraction: number;
     totalInstallments: number;
+    mode: AgreementMode;
+    cadence: AgreementCadence;
   }) => Promise<{ ok: boolean; error?: string }>;
 }) {
   return (
@@ -1272,14 +1376,20 @@ function ProposeAgreementForm({
     objective: string;
     maxUnitsPerInteraction: number;
     totalInstallments: number;
+    mode: AgreementMode;
+    cadence: AgreementCadence;
   }) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const [open, setOpen] = useState(false);
   const [objective, setObjective] = useState("");
   const [maxUnits, setMaxUnits] = useState(3);
-  const [installments, setInstallments] = useState(4);
+  const [mode, setMode] = useState<AgreementMode>("recurring");
+  const [cadence, setCadence] = useState<Exclude<AgreementCadence, "none">>("weekly");
+  const [periods, setPeriods] = useState(4);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  const isRecurring = mode === "recurring";
 
   if (!open) {
     return (
@@ -1288,7 +1398,7 @@ function ProposeAgreementForm({
         onClick={() => setOpen(true)}
         className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-signal-400/40 bg-signal-400/10 px-3 py-2 text-sm font-medium text-signal-400 transition-colors hover:bg-signal-400/20"
       >
-        <Handshake className="h-4 w-4" /> Propose an installment agreement
+        <Handshake className="h-4 w-4" /> Propose a collaboration
       </button>
     );
   }
@@ -1296,19 +1406,66 @@ function ProposeAgreementForm({
   return (
     <div className="space-y-3 rounded-xl border border-signal-400/30 bg-signal-400/5 p-4">
       <p className="text-xs font-medium uppercase tracking-wider text-signal-400">
-        Propose agreement
+        Propose a collaboration
       </p>
+
+      {/* One-time vs recurring */}
+      <div className="grid grid-cols-2 gap-2">
+        {(["one_time", "recurring"] as AgreementMode[]).map((m) => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => setMode(m)}
+            className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+              mode === m
+                ? "border-signal-400/60 bg-signal-400/15 text-signal-300"
+                : "border-ink-700 bg-ink-900/60 text-ink-300 hover:text-ink-100"
+            }`}
+          >
+            {m === "one_time" ? "One-time task" : "Recurring"}
+          </button>
+        ))}
+      </div>
+
       <label className="block space-y-1">
-        <span className="text-[11px] text-ink-400">What do you want to learn?</span>
+        <span className="text-[11px] text-ink-400">What do you want this agent to do?</span>
         <textarea
           value={objective}
           onChange={(e) => setObjective(e.target.value)}
           rows={2}
           maxLength={600}
-          placeholder="e.g. periodic insight on stablecoin yield risk signals"
+          placeholder={
+            isRecurring
+              ? "e.g. weekly insight on stablecoin yield risk signals"
+              : "e.g. a one-off risk assessment of this protocol"
+          }
           className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-xs text-ink-100 outline-none focus:border-signal-400/60"
         />
       </label>
+
+      {/* Cadence (recurring only) */}
+      {isRecurring && (
+        <label className="block space-y-1">
+          <span className="text-[11px] text-ink-400">Cadence (enforced on-chain)</span>
+          <div className="grid grid-cols-3 gap-2">
+            {(["daily", "weekly", "monthly"] as const).map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCadence(c)}
+                className={`rounded-lg border px-2 py-1.5 text-[11px] font-medium capitalize transition-colors ${
+                  cadence === c
+                    ? "border-signal-400/60 bg-signal-400/15 text-signal-300"
+                    : "border-ink-700 bg-ink-900/60 text-ink-300 hover:text-ink-100"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </label>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
         <label className="block space-y-1">
           <span className="text-[11px] text-ink-400">Max units / interaction</span>
@@ -1321,21 +1478,26 @@ function ProposeAgreementForm({
             className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-xs text-ink-100 outline-none focus:border-signal-400/60"
           />
         </label>
-        <label className="block space-y-1">
-          <span className="text-[11px] text-ink-400">Installments</span>
-          <input
-            type="number"
-            min={1}
-            max={52}
-            value={installments}
-            onChange={(e) => setInstallments(Number(e.target.value))}
-            className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-xs text-ink-100 outline-none focus:border-signal-400/60"
-          />
-        </label>
+        {isRecurring && (
+          <label className="block space-y-1">
+            <span className="text-[11px] text-ink-400">Check-ins (periods)</span>
+            <input
+              type="number"
+              min={1}
+              max={52}
+              value={periods}
+              onChange={(e) => setPeriods(Number(e.target.value))}
+              className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-xs text-ink-100 outline-none focus:border-signal-400/60"
+            />
+          </label>
+        )}
       </div>
+
       <p className="text-[11px] text-ink-500">
-        Ceiling: ≤ {maxUnits} units per interaction, up to {installments} paid installments at{" "}
-        {price} credits each. The seller must approve before any exchange.
+        {isRecurring
+          ? `${periods} ${cadence} check-ins, ≤ ${maxUnits} units each, at ${price} credits per check-in. You manually run each check-in when it's due; every one delivers a fresh report and is recorded on-chain.`
+          : `A single task, ≤ ${maxUnits} units, at ${price} credits. It delivers one report and is recorded on-chain.`}{" "}
+        The seller must approve before any exchange.
       </p>
       {err && <p className="text-[11px] text-rose-300">{err}</p>}
       <div className="flex gap-2">
@@ -1348,7 +1510,9 @@ function ProposeAgreementForm({
             const r = await onPropose({
               objective: objective.trim(),
               maxUnitsPerInteraction: maxUnits,
-              totalInstallments: installments,
+              totalInstallments: isRecurring ? periods : 1,
+              mode,
+              cadence: isRecurring ? cadence : "none",
             });
             setBusy(false);
             if (!r.ok) setErr(r.error ?? "Could not propose.");

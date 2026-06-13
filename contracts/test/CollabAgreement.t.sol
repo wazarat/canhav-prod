@@ -21,7 +21,17 @@ contract CollabAgreementTest is CanHavTest {
         returns (bytes32)
     {
         vm.prank(buyer);
-        return agreements.establish(1, 2, maxUnits, installments, 1_000_000, cooldown, expiry);
+        return agreements.establish(
+            1,
+            2,
+            maxUnits,
+            installments,
+            1_000_000,
+            cooldown,
+            expiry,
+            CollabAgreement.Mode.OneTime,
+            CollabAgreement.Cadence.None
+        );
     }
 
     function test_establish_storesTerms() public {
@@ -40,7 +50,9 @@ contract CollabAgreementTest is CanHavTest {
             ,
             ,
             address establisher,
-            CollabAgreement.Status status
+            CollabAgreement.Status status,
+            CollabAgreement.Mode mode,
+            CollabAgreement.Cadence cadence
         ) = agreements.getAgreement(id);
         assertEq(buyerAgentId, 1, "buyer agent id");
         assertEq(sellerAgentId, 2, "seller agent id");
@@ -51,18 +63,44 @@ contract CollabAgreementTest is CanHavTest {
         assertEq(price, 1_000_000, "price per installment");
         assertEq(establisher, buyer, "establisher is caller");
         assertTrue(status == CollabAgreement.Status.Active, "active on establish");
+        assertTrue(mode == CollabAgreement.Mode.OneTime, "default mode one-time");
+        assertTrue(cadence == CollabAgreement.Cadence.None, "default cadence none");
+    }
+
+    function test_establish_recordsModeAndCadence() public {
+        vm.prank(buyer);
+        bytes32 id = agreements.establish(
+            1,
+            2,
+            5,
+            4,
+            1_000_000,
+            604_800,
+            0,
+            CollabAgreement.Mode.Recurring,
+            CollabAgreement.Cadence.Weekly
+        );
+
+        (,,,,,,,,,,,, CollabAgreement.Mode mode, CollabAgreement.Cadence cadence) =
+            agreements.getAgreement(id);
+        assertTrue(mode == CollabAgreement.Mode.Recurring, "recurring mode stored");
+        assertTrue(cadence == CollabAgreement.Cadence.Weekly, "weekly cadence stored");
     }
 
     function test_establish_zeroMaxUnitsReverts() public {
         vm.prank(buyer);
         vm.expectRevert(CollabAgreement.ZeroMaxUnits.selector);
-        agreements.establish(1, 2, 0, 3, 0, 0, 0);
+        agreements.establish(
+            1, 2, 0, 3, 0, 0, 0, CollabAgreement.Mode.OneTime, CollabAgreement.Cadence.None
+        );
     }
 
     function test_establish_zeroInstallmentsReverts() public {
         vm.prank(buyer);
         vm.expectRevert(CollabAgreement.ZeroInstallments.selector);
-        agreements.establish(1, 2, 5, 0, 0, 0, 0);
+        agreements.establish(
+            1, 2, 5, 0, 0, 0, 0, CollabAgreement.Mode.OneTime, CollabAgreement.Cadence.None
+        );
     }
 
     function test_recordInteraction_happyPathAndCompletion() public {
@@ -75,7 +113,7 @@ contract CollabAgreementTest is CanHavTest {
         vm.prank(buyer);
         agreements.recordInteraction(id, 5);
 
-        (,,,, uint32 consumedInstallments, uint256 consumedUnits,,,,,, CollabAgreement.Status status) =
+        (,,,, uint32 consumedInstallments, uint256 consumedUnits,,,,,, CollabAgreement.Status status,,) =
             agreements.getAgreement(id);
         assertEq(uint256(consumedInstallments), 2, "both installments consumed");
         assertEq(consumedUnits, 9, "units accumulated");
@@ -123,7 +161,7 @@ contract CollabAgreementTest is CanHavTest {
         vm.warp(1_000_100);
         vm.prank(buyer);
         agreements.recordInteraction(id, 1);
-        (,,,, uint32 consumedInstallments,,,,,,,) = agreements.getAgreement(id);
+        (,,,, uint32 consumedInstallments,,,,,,,,,) = agreements.getAgreement(id);
         assertEq(uint256(consumedInstallments), 2, "second interaction after cooldown");
     }
 
@@ -147,7 +185,7 @@ contract CollabAgreementTest is CanHavTest {
         vm.prank(buyer);
         agreements.cancel(id);
 
-        (,,,,,,,,,,, CollabAgreement.Status status) = agreements.getAgreement(id);
+        (,,,,,,,,,,, CollabAgreement.Status status,,) = agreements.getAgreement(id);
         assertTrue(status == CollabAgreement.Status.Cancelled, "cancelled");
 
         vm.prank(buyer);

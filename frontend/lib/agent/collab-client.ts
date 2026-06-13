@@ -233,6 +233,199 @@ export async function recordCollabOnChain(params: {
   return { userOpHash, txHash: receipt.receipt.transactionHash };
 }
 
+const collabAgreementAbi = [
+  {
+    type: "function",
+    name: "establish",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "buyerAgentId", type: "uint256" },
+      { name: "sellerAgentId", type: "uint256" },
+      { name: "maxUnitsPerInteraction", type: "uint32" },
+      { name: "installments", type: "uint32" },
+      { name: "pricePerInstallment", type: "uint256" },
+      { name: "minInteractionInterval", type: "uint64" },
+      { name: "expiry", type: "uint64" },
+      { name: "mode", type: "uint8" },
+      { name: "cadence", type: "uint8" },
+    ],
+    outputs: [{ name: "agreementId", type: "bytes32" }],
+  },
+  {
+    type: "function",
+    name: "recordInteraction",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "agreementId", type: "bytes32" },
+      { name: "units", type: "uint32" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "event",
+    name: "AgreementEstablished",
+    inputs: [
+      { name: "agreementId", type: "bytes32", indexed: true },
+      { name: "buyerAgentId", type: "uint256", indexed: true },
+      { name: "sellerAgentId", type: "uint256", indexed: true },
+      { name: "maxUnitsPerInteraction", type: "uint32", indexed: false },
+      { name: "installments", type: "uint32", indexed: false },
+      { name: "pricePerInstallment", type: "uint256", indexed: false },
+      { name: "minInteractionInterval", type: "uint64", indexed: false },
+      { name: "expiry", type: "uint64", indexed: false },
+      { name: "establisher", type: "address", indexed: false },
+      { name: "mode", type: "uint8", indexed: false },
+      { name: "cadence", type: "uint8", indexed: false },
+    ],
+  },
+] as const;
+
+/** Params returned by the agreement anchor preflight for CollabAgreement.establish. */
+export interface EstablishParams {
+  collabAgreement: `0x${string}`;
+  /** Numeric ERC-8004 agent ids (on-chain establish takes uint256). */
+  buyerAgentId: string;
+  sellerAgentId: string;
+  maxUnitsPerInteraction: number;
+  installments: number;
+  /** Price per installment in settlement-asset base units. */
+  pricePerInstallment: string;
+  /** Cooldown between interactions, seconds (the cadence-derived interval). */
+  minInteractionInterval: number;
+  /** Unix seconds; 0 for no expiry. */
+  expiry: number;
+  /** Mode enum: 0 = OneTime, 1 = Recurring. */
+  mode: number;
+  /** Cadence enum: 0 = None, 1 = Daily, 2 = Weekly, 3 = Monthly. */
+  cadence: number;
+  accountIndex: number;
+  mintConfig: SpawnMintConfig;
+}
+
+/**
+ * Anchor a human-approved agreement on-chain via CollabAgreement.establish,
+ * signed by the buyer agent's kernel account. Decodes the deterministic
+ * agreementId from the AgreementEstablished event so the off-chain record can be
+ * linked to its on-chain twin. Gated through the SecurityRegistry allowlist.
+ */
+export async function establishAgreementOnChain(params: {
+  signer: Signer;
+  establish: EstablishParams;
+}): Promise<{ onChainAgreementId: `0x${string}`; txHash: string; userOpHash: string }> {
+  const { signer, establish } = params;
+  const svc = await import("canhav-agent-service");
+  const { encodeFunctionData, decodeEventLog } = await import("viem");
+
+  const cfg = svc.createConfig({
+    zerodevRpc: establish.mintConfig.zerodevRpc,
+    rpcUrl: establish.mintConfig.rpcUrl,
+    identityRegistry: establish.mintConfig.identityRegistry,
+    securityRegistry: establish.mintConfig.securityRegistry,
+  });
+
+  await svc.assertTargetAllowed(cfg, establish.collabAgreement);
+
+  const account = await svc.createEcdsaKernelAccount(cfg, signer, BigInt(establish.accountIndex));
+  const data = encodeFunctionData({
+    abi: collabAgreementAbi,
+    functionName: "establish",
+    args: [
+      BigInt(establish.buyerAgentId),
+      BigInt(establish.sellerAgentId),
+      Math.max(1, Math.min(0xffffffff, Math.floor(establish.maxUnitsPerInteraction))),
+      Math.max(1, Math.min(0xffffffff, Math.floor(establish.installments))),
+      BigInt(establish.pricePerInstallment),
+      BigInt(Math.max(0, Math.floor(establish.minInteractionInterval))),
+      BigInt(Math.max(0, Math.floor(establish.expiry))),
+      Math.max(0, Math.min(255, Math.floor(establish.mode))),
+      Math.max(0, Math.min(255, Math.floor(establish.cadence))),
+    ],
+  });
+
+  const userOpHash = await account.kernelClient.sendUserOperation({
+    account: account.account,
+    calls: [{ to: establish.collabAgreement, data }],
+  });
+  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
+
+  // Recover the agreementId from the AgreementEstablished event in the receipt.
+  let onChainAgreementId: `0x${string}` | null = null;
+  const logs = receipt.receipt.logs ?? [];
+  for (const log of logs) {
+    if (log.address.toLowerCase() !== establish.collabAgreement.toLowerCase()) continue;
+    try {
+      const decoded = decodeEventLog({
+        abi: collabAgreementAbi,
+        data: log.data,
+        topics: log.topics,
+      });
+      if (decoded.eventName === "AgreementEstablished") {
+        onChainAgreementId = (decoded.args as { agreementId: `0x${string}` }).agreementId;
+        break;
+      }
+    } catch {
+      /* not our event — skip */
+    }
+  }
+  if (!onChainAgreementId) {
+    throw new Error("Anchored, but could not read the on-chain agreement id from the receipt.");
+  }
+  return { onChainAgreementId, txHash: receipt.receipt.transactionHash, userOpHash };
+}
+
+/** Params returned by POST /api/collab/request for the per-period agreement write. */
+export interface AgreementInteractionParams {
+  collabAgreement: `0x${string}`;
+  onChainAgreementId: `0x${string}`;
+  units: number;
+  accountIndex: number;
+  mintConfig: SpawnMintConfig;
+}
+
+/**
+ * Record one period's interaction on the CollabAgreement contract, enforcing the
+ * agreed unit cap + cadence cooldown on-chain. Runs in addition to the
+ * CollabRegistry attestation so every period lands two on-chain writes.
+ */
+export async function recordInteractionOnChain(params: {
+  signer: Signer;
+  interaction: AgreementInteractionParams;
+}): Promise<{ userOpHash: string; txHash: string }> {
+  const { signer, interaction } = params;
+  const svc = await import("canhav-agent-service");
+  const { encodeFunctionData } = await import("viem");
+
+  const cfg = svc.createConfig({
+    zerodevRpc: interaction.mintConfig.zerodevRpc,
+    rpcUrl: interaction.mintConfig.rpcUrl,
+    identityRegistry: interaction.mintConfig.identityRegistry,
+    securityRegistry: interaction.mintConfig.securityRegistry,
+  });
+
+  await svc.assertTargetAllowed(cfg, interaction.collabAgreement);
+
+  const account = await svc.createEcdsaKernelAccount(
+    cfg,
+    signer,
+    BigInt(interaction.accountIndex),
+  );
+  const data = encodeFunctionData({
+    abi: collabAgreementAbi,
+    functionName: "recordInteraction",
+    args: [
+      interaction.onChainAgreementId,
+      Math.max(1, Math.min(0xffffffff, Math.floor(interaction.units))),
+    ],
+  });
+
+  const userOpHash = await account.kernelClient.sendUserOperation({
+    account: account.account,
+    calls: [{ to: interaction.collabAgreement, data }],
+  });
+  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
+  return { userOpHash, txHash: receipt.receipt.transactionHash };
+}
+
 const reputationAbi = [
   {
     type: "function",

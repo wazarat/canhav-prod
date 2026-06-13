@@ -16,6 +16,7 @@ import type { StrategyPacketDrip } from "@/lib/types";
 export type TheaterPhase =
   | "idle"
   | "preflight"
+  | "anchoring"
   | "quoting"
   | "paying"
   | "settling"
@@ -53,6 +54,7 @@ type StageStatus = "pending" | "active" | "done" | "error";
 const STAGE_ORDER: TheaterPhase[] = [
   "preflight",
   "quoting",
+  "anchoring",
   "paying",
   "settling",
   "recording",

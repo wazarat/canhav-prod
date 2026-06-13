@@ -79,8 +79,13 @@ export async function POST(req: Request) {
     collabMaxUnits = n;
   }
 
+  // `discoverable` is only mutated when explicitly provided, so the readiness
+  // card (which owns the toggle) and the details panel (description + max units)
+  // can each PATCH their own fields without clobbering the other's.
+  const discoverable = typeof body.discoverable === "boolean" ? body.discoverable : undefined;
+
   const updated = await setAgentCollabSettings(agentId, {
-    discoverable: Boolean(body.discoverable),
+    discoverable,
     collabPriceUsdc: price,
     description,
     collabMaxUnits,

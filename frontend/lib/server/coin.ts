@@ -51,6 +51,8 @@ export interface CoinLiveData {
   contractAddress: string | null;
   chains: string[];
   profilePath: string;
+  /** Whether the coin is reported live by the Arbitrum Portal metadata. */
+  isLive: boolean;
   hasAlchemy: boolean;
   market: MarketData | null;
   onchain: CoinOnchain | null;
@@ -127,6 +129,7 @@ export async function getCoinLiveData(
     contractAddress: address,
     chains,
     profilePath,
+    isLive: profile.arbitrumPortalMetadata.isLive ?? false,
     hasAlchemy: hasAlchemy(),
     market,
     onchain,

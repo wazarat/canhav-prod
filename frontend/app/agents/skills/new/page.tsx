@@ -6,7 +6,12 @@ import { SkillComposer } from "@/components/agent/SkillComposer";
 export const metadata = { title: "Create a skill" };
 export const dynamic = "force-dynamic";
 
-export default function NewSkillPage() {
+export default function NewSkillPage({
+  searchParams,
+}: {
+  searchParams: { agent?: string };
+}) {
+  const returnAgentId = searchParams.agent ? decodeURIComponent(searchParams.agent) : null;
   return (
     <div className="container max-w-3xl space-y-8 py-12">
       <nav className="flex items-center gap-1.5 text-sm text-ink-300">
@@ -28,10 +33,15 @@ export default function NewSkillPage() {
         <p className="max-w-2xl text-sm leading-relaxed text-ink-300">
           Author custom research knowledge and attach it to your agent to train it. Skills are
           read-only — they teach the agent, they never trade or transact.
+          {returnAgentId && (
+            <span className="mt-1 block text-electric-400">
+              After saving, you&apos;ll return to your agent with this skill ready to attach.
+            </span>
+          )}
         </p>
       </header>
 
-      <SkillComposer />
+      <SkillComposer returnAgentId={returnAgentId} />
     </div>
   );
 }

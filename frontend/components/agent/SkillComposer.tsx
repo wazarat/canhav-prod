@@ -18,7 +18,7 @@ const emptyDraft: SkillDraft = {
   sources: [{ label: "", url: "" }],
 };
 
-export function SkillComposer() {
+export function SkillComposer({ returnAgentId }: { returnAgentId?: string | null }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -84,12 +84,27 @@ export function SkillComposer() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...draft, visibility: "private" }),
       });
-      const data = (await res.json()) as { ok?: boolean; error?: string; errors?: string[] };
+      const data = (await res.json()) as {
+        ok?: boolean;
+        skill?: { id: string };
+        error?: string;
+        errors?: string[];
+      };
       if (!res.ok || !data.ok) {
         setErrors(data.errors ?? [data.error ?? `Save failed (status ${res.status}).`]);
         return;
       }
-      router.push("/agents/skills");
+      // When the user came from an agent's "Attach a skill" panel, send them back
+      // with the freshly-created skill preselected so they can attach in one click.
+      if (returnAgentId && data.skill?.id) {
+        router.push(
+          `/agents/${encodeURIComponent(returnAgentId)}?skill=${encodeURIComponent(
+            data.skill.id,
+          )}#panel-attach-skill`,
+        );
+      } else {
+        router.push("/agents/skills");
+      }
       router.refresh();
     } catch (e) {
       setErrors([e instanceof Error ? e.message : "Save failed."]);

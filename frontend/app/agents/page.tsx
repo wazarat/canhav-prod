@@ -21,7 +21,7 @@ import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
 import { LaunchAgentButton } from "@/components/agent/LaunchAgentButton";
 import { getSession } from "@/lib/auth/session";
 import { listUserAgentIds } from "@/lib/auth/users";
-import { getAgentProfile, type AgentProfile } from "@/lib/agent/memory";
+import { getAgentProfile, getAttachedSkillIds, type AgentProfile } from "@/lib/agent/memory";
 import { getApprovedEntities } from "@/lib/data";
 import { userAgentId } from "@/lib/agent/user-agent";
 
@@ -83,6 +83,19 @@ export default async function AgentsPage() {
   ).filter((p): p is NonNullable<typeof p> => Boolean(p));
   const agentsById = new Map(userAgents.map((a) => [a.agentId, a]));
   const agents = [...agentsById.values()].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+
+  // An agent is live in the marketplace when it's discoverable AND advertises at
+  // least one attached skill (the same gate buildAgentEntry enforces). Surface a
+  // "Listed" badge so owners can see at a glance which agents are public.
+  const listedAgentIds = new Set(
+    (
+      await Promise.all(
+        agents.map(async (a) =>
+          a.discoverable && (await getAttachedSkillIds(a.agentId)).length > 0 ? a.agentId : null,
+        ),
+      )
+    ).filter((id): id is string => Boolean(id)),
+  );
 
   // Group agents by project (Entity). Unbound agents fall into "General research".
   const entities = await getApprovedEntities();
@@ -236,6 +249,11 @@ export default async function AgentsPage() {
                           {agentCategoryLabel(agent.category) && (
                             <Badge tone="signal" className="shrink-0">
                               {agentCategoryLabel(agent.category)}
+                            </Badge>
+                          )}
+                          {listedAgentIds.has(agent.agentId) && (
+                            <Badge tone="positive" className="shrink-0">
+                              Listed
                             </Badge>
                           )}
                         </span>

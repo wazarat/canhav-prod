@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { keccak256, toHex } from "viem";
 
 import { agentOfferHash, agentOfferSkillId } from "@/lib/agent/agentOffer";
-import { collabRegistryAddress } from "@/lib/agent/collab-config";
+import { collabAgreementAddress, collabRegistryAddress } from "@/lib/agent/collab-config";
 import { hasZeroDev } from "@/lib/agent/config";
 import { appendMemory, getAgentProfile, markSkillStudied } from "@/lib/agent/memory";
 import { strategyPacketToMarkdown } from "@/lib/agent/strategyPacket";
@@ -107,6 +107,9 @@ export async function POST(req: Request) {
   let recordUnits = 1;
   let onChainAgreementId: `0x${string}` =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
+  // The REAL on-chain agreement id (set only once the agreement was anchored via
+  // CollabAgreement.establish) — drives the per-period recordInteraction write.
+  let anchoredAgreementOnChainId: `0x${string}` | null = null;
 
   if (agreementId) {
     const agreement = await getAgreement(agreementId);
@@ -133,9 +136,8 @@ export async function POST(req: Request) {
       totalInstallments: agreement.totalInstallments,
       units: requestedUnits,
     };
-    onChainAgreementId =
-      (agreement.onChainAgreementId as `0x${string}` | null) ??
-      keccak256(toHex(agreement.agreementId));
+    anchoredAgreementOnChainId = (agreement.onChainAgreementId as `0x${string}` | null) ?? null;
+    onChainAgreementId = anchoredAgreementOnChainId ?? keccak256(toHex(agreement.agreementId));
   }
 
   // Build the canonical x402 v2 X-PAYMENT header: a base64 payload carrying the
@@ -287,10 +289,33 @@ export async function POST(req: Request) {
         }
       : null;
 
+  // Per-period agreement write (CollabAgreement.recordInteraction), in addition
+  // to the CollabRegistry attestation above — so each period lands two on-chain
+  // writes. Only when the agreement was actually anchored on-chain.
+  const collabAgreement = collabAgreementAddress();
+  const agreementRecord =
+    anchoredAgreementOnChainId &&
+    collabAgreement &&
+    buyer?.onChain &&
+    buyer.accountIndex != null &&
+    hasZeroDev() &&
+    zerodevRpc &&
+    identityRegistry &&
+    securityRegistry
+      ? {
+          collabAgreement,
+          onChainAgreementId: anchoredAgreementOnChainId,
+          units: Math.min(disclosedUnits, 0xffffffff),
+          accountIndex: buyer.accountIndex,
+          mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
+        }
+      : null;
+
   return NextResponse.json({
     ok: true,
     packet,
     record,
+    agreementRecord,
     settlement,
     units: disclosedUnits,
     agreement: agreementState,

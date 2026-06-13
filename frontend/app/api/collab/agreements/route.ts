@@ -11,6 +11,8 @@ import {
   HARD_MAX_UNITS,
   listAgreementsForUser,
   proposeAgreement,
+  type AgreementCadence,
+  type AgreementMode,
 } from "@/lib/server/collabAgreements";
 
 /**
@@ -39,7 +41,11 @@ interface ProposeBody {
   maxUnitsPerInteraction?: number;
   totalInstallments?: number;
   cooldownSeconds?: number;
+  mode?: string;
+  cadence?: string;
 }
+
+const VALID_CADENCES: AgreementCadence[] = ["none", "daily", "weekly", "monthly"];
 
 export async function POST(req: Request) {
   const session = getSession();
@@ -112,6 +118,20 @@ export async function POST(req: Request) {
     86_400,
   );
 
+  // One-time vs recurring shape. Validate the cadence; recurring requires one.
+  const mode: AgreementMode = body.mode === "recurring" ? "recurring" : "one_time";
+  let cadence: AgreementCadence = "none";
+  if (mode === "recurring") {
+    if (body.cadence != null && !VALID_CADENCES.includes(body.cadence as AgreementCadence)) {
+      return NextResponse.json(
+        { ok: false, error: "cadence must be one of: daily, weekly, monthly." },
+        { status: 400 },
+      );
+    }
+    cadence = (body.cadence as AgreementCadence) ?? "weekly";
+    if (cadence === "none") cadence = "weekly";
+  }
+
   const agreement = await proposeAgreement({
     buyerAgentId,
     sellerAgentId,
@@ -122,6 +142,8 @@ export async function POST(req: Request) {
     objective,
     maxUnitsPerInteraction,
     totalInstallments,
+    mode,
+    cadence,
     pricePerInstallmentUsdc: seller.collabPriceUsdc ?? defaultCollabPriceUsdc(),
     cooldownSeconds,
   });

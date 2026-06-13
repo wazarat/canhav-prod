@@ -8,6 +8,7 @@ import { AgentNameEditor } from "@/components/agent/AgentNameEditor";
 import { AgentSuggestions } from "@/components/agent/AgentSuggestions";
 import { AgentIdentityCard } from "@/components/agent/AgentIdentityCard";
 import { AgentMemoryPanel } from "@/components/agent/AgentMemoryPanel";
+import { AgentPerformanceCard } from "@/components/agent/AgentPerformanceCard";
 import { AttachSkillPanel } from "@/components/agent/AttachSkillPanel";
 import { CollabSettingsPanel } from "@/components/agent/CollabSettingsPanel";
 import { SkillShelf } from "@/components/agent/SkillShelf";
@@ -33,7 +34,7 @@ import {
 } from "@/lib/agent/memory";
 import { OWNER_CORRECTION_SOURCE } from "@/lib/agent/prompt";
 import { buildAgentSuggestions, type AgentSuggestion } from "@/lib/agent/suggestions";
-import { verifyAgentOnChain } from "@/lib/agent/onchain";
+import { readAgentLedger, verifyAgentOnChain } from "@/lib/agent/onchain";
 import { getAgentSkills } from "@/lib/agent/skills";
 import { getSession } from "@/lib/auth/session";
 import { listUserAgentIds } from "@/lib/auth/users";
@@ -117,6 +118,13 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
       : null;
   const verifyUrl = isMinted ? `/api/agent/${encodeURIComponent(agentId)}/verify` : null;
 
+  // Objective, behavior-derived merit from the on-chain ledger (null when no
+  // ledger / factory unset) — complements the subjective reputation score.
+  const ledgerStats = isNumericId ? await readAgentLedger(agentId) : null;
+  const ledgerExplorerUrl = ledgerStats
+    ? `https://sepolia.arbiscan.io/address/${ledgerStats.ledger}`
+    : null;
+
   return (
     <div className="container space-y-8 py-12">
       <nav className="flex items-center gap-1.5 text-sm text-ink-300">
@@ -145,12 +153,12 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
           <Badge tone="signal">Arbitrum Sepolia · Testnet</Badge>
           {verifiedOnChain ? (
             <Badge tone="positive">
-              <CircleDot className="h-3 w-3 animate-pulse-soft" /> on-chain
+              <CircleDot className="h-3 w-3 animate-pulse-soft" /> verified
             </Badge>
           ) : profile.pendingVerification ? (
             <Badge tone="neutral">verifying…</Badge>
           ) : (
-            <Badge tone="neutral">local</Badge>
+            <Badge tone="neutral">draft</Badge>
           )}
         </div>
         <p className="font-mono text-xs text-ink-500">
@@ -218,6 +226,7 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
               verifyUrl={verifyUrl}
             />
           )}
+          {isMinted && <AgentPerformanceCard stats={ledgerStats} explorerUrl={ledgerExplorerUrl} />}
           {isOwner && (
             <div id="panel-tools">
               <AgentToolPanel

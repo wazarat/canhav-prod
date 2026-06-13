@@ -5,6 +5,7 @@ import { arbitrumSepolia } from "viem/chains";
 
 import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/config";
 import { readSecret } from "@/lib/server/env";
+import { getLedgerAddress } from "@/lib/server/factory";
 
 /**
  * On-chain ERC-8004 identity verification (read-only).
@@ -172,6 +173,188 @@ export async function readAgentWallet(agentId: string): Promise<string | null> {
     });
     const walletStr = getAddress(wallet);
     return walletStr === "0x0000000000000000000000000000000000000000" ? null : walletStr;
+  } catch {
+    return null;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* AgentLedger merit signals + tCNHV credits (read-only)                      */
+/* -------------------------------------------------------------------------- */
+
+const agentLedgerReadAbi = [
+  {
+    type: "function",
+    name: "stats",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        components: [
+          { name: "agentId", type: "uint256" },
+          { name: "owner", type: "address" },
+          { name: "agentWallet", type: "address" },
+          { name: "firstSeen", type: "uint64" },
+          { name: "lastActive", type: "uint64" },
+          { name: "collabCount", type: "uint256" },
+          { name: "cnhvEarned", type: "uint256" },
+          { name: "cnhvSpent", type: "uint256" },
+          { name: "totalGasSpentWei", type: "uint256" },
+          { name: "uniqueCounterparties", type: "uint256" },
+          { name: "repeatCounterparties", type: "uint256" },
+        ],
+      },
+    ],
+  },
+  { type: "function", name: "netFlow", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "int256" }] },
+  { type: "function", name: "repeatRate", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
+  {
+    type: "function",
+    name: "earnedPerCollab",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+] as const;
+
+const tcnhvReadAbi = [
+  {
+    type: "function",
+    name: "balanceOf",
+    stateMutability: "view",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "lastClaim",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  { type: "function", name: "FAUCET_COOLDOWN", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
+] as const;
+
+export interface AgentLedgerStats {
+  /** The deployed ledger clone address. */
+  ledger: string;
+  collabCount: number;
+  /** Cumulative tCNHV earned (base units, 18 decimals), as a string. */
+  cnhvEarned: string;
+  cnhvSpent: string;
+  totalGasSpentWei: string;
+  uniqueCounterparties: number;
+  repeatCounterparties: number;
+  /** Net tCNHV flow (earned - spent), signed base-unit string. */
+  netFlow: string;
+  /** True when net flow is >= 0 (net producer). */
+  netProducer: boolean;
+  /** Repeat-counterparty share in basis points (0-10000). */
+  repeatRateBps: number;
+  /** Average tCNHV earned per collaboration (base-unit string). */
+  earnedPerCollab: string;
+  /** Unix seconds of the most recent recorded activity (0 if none). */
+  lastActive: number;
+  firstSeen: number;
+}
+
+/**
+ * Read an agent's on-chain ledger (the objective merit signal). Returns null
+ * when the factory is unconfigured, the agent has no ledger yet, or the read
+ * fails — callers render a "no on-chain activity" state.
+ */
+export async function readAgentLedger(agentId: string): Promise<AgentLedgerStats | null> {
+  const ledger = await getLedgerAddress(agentId);
+  if (!ledger) return null;
+  try {
+    const client = createPublicClient({ chain: arbitrumSepolia, transport: http(rpcUrl()) });
+    const ledgerAddr = ledger as Address;
+    const [stats, netFlow, repeatRate, earnedPer] = await Promise.all([
+      client.readContract({ address: ledgerAddr, abi: agentLedgerReadAbi, functionName: "stats" }),
+      client.readContract({ address: ledgerAddr, abi: agentLedgerReadAbi, functionName: "netFlow" }),
+      client.readContract({ address: ledgerAddr, abi: agentLedgerReadAbi, functionName: "repeatRate" }),
+      client.readContract({ address: ledgerAddr, abi: agentLedgerReadAbi, functionName: "earnedPerCollab" }),
+    ]);
+    return {
+      ledger,
+      collabCount: Number(stats.collabCount),
+      cnhvEarned: stats.cnhvEarned.toString(),
+      cnhvSpent: stats.cnhvSpent.toString(),
+      totalGasSpentWei: stats.totalGasSpentWei.toString(),
+      uniqueCounterparties: Number(stats.uniqueCounterparties),
+      repeatCounterparties: Number(stats.repeatCounterparties),
+      netFlow: netFlow.toString(),
+      netProducer: netFlow >= 0n,
+      repeatRateBps: Number(repeatRate),
+      earnedPerCollab: earnedPer.toString(),
+      lastActive: Number(stats.lastActive),
+      firstSeen: Number(stats.firstSeen),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** tCNHV balance of an account in base units (string), or null when unconfigured/unreadable. */
+export async function readTcnhvBalance(account: string): Promise<string | null> {
+  const token = readSecret("TCNHV_TOKEN_ADDRESS");
+  if (!token) return null;
+  let tokenAddr: Address;
+  let acct: Address;
+  try {
+    tokenAddr = getAddress(token);
+    acct = getAddress(account);
+  } catch {
+    return null;
+  }
+  try {
+    const client = createPublicClient({ chain: arbitrumSepolia, transport: http(rpcUrl()) });
+    const balance = await client.readContract({
+      address: tokenAddr,
+      abi: tcnhvReadAbi,
+      functionName: "balanceOf",
+      args: [acct],
+    });
+    return balance.toString();
+  } catch {
+    return null;
+  }
+}
+
+export interface FaucetStatus {
+  /** Unix seconds of the account's last faucet claim (0 = never). */
+  lastClaim: number;
+  cooldownSeconds: number;
+  /** Unix seconds when the next claim is allowed (0 = claimable now). */
+  nextClaimAt: number;
+  canClaim: boolean;
+}
+
+/** Faucet cooldown state for an account, or null when unconfigured/unreadable. */
+export async function readFaucetStatus(account: string): Promise<FaucetStatus | null> {
+  const token = readSecret("TCNHV_TOKEN_ADDRESS");
+  if (!token) return null;
+  let tokenAddr: Address;
+  let acct: Address;
+  try {
+    tokenAddr = getAddress(token);
+    acct = getAddress(account);
+  } catch {
+    return null;
+  }
+  try {
+    const client = createPublicClient({ chain: arbitrumSepolia, transport: http(rpcUrl()) });
+    const [last, cooldown] = await Promise.all([
+      client.readContract({ address: tokenAddr, abi: tcnhvReadAbi, functionName: "lastClaim", args: [acct] }),
+      client.readContract({ address: tokenAddr, abi: tcnhvReadAbi, functionName: "FAUCET_COOLDOWN" }),
+    ]);
+    const lastClaim = Number(last);
+    const cooldownSeconds = Number(cooldown);
+    const nextClaimAt = lastClaim === 0 ? 0 : lastClaim + cooldownSeconds;
+    const now = Math.floor(Date.now() / 1000);
+    return { lastClaim, cooldownSeconds, nextClaimAt, canClaim: lastClaim === 0 || now >= nextClaimAt };
   } catch {
     return null;
   }

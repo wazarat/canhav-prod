@@ -66,10 +66,6 @@ function rank(phase: TheaterPhase): number {
 
 const ARBISCAN_TX = (hash: string) => `https://sepolia.arbiscan.io/tx/${hash}`;
 
-function shortHash(hash: string): string {
-  return hash.length > 16 ? `${hash.slice(0, 10)}…${hash.slice(-6)}` : hash;
-}
-
 /** Build a representative base64 X-PAYMENT payload for the wire console. */
 function encodeWirePreview(payload: unknown): string {
   try {
@@ -106,11 +102,11 @@ export function AgentInteractionTheater({
   };
 
   const stages: { phase: TheaterPhase; label: string; detail: string }[] = [
-    { phase: "quoting", label: "402 challenge", detail: price ? `${price} USDC required` : "PaymentRequirements" },
-    { phase: "paying", label: "pay (USDC)", detail: "buyer smart account transfer" },
-    { phase: "settling", label: "verify + settle", detail: "facilitator proves transfer" },
-    { phase: "recording", label: "record on-chain", detail: "CollabRegistry attestation" },
-    { phase: "done", label: "StrategyPacket", detail: drip ? drip.label : "knowledge delivered" },
+    { phase: "quoting", label: "Quote", detail: price ? `${price} credits` : "price quote" },
+    { phase: "paying", label: "Pay", detail: "from your agent" },
+    { phase: "settling", label: "Confirm", detail: "payment confirmed" },
+    { phase: "recording", label: "Save record", detail: "verifiable record" },
+    { phase: "done", label: "Delivered", detail: drip ? drip.label : "knowledge delivered" },
   ];
 
   const flowing = phase !== "idle" && phase !== "done" && !error;
@@ -141,7 +137,7 @@ export function AgentInteractionTheater({
           Agent interaction
         </h3>
         <span className="rounded-full border border-electric-500/30 bg-electric-500/10 px-2 py-0.5 text-[10px] font-medium text-electric-300">
-          x402 · Arbitrum Sepolia
+          Live · Arbitrum testnet
         </span>
         {phase === "done" && !error && (
           <span className="ml-auto flex items-center gap-1 text-[11px] font-medium text-signal-300">
@@ -233,7 +229,7 @@ export function AgentInteractionTheater({
               rel="noreferrer"
               className="inline-flex items-center gap-1 rounded-lg border border-neon-500/30 bg-neon-500/10 px-2.5 py-1.5 text-[11px] font-medium text-neon-300 transition-colors hover:bg-neon-500/20"
             >
-              <ExternalLink className="h-3 w-3" /> USDC settlement {shortHash(paymentTx)}
+              <ExternalLink className="h-3 w-3" /> Payment receipt
             </a>
           )}
           {recordTx && (
@@ -243,7 +239,7 @@ export function AgentInteractionTheater({
               rel="noreferrer"
               className="inline-flex items-center gap-1 rounded-lg border border-signal-400/30 bg-signal-400/10 px-2.5 py-1.5 text-[11px] font-medium text-signal-300 transition-colors hover:bg-signal-400/20"
             >
-              <ExternalLink className="h-3 w-3" /> CollabRegistry {shortHash(recordTx)}
+              <ExternalLink className="h-3 w-3" /> Saved record
             </a>
           )}
         </div>

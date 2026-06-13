@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 
 import { agentOfferSkillId } from "@/lib/agent/agentOffer";
 import {
+  collabSettlement,
   defaultCollabPriceUsdc,
-  formatUsdc,
-  parseUsdcToBaseUnits,
+  formatAmount,
+  parseAmountToBaseUnits,
 } from "@/lib/agent/collab-config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { readAgentWallet } from "@/lib/agent/onchain";
@@ -81,10 +82,11 @@ export async function POST(req: Request) {
     );
   }
 
+  const settleAsset = collabSettlement();
   const priceHuman = seller.collabPriceUsdc ?? defaultCollabPriceUsdc();
   let amount: bigint;
   try {
-    amount = parseUsdcToBaseUnits(priceHuman);
+    amount = parseAmountToBaseUnits(priceHuman, settleAsset.decimals);
   } catch {
     return NextResponse.json({ error: "Seller price is misconfigured." }, { status: 500 });
   }
@@ -156,7 +158,7 @@ export async function POST(req: Request) {
       from: verification.from,
       to: verification.to,
       amount: verification.value.toString(),
-      humanAmount: formatUsdc(verification.value),
+      humanAmount: formatAmount(verification.value, settleAsset.decimals),
     },
     settlement,
   });

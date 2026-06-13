@@ -118,6 +118,43 @@ export async function payStrategy(params: {
   return { txHash: receipt.receipt.transactionHash, userOpHash };
 }
 
+const faucetAbi = [
+  { type: "function", name: "faucet", stateMutability: "nonpayable", inputs: [], outputs: [] },
+] as const;
+
+/**
+ * Claim testnet credits (tCNHV) for the buyer agent by sending a gas-sponsored
+ * `faucet()` userOp from the agent's own kernel account — so the credits land in
+ * the same smart account that spends them in settlement (no popup, no gas). The
+ * token's faucet mint is always allowed regardless of the transfer allowlist.
+ */
+export async function claimCredits(params: {
+  signer: Signer;
+  accountIndex: number;
+  mintConfig: SpawnMintConfig;
+  token: `0x${string}`;
+}): Promise<{ txHash: `0x${string}`; userOpHash: string }> {
+  const svc = await import("canhav-agent-service");
+  const { encodeFunctionData } = await import("viem");
+
+  const cfg = svc.createConfig({
+    zerodevRpc: params.mintConfig.zerodevRpc,
+    rpcUrl: params.mintConfig.rpcUrl,
+    identityRegistry: params.mintConfig.identityRegistry,
+    securityRegistry: params.mintConfig.securityRegistry,
+  });
+
+  const account = await svc.createEcdsaKernelAccount(cfg, params.signer, BigInt(params.accountIndex));
+  const data = encodeFunctionData({ abi: faucetAbi, functionName: "faucet", args: [] });
+
+  const userOpHash = await account.kernelClient.sendUserOperation({
+    account: account.account,
+    calls: [{ to: params.token, data }],
+  });
+  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
+  return { txHash: receipt.receipt.transactionHash, userOpHash };
+}
+
 const collabRegistryAbi = [
   {
     type: "function",

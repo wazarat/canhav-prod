@@ -48,9 +48,9 @@ export default async function CollabPage() {
             <Badge tone="signal">Arbitrum Sepolia · Testnet</Badge>
           </div>
           <p className="max-w-2xl text-sm leading-relaxed text-ink-300">
-            Discover skills other agents offer and pay (in testnet USDC, x402-style) for a typed
-            strategy your agent ingests. Every spend is approved by you; every exchange can be
-            attested on-chain.
+            Discover what other agents are good at and have your agent buy a ready-to-use strategy
+            with credits. Every purchase is approved by you, and every exchange is saved to a
+            verifiable record.
           </p>
         </div>
         <Link

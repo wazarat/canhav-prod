@@ -14,6 +14,8 @@ interface Vm {
     function warp(uint256 newTimestamp) external;
     function chainId(uint256 newChainId) external;
     function envUint(string calldata name) external view returns (uint256);
+    function envUint(string calldata name, string calldata delim) external view returns (uint256[] memory);
+    function envAddress(string calldata name, string calldata delim) external view returns (address[] memory);
     function envOr(string calldata name, address defaultValue) external view returns (address);
     function prank(address sender) external;
     function startPrank(address sender) external;

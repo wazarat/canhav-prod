@@ -2,9 +2,8 @@ import "server-only";
 
 import { agentOfferSkillId } from "@/lib/agent/agentOffer";
 import {
-  collabUsdcAsset,
+  collabSettlement,
   defaultCollabPriceUsdc,
-  USDC_DECIMALS,
 } from "@/lib/agent/collab-config";
 import { listCustomTools } from "@/lib/agent/customTools";
 import { listKnowledgeDocs } from "@/lib/agent/knowledge";
@@ -19,7 +18,7 @@ import {
 } from "@/lib/agent/memory";
 import { OWNER_CORRECTION_SOURCE } from "@/lib/agent/prompt";
 import { readAgentReputation } from "@/lib/agent/reputation";
-import { readAgentWallet } from "@/lib/agent/onchain";
+import { readAgentLedger, readAgentWallet } from "@/lib/agent/onchain";
 import { listCollabExchanges } from "@/lib/server/collabLog";
 import { getCreatorInfo, type SellerCreator } from "@/lib/server/sellerDetail";
 import { getUserSkill } from "@/lib/server/userSkills";
@@ -45,6 +44,16 @@ export interface DiscoverySpecialization {
   exchangeCount: number;
 }
 
+/** Objective, behavior-derived merit from the on-chain ledger (null = none yet). */
+export interface AgentMerit {
+  collabCount: number;
+  netProducer: boolean;
+  /** Repeat-partner share in basis points (0-10000). */
+  repeatRateBps: number;
+  /** Unix seconds of last recorded activity (0 = none). */
+  lastActive: number;
+}
+
 export interface AgentDiscoveryEntry {
   agentId: string;
   agentName: string;
@@ -58,9 +67,12 @@ export interface AgentDiscoveryEntry {
   offerHash: string;
   attachedSkillIds: string[];
   attachedSkillTitles: string[];
-  x402: { price: string; asset: string; decimals: number };
+  /** Settlement asset label + price (tCNHV credits, or USDC fallback). */
+  x402: { price: string; asset: string; decimals: number; assetName: string };
   reputationScore: number | null;
   reputationCount: number;
+  /** On-chain track record (null until the agent has a ledger with activity). */
+  merit: AgentMerit | null;
   specialization: DiscoverySpecialization;
 }
 
@@ -95,16 +107,18 @@ async function buildAgentEntry(
   const offer = await resolveAgentOffer(agentId);
   if (!offer) return null;
 
-  const [wallet, reputation, memory, studied, frames, docs, tools, creator] = await Promise.all([
-    readAgentWallet(agentId),
-    readAgentReputation(agentId),
-    getMemory(agentId),
-    getStudiedSkills(agentId),
-    listDataFrames(agentId),
-    listKnowledgeDocs(agentId),
-    listCustomTools(agentId),
-    getCreatorInfo(profile.ownerUserId),
-  ]);
+  const [wallet, reputation, memory, studied, frames, docs, tools, creator, ledger] =
+    await Promise.all([
+      readAgentWallet(agentId),
+      readAgentReputation(agentId),
+      getMemory(agentId),
+      getStudiedSkills(agentId),
+      listDataFrames(agentId),
+      listKnowledgeDocs(agentId),
+      listCustomTools(agentId),
+      getCreatorInfo(profile.ownerUserId),
+      readAgentLedger(agentId),
+    ]);
 
   const corrections = memory.filter((f) => f.source === OWNER_CORRECTION_SOURCE).length;
   const level = agentLevel(memory.length, studied.length, {
@@ -113,6 +127,8 @@ async function buildAgentEntry(
     customTools: tools.length,
     corrections,
   });
+
+  const settlement = collabSettlement();
 
   return {
     agentId,
@@ -127,11 +143,21 @@ async function buildAgentEntry(
     attachedSkillTitles: offer.attachedSkillTitles,
     x402: {
       price: profile.collabPriceUsdc ?? defaultCollabPriceUsdc(),
-      asset: collabUsdcAsset(),
-      decimals: USDC_DECIMALS,
+      asset: settlement.asset,
+      decimals: settlement.decimals,
+      assetName: settlement.name,
     },
     reputationScore: reputation?.score ?? null,
     reputationCount: reputation?.count ?? 0,
+    merit:
+      ledger && ledger.collabCount > 0
+        ? {
+            collabCount: ledger.collabCount,
+            netProducer: ledger.netProducer,
+            repeatRateBps: ledger.repeatRateBps,
+            lastActive: ledger.lastActive,
+          }
+        : null,
     specialization: {
       focusAreas: profile.config?.focusAreas ?? [],
       riskLens: profile.config?.riskLens ?? null,
@@ -191,6 +217,7 @@ export async function listDiscoverableAgents(
     .sort(
       (a, b) =>
         (b.reputationScore ?? 0) - (a.reputationScore ?? 0) ||
+        (b.merit?.collabCount ?? 0) - (a.merit?.collabCount ?? 0) ||
         b.specialization.level - a.specialization.level,
     );
 }

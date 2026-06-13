@@ -1,7 +1,7 @@
 import "server-only";
 
-import { collabUsdcAsset, formatUsdc, USDC_DECIMALS } from "@/lib/agent/collab-config";
-import { verifyUsdcTransfer, type VerifyTransferResult } from "@/lib/server/collabPayments";
+import { collabSettlement, formatAmount } from "@/lib/agent/collab-config";
+import { verifyErc20Transfer, type VerifyTransferResult } from "@/lib/server/collabPayments";
 
 /**
  * Canonical x402 v2 wire format on Arbitrum Sepolia.
@@ -96,17 +96,23 @@ export interface BuildRequirementsInput {
   amount: bigint;
   resource: string;
   description: string;
+  /** Override the settlement asset; defaults to the active asset (tCNHV/USDC). */
   asset?: string;
+  decimals?: number;
+  assetName?: string;
 }
 
 /** Build a single canonical x402 `PaymentRequirements` entry. */
 export function buildPaymentRequirements(input: BuildRequirementsInput): PaymentRequirements {
-  const asset = input.asset ?? collabUsdcAsset();
+  const settlement = collabSettlement();
+  const asset = input.asset ?? settlement.asset;
+  const decimals = input.decimals ?? settlement.decimals;
+  const assetName = input.assetName ?? settlement.name;
   return {
     scheme: X402_SCHEME,
     network: X402_NETWORK,
     maxAmountRequired: input.amount.toString(),
-    humanAmount: formatUsdc(input.amount),
+    humanAmount: formatAmount(input.amount, decimals),
     resource: input.resource,
     description: input.description,
     mimeType: "application/json",
@@ -114,8 +120,8 @@ export function buildPaymentRequirements(input: BuildRequirementsInput): Payment
     asset,
     maxTimeoutSeconds: 1200,
     extra: {
-      name: "USDC",
-      decimals: USDC_DECIMALS,
+      name: assetName,
+      decimals,
       chainId: 421614,
       networkName: X402_NETWORK_NAME,
       settlement: X402_SETTLEMENT,
@@ -191,7 +197,7 @@ export function decodePaymentResponseHeader(
 /**
  * Facilitator `verify()`: prove the settling transfer described by the
  * X-PAYMENT payload actually moved at least `maxAmountRequired` of the asset to
- * `payTo` on-chain. Wraps {@link verifyUsdcTransfer}.
+ * `payTo` on-chain. Wraps {@link verifyErc20Transfer}.
  */
 export async function verifyPayment(params: {
   payload: { txHash: string; from: string | null };
@@ -200,7 +206,7 @@ export async function verifyPayment(params: {
   expectedFrom?: string | null;
 }): Promise<VerifyTransferResult> {
   const { payload, requirements, expectedFrom } = params;
-  return verifyUsdcTransfer({
+  return verifyErc20Transfer({
     txHash: payload.txHash,
     asset: requirements.asset,
     payTo: requirements.payTo,
@@ -229,7 +235,7 @@ export function settlePayment(params: {
     payTo: requirements.payTo,
     asset: requirements.asset,
     amount: verified.value.toString(),
-    humanAmount: formatUsdc(verified.value),
+    humanAmount: formatAmount(verified.value, requirements.extra.decimals),
     settlement: X402_SETTLEMENT,
   };
 }

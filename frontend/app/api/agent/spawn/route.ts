@@ -15,6 +15,7 @@ import { getAgentSkillById } from "@/lib/agent/skills";
 import { getSession } from "@/lib/auth/session";
 import { getUserEntityAgent, linkAgentToUser, setUserEntityAgent } from "@/lib/auth/users";
 import { readSecret } from "@/lib/server/env";
+import { ensureAgentLedger, hasFactory } from "@/lib/server/factory";
 
 /**
  * ERC-8004 spawn persistence bridge.
@@ -210,6 +211,21 @@ export async function POST(req: Request) {
   }
   await linkAgentToUser(session.userId, agentId);
   await setUserEntityAgent(session.userId, slotKey, agentId);
+
+  // Auto-create the agent's on-chain ledger + allowlist its wallet for tCNHV,
+  // signed with the platform owner key (agents never deploy). Best-effort: a
+  // failure here is additive-only and must never fail a successful mint.
+  if (hasFactory()) {
+    try {
+      await ensureAgentLedger({
+        agentId,
+        owner: verification.owner ?? agentAddress,
+        agentWallet: agentWallet ?? agentAddress,
+      });
+    } catch {
+      /* ledger creation is additive — never block a successful spawn */
+    }
+  }
 
   return NextResponse.json({
     ok: true,

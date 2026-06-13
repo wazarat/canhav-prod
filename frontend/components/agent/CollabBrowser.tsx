@@ -4,14 +4,17 @@ import { useCallback, useEffect, useState } from "react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import {
   AlertTriangle,
+  Award,
   CheckCircle2,
   Clock,
+  Coins,
   ExternalLink,
   Handshake,
   Info,
   Loader2,
   Search,
   ShieldCheck,
+  Sparkles,
   Star,
   User,
   Wallet,
@@ -22,6 +25,7 @@ import {
 import { AGENT_CATEGORIES } from "@/lib/agent/categories";
 import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
 import {
+  claimCredits,
   getSellerQuote,
   payStrategy,
   recordCollabOnChain,
@@ -68,9 +72,16 @@ interface AgentListing {
   agentWallet: string | null;
   walletVerified: boolean;
   attachedSkillTitles: string[];
-  x402: { price: string; asset: string; decimals: number };
+  x402: { price: string; asset: string; decimals: number; assetName?: string };
   reputationScore: number | null;
   reputationCount?: number;
+  /** On-chain track record (null until the agent has completed work). */
+  merit?: {
+    collabCount: number;
+    netProducer: boolean;
+    repeatRateBps: number;
+    lastActive: number;
+  } | null;
   specialization?: {
     focusAreas: string[];
     riskLens: string | null;
@@ -115,12 +126,33 @@ interface BuyerAgent {
   name: string;
 }
 
+interface CreditsInfo {
+  configured: boolean;
+  account?: string;
+  token?: string;
+  assetName?: string;
+  balance?: string;
+  canClaim?: boolean;
+  nextClaimAt?: number;
+  accountIndex?: number;
+  mintConfig?: SpawnMintConfig | null;
+}
+
 function accountAgeLabel(days: number | null): string {
   if (days == null) return "new";
   if (days < 1) return "joined today";
   if (days < 30) return `${days}d on platform`;
   if (days < 365) return `${Math.floor(days / 30)}mo on platform`;
   return `${Math.floor(days / 365)}y on platform`;
+}
+
+/** Relative label for the next faucet claim (e.g. "in 5h"). */
+function nextClaimLabel(unix: number): string {
+  const secs = unix - Math.floor(Date.now() / 1000);
+  if (secs <= 0) return "available now";
+  if (secs < 3600) return `in ${Math.ceil(secs / 60)}m`;
+  if (secs < 86_400) return `in ${Math.ceil(secs / 3600)}h`;
+  return `in ${Math.ceil(secs / 86_400)}d`;
 }
 
 type Phase = "idle" | "preflight" | "quoting" | "paying" | "settling" | "recording" | "done";
@@ -161,6 +193,28 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
   const [paymentTx, setPaymentTx] = useState<string | null>(null);
   const [recordTx, setRecordTx] = useState<string | null>(null);
   const [settlement, setSettlement] = useState<TheaterSettlement | null>(null);
+
+  // Spendable credits for the selected buyer agent (faucet balance + claim).
+  const [credits, setCredits] = useState<CreditsInfo | null>(null);
+  const [claiming, setClaiming] = useState(false);
+
+  const loadCredits = useCallback(async (agentId: string) => {
+    if (!agentId) {
+      setCredits(null);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/agent/credits?agentId=${encodeURIComponent(agentId)}`);
+      const data = (await res.json()) as CreditsInfo;
+      setCredits(data?.configured ? data : null);
+    } catch {
+      setCredits(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadCredits(buyerAgentId);
+  }, [buyerAgentId, loadCredits]);
 
   const loadAgreements = useCallback(async () => {
     try {
@@ -238,6 +292,34 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
       chain: arbitrumSepolia,
       transport: custom(provider),
     });
+  }
+
+  async function handleClaimCredits() {
+    if (!credits?.configured || !credits.token || credits.accountIndex == null || !credits.mintConfig) {
+      return;
+    }
+    if (!authenticated) {
+      login();
+      return;
+    }
+    setClaiming(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const signer = await buildSigner();
+      await claimCredits({
+        signer,
+        accountIndex: credits.accountIndex,
+        mintConfig: credits.mintConfig,
+        token: credits.token as `0x${string}`,
+      });
+      setNotice("Credits added to your agent.");
+      await loadCredits(buyerAgentId);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not add credits right now.");
+    } finally {
+      setClaiming(false);
+    }
   }
 
   async function approveAndPay(agreement?: Agreement) {
@@ -318,19 +400,20 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
           setPhase("recording");
           const { txHash: recordHash } = await recordCollabOnChain({ signer, record: reqData.record });
           setRecordTx(recordHash);
-          setNotice("Exchange complete and attested on-chain (CollabRegistry).");
+          setNotice("Exchange complete and saved to a verifiable record.");
         } catch (e) {
           setNotice(
-            `Exchange complete and ingested. On-chain attestation skipped: ${
-              e instanceof Error ? e.message : "signing failed"
+            `Exchange complete and added to your agent. Saving the record was skipped: ${
+              e instanceof Error ? e.message : "could not confirm"
             }`,
           );
         }
       } else {
-        setNotice("Exchange complete — the strategy was ingested into your agent's memory.");
+        setNotice("Exchange complete — the strategy was added to your agent's memory.");
       }
       setPhase("done");
       void loadAgreements();
+      void loadCredits(buyerAgentId);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Collaboration failed.");
       setPhase("idle");
@@ -460,6 +543,42 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
             ))}
           </select>
         </label>
+
+        {credits?.configured && (
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Coins className="h-4 w-4 text-neon-400" />
+              <div>
+                <p className="text-[10px] font-medium uppercase tracking-wider text-ink-500">
+                  Available credits
+                </p>
+                <p className="text-lg font-semibold tracking-tight text-ink-50">
+                  {credits.balance ?? "0"}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <button
+                type="button"
+                onClick={handleClaimCredits}
+                disabled={claiming || busy || !credits.canClaim || !credits.mintConfig}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-neon-500/40 bg-neon-500/10 px-3 py-1.5 text-xs font-medium text-neon-400 transition-colors hover:bg-neon-500/20 disabled:opacity-40"
+              >
+                {claiming ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Sparkles className="h-3.5 w-3.5" />
+                )}
+                {claiming ? "Adding…" : "Claim free credits"}
+              </button>
+              {!credits.canClaim && credits.nextClaimAt ? (
+                <span className="text-[10px] text-ink-500">
+                  Next claim {nextClaimLabel(credits.nextClaimAt)}
+                </span>
+              ) : null}
+            </div>
+          </div>
+        )}
       </div>
 
       <AgreementsPanel
@@ -550,7 +669,7 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
                     <p className="mt-1 line-clamp-2 text-xs italic text-ink-400">{a.description}</p>
                   )}
                   <p className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-ink-500">
-                    <span>{a.x402.price} USDC</span>
+                    <span>{a.x402.price} credits</span>
                     {a.reputationScore != null ? (
                       <span className="flex items-center gap-0.5 text-amber-300">
                         <Star className="h-3 w-3" /> {a.reputationScore}
@@ -565,6 +684,12 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
                       </span>
                     ) : (
                       <span className="text-amber-300">wallet unverified</span>
+                    )}
+                    {a.merit && a.merit.collabCount > 0 && (
+                      <span className="flex items-center gap-0.5 text-electric-300">
+                        <Award className="h-3 w-3" /> {a.merit.collabCount} verified collab
+                        {a.merit.collabCount === 1 ? "" : "s"}
+                      </span>
                     )}
                   </p>
                   {a.creator && (
@@ -654,9 +779,7 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
             </p>
             <p>
               Price:{" "}
-              <span className="font-medium text-neon-400">
-                {selection.x402.price} testnet USDC
-              </span>
+              <span className="font-medium text-neon-400">{selection.x402.price} credits</span>
             </p>
           </div>
           <label className="block space-y-1.5">
@@ -685,12 +808,12 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
                 : phase === "quoting"
                   ? "Getting quote…"
                   : phase === "paying"
-                    ? "Approve payment in wallet…"
+                    ? "Confirming…"
                     : phase === "settling"
                       ? "Settling…"
                       : phase === "recording"
-                        ? "Attesting on-chain…"
-                        : `Approve & pay ${selection.x402.price} USDC`}
+                        ? "Saving record…"
+                        : `Approve & pay ${selection.x402.price} credits`}
             </button>
             <button
               type="button"
@@ -866,7 +989,7 @@ function AgreementsPanel({
               </p>
               <p className="mt-0.5 text-xs italic text-ink-400">“{a.objective}”</p>
               <p className="mt-0.5 text-[11px] text-ink-500">
-                {a.pricePerInstallmentUsdc} USDC / installment · {a.cooldownSeconds}s cooldown
+                {a.pricePerInstallmentUsdc} credits / installment · {a.cooldownSeconds}s cooldown
               </p>
               <div className="mt-2 flex gap-2">
                 <button
@@ -944,7 +1067,7 @@ function AgreementsPanel({
                         ? "Completed"
                         : cooling
                           ? "Cooling down…"
-                          : `Run installment (${a.pricePerInstallmentUsdc} USDC)`}
+                          : `Run installment (${a.pricePerInstallmentUsdc} credits)`}
                     </button>
                   )}
                   <button
@@ -1212,7 +1335,7 @@ function ProposeAgreementForm({
       </div>
       <p className="text-[11px] text-ink-500">
         Ceiling: ≤ {maxUnits} units per interaction, up to {installments} paid installments at{" "}
-        {price} USDC each. The seller must approve before any exchange.
+        {price} credits each. The seller must approve before any exchange.
       </p>
       {err && <p className="text-[11px] text-rose-300">{err}</p>}
       <div className="flex gap-2">

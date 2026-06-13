@@ -95,7 +95,7 @@ export function AgentIdentityCard({
           <Badge tone="signal">Arbitrum Sepolia</Badge>
           {verification?.verified ? (
             <Badge tone="positive">
-              <ShieldCheck className="h-3 w-3" /> Verified on-chain
+              <ShieldCheck className="h-3 w-3" /> Verified
             </Badge>
           ) : ownershipMismatch ? (
             <Badge tone="warning">
@@ -124,11 +124,11 @@ export function AgentIdentityCard({
 
       {verification?.verified && (
         <p className="text-xs text-emerald-300/90">
-          {`ownerOf(#${identity.agentId}) matches this smart account on Arbitrum Sepolia.`}
+          This identity is verified and controlled by your account.
         </p>
       )}
       {verification && !verification.verified && verification.configured && verification.error && (
-        <p className="text-xs text-ink-500">On-chain check unavailable: {verification.error}</p>
+        <p className="text-xs text-ink-500">Verification check unavailable: {verification.error}</p>
       )}
 
       {/* Arbiscan-first: scan the token + smart account on Arbitrum Sepolia, plus

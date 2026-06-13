@@ -44,7 +44,7 @@ export interface VerifyTransferParams {
   txHash: string;
   asset: string;
   payTo: string;
-  /** Minimum amount in base units (USDC = 6 decimals). */
+  /** Minimum amount in the asset's base units (USDC = 6, tCNHV = 18 decimals). */
   minAmount: bigint;
   /** When set, also require the transfer's `from` to match (the buyer wallet). */
   expectedFrom?: string | null;
@@ -54,8 +54,11 @@ export type VerifyTransferResult =
   | { ok: true; from: string; to: string; value: bigint; blockNumber: bigint }
   | { ok: false; error: string };
 
-/** Verify an on-chain USDC transfer settled the payment (status, asset, to, amount, age). */
-export async function verifyUsdcTransfer(
+/**
+ * Verify an on-chain ERC-20 transfer settled the payment (status, asset, to,
+ * amount, age). Asset-agnostic: the same `Transfer` decode proves USDC or tCNHV.
+ */
+export async function verifyErc20Transfer(
   params: VerifyTransferParams,
 ): Promise<VerifyTransferResult> {
   let hash: Hex;
@@ -122,8 +125,11 @@ export async function verifyUsdcTransfer(
     }
   }
 
-  return { ok: false, error: "No matching USDC transfer to the seller in this transaction." };
+  return { ok: false, error: "No matching transfer to the seller in this transaction." };
 }
+
+/** @deprecated Back-compat alias for {@link verifyErc20Transfer}. */
+export const verifyUsdcTransfer = verifyErc20Transfer;
 
 function safeAddr(value: string): string | null {
   try {

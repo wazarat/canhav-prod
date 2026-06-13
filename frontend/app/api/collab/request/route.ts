@@ -18,6 +18,7 @@ import {
 import { recordCollabExchange } from "@/lib/server/collabLog";
 import { checkRateLimit } from "@/lib/server/collabPayments";
 import { readSecret } from "@/lib/server/env";
+import { hasFactory, readTxGasWei, recordWorkOnLedger } from "@/lib/server/factory";
 import {
   decodePaymentResponseHeader,
   encodePaymentHeader,
@@ -228,6 +229,34 @@ export async function POST(req: Request) {
     units: disclosedUnits,
     agreementId: agreementId || null,
   });
+
+  // Mirror the completed exchange onto both agents' on-chain ledgers via the
+  // platform owner key (the CollabRegistry attestation below is untouched).
+  // Additive + best-effort: sequential to avoid deployer-nonce collisions,
+  // skips cleanly when the factory is unset or a ledger is missing, and never
+  // blocks the exchange.
+  if (hasFactory()) {
+    try {
+      const cnhvDelta = BigInt(sellerData.payment?.amount ?? "0");
+      const gasWei = await readTxGasWei(paymentRef);
+      await recordWorkOnLedger({
+        agentId: toAgentId,
+        counterpartyAgentId: fromAgentId,
+        cnhvDelta,
+        earned: true,
+        gasWei,
+      });
+      await recordWorkOnLedger({
+        agentId: fromAgentId,
+        counterpartyAgentId: toAgentId,
+        cnhvDelta,
+        earned: false,
+        gasWei,
+      });
+    } catch {
+      /* ledger mirroring is additive — never block a completed exchange */
+    }
+  }
 
   const registry = collabRegistryAddress();
   const buyer = await getAgentProfile(fromAgentId);

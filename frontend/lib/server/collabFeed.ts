@@ -20,7 +20,7 @@ const DEFAULT_RPC = "https://sepolia-rollup.arbitrum.io/rpc";
 const LOOKBACK_BLOCKS = 200_000n;
 
 const collabRecordedEvent = parseAbiItem(
-  "event CollabRecorded(uint256 indexed collabId, uint256 indexed fromAgentId, uint256 indexed toAgentId, bytes32 skillHash, bytes32 paymentRef, address recorder)",
+  "event CollabRecorded(uint256 indexed collabId, uint256 indexed fromAgentId, uint256 indexed toAgentId, bytes32 skillHash, bytes32 paymentRef, bytes32 agreementId, uint32 units, address recorder)",
 );
 
 export interface FeedEntry {
@@ -33,6 +33,10 @@ export interface FeedEntry {
   at: string | null;
   onChain: boolean;
   txHash: string | null;
+  /** Interaction magnitude recorded on-chain (data slices). */
+  units: number | null;
+  /** Agreement this interaction belongs to (bytes32(0) / null for one-off). */
+  agreementId: string | null;
 }
 
 function rpcUrl(): string {
@@ -59,18 +63,25 @@ async function readOnChain(): Promise<FeedEntry[]> {
       fromBlock,
       toBlock: latest,
     });
+    const ZERO_BYTES32 =
+      "0x0000000000000000000000000000000000000000000000000000000000000000";
     return logs
-      .map((log) => ({
-        fromAgentId: log.args.fromAgentId?.toString() ?? "",
-        toAgentId: log.args.toAgentId?.toString() ?? "",
-        skillHash: log.args.skillHash ?? "",
-        paymentRef: log.args.paymentRef ?? "",
-        recorder: log.args.recorder ?? null,
-        amount: null,
-        at: null,
-        onChain: true,
-        txHash: log.transactionHash,
-      }))
+      .map((log) => {
+        const agreementId = log.args.agreementId ?? null;
+        return {
+          fromAgentId: log.args.fromAgentId?.toString() ?? "",
+          toAgentId: log.args.toAgentId?.toString() ?? "",
+          skillHash: log.args.skillHash ?? "",
+          paymentRef: log.args.paymentRef ?? "",
+          recorder: log.args.recorder ?? null,
+          amount: null,
+          at: null,
+          onChain: true,
+          txHash: log.transactionHash,
+          units: log.args.units != null ? Number(log.args.units) : null,
+          agreementId: agreementId && agreementId !== ZERO_BYTES32 ? agreementId : null,
+        };
+      })
       .reverse();
   } catch {
     // RPC unavailable / range too large — degrade to the off-chain log.
@@ -92,6 +103,8 @@ export async function listFeed(limit = 50): Promise<FeedEntry[]> {
     if (existing) {
       existing.amount = e.amount;
       existing.at = e.at;
+      if (existing.units == null && e.units != null) existing.units = e.units;
+      if (!existing.agreementId && e.agreementId) existing.agreementId = e.agreementId;
     } else {
       byRef.set(k, {
         fromAgentId: e.fromAgentId,
@@ -103,6 +116,8 @@ export async function listFeed(limit = 50): Promise<FeedEntry[]> {
         at: e.at,
         onChain: false,
         txHash: e.paymentRef,
+        units: e.units ?? null,
+        agreementId: e.agreementId ?? null,
       });
     }
   }

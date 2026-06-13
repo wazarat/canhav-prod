@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { hasZeroDev } from "@/lib/agent/config";
-import { deriveAccountIndex } from "@/lib/agent/account-index";
+import { creationSlotKey, deriveAccountIndex } from "@/lib/agent/account-index";
 import { resolveEntityBinding } from "@/lib/agent/entity-binding";
 import {
   getAgentProfile,
@@ -10,6 +10,7 @@ import {
   seedAgentProfile,
   type AgentCategory,
 } from "@/lib/agent/memory";
+import { verifyAgentOnChain } from "@/lib/agent/onchain";
 import { getAgentSkillById } from "@/lib/agent/skills";
 import { getSession } from "@/lib/auth/session";
 import { getUserEntityAgent, linkAgentToUser, setUserEntityAgent } from "@/lib/auth/users";
@@ -74,6 +75,7 @@ export async function POST(req: Request) {
   let body: {
     skillId?: string;
     entitySlug?: string;
+    nonce?: string;
     mintResult?: unknown;
     name?: unknown;
     category?: unknown;
@@ -113,12 +115,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: `Unknown skill "${skillId}".` }, { status: 404 });
   }
 
+  // General agents (created on /agents) have no entity binding and carry a
+  // per-create nonce; legacy entity-bound mints carry a real entity slug. The
+  // slot key drives idempotency + the deterministic smart-account salt; the
+  // stored profile.entitySlug is the REAL entity (null for general agents).
   const entitySlug =
-    typeof body.entitySlug === "string" && body.entitySlug ? body.entitySlug : skillId;
-  const binding = await resolveEntityBinding(entitySlug);
+    typeof body.entitySlug === "string" && body.entitySlug ? body.entitySlug : null;
+  const nonce = typeof body.nonce === "string" && body.nonce ? body.nonce : null;
+  const slotKey = creationSlotKey({ entitySlug, nonce, skillId });
+  const binding = entitySlug ? await resolveEntityBinding(entitySlug) : null;
   const associatedProducts = binding?.associatedProducts ?? [];
 
-  const existingAgentId = await getUserEntityAgent(session.userId, entitySlug);
+  const existingAgentId = await getUserEntityAgent(session.userId, slotKey);
   if (existingAgentId) {
     const existing = await getAgentProfile(existingAgentId);
     if (existing) {
@@ -143,12 +151,38 @@ export async function POST(req: Request) {
   const { agentId, agentAddress, agentURI } = body.mintResult;
   const walletVerified = Boolean(body.mintResult.walletVerified);
   const agentWallet = walletVerified ? (body.mintResult.agentWallet ?? agentAddress) : null;
-  const accountIndex = deriveAccountIndex(session.userId, entitySlug);
+  const accountIndex = deriveAccountIndex(session.userId, slotKey);
   const registry = readSecret("IDENTITY_REGISTRY_ADDRESS");
   const arbiscanUrl = `https://sepolia.arbiscan.io/address/${agentAddress}`;
   const tokenUrl = registry
     ? `https://sepolia.arbiscan.io/token/${registry}?a=${agentId}`
     : null;
+
+  // Trust, but verify. The mint runs in the browser, so the server independently
+  // reconciles the client-reported result against the chain before claiming the
+  // agent is on-chain ("are they as they seem"):
+  //   - a GENUINE owner mismatch (ownerOf != the minted smart account) is
+  //     rejected as likely spoofed and never persisted;
+  //   - a transient read failure (RPC lag, not yet indexed) is persisted as
+  //     pendingVerification and reconciled later by GET /api/agent/{id}/verify.
+  const verification = await verifyAgentOnChain(agentId, agentAddress);
+  if (
+    verification.configured &&
+    verification.owner &&
+    verification.expectedOwner &&
+    verification.owner.toLowerCase() !== verification.expectedOwner.toLowerCase()
+  ) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: "owner_mismatch",
+        error:
+          "On-chain owner does not match the minted smart account; the agent was not persisted.",
+      },
+      { status: 409 },
+    );
+  }
+  const confirmedOnChain = verification.verified;
 
   await seedAgentProfile({
     agentId,
@@ -156,12 +190,14 @@ export async function POST(req: Request) {
     category,
     skillId,
     entitySlug,
+    ownerUserId: session.userId,
     associatedProducts,
     accountIndex,
     agentAddress,
     agentURI,
     agentWallet,
-    onChain: true,
+    onChain: confirmedOnChain,
+    pendingVerification: !confirmedOnChain,
   });
   await markSkillStudied(agentId, skillId);
 
@@ -173,7 +209,7 @@ export async function POST(req: Request) {
     if (extra) await markSkillStudied(agentId, extraId);
   }
   await linkAgentToUser(session.userId, agentId);
-  await setUserEntityAgent(session.userId, entitySlug, agentId);
+  await setUserEntityAgent(session.userId, slotKey, agentId);
 
   return NextResponse.json({
     ok: true,
@@ -184,5 +220,7 @@ export async function POST(req: Request) {
     tokenUrl,
     agentWallet,
     walletVerified,
+    onChain: confirmedOnChain,
+    pendingVerification: !confirmedOnChain,
   });
 }

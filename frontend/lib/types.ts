@@ -518,6 +518,26 @@ export interface StrategyPacket {
   issuedAt: string;
   /** Objective-aware seller addendum (null when no LLM key / no objective). */
   tailoredBrief?: TailoredBrief | null;
+  /**
+   * Drip-disclosure descriptor when the packet is one installment of an
+   * agreement: the seller reveals only a bounded slice per interaction so the
+   * buyer accumulates the knowledge over installments rather than draining it
+   * all at once (anti-extraction).
+   */
+  drip?: StrategyPacketDrip | null;
+}
+
+export interface StrategyPacketDrip {
+  /** 0-based index of this installment. */
+  installmentIndex: number;
+  /** Total installments agreed. */
+  totalInstallments: number;
+  /** Units (data slices) disclosed in this installment. */
+  units: number;
+  /** Whether more installments remain after this one. */
+  hasMore: boolean;
+  /** Human-readable slice descriptor, e.g. "facts 4–6 of 9". */
+  label: string;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -48,7 +48,8 @@ export async function mintAgentOnClient(params: {
   skill: AgentSkill;
   signer: Signer;
   accountIndex: number;
-  entitySlug: string;
+  /** Real entity slug for legacy entity-bound mints; null/undefined for general agents. */
+  entitySlug?: string | null;
   associatedProducts: AgentProductRef[];
   mintConfig: SpawnMintConfig;
   baseUrl: string;
@@ -66,7 +67,7 @@ export async function mintAgentOnClient(params: {
     skill: params.skill,
     signer: params.signer,
     index: BigInt(params.accountIndex),
-    entity: params.entitySlug,
+    entity: params.entitySlug ?? undefined,
     associatedProducts: params.associatedProducts,
     baseUrl: params.baseUrl,
   });

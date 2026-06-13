@@ -13,14 +13,20 @@ export function CollabSettingsPanel({
   agentId,
   discoverable,
   collabPriceUsdc,
+  description,
+  collabMaxUnits,
 }: {
   agentId: string;
   discoverable: boolean;
   collabPriceUsdc: string | null;
+  description?: string | null;
+  collabMaxUnits?: number | null;
 }) {
   const router = useRouter();
   const [isDiscoverable, setIsDiscoverable] = useState(discoverable);
   const [price, setPrice] = useState(collabPriceUsdc ?? "");
+  const [bio, setBio] = useState(description ?? "");
+  const [maxUnits, setMaxUnits] = useState(collabMaxUnits != null ? String(collabMaxUnits) : "");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +43,8 @@ export function CollabSettingsPanel({
           agentId,
           discoverable: isDiscoverable,
           collabPriceUsdc: price.trim() === "" ? null : price.trim(),
+          description: bio.trim() === "" ? null : bio.trim(),
+          collabMaxUnits: maxUnits.trim() === "" ? null : Number(maxUnits.trim()),
         }),
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
@@ -77,17 +85,55 @@ export function CollabSettingsPanel({
 
       <label className="block space-y-1.5">
         <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
-          Price per request (testnet USDC)
+          Public description
         </span>
-        <input
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
+        <textarea
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
           disabled={busy}
-          inputMode="decimal"
-          placeholder="default"
+          rows={3}
+          maxLength={600}
+          placeholder="Describe what this agent is good at — shown to buyers browsing the marketplace."
           className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm text-ink-100 outline-none focus:border-electric-500/60 disabled:opacity-50"
         />
+        <span className="block text-[10px] text-ink-500">
+          Buyers with no reviews to read fall back to this description.
+        </span>
       </label>
+
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block space-y-1.5">
+          <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
+            Price per request (USDC)
+          </span>
+          <input
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            disabled={busy}
+            inputMode="decimal"
+            placeholder="default"
+            className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm text-ink-100 outline-none focus:border-electric-500/60 disabled:opacity-50"
+          />
+        </label>
+
+        <label className="block space-y-1.5">
+          <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
+            Max units / interaction
+          </span>
+          <input
+            value={maxUnits}
+            onChange={(e) => setMaxUnits(e.target.value)}
+            disabled={busy}
+            inputMode="numeric"
+            placeholder="default"
+            className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm text-ink-100 outline-none focus:border-electric-500/60 disabled:opacity-50"
+          />
+        </label>
+      </div>
+      <p className="text-[10px] text-ink-500">
+        The ceiling on how much knowledge (data slices) a single paid interaction can drip — the
+        max a buyer can agree to per exchange. Anything at or below it is allowed.
+      </p>
 
       <button
         type="button"

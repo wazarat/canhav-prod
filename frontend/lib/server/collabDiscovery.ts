@@ -21,6 +21,7 @@ import { OWNER_CORRECTION_SOURCE } from "@/lib/agent/prompt";
 import { readAgentReputation } from "@/lib/agent/reputation";
 import { readAgentWallet } from "@/lib/agent/onchain";
 import { listCollabExchanges } from "@/lib/server/collabLog";
+import { getCreatorInfo, type SellerCreator } from "@/lib/server/sellerDetail";
 import { getUserSkill } from "@/lib/server/userSkills";
 
 /**
@@ -48,6 +49,10 @@ export interface AgentDiscoveryEntry {
   agentId: string;
   agentName: string;
   ownerHandle: string;
+  /** Owner-authored marketplace bio (null = none yet). */
+  description: string | null;
+  /** Creator identity + account age, for buyer trust. */
+  creator: SellerCreator | null;
   agentWallet: string | null;
   walletVerified: boolean;
   offerHash: string;
@@ -90,7 +95,7 @@ async function buildAgentEntry(
   const offer = await resolveAgentOffer(agentId);
   if (!offer) return null;
 
-  const [wallet, reputation, memory, studied, frames, docs, tools] = await Promise.all([
+  const [wallet, reputation, memory, studied, frames, docs, tools, creator] = await Promise.all([
     readAgentWallet(agentId),
     readAgentReputation(agentId),
     getMemory(agentId),
@@ -98,6 +103,7 @@ async function buildAgentEntry(
     listDataFrames(agentId),
     listKnowledgeDocs(agentId),
     listCustomTools(agentId),
+    getCreatorInfo(profile.ownerUserId),
   ]);
 
   const corrections = memory.filter((f) => f.source === OWNER_CORRECTION_SOURCE).length;
@@ -112,6 +118,8 @@ async function buildAgentEntry(
     agentId,
     agentName: profile.name,
     ownerHandle: profile.name.replace(/ — Research Skill$/, ""),
+    description: profile.description,
+    creator,
     agentWallet: wallet ?? profile.agentWallet ?? null,
     walletVerified: Boolean(wallet),
     offerHash: offer.hash,
@@ -138,8 +146,40 @@ async function buildAgentEntry(
   };
 }
 
+export interface DiscoveryFilter {
+  /** Restrict to a single research category/tag (case-insensitive). */
+  category?: string | null;
+  /** Free-text search over name, description, expertise, focus areas, creator. */
+  q?: string | null;
+}
+
+function matchesFilter(entry: AgentDiscoveryEntry, filter: DiscoveryFilter): boolean {
+  if (filter.category) {
+    if ((entry.specialization.category ?? "").toLowerCase() !== filter.category.toLowerCase()) {
+      return false;
+    }
+  }
+  const q = filter.q?.trim().toLowerCase();
+  if (q) {
+    const haystack = [
+      entry.agentName,
+      entry.description ?? "",
+      entry.creator?.displayName ?? "",
+      entry.specialization.entitySlug ?? "",
+      ...entry.attachedSkillTitles,
+      ...entry.specialization.focusAreas,
+    ]
+      .join(" ")
+      .toLowerCase();
+    if (!haystack.includes(q)) return false;
+  }
+  return true;
+}
+
 /** All discoverable agents with bundled attached skills, ranked by reputation then level. */
-export async function listDiscoverableAgents(): Promise<AgentDiscoveryEntry[]> {
+export async function listDiscoverableAgents(
+  filter: DiscoveryFilter = {},
+): Promise<AgentDiscoveryEntry[]> {
   const exchangeCounts = await sellerExchangeCounts();
   const profiles = await listAgents();
   const entries = await Promise.all(
@@ -147,6 +187,7 @@ export async function listDiscoverableAgents(): Promise<AgentDiscoveryEntry[]> {
   );
   return entries
     .filter((e): e is AgentDiscoveryEntry => Boolean(e))
+    .filter((e) => matchesFilter(e, filter))
     .sort(
       (a, b) =>
         (b.reputationScore ?? 0) - (a.reputationScore ?? 0) ||

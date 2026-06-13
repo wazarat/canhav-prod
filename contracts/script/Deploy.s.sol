@@ -7,6 +7,7 @@ import {ReputationRegistry} from "../src/reputation/ReputationRegistry.sol";
 import {ValidationRegistry} from "../src/validation/ValidationRegistry.sol";
 import {SecurityRegistry} from "../src/security/SecurityRegistry.sol";
 import {CollabRegistry} from "../src/collab/CollabRegistry.sol";
+import {CollabAgreement} from "../src/collab/CollabAgreement.sol";
 import {ISecurityRegistry} from "../src/interfaces/ISecurityRegistry.sol";
 
 /**
@@ -35,7 +36,8 @@ contract Deploy {
             ReputationRegistry reputation,
             ValidationRegistry validation,
             SecurityRegistry security,
-            CollabRegistry collab
+            CollabRegistry collab,
+            CollabAgreement agreement
         )
     {
         if (block.chainid != ARBITRUM_SEPOLIA) revert WrongNetwork(block.chainid);
@@ -49,9 +51,12 @@ contract Deploy {
         validation = new ValidationRegistry(address(identity));
         security = new SecurityRegistry(deployer);
         collab = new CollabRegistry();
-        // Allowlist the CollabRegistry so agents can attest collaborations through
-        // the security gate (assertTargetAllowed) — the deployer is the owner.
+        agreement = new CollabAgreement();
+        // Allowlist the collab contracts so agents can attest collaborations and
+        // record interactions through the security gate (assertTargetAllowed) —
+        // the deployer is the owner.
         security.setStatus(address(collab), ISecurityRegistry.SecurityStatus.Verified, "");
+        security.setStatus(address(agreement), ISecurityRegistry.SecurityStatus.Verified, "");
         vm.stopBroadcast();
     }
 }

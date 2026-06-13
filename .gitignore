@@ -39,6 +39,11 @@ backend/data/agent-store.json
 # Passkey user + conversation fallbacks (offline dev only)
 backend/data/user-store.json
 backend/data/conversation-store.json
+# Agent collaboration state fallbacks (offline dev only; production uses Upstash Redis)
+backend/data/collab-payrefs.json
+backend/data/collab-log.json
+backend/data/collab-agreements.json
+backend/data/collab-reviews.json
 
 # OS / editor
 .DS_Store

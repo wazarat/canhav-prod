@@ -24,7 +24,13 @@ import {
 } from "@/lib/agent/customTools";
 import { frameMetricOptionsForProducts } from "@/lib/agent/dataframes";
 import { KNOWLEDGE_LIMITS, knowledgeUrlAllowlist, listKnowledgeDocs } from "@/lib/agent/knowledge";
-import { agentLevel, getAgentSnapshot, listDataFrames, MAX_DATA_FRAMES } from "@/lib/agent/memory";
+import {
+  agentLevel,
+  confirmAgentOnChain,
+  getAgentSnapshot,
+  listDataFrames,
+  MAX_DATA_FRAMES,
+} from "@/lib/agent/memory";
 import { OWNER_CORRECTION_SOURCE } from "@/lib/agent/prompt";
 import { buildAgentSuggestions, type AgentSuggestion } from "@/lib/agent/suggestions";
 import { verifyAgentOnChain } from "@/lib/agent/onchain";
@@ -81,10 +87,22 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
     : null;
 
   // Verify the ERC-8004 identity on-chain (ownerOf matches the smart account)
-  // for the live "Verified on-chain" badge. Only attempt it for minted agents.
-  const verification = profile.onChain
-    ? await verifyAgentOnChain(agentId, profile.agentAddress)
-    : undefined;
+  // for the live "Verified on-chain" badge. Attempt it for any numeric tokenId —
+  // including mints still pending server-side reconciliation — so the badge
+  // reflects chain truth, not just the stored flag.
+  const isNumericId = /^\d+$/.test(profile.agentId);
+  const verification =
+    isNumericId && (profile.onChain || profile.pendingVerification)
+      ? await verifyAgentOnChain(agentId, profile.agentAddress)
+      : undefined;
+  // Self-heal the stored flag when a pending mint is confirmed on-chain.
+  if (verification?.verified && (!profile.onChain || profile.pendingVerification)) {
+    await confirmAgentOnChain(agentId);
+    profile.onChain = true;
+    profile.pendingVerification = false;
+  }
+  // The badge trusts the live read when we have one, falling back to the flag.
+  const verifiedOnChain = verification ? verification.verified : profile.onChain;
   const agentCardJsonUrl = profile.agentAddress
     ? `/api/agent/by-address/${profile.agentAddress}/agent-card`
     : null;
@@ -92,7 +110,7 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
   // Arbiscan-first: a direct link to the minted ERC-721 token on the registry,
   // plus the platform's own on-chain verification endpoint.
   const registry = verification?.registry ?? null;
-  const isMinted = profile.onChain && /^\d+$/.test(profile.agentId);
+  const isMinted = verifiedOnChain && isNumericId;
   const tokenUrl =
     registry && isMinted
       ? `https://sepolia.arbiscan.io/token/${registry}?a=${profile.agentId}`
@@ -125,10 +143,12 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
             <Sparkles className="h-3 w-3" /> Level {level}
           </Badge>
           <Badge tone="signal">Arbitrum Sepolia · Testnet</Badge>
-          {profile.onChain ? (
+          {verifiedOnChain ? (
             <Badge tone="positive">
               <CircleDot className="h-3 w-3 animate-pulse-soft" /> on-chain
             </Badge>
+          ) : profile.pendingVerification ? (
+            <Badge tone="neutral">verifying…</Badge>
           ) : (
             <Badge tone="neutral">local</Badge>
           )}
@@ -154,27 +174,18 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
             )}
           </p>
         )}
-        {!profile.onChain && (
+        {!verifiedOnChain && (
           <div className="flex flex-wrap items-start gap-3 rounded-xl border border-ink-700/80 bg-ink-900/40 px-4 py-3">
             <Rocket className="mt-0.5 h-4 w-4 shrink-0 text-electric-400" />
             <p className="text-sm text-ink-300">
               This agent is <span className="font-medium text-ink-100">local only</span> — it has
               no ERC-8004 token yet, so there is nothing to scan on Arbiscan.{" "}
-              {profile.entitySlug ? (
-                <Link
-                  href={`/entities/${profile.entitySlug}`}
-                  className="font-medium text-electric-400 hover:text-electric-300"
-                >
-                  Create its on-chain identity on the {profile.entitySlug} page
-                </Link>
-              ) : (
-                <Link
-                  href="/entities"
-                  className="font-medium text-electric-400 hover:text-electric-300"
-                >
-                  Open an entity page
-                </Link>
-              )}{" "}
+              <Link
+                href="/agents#create"
+                className="font-medium text-electric-400 hover:text-electric-300"
+              >
+                Launch a new agent on the Agents tab
+              </Link>{" "}
               to mint a wallet-owned ERC-8004 token on Arbitrum Sepolia.
             </p>
           </div>
@@ -199,7 +210,7 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
                 arbiscanUrl,
                 tokenUrl,
                 skillTitle: profile.name,
-                onChain: profile.onChain,
+                onChain: verifiedOnChain,
               }}
               verification={verification}
               agentCardUrl={agentCardJsonUrl}
@@ -264,6 +275,8 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
                 agentId={agentId}
                 discoverable={profile.discoverable}
                 collabPriceUsdc={profile.collabPriceUsdc}
+                description={profile.description}
+                collabMaxUnits={profile.collabMaxUnits}
               />
             </>
           )}

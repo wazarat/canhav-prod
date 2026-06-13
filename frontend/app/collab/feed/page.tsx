@@ -98,6 +98,16 @@ export default async function CollabFeedPage() {
                   {e.amount && e.amount !== "0" && (
                     <span className="text-ink-400">· paid</span>
                   )}
+                  {e.units != null && (
+                    <span className="rounded-full border border-neon-500/30 bg-neon-500/10 px-2 py-0.5 text-[10px] font-medium text-neon-300">
+                      {e.units} unit{e.units === 1 ? "" : "s"}
+                    </span>
+                  )}
+                  {e.agreementId && (
+                    <span className="rounded-full border border-signal-400/30 bg-signal-400/10 px-2 py-0.5 text-[10px] font-medium text-signal-400">
+                      agreement
+                    </span>
+                  )}
                 </p>
                 <p className="mt-0.5 font-mono text-[10px] text-ink-500">
                   skillHash {e.skillHash.slice(0, 18)}… · ref {e.paymentRef.slice(0, 18)}…

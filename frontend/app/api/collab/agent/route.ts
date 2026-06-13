@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getAgentProfile, setAgentDiscoverability } from "@/lib/agent/memory";
+import { getAgentProfile, setAgentCollabSettings } from "@/lib/agent/memory";
 import { parseUsdcToBaseUnits } from "@/lib/agent/collab-config";
 import { getSession } from "@/lib/auth/session";
 import { listUserAgentIds } from "@/lib/auth/users";
@@ -21,7 +21,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });
   }
 
-  let body: { agentId?: string; discoverable?: boolean; collabPriceUsdc?: string | null } = {};
+  let body: {
+    agentId?: string;
+    discoverable?: boolean;
+    collabPriceUsdc?: string | null;
+    description?: string | null;
+    collabMaxUnits?: number | string | null;
+  } = {};
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -50,7 +56,35 @@ export async function POST(req: Request) {
     price = undefined; // leave unchanged
   }
 
-  const updated = await setAgentDiscoverability(agentId, Boolean(body.discoverable), price);
+  // Optional public description.
+  let description: string | null | undefined;
+  if (typeof body.description === "string") {
+    description = body.description.trim().slice(0, 600) || null;
+  } else if (body.description === null) {
+    description = null;
+  }
+
+  // Optional per-interaction unit ceiling (1–100; the seller's advertised max).
+  let collabMaxUnits: number | null | undefined;
+  if (body.collabMaxUnits === null || body.collabMaxUnits === "") {
+    collabMaxUnits = null;
+  } else if (body.collabMaxUnits !== undefined) {
+    const n = Math.round(Number(body.collabMaxUnits));
+    if (!Number.isFinite(n) || n < 1 || n > 100) {
+      return NextResponse.json(
+        { ok: false, error: "Max units per interaction must be between 1 and 100." },
+        { status: 400 },
+      );
+    }
+    collabMaxUnits = n;
+  }
+
+  const updated = await setAgentCollabSettings(agentId, {
+    discoverable: Boolean(body.discoverable),
+    collabPriceUsdc: price,
+    description,
+    collabMaxUnits,
+  });
   if (!updated) {
     return NextResponse.json({ ok: false, error: "Agent not found." }, { status: 404 });
   }
@@ -60,5 +94,7 @@ export async function POST(req: Request) {
     ok: true,
     discoverable: profile?.discoverable ?? false,
     collabPriceUsdc: profile?.collabPriceUsdc ?? null,
+    description: profile?.description ?? null,
+    collabMaxUnits: profile?.collabMaxUnits ?? null,
   });
 }

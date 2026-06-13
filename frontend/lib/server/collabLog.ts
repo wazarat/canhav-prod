@@ -28,6 +28,10 @@ export interface CollabLogEntry {
   paymentRef: string;
   amount: string;
   at: string;
+  /** Interaction magnitude (data slices) disclosed in this exchange. */
+  units?: number;
+  /** The agreement this interaction belongs to (null for one-off). */
+  agreementId?: string | null;
 }
 
 function filePath(): string {

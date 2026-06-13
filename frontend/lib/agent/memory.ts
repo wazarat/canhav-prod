@@ -69,6 +69,10 @@ export interface AgentProfile {
   skillId: string | null;
   /** The Entity ("project") this agent lives on. Null = general research agent. */
   entitySlug: string | null;
+  /** The Privy user id (DID) of the creator/owner. Null for legacy/seeded agents. */
+  ownerUserId: string | null;
+  /** Owner-authored bio shown in the collaboration marketplace. Null = none. */
+  description: string | null;
   /** Member products of the bound entity, denormalized for fast scoping. */
   associatedProducts: AgentProductRef[];
   /** Deterministic salt used for this agent's ZeroDev sub-account (per project). */
@@ -79,10 +83,18 @@ export interface AgentProfile {
   agentWallet: string | null;
   /** Whether an ERC-8004 identity was minted on-chain for this agent. */
   onChain: boolean;
+  /**
+   * True when a mint was reported by the client but the server has not yet
+   * reconciled `ownerOf(agentId)` on-chain. The live verify route promotes this
+   * to a confirmed `onChain:true` once the read succeeds.
+   */
+  pendingVerification: boolean;
   /** Owner opt-in: only discoverable agents appear in collaboration search. */
   discoverable: boolean;
   /** Price (testnet USDC) the agent charges per StrategyPacket. Null = default. */
   collabPriceUsdc: string | null;
+  /** Seller ceiling: max interaction "units" (data slices) per exchange. Null = default. */
+  collabMaxUnits: number | null;
   /** Owner-tunable framework (focus, instructions, style). Null = defaults. */
   config: AgentConfig | null;
   chain: typeof AGENT_CHAIN;
@@ -206,11 +218,15 @@ function normalizeProfile(profile: AgentProfile | null): AgentProfile | null {
     ...profile,
     category: isAgentCategory(profile.category) ? profile.category : null,
     entitySlug: profile.entitySlug ?? null,
+    ownerUserId: profile.ownerUserId ?? null,
+    description: profile.description ?? null,
     associatedProducts: profile.associatedProducts ?? [],
     accountIndex: profile.accountIndex ?? null,
     agentWallet: profile.agentWallet ?? null,
+    pendingVerification: profile.pendingVerification ?? false,
     discoverable: profile.discoverable ?? false,
     collabPriceUsdc: profile.collabPriceUsdc ?? null,
+    collabMaxUnits: profile.collabMaxUnits ?? null,
     config: profile.config ? sanitizeAgentConfig(profile.config) : null,
   };
 }
@@ -228,14 +244,18 @@ export interface SeedProfileInput {
   category?: AgentCategory | null;
   skillId?: string | null;
   entitySlug?: string | null;
+  ownerUserId?: string | null;
+  description?: string | null;
   associatedProducts?: AgentProductRef[];
   accountIndex?: number | null;
   agentAddress?: string | null;
   agentURI?: string | null;
   agentWallet?: string | null;
   onChain?: boolean;
+  pendingVerification?: boolean;
   discoverable?: boolean;
   collabPriceUsdc?: string | null;
+  collabMaxUnits?: number | null;
   config?: AgentConfig | null;
 }
 
@@ -248,6 +268,8 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
     category: input.category !== undefined ? input.category : (existing?.category ?? null),
     skillId: input.skillId ?? existing?.skillId ?? null,
     entitySlug: input.entitySlug ?? existing?.entitySlug ?? null,
+    ownerUserId: input.ownerUserId ?? existing?.ownerUserId ?? null,
+    description: input.description !== undefined ? input.description : (existing?.description ?? null),
     associatedProducts:
       input.associatedProducts ?? existing?.associatedProducts ?? [],
     accountIndex: input.accountIndex ?? existing?.accountIndex ?? null,
@@ -255,8 +277,10 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
     agentURI: input.agentURI ?? existing?.agentURI ?? null,
     agentWallet: input.agentWallet ?? existing?.agentWallet ?? null,
     onChain: input.onChain ?? existing?.onChain ?? false,
+    pendingVerification: input.pendingVerification ?? existing?.pendingVerification ?? false,
     discoverable: input.discoverable ?? existing?.discoverable ?? false,
     collabPriceUsdc: input.collabPriceUsdc ?? existing?.collabPriceUsdc ?? null,
+    collabMaxUnits: input.collabMaxUnits ?? existing?.collabMaxUnits ?? null,
     config: input.config !== undefined ? input.config : (existing?.config ?? null),
     chain: AGENT_CHAIN,
     createdAt: existing?.createdAt ?? nowIso(),
@@ -308,6 +332,52 @@ export async function setAgentDiscoverability(
     name: existing.name,
     discoverable,
     collabPriceUsdc: collabPriceUsdc !== undefined ? collabPriceUsdc : existing.collabPriceUsdc,
+  });
+}
+
+/**
+ * Owner-only: set the marketplace-facing collaboration settings in one shot —
+ * discoverability, price, a public description, and the per-interaction unit
+ * ceiling sellers advertise. Returns null if the agent doesn't exist.
+ */
+export async function setAgentCollabSettings(
+  agentId: string,
+  updates: {
+    discoverable?: boolean;
+    collabPriceUsdc?: string | null;
+    description?: string | null;
+    collabMaxUnits?: number | null;
+  },
+): Promise<AgentProfile | null> {
+  const existing = await getAgentProfile(agentId);
+  if (!existing) return null;
+  return seedAgentProfile({
+    agentId,
+    name: existing.name,
+    discoverable: updates.discoverable !== undefined ? updates.discoverable : existing.discoverable,
+    collabPriceUsdc:
+      updates.collabPriceUsdc !== undefined ? updates.collabPriceUsdc : existing.collabPriceUsdc,
+    description: updates.description !== undefined ? updates.description : existing.description,
+    collabMaxUnits:
+      updates.collabMaxUnits !== undefined ? updates.collabMaxUnits : existing.collabMaxUnits,
+  });
+}
+
+/**
+ * Reconcile the stored `onChain` flag with a confirmed on-chain read. Called by
+ * the verify route: when a mint that was persisted as `pendingVerification` is
+ * confirmed owned by its smart account, promote it to a trusted `onChain:true`.
+ * Returns the updated profile, or null if nothing changed / unknown agent.
+ */
+export async function confirmAgentOnChain(agentId: string): Promise<AgentProfile | null> {
+  const existing = await getAgentProfile(agentId);
+  if (!existing) return null;
+  if (existing.onChain && !existing.pendingVerification) return existing;
+  return seedAgentProfile({
+    agentId,
+    name: existing.name,
+    onChain: true,
+    pendingVerification: false,
   });
 }
 

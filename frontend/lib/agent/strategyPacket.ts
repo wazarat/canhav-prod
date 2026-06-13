@@ -1,5 +1,5 @@
 import { skillMarkdownHash } from "@/lib/agent/skillHash";
-import type { AgentSkill, StrategyPacket } from "@/lib/types";
+import type { AgentSkill, StrategyPacket, StrategyPacketDrip } from "@/lib/types";
 
 /** Render a received StrategyPacket as Markdown for ingestion into agent memory. */
 export function strategyPacketToMarkdown(packet: StrategyPacket): string {
@@ -7,6 +7,9 @@ export function strategyPacketToMarkdown(packet: StrategyPacket): string {
   lines.push(`# Learned strategy: ${packet.title}`);
   lines.push(`> ${packet.summary}`);
   lines.push(`> Acquired from agent ${packet.producedByAgentId} (skill ${packet.skillId}).`);
+  if (packet.drip) {
+    lines.push(`> Installment ${packet.drip.installmentIndex + 1}/${packet.drip.totalInstallments} — ${packet.drip.label}.`);
+  }
   if (packet.steps.length) {
     lines.push("", "## Steps");
     packet.steps.forEach((s, i) => lines.push(`${i + 1}. ${s}`));
@@ -46,6 +49,14 @@ export function buildStrategyPacket(
     producedByAgentId: string;
     paymentRef: string;
     maxAnswerTokens?: number;
+    /**
+     * Drip disclosure: when set, the packet returns only one installment's
+     * slice of the skill (`units` items per category, windowed by
+     * `installmentIndex`) instead of the full bundle, and carries a `drip`
+     * descriptor. Anti-extraction: a single interaction can never reveal more
+     * than the agreed `units`.
+     */
+    drip?: { installmentIndex: number; totalInstallments: number; units: number };
   },
 ): StrategyPacket {
   // ~4 chars per token: convert the soft token cap to a character budget for steps.
@@ -62,16 +73,44 @@ export function buildStrategyPacket(
     used += step.length;
   }
 
+  let outSteps = steps;
+  let outFacts = skill.facts;
+  let outSources = skill.sources;
+  let drip: StrategyPacketDrip | null = null;
+
+  if (opts.drip) {
+    const { installmentIndex, totalInstallments, units } = opts.drip;
+    const start = installmentIndex * units;
+    const end = start + units;
+    outSteps = steps.slice(start, end);
+    outFacts = skill.facts.slice(start, end);
+    outSources = skill.sources.slice(start, end);
+
+    const maxLen = Math.max(steps.length, skill.facts.length, skill.sources.length);
+    const revealed = Math.min(end, maxLen);
+    drip = {
+      installmentIndex,
+      totalInstallments,
+      units,
+      hasMore: installmentIndex + 1 < totalInstallments && revealed < maxLen,
+      label:
+        maxLen === 0
+          ? `installment ${installmentIndex + 1} of ${totalInstallments}`
+          : `slice ${Math.min(start + 1, maxLen)}–${revealed} of ${maxLen} (installment ${installmentIndex + 1}/${totalInstallments})`,
+    };
+  }
+
   return {
     skillId: skill.id,
     producedByAgentId: opts.producedByAgentId,
     title: skill.title,
     summary: skill.summary,
-    steps,
-    facts: skill.facts,
-    sources: skill.sources,
+    steps: outSteps,
+    facts: outFacts,
+    sources: outSources,
     skillHash: skillMarkdownHash(skill),
     paymentRef: opts.paymentRef,
     issuedAt: new Date().toISOString(),
+    drip,
   };
 }

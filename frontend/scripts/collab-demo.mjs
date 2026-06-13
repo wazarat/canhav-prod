@@ -397,9 +397,11 @@ function seedFiles() {
 /* ---------------------------- on-chain (opt) ----------------------------- */
 
 const collabRegistryAbi = parseAbi([
-  "function recordCollab(uint256 fromAgentId, uint256 toAgentId, bytes32 skillHash, bytes32 paymentRef) returns (uint256)",
+  "function recordCollab(uint256 fromAgentId, uint256 toAgentId, bytes32 skillHash, bytes32 paymentRef, bytes32 agreementId, uint32 units) returns (uint256)",
   "function collabCount() view returns (uint256)",
 ]);
+
+const ZERO_BYTES32 = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 async function attestOnChain() {
   const pk = process.env.PRIVATE_KEY;
@@ -420,7 +422,14 @@ async function attestOnChain() {
         address,
         abi: collabRegistryAbi,
         functionName: "recordCollab",
-        args: [BigInt(ex.fromAgentId), BigInt(ex.toAgentId), ex.skillHash, ex.paymentRef],
+        args: [
+          BigInt(ex.fromAgentId),
+          BigInt(ex.toAgentId),
+          ex.skillHash,
+          ex.paymentRef,
+          ZERO_BYTES32,
+          ex.units ?? 1,
+        ],
       });
       const receipt = await pub.waitForTransactionReceipt({ hash });
       console.log(`  ✓ recordCollab ${ex.fromAgentId}->${ex.toAgentId} tx=${hash} (${receipt.status})`);

@@ -2,28 +2,32 @@ import { NextResponse } from "next/server";
 
 import { agentOfferSkillId } from "@/lib/agent/agentOffer";
 import {
-  collabUsdcAsset,
   defaultCollabPriceUsdc,
   formatUsdc,
   parseUsdcToBaseUnits,
-  USDC_DECIMALS,
 } from "@/lib/agent/collab-config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { readAgentWallet } from "@/lib/agent/onchain";
 import { resolveAgentOffer } from "@/lib/agent/agentOffer";
 import { buildStrategyPacket } from "@/lib/agent/strategyPacket";
 import { generateTailoredBrief } from "@/lib/agent/tailoredBrief";
+import { releasePaymentRef, tryConsumePaymentRef } from "@/lib/server/collabPayments";
 import {
-  releasePaymentRef,
-  tryConsumePaymentRef,
-  verifyUsdcTransfer,
-} from "@/lib/server/collabPayments";
+  buildPaymentChallenge,
+  buildPaymentRequirements,
+  decodePaymentHeader,
+  encodePaymentResponseHeader,
+  settlePayment,
+  verifyPayment,
+} from "@/lib/server/x402";
 
 /**
- * Seller endpoint (x402). A buyer agent requests a discoverable agent's
- * bundled offer:
- *   - No / invalid `X-PAYMENT` -> 402 with a payment challenge.
- *   - Valid `X-PAYMENT` -> verify transfer and return StrategyPacket.
+ * Seller endpoint — canonical x402 v2 on Arbitrum Sepolia.
+ *   - No / invalid `X-PAYMENT` -> HTTP 402 with a structured `accepts[]`
+ *     payment challenge.
+ *   - Valid `X-PAYMENT` (base64 payload carrying the settling tx hash) ->
+ *     facilitator verify() proves the on-chain USDC transfer, settle() returns
+ *     the StrategyPacket plus an `X-PAYMENT-RESPONSE` settlement header.
  */
 
 export const runtime = "nodejs";
@@ -35,6 +39,12 @@ interface SellerBody {
   fromAgentId?: string;
   objective?: string;
   constraints?: { maxAnswerTokens?: number };
+  /**
+   * Drip disclosure for an agreement installment, set by the buyer orchestrator
+   * (/api/collab/request) after it validated + consumed the agreement. Caps how
+   * much the seller reveals in this single interaction.
+   */
+  drip?: { installmentIndex?: number; totalInstallments?: number; units?: number };
 }
 
 export async function POST(req: Request) {
@@ -72,7 +82,6 @@ export async function POST(req: Request) {
   }
 
   const priceHuman = seller.collabPriceUsdc ?? defaultCollabPriceUsdc();
-  const asset = collabUsdcAsset();
   let amount: bigint;
   try {
     amount = parseUsdcToBaseUnits(priceHuman);
@@ -80,31 +89,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Seller price is misconfigured." }, { status: 500 });
   }
 
-  const payment = req.headers.get("x-payment")?.trim();
+  const requirements = buildPaymentRequirements({
+    payTo,
+    amount,
+    resource: agentOfferSkillId(toAgentId),
+    description: `StrategyPacket for agent "${seller.name}" (${offer.attachedSkillTitles.length} attached skills)`,
+  });
 
-  if (!payment) {
-    return NextResponse.json(
-      {
-        x402Version: 1,
-        error: "Payment required.",
-        accepts: [
-          {
-            scheme: "exact",
-            network: "arbitrum-sepolia",
-            asset,
-            assetDecimals: USDC_DECIMALS,
-            payTo,
-            maxAmountRequired: amount.toString(),
-            humanAmount: formatUsdc(amount),
-            resource: agentOfferSkillId(toAgentId),
-            description: `StrategyPacket for agent "${seller.name}" (${offer.attachedSkillTitles.length} attached skills)`,
-          },
-        ],
-      },
-      { status: 402 },
-    );
+  // No / invalid X-PAYMENT -> structured x402 v2 challenge.
+  const decoded = decodePaymentHeader(req.headers.get("x-payment"));
+  if (!decoded) {
+    return NextResponse.json(buildPaymentChallenge(requirements), { status: 402 });
   }
 
+  const payment = decoded.txHash;
   const expectedFrom = body.fromAgentId ? await readAgentWallet(body.fromAgentId.trim()) : null;
 
   const claimed = await tryConsumePaymentRef(
@@ -118,23 +116,24 @@ export async function POST(req: Request) {
     );
   }
 
-  const verification = await verifyUsdcTransfer({
-    txHash: payment,
-    asset,
-    payTo,
-    minAmount: amount,
-    expectedFrom,
-  });
-
+  // Facilitator verify(): prove the settling transfer on-chain.
+  const verification = await verifyPayment({ payload: decoded, requirements, expectedFrom });
   if (!verification.ok) {
     await releasePaymentRef(payment);
     return NextResponse.json({ error: verification.error }, { status: 402 });
   }
 
+  // Drip disclosure / anti-extraction. An agreement installment passes explicit
+  // drip params; otherwise the seller's configured per-interaction ceiling
+  // (`collabMaxUnits`) still caps a one-off disclosure as a single max-units
+  // interaction. With no ceiling set, the full bundle is returned (legacy).
+  const drip = resolveDrip(body.drip, seller.collabMaxUnits);
+
   const packet = buildStrategyPacket(offer.skill, {
     producedByAgentId: toAgentId,
     paymentRef: payment,
     maxAnswerTokens: body.constraints?.maxAnswerTokens,
+    drip,
   });
 
   if (body.objective?.trim()) {
@@ -145,7 +144,11 @@ export async function POST(req: Request) {
     });
   }
 
-  return NextResponse.json({
+  // Facilitator settle(): settlement already happened on-chain; format the
+  // confirmed result as the canonical X-PAYMENT-RESPONSE header.
+  const settlement = settlePayment({ txHash: payment, verified: verification, requirements });
+
+  const res = NextResponse.json({
     ok: true,
     packet,
     payment: {
@@ -155,5 +158,32 @@ export async function POST(req: Request) {
       amount: verification.value.toString(),
       humanAmount: formatUsdc(verification.value),
     },
+    settlement,
   });
+  res.headers.set("X-PAYMENT-RESPONSE", encodePaymentResponseHeader(settlement));
+  return res;
+}
+
+/**
+ * Resolve the effective drip window for this interaction. An explicit
+ * agreement installment wins; otherwise a seller ceiling clamps a one-off into
+ * a single max-units slice; otherwise no drip (full disclosure).
+ */
+function resolveDrip(
+  requested: SellerBody["drip"],
+  sellerCeiling: number | null,
+): { installmentIndex: number; totalInstallments: number; units: number } | undefined {
+  if (requested && typeof requested.units === "number" && requested.units > 0) {
+    const units = Math.floor(requested.units);
+    const cappedUnits = sellerCeiling ? Math.min(units, sellerCeiling) : units;
+    return {
+      installmentIndex: Math.max(0, Math.floor(requested.installmentIndex ?? 0)),
+      totalInstallments: Math.max(1, Math.floor(requested.totalInstallments ?? 1)),
+      units: Math.max(1, cappedUnits),
+    };
+  }
+  if (sellerCeiling && sellerCeiling > 0) {
+    return { installmentIndex: 0, totalInstallments: 1, units: sellerCeiling };
+  }
+  return undefined;
 }

@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { AlertTriangle, Loader2, LogIn, Rocket, Wallet } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Loader2, LogIn, Rocket, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { AGENT_CATEGORIES, type AgentCategory } from "@/lib/agent/categories";
@@ -30,8 +32,17 @@ interface SpawnResponse {
   agentURI?: string;
   arbiscanUrl?: string;
   tokenUrl?: string;
+  onChain?: boolean;
+  pendingVerification?: boolean;
   error?: string;
   code?: string;
+}
+
+function newNonce(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
 }
 
 export function LaunchAgentButton({
@@ -41,9 +52,13 @@ export function LaunchAgentButton({
 }: {
   skills: SkillOption[];
   zerodevConfigured: boolean;
-  /** When set, the agent is launched pre-bound to this project (Entity). */
+  /**
+   * Legacy: when set, the agent is launched pre-bound to this project (Entity).
+   * Omitted on the Agents tab, where agents are general (no entity binding).
+   */
   entitySlug?: string;
 }) {
+  const router = useRouter();
   const [skillId, setSkillId] = useState(skills[0]?.id ?? "");
   const [agentName, setAgentName] = useState("");
   const [category, setCategory] = useState<AgentCategory | null>(null);
@@ -51,12 +66,23 @@ export function LaunchAgentButton({
   const [extraSkillIds, setExtraSkillIds] = useState<string[]>([]);
   const [phase, setPhase] = useState<"idle" | "wallet" | "minting">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [created, setCreated] = useState<{ agentId: string; pending: boolean } | null>(null);
+  // A general agent (no entity) needs a unique creation slot so one wallet can
+  // own many agents; the nonce is held stable across retries and rotated after a
+  // successful mint so the next launch is a distinct agent.
+  const [createNonce, setCreateNonce] = useState<string>(() => newNonce());
 
   const { ready, authenticated, login } = usePrivy();
   const { wallets } = useWallets();
 
+  const isGeneral = !entitySlug;
   const configured = zerodevConfigured;
   const busy = phase !== "idle";
+
+  // Keep the core-skill selection valid as the catalog/props resolve.
+  useEffect(() => {
+    if (!skillId && skills[0]?.id) setSkillId(skills[0].id);
+  }, [skills, skillId]);
 
   // Full platform skill catalog (entities + stablecoins + RWAs + tokens) so
   // the owner can hand the new agent extra knowledge at creation.
@@ -92,6 +118,7 @@ export function LaunchAgentButton({
 
   async function launch() {
     setError(null);
+    setCreated(null);
     const skill = skills.find((s) => s.id === skillId);
     if (!skill) return;
 
@@ -127,9 +154,13 @@ export function LaunchAgentButton({
       });
 
       // 2) Preflight: reuse check + mint config (userOp signing stays in-browser).
+      //    General agents key off a per-create nonce; legacy mints off an entity.
       setPhase("minting");
+      const slotQuery = isGeneral
+        ? `&nonce=${encodeURIComponent(createNonce)}`
+        : `&entitySlug=${encodeURIComponent(entitySlug as string)}`;
       const preflightRes = await fetch(
-        `/api/agent/spawn/preflight?skillId=${encodeURIComponent(skillId)}&entitySlug=${encodeURIComponent(entitySlug ?? skillId)}`,
+        `/api/agent/spawn/preflight?skillId=${encodeURIComponent(skillId)}${slotQuery}`,
       );
       const preflight = (await preflightRes.json()) as SpawnPreflightResponse;
       if (!preflightRes.ok || !preflight.configured) {
@@ -137,7 +168,14 @@ export function LaunchAgentButton({
       }
       if (preflight.reused && preflight.agentId && preflight.agentAddress) {
         window.dispatchEvent(new CustomEvent(ENTITY_AGENT_MINTED_EVENT));
-        openResearchChat();
+        setCreated({ agentId: preflight.agentId, pending: false });
+        if (isGeneral) {
+          setCreateNonce(newNonce());
+          setAgentName("");
+          router.refresh();
+        } else {
+          openResearchChat();
+        }
         return;
       }
       if (
@@ -154,7 +192,7 @@ export function LaunchAgentButton({
         skill: preflight.skill as AgentSkill,
         signer,
         accountIndex: preflight.accountIndex,
-        entitySlug: entitySlug ?? skillId,
+        entitySlug: entitySlug ?? null,
         associatedProducts: (preflight.associatedProducts as AgentProductRef[]) ?? [],
         mintConfig: preflight.mintConfig,
         baseUrl: preflight.baseUrl,
@@ -166,7 +204,7 @@ export function LaunchAgentButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           skillId,
-          entitySlug: entitySlug ?? skillId,
+          ...(isGeneral ? { nonce: createNonce } : { entitySlug }),
           mintResult,
           name: agentName.trim() || undefined,
           category: category ?? undefined,
@@ -178,7 +216,18 @@ export function LaunchAgentButton({
         throw new Error(data.error ?? `Spawn persist failed (status ${res.status}).`);
       }
       window.dispatchEvent(new CustomEvent(ENTITY_AGENT_MINTED_EVENT));
-      openResearchChat();
+      setCreated({ agentId: data.agentId, pending: Boolean(data.pendingVerification) });
+      if (isGeneral) {
+        // Rotate the slot so the next launch is a distinct agent, and refresh
+        // the roster so the new agent appears immediately.
+        setCreateNonce(newNonce());
+        setAgentName("");
+        setCategory(null);
+        setExtraSkillIds([]);
+        router.refresh();
+      } else {
+        openResearchChat();
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Minting failed.");
     } finally {
@@ -321,6 +370,26 @@ export function LaunchAgentButton({
                   : "Sign in to mint"}
           </button>
         </>
+      )}
+
+      {created && (
+        <div className="flex items-start gap-2 rounded-lg border border-neon-500/30 bg-neon-500/10 px-3 py-2.5">
+          <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neon-300" />
+          <p className="text-xs leading-relaxed text-neon-100">
+            Agent minted.{" "}
+            {created.pending && (
+              <span className="text-ink-300">
+                On-chain confirmation is still settling — open the agent to verify.{" "}
+              </span>
+            )}
+            <Link
+              href={`/agents/${encodeURIComponent(created.agentId)}`}
+              className="font-medium text-neon-300 underline-offset-2 hover:underline"
+            >
+              Open {agentName.trim() || "your new agent"} →
+            </Link>
+          </p>
+        </div>
       )}
 
       {error && (

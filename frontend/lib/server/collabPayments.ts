@@ -207,3 +207,54 @@ export async function releasePaymentRef(txHash: string): Promise<void> {
   delete store[k];
   writeRefs(store);
 }
+
+/* -------------------------------------------------------------------------- */
+/* Rate limit — throttle collab requests per buyer (anti-extraction)           */
+/* -------------------------------------------------------------------------- */
+
+const _localRate = new Map<string, { count: number; resetAt: number }>();
+
+export interface RateLimitResult {
+  ok: boolean;
+  /** Seconds until the window resets (only meaningful when !ok). */
+  retryAfter?: number;
+}
+
+/**
+ * Fixed-window rate limit keyed by an arbitrary id (e.g. a buyer agent).
+ * Redis-backed in production (INCR + EXPIRE); in-process Map for offline dev.
+ * Fails open on Redis errors so a transient outage never blocks a real buyer.
+ */
+export async function checkRateLimit(
+  bucket: string,
+  id: string,
+  limit: number,
+  windowSeconds: number,
+): Promise<RateLimitResult> {
+  const k = `collab:rate:${bucket}:${id.toLowerCase()}`;
+  if (hasUpstash()) {
+    try {
+      const redis = getRedisClient();
+      const count = (await redis.incr(k)) as number;
+      if (count === 1) await redis.expire(k, windowSeconds);
+      if (count > limit) {
+        const ttl = (await redis.ttl(k)) as number;
+        return { ok: false, retryAfter: ttl > 0 ? ttl : windowSeconds };
+      }
+      return { ok: true };
+    } catch {
+      return { ok: true };
+    }
+  }
+  const now = Date.now();
+  const entry = _localRate.get(k);
+  if (!entry || now >= entry.resetAt) {
+    _localRate.set(k, { count: 1, resetAt: now + windowSeconds * 1000 });
+    return { ok: true };
+  }
+  entry.count += 1;
+  if (entry.count > limit) {
+    return { ok: false, retryAfter: Math.ceil((entry.resetAt - now) / 1000) };
+  }
+  return { ok: true };
+}

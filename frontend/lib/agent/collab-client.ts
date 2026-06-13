@@ -9,9 +9,16 @@ import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
  *
  * Settlement is signed in the browser because the buyer agent's ZeroDev smart
  * account is driven by the user's Privy embedded signer (keys in Privy's TEE).
- * Flow: fetch the seller's 402 quote -> sign a gas-sponsored USDC `transfer` to
- * the seller's wallet -> hand the tx hash to /api/collab/request as the payment
- * reference.
+ * Flow: fetch the seller's 402 quote (canonical x402 v2 `accepts[]`) -> sign a
+ * gas-sponsored USDC `transfer` to the seller's wallet -> hand the tx hash to
+ * /api/collab/request, which wraps it in the canonical x402 v2 `X-PAYMENT`
+ * payload for the seller's facilitator to verify + settle.
+ *
+ * Deviation from the reference x402 implementation: the canonical EVM `exact`
+ * scheme settles via EIP-3009 `transferWithAuthorization` through a CDP
+ * facilitator on Arbitrum One. A ZeroDev Kernel (ERC-4337) smart account cannot
+ * produce that authorization signature, so we keep the wire format but settle
+ * with a smart-account `transfer` on Arbitrum Sepolia (see lib/server/x402.ts).
  */
 
 const erc20Abi = [
@@ -121,6 +128,8 @@ const collabRegistryAbi = [
       { name: "toAgentId", type: "uint256" },
       { name: "skillHash", type: "bytes32" },
       { name: "paymentRef", type: "bytes32" },
+      { name: "agreementId", type: "bytes32" },
+      { name: "units", type: "uint32" },
     ],
     outputs: [{ name: "", type: "uint256" }],
   },
@@ -133,6 +142,10 @@ export interface RecordParams {
   toAgentId: string;
   skillHash: `0x${string}`;
   paymentRef: `0x${string}`;
+  /** Agreement this interaction belongs to (bytes32(0) for a one-off). */
+  agreementId: `0x${string}`;
+  /** Interaction magnitude recorded on-chain (data slices); must be > 0. */
+  units: number;
   accountIndex: number;
   mintConfig: SpawnMintConfig;
 }
@@ -146,7 +159,7 @@ export interface RecordParams {
 export async function recordCollabOnChain(params: {
   signer: Signer;
   record: RecordParams;
-}): Promise<{ userOpHash: string }> {
+}): Promise<{ userOpHash: string; txHash: string }> {
   const { signer, record } = params;
   const svc = await import("canhav-agent-service");
   const { encodeFunctionData } = await import("viem");
@@ -170,6 +183,8 @@ export async function recordCollabOnChain(params: {
       BigInt(record.toAgentId),
       record.skillHash,
       record.paymentRef,
+      record.agreementId,
+      Math.max(1, Math.min(0xffffffff, Math.floor(record.units))),
     ],
   });
 
@@ -177,8 +192,8 @@ export async function recordCollabOnChain(params: {
     account: account.account,
     calls: [{ to: record.collabRegistry, data }],
   });
-  await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
-  return { userOpHash };
+  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
+  return { userOpHash, txHash: receipt.receipt.transactionHash };
 }
 
 const reputationAbi = [

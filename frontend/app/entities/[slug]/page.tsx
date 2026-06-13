@@ -18,9 +18,7 @@ import {
 import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
 import { MemberCoins } from "@/components/entities/MemberCoins";
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
-import { EntityAgentPanel } from "@/components/agent/EntityAgentPanel";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
-import { agentConfigStatus } from "@/lib/agent/config";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { SourcesFooter } from "@/components/shared/SourcesFooter";
@@ -111,7 +109,6 @@ export default async function EntityProfilePage({ params }: PageProps) {
   const profile = await getApprovedEntityBySlug(params.slug);
   if (!profile) notFound();
 
-  const agentStatus = agentConfigStatus();
   const entitySkill = profile.agentSkill ?? buildSkillFromEntity(profile);
   const scale = profile.currentScale;
   const labels = profile.scaleLabels ?? {};
@@ -241,14 +238,6 @@ export default async function EntityProfilePage({ params }: PageProps) {
               <MemberCoinsSection entity={profile} />
             </Suspense>
           </section>
-
-          <EntityAgentPanel
-            entitySlug={profile.slug}
-            entityName={profile.name}
-            skill={{ id: entitySkill.id, title: entitySkill.title }}
-            zerodevConfigured={agentStatus.zerodev}
-            llmConfigured={agentStatus.llm}
-          />
 
           {profile.market && (
             <EntityMarketCard market={profile.market} symbol={profile.symbol} />

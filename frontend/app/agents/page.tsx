@@ -18,6 +18,7 @@ import { agentConfigStatus } from "@/lib/agent/config";
 import { getAgentSkills, SKILL_GROUPS, type PlatformSkill } from "@/lib/agent/skills";
 import { MemoryInspector } from "@/components/agent/MemoryInspector";
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
+import { LaunchAgentButton } from "@/components/agent/LaunchAgentButton";
 import { getSession } from "@/lib/auth/session";
 import { listUserAgentIds } from "@/lib/auth/users";
 import { getAgentProfile, type AgentProfile } from "@/lib/agent/memory";
@@ -152,14 +153,15 @@ export default async function AgentsPage() {
           <Badge tone="signal">Arbitrum Sepolia · Testnet</Badge>
         </div>
         <p className="max-w-2xl text-sm leading-relaxed text-ink-300">
-          Your roster of CanHav research agents. Each agent lives on a project (an entity),
-          answers only from CanHav&apos;s own data, remembers what it learns, and carries its own
-          on-chain <span className="font-medium text-ink-100">ERC-8004</span> identity through a
-          self-custodial smart account. Launch a new agent from any{" "}
-          <Link href="/entities" className="font-medium text-electric-400 hover:text-electric-300">
-            entity page
+          Your roster of CanHav research agents. Name an agent, tag it with a research category,
+          pick the skills it should study, and mint its own on-chain{" "}
+          <span className="font-medium text-ink-100">ERC-8004</span> identity through a
+          self-custodial smart account — all from{" "}
+          <Link href="#create" className="font-medium text-electric-400 hover:text-electric-300">
+            this page
           </Link>
-          . All agent activity is testnet-only.
+          . Chat with any of your agents from the floating assistant on every data page. All agent
+          activity is testnet-only.
         </p>
       </header>
 
@@ -197,7 +199,7 @@ export default async function AgentsPage() {
             <div>
               <CardTitle className="text-base">Your agents</CardTitle>
               <CardDescription className="mt-1">
-                Each agent lives on a project and answers from that entity&apos;s products.
+                Open an agent to train it, manage its ERC-8004 identity, and enable collaboration.
               </CardDescription>
             </div>
             <Badge tone="neutral">{agents.length}</Badge>
@@ -257,25 +259,24 @@ export default async function AgentsPage() {
         </Card>
       )}
 
-      <Card className="space-y-3">
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">
+      <div id="create" className="scroll-mt-24 space-y-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <CardTitle className="text-base">Launch an agent</CardTitle>
-            <CardDescription className="mt-1">
-              Agents are created on a project. Open an entity and mint its agent there —
-              one ERC-8004 agent per entity, scannable on Arbiscan.
-            </CardDescription>
+            <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
+              Launch an agent
+            </h2>
+            <p className="mt-1 max-w-2xl text-sm text-ink-300">
+              Name it, tag it with a research category, and choose the skills it studies. Minting
+              creates a wallet-owned ERC-8004 token on Arbitrum Sepolia, scannable on Arbiscan.
+            </p>
           </div>
-          <Badge tone="neutral">one per entity</Badge>
+          <Badge tone="neutral">on-chain identity</Badge>
         </div>
-        <Link
-          href="/entities"
-          className="group inline-flex items-center gap-1.5 rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-2 text-sm font-medium text-electric-300 transition-colors hover:bg-electric-500/20"
-        >
-          Browse entities to launch an agent
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-        </Link>
-      </Card>
+        <LaunchAgentButton
+          skills={skills.map((s: PlatformSkill) => ({ id: s.id, title: s.title }))}
+          zerodevConfigured={status.zerodev}
+        />
+      </div>
 
       <Card className="space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { deriveAccountIndex } from "@/lib/agent/account-index";
+import { creationSlotKey, deriveAccountIndex } from "@/lib/agent/account-index";
 import { hasZeroDev } from "@/lib/agent/config";
 import { canhavPublicOrigin } from "@/lib/agent/public-url";
 import { resolveEntityBinding } from "@/lib/agent/entity-binding";
@@ -32,7 +32,8 @@ export async function GET(req: Request) {
 
   const url = new URL(req.url);
   const skillId = url.searchParams.get("skillId")?.trim() ?? "";
-  const entitySlugParam = url.searchParams.get("entitySlug")?.trim();
+  const entitySlugParam = url.searchParams.get("entitySlug")?.trim() || null;
+  const nonceParam = url.searchParams.get("nonce")?.trim() || null;
   if (!skillId) {
     return NextResponse.json({ configured: false, error: "skillId is required." }, { status: 400 });
   }
@@ -42,11 +43,15 @@ export async function GET(req: Request) {
     return NextResponse.json({ configured: false, error: `Unknown skill "${skillId}".` }, { status: 404 });
   }
 
-  const entitySlug = entitySlugParam || skillId;
-  const binding = await resolveEntityBinding(entitySlug);
+  // General agents (created on /agents) carry a per-create nonce and no entity;
+  // legacy/entity-bound mints carry a real entity slug. The slot key drives both
+  // the reuse check and the deterministic smart-account salt.
+  const slotKey = creationSlotKey({ entitySlug: entitySlugParam, nonce: nonceParam, skillId });
+  const entitySlug = entitySlugParam; // null for general agents
+  const binding = entitySlug ? await resolveEntityBinding(entitySlug) : null;
   const associatedProducts = binding?.associatedProducts ?? [];
 
-  const existingAgentId = await getUserEntityAgent(session.userId, entitySlug);
+  const existingAgentId = await getUserEntityAgent(session.userId, slotKey);
   if (existingAgentId) {
     const existing = await getAgentProfile(existingAgentId);
     if (existing) {
@@ -83,7 +88,7 @@ export async function GET(req: Request) {
 
   return NextResponse.json({
     configured: true,
-    accountIndex: deriveAccountIndex(session.userId, entitySlug),
+    accountIndex: deriveAccountIndex(session.userId, slotKey),
     skill,
     entitySlug,
     associatedProducts,

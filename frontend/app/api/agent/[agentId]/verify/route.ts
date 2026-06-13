@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getAgentProfile } from "@/lib/agent/memory";
+import { confirmAgentOnChain, getAgentProfile } from "@/lib/agent/memory";
 import { verifyAgentOnChain } from "@/lib/agent/onchain";
 
 /**
@@ -23,5 +23,23 @@ export async function GET(_req: Request, { params }: { params: { agentId: string
   }
 
   const verification = await verifyAgentOnChain(agentId, profile.agentAddress);
-  return NextResponse.json(verification);
+
+  // Self-healing reconciliation: a mint persisted as pendingVerification (server
+  // couldn't read the chain at spawn time) is promoted to a trusted on-chain
+  // agent once ownerOf confirms the smart account owns the token.
+  let reconciled = false;
+  if (verification.verified && (!profile.onChain || profile.pendingVerification)) {
+    await confirmAgentOnChain(agentId);
+    reconciled = true;
+  }
+
+  // Reconcile the on-chain tokenURI against the expected hosted agent card so a
+  // mismatched/forged URI is visible to anyone verifying the identity.
+  const expectedTokenURI = profile.agentURI ?? null;
+  const uriMatches =
+    verification.tokenURI && expectedTokenURI
+      ? verification.tokenURI === expectedTokenURI
+      : null;
+
+  return NextResponse.json({ ...verification, reconciled, expectedTokenURI, uriMatches });
 }

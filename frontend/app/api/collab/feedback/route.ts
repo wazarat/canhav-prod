@@ -4,6 +4,7 @@ import { reputationEnabled, reputationRegistryAddress } from "@/lib/agent/collab
 import { hasZeroDev } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { recordReputation } from "@/lib/agent/reputation";
+import { appendReview, MAX_REVIEW_COMMENT_LEN } from "@/lib/agent/reviews";
 import { getSession } from "@/lib/auth/session";
 import { listUserAgentIds } from "@/lib/auth/users";
 import { userAgentId } from "@/lib/agent/user-agent";
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
     fromAgentId?: string;
     rating?: number;
     paymentRef?: string;
+    comment?: string;
   } = {};
   try {
     body = (await req.json()) as typeof body;
@@ -48,6 +50,7 @@ export async function POST(req: Request) {
   const toAgentId = (body.toAgentId ?? "").trim();
   const fromAgentId = (body.fromAgentId ?? "").trim();
   const paymentRef = (body.paymentRef ?? "").trim();
+  const comment = (body.comment ?? "").trim().slice(0, MAX_REVIEW_COMMENT_LEN);
   const rating = Number(body.rating);
   if (!toAgentId || !fromAgentId || !Number.isFinite(rating) || rating < 1 || rating > 5) {
     return NextResponse.json(
@@ -94,10 +97,21 @@ export async function POST(req: Request) {
   }
 
   const summary = await recordReputation(toAgentId, rating);
+  const buyer = fromAgentId ? await getAgentProfile(fromAgentId) : null;
+
+  // Persist the exchange-verified text review (newest first) for the seller
+  // marketplace view. The reviewer handle is the buyer agent's name.
+  const review = await appendReview({
+    agentId: toAgentId,
+    fromAgentId,
+    reviewerHandle: buyer?.name ?? "A buyer agent",
+    rating,
+    comment,
+    paymentRef,
+  });
 
   // Flag-off on-chain attestation params.
   const registry = reputationRegistryAddress();
-  const buyer = fromAgentId ? await getAgentProfile(fromAgentId) : null;
   const zerodevRpc = readSecret("ZERODEV_RPC");
   const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
   const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
@@ -123,5 +137,5 @@ export async function POST(req: Request) {
         }
       : null;
 
-  return NextResponse.json({ ok: true, summary, onChain });
+  return NextResponse.json({ ok: true, summary, review, onChain });
 }

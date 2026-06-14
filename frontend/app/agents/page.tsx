@@ -19,6 +19,7 @@ import { agentCategoryLabel } from "@/lib/agent/categories";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { getAgentSkills, SKILL_GROUPS, type PlatformSkill } from "@/lib/agent/skills";
 import { MemoryInspector } from "@/components/agent/MemoryInspector";
+import { AgentLabCreditsSection } from "@/components/agent/AgentLabCreditsSection";
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
 import { LaunchAgentButton } from "@/components/agent/LaunchAgentButton";
 import { getSession } from "@/lib/auth/session";
@@ -150,7 +151,12 @@ export default async function AgentsPage() {
 
   const readyCount = rows.filter((r) => r.ready).length;
 
+  const buyerAgents = agents
+    .filter((a) => a.onChain && a.accountIndex != null)
+    .map((a) => ({ agentId: a.agentId, name: a.name }));
+
   const listingNav: SectionNavItem[] = [
+    ...(session ? [{ id: "agents-credits", label: "Credits" }] : []),
     ...(agents.length > 0 ? [{ id: "agents-roster", label: "Your agents" }] : []),
     { id: "create", label: "Launch" },
     { id: "agents-skills", label: "Your skills" },
@@ -227,6 +233,8 @@ export default async function AgentsPage() {
           </Link>
         </p>
       </Card>
+
+      {session && <AgentLabCreditsSection buyerAgents={buyerAgents} />}
 
       {agents.length > 0 && (
         <Card id="agents-roster" className="scroll-mt-32 space-y-5">

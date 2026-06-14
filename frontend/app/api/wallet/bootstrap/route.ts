@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { hasZeroDev } from "@/lib/agent/config";
 import { getSession } from "@/lib/auth/session";
 import { getUserProfile } from "@/lib/auth/users";
-import { grantSignupCredits } from "@/lib/server/credits";
+import { grantSignupCredits, startingTcnhvHuman } from "@/lib/server/credits";
 import { canMintTcnhv } from "@/lib/server/factory";
 import { readSecret } from "@/lib/server/env";
 
@@ -47,6 +47,7 @@ export async function GET() {
   return NextResponse.json({
     needsGrant,
     granted: Boolean(profile?.tcnhvGranted),
+    startingAmount: startingTcnhvHuman(),
     mintConfig: needsGrant ? cfg : null,
   });
 }

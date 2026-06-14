@@ -11,10 +11,11 @@ import {
   ExternalLink,
   Loader2,
   Send,
+  Sparkles,
   Wallet,
 } from "lucide-react";
 
-import { transferCredits } from "@/lib/agent/collab-client";
+import { transferCredits, claimCredits } from "@/lib/agent/collab-client";
 import { buildPrivySigner, resolveActiveWallet } from "@/lib/agent/privy-signer";
 import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 
@@ -25,8 +26,25 @@ interface WalletCredits {
   assetName?: string;
   decimals?: number;
   balance?: string;
+  granted?: boolean;
   mintConfig?: SpawnMintConfig | null;
   error?: string;
+}
+
+interface BootstrapStatus {
+  needsGrant: boolean;
+  granted: boolean;
+  startingAmount: string;
+  mintConfig: SpawnMintConfig | null;
+}
+
+interface AgentCreditsStatus {
+  configured: boolean;
+  canClaim: boolean;
+  nextClaimAt: number;
+  accountIndex: number;
+  token: string;
+  mintConfig: SpawnMintConfig | null;
 }
 
 interface TransferPreflight {
@@ -124,16 +142,23 @@ function CreditsNotConfigured() {
 export function WalletCreditsPanel({
   buyerAgents = [],
   onChange,
+  /** Mint starting credits + on-chain faucet claim (Agent Lab). */
+  showMintActions = false,
 }: {
   buyerAgents?: { agentId: string; name: string }[];
   onChange?: () => void;
+  showMintActions?: boolean;
 }) {
   const { authenticated, login } = usePrivy();
   const { wallets } = useWallets();
 
   const [info, setInfo] = useState<WalletCredits | null>(null);
   const [address, setAddress] = useState<string | null>(null);
+  const [bootstrap, setBootstrap] = useState<BootstrapStatus | null>(null);
+  const [agentCredits, setAgentCredits] = useState<AgentCreditsStatus | null>(null);
   const [busy, setBusy] = useState(false);
+  const [minting, setMinting] = useState(false);
+  const [claiming, setClaiming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -160,6 +185,61 @@ export function WalletCreditsPanel({
     }
   }, []);
 
+  const loadBootstrap = useCallback(async (): Promise<BootstrapStatus | null> => {
+    try {
+      const res = await fetch("/api/wallet/bootstrap");
+      if (!res.ok) return null;
+      return (await res.json()) as BootstrapStatus;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const deriveTreasuryAddress = useCallback(
+    async (mintConfig: SpawnMintConfig): Promise<string | null> => {
+      if (!resolveActiveWallet(wallets)) return null;
+      try {
+        const signer = await buildPrivySigner(wallets);
+        const svc = await import("canhav-agent-service");
+        const cfg = svc.createConfig({
+          zerodevRpc: mintConfig.zerodevRpc,
+          rpcUrl: mintConfig.rpcUrl,
+          identityRegistry: mintConfig.identityRegistry,
+          securityRegistry: mintConfig.securityRegistry,
+        });
+        const kernel = await svc.createEcdsaKernelAccount(cfg, signer, 0n);
+        return kernel.address;
+      } catch {
+        return null;
+      }
+    },
+    [wallets],
+  );
+
+  const loadAgentCredits = useCallback(async (agentId: string) => {
+    if (!agentId) {
+      setAgentCredits(null);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/agent/credits?agentId=${encodeURIComponent(agentId)}`);
+      if (!res.ok) {
+        setAgentCredits(null);
+        return;
+      }
+      setAgentCredits((await res.json()) as AgentCreditsStatus);
+    } catch {
+      setAgentCredits(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showMintActions) return;
+    void loadBootstrap().then((boot) => {
+      if (boot) setBootstrap(boot);
+    });
+  }, [showMintActions, loadBootstrap]);
+
   useEffect(() => {
     let active = true;
     void (async () => {
@@ -174,34 +254,128 @@ export function WalletCreditsPanel({
       if (!data.mintConfig || derivedRef.current) return;
       if (!resolveActiveWallet(wallets)) return;
       derivedRef.current = true;
-      try {
-        const signer = await buildPrivySigner(wallets);
-        const svc = await import("canhav-agent-service");
-        const cfg = svc.createConfig({
-          zerodevRpc: data.mintConfig.zerodevRpc,
-          rpcUrl: data.mintConfig.rpcUrl,
-          identityRegistry: data.mintConfig.identityRegistry,
-          securityRegistry: data.mintConfig.securityRegistry,
-        });
-        const kernel = await svc.createEcdsaKernelAccount(cfg, signer, 0n);
-        if (!active) return;
-        setAddress(kernel.address);
-        const withBalance = await loadBalance(kernel.address);
-        if (active && withBalance) setInfo(withBalance);
-      } catch {
-        /* leave balance at 0 — transfers still work via preflight */
-      }
+      const treasury = await deriveTreasuryAddress(data.mintConfig);
+      if (!active || !treasury) return;
+      setAddress(treasury);
+      const withBalance = await loadBalance(treasury);
+      if (active && withBalance) setInfo(withBalance);
     })();
     return () => {
       active = false;
     };
-  }, [wallets, loadBalance]);
+  }, [wallets, loadBalance, deriveTreasuryAddress]);
+
+  useEffect(() => {
+    if (!showMintActions || !fundAgentId) return;
+    void loadAgentCredits(fundAgentId);
+  }, [showMintActions, fundAgentId, loadAgentCredits]);
 
   const refresh = useCallback(async () => {
     const data = await loadBalance(address);
     if (data) setInfo(data);
+    if (showMintActions) {
+      const boot = await loadBootstrap();
+      if (boot) setBootstrap(boot);
+      if (fundAgentId) await loadAgentCredits(fundAgentId);
+    }
     onChange?.();
-  }, [address, loadBalance, onChange]);
+  }, [address, loadBalance, loadBootstrap, loadAgentCredits, showMintActions, fundAgentId, onChange]);
+
+  async function mintStartingCredits() {
+    if (!authenticated) {
+      login();
+      return;
+    }
+    setMinting(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const boot = bootstrap ?? (await loadBootstrap());
+      if (!boot) throw new Error("Could not check credit grant status.");
+      if (boot.granted && !boot.needsGrant) {
+        setNotice("Starting credits were already minted to your treasury.");
+        await refresh();
+        return;
+      }
+      if (!boot.needsGrant) {
+        throw new Error("Starting credits are not available in this environment.");
+      }
+      const cfg = boot.mintConfig ?? info?.mintConfig;
+      if (!cfg) throw new Error("Wallet configuration is missing — check ZeroDev + tCNHV env vars.");
+
+      let treasury = address;
+      if (!treasury) {
+        treasury = await deriveTreasuryAddress(cfg);
+        if (!treasury) throw new Error("Connect MetaMask and try again.");
+        setAddress(treasury);
+      }
+
+      const res = await fetch("/api/wallet/bootstrap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: treasury }),
+      });
+      const result = (await res.json()) as {
+        ok?: boolean;
+        granted?: boolean;
+        reason?: string;
+        txHash?: string;
+      };
+      if (!result.ok) {
+        throw new Error(
+          result.reason === "not_configured"
+            ? "tCNHV mint is not configured on the server."
+            : result.reason === "mint_failed"
+              ? "On-chain mint failed — check FACTORY_DEPLOYER_PRIVATE_KEY."
+              : "Could not mint starting credits.",
+        );
+      }
+      if (result.granted) {
+        setNotice(`Minted ${boot.startingAmount} tCNHV to your treasury.`);
+      } else if (result.reason === "already_granted") {
+        setNotice("Starting credits were already in your treasury.");
+      }
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Mint failed.");
+    } finally {
+      setMinting(false);
+    }
+  }
+
+  async function claimAgentFaucet() {
+    if (!fundAgentId) return;
+    if (!authenticated) {
+      login();
+      return;
+    }
+    setClaiming(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const credits =
+        agentCredits ??
+        ((await fetch(`/api/agent/credits?agentId=${encodeURIComponent(fundAgentId)}`).then((r) =>
+          r.json(),
+        )) as AgentCreditsStatus);
+      if (!credits?.configured || !credits.canClaim || !credits.mintConfig) {
+        throw new Error("Faucet is on cooldown or this agent cannot claim yet.");
+      }
+      const signer = await buildPrivySigner(wallets);
+      await claimCredits({
+        signer,
+        accountIndex: credits.accountIndex,
+        mintConfig: credits.mintConfig,
+        token: credits.token as `0x${string}`,
+      });
+      setNotice("Claimed 100 tCNHV from the on-chain faucet to your agent.");
+      await loadAgentCredits(fundAgentId);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Faucet claim failed.");
+    } finally {
+      setClaiming(false);
+    }
+  }
 
   async function transfer(to: string) {
     if (!info?.configured) return;
@@ -305,6 +479,54 @@ export function WalletCreditsPanel({
       </div>
 
       {address && <TreasuryAddressRow address={address} />}
+
+      {showMintActions && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-neon-500/20 bg-neon-500/5 px-4 py-3">
+          {(bootstrap?.needsGrant || (!bootstrap?.granted && !info.granted)) && (
+            <button
+              type="button"
+              onClick={() => void mintStartingCredits()}
+              disabled={minting || busy}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-neon-500/50 bg-neon-500/15 px-3 py-2 text-xs font-medium text-neon-300 transition-colors hover:bg-neon-500/25 disabled:opacity-50"
+            >
+              {minting ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="h-3.5 w-3.5" />
+              )}
+              {minting
+                ? "Minting…"
+                : `Mint ${bootstrap?.startingAmount ?? "10,000"} tCNHV to treasury`}
+            </button>
+          )}
+          {buyerAgents.length > 0 && fundAgentId && (
+            <button
+              type="button"
+              onClick={() => void claimAgentFaucet()}
+              disabled={
+                claiming ||
+                busy ||
+                minting ||
+                !agentCredits?.canClaim ||
+                !agentCredits?.mintConfig
+              }
+              className="inline-flex items-center gap-1.5 rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-2 text-xs font-medium text-electric-300 transition-colors hover:bg-electric-500/20 disabled:opacity-40"
+            >
+              {claiming ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Coins className="h-3.5 w-3.5" />
+              )}
+              {claiming ? "Claiming…" : "Claim 100 tCNHV (faucet)"}
+            </button>
+          )}
+          {!bootstrap?.needsGrant && bootstrap?.granted && (
+            <span className="text-[11px] text-ink-500">
+              Starting grant received · fund an agent below to spend on collabs
+            </span>
+          )}
+        </div>
+      )}
 
       {buyerAgents.length > 0 && (
         <p className="text-xs leading-relaxed text-ink-500">

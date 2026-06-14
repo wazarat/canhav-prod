@@ -684,21 +684,7 @@ export function CollabBrowser({
   const busy = phase !== "idle" && phase !== "done";
   const buyerName = buyerAgents.find((a) => a.agentId === buyerAgentId)?.name ?? buyerAgentId;
   const showTheater = Boolean(selection) && (phase !== "idle" || Boolean(paymentTx));
-
-  if (buyerAgents.length === 0) {
-    return (
-      <div className="space-y-6">
-        <WalletCreditsPanel />
-        <div className="glass rounded-2xl p-6 text-sm text-ink-300">
-          You have a credits wallet, but you need an on-chain agent to pay sellers from.{" "}
-          <a href="/agents#create" className="font-medium text-electric-400 hover:text-electric-300">
-            Launch one on the Agents tab
-          </a>{" "}
-          first, then fund it with credits above.
-        </div>
-      </div>
-    );
-  }
+  const canPayFromAgent = buyerAgents.length > 0 && Boolean(buyerAgentId);
 
   return (
     <div className="space-y-6">
@@ -707,6 +693,7 @@ export function CollabBrowser({
         onChange={() => void loadCredits(buyerAgentId)}
       />
 
+      {canPayFromAgent ? (
       <div className="glass space-y-2 rounded-2xl p-6">
         <label className="block space-y-1.5">
           <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
@@ -795,6 +782,15 @@ export function CollabBrowser({
           </div>
         ) : null}
       </div>
+      ) : (
+        <div className="glass rounded-2xl p-6 text-sm text-ink-300">
+          Browse discoverable agents below. To pay a seller,{" "}
+          <a href="/agents#create" className="font-medium text-electric-400 hover:text-electric-300">
+            launch an on-chain agent
+          </a>{" "}
+          on the Agents tab, fund it from your treasury above, then return here to request a strategy.
+        </div>
+      )}
 
       <AgreementsPanel
         asBuyer={agreements.asBuyer}
@@ -956,7 +952,12 @@ export function CollabBrowser({
                   </button>
                   <button
                     type="button"
-                    disabled={busy || !a.walletVerified || a.agentId === buyerAgentId}
+                    disabled={busy || !a.walletVerified || a.agentId === buyerAgentId || !canPayFromAgent}
+                    title={
+                      !canPayFromAgent
+                        ? "Launch and fund an on-chain agent first to pay sellers"
+                        : undefined
+                    }
                     onClick={() => {
                       setSelection(a);
                       setPacket(null);

@@ -32,6 +32,18 @@ export interface TheaterSettlement {
   asset?: string;
 }
 
+/** On-chain contracts + ledgers surfaced as shareable proof links. */
+export interface TheaterProofLinks {
+  paymentToken?: string | null;
+  factory?: string | null;
+  collabRegistry?: string | null;
+  identityRegistry?: string | null;
+  buyerLedger?: string | null;
+  sellerLedger?: string | null;
+  buyerWallet?: string | null;
+  sellerPayTo?: string | null;
+}
+
 export interface TheaterProps {
   buyer: { id: string; name: string };
   seller: { id: string; name: string };
@@ -42,6 +54,8 @@ export interface TheaterProps {
   recordTx?: string | null;
   /** Decoded X-PAYMENT-RESPONSE settlement from the seller. */
   settlement?: TheaterSettlement | null;
+  /** Factory / registry / ledger addresses for proof links. */
+  proof?: TheaterProofLinks | null;
   /** Quote price (human credits) shown on the 402 challenge. */
   price?: string | null;
   /** Human-readable settlement asset label (e.g. "tCNHV"). */
@@ -71,6 +85,7 @@ function rank(phase: TheaterPhase): number {
 }
 
 const ARBISCAN_TX = (hash: string) => `https://sepolia.arbiscan.io/tx/${hash}`;
+const ARBISCAN_ADDR = (addr: string) => `https://sepolia.arbiscan.io/address/${addr}`;
 
 /** Build a representative base64 X-PAYMENT payload for the wire console. */
 function encodeWirePreview(payload: unknown): string {
@@ -92,6 +107,7 @@ export function AgentInteractionTheater({
   paymentTx,
   recordTx,
   settlement,
+  proof,
   price,
   assetLabel,
   assetAddress,
@@ -252,7 +268,7 @@ export function AgentInteractionTheater({
       )}
 
       {/* On-chain links */}
-      {(paymentTx || recordTx) && (
+      {(paymentTx || recordTx || proof) && (
         <div className="flex flex-wrap gap-2">
           {paymentTx && (
             <a
@@ -271,7 +287,57 @@ export function AgentInteractionTheater({
               rel="noreferrer"
               className="inline-flex items-center gap-1 rounded-lg border border-signal-400/30 bg-signal-400/10 px-2.5 py-1.5 text-[11px] font-medium text-signal-300 transition-colors hover:bg-signal-400/20"
             >
-              <ExternalLink className="h-3 w-3" /> Saved record
+              <ExternalLink className="h-3 w-3" /> Collab registry record
+            </a>
+          )}
+          {proof?.factory && (
+            <a
+              href={ARBISCAN_ADDR(proof.factory)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-lg border border-electric-500/30 bg-electric-500/10 px-2.5 py-1.5 text-[11px] font-medium text-electric-300 transition-colors hover:bg-electric-500/20"
+            >
+              <ExternalLink className="h-3 w-3" /> Agent factory
+            </a>
+          )}
+          {proof?.buyerLedger && (
+            <a
+              href={ARBISCAN_ADDR(proof.buyerLedger)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-lg border border-ink-600/50 bg-ink-900/40 px-2.5 py-1.5 text-[11px] font-medium text-ink-300 transition-colors hover:bg-ink-800/60"
+            >
+              <ExternalLink className="h-3 w-3" /> Buyer ledger
+            </a>
+          )}
+          {proof?.sellerLedger && (
+            <a
+              href={ARBISCAN_ADDR(proof.sellerLedger)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-lg border border-ink-600/50 bg-ink-900/40 px-2.5 py-1.5 text-[11px] font-medium text-ink-300 transition-colors hover:bg-ink-800/60"
+            >
+              <ExternalLink className="h-3 w-3" /> Seller ledger
+            </a>
+          )}
+          {proof?.collabRegistry && (
+            <a
+              href={ARBISCAN_ADDR(proof.collabRegistry)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-lg border border-ink-600/50 bg-ink-900/40 px-2.5 py-1.5 text-[11px] font-medium text-ink-300 transition-colors hover:bg-ink-800/60"
+            >
+              <ExternalLink className="h-3 w-3" /> Collab registry
+            </a>
+          )}
+          {proof?.identityRegistry && (
+            <a
+              href={ARBISCAN_ADDR(proof.identityRegistry)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-lg border border-ink-600/50 bg-ink-900/40 px-2.5 py-1.5 text-[11px] font-medium text-ink-300 transition-colors hover:bg-ink-800/60"
+            >
+              <ExternalLink className="h-3 w-3" /> Identity registry
             </a>
           )}
         </div>

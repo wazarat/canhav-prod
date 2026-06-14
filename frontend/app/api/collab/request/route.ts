@@ -16,6 +16,7 @@ import {
 } from "@/lib/server/collabAgreements";
 import { recordCollabExchange } from "@/lib/server/collabLog";
 import { checkRateLimit } from "@/lib/server/collabPayments";
+import { prepareCollabSettlement } from "@/lib/server/collabPrepare";
 import { readSecret } from "@/lib/server/env";
 import { hasFactory, readTxGasWei, recordWorkOnLedger } from "@/lib/server/factory";
 import {
@@ -319,6 +320,8 @@ export async function POST(req: Request) {
         }
       : null;
 
+  const prepared = await prepareCollabSettlement(fromAgentId, toAgentId);
+
   return NextResponse.json({
     ok: true,
     packet,
@@ -327,5 +330,6 @@ export async function POST(req: Request) {
     settlement,
     units: disclosedUnits,
     agreement: agreementState,
+    proof: prepared.proof,
   });
 }

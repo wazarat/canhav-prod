@@ -19,6 +19,7 @@ import {
 import { OWNER_CORRECTION_SOURCE } from "@/lib/agent/prompt";
 import { readAgentReputation } from "@/lib/agent/reputation";
 import { readAgentLedger, readAgentWallet } from "@/lib/agent/onchain";
+import { isPlaceholderWallet } from "@/lib/server/collabPrepare";
 import { listCollabExchanges } from "@/lib/server/collabLog";
 import { getCreatorInfo, type SellerCreator } from "@/lib/server/sellerDetail";
 import { getUserSkill } from "@/lib/server/userSkills";
@@ -109,10 +110,18 @@ async function buildAgentEntry(
 
   const onChainWallet = await readAgentWallet(agentId);
   const payWallet =
-    onChainWallet ??
-    (profile.agentWallet && /^0x[0-9a-fA-F]{40}$/.test(profile.agentWallet)
-      ? profile.agentWallet
-      : null);
+    onChainWallet && !isPlaceholderWallet(onChainWallet)
+      ? onChainWallet
+      : profile.agentAddress && !isPlaceholderWallet(profile.agentAddress)
+        ? profile.agentAddress
+        : profile.agentWallet &&
+            /^0x[0-9a-fA-F]{40}$/.test(profile.agentWallet) &&
+            !isPlaceholderWallet(profile.agentWallet)
+          ? profile.agentWallet
+          : null;
+
+  // Demo listings without a real settlement wallet cannot receive tCNHV.
+  if (!payWallet) return null;
 
   const [reputation, memory, studied, frames, docs, tools, creator, ledger] =
     await Promise.all([

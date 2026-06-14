@@ -5,12 +5,13 @@ import { hasZeroDev } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
+import { prepareCollabSettlement } from "@/lib/server/collabPrepare";
 import { readSecret } from "@/lib/server/env";
 
 /**
- * Buyer preflight: returns the params the browser needs to sign a USDC transfer
- * from the buyer agent's smart account. Session-gated + ownership-checked so a
- * user can only spend from their own agent.
+ * Buyer preflight: params to sign a settlement transfer from the buyer agent's
+ * smart account. When `toAgentId` is supplied, also validates balance, seller
+ * wallet, factory ledgers, and returns Arbiscan proof link targets.
  */
 
 export const runtime = "nodejs";
@@ -28,7 +29,10 @@ export async function GET(req: Request) {
     );
   }
 
-  const agentId = new URL(req.url).searchParams.get("agentId")?.trim() ?? "";
+  const url = new URL(req.url);
+  const agentId = url.searchParams.get("agentId")?.trim() ?? "";
+  const toAgentId = url.searchParams.get("toAgentId")?.trim() ?? "";
+
   if (!agentId) {
     return NextResponse.json({ configured: false, error: "agentId is required." }, { status: 400 });
   }
@@ -58,10 +62,29 @@ export async function GET(req: Request) {
     );
   }
 
-  return NextResponse.json({
+  const base = {
     configured: true,
     accountIndex: profile.accountIndex,
     asset: collabUsdcAsset(),
     mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
+  };
+
+  if (!toAgentId) {
+    return NextResponse.json(base);
+  }
+
+  const prepared = await prepareCollabSettlement(agentId, toAgentId);
+
+  return NextResponse.json({
+    ...base,
+    settlementReady: prepared.ready,
+    sufficient: prepared.sufficient,
+    humanRequired: prepared.humanRequired,
+    humanBalance: prepared.humanBalance,
+    assetName: prepared.assetName,
+    requiredAmountRaw: prepared.requiredAmountRaw,
+    buyerBalanceRaw: prepared.buyerBalanceRaw,
+    proof: prepared.proof,
+    error: prepared.error,
   });
 }

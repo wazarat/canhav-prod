@@ -10,6 +10,7 @@ import {
 import { getAgentProfile } from "@/lib/agent/memory";
 import { readAgentWallet } from "@/lib/agent/onchain";
 import { resolveAgentOffer } from "@/lib/agent/agentOffer";
+import { resolveSellerPayTo } from "@/lib/server/collabPrepare";
 import { buildStrategyPacket } from "@/lib/agent/strategyPacket";
 import { generateTailoredBrief } from "@/lib/agent/tailoredBrief";
 import { releasePaymentRef, tryConsumePaymentRef } from "@/lib/server/collabPayments";
@@ -74,10 +75,13 @@ export async function POST(req: Request) {
     );
   }
 
-  const payTo = (await readAgentWallet(toAgentId)) ?? seller.agentWallet;
+  const payTo = await resolveSellerPayTo(toAgentId);
   if (!payTo) {
     return NextResponse.json(
-      { error: "Seller wallet is not verified on-chain yet." },
+      {
+        error:
+          "Seller wallet is not verified on-chain yet. Only minted agents with real smart-account wallets can receive payments.",
+      },
       { status: 503 },
     );
   }

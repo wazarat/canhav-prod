@@ -39,7 +39,8 @@ import {
   type RecordParams,
   type SellerQuote,
 } from "@/lib/agent/collab-client";
-import { AgentInteractionTheater, type TheaterSettlement } from "@/components/agent/AgentInteractionTheater";
+import { formatUserOpError } from "@/lib/agent/userOpErrors";
+import { AgentInteractionTheater, type TheaterProofLinks, type TheaterSettlement } from "@/components/agent/AgentInteractionTheater";
 import { WalletCreditsPanel } from "@/components/agent/WalletCreditsPanel";
 import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 import type { StrategyPacket } from "@/lib/types";
@@ -256,6 +257,7 @@ export function CollabBrowser({
   const [paymentTx, setPaymentTx] = useState<string | null>(null);
   const [recordTx, setRecordTx] = useState<string | null>(null);
   const [settlement, setSettlement] = useState<TheaterSettlement | null>(null);
+  const [proofLinks, setProofLinks] = useState<TheaterProofLinks | null>(null);
 
   // Spendable credits for the selected buyer agent (faucet balance + claim).
   const [credits, setCredits] = useState<CreditsInfo | null>(null);
@@ -444,18 +446,25 @@ export function CollabBrowser({
     setPaymentTx(null);
     setRecordTx(null);
     setSettlement(null);
+    setProofLinks(null);
     setActiveAgreement(agreement ?? null);
 
     const seller = selection;
     try {
       setPhase("preflight");
       const pfRes = await fetch(
-        `/api/collab/request/preflight?agentId=${encodeURIComponent(buyerAgentId)}`,
+        `/api/collab/request/preflight?agentId=${encodeURIComponent(buyerAgentId)}&toAgentId=${encodeURIComponent(seller.agentId)}`,
       );
       const pf = (await pfRes.json()) as {
         configured?: boolean;
         accountIndex?: number;
         mintConfig?: SpawnMintConfig;
+        settlementReady?: boolean;
+        sufficient?: boolean;
+        humanRequired?: string;
+        humanBalance?: string;
+        assetName?: string;
+        proof?: TheaterProofLinks;
         error?: string;
       };
       if (!pfRes.ok || !pf.configured || pf.accountIndex == null || !pf.mintConfig) {
@@ -464,6 +473,13 @@ export function CollabBrowser({
             ? "Pick one of your own agents to pay from in the “Pay from agent” menu, and fund it with credits above."
             : (pf.error ?? "Buyer preflight failed.");
         throw new Error(friendly);
+      }
+      if (pf.proof) setProofLinks(pf.proof);
+      if (pf.settlementReady === false || pf.sufficient === false) {
+        throw new Error(
+          pf.error ??
+            `Your agent needs at least ${pf.humanRequired ?? "?"} ${pf.assetName ?? "tCNHV"} to pay (balance: ${pf.humanBalance ?? "0"}). Fund it from the treasury above.`,
+        );
       }
 
       setPhase("quoting");
@@ -535,6 +551,7 @@ export function CollabBrowser({
         record?: RecordParams | null;
         agreementRecord?: AgreementInteractionParams | null;
         settlement?: TheaterSettlement | null;
+        proof?: TheaterProofLinks | null;
         error?: string;
       };
       if (!reqRes.ok || !reqData.ok || !reqData.packet) {
@@ -546,6 +563,7 @@ export function CollabBrowser({
       }
       setPacket(reqData.packet);
       if (reqData.settlement) setSettlement(reqData.settlement);
+      if (reqData.proof) setProofLinks(reqData.proof as TheaterProofLinks);
 
       if (reqData.record) {
         try {
@@ -576,7 +594,7 @@ export function CollabBrowser({
       void loadAgreements();
       void loadCredits(buyerAgentId);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Collaboration failed.");
+      setError(formatUserOpError(e));
       setPhase("idle");
     }
   }
@@ -1066,6 +1084,7 @@ export function CollabBrowser({
           paymentTx={paymentTx}
           recordTx={recordTx}
           settlement={settlement}
+          proof={proofLinks}
           price={selection.x402.price}
           assetAddress={selection.x402.asset || undefined}
           drip={packet?.drip ?? null}

@@ -102,6 +102,12 @@ export async function getSellerDetail(agentId: string): Promise<SellerDetail | n
   const verifiedOnChain = verification ? verification.verified : profile.onChain;
   const registry = verification?.registry ?? null;
 
+  const payWallet =
+    wallet ??
+    (profile.agentWallet && /^0x[0-9a-fA-F]{40}$/.test(profile.agentWallet)
+      ? profile.agentWallet
+      : null);
+
   return {
     agentId: profile.agentId,
     agentName: profile.name,
@@ -120,8 +126,8 @@ export async function getSellerDetail(agentId: string): Promise<SellerDetail | n
     creator,
     onChain: profile.onChain,
     verifiedOnChain,
-    agentWallet: wallet ?? profile.agentWallet ?? null,
-    walletVerified: Boolean(wallet),
+    agentWallet: payWallet,
+    walletVerified: Boolean(payWallet),
     arbiscanAddressUrl: profile.agentAddress
       ? `https://sepolia.arbiscan.io/address/${profile.agentAddress}`
       : null,

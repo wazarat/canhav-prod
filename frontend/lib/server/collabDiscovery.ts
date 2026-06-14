@@ -107,9 +107,15 @@ async function buildAgentEntry(
   const offer = await resolveAgentOffer(agentId);
   if (!offer) return null;
 
-  const [wallet, reputation, memory, studied, frames, docs, tools, creator, ledger] =
+  const onChainWallet = await readAgentWallet(agentId);
+  const payWallet =
+    onChainWallet ??
+    (profile.agentWallet && /^0x[0-9a-fA-F]{40}$/.test(profile.agentWallet)
+      ? profile.agentWallet
+      : null);
+
+  const [reputation, memory, studied, frames, docs, tools, creator, ledger] =
     await Promise.all([
-      readAgentWallet(agentId),
       readAgentReputation(agentId),
       getMemory(agentId),
       getStudiedSkills(agentId),
@@ -136,8 +142,8 @@ async function buildAgentEntry(
     ownerHandle: profile.name.replace(/ — Research Skill$/, ""),
     description: profile.description,
     creator,
-    agentWallet: wallet ?? profile.agentWallet ?? null,
-    walletVerified: Boolean(wallet),
+    agentWallet: payWallet,
+    walletVerified: Boolean(payWallet),
     offerHash: offer.hash,
     attachedSkillIds: offer.attachedSkillIds,
     attachedSkillTitles: offer.attachedSkillTitles,

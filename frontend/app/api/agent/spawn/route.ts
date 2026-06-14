@@ -245,16 +245,23 @@ export async function POST(req: Request) {
 
   // Auto-create the agent's on-chain ledger + allowlist its wallet for tCNHV,
   // signed with the platform owner key (agents never deploy). Best-effort: a
-  // failure here is additive-only and must never fail a successful mint.
+  // failure here is additive-only and must never fail a successful mint, but we
+  // surface the outcome (ledger address) so a silent createLedger failure — e.g.
+  // the deployer is out of gas — is visible in the response/logs.
+  let ledger: string | null = null;
   if (hasFactory()) {
     try {
-      await ensureAgentLedger({
+      const result = await ensureAgentLedger({
         agentId,
         owner: verification.owner ?? agentAddress,
         agentWallet: agentWallet ?? agentAddress,
       });
-    } catch {
-      /* ledger creation is additive — never block a successful spawn */
+      ledger = result.ledger;
+      if (!result.ok) {
+        console.warn(`[spawn] ledger create failed for agent ${agentId} (check deployer gas)`);
+      }
+    } catch (e) {
+      console.warn(`[spawn] ensureAgentLedger threw for agent ${agentId}:`, e);
     }
   }
 
@@ -269,5 +276,6 @@ export async function POST(req: Request) {
     walletVerified,
     onChain: confirmedOnChain,
     pendingVerification: !confirmedOnChain,
+    ledger,
   });
 }

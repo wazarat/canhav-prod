@@ -4,6 +4,7 @@ import { ChevronRight, Activity, LogIn } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { CollabBrowser } from "@/components/agent/CollabBrowser";
 import { getAgentProfile } from "@/lib/agent/memory";
+import { verifyAgentOnChain } from "@/lib/agent/onchain";
 import { listCanonicalOwnedAgentIds, listOwnedAgentIds } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
 
@@ -15,15 +16,27 @@ export default async function CollabPage() {
 
   const ownedAgentIds = session ? await listCanonicalOwnedAgentIds(session.userId) : [];
 
-  const buyerAgents = session
+  // Only offer agents that still resolve on the CURRENTLY configured
+  // IdentityRegistry as payable buyers — agents minted into an abandoned registry
+  // redeploy ("legacy") are excluded so they never throw "That agent isn't yours".
+  const candidateProfiles = session
     ? (
         await Promise.all(
           (await listOwnedAgentIds(session.userId)).map((id) => getAgentProfile(id)),
         )
+      ).filter(
+        (p): p is NonNullable<typeof p> => Boolean(p) && p!.onChain && p!.accountIndex != null,
       )
-        .filter((p): p is NonNullable<typeof p> => Boolean(p) && p!.onChain && p!.accountIndex != null)
-        .map((p) => ({ agentId: p.agentId, name: p.name }))
     : [];
+  const buyerAgents = (
+    await Promise.all(
+      candidateProfiles.map(async (p) => {
+        const ver = await verifyAgentOnChain(p.agentId, p.agentAddress);
+        const verified = ver.configured ? Boolean(ver.owner) : p.onChain;
+        return verified ? { agentId: p.agentId, name: p.name } : null;
+      }),
+    )
+  ).filter((a): a is { agentId: string; name: string } => Boolean(a));
   // De-dupe (default agent id may also appear in the linked list).
   const seen = new Set<string>();
   const uniqueBuyers = buyerAgents.filter((a) => (seen.has(a.agentId) ? false : seen.add(a.agentId)));

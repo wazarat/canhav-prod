@@ -18,6 +18,8 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { SectionNav, type SectionNavItem } from "@/components/ui/SectionNav";
 import { agentCategoryLabel } from "@/lib/agent/categories";
 import { agentConfigStatus } from "@/lib/agent/config";
+import { formatAmount, hasTcnhv, TCNHV_DECIMALS } from "@/lib/agent/collab-config";
+import { readTcnhvBalance, verifyAgentOnChain } from "@/lib/agent/onchain";
 import { getAgentSkills, SKILL_GROUPS, type PlatformSkill } from "@/lib/agent/skills";
 import { MemoryInspector } from "@/components/agent/MemoryInspector";
 import { AgentLabCreditsSection } from "@/components/agent/AgentLabCreditsSection";
@@ -101,6 +103,31 @@ export default async function AgentsPage() {
     ).filter((id): id is string => Boolean(id)),
   );
 
+  // Per-agent on-chain enrichment: tCNHV balance held by the agent smart account
+  // (its spendable funding) and whether the token still resolves on the CURRENTLY
+  // configured IdentityRegistry. Agents minted into an abandoned registry redeploy
+  // read back as "legacy" (owner null) — we flag them and keep them out of the
+  // payable buyer dropdowns so they stop throwing "That agent isn't yours".
+  const agentChain = new Map<string, { balance: string | null; verified: boolean }>();
+  await Promise.all(
+    agents.map(async (a) => {
+      if (!a.onChain || !a.agentAddress) {
+        agentChain.set(a.agentId, { balance: null, verified: false });
+        return;
+      }
+      const [balanceRaw, ver] = await Promise.all([
+        hasTcnhv() ? readTcnhvBalance(a.agentAddress) : Promise.resolve(null),
+        verifyAgentOnChain(a.agentId, a.agentAddress),
+      ]);
+      agentChain.set(a.agentId, {
+        balance: balanceRaw != null ? formatAmount(BigInt(balanceRaw), TCNHV_DECIMALS) : null,
+        // When the registry isn't configured we can't verify; trust the stored
+        // flag rather than falsely flagging every agent as legacy.
+        verified: ver.configured ? Boolean(ver.owner) : a.onChain,
+      });
+    }),
+  );
+
   // Group agents by project (Entity). Unbound agents fall into "General research".
   const entities = await getApprovedEntities();
   const entityNameBySlug = new Map(entities.map((e) => [e.slug, e.name]));
@@ -165,7 +192,10 @@ export default async function AgentsPage() {
   const readyCount = rows.filter((r) => r.ready).length;
 
   const buyerAgents = agents
-    .filter((a) => a.onChain && a.accountIndex != null)
+    .filter(
+      (a) =>
+        a.onChain && a.accountIndex != null && (agentChain.get(a.agentId)?.verified ?? false),
+    )
     .map((a) => ({ agentId: a.agentId, name: a.name }));
 
   const listingNav: SectionNavItem[] = [
@@ -299,15 +329,29 @@ export default async function AgentsPage() {
                               Listed
                             </Badge>
                           )}
+                          {agent.onChain && !(agentChain.get(agent.agentId)?.verified ?? false) && (
+                            <Badge tone="neutral" className="shrink-0">
+                              Legacy
+                            </Badge>
+                          )}
                         </span>
                         {agent.associatedProducts.length > 0 && (
                           <p className="mt-0.5 truncate text-[11px] text-ink-400">
                             {agent.associatedProducts.map((p) => p.symbol).join(" · ")}
                           </p>
                         )}
+                        {agentChain.get(agent.agentId)?.balance != null && (
+                          <p className="mt-0.5 text-[11px] font-medium text-neon-400">
+                            Funded {agentChain.get(agent.agentId)!.balance} tCNHV
+                          </p>
+                        )}
                         <p className="mt-0.5 font-mono text-[10px] text-ink-500">
                           agent {agent.agentId}
-                          {agent.onChain ? " · on-chain" : " · local"}
+                          {agent.onChain
+                            ? agentChain.get(agent.agentId)?.verified
+                              ? " · on-chain"
+                              : " · legacy (re-mint)"
+                            : " · local"}
                         </p>
                       </div>
                       <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-ink-500 transition-colors group-hover:text-electric-400" />

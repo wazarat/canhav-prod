@@ -65,6 +65,8 @@ export async function GET(req: Request) {
   const base = {
     configured: true,
     accountIndex: profile.accountIndex,
+    agentAddress: profile.agentAddress ?? null,
+    signerAddress: profile.signerAddress ?? null,
     asset: collabUsdcAsset(),
     mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
   };

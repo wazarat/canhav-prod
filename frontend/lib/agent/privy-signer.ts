@@ -56,3 +56,38 @@ export async function buildPrivySigner(wallets: ConnectedWallet[]): Promise<Sign
   }
   return walletToSigner(wallet);
 }
+
+/**
+ * Resolve the wallet that controls a minted agent kernel. Each agent smart
+ * account is salted from (mint-signer EOA, accountIndex) — paying or claiming
+ * with a different connected wallet targets a different address (0 balance).
+ */
+export function resolveWalletForAgent(
+  wallets: ConnectedWallet[],
+  agentSignerAddress?: string | null,
+): ConnectedWallet | null {
+  if (agentSignerAddress) {
+    const want = agentSignerAddress.toLowerCase();
+    return wallets.find((w) => w.address.toLowerCase() === want) ?? null;
+  }
+  return resolveActiveWallet(wallets);
+}
+
+export async function buildAgentSigner(
+  wallets: ConnectedWallet[],
+  agentSignerAddress?: string | null,
+): Promise<Signer> {
+  const wallet = resolveWalletForAgent(wallets, agentSignerAddress);
+  if (!wallet) {
+    if (agentSignerAddress) {
+      const short = `${agentSignerAddress.slice(0, 6)}…${agentSignerAddress.slice(-4)}`;
+      throw new Error(
+        `This agent was minted with wallet ${short}. Connect that wallet in Privy (Wallet menu), or disconnect MetaMask if you minted with the embedded wallet, then try again.`,
+      );
+    }
+    throw new Error(
+      "No wallet connected yet — sign in with MetaMask or wait for your embedded wallet to finish loading.",
+    );
+  }
+  return walletToSigner(wallet);
+}

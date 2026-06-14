@@ -77,6 +77,7 @@ export async function GET(req: Request) {
     nextClaimAt: faucet?.nextClaimAt ?? 0,
     cooldownSeconds: faucet?.cooldownSeconds ?? 0,
     accountIndex: profile.accountIndex,
+    signerAddress: profile.signerAddress ?? null,
     mintConfig: claimable ? { zerodevRpc, rpcUrl, identityRegistry, securityRegistry } : null,
   });
 }

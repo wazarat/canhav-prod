@@ -23,7 +23,8 @@ import {
 } from "lucide-react";
 
 import { AGENT_CATEGORIES } from "@/lib/agent/categories";
-import { buildPrivySigner, resolveActiveWallet } from "@/lib/agent/privy-signer";
+import { buildAgentSigner, buildPrivySigner, resolveActiveWallet } from "@/lib/agent/privy-signer";
+import { assertAgentKernelMatch } from "@/lib/agent/verify-agent-signer";
 import { deriveKernelAddress } from "@/lib/agent/kernel-address";
 import {
   claimCredits,
@@ -181,6 +182,7 @@ interface CreditsInfo {
   canClaim?: boolean;
   nextClaimAt?: number;
   accountIndex?: number;
+  signerAddress?: string | null;
   mintConfig?: SpawnMintConfig | null;
   error?: string;
 }
@@ -417,7 +419,15 @@ export function CollabBrowser({
     setError(null);
     setNotice(null);
     try {
-      const signer = await buildSigner();
+      const signer = await buildAgentSigner(wallets, credits.signerAddress);
+      if (credits.account && credits.accountIndex != null && credits.mintConfig) {
+        await assertAgentKernelMatch({
+          signer,
+          accountIndex: credits.accountIndex,
+          mintConfig: credits.mintConfig,
+          expectedAgentAddress: credits.account,
+        });
+      }
       await claimCredits({
         signer,
         accountIndex: credits.accountIndex,
@@ -458,6 +468,8 @@ export function CollabBrowser({
       const pf = (await pfRes.json()) as {
         configured?: boolean;
         accountIndex?: number;
+        agentAddress?: string | null;
+        signerAddress?: string | null;
         mintConfig?: SpawnMintConfig;
         settlementReady?: boolean;
         sufficient?: boolean;
@@ -488,7 +500,15 @@ export function CollabBrowser({
         fromAgentId: buyerAgentId,
       });
 
-      const signer = await buildSigner();
+      const signer = await buildAgentSigner(wallets, pf.signerAddress);
+      if (pf.agentAddress && pf.accountIndex != null && pf.mintConfig) {
+        await assertAgentKernelMatch({
+          signer,
+          accountIndex: pf.accountIndex,
+          mintConfig: pf.mintConfig,
+          expectedAgentAddress: pf.agentAddress,
+        });
+      }
 
       // Lazily anchor the agreement on-chain (CollabAgreement.establish) before
       // the first paid period. Best-effort: off-chain enforcement stands in when
@@ -686,7 +706,7 @@ export function CollabBrowser({
         setNotice(`Thanks — rated ${stars}/5.${rewardNote}`);
         if (data.onChain) {
           try {
-            const signer = await buildSigner();
+            const signer = await buildAgentSigner(wallets, credits?.signerAddress);
             await submitFeedbackOnChain({ signer, feedback: data.onChain });
             setNotice(`Rated ${stars}/5 and recorded on-chain.${rewardNote}`);
           } catch {

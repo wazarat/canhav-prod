@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 const STAGES = [
   "discover",
   "402 challenge",
-  "pay (USDC)",
+  "pay (tCNHV)",
   "StrategyPacket",
   "record on-chain",
   "reputation",
@@ -122,14 +122,20 @@ export default async function CollabFeedPage() {
                 ) : (
                   <Badge tone="neutral">recorded</Badge>
                 )}
+                <Link
+                  href={`/collab/tx/${e.paymentRef}`}
+                  className="text-[10px] font-medium text-electric-400 hover:text-electric-300"
+                >
+                  proof
+                </Link>
                 {e.txHash && (
                   <a
                     href={`https://sepolia.arbiscan.io/tx/${e.txHash}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[10px] font-medium text-electric-400 hover:text-electric-300"
+                    className="text-[10px] font-medium text-ink-500 hover:text-ink-300"
                   >
-                    tx
+                    arbiscan
                   </a>
                 )}
               </div>

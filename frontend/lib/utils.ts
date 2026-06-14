@@ -107,3 +107,13 @@ export function arbiscanToken(address: string | null | undefined): string | null
 export function arbiscanTx(hash: string | null | undefined): string | null {
   return hash ? `https://arbiscan.io/tx/${hash}` : null;
 }
+
+/** Arbitrum Sepolia Arbiscan transaction URL (agent collab / testnet stack). */
+export function arbiscanSepoliaTx(hash: string | null | undefined): string | null {
+  return hash ? `https://sepolia.arbiscan.io/tx/${hash}` : null;
+}
+
+/** Arbitrum Sepolia Arbiscan address page. */
+export function arbiscanSepoliaAddress(address: string | null | undefined): string | null {
+  return address ? `https://sepolia.arbiscan.io/address/${address}` : null;
+}

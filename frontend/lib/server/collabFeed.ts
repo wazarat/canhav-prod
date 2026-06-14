@@ -89,6 +89,14 @@ async function readOnChain(): Promise<FeedEntry[]> {
   }
 }
 
+/** Look up one exchange by its settling payment tx hash (`paymentRef`). */
+export async function getFeedEntryByPaymentRef(paymentRef: string): Promise<FeedEntry | null> {
+  const normalized = paymentRef.trim().toLowerCase();
+  if (!/^0x[0-9a-f]{64}$/.test(normalized)) return null;
+  const entries = await listFeed(500);
+  return entries.find((e) => e.paymentRef.toLowerCase() === normalized) ?? null;
+}
+
 export async function listFeed(limit = 50): Promise<FeedEntry[]> {
   const [onChain, offChain] = await Promise.all([readOnChain(), listCollabExchanges(limit)]);
 

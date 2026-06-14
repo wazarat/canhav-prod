@@ -42,6 +42,7 @@ import { AgentInteractionTheater, type TheaterSettlement } from "@/components/ag
 import { WalletCreditsPanel } from "@/components/agent/WalletCreditsPanel";
 import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 import type { StrategyPacket } from "@/lib/types";
+import { arbiscanSepoliaTx } from "@/lib/utils";
 
 type AgreementMode = "one_time" | "recurring";
 type AgreementCadence = "none" | "daily" | "weekly" | "monthly";
@@ -987,9 +988,51 @@ export function CollabBrowser({
           recordTx={recordTx}
           settlement={settlement}
           price={selection.x402.price}
+          assetAddress={selection.x402.asset || undefined}
           drip={packet?.drip ?? null}
           error={error}
         />
+      )}
+
+      {phase === "done" && paymentTx && (
+        <div className="space-y-3 rounded-xl border border-signal-400/20 bg-signal-400/5 p-4 text-xs">
+          <p className="flex items-center gap-1.5 font-medium text-signal-300">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Transaction complete — here&apos;s exactly what
+            happened, on-chain.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={`/collab/tx/${paymentTx}`}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-electric-500/30 bg-electric-500/10 px-3 py-1.5 font-medium text-electric-300 transition-colors hover:bg-electric-500/20"
+            >
+              <ExternalLink className="h-3.5 w-3.5" /> View proof page
+            </a>
+            <a
+              href={arbiscanSepoliaTx(paymentTx) ?? "#"}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-neon-500/30 bg-neon-500/10 px-3 py-1.5 font-medium text-neon-300 transition-colors hover:bg-neon-500/20"
+            >
+              <ExternalLink className="h-3.5 w-3.5" /> Payment on Arbiscan
+            </a>
+            {recordTx && (
+              <a
+                href={arbiscanSepoliaTx(recordTx) ?? "#"}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-signal-400/30 bg-signal-400/10 px-3 py-1.5 font-medium text-signal-300 transition-colors hover:bg-signal-400/20"
+              >
+                <ExternalLink className="h-3.5 w-3.5" /> Record on Arbiscan
+              </a>
+            )}
+          </div>
+          <p className="text-ink-500">
+            Shareable link:{" "}
+            <span className="font-mono text-ink-400">
+              canhav.co/collab/tx/{paymentTx.slice(0, 10)}…
+            </span>
+          </p>
+        </div>
       )}
 
       {activeAgreement && packet?.drip && (

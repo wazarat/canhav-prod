@@ -36,14 +36,18 @@ export interface TheaterProps {
   buyer: { id: string; name: string };
   seller: { id: string; name: string };
   phase: TheaterPhase;
-  /** Settlement (USDC) tx hash. */
+  /** Settlement (tCNHV transfer) tx hash. */
   paymentTx?: string | null;
   /** CollabRegistry attestation tx hash (if recorded). */
   recordTx?: string | null;
   /** Decoded X-PAYMENT-RESPONSE settlement from the seller. */
   settlement?: TheaterSettlement | null;
-  /** Quote price (human USDC) shown on the 402 challenge. */
+  /** Quote price (human credits) shown on the 402 challenge. */
   price?: string | null;
+  /** Human-readable settlement asset label (e.g. "tCNHV"). */
+  assetLabel?: string | null;
+  /** Settlement token contract address (for an Arbiscan link). */
+  assetAddress?: string | null;
   /** Drip descriptor for an agreement installment. */
   drip?: StrategyPacketDrip | null;
   error?: string | null;
@@ -89,10 +93,14 @@ export function AgentInteractionTheater({
   recordTx,
   settlement,
   price,
+  assetLabel,
+  assetAddress,
   drip,
   error,
 }: TheaterProps) {
   const current = rank(phase);
+  const asset = assetLabel ?? "tCNHV";
+  const amountHuman = settlement?.humanAmount ?? price ?? null;
 
   const stageStatus = (stagePhase: TheaterPhase): StageStatus => {
     const stageRank = rank(stagePhase);
@@ -104,7 +112,7 @@ export function AgentInteractionTheater({
   };
 
   const stages: { phase: TheaterPhase; label: string; detail: string }[] = [
-    { phase: "quoting", label: "Quote", detail: price ? `${price} credits` : "price quote" },
+    { phase: "quoting", label: "Quote", detail: price ? `${price} ${asset}` : "price quote" },
     { phase: "paying", label: "Pay", detail: "from your agent" },
     { phase: "settling", label: "Confirm", detail: "payment confirmed" },
     { phase: "recording", label: "Save record", detail: "verifiable record" },
@@ -217,6 +225,28 @@ export function AgentInteractionTheater({
               <p className="text-signal-300">← X-PAYMENT-RESPONSE</p>
               <p className="break-all text-ink-400">{xPaymentResponsePreview.slice(0, 120)}…</p>
             </div>
+          )}
+        </div>
+      )}
+
+      {/* Settlement summary */}
+      {amountHuman && (
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-2.5 text-xs text-ink-300">
+          <span className="text-ink-400">{buyer.name}</span>
+          <span className="text-neon-400">paid</span>
+          <span className="font-semibold text-ink-50">
+            {amountHuman} {asset}
+          </span>
+          <span className="text-ink-400">to {seller.name}</span>
+          {assetAddress && (
+            <a
+              href={`https://sepolia.arbiscan.io/token/${assetAddress}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-electric-400 hover:text-electric-300"
+            >
+              <ExternalLink className="h-3 w-3" /> token contract
+            </a>
           )}
         </div>
       )}

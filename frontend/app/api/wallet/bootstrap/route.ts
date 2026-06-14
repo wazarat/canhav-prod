@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { hasZeroDev } from "@/lib/agent/config";
 import { getSession } from "@/lib/auth/session";
-import { getUserProfile } from "@/lib/auth/users";
+import { getUserProfile, updateUserProfile } from "@/lib/auth/users";
 import { grantSignupCredits, startingTcnhvHuman } from "@/lib/server/credits";
 import { canMintTcnhv } from "@/lib/server/factory";
 import { readSecret } from "@/lib/server/env";
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });
   }
 
-  let body: { address?: unknown } = {};
+  let body: { address?: unknown; signerAddress?: unknown } = {};
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -80,7 +80,17 @@ export async function POST(req: Request) {
   }
 
   const address = typeof body.address === "string" ? body.address.trim() : "";
+  const signerAddress =
+    typeof body.signerAddress === "string" ? body.signerAddress.trim() : "";
+
+  if (signerAddress && /^0x[0-9a-fA-F]{40}$/.test(signerAddress)) {
+    await updateUserProfile(session.userId, { signerAddress });
+  }
+
   if (!/^0x[0-9a-fA-F]{40}$/.test(address)) {
+    if (signerAddress && /^0x[0-9a-fA-F]{40}$/.test(signerAddress)) {
+      return NextResponse.json({ ok: true, signerPersisted: true });
+    }
     return NextResponse.json({ ok: false, error: "A valid wallet address is required." }, {
       status: 400,
     });

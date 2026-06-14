@@ -28,13 +28,23 @@ export function WalletBootstrap() {
 
     void (async () => {
       try {
+        const signerAddress = wallet.address;
+
         const res = await fetch("/api/wallet/bootstrap");
         if (!res.ok) return;
         const data = (await res.json()) as {
           needsGrant?: boolean;
           mintConfig?: SpawnMintConfig | null;
         };
-        if (!data.needsGrant || !data.mintConfig) return;
+
+        if (!data.needsGrant || !data.mintConfig) {
+          await fetch("/api/wallet/bootstrap", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ address: "", signerAddress }),
+          });
+          return;
+        }
 
         const signer = await buildPrivySigner(wallets);
 
@@ -50,7 +60,7 @@ export function WalletBootstrap() {
         await fetch("/api/wallet/bootstrap", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address: kernel.address }),
+          body: JSON.stringify({ address: kernel.address, signerAddress }),
         });
       } catch {
         /* best-effort — a later mount will retry */

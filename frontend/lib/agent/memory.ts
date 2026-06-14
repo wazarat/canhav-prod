@@ -82,6 +82,8 @@ export interface AgentProfile {
   entitySlug: string | null;
   /** The Privy user id (DID) of the creator/owner. Null for legacy/seeded agents. */
   ownerUserId: string | null;
+  /** MetaMask / embedded EOA that controls this agent's ZeroDev kernel. */
+  signerAddress: string | null;
   /** Owner-authored bio shown in the collaboration marketplace. Null = none. */
   description: string | null;
   /** Member products of the bound entity, denormalized for fast scoping. */
@@ -250,6 +252,7 @@ function normalizeProfile(profile: AgentProfile | null): AgentProfile | null {
     category: isAgentCategory(profile.category) ? profile.category : null,
     entitySlug: profile.entitySlug ?? null,
     ownerUserId: profile.ownerUserId ?? null,
+    signerAddress: profile.signerAddress ?? null,
     description: profile.description ?? null,
     associatedProducts: profile.associatedProducts ?? [],
     accountIndex: profile.accountIndex ?? null,
@@ -277,6 +280,7 @@ export interface SeedProfileInput {
   skillId?: string | null;
   entitySlug?: string | null;
   ownerUserId?: string | null;
+  signerAddress?: string | null;
   description?: string | null;
   associatedProducts?: AgentProductRef[];
   accountIndex?: number | null;
@@ -302,6 +306,7 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
     skillId: input.skillId ?? existing?.skillId ?? null,
     entitySlug: input.entitySlug ?? existing?.entitySlug ?? null,
     ownerUserId: input.ownerUserId ?? existing?.ownerUserId ?? null,
+    signerAddress: input.signerAddress ?? existing?.signerAddress ?? null,
     description: input.description !== undefined ? input.description : (existing?.description ?? null),
     associatedProducts:
       input.associatedProducts ?? existing?.associatedProducts ?? [],

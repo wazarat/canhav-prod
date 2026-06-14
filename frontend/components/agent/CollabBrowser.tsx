@@ -23,7 +23,8 @@ import {
 } from "lucide-react";
 
 import { AGENT_CATEGORIES } from "@/lib/agent/categories";
-import { buildPrivySigner } from "@/lib/agent/privy-signer";
+import { buildPrivySigner, resolveActiveWallet } from "@/lib/agent/privy-signer";
+import { deriveKernelAddress } from "@/lib/agent/kernel-address";
 import {
   claimCredits,
   establishAgreementOnChain,
@@ -259,6 +260,7 @@ export function CollabBrowser({
   // Spendable credits for the selected buyer agent (faucet balance + claim).
   const [credits, setCredits] = useState<CreditsInfo | null>(null);
   const [claiming, setClaiming] = useState(false);
+  const [reclaiming, setReclaiming] = useState(false);
 
   const loadCredits = useCallback(async (agentId: string) => {
     if (!agentId) {
@@ -340,6 +342,65 @@ export function CollabBrowser({
 
   async function buildSigner() {
     return buildPrivySigner(wallets);
+  }
+
+  async function handleReclaimAgent() {
+    if (!buyerAgentId) return;
+    if (!authenticated) {
+      login();
+      return;
+    }
+    setReclaiming(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const preRes = await fetch(`/api/agent/${encodeURIComponent(buyerAgentId)}/reclaim`);
+      const pre = (await preRes.json()) as {
+        ok?: boolean;
+        alreadyOwned?: boolean;
+        error?: string;
+        accountIndex?: number;
+        agentAddress?: string;
+        mintConfig?: SpawnMintConfig;
+      };
+      if (!preRes.ok || !pre.ok) {
+        throw new Error(pre.error ?? "Could not prepare agent reclaim.");
+      }
+      if (pre.alreadyOwned) {
+        await loadCredits(buyerAgentId);
+        setNotice("This agent is already linked to your account.");
+        return;
+      }
+      if (pre.accountIndex == null || !pre.agentAddress || !pre.mintConfig) {
+        throw new Error("Reclaim parameters are missing.");
+      }
+
+      const activeWallet = resolveActiveWallet(wallets);
+      if (!activeWallet) throw new Error("Connect MetaMask or your embedded wallet and try again.");
+
+      const signer = await buildSigner();
+      const derived = await deriveKernelAddress(signer, pre.accountIndex, pre.mintConfig);
+
+      const res = await fetch(`/api/agent/${encodeURIComponent(buyerAgentId)}/reclaim`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agentAddress: derived,
+          signerAddress: activeWallet.address,
+        }),
+      });
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error ?? "Could not re-link this agent.");
+      }
+
+      setNotice("Agent re-linked to your wallet. You can pay from it now.");
+      await loadCredits(buyerAgentId);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Re-link failed.");
+    } finally {
+      setReclaiming(false);
+    }
   }
 
   async function handleClaimCredits() {
@@ -711,10 +772,27 @@ export function CollabBrowser({
             </div>
           </div>
         ) : credits && !credits.configured ? (
-          <p className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-xs text-ink-400">
-            {credits.error ??
-              "Agent credits unavailable — fund this agent from your treasury above once tCNHV is provisioned."}
-          </p>
+          <div className="mt-3 space-y-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3">
+            <p className="text-xs text-ink-400">
+              {credits.error ??
+                "Agent credits unavailable — fund this agent from your treasury above once tCNHV is provisioned."}
+            </p>
+            {credits.error === "That agent isn't yours." ? (
+              <button
+                type="button"
+                onClick={() => void handleReclaimAgent()}
+                disabled={reclaiming || busy}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-1.5 text-xs font-medium text-electric-300 transition-colors hover:bg-electric-500/20 disabled:opacity-40"
+              >
+                {reclaiming ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Wallet className="h-3.5 w-3.5" />
+                )}
+                {reclaiming ? "Re-linking…" : "Re-link this agent to your wallet"}
+              </button>
+            ) : null}
+          </div>
         ) : null}
       </div>
 

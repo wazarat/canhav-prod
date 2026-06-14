@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { accessToken?: unknown; displayName?: unknown; email?: unknown; address?: unknown } =
+  let body: { accessToken?: unknown; displayName?: unknown; email?: unknown; address?: unknown; signerAddress?: unknown } =
     {};
   try {
     body = (await req.json()) as typeof body;
@@ -58,12 +58,17 @@ export async function POST(req: Request) {
     typeof body.address === "string" && /^0x[0-9a-fA-F]{40}$/.test(body.address)
       ? body.address
       : null;
+  const signerAddress =
+    typeof body.signerAddress === "string" && /^0x[0-9a-fA-F]{40}$/.test(body.signerAddress.trim())
+      ? body.signerAddress.trim()
+      : null;
 
   const profile = await upsertUserFromPrivy({
     userId: verified.userId,
     displayName,
     email,
     address,
+    signerAddress,
   });
 
   // Seed the one-time tCNHV starting grant when login already carries the

@@ -14,7 +14,7 @@ import { verifyAgentOnChain } from "@/lib/agent/onchain";
 import { getAgentSkillById } from "@/lib/agent/skills";
 import { groundUserSkillOnAgent } from "@/lib/agent/attachUserSkill";
 import { getSession } from "@/lib/auth/session";
-import { getUserEntityAgent, linkAgentToUser, setUserEntityAgent } from "@/lib/auth/users";
+import { getUserEntityAgent, linkAgentToUser, setUserEntityAgent, updateUserProfile } from "@/lib/auth/users";
 import { getUserSkill } from "@/lib/server/userSkills";
 import { readSecret } from "@/lib/server/env";
 import { ensureAgentLedger, hasFactory } from "@/lib/server/factory";
@@ -84,6 +84,7 @@ export async function POST(req: Request) {
     category?: unknown;
     extraSkillIds?: unknown;
     userSkillIds?: unknown;
+    signerAddress?: unknown;
   } = {};
   try {
     body = (await req.json()) as typeof body;
@@ -191,6 +192,11 @@ export async function POST(req: Request) {
   }
   const confirmedOnChain = verification.verified;
 
+  const signerAddress =
+    typeof body.signerAddress === "string" && /^0x[0-9a-fA-F]{40}$/.test(body.signerAddress.trim())
+      ? body.signerAddress.trim()
+      : null;
+
   await seedAgentProfile({
     agentId,
     name: customName ?? skill.title,
@@ -198,6 +204,7 @@ export async function POST(req: Request) {
     skillId,
     entitySlug,
     ownerUserId: session.userId,
+    signerAddress,
     associatedProducts,
     accountIndex,
     agentAddress,
@@ -231,6 +238,10 @@ export async function POST(req: Request) {
   }
   await linkAgentToUser(session.userId, agentId);
   await setUserEntityAgent(session.userId, slotKey, agentId);
+
+  if (signerAddress) {
+    await updateUserProfile(session.userId, { signerAddress });
+  }
 
   // Auto-create the agent's on-chain ledger + allowlist its wallet for tCNHV,
   // signed with the platform owner key (agents never deploy). Best-effort: a

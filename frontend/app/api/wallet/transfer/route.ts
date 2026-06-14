@@ -9,6 +9,7 @@ import {
 } from "@/lib/agent/collab-config";
 import { hasZeroDev } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
+import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
 import { getUserProfile } from "@/lib/auth/users";
 import { readSecret } from "@/lib/server/env";
@@ -105,6 +106,13 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { ok: false, error: "Could not resolve that recipient. Use a wallet address, agent id, or user id." },
       { status: 404 },
+    );
+  }
+
+  if (recipient.kind === "agent" && !(await userOwnsAgent(session.userId, to))) {
+    return NextResponse.json(
+      { ok: false, error: "That agent isn't yours." },
+      { status: 403 },
     );
   }
 

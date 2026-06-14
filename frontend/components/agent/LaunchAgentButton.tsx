@@ -8,7 +8,7 @@ import { AlertTriangle, CheckCircle2, Loader2, LogIn, Rocket, Wallet } from "luc
 
 import { Badge } from "@/components/ui/Badge";
 import { AGENT_CATEGORIES, type AgentCategory } from "@/lib/agent/categories";
-import { buildPrivySigner } from "@/lib/agent/privy-signer";
+import { buildPrivySigner, resolveActiveWallet } from "@/lib/agent/privy-signer";
 import { mintAgentOnClient, type SpawnPreflightResponse } from "@/lib/agent/spawn-client";
 import { cn } from "@/lib/utils";
 import type { AgentProductRef, AgentSkill } from "canhav-agent-service";
@@ -153,6 +153,8 @@ export function LaunchAgentButton({
       //    viem signer. This signer drives the ZeroDev Kernel account's ECDSA validator.
       setPhase("wallet");
       const signer = await buildPrivySigner(wallets);
+      const activeWallet = resolveActiveWallet(wallets);
+      const signerAddress = activeWallet?.address ?? null;
 
       // 2) Preflight: reuse check + mint config (userOp signing stays in-browser).
       //    General agents key off a per-create nonce; legacy mints off an entity.
@@ -214,6 +216,7 @@ export function LaunchAgentButton({
           skillId,
           ...(isGeneral ? { nonce: createNonce } : { entitySlug }),
           mintResult,
+          signerAddress,
           name: agentName.trim() || undefined,
           category: category ?? undefined,
           extraSkillIds: platformExtraIds,

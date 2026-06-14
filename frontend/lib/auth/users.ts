@@ -26,6 +26,11 @@ export interface UserProfile {
    */
   address: string | null;
   /**
+   * The ECDSA root (MetaMask EOA or Privy embedded wallet) that drives the user's
+   * ZeroDev kernels. Stable across Privy DID changes when the same wallet reconnects.
+   */
+  signerAddress: string | null;
+  /**
    * Whether the one-time tCNHV starting grant (10,000) has already been minted
    * to this user's wallet. Guards against double-granting across logins.
    */
@@ -102,6 +107,7 @@ function normalizeUserProfile(profile: UserProfile | null): UserProfile | null {
     email: profile.email ?? null,
     displayName: profile.displayName ?? null,
     address: profile.address ?? null,
+    signerAddress: profile.signerAddress ?? null,
     tcnhvGranted: profile.tcnhvGranted ?? false,
   };
 }
@@ -123,6 +129,7 @@ export async function upsertUserFromPrivy(input: {
   email?: string | null;
   displayName?: string | null;
   address?: string | null;
+  signerAddress?: string | null;
 }): Promise<UserProfile> {
   const existing = await getUserProfile(input.userId);
   const profile: UserProfile = {
@@ -130,6 +137,7 @@ export async function upsertUserFromPrivy(input: {
     email: (input.email?.trim() || existing?.email) ?? null,
     displayName: (input.displayName?.trim() || existing?.displayName) ?? null,
     address: (input.address?.trim() || existing?.address) ?? null,
+    signerAddress: (input.signerAddress?.trim() || existing?.signerAddress) ?? null,
     tcnhvGranted: existing?.tcnhvGranted ?? false,
     createdAt: existing?.createdAt ?? nowIso(),
     updatedAt: nowIso(),
@@ -169,7 +177,7 @@ export async function upsertUserFromPrivy(input: {
  */
 export async function updateUserProfile(
   userId: string,
-  patch: { displayName?: string | null; address?: string | null },
+  patch: { displayName?: string | null; address?: string | null; signerAddress?: string | null },
 ): Promise<UserProfile | null> {
   const existing = await getUserProfile(userId);
   if (!existing) return null;
@@ -178,6 +186,10 @@ export async function updateUserProfile(
     displayName:
       patch.displayName !== undefined ? (patch.displayName?.trim() || null) : existing.displayName,
     address: patch.address !== undefined ? (patch.address?.trim() || null) : existing.address,
+    signerAddress:
+      patch.signerAddress !== undefined
+        ? (patch.signerAddress?.trim() || null)
+        : existing.signerAddress,
     updatedAt: nowIso(),
   };
 
@@ -205,6 +217,7 @@ export async function markTcnhvGranted(
   const updated: UserProfile = {
     ...existing,
     address: address?.trim() || existing.address,
+    signerAddress: existing.signerAddress,
     tcnhvGranted: true,
     updatedAt: nowIso(),
   };

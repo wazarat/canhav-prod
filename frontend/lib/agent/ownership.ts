@@ -2,7 +2,7 @@ import "server-only";
 
 import { NextResponse } from "next/server";
 
-import { getAgentProfile, setAgentOwner, type AgentProfile } from "@/lib/agent/memory";
+import { getAgentProfile, seedAgentProfile, setAgentOwner, type AgentProfile } from "@/lib/agent/memory";
 import { readAgentWallet, verifyAgentOnChain } from "@/lib/agent/onchain";
 import { userAgentId } from "@/lib/agent/user-agent";
 import { getSession, type SessionPayload } from "@/lib/auth/session";
@@ -11,6 +11,7 @@ import {
   linkAgentToUser,
   listUserAgentIds,
   unlinkAgentFromUser,
+  updateUserProfile,
 } from "@/lib/auth/users";
 
 /**
@@ -27,8 +28,9 @@ import {
  *      wallet / ERC-8004 ownerOf) resolves to the user's canonical treasury
  *      wallet — which durably re-claims agents whose off-chain `ownerUserId`
  *      link was orphaned by an identity change (e.g. the passkey → Privy DID
- *      migration). Address equality is the only thing that can grant (4), so it
- *      can never leak across distinct wallets.
+ *      migration), or
+ *   5. (recovery) the agent's stored `signerAddress` matches the user's
+ *      `signerAddress` (same MetaMask EOA after a Privy DID change).
  */
 
 export interface OwnedAgentGuard {
@@ -38,6 +40,7 @@ export interface OwnedAgentGuard {
 }
 
 const ZERO_ADDR = "0x0000000000000000000000000000000000000000";
+const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 
 function sameAddress(a: string | null | undefined, b: string | null | undefined): boolean {
   if (!a || !b) return false;
@@ -46,11 +49,25 @@ function sameAddress(a: string | null | undefined, b: string | null | undefined)
 }
 
 /**
+ * Signer-root recovery: same MetaMask / embedded EOA after a Privy DID change.
+ */
+async function reconcileSignerOwnershipAsync(
+  userId: string,
+  agentId: string,
+  loaded?: AgentProfile | null,
+): Promise<boolean> {
+  const user = await getUserProfile(userId);
+  if (!user?.signerAddress) return false;
+  const profile = loaded ?? (await getAgentProfile(agentId));
+  if (!profile?.signerAddress) return false;
+  return sameAddress(user.signerAddress, profile.signerAddress);
+}
+
+/**
  * Address-gated, false-positive-safe recovery: when the off-chain link is
  * orphaned (no/old `ownerUserId`), see whether the agent's on-chain footprint
  * (its smart account / reserved wallet / ERC-8004 ownerOf) resolves to the
- * user's canonical treasury wallet. Only address equality can grant access, so
- * distinct wallets never match. Best-effort — any read failure returns false.
+ * user's canonical treasury wallet, or the signer roots match.
  */
 async function reconcileOnChainOwnership(
   userId: string,
@@ -59,6 +76,9 @@ async function reconcileOnChainOwnership(
 ): Promise<boolean> {
   try {
     if (!/^\d+$/.test(agentId)) return false; // only minted (numeric tokenId) agents
+
+    if (await reconcileSignerOwnershipAsync(userId, agentId, loaded)) return true;
+
     const user = await getUserProfile(userId);
     const wallet = user?.address;
     if (!wallet) return false;
@@ -81,10 +101,8 @@ async function reconcileOnChainOwnership(
 
 /**
  * Remove minted agents from a user's Redis index when `profile.ownerUserId`
- * points at someone else AND on-chain ownership does NOT reconcile to this
- * user's wallet. Reconcilable agents (orphaned legacy links) are durably
- * re-claimed instead of unlinked, so a stale `ownerUserId` never permanently
- * hides an agent the user actually owns.
+ * points at someone else AND ownership does NOT reconcile. Reconcilable agents
+ * are durably re-claimed instead of unlinked.
  */
 export async function pruneStaleAgentLinks(userId: string): Promise<void> {
   const linked = await listUserAgentIds(userId);
@@ -147,9 +165,10 @@ export async function userOwnsAgent(
 ): Promise<boolean> {
   if (agentId === userAgentId(userId)) return true;
 
+  let profile: AgentProfile | null = null;
   let ownerUserId = profileOwnerUserId;
   if (ownerUserId === undefined) {
-    const profile = await getAgentProfile(agentId);
+    profile = await getAgentProfile(agentId);
     ownerUserId = profile?.ownerUserId ?? null;
   }
 
@@ -158,12 +177,8 @@ export async function userOwnsAgent(
     return true;
   }
 
-  // A canonical owner is set, but it isn't this user. Block — UNLESS the agent's
-  // on-chain footprint reconciles to this user's wallet (an orphaned legacy link
-  // from the passkey → Privy DID migration). Address equality can't leak across
-  // distinct wallets, so a match safely re-claims the agent for the current id.
   if (ownerUserId && ownerUserId !== userId) {
-    if (await reconcileOnChainOwnership(userId, agentId)) {
+    if (await reconcileOnChainOwnership(userId, agentId, profile ?? undefined)) {
       await setAgentOwner(agentId, userId);
       await linkAgentToUser(userId, agentId);
       return true;
@@ -171,15 +186,71 @@ export async function userOwnsAgent(
     return false;
   }
 
-  // No canonical owner: honor the Redis index link, or recover via on-chain
-  // address match (self-healing the canonical owner so it sticks).
   if ((await listUserAgentIds(userId)).includes(agentId)) return true;
-  if (await reconcileOnChainOwnership(userId, agentId)) {
+  if (await reconcileOnChainOwnership(userId, agentId, profile ?? undefined)) {
     await setAgentOwner(agentId, userId);
     await linkAgentToUser(userId, agentId);
     return true;
   }
   return false;
+}
+
+export type ReclaimResult = { ok: true } | { ok: false; error: string };
+
+/**
+ * Re-link an agent to the current user by proving control of its kernel address
+ * (client-derived from the connected wallet + stored accountIndex).
+ */
+export async function reclaimAgentByProof(
+  userId: string,
+  agentId: string,
+  proof: { agentAddress: string; signerAddress?: string | null },
+): Promise<ReclaimResult> {
+  const profile = await getAgentProfile(agentId);
+  if (!profile) return { ok: false, error: "Agent not found." };
+  if (!profile.onChain || profile.accountIndex == null || !profile.agentAddress) {
+    return { ok: false, error: "Agent must be on-chain to reclaim." };
+  }
+
+  const derived = proof.agentAddress.trim();
+  if (!ADDRESS_RE.test(derived)) {
+    return { ok: false, error: "A valid derived agent address is required." };
+  }
+  if (!sameAddress(derived, profile.agentAddress)) {
+    return { ok: false, error: "Derived address does not match this agent." };
+  }
+
+  const verification = await verifyAgentOnChain(agentId, profile.agentAddress);
+  if (
+    verification.configured &&
+    verification.owner &&
+    verification.expectedOwner &&
+    !sameAddress(verification.owner, verification.expectedOwner)
+  ) {
+    return { ok: false, error: "On-chain owner does not match this agent." };
+  }
+
+  const signer = proof.signerAddress?.trim() ?? null;
+  if (signer) {
+    if (!ADDRESS_RE.test(signer)) {
+      return { ok: false, error: "Invalid signer address." };
+    }
+    if (profile.signerAddress && !sameAddress(profile.signerAddress, signer)) {
+      return { ok: false, error: "Signer does not match the wallet that minted this agent." };
+    }
+    await updateUserProfile(userId, { signerAddress: signer });
+    if (!profile.signerAddress) {
+      await seedAgentProfile({
+        agentId,
+        name: profile.name,
+        signerAddress: signer,
+      });
+    }
+  }
+
+  await setAgentOwner(agentId, userId);
+  await linkAgentToUser(userId, agentId);
+  return { ok: true };
 }
 
 export async function requireOwnedAgent(agentId: string): Promise<OwnedAgentGuard> {

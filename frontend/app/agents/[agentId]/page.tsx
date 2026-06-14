@@ -9,6 +9,7 @@ import { AgentSuggestions } from "@/components/agent/AgentSuggestions";
 import { AgentIdentityCard } from "@/components/agent/AgentIdentityCard";
 import { AgentMemoryPanel } from "@/components/agent/AgentMemoryPanel";
 import { AgentPerformanceCard } from "@/components/agent/AgentPerformanceCard";
+import { VerdictFeed } from "@/components/agent/VerdictFeed";
 import { AttachSkillPanel } from "@/components/agent/AttachSkillPanel";
 import { CollabSettingsPanel } from "@/components/agent/CollabSettingsPanel";
 import { DunePublishPanel } from "@/components/agent/DunePublishPanel";
@@ -45,6 +46,7 @@ import { collabSettlement, hasTcnhv } from "@/lib/agent/collab-config";
 import { getSession } from "@/lib/auth/session";
 import { userOwnsAgent } from "@/lib/agent/ownership";
 import { canMintTcnhv } from "@/lib/server/factory";
+import { demoAgentConfig } from "@/lib/agent/verdictRunner";
 
 export const dynamic = "force-dynamic";
 
@@ -131,6 +133,8 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
     ? `https://sepolia.arbiscan.io/address/${ledgerStats.ledger}`
     : null;
 
+  const hasVerdictLoop = Boolean(demoAgentConfig(agentId));
+
   return (
     <div className="container space-y-8 py-12">
       <nav className="flex items-center gap-1.5 text-sm text-ink-300">
@@ -212,6 +216,7 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
           isOwner,
           isMinted,
           hasIdentity: Boolean(profile.agentAddress),
+          hasVerdictLoop,
         })}
         trailing={
           <Link
@@ -248,8 +253,11 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
       )}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div id="panel-chat" className="scroll-mt-32 lg:col-span-2">
-          <AgentLabPanel agentId={agentId} llmConfigured={status.llm} />
+        <div className="space-y-6 lg:col-span-2">
+          {hasVerdictLoop && <VerdictFeed agentId={agentId} />}
+          <div id="panel-chat" className="scroll-mt-32">
+            <AgentLabPanel agentId={agentId} llmConfigured={status.llm} />
+          </div>
         </div>
         <div className="space-y-6">
           {profile.agentAddress && (

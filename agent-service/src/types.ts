@@ -102,3 +102,43 @@ export interface ScopedAction {
   data: Hex;
   value?: bigint;
 }
+
+/** The three on-chain anchors an agent tracks per asset (Arbitrum One reads). */
+export interface WatchedAsset {
+  symbol: string;
+  /** (1) ERC-20 token contract. */
+  token: Address;
+  /** (2) Factory that mints pools for this asset. */
+  factory: Address;
+  /** (2) Pool contracts spawned by the factory. */
+  pools: Address[];
+  /** (3) Protocol vault / staking / minting core. */
+  core: Address;
+  decimals: number;
+  /** Store / CoinGecko slug for off-chain reads. */
+  slug: string;
+  entitySlug: string;
+}
+
+/** Typed research verdict emitted by stablecoin or yield agents. */
+export interface ResearchVerdict {
+  agentId: string;
+  asset: string;
+  kind: "stablecoin" | "yield";
+  signal: string;
+  severity: "low" | "medium" | "high";
+  confidence: number;
+  rationale: string;
+  ts: string;
+}
+
+/** Prior readings stored for trend detection between runs. */
+export interface AssetSnapshot {
+  asset: string;
+  totalSupply: string | null;
+  priceUsd: number | null;
+  apy: number | null;
+  ts: string;
+}
+
+export type AgentType = "stablecoin" | "yield";

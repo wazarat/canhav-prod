@@ -1,0 +1,26 @@
+{
+  "id": "skill_stablecoin_research",
+  "title": "Stablecoin Research Agent",
+  "summary": "Monitors a synthetic/yield-bearing stablecoin's supply, peg, and backing using its token, factory/pool, and core contracts; emits typed verdicts. Research-only, Arbitrum Sepolia.",
+  "facts": [
+    { "key": "chain", "value": "Arbitrum Sepolia (421614)" },
+    { "key": "mode", "value": "research-only, no trading" },
+    { "key": "tracks", "value": "token, factory+pools, core/protocol contract" }
+  ],
+  "sections": [
+    { "heading": "Supply", "body": "Read token.totalSupply over time; classify growth vs contraction." },
+    { "heading": "Backing", "body": "Read core contract reserve/backing state; compute reserve ratio." },
+    { "heading": "Peg", "body": "Compare pool price vs $1; flag peg_risk on deviation." }
+  ],
+  "actions": [
+    { "name": "readSupply", "description": "Read token totalSupply", "signature": "totalSupply()", "readOnly": true },
+    { "name": "readReserve", "description": "Read core backing state", "signature": "reserves()", "readOnly": true },
+    { "name": "recordVerdict", "description": "Write a verdict on-chain (gated)", "signature": "recordVerdict(bytes32,uint8,uint16)", "readOnly": false }
+  ],
+  "sources": [
+    { "label": "Ethena docs", "url": "https://docs.ethena.fi" },
+    { "label": "Dune dashboard", "url": "https://dune.com/wazarat/ethena-usdai" }
+  ],
+  "version": "1.0.0",
+  "updatedAt": "2026-06-14T00:00:00Z"
+}

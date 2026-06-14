@@ -1,0 +1,26 @@
+{
+  "id": "skill_yield_generation",
+  "title": "Yield Research Agent",
+  "summary": "Monitors yield sources behind a yield-bearing stablecoin — staking core, funding rates, or repayment streams — and emits typed APY/compression verdicts. Research-only, Arbitrum Sepolia.",
+  "facts": [
+    { "key": "chain", "value": "Arbitrum Sepolia (421614)" },
+    { "key": "mode", "value": "research-only, no trading" },
+    { "key": "tracks", "value": "core staking rate, trailing APY, yield source durability" }
+  ],
+  "sections": [
+    { "heading": "APY", "body": "Compare current APY vs trailing 7d/30d average; flag yield_compression on sustained decline." },
+    { "heading": "Source", "body": "Identify whether yield comes from funding, protocol revenue, or collateralized lending repayments." },
+    { "heading": "Catalysts", "body": "Flag catalyst_positive or catalyst_negative when governance or market events shift yield trajectory." }
+  ],
+  "actions": [
+    { "name": "readApy", "description": "Read current staking/yield rate from core contract", "signature": "exchangeRate()", "readOnly": true },
+    { "name": "readFunding", "description": "Read perpetual funding rate feed", "signature": "fundingRate()", "readOnly": true },
+    { "name": "recordVerdict", "description": "Write a verdict on-chain (gated)", "signature": "recordVerdict(bytes32,uint8,uint16)", "readOnly": false }
+  ],
+  "sources": [
+    { "label": "Ethena docs", "url": "https://docs.ethena.fi" },
+    { "label": "USD.AI docs", "url": "https://docs.usd.ai/" }
+  ],
+  "version": "1.0.0",
+  "updatedAt": "2026-06-14T00:00:00Z"
+}

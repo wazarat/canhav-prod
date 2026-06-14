@@ -17,6 +17,7 @@ import {
 } from "@/components/entities/EntitySections";
 import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
 import { MemberCoins } from "@/components/entities/MemberCoins";
+import { CombinedVerdictCard } from "@/components/agent/CombinedVerdictCard";
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
@@ -219,6 +220,13 @@ export default async function EntityProfilePage({ params }: PageProps) {
           <StatCard key={s.label} label={s.label} value={s.value} hint={s.hint} />
         ))}
       </section>
+
+      {(profile.slug === "ethena" || profile.slug === "usd-ai") && (
+        <CombinedVerdictCard
+          entitySlug={profile.slug}
+          asset={profile.slug === "ethena" ? "sUSDe" : "sUSDai"}
+        />
+      )}
 
       {/* Mobile section nav */}
       <SectionNav items={sectionNavItems} className="lg:hidden" />

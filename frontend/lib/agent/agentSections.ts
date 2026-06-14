@@ -10,6 +10,7 @@ export function buildAgentSectionNav(opts: {
   isOwner: boolean;
   isMinted: boolean;
   hasIdentity: boolean;
+  hasVerdictLoop?: boolean;
 }): SectionNavItem[] {
   const items: SectionNavItem[] = [{ id: "agent-overview", label: "Overview" }];
 
@@ -18,6 +19,7 @@ export function buildAgentSectionNav(opts: {
     items.push({ id: "panel-dune", label: "Dune" });
   }
 
+  if (opts.hasVerdictLoop) items.push({ id: "panel-verdicts", label: "Verdicts" });
   items.push({ id: "panel-chat", label: "Research chat" });
 
   if (opts.hasIdentity) items.push({ id: "panel-identity", label: "Identity" });

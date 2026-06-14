@@ -9,7 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "seed:upstash": "node scripts/seed-upstash.mjs",
-    "collab:demo": "node scripts/collab-demo.mjs"
+    "collab:demo": "node scripts/collab-demo.mjs",
+    "yield:demo": "node scripts/yield-agents-demo.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.68",

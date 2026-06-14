@@ -10,6 +10,7 @@ import { agentOfferHash } from "@/lib/agent/agentOffer";
 import { sanitizeAgentConfig, type AgentConfig } from "@/lib/agent/agentConfig";
 import { isAgentCategory, type AgentCategory } from "@/lib/agent/categories";
 import type { DataFrame } from "@/lib/types";
+import type { AssetSnapshot, ResearchVerdict } from "canhav-agent-service";
 
 /**
  * Agent memory layer (no Supabase).
@@ -132,7 +133,13 @@ const key = {
   skillAgents: (skillId: string) => `skill:${skillId}:agents`,
   offerHash: (id: string) => `agent:${id}:offerHash`,
   frames: (id: string) => `agent:${id}:frames`,
+  verdicts: (id: string) => `agent:${id}:verdicts`,
+  snapshot: (id: string, asset: string) => `agent:${id}:snapshot:${asset}`,
 };
+
+export const MAX_VERDICTS = 50;
+
+const combinedVerdictKey = (asset: string) => `combined:verdict:${asset}`;
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -174,6 +181,12 @@ interface FileStore {
   offerHashes?: Record<string, string>;
   /** agentId -> pinned data frames. */
   frames?: Record<string, DataFrame[]>;
+  /** agentId -> research verdict log (newest first). */
+  verdicts?: Record<string, ResearchVerdict[]>;
+  /** `${agentId}|${asset}` -> last snapshot for trend detection. */
+  snapshots?: Record<string, AssetSnapshot>;
+  /** asset symbol -> latest combined verdict. */
+  combinedVerdicts?: Record<string, ResearchVerdict>;
 }
 
 function filePath(): string {
@@ -193,6 +206,9 @@ function readFile(): FileStore {
       skillAgents: parsed.skillAgents ?? {},
       offerHashes: parsed.offerHashes ?? {},
       frames: parsed.frames ?? {},
+      verdicts: parsed.verdicts ?? {},
+      snapshots: parsed.snapshots ?? {},
+      combinedVerdicts: parsed.combinedVerdicts ?? {},
     };
   } catch {
     return {
@@ -205,6 +221,9 @@ function readFile(): FileStore {
       skillAgents: {},
       offerHashes: {},
       frames: {},
+      verdicts: {},
+      snapshots: {},
+      combinedVerdicts: {},
     };
   }
 }
@@ -653,6 +672,82 @@ export async function deleteDataFrame(agentId: string, frameId: string): Promise
 export async function getDataFrame(agentId: string, frameId: string): Promise<DataFrame | null> {
   const frames = await listDataFrames(agentId);
   return frames.find((f) => f.id === frameId) ?? null;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Research verdicts (stablecoin / yield agent loop)                          */
+/* -------------------------------------------------------------------------- */
+
+function snapshotFileKey(agentId: string, asset: string): string {
+  return `${agentId}|${asset}`;
+}
+
+export async function listVerdicts(agentId: string, limit = MAX_VERDICTS): Promise<ResearchVerdict[]> {
+  if (hasUpstash()) {
+    const raw = await getRedisClient().lrange(key.verdicts(agentId), 0, limit - 1);
+    return raw
+      .map((v) => coerce<ResearchVerdict>(v))
+      .filter((v): v is ResearchVerdict => v != null);
+  }
+  return (readFile().verdicts?.[agentId] ?? []).slice(0, limit);
+}
+
+export async function appendVerdict(agentId: string, verdict: ResearchVerdict): Promise<void> {
+  if (hasUpstash()) {
+    const redis = getRedisClient();
+    await redis.lpush(key.verdicts(agentId), JSON.stringify(verdict));
+    await redis.ltrim(key.verdicts(agentId), 0, MAX_VERDICTS - 1);
+  } else {
+    const store = readFile();
+    const list = store.verdicts?.[agentId] ?? [];
+    store.verdicts = {
+      ...(store.verdicts ?? {}),
+      [agentId]: [verdict, ...list].slice(0, MAX_VERDICTS),
+    };
+    writeFile(store);
+  }
+}
+
+export async function getLastSnapshot(agentId: string, asset: string): Promise<AssetSnapshot | null> {
+  if (hasUpstash()) {
+    return coerce<AssetSnapshot>(await getRedisClient().get(key.snapshot(agentId, asset)));
+  }
+  const store = readFile();
+  return store.snapshots?.[snapshotFileKey(agentId, asset)] ?? null;
+}
+
+export async function setSnapshot(
+  agentId: string,
+  asset: string,
+  snapshot: AssetSnapshot,
+): Promise<void> {
+  if (hasUpstash()) {
+    await getRedisClient().set(key.snapshot(agentId, asset), JSON.stringify(snapshot));
+  } else {
+    const store = readFile();
+    store.snapshots = {
+      ...(store.snapshots ?? {}),
+      [snapshotFileKey(agentId, asset)]: snapshot,
+    };
+    writeFile(store);
+  }
+}
+
+export async function getCombinedVerdict(asset: string): Promise<ResearchVerdict | null> {
+  if (hasUpstash()) {
+    return coerce<ResearchVerdict>(await getRedisClient().get(combinedVerdictKey(asset)));
+  }
+  return readFile().combinedVerdicts?.[asset] ?? null;
+}
+
+export async function setCombinedVerdict(asset: string, verdict: ResearchVerdict): Promise<void> {
+  if (hasUpstash()) {
+    await getRedisClient().set(combinedVerdictKey(asset), JSON.stringify(verdict));
+  } else {
+    const store = readFile();
+    store.combinedVerdicts = { ...(store.combinedVerdicts ?? {}), [asset]: verdict };
+    writeFile(store);
+  }
 }
 
 /* -------------------------------------------------------------------------- */

@@ -5,6 +5,10 @@
     {
       "path": "/api/cron/refresh",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/agent-verdicts",
+      "schedule": "0 * * * *"
     }
   ]
 }

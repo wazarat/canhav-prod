@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "spawn": "tsx src/cli/spawn.ts"
+    "spawn": "tsx src/cli/spawn.ts",
+    "run-agent": "tsx src/cli/run-agent.ts"
   },
   "dependencies": {
     "@zerodev/ecdsa-validator": "^5.4.9",

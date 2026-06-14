@@ -155,7 +155,9 @@ export default async function AgentsPage() {
       ready: status.canMintTcnhv,
       readyHint: "Starting credits can be minted to treasuries and rewards paid out.",
       pendingHint: status.tcnhv
-        ? "Token is set but the owner key is missing — set FACTORY_DEPLOYER_PRIVATE_KEY on Vercel, then redeploy."
+        ? status.factoryDeployerKeySet && !status.factoryDeployerKeyValid
+          ? "FACTORY_DEPLOYER_PRIVATE_KEY is set but invalid — use the deployer wallet private key (0x + 64 hex chars, no quotes), then redeploy."
+          : "Token is set but the owner key is missing — set FACTORY_DEPLOYER_PRIVATE_KEY on Vercel, then redeploy."
         : "Set TCNHV_TOKEN_ADDRESS and FACTORY_DEPLOYER_PRIVATE_KEY on Vercel to enable minting starting credits.",
     },
   ];

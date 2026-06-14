@@ -418,6 +418,23 @@ export async function confirmAgentOnChain(agentId: string): Promise<AgentProfile
 }
 
 /**
+ * Migrate an agent's canonical owner to `userId`. Used to durably reclaim an
+ * agent whose off-chain `ownerUserId` link was orphaned by an identity change
+ * (e.g. the passkey → Privy DID migration) once on-chain ownership has been
+ * reconciled to the user's wallet. Returns the updated profile, or null if the
+ * agent doesn't exist or already has this owner.
+ */
+export async function setAgentOwner(
+  agentId: string,
+  userId: string,
+): Promise<AgentProfile | null> {
+  const existing = await getAgentProfile(agentId);
+  if (!existing) return null;
+  if (existing.ownerUserId === userId) return existing;
+  return seedAgentProfile({ agentId, name: existing.name, ownerUserId: userId });
+}
+
+/**
  * Owner-only: persist the agent's framework config (already sanitized by the
  * route). Returns null if the agent doesn't exist.
  */

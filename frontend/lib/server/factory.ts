@@ -128,6 +128,19 @@ function deployerKey(): Hex | null {
   return /^0x[0-9a-fA-F]{64}$/.test(key) ? (key as Hex) : null;
 }
 
+/** Safe diagnostics for /api/agent/status — never exposes the key. */
+export function deployerKeyDiagnostics(): { set: boolean; valid: boolean; length: number | null } {
+  const raw = readSecret("FACTORY_DEPLOYER_PRIVATE_KEY");
+  if (!raw?.trim()) return { set: false, valid: false, length: null };
+  const trimmed = raw.trim();
+  const withPrefix = trimmed.startsWith("0x") ? trimmed : `0x${trimmed}`;
+  return {
+    set: true,
+    valid: /^0x[0-9a-fA-F]{64}$/.test(withPrefix),
+    length: withPrefix.length,
+  };
+}
+
 /** Whether the factory wiring is provisioned enough to write (address + owner key). */
 export function hasFactory(): boolean {
   return Boolean(factoryAddress() && deployerKey());

@@ -4,7 +4,7 @@ import { openai } from "@ai-sdk/openai";
 import type { EmbeddingModel, LanguageModel } from "ai";
 
 import { readSecret } from "@/lib/server/env";
-import { canMintTcnhv } from "@/lib/server/factory";
+import { canMintTcnhv, deployerKeyDiagnostics } from "@/lib/server/factory";
 
 import { hasTcnhv } from "./collab-config";
 import { hasUpstash } from "@/lib/server/redis";
@@ -303,10 +303,15 @@ export interface AgentConfigStatus {
   tcnhv: boolean;
   /** Owner key + token wired enough to mint signup grants and rewards. */
   canMintTcnhv: boolean;
+  /** Whether FACTORY_DEPLOYER_PRIVATE_KEY is present (no secret leaked). */
+  factoryDeployerKeySet: boolean;
+  /** Whether the key passes format validation (0x + 64 hex chars). */
+  factoryDeployerKeyValid: boolean;
 }
 
 /** Snapshot of which agent-layer capabilities are live in this environment. */
 export function agentConfigStatus(): AgentConfigStatus {
+  const key = deployerKeyDiagnostics();
   return {
     openai: hasOpenAI(),
     llm: hasLLM(),
@@ -321,5 +326,7 @@ export function agentConfigStatus(): AgentConfigStatus {
     model: agentModel(),
     tcnhv: hasTcnhv(),
     canMintTcnhv: canMintTcnhv(),
+    factoryDeployerKeySet: key.set,
+    factoryDeployerKeyValid: key.valid,
   };
 }

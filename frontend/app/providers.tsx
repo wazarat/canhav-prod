@@ -5,11 +5,12 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { arbitrumSepolia } from "viem/chains";
 
 import { ResearchChatProvider } from "@/components/agent/research-chat-context";
+import { WalletBootstrapGate } from "@/components/agent/WalletBootstrapGate";
 
 /**
- * Privy social-login provider. Each user gets a self-custodial embedded wallet
- * (2-of-3 Shamir + TEE) from a social login; that wallet is the ECDSA root of
- * the user's ZeroDev Kernel smart account + every ERC-8004 agent they mint.
+ * Privy auth provider. Social login provisions an embedded wallet; wallet login
+ * (MetaMask) uses the external signer as the ECDSA root of the user's ZeroDev
+ * Kernel smart account + every ERC-8004 agent they mint.
  *
  * `NEXT_PUBLIC_PRIVY_APP_ID` is inlined at build time. When it is absent the app
  * still renders (research pages stay public); auth surfaces show a
@@ -28,7 +29,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <PrivyProvider
       appId={PRIVY_APP_ID}
       config={{
-        loginMethods: ["google", "email"],
+        loginMethods: ["google", "email", "wallet"],
         embeddedWallets: {
           ethereum: { createOnLogin: "users-without-wallets" },
         },
@@ -42,6 +43,7 @@ export function Providers({ children }: { children: ReactNode }) {
         },
       }}
     >
+      <WalletBootstrapGate />
       {shell}
     </PrivyProvider>
   );

@@ -6,9 +6,8 @@ import Link from "next/link";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { GraduationCap, Loader2, Plus } from "lucide-react";
 
-import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
+import { buildPrivySigner } from "@/lib/agent/privy-signer";
 import { advertiseSkillsOnChain, type AdvertiseParams } from "@/lib/agent/skill-attach-client";
-import type { Signer } from "@zerodev/sdk/types";
 
 interface MySkill {
   id: string;
@@ -96,24 +95,9 @@ export function AttachSkillPanel({ agentId, onChain }: { agentId: string; onChai
         } else {
           try {
             setPhase("advertising");
-            const embedded = wallets.find((w) => w.walletClientType === "privy");
-            if (embedded) {
-              try {
-                await embedded.switchChain(ARBITRUM_SEPOLIA_CHAIN_ID);
-              } catch {
-                /* kernel client pins the chain regardless */
-              }
-              const provider = await embedded.getEthereumProvider();
-              const { createWalletClient, custom } = await import("viem");
-              const { arbitrumSepolia } = await import("viem/chains");
-              const signer: Signer = createWalletClient({
-                account: embedded.address as `0x${string}`,
-                chain: arbitrumSepolia,
-                transport: custom(provider),
-              });
-              await advertiseSkillsOnChain({ signer, advertise: data.advertise });
-              setNotice("Trained and advertised on-chain.");
-            }
+            const signer = await buildPrivySigner(wallets);
+            await advertiseSkillsOnChain({ signer, advertise: data.advertise });
+            setNotice("Trained and advertised on-chain.");
           } catch (e) {
             setNotice(
               `Trained, but on-chain advertise was skipped: ${

@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 
 import { AGENT_CATEGORIES } from "@/lib/agent/categories";
-import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
+import { buildPrivySigner } from "@/lib/agent/privy-signer";
 import {
   claimCredits,
   establishAgreementOnChain,
@@ -42,7 +42,6 @@ import { AgentInteractionTheater, type TheaterSettlement } from "@/components/ag
 import { WalletCreditsPanel } from "@/components/agent/WalletCreditsPanel";
 import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 import type { StrategyPacket } from "@/lib/types";
-import type { Signer } from "@zerodev/sdk/types";
 
 type AgreementMode = "one_time" | "recurring";
 type AgreementCadence = "none" | "daily" | "weekly" | "monthly";
@@ -180,6 +179,7 @@ interface CreditsInfo {
   nextClaimAt?: number;
   accountIndex?: number;
   mintConfig?: SpawnMintConfig | null;
+  error?: string;
 }
 
 function accountAgeLabel(days: number | null): string {
@@ -267,7 +267,7 @@ export function CollabBrowser({
     try {
       const res = await fetch(`/api/agent/credits?agentId=${encodeURIComponent(agentId)}`);
       const data = (await res.json()) as CreditsInfo;
-      setCredits(data?.configured ? data : null);
+      setCredits(data);
     } catch {
       setCredits(null);
     }
@@ -337,22 +337,8 @@ export function CollabBrowser({
     }
   }
 
-  async function buildSigner(): Promise<Signer> {
-    const embedded = wallets.find((w) => w.walletClientType === "privy");
-    if (!embedded) throw new Error("Your embedded wallet isn't ready yet — try again in a moment.");
-    try {
-      await embedded.switchChain(ARBITRUM_SEPOLIA_CHAIN_ID);
-    } catch {
-      /* kernel client pins the chain regardless */
-    }
-    const provider = await embedded.getEthereumProvider();
-    const { createWalletClient, custom } = await import("viem");
-    const { arbitrumSepolia } = await import("viem/chains");
-    return createWalletClient({
-      account: embedded.address as `0x${string}`,
-      chain: arbitrumSepolia,
-      transport: custom(provider),
-    });
+  async function buildSigner() {
+    return buildPrivySigner(wallets);
   }
 
   async function handleClaimCredits() {
@@ -678,17 +664,28 @@ export function CollabBrowser({
           </select>
         </label>
 
-        {credits?.configured && (
+        {credits?.configured ? (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-3">
             <div className="flex items-center gap-2">
               <Coins className="h-4 w-4 text-neon-400" />
               <div>
                 <p className="text-[10px] font-medium uppercase tracking-wider text-ink-500">
-                  Available credits
+                  Agent spendable credits
                 </p>
                 <p className="text-lg font-semibold tracking-tight text-ink-50">
                   {credits.balance ?? "0"}
                 </p>
+                {credits.account && (
+                  <a
+                    href={`https://sepolia.arbiscan.io/address/${credits.account}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-0.5 inline-flex items-center gap-0.5 font-mono text-[10px] text-electric-400 hover:text-electric-300"
+                  >
+                    {credits.account.slice(0, 6)}…{credits.account.slice(-4)}
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
               </div>
             </div>
             <div className="flex flex-col items-end gap-1">
@@ -712,7 +709,12 @@ export function CollabBrowser({
               ) : null}
             </div>
           </div>
-        )}
+        ) : credits && !credits.configured ? (
+          <p className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-xs text-ink-400">
+            {credits.error ??
+              "Agent credits unavailable — fund this agent from your treasury above once tCNHV is provisioned."}
+          </p>
+        ) : null}
       </div>
 
       <AgreementsPanel

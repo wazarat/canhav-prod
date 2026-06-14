@@ -2,12 +2,21 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { AlertTriangle, CheckCircle2, Coins, Loader2, Send, Wallet } from "lucide-react";
+import {
+  AlertTriangle,
+  Check,
+  CheckCircle2,
+  Coins,
+  Copy,
+  ExternalLink,
+  Loader2,
+  Send,
+  Wallet,
+} from "lucide-react";
 
-import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
 import { transferCredits } from "@/lib/agent/collab-client";
+import { buildPrivySigner, resolveActiveWallet } from "@/lib/agent/privy-signer";
 import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
-import type { Signer } from "@zerodev/sdk/types";
 
 interface WalletCredits {
   configured: boolean;
@@ -17,6 +26,7 @@ interface WalletCredits {
   decimals?: number;
   balance?: string;
   mintConfig?: SpawnMintConfig | null;
+  error?: string;
 }
 
 interface TransferPreflight {
@@ -32,8 +42,76 @@ interface TransferPreflight {
   error?: string;
 }
 
+const ARBISCAN_BASE = "https://sepolia.arbiscan.io/address";
+
 function shorten(addr: string): string {
   return addr.length > 12 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
+}
+
+function TreasuryAddressRow({ address }: { address: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard unavailable */
+    }
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-lg border border-ink-800/60 bg-ink-900/40 px-3 py-2">
+      <span className="text-[10px] font-medium uppercase tracking-wider text-ink-500">
+        Treasury (kernel index 0)
+      </span>
+      <code className="flex-1 break-all font-mono text-[11px] text-ink-300">{address}</code>
+      <button
+        type="button"
+        onClick={() => void copy()}
+        className="inline-flex items-center gap-1 rounded-md border border-ink-700 px-2 py-1 text-[10px] text-ink-400 transition-colors hover:text-ink-100"
+        aria-label="Copy treasury address"
+      >
+        {copied ? <Check className="h-3 w-3 text-signal-400" /> : <Copy className="h-3 w-3" />}
+        {copied ? "Copied" : "Copy"}
+      </button>
+      <a
+        href={`${ARBISCAN_BASE}/${address}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 rounded-md border border-ink-700 px-2 py-1 text-[10px] text-electric-400 transition-colors hover:text-electric-300"
+      >
+        Arbiscan <ExternalLink className="h-3 w-3" />
+      </a>
+    </div>
+  );
+}
+
+function CreditsNotConfigured() {
+  return (
+    <div className="glass space-y-3 rounded-2xl p-6">
+      <div className="flex items-center gap-2">
+        <Wallet className="h-4 w-4 text-amber-400" />
+        <h3 className="font-display text-base font-semibold tracking-tight text-ink-50">
+          Credits wallet not provisioned
+        </h3>
+      </div>
+      <p className="text-sm leading-relaxed text-ink-400">
+        tCNHV test credits are not configured in this environment. Set{" "}
+        <code className="font-mono text-ink-200">TCNHV_TOKEN_ADDRESS</code> and{" "}
+        <code className="font-mono text-ink-200">FACTORY_DEPLOYER_PRIVATE_KEY</code> on Vercel,
+        then redeploy. See <code className="font-mono text-ink-200">frontend/.env.example</code>.
+      </p>
+      <p className="text-xs text-ink-500">
+        Diagnostic:{" "}
+        <a href="/api/agent/status" className="text-electric-400 hover:text-electric-300">
+          /api/agent/status
+        </a>{" "}
+        — check <code className="font-mono">tcnhv</code> and <code className="font-mono">canMintTcnhv</code>.
+      </p>
+    </div>
+  );
 }
 
 /**
@@ -41,8 +119,7 @@ function shorten(addr: string): string {
  * two ways to move it — "Send credits" to any wallet / agent / user, and "Fund
  * this agent" to top up one of their own agents (the account they pay sellers
  * from). All movement is a gas-sponsored, client-signed ERC-20 transfer from the
- * user's kernel wallet (index 0). Renders nothing when credits aren't
- * provisioned in this environment.
+ * user's kernel wallet (index 0).
  */
 export function WalletCreditsPanel({
   buyerAgents = [],
@@ -67,28 +144,15 @@ export function WalletCreditsPanel({
 
   const derivedRef = useRef(false);
 
-  const buildSigner = useCallback(async (): Promise<Signer> => {
-    const embedded = wallets.find((w) => w.walletClientType === "privy");
-    if (!embedded) throw new Error("Your embedded wallet isn't ready yet — try again in a moment.");
-    try {
-      await embedded.switchChain(ARBITRUM_SEPOLIA_CHAIN_ID);
-    } catch {
-      /* kernel client pins the chain regardless */
-    }
-    const provider = await embedded.getEthereumProvider();
-    const { createWalletClient, custom } = await import("viem");
-    const { arbitrumSepolia } = await import("viem/chains");
-    return createWalletClient({
-      account: embedded.address as `0x${string}`,
-      chain: arbitrumSepolia,
-      transport: custom(provider),
-    });
-  }, [wallets]);
+  useEffect(() => {
+    setFundAgentId(buyerAgents[0]?.agentId ?? "");
+  }, [buyerAgents]);
 
   const loadBalance = useCallback(async (addr?: string | null): Promise<WalletCredits | null> => {
     try {
       const qs = addr ? `?address=${encodeURIComponent(addr)}` : "";
       const res = await fetch(`/api/wallet/credits${qs}`);
+      if (res.status === 401) return { configured: false, address: null, error: "Sign in." };
       if (!res.ok) return null;
       return (await res.json()) as WalletCredits;
     } catch {
@@ -107,14 +171,11 @@ export function WalletCreditsPanel({
         setAddress(data.address);
         return;
       }
-      // Wallet address not persisted yet — derive it client-side (silent), then
-      // read the balance for it.
       if (!data.mintConfig || derivedRef.current) return;
-      const embedded = wallets.find((w) => w.walletClientType === "privy");
-      if (!embedded) return;
+      if (!resolveActiveWallet(wallets)) return;
       derivedRef.current = true;
       try {
-        const signer = await buildSigner();
+        const signer = await buildPrivySigner(wallets);
         const svc = await import("canhav-agent-service");
         const cfg = svc.createConfig({
           zerodevRpc: data.mintConfig.zerodevRpc,
@@ -134,7 +195,7 @@ export function WalletCreditsPanel({
     return () => {
       active = false;
     };
-  }, [wallets, loadBalance, buildSigner]);
+  }, [wallets, loadBalance]);
 
   const refresh = useCallback(async () => {
     const data = await loadBalance(address);
@@ -171,7 +232,7 @@ export function WalletCreditsPanel({
         throw new Error(pf.error ?? "Could not prepare the transfer.");
       }
 
-      const signer = await buildSigner();
+      const signer = await buildPrivySigner(wallets);
       const { txHash } = await transferCredits({
         signer,
         accountIndex: pf.accountIndex,
@@ -200,8 +261,25 @@ export function WalletCreditsPanel({
     }
   }
 
-  // Credits aren't provisioned in this environment — hide entirely.
-  if (info && !info.configured) return null;
+  if (info === null) {
+    return (
+      <div className="glass flex items-center gap-2 rounded-2xl p-6 text-sm text-ink-400">
+        <Loader2 className="h-4 w-4 animate-spin text-ink-500" />
+        Loading credits wallet…
+      </div>
+    );
+  }
+
+  if (!info.configured) {
+    if (info.error === "Sign in.") {
+      return (
+        <div className="glass space-y-2 rounded-2xl p-6 text-sm text-ink-400">
+          <p>Sign in to view your treasury credits wallet.</p>
+        </div>
+      );
+    }
+    return <CreditsNotConfigured />;
+  }
 
   return (
     <div className="glass space-y-4 rounded-2xl p-6">
@@ -216,18 +294,23 @@ export function WalletCreditsPanel({
           <Coins className="h-4 w-4 text-neon-400" />
           <div className="text-right">
             <p className="text-[10px] font-medium uppercase tracking-wider text-ink-500">
-              Balance
+              Treasury balance
             </p>
             <p className="text-lg font-semibold tracking-tight text-ink-50">
-              {info?.balance ?? "—"}{" "}
-              <span className="text-xs font-normal text-ink-400">{info?.assetName ?? "tCNHV"}</span>
+              {info.balance ?? "0"}{" "}
+              <span className="text-xs font-normal text-ink-400">{info.assetName ?? "tCNHV"}</span>
             </p>
           </div>
         </div>
       </div>
 
-      {address && (
-        <p className="font-mono text-[10px] text-ink-500">treasury {shorten(address)}</p>
+      {address && <TreasuryAddressRow address={address} />}
+
+      {buyerAgents.length > 0 && (
+        <p className="text-xs leading-relaxed text-ink-500">
+          Spendable credits for buying strategies live on your <strong className="text-ink-400">paying agent</strong>{" "}
+          smart account below — fund it from this treasury before requesting sellers.
+        </p>
       )}
 
       <div className="flex gap-2">

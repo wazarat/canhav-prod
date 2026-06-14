@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useWallets } from "@privy-io/react-auth";
 
-import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
+import { buildPrivySigner, resolveActiveWallet } from "@/lib/agent/privy-signer";
 import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 
 /**
@@ -22,8 +22,8 @@ export function WalletBootstrap() {
 
   useEffect(() => {
     if (ran.current) return;
-    const embedded = wallets.find((w) => w.walletClientType === "privy");
-    if (!embedded) return;
+    const wallet = resolveActiveWallet(wallets);
+    if (!wallet) return;
     ran.current = true;
 
     void (async () => {
@@ -36,20 +36,7 @@ export function WalletBootstrap() {
         };
         if (!data.needsGrant || !data.mintConfig) return;
 
-        try {
-          await embedded.switchChain(ARBITRUM_SEPOLIA_CHAIN_ID);
-        } catch {
-          /* kernel client pins the chain regardless */
-        }
-
-        const provider = await embedded.getEthereumProvider();
-        const { createWalletClient, custom } = await import("viem");
-        const { arbitrumSepolia } = await import("viem/chains");
-        const signer = createWalletClient({
-          account: embedded.address as `0x${string}`,
-          chain: arbitrumSepolia,
-          transport: custom(provider),
-        });
+        const signer = await buildPrivySigner(wallets);
 
         const svc = await import("canhav-agent-service");
         const cfg = svc.createConfig({

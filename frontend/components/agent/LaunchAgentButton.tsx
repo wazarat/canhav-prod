@@ -8,11 +8,10 @@ import { AlertTriangle, CheckCircle2, Loader2, LogIn, Rocket, Wallet } from "luc
 
 import { Badge } from "@/components/ui/Badge";
 import { AGENT_CATEGORIES, type AgentCategory } from "@/lib/agent/categories";
+import { buildPrivySigner } from "@/lib/agent/privy-signer";
 import { mintAgentOnClient, type SpawnPreflightResponse } from "@/lib/agent/spawn-client";
-import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
 import { cn } from "@/lib/utils";
 import type { AgentProductRef, AgentSkill } from "canhav-agent-service";
-import type { Signer } from "@zerodev/sdk/types";
 import {
   ENTITY_AGENT_MINTED_EVENT,
   openResearchChat,
@@ -150,27 +149,10 @@ export function LaunchAgentButton({
     }
 
     try {
-      // 1) Resolve the user's Privy embedded wallet and build a viem signer from
-      //    its EIP-1193 provider. Keys stay in Privy's TEE; this signer drives
-      //    the ZeroDev Kernel account's ECDSA validator.
+      // 1) Resolve the user's connected wallet (MetaMask or embedded) and build a
+      //    viem signer. This signer drives the ZeroDev Kernel account's ECDSA validator.
       setPhase("wallet");
-      const embedded = wallets.find((w) => w.walletClientType === "privy");
-      if (!embedded) {
-        throw new Error("Your embedded wallet isn't ready yet — try again in a moment.");
-      }
-      try {
-        await embedded.switchChain(ARBITRUM_SEPOLIA_CHAIN_ID);
-      } catch {
-        // Non-fatal: the kernel client pins Arbitrum Sepolia regardless.
-      }
-      const provider = await embedded.getEthereumProvider();
-      const { createWalletClient, custom } = await import("viem");
-      const { arbitrumSepolia } = await import("viem/chains");
-      const signer: Signer = createWalletClient({
-        account: embedded.address as `0x${string}`,
-        chain: arbitrumSepolia,
-        transport: custom(provider),
-      });
+      const signer = await buildPrivySigner(wallets);
 
       // 2) Preflight: reuse check + mint config (userOp signing stays in-browser).
       //    General agents key off a per-create nonce; legacy mints off an entity.
@@ -206,7 +188,7 @@ export function LaunchAgentButton({
         throw new Error("Spawn preflight missing mint parameters.");
       }
 
-      // 3) Mint in the browser (the embedded wallet signs userOps).
+      // 3) Mint in the browser (the connected wallet signs userOps).
       const mintResult = await mintAgentOnClient({
         skill: preflight.skill as AgentSkill,
         signer,

@@ -4,6 +4,9 @@ import { openai } from "@ai-sdk/openai";
 import type { EmbeddingModel, LanguageModel } from "ai";
 
 import { readSecret } from "@/lib/server/env";
+import { canMintTcnhv } from "@/lib/server/factory";
+
+import { hasTcnhv } from "./collab-config";
 import { hasUpstash } from "@/lib/server/redis";
 
 import { AGENT_CHAIN, ARBITRUM_SEPOLIA_CHAIN_ID } from "./chain";
@@ -296,6 +299,10 @@ export interface AgentConfigStatus {
   chain: typeof AGENT_CHAIN;
   /** Resolved model id (informational; reflects OPENAI_AGENT_MODEL or default). */
   model: string;
+  /** tCNHV token address is configured (credits UI + settlement). */
+  tcnhv: boolean;
+  /** Owner key + token wired enough to mint signup grants and rewards. */
+  canMintTcnhv: boolean;
 }
 
 /** Snapshot of which agent-layer capabilities are live in this environment. */
@@ -312,5 +319,7 @@ export function agentConfigStatus(): AgentConfigStatus {
     zerodevChain: parseZeroDevRpc().chainId,
     chain: AGENT_CHAIN,
     model: agentModel(),
+    tcnhv: hasTcnhv(),
+    canMintTcnhv: canMintTcnhv(),
   };
 }

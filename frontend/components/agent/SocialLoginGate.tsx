@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLogin, usePrivy } from "@privy-io/react-auth";
-import { Loader2, LogIn } from "lucide-react";
+import { Loader2, LogIn, Wallet } from "lucide-react";
 
 export interface SessionInfo {
   userId: string;
@@ -11,11 +11,10 @@ export interface SessionInfo {
 }
 
 /**
- * Social-login gate (Privy). The user signs in with Google or email and Privy
- * provisions a self-custodial embedded wallet; we then verify the Privy access
- * token server-side and mint the CanHav session cookie. No QR codes, no seed
- * phrase. Only rendered when Privy is configured (provider is mounted), so the
- * `usePrivy` hook is always safe here.
+ * Auth gate (Privy). Sign in with MetaMask, Google, or email. MetaMask becomes
+ * the ECDSA root of your treasury + agents; social login provisions an embedded
+ * wallet instead. We verify the Privy access token server-side and mint the
+ * CanHav session cookie.
  */
 export function SocialLoginGate({
   onAuthenticated,
@@ -27,7 +26,7 @@ export function SocialLoginGate({
     onError: (code) => {
       setPhase("idle");
       setError(
-        `Privy sign-in failed (${code}). If this persists, check the Privy dashboard: Allowed origins include this site, Google + email login are enabled, embedded wallets are on, and Arbitrum Sepolia (421614) is added as a chain.`,
+        `Privy sign-in failed (${code}). Check the Privy dashboard: allowed origins include this site, Wallet + Google + email login are enabled, embedded wallets are on for social users, and Arbitrum Sepolia (421614) is added.`,
       );
     },
   });
@@ -81,7 +80,6 @@ export function SocialLoginGate({
     }
   }, [getAccessToken, user, onAuthenticated]);
 
-  // Once Privy reports an authenticated user, exchange the token for our cookie.
   useEffect(() => {
     if (ready && authenticated && !establishedRef.current) {
       establishedRef.current = true;
@@ -99,8 +97,9 @@ export function SocialLoginGate({
             Sign in to Agent Lab
           </h1>
           <p className="text-sm leading-relaxed text-ink-300">
-            Sign in with Google or email to spin up your self-custodial research wallet and launch
-            on-chain agents. No seed phrase, no extensions.
+            Connect MetaMask for a wallet you control on Arbitrum Sepolia, or sign in with Google
+            or email for a self-custodial embedded wallet. Your signer becomes the treasury root for
+            test credits and on-chain agents.
           </p>
         </div>
 
@@ -141,8 +140,13 @@ export function SocialLoginGate({
               ? "Setting up your wallet…"
               : phase === "connecting"
                 ? "Opening sign-in…"
-                : "Continue with Google or email"}
+                : "Continue with MetaMask, Google, or email"}
           </button>
+
+          <p className="flex items-center justify-center gap-1.5 text-[10px] text-ink-500">
+            <Wallet className="h-3 w-3" />
+            MetaMask login uses your extension on Arbitrum Sepolia · Privy embedded wallet for social
+          </p>
 
           {error && (
             <button
@@ -158,7 +162,7 @@ export function SocialLoginGate({
         {error && <p className="text-center text-xs text-rose-300">{error}</p>}
 
         <p className="text-center text-[10px] text-ink-500">
-          Self-custodial wallet by Privy · ZeroDev smart accounts · Arbitrum Sepolia testnet
+          ZeroDev smart accounts · tCNHV test credits · Arbitrum Sepolia testnet only
         </p>
       </div>
     </div>

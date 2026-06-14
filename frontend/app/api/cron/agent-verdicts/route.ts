@@ -14,7 +14,8 @@ function authorized(req: Request): boolean {
 }
 
 /**
- * Hourly cron: run all four alpha demo agents and refresh combined verdicts.
+ * Daily cron: run all four alpha demo agents and refresh combined verdicts.
+ * Schedule: 07:00 UTC (vercel.json) — Hobby plan allows one run per day per job.
  * Auth: Authorization: Bearer ${CRON_SECRET}
  */
 export async function GET(req: Request) {

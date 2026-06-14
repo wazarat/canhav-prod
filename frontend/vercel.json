@@ -8,7 +8,7 @@
     },
     {
       "path": "/api/cron/agent-verdicts",
-      "schedule": "0 * * * *"
+      "schedule": "0 7 * * *"
     }
   ]
 }

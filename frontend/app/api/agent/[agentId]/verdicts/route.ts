@@ -36,7 +36,7 @@ export async function GET(_req: Request, { params }: { params: { agentId: string
     kind: cfg?.type ?? null,
     verdicts,
     combined,
-    cadence: "hourly",
+    cadence: "daily",
   });
 }
 

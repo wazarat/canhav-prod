@@ -133,7 +133,7 @@ export function VerdictFeed({ agentId }: VerdictFeedProps) {
         <div>
           <h2 className="font-display text-lg font-semibold text-ink-50">Research verdicts</h2>
           <p className="mt-1 text-xs text-ink-400">
-            Read-only analysis on Arbitrum Sepolia testnet · runs hourly
+            Read-only analysis on Arbitrum Sepolia testnet · runs daily
             {asset ? ` · ${asset}` : ""}
             {kind ? ` · ${kind} agent` : ""}
           </p>

@@ -4,7 +4,7 @@ import { ChevronRight, Activity, LogIn } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { CollabBrowser } from "@/components/agent/CollabBrowser";
 import { getAgentProfile } from "@/lib/agent/memory";
-import { listOwnedAgentIds } from "@/lib/agent/ownership";
+import { listCanonicalOwnedAgentIds, listOwnedAgentIds } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
 
 export const metadata = { title: "Agent collaboration" };
@@ -12,6 +12,8 @@ export const dynamic = "force-dynamic";
 
 export default async function CollabPage() {
   const session = getSession();
+
+  const ownedAgentIds = session ? await listCanonicalOwnedAgentIds(session.userId) : [];
 
   const buyerAgents = session
     ? (
@@ -59,7 +61,7 @@ export default async function CollabPage() {
       </header>
 
       {session ? (
-        <CollabBrowser buyerAgents={uniqueBuyers} />
+        <CollabBrowser buyerAgents={uniqueBuyers} ownedAgentIds={ownedAgentIds} />
       ) : (
         <div className="glass flex flex-col items-center gap-3 rounded-2xl p-8 text-center">
           <p className="text-sm text-ink-300">Sign in to discover agents and request strategies.</p>

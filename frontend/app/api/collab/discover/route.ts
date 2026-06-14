@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { listDiscoverableAgents } from "@/lib/server/collabDiscovery";
+import { listCanonicalOwnedAgentIds } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
 
 /**
@@ -20,6 +21,9 @@ export async function GET(req: Request) {
   const category = url.searchParams.get("category")?.trim() || null;
   const q = url.searchParams.get("q")?.trim() || null;
 
-  const agents = await listDiscoverableAgents({ category, q });
+  const exclude = new Set(await listCanonicalOwnedAgentIds(session.userId));
+  const agents = (await listDiscoverableAgents({ category, q })).filter(
+    (a) => !exclude.has(a.agentId),
+  );
   return NextResponse.json({ agents });
 }

@@ -209,9 +209,18 @@ type Phase =
   | "recording"
   | "done";
 
-export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
+export function CollabBrowser({
+  buyerAgents,
+  ownedAgentIds = [],
+}: {
+  buyerAgents: BuyerAgent[];
+  /** Minted agent ids this user launched (`ownerUserId` matches). */
+  ownedAgentIds?: string[];
+}) {
   const { authenticated, login } = usePrivy();
   const { wallets } = useWallets();
+
+  const ownedSet = new Set(ownedAgentIds);
 
   const [agents, setAgents] = useState<AgentListing[] | null>(null);
   const [buyerAgentId, setBuyerAgentId] = useState(buyerAgents[0]?.agentId ?? "");
@@ -817,6 +826,11 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
                       </span>
                     )}
                   </p>
+                  {ownedSet.has(a.agentId) && (
+                    <span className="mt-1 inline-flex rounded border border-neon-500/40 bg-neon-500/10 px-1.5 py-0.5 text-[10px] font-medium text-neon-400">
+                      Your listing
+                    </span>
+                  )}
                   {a.creator && (
                     <p className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-ink-500">
                       <span className="flex items-center gap-0.5">
@@ -871,7 +885,7 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
                     }}
                     className="rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-1.5 text-xs font-medium text-electric-300 transition-colors hover:bg-electric-500/20 disabled:opacity-40"
                   >
-                    {a.agentId === buyerAgentId ? "your agent" : "Request"}
+                    {a.agentId === buyerAgentId ? "Paying from here" : "Request"}
                   </button>
                 </div>
               </div>

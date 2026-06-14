@@ -2,11 +2,14 @@ import "server-only";
 
 import { NextResponse } from "next/server";
 
-import { getAgentProfile, type AgentProfile } from "@/lib/agent/memory";
-import { readAgentWallet, verifyAgentOnChain } from "@/lib/agent/onchain";
+import { getAgentProfile } from "@/lib/agent/memory";
 import { userAgentId } from "@/lib/agent/user-agent";
 import { getSession, type SessionPayload } from "@/lib/auth/session";
-import { getUserProfile, linkAgentToUser, listUserAgentIds } from "@/lib/auth/users";
+import {
+  linkAgentToUser,
+  listUserAgentIds,
+  unlinkAgentFromUser,
+} from "@/lib/auth/users";
 
 /**
  * Shared owner-only guard for per-agent enrichment routes (config, data frames,
@@ -15,13 +18,11 @@ import { getUserProfile, linkAgentToUser, listUserAgentIds } from "@/lib/auth/us
  *
  * A user owns an agent when ANY of these hold:
  *   1. `profile.ownerUserId` matches (set at mint — canonical), or
- *   2. the agent id is in `user:{userId}:agents` (Redis index), or
- *   3. the agent id is their default research agent (`userAgentId`), or
- *   4. (last resort) the agent's on-chain identity/smart-account/wallet resolves
- *      to the user's canonical treasury wallet.
+ *   2. the agent id is their default research agent (`userAgentId`), or
+ *   3. the agent id is in `user:{userId}:agents` AND no other user is the
+ *      canonical owner (`ownerUserId` is null or matches).
  *
- * (1) is checked first so a stale/missing Redis index never hides owner panels
- * for a minted ERC-8004 agent the user actually created.
+ * Cross-account leaks are blocked by always honoring `ownerUserId` when set.
  */
 
 export interface OwnedAgentGuard {
@@ -31,57 +32,54 @@ export interface OwnedAgentGuard {
 }
 
 /**
- * The canonical set of agent ids a user owns: their default research agent plus
- * every agent in the `user:{userId}:agents` Redis index. This is the SINGLE
- * source of truth shared by the buyer dropdown (`/collab`, `/agents`) and the
- * ownership gate, so the list a user can pick from never drifts from the list
- * the server accepts payments / writes from.
+ * Remove minted agents from a user's Redis index when `profile.ownerUserId`
+ * points at someone else (stale links from the old wallet-reconcile path).
  */
-export async function listOwnedAgentIds(userId: string): Promise<string[]> {
-  const ids = new Set<string>([userAgentId(userId), ...(await listUserAgentIds(userId))]);
-  return [...ids];
-}
-
-const ZERO_ADDR = "0x0000000000000000000000000000000000000000";
-
-function sameAddress(a: string | null | undefined, b: string | null | undefined): boolean {
-  if (!a || !b) return false;
-  if (a === ZERO_ADDR || b === ZERO_ADDR) return false;
-  return a.toLowerCase() === b.toLowerCase();
+export async function pruneStaleAgentLinks(userId: string): Promise<void> {
+  const linked = await listUserAgentIds(userId);
+  await Promise.all(
+    linked.map(async (agentId) => {
+      if (!/^\d+$/.test(agentId)) return;
+      const profile = await getAgentProfile(agentId);
+      if (profile?.ownerUserId && profile.ownerUserId !== userId) {
+        await unlinkAgentFromUser(userId, agentId);
+      }
+    }),
+  );
 }
 
 /**
- * Additive, false-positive-safe reconciliation: when local links all miss, see
- * whether the agent's on-chain footprint (its smart account / reserved wallet /
- * ERC-8004 ownerOf) resolves to the user's canonical treasury wallet. Recovers
- * agents whose off-chain `ownerUserId` link was orphaned (e.g. the passkey ->
- * Privy DID migration) while keeping address equality the only thing that can
- * grant access. Best-effort — any read failure simply returns false.
+ * The canonical set of agent ids a user owns: their default research agent plus
+ * every agent in the `user:{userId}:agents` Redis index that passes the
+ * ownership gate. Stale cross-account links are pruned on each read.
  */
-async function reconcileOnChainOwnership(
-  userId: string,
-  agentId: string,
-  loaded?: AgentProfile | null,
-): Promise<boolean> {
-  try {
-    if (!/^\d+$/.test(agentId)) return false; // only minted (numeric tokenId) agents
-    const user = await getUserProfile(userId);
-    const wallet = user?.address;
-    if (!wallet) return false;
+export async function listOwnedAgentIds(userId: string): Promise<string[]> {
+  await pruneStaleAgentLinks(userId);
 
-    const profile = loaded ?? (await getAgentProfile(agentId));
-    if (!profile || !profile.onChain) return false;
-
-    if (sameAddress(profile.agentAddress, wallet)) return true;
-
-    const [agentWallet, verification] = await Promise.all([
-      readAgentWallet(agentId),
-      verifyAgentOnChain(agentId, profile.agentAddress),
-    ]);
-    return sameAddress(agentWallet, wallet) || sameAddress(verification.owner, wallet);
-  } catch {
-    return false;
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const id of [userAgentId(userId), ...(await listUserAgentIds(userId))]) {
+    if (seen.has(id)) continue;
+    if (await userOwnsAgent(userId, id)) {
+      seen.add(id);
+      out.push(id);
+    }
   }
+  return out;
+}
+
+/**
+ * Minted agents this user launched (`ownerUserId` matches). Used for seller
+ * badges and excluding own listings from the buyer marketplace.
+ */
+export async function listCanonicalOwnedAgentIds(userId: string): Promise<string[]> {
+  const owned = await listOwnedAgentIds(userId);
+  const out: string[] = [];
+  for (const id of owned) {
+    const profile = await getAgentProfile(id);
+    if (profile?.ownerUserId === userId) out.push(id);
+  }
+  return out;
 }
 
 /**
@@ -93,33 +91,23 @@ export async function userOwnsAgent(
   agentId: string,
   profileOwnerUserId?: string | null,
 ): Promise<boolean> {
-  if (profileOwnerUserId && profileOwnerUserId === userId) {
-    // Self-heal the Redis index when the canonical owner field matches but the
-    // set lookup would fail (e.g. linkAgentToUser missed at mint time).
+  if (agentId === userAgentId(userId)) return true;
+
+  let ownerUserId = profileOwnerUserId;
+  if (ownerUserId === undefined) {
+    const profile = await getAgentProfile(agentId);
+    ownerUserId = profile?.ownerUserId ?? null;
+  }
+
+  // Canonical owner wins — never grant access to another user's minted agent.
+  if (ownerUserId && ownerUserId !== userId) return false;
+
+  if (ownerUserId === userId) {
     await linkAgentToUser(userId, agentId);
     return true;
   }
 
-  const ownedIds = new Set(await listOwnedAgentIds(userId));
-  if (ownedIds.has(agentId)) return true;
-
-  // Fallback: read ownerUserId from the stored profile.
-  let profile: AgentProfile | null = null;
-  if (profileOwnerUserId === undefined) {
-    profile = await getAgentProfile(agentId);
-    if (profile?.ownerUserId === userId) {
-      await linkAgentToUser(userId, agentId);
-      return true;
-    }
-  }
-
-  // Last resort: reconcile against on-chain ownership and self-heal the link.
-  if (await reconcileOnChainOwnership(userId, agentId, profile)) {
-    await linkAgentToUser(userId, agentId);
-    return true;
-  }
-
-  return false;
+  return (await listUserAgentIds(userId)).includes(agentId);
 }
 
 export async function requireOwnedAgent(agentId: string): Promise<OwnedAgentGuard> {

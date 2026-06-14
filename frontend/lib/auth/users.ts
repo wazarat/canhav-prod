@@ -6,7 +6,7 @@ import path from "node:path";
 import { repoRoot } from "@/lib/server/env";
 import { getRedisClient, hasUpstash } from "@/lib/server/redis";
 
-import { seedAgentProfile } from "@/lib/agent/memory";
+import { getAgentProfile, seedAgentProfile } from "@/lib/agent/memory";
 import { userAgentId } from "@/lib/agent/user-agent";
 
 export interface UserProfile {
@@ -220,6 +220,13 @@ export async function markTcnhvGranted(
 
 export async function linkAgentToUser(userId: string, agentId: string): Promise<void> {
   if (!userId || !agentId) return;
+
+  // Minted agents are exclusive: never link when another user is canonical owner.
+  if (/^\d+$/.test(agentId)) {
+    const profile = await getAgentProfile(agentId);
+    if (profile?.ownerUserId && profile.ownerUserId !== userId) return;
+  }
+
   if (hasUpstash()) {
     await getRedisClient().sadd(key.agents(userId), agentId);
   } else {
@@ -227,6 +234,18 @@ export async function linkAgentToUser(userId: string, agentId: string): Promise<
     const set = new Set(store.agents[userId] ?? []);
     set.add(agentId);
     store.agents[userId] = [...set];
+    writeFile(store);
+  }
+}
+
+/** Remove a stale agent id from a user's index (e.g. cross-account reconcile leak). */
+export async function unlinkAgentFromUser(userId: string, agentId: string): Promise<void> {
+  if (!userId || !agentId) return;
+  if (hasUpstash()) {
+    await getRedisClient().srem(key.agents(userId), agentId);
+  } else {
+    const store = readFile();
+    store.agents[userId] = (store.agents[userId] ?? []).filter((id) => id !== agentId);
     writeFile(store);
   }
 }

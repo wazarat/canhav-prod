@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { verifyPrivyToken } from "@/lib/auth/privy";
 import { createSessionToken, sessionCookieOptions, SESSION_COOKIE } from "@/lib/auth/session";
 import { upsertUserFromPrivy } from "@/lib/auth/users";
+import { grantSignupCredits } from "@/lib/server/credits";
 import { hasPrivy } from "@/lib/agent/config";
 
 export const runtime = "nodejs";
@@ -64,6 +65,18 @@ export async function POST(req: Request) {
     email,
     address,
   });
+
+  // Seed the one-time tCNHV starting grant when login already carries the
+  // canonical kernel wallet address. When it doesn't (the common case), the
+  // browser derives it and hits /api/wallet/bootstrap instead. Idempotent +
+  // best-effort: never block a successful login.
+  if (address) {
+    try {
+      await grantSignupCredits({ userId: verified.userId, address });
+    } catch {
+      /* additive — the bootstrap path will retry */
+    }
+  }
 
   const sessionToken = createSessionToken(verified.userId);
   const res = NextResponse.json({ ok: true, userId: verified.userId, profile });

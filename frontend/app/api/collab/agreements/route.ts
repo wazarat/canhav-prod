@@ -6,8 +6,11 @@ import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
 import {
   DEFAULT_COOLDOWN_SECONDS,
+  HARD_MAX_CALL_BUDGET,
   HARD_MAX_INSTALLMENTS,
+  HARD_MAX_TOKEN_BUDGET,
   HARD_MAX_UNITS,
+  HARD_MAX_UPDATES,
   listAgreementsForUser,
   proposeAgreement,
   type AgreementCadence,
@@ -42,6 +45,13 @@ interface ProposeBody {
   cooldownSeconds?: number;
   mode?: string;
   cadence?: string;
+  selectedJobTitle?: string | null;
+  selectedJobDescription?: string | null;
+  callBudgetPerPeriod?: number;
+  tokenBudgetPerPeriod?: number;
+  updatesPerPeriod?: number;
+  duneLinked?: boolean;
+  duneUrl?: string | null;
 }
 
 const VALID_CADENCES: AgreementCadence[] = ["none", "daily", "weekly", "monthly"];
@@ -127,6 +137,35 @@ export async function POST(req: Request) {
     if (cadence === "none") cadence = "weekly";
   }
 
+  // Resolve the chosen seller job against the seller's advertised catalog. A
+  // blank/unknown title falls back to the general objective (job omitted).
+  let selectedJobTitle: string | null = null;
+  let selectedJobDescription: string | null = null;
+  const requestedJob = (body.selectedJobTitle ?? "").trim();
+  if (requestedJob) {
+    const match = (seller.services ?? []).find((s) => s.title === requestedJob);
+    if (!match) {
+      return NextResponse.json(
+        { ok: false, error: "Selected job is not offered by this seller." },
+        { status: 400 },
+      );
+    }
+    selectedJobTitle = match.title;
+    selectedJobDescription = match.description;
+  }
+
+  const callBudgetPerPeriod = clampInt(body.callBudgetPerPeriod ?? 0, 0, HARD_MAX_CALL_BUDGET);
+  const tokenBudgetPerPeriod = clampInt(body.tokenBudgetPerPeriod ?? 0, 0, HARD_MAX_TOKEN_BUDGET);
+  const updatesPerPeriod = clampInt(body.updatesPerPeriod ?? 0, 0, HARD_MAX_UPDATES);
+  const duneUrl = (body.duneUrl ?? "").trim() || null;
+  if (duneUrl && !/^https?:\/\//i.test(duneUrl)) {
+    return NextResponse.json(
+      { ok: false, error: "Dune URL must start with http(s)://." },
+      { status: 400 },
+    );
+  }
+  const duneLinked = Boolean(body.duneLinked) || duneUrl != null;
+
   const agreement = await proposeAgreement({
     buyerAgentId,
     sellerAgentId,
@@ -141,6 +180,13 @@ export async function POST(req: Request) {
     cadence,
     pricePerInstallmentUsdc: seller.collabPriceUsdc ?? defaultCollabPriceUsdc(),
     cooldownSeconds,
+    selectedJobTitle,
+    selectedJobDescription,
+    callBudgetPerPeriod,
+    tokenBudgetPerPeriod,
+    updatesPerPeriod,
+    duneLinked,
+    duneUrl,
   });
 
   return NextResponse.json({ ok: true, agreement }, { status: 201 });

@@ -21,9 +21,15 @@ export interface UserProfile {
   displayName: string | null;
   /**
    * The user's canonical ZeroDev Kernel smart-account (wallet) address, derived
-   * from their Privy embedded signer (index 0). Null until first derived.
+   * from their Privy embedded signer (index 0). Null until first derived. This
+   * is the wallet "treasury" that holds the user's spendable tCNHV credits.
    */
   address: string | null;
+  /**
+   * Whether the one-time tCNHV starting grant (10,000) has already been minted
+   * to this user's wallet. Guards against double-granting across logins.
+   */
+  tcnhvGranted: boolean;
   createdAt: string;
   updatedAt: string;
   lastLoginAt: string;
@@ -96,6 +102,7 @@ function normalizeUserProfile(profile: UserProfile | null): UserProfile | null {
     email: profile.email ?? null,
     displayName: profile.displayName ?? null,
     address: profile.address ?? null,
+    tcnhvGranted: profile.tcnhvGranted ?? false,
   };
 }
 
@@ -123,6 +130,7 @@ export async function upsertUserFromPrivy(input: {
     email: (input.email?.trim() || existing?.email) ?? null,
     displayName: (input.displayName?.trim() || existing?.displayName) ?? null,
     address: (input.address?.trim() || existing?.address) ?? null,
+    tcnhvGranted: existing?.tcnhvGranted ?? false,
     createdAt: existing?.createdAt ?? nowIso(),
     updatedAt: nowIso(),
     lastLoginAt: nowIso(),
@@ -173,6 +181,33 @@ export async function updateUserProfile(
     updatedAt: nowIso(),
   };
 
+  if (hasUpstash()) {
+    await getRedisClient().set(key.profile(userId), JSON.stringify(updated));
+  } else {
+    const store = readFile();
+    store.profiles[userId] = updated;
+    writeFile(store);
+  }
+  return updated;
+}
+
+/**
+ * Mark the one-time tCNHV starting grant as delivered, and persist the wallet
+ * address it was minted to (so the canonical treasury wallet is recorded even if
+ * login didn't carry it). Idempotent: returns null if the user doesn't exist.
+ */
+export async function markTcnhvGranted(
+  userId: string,
+  address: string,
+): Promise<UserProfile | null> {
+  const existing = await getUserProfile(userId);
+  if (!existing) return null;
+  const updated: UserProfile = {
+    ...existing,
+    address: address?.trim() || existing.address,
+    tcnhvGranted: true,
+    updatedAt: nowIso(),
+  };
   if (hasUpstash()) {
     await getRedisClient().set(key.profile(userId), JSON.stringify(updated));
   } else {

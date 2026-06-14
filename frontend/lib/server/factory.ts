@@ -218,6 +218,18 @@ async function ensureTransferAllowed(account: Address): Promise<void> {
   }
 }
 
+/**
+ * Allowlist a user/treasury wallet for tCNHV transfers (the merit-signal rule
+ * permits a transfer when EITHER side is allowlisted). Allowlisting the sender
+ * lets a wallet send credits to anyone — used after the signup grant so the
+ * treasury can fund agents and pay peers. Best-effort + no-op when unconfigured.
+ */
+export async function ensureWalletTransferAllowed(address: string): Promise<void> {
+  const addr = safeAddress(address);
+  if (!addr) return;
+  await ensureTransferAllowed(addr);
+}
+
 export interface EnsureLedgerResult {
   ok: boolean;
   created: boolean;

@@ -6,6 +6,7 @@ import { AlertTriangle, Check, Pencil, Wallet, X } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { SocialLoginGate, type SessionInfo } from "./SocialLoginGate";
 import { SignOutButton } from "./SignOutButton";
+import { WalletBootstrap } from "./WalletBootstrap";
 
 function AuthNotConfigured() {
   return (
@@ -72,6 +73,7 @@ export function AgentsShell({
 
   return (
     <div>
+      {privyConfigured && <WalletBootstrap />}
       <div className="border-b border-ink-800/60 bg-ink-950/80">
         <div className="container flex flex-wrap items-center justify-between gap-3 py-2.5">
           <div className="flex items-center gap-2 text-xs text-ink-400">

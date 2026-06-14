@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight, CircleDot, Rocket, Sparkles } from "lucide-react";
+import { ChevronRight, CircleDot, Rocket, Sparkles, Store } from "lucide-react";
 
 import { AgentFrameworkPanel } from "@/components/agent/AgentFrameworkPanel";
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
@@ -15,6 +15,8 @@ import { DunePublishPanel } from "@/components/agent/DunePublishPanel";
 import { PublishAgentCard } from "@/components/agent/PublishAgentCard";
 import { SkillShelf } from "@/components/agent/SkillShelf";
 import { Badge } from "@/components/ui/Badge";
+import { SectionNav } from "@/components/ui/SectionNav";
+import { buildAgentSectionNav } from "@/lib/agent/agentSections";
 import { AgentToolPanel } from "@/components/agent/AgentToolPanel";
 import { CustomToolsPanel } from "@/components/agent/CustomToolsPanel";
 import { DataFramesPanel } from "@/components/agent/DataFramesPanel";
@@ -143,7 +145,7 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
         <span className="text-ink-100">{profile.name}</span>
       </nav>
 
-      <header className="space-y-3">
+      <header id="agent-overview" className="space-y-3 scroll-mt-32">
         <div className="flex flex-wrap items-center gap-3">
           <AgentNameEditor
             agentId={agentId}
@@ -204,53 +206,78 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
         )}
       </header>
 
+      <SectionNav
+        variant="bar"
+        items={buildAgentSectionNav({
+          isOwner,
+          isMinted,
+          hasIdentity: Boolean(profile.agentAddress),
+        })}
+        trailing={
+          <Link
+            href="/collab"
+            className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-neon-500/40 bg-neon-500/10 px-3 py-1.5 text-xs font-medium text-neon-400 transition-colors hover:bg-neon-500/20"
+          >
+            <Store className="h-3 w-3" /> Browse marketplace
+          </Link>
+        }
+      />
+
       {isOwner && suggestions.length > 0 && (
         <AgentSuggestions agentId={agentId} suggestions={suggestions} />
       )}
 
       {isOwner && (
-        <PublishAgentCard
-          agentId={agentId}
-          minted={isMinted}
-          hasSkill={attachedSkillIds.length > 0}
-          discoverable={profile.discoverable}
-          collabPriceUsdc={profile.collabPriceUsdc}
-          settlementAsset={collabSettlement().name}
-          tcnhvRewards={hasTcnhv() && canMintTcnhv()}
-        />
+        <div id="panel-marketplace" className="scroll-mt-32">
+          <PublishAgentCard
+            agentId={agentId}
+            minted={isMinted}
+            hasSkill={attachedSkillIds.length > 0}
+            discoverable={profile.discoverable}
+            collabPriceUsdc={profile.collabPriceUsdc}
+            settlementAsset={collabSettlement().name}
+            tcnhvRewards={hasTcnhv() && canMintTcnhv()}
+          />
+        </div>
       )}
 
       {isOwner && (
-        <div id="panel-dune">
+        <div id="panel-dune" className="scroll-mt-32">
           <DunePublishPanel agentId={agentId} config={profile.config} />
         </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div id="panel-chat" className="scroll-mt-32 lg:col-span-2">
           <AgentLabPanel agentId={agentId} llmConfigured={status.llm} />
         </div>
         <div className="space-y-6">
           {profile.agentAddress && (
-            <AgentIdentityCard
-              identity={{
-                agentId: profile.agentId,
-                agentAddress: profile.agentAddress,
-                agentURI: profile.agentURI,
-                arbiscanUrl,
-                tokenUrl,
-                skillTitle: profile.name,
-                onChain: verifiedOnChain,
-              }}
-              verification={verification}
-              agentCardUrl={agentCardJsonUrl}
-              cardPageUrl={cardPageUrl}
-              verifyUrl={verifyUrl}
-            />
+            <div id="panel-identity" className="scroll-mt-32">
+              <AgentIdentityCard
+                identity={{
+                  agentId: profile.agentId,
+                  agentAddress: profile.agentAddress,
+                  agentURI: profile.agentURI,
+                  arbiscanUrl,
+                  tokenUrl,
+                  skillTitle: profile.name,
+                  onChain: verifiedOnChain,
+                }}
+                verification={verification}
+                agentCardUrl={agentCardJsonUrl}
+                cardPageUrl={cardPageUrl}
+                verifyUrl={verifyUrl}
+              />
+            </div>
           )}
-          {isMinted && <AgentPerformanceCard stats={ledgerStats} explorerUrl={ledgerExplorerUrl} />}
+          {isMinted && (
+            <div id="panel-performance" className="scroll-mt-32">
+              <AgentPerformanceCard stats={ledgerStats} explorerUrl={ledgerExplorerUrl} />
+            </div>
+          )}
           {isOwner && (
-            <div id="panel-tools">
+            <div id="panel-tools" className="scroll-mt-32">
               <AgentToolPanel
                 agentId={agentId}
                 entitySlug={profile.entitySlug}
@@ -260,23 +287,27 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
               />
             </div>
           )}
-          <AgentMemoryPanel memory={memory} studiedSkills={studiedSkills} />
-          <SkillShelf
-            agentId={agentId}
-            allSkills={skills.map((s) => ({
-              id: s.id,
-              title: s.title,
-              summary: s.summary,
-              group: s.group,
-            }))}
-            studied={studiedSkills}
-          />
+          <div id="panel-memory" className="scroll-mt-32">
+            <AgentMemoryPanel memory={memory} studiedSkills={studiedSkills} />
+          </div>
+          <div id="panel-skills" className="scroll-mt-32">
+            <SkillShelf
+              agentId={agentId}
+              allSkills={skills.map((s) => ({
+                id: s.id,
+                title: s.title,
+                summary: s.summary,
+                group: s.group,
+              }))}
+              studied={studiedSkills}
+            />
+          </div>
           {isOwner && (
             <>
-              <div id="panel-framework">
+              <div id="panel-framework" className="scroll-mt-32">
                 <AgentFrameworkPanel agentId={agentId} config={profile.config} />
               </div>
-              <div id="panel-frames">
+              <div id="panel-frames" className="scroll-mt-32">
                 <DataFramesPanel
                   agentId={agentId}
                   frames={frames}
@@ -284,7 +315,7 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
                   max={MAX_DATA_FRAMES}
                 />
               </div>
-              <div id="panel-knowledge">
+              <div id="panel-knowledge" className="scroll-mt-32">
                 <KnowledgePanel
                   agentId={agentId}
                   docs={knowledgeDocs}
@@ -293,7 +324,7 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
                   urlIngestionEnabled={knowledgeUrlAllowlist().length > 0}
                 />
               </div>
-              <div id="panel-custom-tools">
+              <div id="panel-custom-tools" className="scroll-mt-32">
                 <CustomToolsPanel
                   agentId={agentId}
                   tools={customTools}
@@ -301,13 +332,14 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
                   httpEnabled={customToolHttpAllowlist().length > 0}
                 />
               </div>
-              <div id="panel-attach-skill">
+              <div id="panel-attach-skill" className="scroll-mt-32">
                 <AttachSkillPanel agentId={agentId} onChain={profile.onChain} />
               </div>
               <CollabSettingsPanel
                 agentId={agentId}
                 description={profile.description}
                 collabMaxUnits={profile.collabMaxUnits}
+                services={profile.services}
               />
             </>
           )}

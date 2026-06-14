@@ -12,10 +12,17 @@ pragma solidity ^0.8.28;
  *
  *           - `recordInteraction` reverts if `units > maxUnitsPerInteraction`
  *             (the human-agreed per-interaction ceiling),
- *           - reverts once `installments` are exhausted (the anti-extraction
- *             limit: the buyer can never drain more than the agreed total),
- *           - reverts if the cooldown has not elapsed, or the agreement expired
- *             or is no longer active.
+ *           - reverts once the agreed number of periods (`installments`) are
+ *             exhausted (the anti-extraction limit),
+ *           - reverts if the per-period call budget is exhausted (the cooldown,
+ *             in legacy "one call per period" mode), or the per-period token
+ *             budget would be exceeded (the chatbot-style allowance),
+ *           - reverts if the agreement expired or is no longer active.
+ *
+ *         Richer terms (the chosen seller job, the Dune dashboard link, the full
+ *         human-readable detail) live off-chain but are committed here via
+ *         `termsHash` (keccak of the canonical terms JSON), so the on-chain
+ *         record verifies the complete agreement, not just the numeric caps.
  *
  *         This is the on-chain proof that the magnitude of every agent-to-agent
  *         exchange stayed within bounds both parties signed off on — real work
@@ -53,18 +60,54 @@ contract CollabAgreement {
     struct Agreement {
         uint256 buyerAgentId;
         uint256 sellerAgentId;
-        uint32 maxUnitsPerInteraction;
-        uint32 installments;
-        uint32 consumedInstallments;
         uint256 consumedUnits;
         uint256 pricePerInstallment;
+        // Per-period token allowance (0 = unlimited) + running tally for the period.
+        uint256 tokenBudgetPerPeriod;
+        uint256 periodTokens;
+        // keccak of the canonical off-chain terms JSON (the full-terms commitment).
+        bytes32 termsHash;
+        uint32 maxUnitsPerInteraction;
+        // Number of agreed periods (a.k.a. installments / check-ins).
+        uint32 installments;
+        // Total interactions recorded across all periods.
+        uint32 consumedInstallments;
+        // Max calls allowed within one period (0 = one call per period / cooldown-gated).
+        uint32 callBudgetPerPeriod;
+        // Updates the seller commits to deliver per period (informational).
+        uint32 updatesPerPeriod;
+        // 0-based index of the current period + calls consumed within it.
+        uint32 periodIndex;
+        uint32 periodCalls;
         uint64 minInteractionInterval;
         uint64 lastInteractionAt;
         uint64 expiry;
+        // When the current period opened (drives per-period budget rollover).
+        uint64 periodStartedAt;
         address establisher;
         Status status;
         Mode mode;
         Cadence cadence;
+        // Whether the deliverable is connected to a Dune dashboard.
+        bool duneLinked;
+    }
+
+    /// @notice Calldata bundle for {establish} — a struct to dodge stack limits.
+    struct EstablishParams {
+        uint256 buyerAgentId;
+        uint256 sellerAgentId;
+        uint32 maxUnitsPerInteraction;
+        uint32 installments;
+        uint256 pricePerInstallment;
+        uint64 minInteractionInterval;
+        uint64 expiry;
+        Mode mode;
+        Cadence cadence;
+        uint32 callBudgetPerPeriod;
+        uint256 tokenBudgetPerPeriod;
+        uint32 updatesPerPeriod;
+        bool duneLinked;
+        bytes32 termsHash;
     }
 
     mapping(bytes32 => Agreement) private _agreements;
@@ -81,6 +124,8 @@ contract CollabAgreement {
     error ZeroUnits();
     error InstallmentsExhausted(bytes32 agreementId);
     error CooldownActive(uint64 availableAt);
+    error CallBudgetExceeded(uint32 callBudgetPerPeriod);
+    error TokenBudgetExceeded(uint256 tokenBudgetPerPeriod, uint256 attempted);
 
     event AgreementEstablished(
         bytes32 indexed agreementId,
@@ -93,13 +138,19 @@ contract CollabAgreement {
         uint64 expiry,
         address establisher,
         Mode mode,
-        Cadence cadence
+        Cadence cadence,
+        uint32 callBudgetPerPeriod,
+        uint256 tokenBudgetPerPeriod,
+        uint32 updatesPerPeriod,
+        bool duneLinked,
+        bytes32 termsHash
     );
 
     event InteractionRecorded(
         bytes32 indexed agreementId,
-        uint32 installmentIndex,
+        uint32 periodIndex,
         uint32 units,
+        uint256 tokens,
         uint256 consumedUnits,
         Status status
     );
@@ -115,58 +166,63 @@ contract CollabAgreement {
      *         parties have approved off-chain; the caller (the establishing
      *         smart account) becomes the only party allowed to record
      *         interactions and cancel.
-     * @param expiry Unix seconds after which the agreement can no longer be
-     *               used; pass 0 for no expiry.
+     * @param p Bundled agreement terms. `p.expiry` is unix seconds after which
+     *          the agreement can no longer be used (0 for no expiry); `p.termsHash`
+     *          commits to the full off-chain terms (chosen job, Dune url, etc.).
      * @return agreementId Deterministic id for the new agreement.
      */
-    function establish(
-        uint256 buyerAgentId,
-        uint256 sellerAgentId,
-        uint32 maxUnitsPerInteraction,
-        uint32 installments,
-        uint256 pricePerInstallment,
-        uint64 minInteractionInterval,
-        uint64 expiry,
-        Mode mode,
-        Cadence cadence
-    ) external returns (bytes32 agreementId) {
-        if (maxUnitsPerInteraction == 0) revert ZeroMaxUnits();
-        if (installments == 0) revert ZeroInstallments();
+    function establish(EstablishParams calldata p) external returns (bytes32 agreementId) {
+        if (p.maxUnitsPerInteraction == 0) revert ZeroMaxUnits();
+        if (p.installments == 0) revert ZeroInstallments();
 
         agreementId = keccak256(
-            abi.encode(msg.sender, buyerAgentId, sellerAgentId, _nonce++, block.chainid)
+            abi.encode(msg.sender, p.buyerAgentId, p.sellerAgentId, _nonce++, block.chainid)
         );
 
         _agreements[agreementId] = Agreement({
-            buyerAgentId: buyerAgentId,
-            sellerAgentId: sellerAgentId,
-            maxUnitsPerInteraction: maxUnitsPerInteraction,
-            installments: installments,
-            consumedInstallments: 0,
+            buyerAgentId: p.buyerAgentId,
+            sellerAgentId: p.sellerAgentId,
             consumedUnits: 0,
-            pricePerInstallment: pricePerInstallment,
-            minInteractionInterval: minInteractionInterval,
+            pricePerInstallment: p.pricePerInstallment,
+            tokenBudgetPerPeriod: p.tokenBudgetPerPeriod,
+            periodTokens: 0,
+            termsHash: p.termsHash,
+            maxUnitsPerInteraction: p.maxUnitsPerInteraction,
+            installments: p.installments,
+            consumedInstallments: 0,
+            callBudgetPerPeriod: p.callBudgetPerPeriod,
+            updatesPerPeriod: p.updatesPerPeriod,
+            periodIndex: 0,
+            periodCalls: 0,
+            minInteractionInterval: p.minInteractionInterval,
             lastInteractionAt: 0,
-            expiry: expiry,
+            expiry: p.expiry,
+            periodStartedAt: 0,
             establisher: msg.sender,
             status: Status.Active,
-            mode: mode,
-            cadence: cadence
+            mode: p.mode,
+            cadence: p.cadence,
+            duneLinked: p.duneLinked
         });
         _count += 1;
 
         emit AgreementEstablished(
             agreementId,
-            buyerAgentId,
-            sellerAgentId,
-            maxUnitsPerInteraction,
-            installments,
-            pricePerInstallment,
-            minInteractionInterval,
-            expiry,
+            p.buyerAgentId,
+            p.sellerAgentId,
+            p.maxUnitsPerInteraction,
+            p.installments,
+            p.pricePerInstallment,
+            p.minInteractionInterval,
+            p.expiry,
             msg.sender,
-            mode,
-            cadence
+            p.mode,
+            p.cadence,
+            p.callBudgetPerPeriod,
+            p.tokenBudgetPerPeriod,
+            p.updatesPerPeriod,
+            p.duneLinked,
+            p.termsHash
         );
     }
 
@@ -175,8 +231,10 @@ contract CollabAgreement {
      *         human-agreed ceiling and the anti-extraction limits on-chain.
      * @param agreementId The agreement to charge against.
      * @param units       Interaction magnitude; must be 0 < units <= max.
+     * @param tokens      Tokens/credits drawn this call (checked against the
+     *                    per-period token budget; pass 0 when not metered).
      */
-    function recordInteraction(bytes32 agreementId, uint32 units) external {
+    function recordInteraction(bytes32 agreementId, uint32 units, uint256 tokens) external {
         Agreement storage a = _agreements[agreementId];
         if (a.status != Status.Active) revert AgreementNotActive(agreementId);
         if (msg.sender != a.establisher) revert NotEstablisher(agreementId);
@@ -185,23 +243,54 @@ contract CollabAgreement {
         if (units > a.maxUnitsPerInteraction) {
             revert UnitsExceedMax(units, a.maxUnitsPerInteraction);
         }
-        if (a.consumedInstallments >= a.installments) revert InstallmentsExhausted(agreementId);
 
-        if (a.minInteractionInterval != 0 && a.lastInteractionAt != 0) {
-            uint64 availableAt = a.lastInteractionAt + a.minInteractionInterval;
-            if (block.timestamp < availableAt) revert CooldownActive(availableAt);
+        // Resolve the active period: roll forward (resetting per-period budgets)
+        // once the cooldown window has elapsed since the period opened.
+        bool firstEver = a.periodStartedAt == 0;
+        bool rolled = firstEver;
+        if (!firstEver && a.minInteractionInterval != 0) {
+            if (block.timestamp >= a.periodStartedAt + a.minInteractionInterval) {
+                rolled = true;
+            }
+        }
+        uint32 periodIndex = rolled && !firstEver ? a.periodIndex + 1 : a.periodIndex;
+        if (periodIndex >= a.installments) revert InstallmentsExhausted(agreementId);
+
+        uint32 periodCalls = rolled ? 0 : a.periodCalls;
+        uint256 periodTokens = rolled ? 0 : a.periodTokens;
+
+        // Per-period call budget (0 => exactly one call per period: the cooldown).
+        uint32 callCeiling = a.callBudgetPerPeriod > 0 ? a.callBudgetPerPeriod : 1;
+        if (periodCalls >= callCeiling) {
+            if (a.callBudgetPerPeriod > 0) revert CallBudgetExceeded(a.callBudgetPerPeriod);
+            revert CooldownActive(a.periodStartedAt + a.minInteractionInterval);
         }
 
-        uint32 installmentIndex = a.consumedInstallments;
-        a.consumedInstallments = installmentIndex + 1;
+        // Per-period token budget (the chatbot-style allowance).
+        if (a.tokenBudgetPerPeriod != 0 && periodTokens + tokens > a.tokenBudgetPerPeriod) {
+            revert TokenBudgetExceeded(a.tokenBudgetPerPeriod, periodTokens + tokens);
+        }
+
+        // Commit the resolved period.
+        if (rolled) {
+            a.periodIndex = periodIndex;
+            a.periodStartedAt = uint64(block.timestamp);
+            a.periodCalls = 1;
+            a.periodTokens = tokens;
+        } else {
+            a.periodCalls = periodCalls + 1;
+            a.periodTokens = periodTokens + tokens;
+        }
+        a.consumedInstallments += 1;
         a.consumedUnits += units;
         a.lastInteractionAt = uint64(block.timestamp);
 
-        if (a.consumedInstallments >= a.installments) {
+        // Completed once the final period's call budget is fully consumed.
+        if (periodIndex >= a.installments - 1 && a.periodCalls >= callCeiling) {
             a.status = Status.Completed;
         }
 
-        emit InteractionRecorded(agreementId, installmentIndex, units, a.consumedUnits, a.status);
+        emit InteractionRecorded(agreementId, periodIndex, units, tokens, a.consumedUnits, a.status);
     }
 
     /// @notice Cancel an active agreement (only the establisher).
@@ -213,52 +302,19 @@ contract CollabAgreement {
         emit AgreementCancelled(agreementId, msg.sender);
     }
 
-    /// @notice Read an agreement's full state.
-    function getAgreement(bytes32 agreementId)
-        external
-        view
-        returns (
-            uint256 buyerAgentId,
-            uint256 sellerAgentId,
-            uint32 maxUnitsPerInteraction,
-            uint32 installments,
-            uint32 consumedInstallments,
-            uint256 consumedUnits,
-            uint256 pricePerInstallment,
-            uint64 minInteractionInterval,
-            uint64 lastInteractionAt,
-            uint64 expiry,
-            address establisher,
-            Status status,
-            Mode mode,
-            Cadence cadence
-        )
-    {
-        Agreement storage a = _agreements[agreementId];
-        return (
-            a.buyerAgentId,
-            a.sellerAgentId,
-            a.maxUnitsPerInteraction,
-            a.installments,
-            a.consumedInstallments,
-            a.consumedUnits,
-            a.pricePerInstallment,
-            a.minInteractionInterval,
-            a.lastInteractionAt,
-            a.expiry,
-            a.establisher,
-            a.status,
-            a.mode,
-            a.cadence
-        );
+    /// @notice Read an agreement's full state (the whole struct).
+    function getAgreement(bytes32 agreementId) external view returns (Agreement memory) {
+        return _agreements[agreementId];
     }
 
-    /// @notice Remaining interactions allowed under an agreement.
+    /// @notice Remaining PERIODS not yet entered (the current in-progress period
+    ///         counts as started). 0 once completed/cancelled or all entered.
     function remainingInstallments(bytes32 agreementId) external view returns (uint32) {
         Agreement storage a = _agreements[agreementId];
         if (a.status != Status.Active) return 0;
-        if (a.consumedInstallments >= a.installments) return 0;
-        return a.installments - a.consumedInstallments;
+        uint32 started = a.periodStartedAt == 0 ? 0 : a.periodIndex + 1;
+        if (started >= a.installments) return 0;
+        return a.installments - started;
     }
 
     /// @notice Total number of agreements established.

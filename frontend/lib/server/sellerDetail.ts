@@ -5,7 +5,7 @@ import {
   defaultCollabPriceUsdc,
   USDC_DECIMALS,
 } from "@/lib/agent/collab-config";
-import { getAgentProfile } from "@/lib/agent/memory";
+import { getAgentProfile, type AgentService } from "@/lib/agent/memory";
 import { readAgentReputation } from "@/lib/agent/reputation";
 import { readAgentWallet, verifyAgentOnChain } from "@/lib/agent/onchain";
 import { listReviews, type AgentReview } from "@/lib/agent/reviews";
@@ -37,6 +37,8 @@ export interface SellerDetail {
   category: string | null;
   entitySlug: string | null;
   attachedSkillTitles: string[];
+  /** Specific jobs this seller advertises it can do. */
+  services: AgentService[];
   price: string;
   asset: string;
   decimals: number;
@@ -107,6 +109,7 @@ export async function getSellerDetail(agentId: string): Promise<SellerDetail | n
     category: profile.category,
     entitySlug: profile.entitySlug,
     attachedSkillTitles,
+    services: profile.services ?? [],
     price: profile.collabPriceUsdc ?? defaultCollabPriceUsdc(),
     asset: collabUsdcAsset(),
     decimals: USDC_DECIMALS,

@@ -61,6 +61,16 @@ export interface AgentProductRef {
   category: "Stablecoin" | "Token" | "RWA";
 }
 
+/**
+ * A specific job a seller agent advertises it can do (e.g. "Weekly risk digest").
+ * Buyers pick one when proposing a collaboration; the chosen title/description is
+ * committed into the agreement terms (and its hash, on-chain).
+ */
+export interface AgentService {
+  title: string;
+  description: string;
+}
+
 export interface AgentProfile {
   agentId: string;
   name: string;
@@ -95,6 +105,8 @@ export interface AgentProfile {
   collabPriceUsdc: string | null;
   /** Seller ceiling: max interaction "units" (data slices) per exchange. Null = default. */
   collabMaxUnits: number | null;
+  /** Specific jobs this seller advertises it can do (chosen by buyers at proposal). */
+  services: AgentService[];
   /** Owner-tunable framework (focus, instructions, style). Null = defaults. */
   config: AgentConfig | null;
   chain: typeof AGENT_CHAIN;
@@ -227,6 +239,7 @@ function normalizeProfile(profile: AgentProfile | null): AgentProfile | null {
     discoverable: profile.discoverable ?? false,
     collabPriceUsdc: profile.collabPriceUsdc ?? null,
     collabMaxUnits: profile.collabMaxUnits ?? null,
+    services: Array.isArray(profile.services) ? profile.services : [],
     config: profile.config ? sanitizeAgentConfig(profile.config) : null,
   };
 }
@@ -256,6 +269,7 @@ export interface SeedProfileInput {
   discoverable?: boolean;
   collabPriceUsdc?: string | null;
   collabMaxUnits?: number | null;
+  services?: AgentService[];
   config?: AgentConfig | null;
 }
 
@@ -281,6 +295,7 @@ export async function seedAgentProfile(input: SeedProfileInput): Promise<AgentPr
     discoverable: input.discoverable ?? existing?.discoverable ?? false,
     collabPriceUsdc: input.collabPriceUsdc ?? existing?.collabPriceUsdc ?? null,
     collabMaxUnits: input.collabMaxUnits ?? existing?.collabMaxUnits ?? null,
+    services: input.services ?? existing?.services ?? [],
     config: input.config !== undefined ? input.config : (existing?.config ?? null),
     chain: AGENT_CHAIN,
     createdAt: existing?.createdAt ?? nowIso(),
@@ -347,6 +362,7 @@ export async function setAgentCollabSettings(
     collabPriceUsdc?: string | null;
     description?: string | null;
     collabMaxUnits?: number | null;
+    services?: AgentService[];
   },
 ): Promise<AgentProfile | null> {
   const existing = await getAgentProfile(agentId);
@@ -360,6 +376,7 @@ export async function setAgentCollabSettings(
     description: updates.description !== undefined ? updates.description : existing.description,
     collabMaxUnits:
       updates.collabMaxUnits !== undefined ? updates.collabMaxUnits : existing.collabMaxUnits,
+    services: updates.services !== undefined ? updates.services : existing.services,
   });
 }
 

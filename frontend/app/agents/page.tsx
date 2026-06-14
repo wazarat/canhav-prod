@@ -9,10 +9,12 @@ import {
   ScrollText,
   ArrowRight,
   Bot,
+  Store,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
+import { SectionNav, type SectionNavItem } from "@/components/ui/SectionNav";
 import { agentCategoryLabel } from "@/lib/agent/categories";
 import { agentConfigStatus } from "@/lib/agent/config";
 import { getAgentSkills, SKILL_GROUPS, type PlatformSkill } from "@/lib/agent/skills";
@@ -20,8 +22,8 @@ import { MemoryInspector } from "@/components/agent/MemoryInspector";
 import { AgentLabPanel } from "@/components/agent/AgentLabPanel";
 import { LaunchAgentButton } from "@/components/agent/LaunchAgentButton";
 import { getSession } from "@/lib/auth/session";
-import { listUserAgentIds } from "@/lib/auth/users";
 import { getAgentProfile, getAttachedSkillIds, type AgentProfile } from "@/lib/agent/memory";
+import { listOwnedAgentIds } from "@/lib/agent/ownership";
 import { getApprovedEntities } from "@/lib/data";
 import { userAgentId } from "@/lib/agent/user-agent";
 
@@ -73,13 +75,13 @@ export default async function AgentsPage() {
   const session = getSession();
   const defaultAgentId = session ? userAgentId(session.userId) : "sandbox";
 
-  const [skills, userAgentIds] = await Promise.all([
+  const [skills, ownedIds] = await Promise.all([
     getAgentSkills(),
-    session ? listUserAgentIds(session.userId) : Promise.resolve([] as string[]),
+    session ? listOwnedAgentIds(session.userId) : Promise.resolve([defaultAgentId]),
   ]);
 
   const userAgents = (
-    await Promise.all([defaultAgentId, ...userAgentIds].map((id) => getAgentProfile(id)))
+    await Promise.all(ownedIds.map((id) => getAgentProfile(id)))
   ).filter((p): p is NonNullable<typeof p> => Boolean(p));
   const agentsById = new Map(userAgents.map((a) => [a.agentId, a]));
   const agents = [...agentsById.values()].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
@@ -148,6 +150,13 @@ export default async function AgentsPage() {
 
   const readyCount = rows.filter((r) => r.ready).length;
 
+  const listingNav: SectionNavItem[] = [
+    ...(agents.length > 0 ? [{ id: "agents-roster", label: "Your agents" }] : []),
+    { id: "create", label: "Launch" },
+    { id: "agents-skills", label: "Your skills" },
+    { id: "agents-catalog", label: "Skill catalog" },
+  ];
+
   return (
     <div className="container space-y-8 py-12">
       <nav className="flex items-center gap-1.5 text-sm text-ink-300">
@@ -178,6 +187,19 @@ export default async function AgentsPage() {
         </p>
       </header>
 
+      <SectionNav
+        variant="bar"
+        items={listingNav}
+        trailing={
+          <Link
+            href="/collab"
+            className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-neon-500/40 bg-neon-500/10 px-3 py-1.5 text-xs font-medium text-neon-400 transition-colors hover:bg-neon-500/20"
+          >
+            <Store className="h-3 w-3" /> Browse marketplace
+          </Link>
+        }
+      />
+
       <Card className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">
           <div>
@@ -207,7 +229,7 @@ export default async function AgentsPage() {
       </Card>
 
       {agents.length > 0 && (
-        <Card className="space-y-5">
+        <Card id="agents-roster" className="scroll-mt-32 space-y-5">
           <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">
             <div>
               <CardTitle className="text-base">Your agents</CardTitle>
@@ -277,7 +299,7 @@ export default async function AgentsPage() {
         </Card>
       )}
 
-      <div id="create" className="scroll-mt-24 space-y-3">
+      <div id="create" className="scroll-mt-32 space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
@@ -296,7 +318,7 @@ export default async function AgentsPage() {
         />
       </div>
 
-      <Card className="space-y-3">
+      <Card id="agents-skills" className="scroll-mt-32 space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">
           <div>
             <CardTitle className="text-base">Your custom skills</CardTitle>
@@ -342,7 +364,7 @@ export default async function AgentsPage() {
         </CardDescription>
       </Card>
 
-      <Card className="space-y-4">
+      <Card id="agents-catalog" className="scroll-mt-32 space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-800/60 pb-3">
           <div>
             <CardTitle className="text-base">Skills</CardTitle>

@@ -155,6 +155,47 @@ export async function claimCredits(params: {
   return { txHash: receipt.receipt.transactionHash, userOpHash };
 }
 
+/**
+ * Transfer tCNHV credits from the user's treasury wallet (kernel index 0) to any
+ * recipient — a peer's wallet or one of their own agents' smart accounts. A
+ * gas-sponsored ERC-20 `transfer` userOp signed by the user's embedded signer.
+ * The treasury is allowlisted at signup, so the transfer clears the token's
+ * merit-signal transfer rule. Returns the settling tx hash.
+ */
+export async function transferCredits(params: {
+  signer: Signer;
+  accountIndex: number;
+  mintConfig: SpawnMintConfig;
+  token: `0x${string}`;
+  payTo: `0x${string}`;
+  /** Amount in base units (tCNHV = 18 decimals). */
+  amount: string;
+}): Promise<{ txHash: `0x${string}`; userOpHash: string }> {
+  const svc = await import("canhav-agent-service");
+  const { encodeFunctionData } = await import("viem");
+
+  const cfg = svc.createConfig({
+    zerodevRpc: params.mintConfig.zerodevRpc,
+    rpcUrl: params.mintConfig.rpcUrl,
+    identityRegistry: params.mintConfig.identityRegistry,
+    securityRegistry: params.mintConfig.securityRegistry,
+  });
+
+  const account = await svc.createEcdsaKernelAccount(cfg, params.signer, BigInt(params.accountIndex));
+  const data = encodeFunctionData({
+    abi: erc20Abi,
+    functionName: "transfer",
+    args: [params.payTo, BigInt(params.amount)],
+  });
+
+  const userOpHash = await account.kernelClient.sendUserOperation({
+    account: account.account,
+    calls: [{ to: params.token, data }],
+  });
+  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
+  return { txHash: receipt.receipt.transactionHash, userOpHash };
+}
+
 const collabRegistryAbi = [
   {
     type: "function",
@@ -239,15 +280,26 @@ const collabAgreementAbi = [
     name: "establish",
     stateMutability: "nonpayable",
     inputs: [
-      { name: "buyerAgentId", type: "uint256" },
-      { name: "sellerAgentId", type: "uint256" },
-      { name: "maxUnitsPerInteraction", type: "uint32" },
-      { name: "installments", type: "uint32" },
-      { name: "pricePerInstallment", type: "uint256" },
-      { name: "minInteractionInterval", type: "uint64" },
-      { name: "expiry", type: "uint64" },
-      { name: "mode", type: "uint8" },
-      { name: "cadence", type: "uint8" },
+      {
+        name: "p",
+        type: "tuple",
+        components: [
+          { name: "buyerAgentId", type: "uint256" },
+          { name: "sellerAgentId", type: "uint256" },
+          { name: "maxUnitsPerInteraction", type: "uint32" },
+          { name: "installments", type: "uint32" },
+          { name: "pricePerInstallment", type: "uint256" },
+          { name: "minInteractionInterval", type: "uint64" },
+          { name: "expiry", type: "uint64" },
+          { name: "mode", type: "uint8" },
+          { name: "cadence", type: "uint8" },
+          { name: "callBudgetPerPeriod", type: "uint32" },
+          { name: "tokenBudgetPerPeriod", type: "uint256" },
+          { name: "updatesPerPeriod", type: "uint32" },
+          { name: "duneLinked", type: "bool" },
+          { name: "termsHash", type: "bytes32" },
+        ],
+      },
     ],
     outputs: [{ name: "agreementId", type: "bytes32" }],
   },
@@ -258,6 +310,7 @@ const collabAgreementAbi = [
     inputs: [
       { name: "agreementId", type: "bytes32" },
       { name: "units", type: "uint32" },
+      { name: "tokens", type: "uint256" },
     ],
     outputs: [],
   },
@@ -276,6 +329,11 @@ const collabAgreementAbi = [
       { name: "establisher", type: "address", indexed: false },
       { name: "mode", type: "uint8", indexed: false },
       { name: "cadence", type: "uint8", indexed: false },
+      { name: "callBudgetPerPeriod", type: "uint32", indexed: false },
+      { name: "tokenBudgetPerPeriod", type: "uint256", indexed: false },
+      { name: "updatesPerPeriod", type: "uint32", indexed: false },
+      { name: "duneLinked", type: "bool", indexed: false },
+      { name: "termsHash", type: "bytes32", indexed: false },
     ],
   },
 ] as const;
@@ -298,6 +356,16 @@ export interface EstablishParams {
   mode: number;
   /** Cadence enum: 0 = None, 1 = Daily, 2 = Weekly, 3 = Monthly. */
   cadence: number;
+  /** Max calls per period (0 = one call per period, cooldown-gated). */
+  callBudgetPerPeriod: number;
+  /** Max tokens/credits per period in base units (0 = unlimited). */
+  tokenBudgetPerPeriod: string;
+  /** Updates the seller delivers per period (informational). */
+  updatesPerPeriod: number;
+  /** Whether the deliverable links to a Dune dashboard. */
+  duneLinked: boolean;
+  /** keccak of the canonical off-chain terms (bytes32 hex). */
+  termsHash: `0x${string}`;
   accountIndex: number;
   mintConfig: SpawnMintConfig;
 }
@@ -330,15 +398,28 @@ export async function establishAgreementOnChain(params: {
     abi: collabAgreementAbi,
     functionName: "establish",
     args: [
-      BigInt(establish.buyerAgentId),
-      BigInt(establish.sellerAgentId),
-      Math.max(1, Math.min(0xffffffff, Math.floor(establish.maxUnitsPerInteraction))),
-      Math.max(1, Math.min(0xffffffff, Math.floor(establish.installments))),
-      BigInt(establish.pricePerInstallment),
-      BigInt(Math.max(0, Math.floor(establish.minInteractionInterval))),
-      BigInt(Math.max(0, Math.floor(establish.expiry))),
-      Math.max(0, Math.min(255, Math.floor(establish.mode))),
-      Math.max(0, Math.min(255, Math.floor(establish.cadence))),
+      {
+        buyerAgentId: BigInt(establish.buyerAgentId),
+        sellerAgentId: BigInt(establish.sellerAgentId),
+        maxUnitsPerInteraction: Math.max(
+          1,
+          Math.min(0xffffffff, Math.floor(establish.maxUnitsPerInteraction)),
+        ),
+        installments: Math.max(1, Math.min(0xffffffff, Math.floor(establish.installments))),
+        pricePerInstallment: BigInt(establish.pricePerInstallment),
+        minInteractionInterval: BigInt(Math.max(0, Math.floor(establish.minInteractionInterval))),
+        expiry: BigInt(Math.max(0, Math.floor(establish.expiry))),
+        mode: Math.max(0, Math.min(255, Math.floor(establish.mode))),
+        cadence: Math.max(0, Math.min(255, Math.floor(establish.cadence))),
+        callBudgetPerPeriod: Math.max(
+          0,
+          Math.min(0xffffffff, Math.floor(establish.callBudgetPerPeriod)),
+        ),
+        tokenBudgetPerPeriod: BigInt(establish.tokenBudgetPerPeriod),
+        updatesPerPeriod: Math.max(0, Math.min(0xffffffff, Math.floor(establish.updatesPerPeriod))),
+        duneLinked: Boolean(establish.duneLinked),
+        termsHash: establish.termsHash,
+      },
     ],
   });
 
@@ -378,6 +459,8 @@ export interface AgreementInteractionParams {
   collabAgreement: `0x${string}`;
   onChainAgreementId: `0x${string}`;
   units: number;
+  /** Tokens/credits drawn this call, base units (checked vs the per-period budget). */
+  tokens: string;
   accountIndex: number;
   mintConfig: SpawnMintConfig;
 }
@@ -415,6 +498,7 @@ export async function recordInteractionOnChain(params: {
     args: [
       interaction.onChainAgreementId,
       Math.max(1, Math.min(0xffffffff, Math.floor(interaction.units))),
+      BigInt(interaction.tokens || "0"),
     ],
   });
 

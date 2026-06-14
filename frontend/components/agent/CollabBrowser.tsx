@@ -39,6 +39,7 @@ import {
   type SellerQuote,
 } from "@/lib/agent/collab-client";
 import { AgentInteractionTheater, type TheaterSettlement } from "@/components/agent/AgentInteractionTheater";
+import { WalletCreditsPanel } from "@/components/agent/WalletCreditsPanel";
 import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 import type { StrategyPacket } from "@/lib/types";
 import type { Signer } from "@zerodev/sdk/types";
@@ -59,6 +60,14 @@ interface Agreement {
   cadence: AgreementCadence;
   pricePerInstallmentUsdc: string;
   cooldownSeconds: number;
+  selectedJobTitle: string | null;
+  selectedJobDescription: string | null;
+  callBudgetPerPeriod: number;
+  tokenBudgetPerPeriod: number;
+  updatesPerPeriod: number;
+  duneLinked: boolean;
+  duneUrl: string | null;
+  termsHash: string | null;
   consumedUnits: number;
   interactionCount: number;
   lastInteractionAt: string | null;
@@ -132,12 +141,18 @@ interface SellerReview {
   ts: string;
 }
 
+interface SellerService {
+  title: string;
+  description: string;
+}
+
 interface SellerDetail {
   agentId: string;
   agentName: string;
   description: string | null;
   category: string | null;
   attachedSkillTitles: string[];
+  services: SellerService[];
   price: string;
   reputationScore: number | null;
   reputationCount: number;
@@ -387,7 +402,11 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
         error?: string;
       };
       if (!pfRes.ok || !pf.configured || pf.accountIndex == null || !pf.mintConfig) {
-        throw new Error(pf.error ?? "Buyer preflight failed.");
+        const friendly =
+          pfRes.status === 403
+            ? "Pick one of your own agents to pay from in the “Pay from agent” menu, and fund it with credits above."
+            : (pf.error ?? "Buyer preflight failed.");
+        throw new Error(friendly);
       }
 
       setPhase("quoting");
@@ -462,7 +481,11 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
         error?: string;
       };
       if (!reqRes.ok || !reqData.ok || !reqData.packet) {
-        throw new Error(reqData.error ?? "Strategy request failed.");
+        const friendly =
+          reqRes.status === 403
+            ? "Pick one of your own agents to pay from in the “Pay from agent” menu, and fund it with credits above."
+            : (reqData.error ?? "Strategy request failed.");
+        throw new Error(friendly);
       }
       setPacket(reqData.packet);
       if (reqData.settlement) setSettlement(reqData.settlement);
@@ -508,6 +531,13 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
     totalInstallments: number;
     mode: AgreementMode;
     cadence: AgreementCadence;
+    selectedJobTitle?: string | null;
+    selectedJobDescription?: string | null;
+    callBudgetPerPeriod?: number;
+    tokenBudgetPerPeriod?: number;
+    updatesPerPeriod?: number;
+    duneLinked?: boolean;
+    duneUrl?: string | null;
   }) {
     if (!buyerAgentId) return { ok: false, error: "Pick a buyer agent first." };
     const res = await fetch("/api/collab/agreements", {
@@ -600,18 +630,26 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
 
   if (buyerAgents.length === 0) {
     return (
-      <div className="glass rounded-2xl p-6 text-sm text-ink-300">
-        You need an on-chain agent to pay from.{" "}
-        <a href="/agents#create" className="font-medium text-electric-400 hover:text-electric-300">
-          Launch one on the Agents tab
-        </a>{" "}
-        first.
+      <div className="space-y-6">
+        <WalletCreditsPanel />
+        <div className="glass rounded-2xl p-6 text-sm text-ink-300">
+          You have a credits wallet, but you need an on-chain agent to pay sellers from.{" "}
+          <a href="/agents#create" className="font-medium text-electric-400 hover:text-electric-300">
+            Launch one on the Agents tab
+          </a>{" "}
+          first, then fund it with credits above.
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      <WalletCreditsPanel
+        buyerAgents={buyerAgents}
+        onChange={() => void loadCredits(buyerAgentId)}
+      />
+
       <div className="glass space-y-2 rounded-2xl p-6">
         <label className="block space-y-1.5">
           <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
@@ -1030,6 +1068,52 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
   );
 }
 
+/** Compact summary of the richer agreement terms (job, budgets, Dune). */
+function AgreementTerms({ a }: { a: Agreement }) {
+  const chips: string[] = [];
+  if (a.callBudgetPerPeriod > 0) chips.push(`${a.callBudgetPerPeriod} calls/period`);
+  if (a.tokenBudgetPerPeriod > 0) chips.push(`${a.tokenBudgetPerPeriod} tokens/period`);
+  if (a.updatesPerPeriod > 0) chips.push(`${a.updatesPerPeriod} updates/period`);
+  const hasJob = Boolean(a.selectedJobTitle);
+  if (!hasJob && chips.length === 0 && !a.duneLinked) return null;
+  return (
+    <div className="mt-1 space-y-1">
+      {hasJob && (
+        <p className="text-[11px] text-ink-300">
+          <span className="font-medium text-ink-200">Job:</span> {a.selectedJobTitle}
+        </p>
+      )}
+      {(chips.length > 0 || a.duneLinked) && (
+        <div className="flex flex-wrap gap-1.5">
+          {chips.map((c) => (
+            <span
+              key={c}
+              className="rounded border border-ink-700 bg-ink-900/60 px-1.5 py-0.5 text-[10px] text-ink-300"
+            >
+              {c}
+            </span>
+          ))}
+          {a.duneLinked &&
+            (a.duneUrl ? (
+              <a
+                href={a.duneUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 rounded border border-electric-500/40 bg-electric-500/10 px-1.5 py-0.5 text-[10px] text-electric-300 hover:bg-electric-500/20"
+              >
+                <ExternalLink className="h-2.5 w-2.5" /> Dune
+              </a>
+            ) : (
+              <span className="rounded border border-electric-500/40 bg-electric-500/10 px-1.5 py-0.5 text-[10px] text-electric-300">
+                Dune linked
+              </span>
+            ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AgreementsPanel({
   asBuyer,
   asSeller,
@@ -1078,6 +1162,7 @@ function AgreementsPanel({
                 · up to {a.maxUnitsPerInteraction} units/interaction
               </p>
               <p className="mt-0.5 text-xs italic text-ink-400">“{a.objective}”</p>
+              <AgreementTerms a={a} />
               <p className="mt-0.5 text-[11px] text-ink-500">
                 {a.pricePerInstallmentUsdc} credits / {a.mode === "recurring" ? "check-in" : "task"}
                 {a.mode === "recurring" ? ` · ${CADENCE_LABEL[a.cadence]} cadence` : ""}
@@ -1139,6 +1224,7 @@ function AgreementsPanel({
                   </span>
                 </div>
                 <p className="mt-0.5 text-xs italic text-ink-400">“{a.objective}”</p>
+                <AgreementTerms a={a} />
                 <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-ink-500">
                   {a.mode === "recurring"
                     ? `Recurring · ${CADENCE_LABEL[a.cadence]} · ${a.totalInstallments} check-ins`
@@ -1209,6 +1295,13 @@ function SellerDetailModal({
     totalInstallments: number;
     mode: AgreementMode;
     cadence: AgreementCadence;
+    selectedJobTitle?: string | null;
+    selectedJobDescription?: string | null;
+    callBudgetPerPeriod?: number;
+    tokenBudgetPerPeriod?: number;
+    updatesPerPeriod?: number;
+    duneLinked?: boolean;
+    duneUrl?: string | null;
   }) => Promise<{ ok: boolean; error?: string }>;
 }) {
   return (
@@ -1290,6 +1383,28 @@ function SellerDetailModal({
               )}
             </div>
 
+            {/* Jobs this seller can do */}
+            {detail.services.length > 0 && (
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-ink-400">
+                  Jobs this agent can do
+                </p>
+                <ul className="mt-2 space-y-1.5">
+                  {detail.services.map((s, i) => (
+                    <li
+                      key={i}
+                      className="rounded-lg border border-ink-800 bg-ink-900/40 px-3 py-2"
+                    >
+                      <p className="text-sm font-medium text-ink-100">{s.title}</p>
+                      {s.description && (
+                        <p className="mt-0.5 text-xs text-ink-400">{s.description}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Reviews */}
             <div>
               <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-ink-400">
@@ -1363,7 +1478,11 @@ function SellerDetailModal({
             </div>
 
             {/* Propose an installment agreement (human-in-the-loop). */}
-            <ProposeAgreementForm price={detail.price} onPropose={onPropose} />
+            <ProposeAgreementForm
+              price={detail.price}
+              services={detail.services}
+              onPropose={onPropose}
+            />
           </div>
         )}
       </div>
@@ -1373,15 +1492,24 @@ function SellerDetailModal({
 
 function ProposeAgreementForm({
   price,
+  services,
   onPropose,
 }: {
   price: string;
+  services: SellerService[];
   onPropose: (input: {
     objective: string;
     maxUnitsPerInteraction: number;
     totalInstallments: number;
     mode: AgreementMode;
     cadence: AgreementCadence;
+    selectedJobTitle?: string | null;
+    selectedJobDescription?: string | null;
+    callBudgetPerPeriod?: number;
+    tokenBudgetPerPeriod?: number;
+    updatesPerPeriod?: number;
+    duneLinked?: boolean;
+    duneUrl?: string | null;
   }) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const [open, setOpen] = useState(false);
@@ -1390,10 +1518,16 @@ function ProposeAgreementForm({
   const [mode, setMode] = useState<AgreementMode>("recurring");
   const [cadence, setCadence] = useState<Exclude<AgreementCadence, "none">>("weekly");
   const [periods, setPeriods] = useState(4);
+  const [selectedJob, setSelectedJob] = useState("");
+  const [callBudget, setCallBudget] = useState("");
+  const [tokenBudget, setTokenBudget] = useState("");
+  const [updates, setUpdates] = useState("");
+  const [duneUrl, setDuneUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const isRecurring = mode === "recurring";
+  const chosenService = services.find((s) => s.title === selectedJob) ?? null;
 
   if (!open) {
     return (
@@ -1430,6 +1564,28 @@ function ProposeAgreementForm({
           </button>
         ))}
       </div>
+
+      {/* Pick one of the seller's advertised jobs (optional). */}
+      {services.length > 0 && (
+        <label className="block space-y-1">
+          <span className="text-[11px] text-ink-400">Job (from this agent&apos;s catalog)</span>
+          <select
+            value={selectedJob}
+            onChange={(e) => setSelectedJob(e.target.value)}
+            className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-xs text-ink-100 outline-none focus:border-signal-400/60"
+          >
+            <option value="">General objective (no specific job)</option>
+            {services.map((s) => (
+              <option key={s.title} value={s.title}>
+                {s.title}
+              </option>
+            ))}
+          </select>
+          {chosenService?.description && (
+            <span className="block text-[10px] text-ink-500">{chosenService.description}</span>
+          )}
+        </label>
+      )}
 
       <label className="block space-y-1">
         <span className="text-[11px] text-ink-400">What do you want this agent to do?</span>
@@ -1497,10 +1653,68 @@ function ProposeAgreementForm({
         )}
       </div>
 
+      {/* Per-period budgets (the chatbot-style allowance) + update cadence. */}
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block space-y-1">
+          <span className="text-[11px] text-ink-400">Calls / period</span>
+          <input
+            type="number"
+            min={0}
+            value={callBudget}
+            onChange={(e) => setCallBudget(e.target.value)}
+            placeholder="1"
+            className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-xs text-ink-100 outline-none focus:border-signal-400/60"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-[11px] text-ink-400">Tokens / period</span>
+          <input
+            type="number"
+            min={0}
+            value={tokenBudget}
+            onChange={(e) => setTokenBudget(e.target.value)}
+            placeholder="unlimited"
+            className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-xs text-ink-100 outline-none focus:border-signal-400/60"
+          />
+        </label>
+      </div>
+
+      <label className="block space-y-1">
+        <span className="text-[11px] text-ink-400">Updates the seller delivers / period</span>
+        <input
+          type="number"
+          min={0}
+          value={updates}
+          onChange={(e) => setUpdates(e.target.value)}
+          placeholder="optional"
+          className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-xs text-ink-100 outline-none focus:border-signal-400/60"
+        />
+      </label>
+
+      <label className="block space-y-1">
+        <span className="text-[11px] text-ink-400">Dune dashboard link (optional)</span>
+        <input
+          type="url"
+          value={duneUrl}
+          onChange={(e) => setDuneUrl(e.target.value)}
+          placeholder="https://dune.com/…"
+          className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-xs text-ink-100 outline-none focus:border-signal-400/60"
+        />
+        <span className="block text-[10px] text-ink-500">
+          When set, the deliverable is committed as connected to this Dune dashboard.
+        </span>
+      </label>
+
       <p className="text-[11px] text-ink-500">
         {isRecurring
           ? `${periods} ${cadence} check-ins, ≤ ${maxUnits} units each, at ${price} credits per check-in. You manually run each check-in when it's due; every one delivers a fresh report and is recorded on-chain.`
           : `A single task, ≤ ${maxUnits} units, at ${price} credits. It delivers one report and is recorded on-chain.`}{" "}
+        {callBudget && Number(callBudget) > 0
+          ? `Up to ${callBudget} calls per period. `
+          : ""}
+        {tokenBudget && Number(tokenBudget) > 0
+          ? `Up to ${tokenBudget} tokens per period. `
+          : ""}
         The seller must approve before any exchange.
       </p>
       {err && <p className="text-[11px] text-rose-300">{err}</p>}
@@ -1517,6 +1731,13 @@ function ProposeAgreementForm({
               totalInstallments: isRecurring ? periods : 1,
               mode,
               cadence: isRecurring ? cadence : "none",
+              selectedJobTitle: chosenService?.title ?? null,
+              selectedJobDescription: chosenService?.description ?? null,
+              callBudgetPerPeriod: callBudget.trim() === "" ? 0 : Number(callBudget),
+              tokenBudgetPerPeriod: tokenBudget.trim() === "" ? 0 : Number(tokenBudget),
+              updatesPerPeriod: updates.trim() === "" ? 0 : Number(updates),
+              duneLinked: duneUrl.trim() !== "",
+              duneUrl: duneUrl.trim() === "" ? null : duneUrl.trim(),
             });
             setBusy(false);
             if (!r.ok) setErr(r.error ?? "Could not propose.");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -12,9 +12,25 @@ export interface SectionNavItem {
 interface SectionNavProps {
   items: SectionNavItem[];
   className?: string;
+  /**
+   * "sidebar" (default) renders mobile pills + a desktop sticky vertical nav.
+   * "bar" renders a single horizontal sticky bar across all breakpoints — used
+   * as a top jump-nav on long single-column pages (e.g. the agent page).
+   */
+  variant?: "sidebar" | "bar";
+  /** Optional content pinned to the end of the "bar" variant (e.g. a CTA link). */
+  trailing?: ReactNode;
+  /** Tailwind `top-*` offset for the sticky "bar" (defaults to `top-16`). */
+  stickyTopClassName?: string;
 }
 
-export function SectionNav({ items, className }: SectionNavProps) {
+export function SectionNav({
+  items,
+  className,
+  variant = "sidebar",
+  trailing,
+  stickyTopClassName,
+}: SectionNavProps) {
   const [activeId, setActiveId] = useState(items[0]?.id ?? "");
 
   useEffect(() => {
@@ -67,6 +83,17 @@ export function SectionNav({ items, className }: SectionNavProps) {
       {item.label}
     </button>
   );
+
+  if (variant === "bar") {
+    return (
+      <div className={cn("sticky z-30", stickyTopClassName ?? "top-16", className)}>
+        <div className="flex items-center gap-2 overflow-x-auto rounded-xl border border-ink-800/60 bg-ink-950/80 px-3 py-2 backdrop-blur">
+          {items.map(navLink)}
+          {trailing ? <div className="shrink-0 pl-1">{trailing}</div> : null}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

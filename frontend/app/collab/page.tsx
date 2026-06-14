@@ -4,9 +4,8 @@ import { ChevronRight, Activity, LogIn } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { CollabBrowser } from "@/components/agent/CollabBrowser";
 import { getAgentProfile } from "@/lib/agent/memory";
+import { listOwnedAgentIds } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
-import { listUserAgentIds } from "@/lib/auth/users";
-import { userAgentId } from "@/lib/agent/user-agent";
 
 export const metadata = { title: "Agent collaboration" };
 export const dynamic = "force-dynamic";
@@ -17,9 +16,7 @@ export default async function CollabPage() {
   const buyerAgents = session
     ? (
         await Promise.all(
-          [userAgentId(session.userId), ...(await listUserAgentIds(session.userId))].map((id) =>
-            getAgentProfile(id),
-          ),
+          (await listOwnedAgentIds(session.userId)).map((id) => getAgentProfile(id)),
         )
       )
         .filter((p): p is NonNullable<typeof p> => Boolean(p) && p!.onChain && p!.accountIndex != null)

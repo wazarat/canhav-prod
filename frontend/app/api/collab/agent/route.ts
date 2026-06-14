@@ -1,9 +1,33 @@
 import { NextResponse } from "next/server";
 
-import { getAgentProfile, setAgentCollabSettings } from "@/lib/agent/memory";
+import { getAgentProfile, setAgentCollabSettings, type AgentService } from "@/lib/agent/memory";
 import { parseUsdcToBaseUnits } from "@/lib/agent/collab-config";
 import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
+
+const MAX_SERVICES = 8;
+const SERVICE_TITLE_MAX = 80;
+const SERVICE_DESC_MAX = 300;
+
+/** Sanitize a raw services array: trim, cap lengths, drop empties, cap count. */
+function sanitizeServices(raw: unknown): AgentService[] | undefined {
+  if (raw === undefined) return undefined;
+  if (!Array.isArray(raw)) return [];
+  const out: AgentService[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const title = typeof (item as AgentService).title === "string"
+      ? (item as AgentService).title.trim().slice(0, SERVICE_TITLE_MAX)
+      : "";
+    const description = typeof (item as AgentService).description === "string"
+      ? (item as AgentService).description.trim().slice(0, SERVICE_DESC_MAX)
+      : "";
+    if (!title) continue;
+    out.push({ title, description });
+    if (out.length >= MAX_SERVICES) break;
+  }
+  return out;
+}
 
 /**
  * Owner-only collaboration settings for an agent: opt into discovery + set the
@@ -26,6 +50,7 @@ export async function POST(req: Request) {
     collabPriceUsdc?: string | null;
     description?: string | null;
     collabMaxUnits?: number | string | null;
+    services?: unknown;
   } = {};
   try {
     body = (await req.json()) as typeof body;
@@ -82,11 +107,14 @@ export async function POST(req: Request) {
   // can each PATCH their own fields without clobbering the other's.
   const discoverable = typeof body.discoverable === "boolean" ? body.discoverable : undefined;
 
+  const services = sanitizeServices(body.services);
+
   const updated = await setAgentCollabSettings(agentId, {
     discoverable,
     collabPriceUsdc: price,
     description,
     collabMaxUnits,
+    services,
   });
   if (!updated) {
     return NextResponse.json({ ok: false, error: "Agent not found." }, { status: 404 });
@@ -99,5 +127,6 @@ export async function POST(req: Request) {
     collabPriceUsdc: profile?.collabPriceUsdc ?? null,
     description: profile?.description ?? null,
     collabMaxUnits: profile?.collabMaxUnits ?? null,
+    services: profile?.services ?? [],
   });
 }

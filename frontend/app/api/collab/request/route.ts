@@ -103,6 +103,8 @@ export async function POST(req: Request) {
   const agreementId = (body.agreementId ?? "").trim();
   let drip: { installmentIndex: number; totalInstallments: number; units: number } | undefined;
   let recordUnits = 1;
+  // Token/credit draw for this call (checked against the per-period token budget).
+  let recordTokens = 0;
   let onChainAgreementId: `0x${string}` =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
   // The REAL on-chain agreement id (set only once the agreement was anchored via
@@ -121,7 +123,8 @@ export async function POST(req: Request) {
       );
     }
     const requestedUnits = Math.floor(body.units ?? agreement.maxUnitsPerInteraction);
-    const check = validateInteraction(agreement, requestedUnits, session.userId);
+    const requestedTokens = Math.max(0, Math.floor(body.constraints?.maxAnswerTokens ?? 0));
+    const check = validateInteraction(agreement, requestedUnits, session.userId, requestedTokens);
     if (!check.ok) {
       return NextResponse.json(
         { ok: false, error: check.error, retryAt: check.retryAt },
@@ -129,6 +132,7 @@ export async function POST(req: Request) {
       );
     }
     recordUnits = requestedUnits;
+    recordTokens = requestedTokens;
     drip = {
       installmentIndex: check.installmentIndex ?? agreement.interactionCount,
       totalInstallments: agreement.totalInstallments,
@@ -205,7 +209,12 @@ export async function POST(req: Request) {
   // failed exchange never burns an installment. Re-validates atomically.
   let agreementState = null;
   if (agreementId) {
-    const consumed = await consumeAgreementInteraction(agreementId, recordUnits, session.userId);
+    const consumed = await consumeAgreementInteraction(
+      agreementId,
+      recordUnits,
+      session.userId,
+      recordTokens,
+    );
     if (!consumed.ok) {
       return NextResponse.json({ ok: false, error: consumed.error }, { status: 409 });
     }
@@ -304,6 +313,7 @@ export async function POST(req: Request) {
           collabAgreement,
           onChainAgreementId: anchoredAgreementOnChainId,
           units: Math.min(disclosedUnits, 0xffffffff),
+          tokens: String(recordTokens),
           accountIndex: buyer.accountIndex,
           mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
         }

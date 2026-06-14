@@ -107,6 +107,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     pricePerInstallment = "0";
   }
 
+  const ZERO_HASH = "0x0000000000000000000000000000000000000000000000000000000000000000";
+  const termsHash =
+    agreement.termsHash && /^0x[0-9a-fA-F]{64}$/.test(agreement.termsHash)
+      ? agreement.termsHash
+      : ZERO_HASH;
+
   return NextResponse.json({
     configured: true,
     establish: {
@@ -120,6 +126,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       expiry: 0,
       mode: modeEnum(agreement.mode),
       cadence: cadenceEnum(agreement.cadence),
+      // Richer terms committed on-chain (token/call counts are unscaled integers).
+      callBudgetPerPeriod: agreement.callBudgetPerPeriod,
+      tokenBudgetPerPeriod: String(agreement.tokenBudgetPerPeriod),
+      updatesPerPeriod: agreement.updatesPerPeriod,
+      duneLinked: agreement.duneLinked,
+      termsHash,
       accountIndex: buyer.accountIndex,
       mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
     },

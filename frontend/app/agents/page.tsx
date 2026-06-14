@@ -10,6 +10,7 @@ import {
   ArrowRight,
   Bot,
   Store,
+  Coins,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
@@ -35,7 +36,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 interface CapabilityRow {
-  key: "openai" | "upstash" | "zerodev";
+  key: "openai" | "upstash" | "zerodev" | "tcnhv";
   icon: typeof BrainCircuit;
   label: string;
   ready: boolean;
@@ -146,6 +147,16 @@ export default async function AgentsPage() {
       readyHint: "Agents can mint a wallet-owned ERC-8004 identity (gas sponsored).",
       pendingHint:
         "Deploy the registries + create a ZeroDev project, then set ZERODEV_RPC, IDENTITY_REGISTRY_ADDRESS, SECURITY_REGISTRY_ADDRESS, NEXT_PUBLIC_PRIVY_APP_ID, and PRIVY_APP_SECRET.",
+    },
+    {
+      key: "tcnhv",
+      icon: Coins,
+      label: "tCNHV credits (mint + faucet)",
+      ready: status.canMintTcnhv,
+      readyHint: "Starting credits can be minted to treasuries and rewards paid out.",
+      pendingHint: status.tcnhv
+        ? "Token is set but the owner key is missing — set FACTORY_DEPLOYER_PRIVATE_KEY on Vercel, then redeploy."
+        : "Set TCNHV_TOKEN_ADDRESS and FACTORY_DEPLOYER_PRIVATE_KEY on Vercel to enable minting starting credits.",
     },
   ];
 

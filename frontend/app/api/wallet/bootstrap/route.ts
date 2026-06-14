@@ -40,13 +40,27 @@ export async function GET() {
 
   const profile = await getUserProfile(session.userId);
   const cfg = mintConfig();
-  const needsGrant = Boolean(
-    profile && !profile.tcnhvGranted && canMintTcnhv() && hasZeroDev() && cfg,
-  );
+  const granted = Boolean(profile?.tcnhvGranted);
+  const needsGrant = Boolean(profile && !granted && canMintTcnhv() && hasZeroDev() && cfg);
+
+  // Explain *why* a grant isn't offered so the UI can show an actionable
+  // message instead of a generic "not available in this environment".
+  let reason:
+    | "needs_grant"
+    | "already_granted"
+    | "no_profile"
+    | "mint_unconfigured"
+    | "identity_unconfigured" = "needs_grant";
+  if (needsGrant) reason = "needs_grant";
+  else if (!profile) reason = "no_profile";
+  else if (granted) reason = "already_granted";
+  else if (!canMintTcnhv()) reason = "mint_unconfigured";
+  else reason = "identity_unconfigured";
 
   return NextResponse.json({
     needsGrant,
-    granted: Boolean(profile?.tcnhvGranted),
+    granted,
+    reason,
     startingAmount: startingTcnhvHuman(),
     mintConfig: needsGrant ? cfg : null,
   });

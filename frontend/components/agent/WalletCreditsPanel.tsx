@@ -31,11 +31,33 @@ interface WalletCredits {
   error?: string;
 }
 
+type BootstrapReason =
+  | "needs_grant"
+  | "already_granted"
+  | "no_profile"
+  | "mint_unconfigured"
+  | "identity_unconfigured";
+
 interface BootstrapStatus {
   needsGrant: boolean;
   granted: boolean;
+  reason?: BootstrapReason;
   startingAmount: string;
   mintConfig: SpawnMintConfig | null;
+}
+
+/** Map a bootstrap GET reason to an actionable user-facing message. */
+function bootstrapReasonMessage(reason?: BootstrapReason): string {
+  switch (reason) {
+    case "mint_unconfigured":
+      return "Minting isn't enabled on the server — set FACTORY_DEPLOYER_PRIVATE_KEY (and TCNHV_TOKEN_ADDRESS) on Vercel, then redeploy.";
+    case "identity_unconfigured":
+      return "On-chain identity isn't configured — set ZERODEV_RPC and the registry addresses on Vercel.";
+    case "no_profile":
+      return "Your profile isn't ready yet — sign out and back in, then try again.";
+    default:
+      return "Starting credits are not available in this environment.";
+  }
 }
 
 interface AgentCreditsStatus {
@@ -45,6 +67,7 @@ interface AgentCreditsStatus {
   accountIndex: number;
   token: string;
   mintConfig: SpawnMintConfig | null;
+  error?: string;
 }
 
 interface TransferPreflight {
@@ -223,10 +246,8 @@ export function WalletCreditsPanel({
     }
     try {
       const res = await fetch(`/api/agent/credits?agentId=${encodeURIComponent(agentId)}`);
-      if (!res.ok) {
-        setAgentCredits(null);
-        return;
-      }
+      // Keep the body even on non-2xx (e.g. 400 for off-chain agents) so the UI
+      // can explain why the faucet is unavailable instead of silently disabling.
       setAgentCredits((await res.json()) as AgentCreditsStatus);
     } catch {
       setAgentCredits(null);
@@ -298,7 +319,7 @@ export function WalletCreditsPanel({
         return;
       }
       if (!boot.needsGrant) {
-        throw new Error("Starting credits are not available in this environment.");
+        throw new Error(bootstrapReasonMessage(boot.reason));
       }
       const cfg = boot.mintConfig ?? info?.mintConfig;
       if (!cfg) throw new Error("Wallet configuration is missing — check ZeroDev + tCNHV env vars.");
@@ -520,6 +541,20 @@ export function WalletCreditsPanel({
               {claiming ? "Claiming…" : "Claim 100 tCNHV (faucet)"}
             </button>
           )}
+          {buyerAgents.length > 0 &&
+            fundAgentId &&
+            agentCredits &&
+            !claiming &&
+            (!agentCredits.canClaim || !agentCredits.mintConfig) && (
+              <span className="text-[11px] text-ink-500">
+                {!agentCredits.configured
+                  ? (agentCredits.error ??
+                    "Mint this agent on-chain to enable the faucet.")
+                  : !agentCredits.mintConfig
+                    ? "On-chain identity isn't configured — set ZERODEV_RPC and registry addresses on Vercel."
+                    : "Faucet is on cooldown — try again later."}
+              </span>
+            )}
           {!bootstrap?.needsGrant && bootstrap?.granted && (
             <span className="text-[11px] text-ink-500">
               Starting grant received · fund an agent below to spend on collabs

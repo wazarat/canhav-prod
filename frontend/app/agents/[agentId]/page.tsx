@@ -40,8 +40,7 @@ import { buildAgentSuggestions, type AgentSuggestion } from "@/lib/agent/suggest
 import { readAgentLedger, verifyAgentOnChain } from "@/lib/agent/onchain";
 import { getAgentSkills } from "@/lib/agent/skills";
 import { getSession } from "@/lib/auth/session";
-import { listUserAgentIds } from "@/lib/auth/users";
-import { userAgentId } from "@/lib/agent/user-agent";
+import { userOwnsAgent } from "@/lib/agent/ownership";
 
 export const dynamic = "force-dynamic";
 
@@ -60,10 +59,9 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
 
   // Only the owner can attach skills / toggle discoverability.
   const session = getSession();
-  const ownedIds = session
-    ? new Set([userAgentId(session.userId), ...(await listUserAgentIds(session.userId))])
-    : new Set<string>();
-  const isOwner = ownedIds.has(agentId);
+  const isOwner = session
+    ? await userOwnsAgent(session.userId, agentId, profile.ownerUserId)
+    : false;
 
   // Enrichment state feeds the level for everyone; the editing surfaces
   // (options + suggestions) are owner-only.

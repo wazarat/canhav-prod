@@ -1,10 +1,9 @@
 import "server-only";
 
 import { getAgentProfile } from "@/lib/agent/memory";
-import { userAgentId } from "@/lib/agent/user-agent";
+import { userOwnsAgent } from "@/lib/agent/ownership";
 import { hasDuneWrite } from "@/lib/server/dune";
 import { getRedisClient, hasUpstash } from "@/lib/server/redis";
-import { listUserAgentIds } from "@/lib/auth/users";
 
 /**
  * Off-chain gate for the `dune_publishVerdict` tool. The platform's on-chain
@@ -36,13 +35,10 @@ export async function canPublishVerdict(
     return { ok: false, reason: "Publishing to Dune is turned off for this agent." };
   }
 
-  // Ownership: only the owner may publish on an agent's behalf. When no session
-  // user id is threaded through, deny rather than write on an unverified caller.
   if (!ownerUserId) {
     return { ok: false, reason: "Sign in as the agent owner to publish verdicts." };
   }
-  const ownedIds = new Set([userAgentId(ownerUserId), ...(await listUserAgentIds(ownerUserId))]);
-  if (!ownedIds.has(agentId)) {
+  if (!(await userOwnsAgent(ownerUserId, agentId, profile.ownerUserId))) {
     return { ok: false, reason: "Only the agent owner can publish its verdicts." };
   }
 

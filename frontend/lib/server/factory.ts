@@ -82,6 +82,16 @@ const tokenAbi = [
     ],
     outputs: [],
   },
+  {
+    type: "function",
+    name: "mint",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "to", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    outputs: [],
+  },
 ] as const;
 
 const ZERO = "0x0000000000000000000000000000000000000000";
@@ -121,6 +131,11 @@ function deployerKey(): Hex | null {
 /** Whether the factory wiring is provisioned enough to write (address + owner key). */
 export function hasFactory(): boolean {
   return Boolean(factoryAddress() && deployerKey());
+}
+
+/** Whether the tCNHV token + owner key are provisioned enough to mint rewards. */
+export function canMintTcnhv(): boolean {
+  return Boolean(tokenAddress() && deployerKey());
 }
 
 function publicClient() {
@@ -318,6 +333,46 @@ export async function recordWorkOnLedger(params: {
         params.earned,
         params.gasWei,
       ],
+    });
+    await publicClient().waitForTransactionReceipt({ hash });
+    return { ok: true, txHash: hash };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export interface MintRewardResult {
+  ok: boolean;
+  txHash?: string;
+}
+
+/**
+ * Mint a tCNHV reward to an address with the platform owner (deployer) key.
+ * `CnhvToken.mint` is owner-gated, so it is signed here with the single
+ * server-side owner key — never the agent's wallet. Minting bypasses the
+ * merit-signal transfer restriction (`from == address(0)`), so the recipient
+ * need not be allowlisted to receive a reward.
+ *
+ * Skips cleanly (never throws) when tCNHV / the deployer key is unconfigured,
+ * the recipient address is invalid, or the amount is zero.
+ */
+export async function mintTcnhvReward(params: {
+  to: string;
+  amount: bigint;
+}): Promise<MintRewardResult> {
+  const token = tokenAddress();
+  const wallet = walletClient();
+  const to = safeAddress(params.to);
+  if (!token || !wallet || !to || params.amount <= 0n) {
+    return { ok: false };
+  }
+
+  try {
+    const hash = await wallet.writeContract({
+      address: token,
+      abi: tokenAbi,
+      functionName: "mint",
+      args: [to, params.amount],
     });
     await publicClient().waitForTransactionReceipt({ hash });
     return { ok: true, txHash: hash };

@@ -6,10 +6,9 @@ import { agentOfferHash, agentOfferSkillId } from "@/lib/agent/agentOffer";
 import { collabAgreementAddress, collabRegistryAddress } from "@/lib/agent/collab-config";
 import { hasZeroDev } from "@/lib/agent/config";
 import { appendMemory, getAgentProfile, markSkillStudied } from "@/lib/agent/memory";
+import { userOwnsAgent } from "@/lib/agent/ownership";
 import { strategyPacketToMarkdown } from "@/lib/agent/strategyPacket";
 import { getSession } from "@/lib/auth/session";
-import { listUserAgentIds } from "@/lib/auth/users";
-import { userAgentId } from "@/lib/agent/user-agent";
 import {
   consumeAgreementInteraction,
   getAgreement,
@@ -82,8 +81,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const ownedIds = new Set([userAgentId(session.userId), ...(await listUserAgentIds(session.userId))]);
-  if (!ownedIds.has(fromAgentId)) {
+  if (!(await userOwnsAgent(session.userId, fromAgentId))) {
     return NextResponse.json({ ok: false, error: "Buyer agent isn't yours." }, { status: 403 });
   }
   if (toAgentId === fromAgentId) {

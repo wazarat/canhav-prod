@@ -39,8 +39,10 @@ import { OWNER_CORRECTION_SOURCE } from "@/lib/agent/prompt";
 import { buildAgentSuggestions, type AgentSuggestion } from "@/lib/agent/suggestions";
 import { readAgentLedger, verifyAgentOnChain } from "@/lib/agent/onchain";
 import { getAgentSkills } from "@/lib/agent/skills";
+import { collabSettlement, hasTcnhv } from "@/lib/agent/collab-config";
 import { getSession } from "@/lib/auth/session";
 import { userOwnsAgent } from "@/lib/agent/ownership";
+import { canMintTcnhv } from "@/lib/server/factory";
 
 export const dynamic = "force-dynamic";
 
@@ -213,6 +215,8 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
           hasSkill={attachedSkillIds.length > 0}
           discoverable={profile.discoverable}
           collabPriceUsdc={profile.collabPriceUsdc}
+          settlementAsset={collabSettlement().name}
+          tcnhvRewards={hasTcnhv() && canMintTcnhv()}
         />
       )}
 

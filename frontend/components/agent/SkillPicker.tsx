@@ -1,16 +1,27 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Building2, Check, ChevronDown, Coins, Gem, Landmark, Search, X } from "lucide-react";
+import {
+  Building2,
+  Check,
+  ChevronDown,
+  Coins,
+  Gem,
+  Landmark,
+  Search,
+  Sparkles,
+  X,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-/** Lightweight, client-safe projection of a platform skill for the picker. */
+/** Lightweight, client-safe projection of a skill for the picker. */
 export interface SkillPickerOption {
   id: string;
   title: string;
   summary?: string;
-  group: "entity" | "stablecoin" | "rwa" | "token";
+  /** "user" = a skill the signed-in user authored ("My Skills"). */
+  group: "user" | "entity" | "stablecoin" | "rwa" | "token";
 }
 
 const GROUP_META: {
@@ -19,6 +30,7 @@ const GROUP_META: {
   icon: typeof Coins;
   hint: string;
 }[] = [
+  { id: "user", label: "My Skills", icon: Sparkles, hint: "Skills you created" },
   { id: "entity", label: "Entities", icon: Building2, hint: "Umbrella protocols" },
   { id: "stablecoin", label: "Stablecoins", icon: Coins, hint: "Pegged assets" },
   { id: "rwa", label: "RWAs", icon: Landmark, hint: "Real-world assets" },
@@ -52,7 +64,7 @@ export function SkillPicker({
   maxHeightClass?: string;
 }) {
   const [query, setQuery] = useState("");
-  const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set(["entity"]));
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set(["user", "entity"]));
 
   const selectedSet = useMemo(() => new Set(selected), [selected]);
   const lockedSet = useMemo(() => new Set(lockedIds), [lockedIds]);

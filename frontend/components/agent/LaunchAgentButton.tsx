@@ -84,16 +84,35 @@ export function LaunchAgentButton({
     if (!skillId && skills[0]?.id) setSkillId(skills[0].id);
   }, [skills, skillId]);
 
-  // Full platform skill catalog (entities + stablecoins + RWAs + tokens) so
-  // the owner can hand the new agent extra knowledge at creation.
+  // Full skill catalog so the owner can hand the new agent extra knowledge at
+  // creation: the platform catalog (entities + stablecoins + RWAs + tokens) plus
+  // the signed-in user's own authored skills ("My Skills"). Refetched on login
+  // so My Skills appears once the session cookie is live.
   useEffect(() => {
     let active = true;
     (async () => {
       try {
-        const res = await fetch("/api/agent/skills");
-        if (!res.ok) return;
-        const data = (await res.json()) as { skills?: SkillPickerOption[] };
-        if (active && data.skills) setCatalog(data.skills);
+        const [platformRes, userRes] = await Promise.all([
+          fetch("/api/agent/skills"),
+          fetch("/api/collab/skills").catch(() => null),
+        ]);
+        const platform: SkillPickerOption[] = platformRes.ok
+          ? ((await platformRes.json()) as { skills?: SkillPickerOption[] }).skills ?? []
+          : [];
+        let mine: SkillPickerOption[] = [];
+        if (userRes && userRes.ok) {
+          const data = (await userRes.json()) as {
+            skills?: { id: string; title: string; summary?: string }[];
+          };
+          mine = (data.skills ?? []).map((s) => ({
+            id: s.id,
+            title: s.title,
+            summary: s.summary,
+            group: "user" as const,
+          }));
+        }
+        // My Skills first so the owner's own knowledge is front and center.
+        if (active) setCatalog([...mine, ...platform]);
       } catch {
         // Catalog is optional sugar — the bound entity skill still works.
       }
@@ -101,7 +120,7 @@ export function LaunchAgentButton({
     return () => {
       active = false;
     };
-  }, []);
+  }, [authenticated]);
 
   // The bound entity skill is always part of the selection and can't be removed.
   const pickerSelection = useMemo(
@@ -199,6 +218,13 @@ export function LaunchAgentButton({
       });
 
       // 4) Persist the minted identity server-side (no signing on Vercel).
+      // Platform extras are studied; user-authored skills ("My Skills") are
+      // fully grounded into memory, so they're sent under a separate key.
+      const userSkillIdSet = new Set(
+        catalog.filter((o) => o.group === "user").map((o) => o.id),
+      );
+      const platformExtraIds = extraSkillIds.filter((id) => !userSkillIdSet.has(id));
+      const userSkillIds = extraSkillIds.filter((id) => userSkillIdSet.has(id));
       const res = await fetch("/api/agent/spawn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -208,7 +234,8 @@ export function LaunchAgentButton({
           mintResult,
           name: agentName.trim() || undefined,
           category: category ?? undefined,
-          extraSkillIds,
+          extraSkillIds: platformExtraIds,
+          userSkillIds,
         }),
       });
       const data = (await res.json()) as SpawnResponse;

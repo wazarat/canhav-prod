@@ -3,9 +3,8 @@ import { NextResponse } from "next/server";
 import { collabUsdcAsset, hasCollab } from "@/lib/agent/collab-config";
 import { hasZeroDev } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
+import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
-import { listUserAgentIds } from "@/lib/auth/users";
-import { userAgentId } from "@/lib/agent/user-agent";
 import { readSecret } from "@/lib/server/env";
 
 /**
@@ -34,8 +33,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ configured: false, error: "agentId is required." }, { status: 400 });
   }
 
-  const ownedIds = new Set([userAgentId(session.userId), ...(await listUserAgentIds(session.userId))]);
-  if (!ownedIds.has(agentId)) {
+  if (!(await userOwnsAgent(session.userId, agentId))) {
     return NextResponse.json({ configured: false, error: "That agent isn't yours." }, { status: 403 });
   }
 

@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 
 import { getAgentProfile, setAgentCollabSettings } from "@/lib/agent/memory";
 import { parseUsdcToBaseUnits } from "@/lib/agent/collab-config";
+import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
-import { listUserAgentIds } from "@/lib/auth/users";
-import { userAgentId } from "@/lib/agent/user-agent";
 
 /**
  * Owner-only collaboration settings for an agent: opt into discovery + set the
@@ -39,8 +38,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "agentId is required." }, { status: 400 });
   }
 
-  const ownedIds = new Set([userAgentId(session.userId), ...(await listUserAgentIds(session.userId))]);
-  if (!ownedIds.has(agentId)) {
+  if (!(await userOwnsAgent(session.userId, agentId))) {
     return NextResponse.json({ ok: false, error: "That agent isn't yours." }, { status: 403 });
   }
 

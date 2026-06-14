@@ -570,16 +570,20 @@ export function CollabBrowser({ buyerAgents }: { buyerAgents: BuyerAgent[] }) {
         ok?: boolean;
         error?: string;
         onChain?: FeedbackParams | null;
+        reward?: { asset: string; amount: string; txHash?: string } | null;
       };
       if (!res.ok || !data.ok) {
         setNotice(data.error ?? "Rating was not accepted.");
       } else {
-        setNotice(`Thanks — rated ${stars}/5.`);
+        const rewardNote = data.reward
+          ? ` ${data.reward.amount} ${data.reward.asset} rewarded to the agent for the great review.`
+          : "";
+        setNotice(`Thanks — rated ${stars}/5.${rewardNote}`);
         if (data.onChain) {
           try {
             const signer = await buildSigner();
             await submitFeedbackOnChain({ signer, feedback: data.onChain });
-            setNotice(`Rated ${stars}/5 and recorded on-chain.`);
+            setNotice(`Rated ${stars}/5 and recorded on-chain.${rewardNote}`);
           } catch {
             /* flag-off / gate / signing issue — Redis rating already stored */
           }

@@ -39,6 +39,28 @@ export function hasTcnhv(): boolean {
   return Boolean(tcnhvAssetAddress());
 }
 
+/** Minimum buyer rating (stars) that earns a tCNHV reward. */
+export const TCNHV_REWARD_MIN_RATING = 4;
+
+/**
+ * The tCNHV reward (base units, 18 decimals) minted to a seller agent for a
+ * verified buyer rating. Tiered: a 5-star review earns more than a 4-star one;
+ * anything below {@link TCNHV_REWARD_MIN_RATING} earns nothing. The per-tier
+ * amounts are configurable via env (human units), defaulting to 10 / 5 tCNHV.
+ */
+export function tcnhvRewardForRating(rating: number): bigint {
+  const stars = Math.round(rating);
+  let human: string | null = null;
+  if (stars >= 5) human = readSecret("COLLAB_REWARD_TCNHV_5STAR") ?? "10";
+  else if (stars === 4) human = readSecret("COLLAB_REWARD_TCNHV_4STAR") ?? "5";
+  if (!human) return 0n;
+  try {
+    return parseAmountToBaseUnits(human, TCNHV_DECIMALS);
+  } catch {
+    return 0n;
+  }
+}
+
 export interface CollabSettlementAsset {
   /** Settlement token contract address. */
   asset: string;

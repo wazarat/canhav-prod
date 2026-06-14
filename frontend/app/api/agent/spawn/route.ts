@@ -12,8 +12,10 @@ import {
 } from "@/lib/agent/memory";
 import { verifyAgentOnChain } from "@/lib/agent/onchain";
 import { getAgentSkillById } from "@/lib/agent/skills";
+import { groundUserSkillOnAgent } from "@/lib/agent/attachUserSkill";
 import { getSession } from "@/lib/auth/session";
 import { getUserEntityAgent, linkAgentToUser, setUserEntityAgent } from "@/lib/auth/users";
+import { getUserSkill } from "@/lib/server/userSkills";
 import { readSecret } from "@/lib/server/env";
 import { ensureAgentLedger, hasFactory } from "@/lib/server/factory";
 
@@ -81,6 +83,7 @@ export async function POST(req: Request) {
     name?: unknown;
     category?: unknown;
     extraSkillIds?: unknown;
+    userSkillIds?: unknown;
   } = {};
   try {
     body = (await req.json()) as typeof body;
@@ -98,6 +101,9 @@ export async function POST(req: Request) {
   const category: AgentCategory | null = isAgentCategory(body.category) ? body.category : null;
   const extraSkillIds = Array.isArray(body.extraSkillIds)
     ? body.extraSkillIds.filter((s): s is string => typeof s === "string" && s.length > 0)
+    : [];
+  const userSkillIds = Array.isArray(body.userSkillIds)
+    ? body.userSkillIds.filter((s): s is string => typeof s === "string" && s.length > 0)
     : [];
 
   if (!isMintResult(body.mintResult)) {
@@ -208,6 +214,20 @@ export async function POST(req: Request) {
     if (extraId === skillId) continue;
     const extra = await getAgentSkillById(extraId);
     if (extra) await markSkillStudied(agentId, extraId);
+  }
+
+  // User-authored skills ("My Skills") the owner selected are fully grounded
+  // into memory (the real "training"), mirroring the attach route. Unknown or
+  // not-owned ids are skipped so they never block a successful mint.
+  for (const userSkillId of userSkillIds) {
+    try {
+      const userSkill = await getUserSkill(userSkillId);
+      if (userSkill && userSkill.authorUserId === session.userId) {
+        await groundUserSkillOnAgent(agentId, userSkill);
+      }
+    } catch {
+      /* additive — never block a successful mint */
+    }
   }
   await linkAgentToUser(session.userId, agentId);
   await setUserEntityAgent(session.userId, slotKey, agentId);

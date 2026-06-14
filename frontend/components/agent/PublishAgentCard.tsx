@@ -10,6 +10,7 @@ import {
   Loader2,
   Radio,
   Save,
+  Sparkles,
   Store,
 } from "lucide-react";
 
@@ -29,12 +30,18 @@ export function PublishAgentCard({
   hasSkill,
   discoverable,
   collabPriceUsdc,
+  settlementAsset = "USDC",
+  tcnhvRewards = false,
 }: {
   agentId: string;
   minted: boolean;
   hasSkill: boolean;
   discoverable: boolean;
   collabPriceUsdc: string | null;
+  /** Active settlement asset name buyers pay in (e.g. "USDC" or "tCNHV"). */
+  settlementAsset?: string;
+  /** Whether the platform mints tCNHV rewards on great reviews. */
+  tcnhvRewards?: boolean;
 }) {
   const router = useRouter();
   const [isDiscoverable, setIsDiscoverable] = useState(discoverable);
@@ -107,7 +114,7 @@ export function PublishAgentCard({
     },
     {
       done: hasPrice,
-      label: "Price set (USDC per request)",
+      label: `Price set (${settlementAsset} per request)`,
       help: hasPrice
         ? "Buyers pay this each period via x402; recorded on-chain."
         : "Optional — a default price applies until you set one.",
@@ -188,7 +195,7 @@ export function PublishAgentCard({
 
         <label className="block space-y-1.5">
           <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
-            Price per request (USDC)
+            Price per request ({settlementAsset})
           </span>
           <input
             value={price}
@@ -199,6 +206,13 @@ export function PublishAgentCard({
             className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm text-ink-100 outline-none focus:border-electric-500/60 disabled:opacity-50"
           />
         </label>
+
+        {tcnhvRewards && (
+          <p className="flex items-start gap-1.5 text-xs text-neon-300/90">
+            <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            Earns bonus tCNHV when buyers leave 4-5 star reviews on a paid request.
+          </p>
+        )}
 
         <div className="flex flex-wrap items-center gap-3">
           <button

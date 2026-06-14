@@ -1,16 +1,23 @@
 import { NextResponse } from "next/server";
 
-import { reputationEnabled, reputationRegistryAddress } from "@/lib/agent/collab-config";
+import {
+  formatAmount,
+  hasTcnhv,
+  reputationEnabled,
+  reputationRegistryAddress,
+  TCNHV_DECIMALS,
+  tcnhvRewardForRating,
+} from "@/lib/agent/collab-config";
 import { hasZeroDev } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
+import { userOwnsAgent } from "@/lib/agent/ownership";
 import { recordReputation } from "@/lib/agent/reputation";
 import { appendReview, MAX_REVIEW_COMMENT_LEN } from "@/lib/agent/reviews";
 import { getSession } from "@/lib/auth/session";
-import { listUserAgentIds } from "@/lib/auth/users";
-import { userAgentId } from "@/lib/agent/user-agent";
 import { listCollabExchanges } from "@/lib/server/collabLog";
 import { tryConsumeRatingRef } from "@/lib/server/collabPayments";
 import { readSecret } from "@/lib/server/env";
+import { canMintTcnhv, hasFactory, mintTcnhvReward, recordWorkOnLedger } from "@/lib/server/factory";
 
 /**
  * Buyer feedback after a completed exchange — EXCHANGE-VERIFIED reputation.
@@ -66,8 +73,7 @@ export async function POST(req: Request) {
   }
 
   // Only an owner of the buyer agent can rate (prevents ballot stuffing).
-  const ownedIds = new Set([userAgentId(session.userId), ...(await listUserAgentIds(session.userId))]);
-  if (!ownedIds.has(fromAgentId)) {
+  if (!(await userOwnsAgent(session.userId, fromAgentId))) {
     return NextResponse.json({ ok: false, error: "Buyer agent isn't yours." }, { status: 403 });
   }
 
@@ -110,6 +116,42 @@ export async function POST(req: Request) {
     paymentRef,
   });
 
+  // tCNHV reward on good results: a verified rating at/above the reward
+  // threshold mints a tiered tCNHV bonus to the SELLER agent's wallet (signed
+  // with the platform owner key) and mirrors it as earned on the seller's
+  // merit ledger. The one-rating-per-exchange guard above (tryConsumeRatingRef)
+  // already prevents double rewards. Additive + best-effort: any failure here
+  // never fails the rating itself.
+  let reward: { asset: "tCNHV"; amount: string; txHash?: string } | null = null;
+  const rewardBase = tcnhvRewardForRating(rating);
+  if (rewardBase > 0n && hasTcnhv() && canMintTcnhv()) {
+    const seller = await getAgentProfile(toAgentId);
+    const sellerWallet = seller?.agentWallet ?? seller?.agentAddress ?? null;
+    if (sellerWallet) {
+      try {
+        const minted = await mintTcnhvReward({ to: sellerWallet, amount: rewardBase });
+        if (minted.ok) {
+          reward = {
+            asset: "tCNHV",
+            amount: formatAmount(rewardBase, TCNHV_DECIMALS),
+            txHash: minted.txHash,
+          };
+          if (hasFactory()) {
+            await recordWorkOnLedger({
+              agentId: toAgentId,
+              counterpartyAgentId: fromAgentId,
+              cnhvDelta: rewardBase,
+              earned: true,
+              gasWei: 0n,
+            });
+          }
+        }
+      } catch {
+        /* additive — never fail the rating on a reward error */
+      }
+    }
+  }
+
   // Flag-off on-chain attestation params.
   const registry = reputationRegistryAddress();
   const zerodevRpc = readSecret("ZERODEV_RPC");
@@ -137,5 +179,5 @@ export async function POST(req: Request) {
         }
       : null;
 
-  return NextResponse.json({ ok: true, summary, review, onChain });
+  return NextResponse.json({ ok: true, summary, review, onChain, reward });
 }

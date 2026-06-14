@@ -1,18 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { hasZeroDev } from "@/lib/agent/config";
-import {
-  appendMemory,
-  attachSkillToAgent,
-  getAgentProfile,
-  getAttachedSkillIds,
-  markSkillStudied,
-} from "@/lib/agent/memory";
-import { skillMarkdownHash } from "@/lib/agent/skillHash";
-import { skillToMarkdown } from "@/lib/agent/skillExport";
+import { groundUserSkillOnAgent } from "@/lib/agent/attachUserSkill";
+import { getAgentProfile, getAttachedSkillIds } from "@/lib/agent/memory";
+import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
-import { listUserAgentIds } from "@/lib/auth/users";
-import { userAgentId } from "@/lib/agent/user-agent";
 import { getUserSkill } from "@/lib/server/userSkills";
 import { readSecret } from "@/lib/server/env";
 
@@ -47,9 +39,16 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     return NextResponse.json({ ok: false, error: "agentId is required." }, { status: 400 });
   }
 
-  // Ownership: the agent must be the caller's default agent or one they own.
-  const ownedIds = new Set([userAgentId(session.userId), ...(await listUserAgentIds(session.userId))]);
-  if (!ownedIds.has(agentId)) {
+  // Load the profile first so the ownership check can honor the canonical
+  // `ownerUserId` (set at mint) even when the Redis index is stale/missing.
+  const profile = await getAgentProfile(agentId);
+  if (!profile) {
+    return NextResponse.json({ ok: false, error: "Agent not found." }, { status: 404 });
+  }
+
+  // Ownership: matches the agent page guard (profile owner OR Redis index OR
+  // the caller's default research agent).
+  if (!(await userOwnsAgent(session.userId, agentId, profile.ownerUserId))) {
     return NextResponse.json({ ok: false, error: "That agent isn't yours." }, { status: 403 });
   }
 
@@ -59,18 +58,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     return NextResponse.json({ ok: false, error: "Skill not found or not yours." }, { status: 404 });
   }
 
-  const profile = await getAgentProfile(agentId);
-  if (!profile) {
-    return NextResponse.json({ ok: false, error: "Agent not found." }, { status: 404 });
-  }
-
-  const markdown = skillToMarkdown(skill);
-  const skillHash = skillMarkdownHash(skill);
-
   // Train: ground the knowledge into memory + mark studied + record the advert.
-  await appendMemory(agentId, { text: markdown, source: `skill:${skillId}` });
-  await markSkillStudied(agentId, skillId);
-  await attachSkillToAgent(agentId, skillId, skillHash);
+  const { skillHash } = await groundUserSkillOnAgent(agentId, skill);
 
   const attachedSkillIds = await getAttachedSkillIds(agentId);
 

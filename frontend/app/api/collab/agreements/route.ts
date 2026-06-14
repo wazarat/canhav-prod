@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 
 import { defaultCollabPriceUsdc } from "@/lib/agent/collab-config";
 import { getAgentProfile } from "@/lib/agent/memory";
-import { userAgentId } from "@/lib/agent/user-agent";
+import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
-import { listUserAgentIds } from "@/lib/auth/users";
 import {
   DEFAULT_COOLDOWN_SECONDS,
   HARD_MAX_INSTALLMENTS,
@@ -82,11 +81,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const ownedIds = new Set([
-    userAgentId(session.userId),
-    ...(await listUserAgentIds(session.userId)),
-  ]);
-  if (!ownedIds.has(buyerAgentId)) {
+  if (!(await userOwnsAgent(session.userId, buyerAgentId))) {
     return NextResponse.json({ ok: false, error: "Buyer agent isn't yours." }, { status: 403 });
   }
 

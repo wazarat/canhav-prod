@@ -95,6 +95,61 @@ export interface FeesSummary {
   hasData: boolean;
 }
 
+export interface NetworkSnapshot {
+  protocolTvlUsd: number | null;
+  memberMcapUsd: number | null;
+  weightedChange24hPct: number | null;
+  netFlow24hUsd: number | null;
+  fees24hUsd: number | null;
+  revenue24hUsd: number | null;
+  topLendingApyPct: number | null;
+  topLendingSymbol: string | null;
+  coinsLive: number;
+  coinsTotal: number;
+}
+
+/** Aggregate on-chain + off-chain headline metrics for the network pulse panel. */
+export function buildNetworkSnapshot(
+  network: NetworkProfile,
+  coins: CoinLiveData[],
+): NetworkSnapshot {
+  const flow = buildTvlFlow(coins);
+  const fees = buildFeesSummary(network);
+
+  let memberMcapUsd = 0;
+  let coinsLive = 0;
+  for (const c of coins) {
+    const mcap = c.market?.marketCap;
+    if (mcap != null && mcap > 0) {
+      memberMcapUsd += mcap;
+      coinsLive++;
+    }
+  }
+
+  let topLendingApyPct: number | null = null;
+  let topLendingSymbol: string | null = null;
+  for (const c of coins) {
+    const apy = c.lendingMarket?.supplyApyPct;
+    if (apy != null && (topLendingApyPct == null || apy > topLendingApyPct)) {
+      topLendingApyPct = apy;
+      topLendingSymbol = c.symbol;
+    }
+  }
+
+  return {
+    protocolTvlUsd: network.currentScale.tvlUsd ?? null,
+    memberMcapUsd: memberMcapUsd > 0 ? memberMcapUsd : null,
+    weightedChange24hPct: flow.change24hPct,
+    netFlow24hUsd: flow.netFlow24hUsd,
+    fees24hUsd: fees.fees24hUsd,
+    revenue24hUsd: fees.revenue24hUsd,
+    topLendingApyPct,
+    topLendingSymbol,
+    coinsLive,
+    coinsTotal: coins.length,
+  };
+}
+
 /** Roll up the DeFi Llama fee/revenue + DEX volume overlays for the fees widget. */
 export function buildFeesSummary(network: NetworkProfile): FeesSummary {
   const f = network.protocolFeesRevenue ?? null;

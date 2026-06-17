@@ -36,13 +36,22 @@ function SectionHeading({
   );
 }
 
-export function ComponentsSection({ components }: { components: NetworkComponent[] }) {
+export function ComponentsSection({
+  components,
+  embedded = false,
+}: {
+  components: NetworkComponent[];
+  embedded?: boolean;
+}) {
   if (!components.length) return null;
   const title =
     components.length === 1 ? "Main component" : `Main components (${components.length})`;
-  return (
-    <section id="overview" className="scroll-mt-24 space-y-4">
-      <SectionHeading title={title} />
+  const inner = (
+    <>
+      {!embedded && <SectionHeading title={title} />}
+      {embedded && (
+        <h3 className="text-sm font-semibold text-ink-100">{title}</h3>
+      )}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {components.map((c, i) => (
           <Card key={c.name} className="space-y-2 p-5">
@@ -56,28 +65,51 @@ export function ComponentsSection({ components }: { components: NetworkComponent
           </Card>
         ))}
       </div>
+    </>
+  );
+
+  if (embedded) {
+    return <div className="space-y-3">{inner}</div>;
+  }
+
+  return (
+    <section id="overview" className="scroll-mt-24 space-y-4">
+      {inner}
     </section>
   );
 }
 
-export function DifferentiatorSection({ differentiator }: { differentiator: string }) {
+export function DifferentiatorSection({
+  differentiator,
+  embedded = false,
+}: {
+  differentiator: string;
+  embedded?: boolean;
+}) {
   if (!differentiator) return null;
-  return (
-    <section className="space-y-4">
-      <SectionHeading title="Differentiator" />
+  const inner = (
+    <>
+      {!embedded && <SectionHeading title="Differentiator" />}
+      {embedded && <h3 className="text-sm font-semibold text-ink-100">Differentiator</h3>}
       <Card className="glass-strong border-l-2 border-l-electric-500/60 p-5">
         <p className="text-sm leading-relaxed text-ink-200">{differentiator}</p>
       </Card>
-    </section>
+    </>
   );
+
+  if (embedded) {
+    return <div className="space-y-3">{inner}</div>;
+  }
+
+  return <section className="space-y-4">{inner}</section>;
 }
 
-export function FaqSection({ faq }: { faq: FaqItem[] }) {
+export function FaqSection({ faq, embedded = false }: { faq: FaqItem[]; embedded?: boolean }) {
   if (!faq.length) return null;
   const ordered = [...faq].sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
-  return (
-    <section id="faq" className="scroll-mt-24 space-y-4">
-      <SectionHeading title="Commonly asked questions" />
+  const inner = (
+    <>
+      {!embedded && <SectionHeading title="Commonly asked questions" />}
       <div className="space-y-2">
         {ordered.map((f) => (
           <details
@@ -98,6 +130,16 @@ export function FaqSection({ faq }: { faq: FaqItem[] }) {
           </details>
         ))}
       </div>
+    </>
+  );
+
+  if (embedded) {
+    return <div className="space-y-3">{inner}</div>;
+  }
+
+  return (
+    <section id="faq" className="scroll-mt-24 space-y-4">
+      {inner}
     </section>
   );
 }
@@ -187,15 +229,23 @@ const TIMELINE_STATUS_META: Record<
   },
 };
 
-export function EventsSection({ events }: { events: TimelineEntry[] }) {
+export function EventsSection({
+  events,
+  embedded = false,
+}: {
+  events: TimelineEntry[];
+  embedded?: boolean;
+}) {
   if (!events.length) return null;
   const showLegend = events.some((e) => e.status === "theoretical" || e.status === "canhav-inferred");
-  return (
-    <section id="timeline" className="scroll-mt-24 space-y-4">
-      <SectionHeading
-        title="Timeline & news"
-        subtitle="Key milestones in the network's history."
-      />
+  const inner = (
+    <>
+      {!embedded && (
+        <SectionHeading
+          title="Timeline & news"
+          subtitle="Key milestones in the network's history."
+        />
+      )}
       {showLegend && (
         <p className="text-xs text-ink-400">
           <span className="text-ink-300">Executed</span> and{" "}
@@ -258,6 +308,16 @@ export function EventsSection({ events }: { events: TimelineEntry[] }) {
           );
         })}
       </div>
+    </>
+  );
+
+  if (embedded) {
+    return <div className="space-y-3">{inner}</div>;
+  }
+
+  return (
+    <section id="timeline" className="scroll-mt-24 space-y-4">
+      {inner}
     </section>
   );
 }
@@ -414,17 +474,20 @@ export function buildNetworkSectionNav(profile: {
   offchainFacts?: unknown[];
   agentSkill?: unknown;
 }) {
-  const items: { id: string; label: string }[] = [];
+  const items: { id: string; label: string; researchTab?: string }[] = [];
 
-  if (profile.memberCoins.length) items.push({ id: "member-coins", label: "Member coins" });
+  const hasResearch =
+    profile.components.length > 0 ||
+    profile.offchainFacts?.length ||
+    profile.faq.length ||
+    profile.timeline?.length ||
+    profile.events.length ||
+    profile.tokenomics;
+
+  if (profile.memberCoins.length) items.push({ id: "member-coins", label: "Dashboard" });
+  if (hasResearch) items.push({ id: "research-hub", label: "Research" });
   if (profile.market) items.push({ id: "market", label: "Market" });
-  if (profile.components.length) items.push({ id: "overview", label: "Overview" });
-  if (profile.offchainFacts?.length) items.push({ id: "facts", label: "Key facts" });
-  if (profile.faq.length) items.push({ id: "faq", label: "FAQ" });
-  if (profile.timeline?.length || profile.events.length)
-    items.push({ id: "timeline", label: "Timeline" });
   if (profile.orgStructure.length) items.push({ id: "org", label: "Org structure" });
-  if (profile.tokenomics) items.push({ id: "tokenomics", label: "Tokenomics" });
   if (profile.typedRisks?.length) items.push({ id: "typed-risks", label: "Risks" });
   else if (profile.risks.length) items.push({ id: "risks", label: "Risks" });
   if (profile.investmentRounds.length) items.push({ id: "funding", label: "Funding" });

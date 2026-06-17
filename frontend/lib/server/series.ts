@@ -146,6 +146,15 @@ export async function resolveTvlSeries(profile: RwaProfile): Promise<TvlSeries> 
   return { points: stored, source: null };
 }
 
+/** Protocol TVL time series for a network slug (DeFi Llama). */
+export async function resolveNetworkTvlSeries(slug: string): Promise<TvlSeries> {
+  const llama = await fetchLlamaProtocolTvl(slug, DAYS, LIVE_REVALIDATE);
+  if (llama && llama.points.length >= 2) {
+    return { points: llama.points, source: "defillama" };
+  }
+  return { points: [], source: null };
+}
+
 /* -------------------------------------------------------------------------- */
 /* Derived helpers over a resolved series (independent of stored data)        */
 /* -------------------------------------------------------------------------- */

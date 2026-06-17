@@ -4,10 +4,6 @@ import { notFound } from "next/navigation";
 import { ArrowUpRight, BookOpen } from "lucide-react";
 
 import {
-  ComponentsSection,
-  DifferentiatorSection,
-  EventsSection,
-  FaqSection,
   InvestmentRoundsSection,
   OrgStructureSection,
   PartnershipsSection,
@@ -16,17 +12,16 @@ import {
   buildNetworkSectionNav,
 } from "@/components/networks/NetworkSections";
 import { NetworkMarketCard } from "@/components/networks/NetworkMarketCard";
-import { MemberCoins } from "@/components/networks/MemberCoins";
+import { MemberCoinsLauncher } from "@/components/networks/MemberCoinsLauncher";
+import { NetworkPulsePanel } from "@/components/networks/NetworkPulsePanel";
+import { NetworkResearchHub } from "@/components/networks/NetworkResearchHub";
 import { TvlFlowWidget } from "@/components/networks/dashboard/TvlFlowWidget";
 import { FeesWidget } from "@/components/networks/dashboard/FeesWidget";
-import { TimelineWidget } from "@/components/networks/dashboard/TimelineWidget";
 import { CombinedVerdictCard } from "@/components/agent/CombinedVerdictCard";
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
-import { OffchainFactsPanel } from "@/components/shared/OffchainFactsPanel";
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { SourcesFooter } from "@/components/shared/SourcesFooter";
-import { TokenomicsCard } from "@/components/shared/TokenomicsCard";
 import { TypedRiskList } from "@/components/shared/TypedRiskList";
 import { Badge } from "@/components/ui/Badge";
 import { DataPanel, DataRow, LinkRow } from "@/components/ui/DataPanel";
@@ -34,11 +29,10 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionNav } from "@/components/ui/SectionNav";
 import { StatCard } from "@/components/ui/StatCard";
 import { Card } from "@/components/ui/Card";
-import { getApprovedNetworks, getApprovedNetworkBySlug, getNetworkMemberCoins } from "@/lib/data";
+import { getApprovedNetworks, getApprovedNetworkBySlug } from "@/lib/data";
 import { buildSkillFromEntity } from "@/lib/agent/skills";
 import { deriveSecurityStatus } from "@/lib/security";
-import { getCoinLiveData } from "@/lib/server/coin";
-import { buildFeesSummary, buildTvlFlow } from "@/lib/networks/metrics";
+import { loadNetworkDashboardData } from "@/lib/networks/dashboard-data";
 import type { NetworkProfile } from "@/lib/types";
 import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
 
@@ -58,56 +52,53 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return { title: profile.name, description: profile.description };
 }
 
-function DashboardBandSkeleton() {
+function DashboardSkeleton() {
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-2">
-        {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className="h-44 animate-pulse rounded-2xl bg-ink-800/50" />
-        ))}
-      </div>
-      <div className="space-y-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-40 animate-pulse rounded-2xl bg-ink-800/50" />
-        ))}
-      </div>
+    <div className="space-y-6">
+      <div className="h-36 animate-pulse rounded-2xl bg-ink-800/50" />
+      <div className="h-48 animate-pulse rounded-2xl bg-ink-800/50" />
+      <div className="h-64 animate-pulse rounded-2xl bg-ink-800/50" />
     </div>
   );
 }
 
-/**
- * Dashboard band: member-coin cards (click to expand for live data) on the left,
- * a stacked rail of derived widgets (24h value flow, fees paid, timeline) on the
- * right — DeFi-Llama-style, so the headline signal is visible without scrolling.
- */
-async function DashboardBand({ network }: { network: NetworkProfile }) {
-  const members = await getNetworkMemberCoins(network);
-  const coins = await Promise.all(
-    members
-      .filter((m) => m.profile !== null)
-      .map((m) => getCoinLiveData(m.profile!, m.ref.role)),
-  );
-  const flow = buildTvlFlow(coins);
-  const fees = buildFeesSummary(network);
-  const timeline = network.timeline ?? network.events ?? [];
+async function NetworkDashboard({ network }: { network: NetworkProfile }) {
+  const data = await loadNetworkDashboardData(network);
+  const labels = network.scaleLabels ?? {};
+  const tvlLabel = labels.tvl ?? "Protocol TVL";
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
-      <div className="lg:col-span-2">
-        {coins.length === 0 ? (
-          <Card className="text-sm text-ink-300">
-            Member coins are staged but not yet approved. They&apos;ll appear here (with live
-            CoinGecko + Alchemy data) once approved.
-          </Card>
-        ) : (
-          <MemberCoins coins={coins} />
-        )}
+    <>
+      <NetworkPulsePanel
+        snapshot={data.snapshot}
+        tvlLabel={tvlLabel}
+        tvlSeries={data.tvlSeries}
+        tvlSeriesSource={data.tvlSeriesSource}
+      />
+      <MemberCoinsLauncher coins={data.coins} networkName={network.name} />
+      <NetworkResearchHub
+        components={network.components}
+        differentiator={network.differentiator}
+        offchainFacts={network.offchainFacts}
+        faq={network.faq}
+        timeline={network.timeline ?? network.events}
+        tokenomics={network.tokenomics}
+      />
+      <div className="space-y-4 lg:hidden">
+        <TvlFlowWidget flow={data.flow} tvlSeries={data.tvlValues} />
+        <FeesWidget fees={data.fees} />
       </div>
-      <div className="space-y-4">
-        <TvlFlowWidget flow={flow} />
-        <FeesWidget fees={fees} />
-        <TimelineWidget entries={timeline} />
-      </div>
+    </>
+  );
+}
+
+async function NetworkDashboardRail({ network }: { network: NetworkProfile }) {
+  const data = await loadNetworkDashboardData(network);
+
+  return (
+    <div className="hidden space-y-4 lg:block">
+      <TvlFlowWidget flow={data.flow} tvlSeries={data.tvlValues} />
+      <FeesWidget fees={data.fees} />
     </div>
   );
 }
@@ -148,7 +139,6 @@ export default async function NetworkProfilePage({ params }: PageProps) {
   const partnershipsLabel = labels.partnerships ?? "Partnerships";
   const coinsLabel = labels.coins ?? `Coins under ${profile.name}`;
 
-  // Only render stat tiles that actually have data — no blank "—" placeholders.
   const aprValue =
     scale.marketCapUsd != null
       ? formatUsdCompact(scale.marketCapUsd)
@@ -190,7 +180,7 @@ export default async function NetworkProfilePage({ params }: PageProps) {
   const ctaSecondary = `${ctaClass} border-ink-700 bg-ink-900/60 text-ink-200 hover:text-ink-50`;
 
   return (
-    <div className="container space-y-8 py-12">
+    <div className="container space-y-8 pb-24 py-12">
       <PageHeader
         breadcrumbs={[
           { label: "Dashboard", href: "/" },
@@ -256,27 +246,14 @@ export default async function NetworkProfilePage({ params }: PageProps) {
         />
       )}
 
-      {/* Mobile section nav */}
       <SectionNav items={sectionNavItems} className="lg:hidden" />
 
-      {/* Dashboard band — member coins + derived widgets, the headline signal
-          without scrolling. Deeper research lives below. */}
-      <section id="member-coins" className="scroll-mt-24 space-y-3">
-        <div className="border-b border-ink-800/60 pb-2">
-          <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
-            {profile.name} dashboard
-          </h2>
-          <p className="mt-1 text-sm text-ink-300">
-            Coins under {profile.name} (click a card for live data), 24h value flow, and fees.
-          </p>
-        </div>
-        <Suspense fallback={<DashboardBandSkeleton />}>
-          <DashboardBand network={profile} />
-        </Suspense>
-      </section>
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="space-y-8 lg:col-span-2">
+        <div className="space-y-6 lg:col-span-2">
+          <Suspense fallback={<DashboardSkeleton />}>
+            <NetworkDashboard network={profile} />
+          </Suspense>
+
           {profile.market && (
             <NetworkMarketCard market={profile.market} symbol={profile.symbol} />
           )}
@@ -295,25 +272,7 @@ export default async function NetworkProfilePage({ params }: PageProps) {
           )}
 
           <div className="space-y-8">
-            <ComponentsSection components={profile.components} />
-            <DifferentiatorSection differentiator={profile.differentiator} />
-            {profile.offchainFacts && (
-              <section id="facts" className="scroll-mt-24 space-y-4">
-                <div className="border-b border-ink-800/60 pb-2">
-                  <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
-                    Key facts
-                  </h2>
-                  <p className="mt-1 text-sm text-ink-300">
-                    Curated off-chain facts with source + freshness.
-                  </p>
-                </div>
-                <OffchainFactsPanel facts={profile.offchainFacts} title="Off-chain facts" />
-              </section>
-            )}
-            <FaqSection faq={profile.faq} />
-            <EventsSection events={profile.timeline ?? profile.events} />
             <OrgStructureSection org={profile.orgStructure} />
-            {profile.tokenomics && <TokenomicsCard tokenomics={profile.tokenomics} />}
             {profile.typedRisks ? (
               <TypedRiskList risks={profile.typedRisks} />
             ) : (
@@ -330,10 +289,17 @@ export default async function NetworkProfilePage({ params }: PageProps) {
           </div>
         </div>
 
-        <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-          <div className="hidden lg:block">
-            <SectionNav items={sectionNavItems} />
-          </div>
+        <aside className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto lg:space-y-4 space-y-4">
+          <Suspense
+            fallback={
+              <div className="hidden space-y-4 lg:block">
+                <div className="h-52 animate-pulse rounded-2xl bg-ink-800/50" />
+                <div className="h-40 animate-pulse rounded-2xl bg-ink-800/50" />
+              </div>
+            }
+          >
+            <NetworkDashboardRail network={profile} />
+          </Suspense>
 
           <div className="flex items-center gap-3 px-1">
             <NetworkAvatar profile={profile} />
@@ -353,10 +319,18 @@ export default async function NetworkProfilePage({ params }: PageProps) {
             {profile.memberCoins.length > 0 && (
               <DataRow
                 label="Member coins"
-                value={profile.memberCoins.map((c) => c.symbol).join(", ")}
+                value={
+                  <a href="#member-coins" className="text-electric-400 hover:underline">
+                    {profile.memberCoins.length} products →
+                  </a>
+                }
               />
             )}
           </DataPanel>
+
+          <div className="hidden lg:block">
+            <SectionNav items={sectionNavItems} nested />
+          </div>
 
           <DataPanel title="Links">
             <div className="-mx-1">

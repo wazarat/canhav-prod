@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 export interface SectionNavItem {
   id: string;
   label: string;
+  /** When set, scrolls to #research-hub and switches to this tab. */
+  researchTab?: string;
 }
 
 interface SectionNavProps {
@@ -22,6 +24,8 @@ interface SectionNavProps {
   trailing?: ReactNode;
   /** Tailwind `top-*` offset for the sticky "bar" (defaults to `top-16`). */
   stickyTopClassName?: string;
+  /** When true, skip inner sticky — parent aside owns stickiness. */
+  nested?: boolean;
 }
 
 export function SectionNav({
@@ -30,6 +34,7 @@ export function SectionNav({
   variant = "sidebar",
   trailing,
   stickyTopClassName,
+  nested = false,
 }: SectionNavProps) {
   const [activeId, setActiveId] = useState(items[0]?.id ?? "");
 
@@ -60,11 +65,16 @@ export function SectionNav({
 
   if (items.length === 0) return null;
 
-  function scrollTo(id: string) {
+  function scrollTo(id: string, researchTab?: string) {
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
       setActiveId(id);
+    }
+    if (researchTab) {
+      window.dispatchEvent(
+        new CustomEvent("network-research-tab", { detail: researchTab }),
+      );
     }
   }
 
@@ -72,7 +82,7 @@ export function SectionNav({
     <button
       key={item.id}
       type="button"
-      onClick={() => scrollTo(item.id)}
+      onClick={() => scrollTo(item.id, item.researchTab)}
       className={cn(
         "whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
         activeId === item.id
@@ -105,7 +115,8 @@ export function SectionNav({
       {/* Desktop: sticky vertical nav */}
       <nav
         className={cn(
-          "hidden space-y-1 md:block md:sticky md:top-24",
+          "hidden space-y-1 md:block",
+          !nested && "md:sticky md:top-24",
           className,
         )}
       >
@@ -116,7 +127,7 @@ export function SectionNav({
           <button
             key={item.id}
             type="button"
-            onClick={() => scrollTo(item.id)}
+            onClick={() => scrollTo(item.id, item.researchTab)}
             className={cn(
               "block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors",
               activeId === item.id

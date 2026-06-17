@@ -2,19 +2,119 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { Sparkline } from "@/components/ui/Sparkline";
 import type { TvlFlow } from "@/lib/networks/metrics";
-import { cn, formatPct, formatUsdCompact } from "@/lib/utils";
+import { formatPct, formatUsdCompact } from "@/lib/utils";
+
+const DONUT_COLORS = ["#5C92FF", "#34D399", "#A78BFA", "#FBBF24", "#64748B"];
+const TOP_SEGMENTS = 4;
+
+interface DonutSegment {
+  symbol: string;
+  valueUsd: number;
+  pct: number;
+}
+
+function buildDonutSegments(flow: TvlFlow): DonutSegment[] {
+  const withValue = flow.contributions.filter((c) => c.valueUsd != null && c.valueUsd > 0);
+  const top = withValue.slice(0, TOP_SEGMENTS);
+  const otherUsd = withValue.slice(TOP_SEGMENTS).reduce((s, c) => s + (c.valueUsd ?? 0), 0);
+  const total = flow.totalUsd || 1;
+
+  const segments: DonutSegment[] = top.map((c) => ({
+    symbol: c.symbol,
+    valueUsd: c.valueUsd!,
+    pct: ((c.valueUsd ?? 0) / total) * 100,
+  }));
+
+  if (otherUsd > 0) {
+    segments.push({
+      symbol: "Other",
+      valueUsd: otherUsd,
+      pct: (otherUsd / total) * 100,
+    });
+  }
+
+  return segments;
+}
+
+function DonutChart({ segments }: { segments: DonutSegment[] }) {
+  if (segments.length === 0) return null;
+
+  const size = 88;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 34;
+  const stroke = 14;
+  const circumference = 2 * Math.PI * r;
+  let offset = 0;
+
+  return (
+    <svg
+      role="img"
+      aria-label="Member coin composition"
+      viewBox={`0 0 ${size} ${size}`}
+      className="h-[88px] w-[88px] shrink-0"
+    >
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill="none"
+        stroke="rgba(30,41,59,0.8)"
+        strokeWidth={stroke}
+      />
+      {segments.map((seg, i) => {
+        const dash = (seg.pct / 100) * circumference;
+        const el = (
+          <circle
+            key={seg.symbol}
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill="none"
+            stroke={DONUT_COLORS[i % DONUT_COLORS.length]}
+            strokeWidth={stroke}
+            strokeDasharray={`${dash} ${circumference - dash}`}
+            strokeDashoffset={-offset}
+            transform={`rotate(-90 ${cx} ${cy})`}
+          />
+        );
+        offset += dash;
+        return el;
+      })}
+    </svg>
+  );
+}
+
+function sparklineValues(
+  flow: TvlFlow,
+  tvlSeries?: number[],
+): { values: number[]; label: string } {
+  if (tvlSeries && tvlSeries.length >= 2) {
+    return { values: tvlSeries, label: "Protocol TVL · 30d" };
+  }
+  if (flow.change24hPct != null && flow.totalUsd > 0) {
+    const start = flow.totalUsd / (1 + flow.change24hPct / 100);
+    return { values: [start, flow.totalUsd], label: "Implied 24h mcap move" };
+  }
+  return { values: [], label: "" };
+}
 
 /**
- * 24h value-flow widget. The aggregate move is a market-cap-weighted roll-up of
- * the network's member coins' live 24h price changes (real CoinGecko data) — we
- * have no entity-level TVL time series, so this is the honest derivation. When
- * no member reports live market data the widget shows an explicit empty state.
+ * 24h value-flow widget with composition donut + sparkline. Fixed height so the
+ * right rail never grows unbounded with coin count.
  */
-export function TvlFlowWidget({ flow }: { flow: TvlFlow }) {
+export function TvlFlowWidget({
+  flow,
+  tvlSeries,
+}: {
+  flow: TvlFlow;
+  tvlSeries?: number[];
+}) {
   if (!flow.hasData) {
     return (
-      <Card className="flex h-full flex-col gap-2 p-5">
+      <Card className="flex max-h-[220px] flex-col gap-2 p-5">
         <Header />
         <p className="mt-2 text-sm text-ink-400">
           No live 24h market data for this network&apos;s coins yet — the value flow will
@@ -26,66 +126,58 @@ export function TvlFlowWidget({ flow }: { flow: TvlFlow }) {
 
   const up = (flow.change24hPct ?? 0) >= 0;
   const tone = flow.change24hPct == null ? "neutral" : up ? "positive" : "danger";
-  const barColor = up ? "bg-emerald-500/70" : "bg-rose-500/70";
-  const maxValue = Math.max(...flow.contributions.map((c) => c.valueUsd ?? 0), 1);
-  const withValue = flow.contributions.filter((c) => c.valueUsd != null && c.valueUsd > 0);
+  const segments = buildDonutSegments(flow);
+  const { values: sparkValues, label: sparkLabel } = sparklineValues(flow, tvlSeries);
+  const legendItems = segments.slice(0, 3);
 
   return (
-    <Card className="flex h-full flex-col gap-4 p-5">
+    <Card className="flex max-h-[220px] flex-col gap-3 overflow-hidden p-5">
       <Header />
-      <div className="flex flex-wrap items-baseline gap-3">
-        <span className="font-display text-2xl font-semibold tracking-tight text-ink-50">
+      <div className="flex flex-wrap items-baseline gap-2">
+        <span className="font-display text-xl font-semibold tracking-tight text-ink-50">
           {formatUsdCompact(flow.totalUsd)}
         </span>
         {flow.change24hPct != null && (
-          <Badge tone={tone}>
-            {up ? (
-              <TrendingUp className="h-3 w-3" />
-            ) : (
-              <TrendingDown className="h-3 w-3" />
-            )}
+          <Badge tone={tone} className="text-[10px]">
+            {up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
             {formatPct(flow.change24hPct)} 24h
           </Badge>
         )}
       </div>
-      {flow.netFlow24hUsd != null && (
-        <p className="-mt-2 text-xs text-ink-400">
-          {up ? "+" : "−"}
-          {formatUsdCompact(Math.abs(flow.netFlow24hUsd))} implied net flow over 24h
-        </p>
-      )}
 
-      <div className="space-y-2">
-        {withValue.map((c) => {
-          const pct = ((c.valueUsd ?? 0) / maxValue) * 100;
-          return (
-            <div key={c.slug} className="space-y-1">
-              <div className="flex items-center justify-between gap-2 text-xs">
-                <span className="font-mono text-ink-200">{c.symbol}</span>
-                <span className="flex items-center gap-2 text-ink-400">
-                  <span className="font-mono text-ink-200">
-                    {formatUsdCompact(c.valueUsd)}
-                  </span>
-                  {c.change24hPct != null && (
-                    <span
-                      className={
-                        c.change24hPct >= 0 ? "text-emerald-400" : "text-rose-400"
-                      }
-                    >
-                      {formatPct(c.change24hPct)}
-                    </span>
-                  )}
-                </span>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-ink-800/70">
-                <div
-                  className={cn("h-full rounded-full", barColor)}
-                  style={{ width: `${Math.max(pct, 3)}%` }}
-                />
-              </div>
+      <div className="flex items-center gap-4">
+        <DonutChart segments={segments} />
+        <div className="min-w-0 flex-1 space-y-2">
+          {sparkValues.length >= 2 && (
+            <div className="space-y-1">
+              <p className="text-[10px] text-ink-500">{sparkLabel}</p>
+              <Sparkline
+                id="value-flow"
+                values={sparkValues}
+                height={40}
+                color={up ? "#34D399" : "#F87171"}
+              />
             </div>
-          );
-        })}
+          )}
+          {flow.netFlow24hUsd != null && (
+            <p className="text-[10px] text-ink-400">
+              {up ? "+" : "−"}
+              {formatUsdCompact(Math.abs(flow.netFlow24hUsd))} net flow
+            </p>
+          )}
+          <div className="flex flex-wrap gap-x-3 gap-y-1">
+            {legendItems.map((seg, i) => (
+              <span key={seg.symbol} className="flex items-center gap-1 text-[10px] text-ink-400">
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ backgroundColor: DONUT_COLORS[i % DONUT_COLORS.length] }}
+                />
+                <span className="font-mono text-ink-300">{seg.symbol}</span>
+                <span>{seg.pct.toFixed(0)}%</span>
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </Card>
   );

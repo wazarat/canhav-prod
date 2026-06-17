@@ -93,6 +93,9 @@ class StablecoinProfile(BaseModel):
     totalSupply: TotalSupply = Field(default_factory=TotalSupply)
     historicalPegData: HistoricalPegData = Field(default_factory=HistoricalPegData)
     lendingMarket: Optional[LendingMarket] = None
+    # Protocol fees/revenue overlay (DeFi Llama; written by the cron). Stored as
+    # a passthrough dict so unknown Llama fields survive round-trips.
+    protocolFeesRevenue: Optional[dict] = None
     arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
         default_factory=ArbitrumPortalMetadata
     )
@@ -124,6 +127,7 @@ class StablecoinProfile(BaseModel):
             "TotalSupply": self.totalSupply.model_dump(),
             "HistoricalPegData": self.historicalPegData.model_dump(),
             "LendingMarket": self.lendingMarket.model_dump() if self.lendingMarket else None,
+            "ProtocolFeesRevenue": self.protocolFeesRevenue,
             "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
             "CreatedAt": self.createdAt,
             "UpdatedAt": self.updatedAt,
@@ -153,6 +157,7 @@ class StablecoinProfile(BaseModel):
             lendingMarket=LendingMarket(**item["LendingMarket"])
             if item.get("LendingMarket")
             else None,
+            protocolFeesRevenue=item.get("ProtocolFeesRevenue"),
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
                 **(item.get("ArbitrumPortalMetadata") or {})
             ),
@@ -201,6 +206,8 @@ class RwaProfile(BaseModel):
     vaultAddresses: Optional[List[str]] = None
     totalValueLocked: TotalValueLocked = Field(default_factory=TotalValueLocked)
     historicalTvlData: HistoricalTvlData = Field(default_factory=HistoricalTvlData)
+    # Protocol fees/revenue overlay (DeFi Llama; written by the cron).
+    protocolFeesRevenue: Optional[dict] = None
     arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
         default_factory=ArbitrumPortalMetadata
     )
@@ -230,6 +237,7 @@ class RwaProfile(BaseModel):
             "VaultAddresses": self.vaultAddresses,
             "TotalValueLocked": self.totalValueLocked.model_dump(),
             "HistoricalTvlData": self.historicalTvlData.model_dump(),
+            "ProtocolFeesRevenue": self.protocolFeesRevenue,
             "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
             "CreatedAt": self.createdAt,
             "UpdatedAt": self.updatedAt,
@@ -255,6 +263,7 @@ class RwaProfile(BaseModel):
             vaultAddresses=item.get("VaultAddresses"),
             totalValueLocked=TotalValueLocked(**(item.get("TotalValueLocked") or {})),
             historicalTvlData=HistoricalTvlData(**(item.get("HistoricalTvlData") or {})),
+            protocolFeesRevenue=item.get("ProtocolFeesRevenue"),
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
                 **(item.get("ArbitrumPortalMetadata") or {})
             ),
@@ -308,6 +317,9 @@ class TokenProfile(BaseModel):
     entitySlug: Optional[str] = None
     totalSupply: TotalSupply = Field(default_factory=TotalSupply)
     lendingMarket: Optional[LendingMarket] = None
+    # DeFi Llama overlays (written by the cron); passthrough dicts.
+    protocolFeesRevenue: Optional[dict] = None
+    dexVolume: Optional[dict] = None
     arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
         default_factory=ArbitrumPortalMetadata
     )
@@ -336,6 +348,8 @@ class TokenProfile(BaseModel):
             "EntitySlug": self.entitySlug,
             "TotalSupply": self.totalSupply.model_dump(),
             "LendingMarket": self.lendingMarket.model_dump() if self.lendingMarket else None,
+            "ProtocolFeesRevenue": self.protocolFeesRevenue,
+            "DexVolume": self.dexVolume,
             "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
             "CreatedAt": self.createdAt,
             "UpdatedAt": self.updatedAt,
@@ -363,6 +377,8 @@ class TokenProfile(BaseModel):
             lendingMarket=LendingMarket(**item["LendingMarket"])
             if item.get("LendingMarket")
             else None,
+            protocolFeesRevenue=item.get("ProtocolFeesRevenue"),
+            dexVolume=item.get("DexVolume"),
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
                 **(item.get("ArbitrumPortalMetadata") or {})
             ),
@@ -495,6 +511,12 @@ class EntityProfile(BaseModel):
     currentScale: CurrentScale = Field(default_factory=CurrentScale)
     scaleLabels: Optional[ScaleLabels] = None
     memberCoins: List[MemberCoinRef] = Field(default_factory=list)
+    # DeFi Llama overlays (written by the cron); passthrough dicts. Options /
+    # open-interest are scaffolded for the coming-soon options/perpetuals categories.
+    protocolFeesRevenue: Optional[dict] = None
+    dexVolume: Optional[dict] = None
+    optionsVolume: Optional[dict] = None
+    openInterest: Optional[dict] = None
     arbitrumPortalMetadata: ArbitrumPortalMetadata = Field(
         default_factory=ArbitrumPortalMetadata
     )
@@ -529,6 +551,10 @@ class EntityProfile(BaseModel):
             "Partnerships": [p.model_dump() for p in self.partnerships],
             "CurrentScale": self.currentScale.model_dump(),
             "MemberCoins": [m.model_dump() for m in self.memberCoins],
+            "ProtocolFeesRevenue": self.protocolFeesRevenue,
+            "DexVolume": self.dexVolume,
+            "OptionsVolume": self.optionsVolume,
+            "OpenInterest": self.openInterest,
             "ArbitrumPortalMetadata": self.arbitrumPortalMetadata.model_dump(),
             "CreatedAt": self.createdAt,
             "UpdatedAt": self.updatedAt,
@@ -564,6 +590,10 @@ class EntityProfile(BaseModel):
             if item.get("ScaleLabels")
             else None,
             memberCoins=[MemberCoinRef(**m) for m in (item.get("MemberCoins") or [])],
+            protocolFeesRevenue=item.get("ProtocolFeesRevenue"),
+            dexVolume=item.get("DexVolume"),
+            optionsVolume=item.get("OptionsVolume"),
+            openInterest=item.get("OpenInterest"),
             arbitrumPortalMetadata=ArbitrumPortalMetadata(
                 **(item.get("ArbitrumPortalMetadata") or {})
             ),

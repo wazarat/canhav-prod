@@ -111,6 +111,9 @@ function common(item: Record<string, any>) {
     assetSubtype: item.AssetSubtype ?? null,
     pegMechanism: item.PegMechanism ?? null,
     offchainFacts: item.OffchainFacts ?? undefined,
+    // Protocol fees/revenue (DeFi Llama; written by the cron). Shared by
+    // stablecoins, RWAs, and tokens.
+    protocolFeesRevenue: item.ProtocolFeesRevenue ?? undefined,
     arbitrumPortalMetadata: item.ArbitrumPortalMetadata ?? {
       portalUrl: null,
       logoUrl: null,
@@ -190,6 +193,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         poolComposition: item.PoolComposition ?? undefined,
         yieldMechanics: item.YieldMechanics ?? undefined,
         lendingMarket: item.LendingMarket ?? undefined,
+        dexVolume: item.DexVolume ?? undefined,
         typedRisks: item.TypedRisks ?? undefined,
         tokenomics: item.Tokenomics ?? undefined,
         audits: item.Audits ?? undefined,
@@ -243,6 +247,12 @@ export async function readLiveStore(): Promise<LiveStore> {
           isPubliclyAudited: false,
           foundedDate: null,
         },
+        // DeFi Llama overlays (written by the cron). Options/OI are scaffolded
+        // for the coming-soon options/perpetuals categories.
+        protocolFeesRevenue: item.ProtocolFeesRevenue ?? undefined,
+        dexVolume: item.DexVolume ?? undefined,
+        optionsVolume: item.OptionsVolume ?? undefined,
+        openInterest: item.OpenInterest ?? undefined,
         // Rich detail-page fields (additive; surfaced when seeded, else undefined).
         longDescription: item.LongDescription ?? undefined,
         market: item.Market ?? undefined,

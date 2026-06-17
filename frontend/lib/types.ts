@@ -100,6 +100,75 @@ export interface IssuanceMeta {
   updatedAt: string | null;
 }
 
+/**
+ * Protocol fees & revenue (source: DeFi Llama `summary/fees/{protocol}`).
+ *
+ * "Fees" is what users pay; "revenue" is the slice the protocol/token holders
+ * keep; "holdersRevenue" is the share that flows to token holders specifically.
+ * 30d figures are derived by summing the last 30 daily chart points when Llama
+ * doesn't expose a `total30d`. `methodology` is Llama's plain-language note on
+ * what is counted, used for the fee/revenue/earnings benchmark.
+ */
+export interface ProtocolFeesRevenue {
+  fees24hUsd: number | null;
+  fees7dUsd: number | null;
+  fees30dUsd: number | null;
+  feesAllTimeUsd?: number | null;
+  revenue24hUsd: number | null;
+  revenue7dUsd: number | null;
+  revenue30dUsd: number | null;
+  holdersRevenue24hUsd?: number | null;
+  /** 24h % change in fees (Llama `change_1d`). */
+  feesChange1dPct?: number | null;
+  /** Llama's methodology note (what's counted as fees vs revenue). */
+  methodology?: string | null;
+  methodologyUrl?: string | null;
+  /** Llama protocol category (e.g. "Dexes", "Lending", "Liquid Staking"). */
+  llamaCategory?: string | null;
+  source: "defillama";
+  updatedAt: string | null;
+}
+
+/** DEX trading volume (source: DeFi Llama `summary/dexs/{protocol}`). */
+export interface DexVolume {
+  volume24hUsd: number | null;
+  volume7dUsd: number | null;
+  volume30dUsd: number | null;
+  volumeAllTimeUsd?: number | null;
+  /** 24h % change in volume (Llama `change_1d`). */
+  change1dPct?: number | null;
+  source: "defillama";
+  updatedAt: string | null;
+}
+
+/**
+ * Options dex volume (source: DeFi Llama `summary/options/{protocol}`).
+ *
+ * Scaffolding only — populated once the `options` category has live profiles.
+ * Notional is the value of the underlying; premium is what buyers actually pay.
+ */
+export interface OptionsVolume {
+  notionalVolume24hUsd: number | null;
+  notionalVolume30dUsd: number | null;
+  premiumVolume24hUsd: number | null;
+  premiumVolume30dUsd: number | null;
+  source: "defillama";
+  updatedAt: string | null;
+}
+
+/**
+ * Perp open interest (source: DeFi Llama `overview/open-interest`).
+ *
+ * Scaffolding only — populated once the `perpetuals` category has live profiles.
+ */
+export interface OpenInterest {
+  openInterestUsd: number | null;
+  longOpenInterestUsd?: number | null;
+  shortOpenInterestUsd?: number | null;
+  source: "defillama";
+  updatedAt: string | null;
+}
+
 /** Raw metadata sourced directly from the Arbitrum Portal CSV. */
 export interface ArbitrumPortalMetadata {
   portalUrl: string | null;
@@ -148,6 +217,8 @@ export interface StablecoinProfile {
   offchainFacts?: OffchainFact[];
   /** Live Aave V3 lending rates when this coin is an Aave reserve (e.g. GHO). */
   lendingMarket?: LendingMarket | null;
+  /** Protocol fees/revenue when this coin maps to a Llama protocol (DeFi Llama). */
+  protocolFeesRevenue?: ProtocolFeesRevenue | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -227,6 +298,8 @@ export interface RwaProfile {
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Curated off-chain facts (issuer, custody, gating) with provenance. */
   offchainFacts?: OffchainFact[];
+  /** Protocol fees/revenue when this protocol maps to a Llama protocol (DeFi Llama). */
+  protocolFeesRevenue?: ProtocolFeesRevenue | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -660,6 +733,10 @@ export interface TokenProfile {
   yieldMechanics?: YieldMechanics;
   /** Live Aave V3 lending rates when this token is an Aave reserve (e.g. aUSDC). */
   lendingMarket?: LendingMarket | null;
+  /** Protocol fees/revenue when this token maps to a Llama protocol (DeFi Llama). */
+  protocolFeesRevenue?: ProtocolFeesRevenue | null;
+  /** DEX trading volume when this token is a DEX governance token (DeFi Llama). */
+  dexVolume?: DexVolume | null;
   typedRisks?: TypedRisk[];
   tokenomics?: Tokenomics;
   audits?: { firm: string; date: string; url: string | null }[];
@@ -812,6 +889,14 @@ export interface EntityProfile {
   scaleLabels?: ScaleLabels;
   memberCoins: MemberCoinRef[];
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
+  /** Protocol fees/revenue when this entity maps to a Llama protocol (DeFi Llama). */
+  protocolFeesRevenue?: ProtocolFeesRevenue | null;
+  /** DEX trading volume when this entity is a DEX (DeFi Llama). */
+  dexVolume?: DexVolume | null;
+  /** Options dex volume (DeFi Llama) — populated once `options` category is live. */
+  optionsVolume?: OptionsVolume | null;
+  /** Perp open interest (DeFi Llama) — populated once `perpetuals` category is live. */
+  openInterest?: OpenInterest | null;
   createdAt: string;
   updatedAt: string;
   longDescription?: string;

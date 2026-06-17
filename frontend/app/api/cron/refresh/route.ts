@@ -11,9 +11,20 @@ import {
   type TokenResolution,
 } from "@/lib/server/coingecko";
 import {
+  arbCoinKey,
+  fetchLlamaCoinChart,
+  fetchLlamaCoinPercentage,
+  fetchLlamaCoinPrice,
+  fetchLlamaDexVolume,
+  fetchLlamaFeesRevenue,
+  fetchLlamaPools,
   fetchLlamaProtocolTvl,
   fetchLlamaStablecoin,
   fetchLlamaStablecoinCharts,
+  fetchLlamaStablecoinPrices,
+  fetchLlamaYieldChart,
+  type LlamaPool,
+  resolveLlamaYieldPool,
 } from "@/lib/server/defillama";
 import { hasUpstash, putItem, readAllItemsFromRedis } from "@/lib/server/redis";
 import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
@@ -136,8 +147,9 @@ async function refreshStablecoinExtras(item: Record<string, any>, slug: string):
     }
   }
 
-  // Peg history: Llama's USD ratio for USD-pegged coins; CoinGecko market_chart
-  // in the peg currency otherwise (e.g. EURe charted vs EUR).
+  // Peg history: Llama's USD ratio for USD-pegged coins; then Llama's dedicated
+  // /stablecoinprices depeg track; then CoinGecko market_chart in the peg
+  // currency (e.g. EURe charted vs EUR).
   const charts = await fetchLlamaStablecoinCharts(slug, HISTORY_DAYS);
   if (charts && charts.pegPrice.length >= 2) {
     item.HistoricalPegData = {
@@ -147,6 +159,16 @@ async function refreshStablecoinExtras(item: Record<string, any>, slug: string):
     };
     mutated = true;
   } else {
+    const pegPrices = await fetchLlamaStablecoinPrices(slug, HISTORY_DAYS);
+    if (pegPrices.length >= 2) {
+      item.HistoricalPegData = {
+        points: pegPrices.map((p) => ({ date: p.date, price: p.value })),
+        source: "defillama",
+        updatedAt: nowIso(),
+      };
+      mutated = true;
+      return mutated;
+    }
     const coinId = coinIdForSlug(slug);
     if (coinId) {
       const vsCurrency = pegVsCurrency((item.PegTarget ?? "USD") as StablecoinProfile["pegTarget"]);
@@ -242,6 +264,119 @@ async function refreshRwaExtras(
   return mutated;
 }
 
+/**
+ * DeFi Llama "dimensions" pass — runs for any category. Writes (when mapped):
+ *   - ProtocolFeesRevenue (fees/revenue/holders-revenue + methodology) — all categories
+ *   - DexVolume (DEX trading volume) — Entities + Tokens
+ *   - YieldMechanics (pool APY + history) — Tokens (skips Aave aTokens, which the
+ *     on-chain Aave pass owns)
+ *   - Market.priceUsd / change24hPct / PriceHistory — Tokens unlisted on CoinGecko
+ *     (only when no CoinGecko price was resolved this run)
+ *
+ * `pools` is a single shared `/pools` snapshot so this never refetches per item.
+ */
+async function refreshLlamaDimensions(
+  item: Record<string, any>,
+  slug: string,
+  category: string,
+  pools: LlamaPool[],
+): Promise<{ mutated: boolean; note: string }> {
+  let mutated = false;
+  const notes: string[] = [];
+
+  // Fees & revenue (all categories that map to a Llama fees protocol).
+  const feesRev = await fetchLlamaFeesRevenue(slug);
+  if (feesRev) {
+    item.ProtocolFeesRevenue = {
+      fees24hUsd: feesRev.fees24hUsd,
+      fees7dUsd: feesRev.fees7dUsd,
+      fees30dUsd: feesRev.fees30dUsd,
+      feesAllTimeUsd: feesRev.feesAllTimeUsd,
+      revenue24hUsd: feesRev.revenue24hUsd,
+      revenue7dUsd: feesRev.revenue7dUsd,
+      revenue30dUsd: feesRev.revenue30dUsd,
+      holdersRevenue24hUsd: feesRev.holdersRevenue24hUsd,
+      feesChange1dPct: feesRev.feesChange1dPct,
+      methodology: feesRev.methodology,
+      methodologyUrl: feesRev.methodologyUrl,
+      llamaCategory: feesRev.category,
+      source: "defillama",
+      updatedAt: nowIso(),
+    };
+    mutated = true;
+    notes.push("fees/rev");
+  }
+
+  // DEX volume (entities + tokens that are DEXes).
+  if (category === "Entity" || category === CATEGORY_TOKEN) {
+    const dex = await fetchLlamaDexVolume(slug);
+    if (dex) {
+      item.DexVolume = { ...dex, source: "defillama", updatedAt: nowIso() };
+      mutated = true;
+      notes.push("dex vol");
+    }
+  }
+
+  // Yields APY (tokens). aTokens are owned by the on-chain Aave pass below.
+  if (category === CATEGORY_TOKEN && !AAVE_ATOKEN_SLUGS.has(slug)) {
+    const pool = resolveLlamaYieldPool(slug, pools);
+    if (pool && pool.apyPct !== null) {
+      const apyHistory = await fetchLlamaYieldChart(pool.poolId, HISTORY_DAYS);
+      item.YieldMechanics = {
+        currentApyPct: pool.apyPct,
+        ...(pool.apyMean30dPct !== null ? { apy30dPct: pool.apyMean30dPct } : {}),
+        feeShareToHoldersPct: 0,
+        yieldSource: `DeFi Llama pool — ${pool.project} ${pool.symbol} on ${pool.chain}`,
+        isAutoCompounding: true,
+        emissionsBased: (pool.apyRewardPct ?? 0) > 0,
+        payoutAsset: "Accrues into the pool position (base APY; rewards where applicable)",
+        ...(apyHistory.length >= 2
+          ? { apyHistory: apyHistory.map((p) => ({ date: p.date, price: p.value })) }
+          : {}),
+        dataSource: "live",
+      };
+      mutated = true;
+      notes.push("yield apy");
+    }
+  }
+
+  // Coins price fallback (tokens unlisted on CoinGecko but with a known address).
+  if (
+    category === CATEGORY_TOKEN &&
+    (item.Market?.priceUsd?.value ?? null) == null &&
+    item.ContractAddress
+  ) {
+    const key = arbCoinKey(String(item.ContractAddress));
+    const price = await fetchLlamaCoinPrice(key);
+    if (price && price.priceUsd !== null) {
+      const sourced = (value: number | null) => ({
+        value,
+        dataSource: "live" as const,
+        sourceLabel: "DeFi Llama",
+        updatedAt: nowIso(),
+      });
+      const pct = await fetchLlamaCoinPercentage(key);
+      item.Market = {
+        ...(item.Market ?? {}),
+        priceUsd: sourced(price.priceUsd),
+        change24hPct: sourced(pct),
+      };
+      const chart = await fetchLlamaCoinChart(key, HISTORY_DAYS);
+      if (chart.length >= 2) {
+        item.PriceHistory = {
+          points: chart.map((p) => ({ date: p.date, price: p.value })),
+          dataSource: "live",
+          updatedAt: nowIso(),
+        };
+      }
+      mutated = true;
+      notes.push("llama price");
+    }
+  }
+
+  return { mutated, note: notes.join("; ") };
+}
+
 export async function GET(req: Request): Promise<NextResponse> {
   if (!authorized(req)) {
     // 500 if the secret isn't configured at all; 401 otherwise.
@@ -263,6 +398,10 @@ export async function GET(req: Request): Promise<NextResponse> {
 
   const hasAlchemy = Boolean(process.env.ALCHEMY_API_KEY);
   const items = await readAllItemsFromRedis();
+
+  // Yields `/pools` is one large keyless payload; fetch it once and reuse the
+  // snapshot for every slug's pool resolution. Fails soft to an empty list.
+  const llamaPools = await fetchLlamaPools();
 
   let updated = 0;
   const touchedSlugs: { category: string; slug: string }[] = [];
@@ -367,6 +506,14 @@ export async function GET(req: Request): Promise<NextResponse> {
         row.note = row.note ? `${row.note}; llama extras` : "llama extras";
         if (row.metric === null) row.metric = item.TotalValueLocked?.value ?? null;
       }
+    }
+
+    // DeFi Llama dimensions: fees/revenue (all categories), DEX volume, yield
+    // APY, and a contract-address price fallback for tokens unlisted on CoinGecko.
+    const dims = await refreshLlamaDimensions(item, slug, category, llamaPools);
+    if (dims.mutated) {
+      mutated = true;
+      row.note = row.note ? `${row.note}; ${dims.note}` : dims.note;
     }
 
     if (mutated) {

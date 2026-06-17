@@ -422,6 +422,159 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         "discord": None,
         "github": None,
     },
+    # --- Lending-network governance tokens (PDF Week 7+8) -------------------
+    "morpho": {
+        "name": "MORPHO",
+        "symbol": "MORPHO",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of the Morpho protocol. MORPHO holders govern the Morpho "
+            "Blue lending primitive, market creation, and the MetaMorpho vault framework."
+        ),
+        "entitySlug": "morpho",
+        "coingecko": "https://www.coingecko.com/en/coins/morpho",
+        "contractAddress": "0x9994e35db50125e0df82e4c2dde62496ce330999",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Base"],
+        "website": "https://morpho.org",
+        "twitter": "https://x.com/MorphoLabs",
+        "discord": None,
+        "github": "https://github.com/morpho-org",
+    },
+    "spk": {
+        "name": "Spark",
+        "symbol": "SPK",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Spark, the Sky/Maker-aligned stablecoin lending stack "
+            "(SparkLend + Spark Savings). Governs risk parameters and USDS/DAI liquidity."
+        ),
+        "entitySlug": "spark",
+        "coingecko": "https://www.coingecko.com/en/coins/spark",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
+        "website": "https://spark.fi",
+        "twitter": "https://x.com/sparkdotfi",
+        "discord": None,
+        "github": "https://github.com/marsfoundation",
+    },
+    "comp": {
+        "name": "Compound",
+        "symbol": "COMP",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Compound. COMP holders propose and vote on market "
+            "parameters and upgrades for the Compound III money markets."
+        ),
+        "entitySlug": "compound",
+        "coingecko": "https://www.coingecko.com/en/coins/compound",
+        "contractAddress": "0xc00e94cb662c3520282e6f5717214004a7f26888",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Base", "Arbitrum One", "Optimism", "Polygon"],
+        "website": "https://compound.finance",
+        "twitter": "https://x.com/compoundfinance",
+        "discord": None,
+        "github": "https://github.com/compound-finance",
+    },
+    "fluid": {
+        "name": "Fluid",
+        "symbol": "FLUID",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Fluid (formerly Instadapp / INST). Governs the shared "
+            "liquidity layer combining lending, vaults, and DEX liquidity."
+        ),
+        "entitySlug": "fluid",
+        "coingecko": "https://www.coingecko.com/en/coins/fluid",
+        "contractAddress": "0x6f40d4a6237c257fff2db00fa0510deeecd303eb",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Base", "Polygon"],
+        "website": "https://fluid.io",
+        "twitter": "https://x.com/0xfluid",
+        "discord": None,
+        "github": "https://github.com/Instadapp",
+    },
+    "xvs": {
+        "name": "Venus",
+        "symbol": "XVS",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Venus Protocol, the leading money market on BNB Chain. "
+            "XVS governs markets, risk parameters, and the VAI stablecoin module."
+        ),
+        "entitySlug": "venus",
+        "coingecko": "https://www.coingecko.com/en/coins/venus",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["BNB Chain", "Ethereum", "Arbitrum One", "Optimism", "zkSync"],
+        "website": "https://venus.io",
+        "twitter": "https://x.com/VenusProtocol",
+        "discord": None,
+        "github": "https://github.com/VenusProtocol",
+    },
+    "jst": {
+        "name": "JUST",
+        "symbol": "JST",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of JustLend DAO, the largest lending market on Tron "
+            "(notably for USDT). JST governs parameters across the JUST ecosystem."
+        ),
+        "entitySlug": "justlend",
+        "coingecko": "https://www.coingecko.com/en/coins/just",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Tron"],
+        "website": "https://justlend.org",
+        "twitter": "https://x.com/DeFi_JUST",
+        "discord": None,
+        "github": None,
+    },
+    "kmno": {
+        "name": "Kamino",
+        "symbol": "KMNO",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Kamino Finance, a Solana-native lending and liquidity "
+            "protocol with isolated/curated markets. KMNO governs the protocol."
+        ),
+        "entitySlug": "kamino",
+        "coingecko": "https://www.coingecko.com/en/coins/kamino",
+        "contractAddress": "KMNo3nJsBXfcpJTVhZcXLW7RmTwTt4GVFE7suUBo9sS",
+        "csvParentSlug": None,
+        "chains": ["Solana"],
+        "website": "https://kamino.finance",
+        "twitter": "https://x.com/KaminoFinance",
+        "discord": None,
+        "github": None,
+    },
+    "syrup": {
+        "name": "Syrup",
+        "symbol": "SYRUP",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance and staking token of Maple Finance (SYRUP, migrated from MPL). "
+            "Maple runs onchain institutional / private-credit lending pools."
+        ),
+        "entitySlug": "maple",
+        "coingecko": "https://www.coingecko.com/en/coins/syrup",
+        "contractAddress": "0x643c4e15d7d62ad0abec4a9bd4b001aa3ef52d66",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Solana", "Base", "Arbitrum One"],
+        "website": "https://maple.finance",
+        "twitter": "https://x.com/maplefinance",
+        "discord": None,
+        "github": "https://github.com/maple-labs",
+    },
 }
 
 

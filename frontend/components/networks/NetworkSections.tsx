@@ -5,6 +5,8 @@ import { Card, CardTitle } from "@/components/ui/Card";
 import { DataPanel } from "@/components/ui/DataPanel";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import type {
+  Competitor,
+  LendingMetrics,
   NetworkComponent,
   NetworkEvent,
   NetworkRisk,
@@ -12,6 +14,7 @@ import type {
   InvestmentRound,
   OrgUnit,
   Partnership,
+  Sourced,
   TimelineEntry,
   TimelineStatus,
   TradFiRow,
@@ -456,6 +459,188 @@ export function TradFiComparisonSection({
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/* Lending sector — metrics + competitors                                     */
+/* -------------------------------------------------------------------------- */
+
+function fmtPct(v: number | null | undefined): string {
+  if (v == null) return "—";
+  return `${v.toFixed(2)}%`;
+}
+
+function fmtUsd(v: number | null | undefined): string {
+  if (v == null) return "—";
+  return formatUsdCompact(v);
+}
+
+/** A live (Sourced) metric tile: value + provenance label. */
+function MetricTile({
+  label,
+  sourced,
+  kind,
+}: {
+  label: string;
+  sourced?: Sourced<number | null>;
+  kind: "usd" | "pct";
+}) {
+  const value = sourced?.value ?? null;
+  const text = kind === "usd" ? fmtUsd(value) : fmtPct(value);
+  return (
+    <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+      <p className="text-xs uppercase tracking-wide text-ink-500">{label}</p>
+      <p className="mt-1 font-mono text-lg text-ink-50">{text}</p>
+      <p className="mt-1 text-[10px] text-ink-500">
+        {sourced?.sourceLabel ?? "Pending live refresh"}
+      </p>
+    </div>
+  );
+}
+
+/** A curated (static research) row: label + free text or chips. */
+function CuratedRow({
+  label,
+  text,
+  chips,
+}: {
+  label: string;
+  text?: string | null;
+  chips?: string[];
+}) {
+  if (!text && !(chips && chips.length)) return null;
+  return (
+    <div className="py-3 first:pt-0 last:pb-0">
+      <p className="text-xs font-medium uppercase tracking-wide text-ink-500">{label}</p>
+      {chips && chips.length ? (
+        <div className="mt-1.5 flex flex-wrap gap-1">
+          {chips.map((c) => (
+            <Badge key={c} tone="neutral">
+              {c}
+            </Badge>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-1 text-sm leading-relaxed text-ink-300">{text}</p>
+      )}
+    </div>
+  );
+}
+
+export function LendingMetricsSection({ lending }: { lending?: LendingMetrics | null }) {
+  if (!lending) return null;
+  const dep = lending.deployment;
+  const hasLive =
+    lending.tvlUsd ||
+    lending.totalBorrowsUsd ||
+    lending.utilizationPct ||
+    lending.supplyApyPct ||
+    lending.borrowApyPct;
+  return (
+    <section id="lending" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Lending metrics"
+        subtitle="Live supply/borrow data (DeFi Llama) plus curated risk and deployment facts."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <MetricTile label="TVL / deposits" sourced={lending.tvlUsd} kind="usd" />
+        <MetricTile label="Total borrows" sourced={lending.totalBorrowsUsd} kind="usd" />
+        <MetricTile label="Utilization" sourced={lending.utilizationPct} kind="pct" />
+        <MetricTile label="Supply APY" sourced={lending.supplyApyPct} kind="pct" />
+        <MetricTile label="Borrow APY" sourced={lending.borrowApyPct} kind="pct" />
+        <MetricTile label="Net interest margin" sourced={lending.netInterestMarginPct} kind="pct" />
+        <MetricTile label="Revenue (30d)" sourced={lending.revenue30dUsd} kind="usd" />
+        <MetricTile label="Fees (30d)" sourced={lending.fees30dUsd} kind="usd" />
+      </div>
+      {!hasLive && (
+        <p className="text-xs text-ink-500">
+          Live supply/borrow metrics populate on the next DeFi Llama refresh.
+        </p>
+      )}
+
+      <DataPanel title="Asset coverage & risk">
+        <div className="divide-y divide-ink-800/60">
+          <CuratedRow label="Collateral assets" chips={lending.collateralAssets} />
+          <CuratedRow label="Loan assets" chips={lending.loanAssets} />
+          <CuratedRow label="Stablecoin exposure" chips={lending.stablecoinExposure} />
+          <CuratedRow label="Oracles" chips={lending.oracles} />
+          <CuratedRow label="Risk parameters" text={lending.riskParameters} />
+          <CuratedRow label="Liquidations" text={lending.liquidations} />
+          <CuratedRow label="Bad debt" text={lending.badDebt} />
+          <CuratedRow label="Governance activity" text={lending.governanceActivity} />
+          <CuratedRow label="Audit / exploit history" text={lending.auditHistory} />
+          {dep && (
+            <CuratedRow
+              label={`Chains${
+                dep.evmCompatible ? ` · EVM: ${dep.evmCompatible}` : ""
+              }`}
+              chips={dep.chains}
+            />
+          )}
+          {dep?.notes && <CuratedRow label="Deployment notes" text={dep.notes} />}
+        </div>
+      </DataPanel>
+    </section>
+  );
+}
+
+export function CompetitorsSection({
+  competitors,
+  networkName,
+}: {
+  competitors?: Competitor[];
+  networkName?: string;
+}) {
+  if (!competitors || competitors.length === 0) return null;
+  const ranked = [...competitors].sort((a, b) => a.rank - b.rank);
+  return (
+    <section id="competitors" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Competitors"
+        subtitle={
+          networkName
+            ? `Ranked top→bottom — who competes with ${networkName} and how they differ.`
+            : "Ranked top→bottom by how directly they compete."
+        }
+      />
+      <TableShell>
+        <Table className="min-w-[760px]">
+          <THead>
+            <tr>
+              <TH className="w-10">#</TH>
+              <TH>Competitor</TH>
+              <TH>Positioning</TH>
+              <TH>Similarities</TH>
+              <TH>Differentiator</TH>
+            </tr>
+          </THead>
+          <TBody>
+            {ranked.map((c) => (
+              <TR key={`${c.rank}-${c.name}`}>
+                <TD className="font-mono text-ink-400">{c.rank}</TD>
+                <TD className="font-medium text-ink-50">
+                  {c.slug ? (
+                    <a
+                      href={`/networks/${c.slug}`}
+                      className="inline-flex items-center gap-0.5 text-ink-50 transition-colors hover:text-electric-400"
+                    >
+                      {c.name}
+                      <ArrowUpRight className="h-3 w-3" />
+                    </a>
+                  ) : (
+                    c.name
+                  )}
+                </TD>
+                <TD className="text-ink-300">{c.positioning}</TD>
+                <TD className="text-ink-300">{c.similarities}</TD>
+                <TD className="text-ink-300">{c.differences}</TD>
+              </TR>
+            ))}
+          </TBody>
+        </Table>
+      </TableShell>
+    </section>
+  );
+}
+
 /** Build section nav items based on which sections have content. */
 export function buildNetworkSectionNav(profile: {
   components: NetworkComponent[];
@@ -473,6 +658,8 @@ export function buildNetworkSectionNav(profile: {
   timeline?: unknown[];
   offchainFacts?: unknown[];
   agentSkill?: unknown;
+  lending?: unknown;
+  competitors?: unknown[];
 }) {
   const items: { id: string; label: string; researchTab?: string }[] = [];
 
@@ -485,6 +672,8 @@ export function buildNetworkSectionNav(profile: {
     profile.tokenomics;
 
   if (profile.memberCoins.length) items.push({ id: "member-coins", label: "Dashboard" });
+  if (profile.lending) items.push({ id: "lending", label: "Lending" });
+  if (profile.competitors?.length) items.push({ id: "competitors", label: "Competitors" });
   if (hasResearch) items.push({ id: "research-hub", label: "Research" });
   if (profile.market) items.push({ id: "market", label: "Market" });
   if (profile.orgStructure.length) items.push({ id: "org", label: "Org structure" });

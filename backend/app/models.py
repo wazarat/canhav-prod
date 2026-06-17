@@ -510,6 +510,14 @@ class EntityProfile(BaseModel):
     partnerships: List[Partnership] = Field(default_factory=list)
     currentScale: CurrentScale = Field(default_factory=CurrentScale)
     scaleLabels: Optional[ScaleLabels] = None
+    # Taxonomy hierarchy (Network -> subCategory -> sector -> subSector).
+    subCategory: Optional[str] = "Protocol"
+    sector: Optional[str] = None
+    subSector: Optional[str] = None
+    # Ranked competitors (top->bottom) + lending-specific metrics; passthrough
+    # dicts written by the seed scripts / TS cron (mirrors protocolFeesRevenue).
+    competitors: List[dict] = Field(default_factory=list)
+    lending: Optional[dict] = None
     memberCoins: List[MemberCoinRef] = Field(default_factory=list)
     # DeFi Llama overlays (written by the cron); passthrough dicts. Options /
     # open-interest are scaffolded for the coming-soon options/perpetuals categories.
@@ -548,6 +556,11 @@ class EntityProfile(BaseModel):
             "Events": [e.model_dump() for e in self.events],
             "InvestmentRounds": [r.model_dump() for r in self.investmentRounds],
             "ScaleLabels": self.scaleLabels.model_dump() if self.scaleLabels else None,
+            "SubCategory": self.subCategory,
+            "Sector": self.sector,
+            "SubSector": self.subSector,
+            "Competitors": self.competitors,
+            "Lending": self.lending,
             "Partnerships": [p.model_dump() for p in self.partnerships],
             "CurrentScale": self.currentScale.model_dump(),
             "MemberCoins": [m.model_dump() for m in self.memberCoins],
@@ -589,6 +602,11 @@ class EntityProfile(BaseModel):
             scaleLabels=ScaleLabels(**item["ScaleLabels"])
             if item.get("ScaleLabels")
             else None,
+            subCategory=item.get("SubCategory", "Protocol"),
+            sector=item.get("Sector"),
+            subSector=item.get("SubSector"),
+            competitors=item.get("Competitors") or [],
+            lending=item.get("Lending"),
             memberCoins=[MemberCoinRef(**m) for m in (item.get("MemberCoins") or [])],
             protocolFeesRevenue=item.get("ProtocolFeesRevenue"),
             dexVolume=item.get("DexVolume"),

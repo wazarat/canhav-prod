@@ -40,11 +40,40 @@ TOKEN_TYPES = (
 
 # Categories queued for the sequential rollout (kept here for reference).
 FUTURE_CATEGORIES = (
+    "Perpetuals",
+    "Yield",
+    "DEX",
+    "Options",
+)
+
+# --- Network taxonomy hierarchy --------------------------------------------
+# Networks (stored on the CATEGORY#Entity partition) carry an optional
+# sub-taxonomy: subCategory (what kind of network) -> sector (what it does) ->
+# subSector (functional leaf). This is distinct from the coin-level subtypes.
+NETWORK_SUBCATEGORIES = (
+    "Protocol",
+    "Chain",
+    "Rollup",
+    "Appchain",
+)
+
+NETWORK_SECTORS = (
     "Lending",
     "Perpetuals",
     "Yield",
     "DEX",
     "Options",
+    "Stablecoin",
+    "RWA",
+)
+
+# Lending sub-sectors (PDF "Further sub categories within lending").
+LENDING_SUBSECTORS = (
+    "Money Markets",
+    "Isolated / Curated Lending",
+    "Stablecoin-Native Credit Stack",
+    "Liquidity Hybrid",
+    "Institutional / Private Credit",
 )
 
 # Derived RWA asset classes (the CSV labels everything "Real World Assets

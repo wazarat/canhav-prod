@@ -76,6 +76,17 @@ export const LLAMA_STABLECOIN_IDS: Record<string, number | null> = {
  * absent. Slugs verified against https://api.llama.fi/protocols on 2026-06-12.
  */
 export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
+  // Lending networks (PDF Week 7+8) — protocol TVL series. Verify against
+  // https://api.llama.fi/protocols. `// verify` ones fail soft to null.
+  aave: "aave-v3",
+  morpho: "morpho-blue", // verify
+  spark: "spark", // verify
+  compound: "compound-v3", // verify
+  fluid: "fluid", // verify
+  venus: "venus-core-pool", // verify
+  justlend: "justlend", // verify
+  kamino: "kamino-lend", // verify
+  maple: "maple", // verify
   centrifuge: "centrifuge-protocol",
   dinari: "dinari",
   "estate-protocol": "estate-protocol",
@@ -102,6 +113,16 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
  */
 export const LLAMA_FEES_SLUGS: Record<string, string | null> = {
   aave: "aave-v3", // Aave V3 fees/revenue
+  // Lending networks (PDF Week 7+8) — fees/revenue adapters. Verify against
+  // https://defillama.com/fees. `// verify` ones fail soft to null.
+  morpho: "morpho-blue", // verify
+  spark: "spark", // verify
+  compound: "compound-v3", // verify
+  fluid: "fluid", // verify
+  venus: "venus-finance", // verify
+  justlend: "justlend", // verify
+  kamino: "kamino-lend", // verify
+  maple: "maple", // verify
   ethena: "ethena", // Ethena (USDe yield)
   sky: "sky-lending", // Sky / MakerDAO lending fees // verify
   "sky-gov": "sky-lending", // verify
@@ -623,6 +644,132 @@ export async function fetchLlamaPools(revalidate?: number): Promise<LlamaPool[]>
   }
   if (pools.length > 0) _poolsCache = { at: Date.now(), pools };
   return pools;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Lending borrow metrics (yields /poolsBorrow)                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Curated network slug -> DeFi Llama yields `project` value, used to aggregate
+ * the `/poolsBorrow` rows into protocol-level lending metrics (supply/borrow
+ * APY, utilization). Distinct from the TVL/fees protocol slugs. `// verify`
+ * entries should be confirmed against https://yields.llama.fi/poolsBorrow.
+ */
+export const LLAMA_LENDING_PROJECTS: Record<string, string | null> = {
+  aave: "aave-v3",
+  morpho: "morpho-blue", // verify
+  spark: "sparklend", // verify
+  compound: "compound-v3", // verify
+  fluid: "fluid-lending", // verify
+  venus: "venus-core-pool", // verify
+  justlend: "justlend", // verify
+  kamino: "kamino-lend", // verify
+  maple: "maple", // verify
+};
+
+export function llamaLendingProjectForSlug(slug: string): string | null {
+  return LLAMA_LENDING_PROJECTS[slug] ?? null;
+}
+
+interface LlamaBorrowPool {
+  project: string;
+  chain: string;
+  symbol: string;
+  totalSupplyUsd: number | null;
+  totalBorrowUsd: number | null;
+  apyBase: number | null;
+  apyBaseBorrow: number | null;
+  ltv: number | null;
+}
+
+let _borrowCache: { at: number; pools: LlamaBorrowPool[] } | null = null;
+
+/** All tracked borrow pools (cached ~5 min). Large payload; fetched once. */
+export async function fetchLlamaBorrowPools(revalidate?: number): Promise<LlamaBorrowPool[]> {
+  if (_borrowCache && Date.now() - _borrowCache.at < POOLS_CACHE_MS) return _borrowCache.pools;
+  const data = await getJson(`${YIELDS_BASE}/poolsBorrow`, revalidate);
+  const rows = data && Array.isArray(data.data) ? data.data : [];
+  const pools: LlamaBorrowPool[] = [];
+  for (const r of rows) {
+    if (!r || typeof r !== "object") continue;
+    pools.push({
+      project: String(r.project ?? ""),
+      chain: String(r.chain ?? ""),
+      symbol: String(r.symbol ?? ""),
+      totalSupplyUsd: num(r.totalSupplyUsd),
+      totalBorrowUsd: num(r.totalBorrowUsd),
+      apyBase: num(r.apyBase),
+      apyBaseBorrow: num(r.apyBaseBorrow),
+      ltv: num(r.ltv),
+    });
+  }
+  if (pools.length > 0) _borrowCache = { at: Date.now(), pools };
+  return pools;
+}
+
+export interface LlamaLendingBorrow {
+  /** Total supplied / deposits across the project's pools (USD). */
+  totalSupplyUsd: number | null;
+  /** Total outstanding borrows across the project's pools (USD). */
+  totalBorrowUsd: number | null;
+  /** borrowed / supplied (0–100). */
+  utilizationPct: number | null;
+  /** Supply-weighted base supply APY (%). */
+  supplyApyPct: number | null;
+  /** Borrow-weighted base borrow APY (%). */
+  borrowApyPct: number | null;
+}
+
+/**
+ * Aggregate a project's `/poolsBorrow` rows into protocol-level lending
+ * metrics. Supply/borrow APYs are TVL-weighted so a single dominant market
+ * doesn't get drowned out by long-tail pools. Returns null when the project
+ * has no borrow pools in the snapshot.
+ */
+export function aggregateLendingBorrow(
+  slug: string,
+  pools: LlamaBorrowPool[],
+): LlamaLendingBorrow | null {
+  const project = llamaLendingProjectForSlug(slug);
+  if (!project) return null;
+  const proj = project.toLowerCase();
+  const rows = pools.filter((p) => p.project.toLowerCase() === proj);
+  if (rows.length === 0) return null;
+
+  let supply = 0;
+  let borrow = 0;
+  let supplyApyWeighted = 0;
+  let supplyWeight = 0;
+  let borrowApyWeighted = 0;
+  let borrowWeight = 0;
+
+  for (const r of rows) {
+    const s = r.totalSupplyUsd ?? 0;
+    const b = r.totalBorrowUsd ?? 0;
+    supply += s;
+    borrow += b;
+    if (r.apyBase != null && s > 0) {
+      supplyApyWeighted += r.apyBase * s;
+      supplyWeight += s;
+    }
+    if (r.apyBaseBorrow != null && b > 0) {
+      borrowApyWeighted += r.apyBaseBorrow * b;
+      borrowWeight += b;
+    }
+  }
+
+  const supplyApyPct = supplyWeight > 0 ? supplyApyWeighted / supplyWeight : null;
+  const borrowApyPct = borrowWeight > 0 ? borrowApyWeighted / borrowWeight : null;
+  const utilizationPct = supply > 0 ? (borrow / supply) * 100 : null;
+
+  return {
+    totalSupplyUsd: supply > 0 ? supply : null,
+    totalBorrowUsd: borrow > 0 ? borrow : null,
+    utilizationPct,
+    supplyApyPct,
+    borrowApyPct,
+  };
 }
 
 export interface LlamaYieldPool {

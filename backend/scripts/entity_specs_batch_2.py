@@ -833,6 +833,129 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         "scale_labels": {
             "tvl": "Protocol TVL",
         },
+        # --- Lending taxonomy (Network -> Protocol -> Lending -> Money Markets) ---
+        "sub_category": "Protocol",
+        "sector": "Lending",
+        "sub_sector": "Money Markets",
+        "competitors": [
+            {
+                "name": "Morpho",
+                "slug": "morpho",
+                "rank": 1,
+                "positioning": "Customizable lending infrastructure.",
+                "similarities": "Both are major EVM money markets for supplying and borrowing.",
+                "differences": (
+                    "Morpho Blue creates isolated markets (collateral, loan asset, oracle, "
+                    "liquidation settings) with MetaMorpho vaults allocated by curators — more "
+                    "modular and risk-specific than Aave's broad pooled markets."
+                ),
+            },
+            {
+                "name": "Spark / SparkLend",
+                "slug": "spark",
+                "rank": 2,
+                "positioning": "Stablecoin-native lending stack.",
+                "similarities": "SparkLend started from Aave V3 architecture.",
+                "differences": (
+                    "Edge is the Sky/Maker stablecoin ecosystem — focused on USDS/DAI liquidity, "
+                    "savings products, and stablecoin borrowing at scale."
+                ),
+            },
+            {
+                "name": "Compound",
+                "slug": "compound",
+                "rank": 3,
+                "positioning": "Simple, battle-tested lending.",
+                "similarities": "Classic pooled money-market model; one of the most trusted DeFi lending brands.",
+                "differences": (
+                    "Compound III uses one base borrowable asset per market with other assets as "
+                    "collateral — simpler to reason about but less flexible than Aave's multi-asset pools."
+                ),
+            },
+            {
+                "name": "Fluid",
+                "slug": "fluid",
+                "rank": 4,
+                "positioning": "Capital-efficient lending + DEX hybrid.",
+                "similarities": "Lending/borrowing money market live across EVM chains.",
+                "differences": (
+                    "Combines lending, vaults, and DEX liquidity through a shared liquidity layer — "
+                    "more capital-efficient but more complex to analyze."
+                ),
+            },
+            {
+                "name": "JustLend",
+                "slug": "justlend",
+                "rank": 5,
+                "positioning": "Chain-specific lending leader (Tron).",
+                "similarities": "Pooled money market by design.",
+                "differences": "Tron-native, big on USDT lending TVL; not an Ethereum/L2 competitor.",
+            },
+            {
+                "name": "Venus",
+                "slug": "venus",
+                "rank": 6,
+                "positioning": "Chain-specific lending leader (BNB Chain).",
+                "similarities": "Pooled money market, similar to JustLend.",
+                "differences": "Competes by ecosystem (BNB Chain) rather than directly on Ethereum.",
+            },
+            {
+                "name": "Kamino Lend",
+                "slug": "kamino",
+                "rank": 7,
+                "positioning": "Chain-specific lending leader (Solana).",
+                "similarities": "Major cross-chain lending venue.",
+                "differences": "Solana-native (isolated/curated markets); not a direct Ethereum competitor.",
+            },
+            {
+                "name": "Maple Finance",
+                "slug": "maple",
+                "rank": 8,
+                "positioning": "Institutional credit, not just overcollateralized DeFi.",
+                "similarities": "A venue matching borrowers and lenders.",
+                "differences": (
+                    "Institutional / private-credit model — vetted borrowers, loan terms, repayment "
+                    "history and pool managers rather than open overcollateralized lending."
+                ),
+            },
+        ],
+        "lending": {
+            "collateralAssets": ["ETH", "wstETH", "weETH", "WBTC", "USDC", "USDT", "DAI", "GHO", "LINK"],
+            "loanAssets": ["USDC", "USDT", "DAI", "GHO", "ETH", "WBTC"],
+            "stablecoinExposure": ["USDC", "USDT", "DAI", "GHO"],
+            "oracles": ["Chainlink"],
+            "riskParameters": (
+                "Per-asset LTV, liquidation threshold/penalty and supply/borrow caps set by Aave "
+                "governance; isolation mode and e-mode tiers for correlated assets."
+            ),
+            "liquidations": (
+                "On-chain liquidations by keepers once a position's health factor drops below 1; "
+                "penalties vary by asset risk tier."
+            ),
+            "badDebt": (
+                "Minimal historical bad debt; the Umbrella safety module (stkGHO/stkABPT) backstops "
+                "shortfalls."
+            ),
+            "governanceActivity": (
+                "Active Aave DAO — risk-parameter updates, new listings, Aavenomics buybacks, and "
+                "the Aave V4 direction."
+            ),
+            "auditHistory": (
+                "Extensively audited across multiple firms with a long live track record and no "
+                "protocol-insolvency exploit."
+            ),
+            "deployment": {
+                "chains": [
+                    "Ethereum", "Arbitrum", "Optimism", "Base", "Polygon",
+                    "Avalanche", "BNB Chain", "Gnosis", "Scroll", "Metis", "zkSync",
+                ],
+                "evmCompatible": "yes",
+                "notes": (
+                    "Mainly EVM/multi-chain; has also explored Aptos/Move deployments — check the "
+                    "specific market."
+                ),
+            },
+        },
         "member_coins": [
             {
                 "slug": "gho",

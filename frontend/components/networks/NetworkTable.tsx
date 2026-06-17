@@ -53,6 +53,12 @@ export function NetworkTable({ profiles, showStatus = false, emptyHint }: Networ
                 <p className="mt-0.5 line-clamp-1 max-w-[320px] text-xs text-ink-300">
                   {p.description}
                 </p>
+                {p.sector && (
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                    <Badge tone="electric">{p.sector}</Badge>
+                    {p.subSector && <Badge tone="neutral">{p.subSector}</Badge>}
+                  </div>
+                )}
                 <p className="mt-1 text-xs text-ink-400">
                   {p.memberCoins.length} coin{p.memberCoins.length !== 1 ? "s" : ""}
                 </p>

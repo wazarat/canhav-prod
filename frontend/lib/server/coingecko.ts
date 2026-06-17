@@ -96,6 +96,18 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   usdsc: null,
   "ondo-gm": null,
   "stably-gold": null,
+  // Lending-network governance tokens (PDF Week 7+8). Ids verified via the
+  // CoinGecko /search endpoint; `// verify` ones should be confirmed before
+  // relying on live price/supply (the cron fails soft to null otherwise).
+  morpho: "morpho",
+  comp: "compound-governance-token",
+  spk: "spark", // Spark (SPK) // verify
+  fluid: "instadapp", // Fluid (ex-INST) // verify
+  xvs: "venus",
+  jst: "just",
+  kmno: "kamino",
+  syrup: "syrup", // Maple SYRUP // verify
+  vai: null,
 };
 
 export interface TokenResolution {

@@ -11,7 +11,9 @@ import {
   type TokenResolution,
 } from "@/lib/server/coingecko";
 import {
+  aggregateLendingBorrow,
   arbCoinKey,
+  fetchLlamaBorrowPools,
   fetchLlamaCoinChart,
   fetchLlamaCoinPercentage,
   fetchLlamaCoinPrice,
@@ -23,6 +25,7 @@ import {
   fetchLlamaStablecoinCharts,
   fetchLlamaStablecoinPrices,
   fetchLlamaYieldChart,
+  llamaLendingProjectForSlug,
   type LlamaPool,
   resolveLlamaYieldPool,
 } from "@/lib/server/defillama";
@@ -584,6 +587,71 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
   }
 
+  // --- Lending networks: DeFi Llama live metrics ---------------------------
+  // For each network tagged sector "Lending", overlay live supply/borrow/APY/
+  // utilization (yields /poolsBorrow), protocol TVL, and fees/revenue onto the
+  // curated `Lending` block. Curated string/array fields (risk params, oracles,
+  // bad debt, audit history) are preserved.
+  const lendingItems = items.filter(
+    (it) =>
+      isNetworkCategory(String(it.Category ?? "")) &&
+      String(it.Sector ?? "") === "Lending" &&
+      llamaLendingProjectForSlug(String(it.Slug ?? "")) !== null,
+  );
+  const lendingResults: { slug: string; tvlUsd: number | null; utilizationPct: number | null }[] =
+    [];
+  if (lendingItems.length > 0) {
+    const sourced = (value: number | null) => ({
+      value,
+      dataSource: "live" as const,
+      sourceLabel: "DeFi Llama",
+      updatedAt: nowIso(),
+    });
+    const borrowPools = await fetchLlamaBorrowPools();
+    for (const item of lendingItems) {
+      const slug = String(item.Slug ?? "");
+      const borrow = aggregateLendingBorrow(slug, borrowPools);
+      const tvl = await fetchLlamaProtocolTvl(slug, 1);
+      const tvlUsd = tvl && tvl.points.length > 0 ? tvl.points[tvl.points.length - 1].value : null;
+      const feesRev = item.ProtocolFeesRevenue ?? null;
+
+      const supplyApy = borrow?.supplyApyPct ?? null;
+      const borrowApy = borrow?.borrowApyPct ?? null;
+      const nim =
+        supplyApy != null && borrowApy != null ? borrowApy - supplyApy : null;
+
+      const live: Record<string, unknown> = {
+        ...(tvlUsd != null ? { tvlUsd: sourced(tvlUsd) } : {}),
+        ...(borrow?.totalBorrowUsd != null
+          ? { totalBorrowsUsd: sourced(borrow.totalBorrowUsd) }
+          : {}),
+        ...(borrow?.utilizationPct != null
+          ? { utilizationPct: sourced(borrow.utilizationPct) }
+          : {}),
+        ...(supplyApy != null ? { supplyApyPct: sourced(supplyApy) } : {}),
+        ...(borrowApy != null ? { borrowApyPct: sourced(borrowApy) } : {}),
+        ...(nim != null ? { netInterestMarginPct: sourced(nim) } : {}),
+        ...(feesRev?.revenue30dUsd != null
+          ? { revenue30dUsd: sourced(feesRev.revenue30dUsd) }
+          : {}),
+        ...(feesRev?.fees30dUsd != null ? { fees30dUsd: sourced(feesRev.fees30dUsd) } : {}),
+      };
+
+      if (Object.keys(live).length > 0) {
+        // Preserve curated fields; overlay live (Sourced) fields.
+        item.Lending = { ...(item.Lending ?? {}), ...live };
+        // Headline TVL on the network card mirrors the lending TVL when present.
+        if (tvlUsd != null) {
+          item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
+        }
+        item.UpdatedAt = nowIso();
+        await putItem(item);
+        updated += 1;
+        lendingResults.push({ slug, tvlUsd, utilizationPct: borrow?.utilizationPct ?? null });
+      }
+    }
+  }
+
   // --- Entity headline TVL aggregation --------------------------------------
   // A few entities ship with CurrentScale.tvlUsd = null (e.g. Monerium, Pleasing
   // Market). Derive it from the member-coin metrics refreshed above so the value
@@ -644,5 +712,6 @@ export async function GET(req: Request): Promise<NextResponse> {
     updated,
     results,
     aave: aaveResults,
+    lending: lendingResults,
   });
 }

@@ -226,6 +226,11 @@ export async function readLiveStore(): Promise<LiveStore> {
         investmentRounds: item.InvestmentRounds ?? [],
         partnerships: item.Partnerships ?? [],
         scaleLabels: item.ScaleLabels ?? undefined,
+        subCategory: item.SubCategory ?? null,
+        sector: item.Sector ?? null,
+        subSector: item.SubSector ?? null,
+        competitors: item.Competitors ?? [],
+        lending: item.Lending ?? null,
         currentScale: {
           tvlUsd: null,
           users: null,

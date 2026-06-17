@@ -1,0 +1,618 @@
+#!/usr/bin/env python3
+"""
+Lending-network specs (PDF "CanHav - Week (7+8) Q2_26").
+
+The eight new lending networks that join Aave under the
+Network -> Protocol -> Lending taxonomy, each tagged with its lending
+sub-sector (PDF "Further sub categories within lending"):
+
+    Money Markets ................ Aave*, Compound, JustLend, Venus
+    Isolated / Curated Lending ... Morpho, Kamino
+    Stablecoin-Native Credit ..... Spark
+    Liquidity Hybrid ............. Fluid
+    Institutional / Private Credit Maple
+
+(* Aave already exists; it is reclassified in entity_specs_batch_2.py.)
+
+These dicts are merged into ENTITY_SPECS by ingest_entities.py and flattened to
+store items by `build_entity_item`. Live lending metrics (TVL, borrow/supply
+APY, utilization, fees/revenue) are filled by the DeFiLlama cron pass; the
+curated string/array fields below are the static research that DeFiLlama does
+not expose.
+
+Stdlib only.
+"""
+
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional
+
+
+def _empty_scale() -> Dict[str, Any]:
+    return {
+        "tvlUsd": None,
+        "users": None,
+        "aprPct": None,
+        "targetAprPct": None,
+        "marketCapUsd": None,
+        "loanPipelineUsd": None,
+        "partnerships": None,
+    }
+
+
+def _portal_defaults(chains: List[str]) -> Dict[str, Any]:
+    return {
+        "chains": chains,
+        "subCategory": "Entity",
+        "isLive": True,
+        "isArbitrumNative": False,
+        "isPubliclyAudited": True,
+        "foundedDate": None,
+        "logoUrl": None,
+        "bannerUrl": None,
+        "portalUrl": None,
+    }
+
+
+def _net(
+    *,
+    name: str,
+    symbol: str,
+    tagline: str,
+    description: str,
+    differentiator: str,
+    sub_sector: str,
+    competitors: List[Dict[str, Any]],
+    lending: Dict[str, Any],
+    member_coins: List[Dict[str, Any]],
+    chains: List[str],
+    official_docs: Optional[str] = None,
+    website: Optional[str] = None,
+    twitter: Optional[str] = None,
+    discord: Optional[str] = None,
+    github: Optional[str] = None,
+    risks: Optional[List[Dict[str, str]]] = None,
+    events: Optional[List[Dict[str, Any]]] = None,
+    scale_labels: Optional[Dict[str, str]] = None,
+) -> Dict[str, Any]:
+    """Build a lending-network spec, filling the editorial defaults that
+    `build_entity_item` expects so each entry stays focused on real content."""
+    return {
+        "name": name,
+        "symbol": symbol,
+        "csv_slug": None,
+        "tagline": tagline,
+        "description": description,
+        "differentiator": differentiator,
+        "official_docs": official_docs,
+        "website": website,
+        "twitter": twitter,
+        "discord": discord,
+        "github": github,
+        "components": [],
+        "faq": [],
+        "org_structure": [],
+        "tradfi_comparison": [],
+        "risks": risks or [],
+        "events": events or [],
+        "investment_rounds": [],
+        "partnerships": [],
+        "current_scale": _empty_scale(),
+        "scale_labels": scale_labels or {"tvl": "Protocol TVL"},
+        # Taxonomy hierarchy.
+        "sub_category": "Protocol",
+        "sector": "Lending",
+        "sub_sector": sub_sector,
+        "competitors": competitors,
+        "lending": lending,
+        "member_coins": member_coins,
+        "portal_defaults": _portal_defaults(chains),
+    }
+
+
+# Reusable competitor entry pointing back at Aave (the reference brand).
+_AAVE_COMPETITOR = {
+    "name": "Aave",
+    "slug": "aave",
+    "rank": 1,
+    "positioning": "Safest broad money-market brand.",
+    "similarities": "Both let users supply and borrow crypto assets onchain.",
+    "differences": (
+        "Aave is the broadest general-purpose pooled money market — brand, liquidity "
+        "depth, multi-chain reach and risk tooling."
+    ),
+}
+
+
+LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
+    "morpho": _net(
+        name="Morpho",
+        symbol="MORPHO",
+        tagline="Customizable lending infrastructure — isolated markets + curated vaults.",
+        description=(
+            "Morpho is a lending protocol built around Morpho Blue, a minimal primitive "
+            "for creating isolated markets, with MetaMorpho vaults that allocate deposits "
+            "across those markets through risk curators."
+        ),
+        differentiator=(
+            "Instead of one big pool, Morpho Blue markets each fix a collateral, loan "
+            "asset, oracle and liquidation setting; curators build vaults on top — more "
+            "modular and risk-specific than Aave."
+        ),
+        sub_sector="Isolated / Curated Lending",
+        official_docs="https://docs.morpho.org",
+        website="https://morpho.org",
+        twitter="https://x.com/MorphoLabs",
+        github="https://github.com/morpho-org",
+        chains=["Ethereum", "Base"],
+        competitors=[
+            _AAVE_COMPETITOR,
+            {
+                "name": "Spark / SparkLend",
+                "slug": "spark",
+                "rank": 2,
+                "positioning": "Stablecoin-native lending stack.",
+                "similarities": "Both build curated/isolated lending on top of base liquidity.",
+                "differences": "Spark is tied to the Sky/Maker USDS/DAI ecosystem; Morpho is asset-agnostic infrastructure.",
+            },
+            {
+                "name": "Kamino",
+                "slug": "kamino",
+                "rank": 3,
+                "positioning": "Solana isolated/curated lending.",
+                "similarities": "Shares the isolated-market / curated-vault model.",
+                "differences": "Kamino is Solana-native; Morpho is EVM (Ethereum/Base).",
+            },
+        ],
+        lending={
+            "collateralAssets": ["ETH", "wstETH", "weETH", "WBTC", "cbBTC", "USDC", "USDe"],
+            "loanAssets": ["USDC", "USDT", "DAI", "ETH", "WBTC"],
+            "stablecoinExposure": ["USDC", "USDT", "DAI", "USDe"],
+            "oracles": ["Chainlink", "Per-market configurable (curator chooses)"],
+            "riskParameters": (
+                "Per-market and immutable: each Morpho Blue market fixes its LTV (LLTV), oracle "
+                "and liquidation parameters; MetaMorpho vaults set supply caps and allocations."
+            ),
+            "liquidations": "Permissionless liquidations per market once LLTV is breached.",
+            "badDebt": "Isolated by design — bad debt is contained to a single market/vault rather than socialized.",
+            "governanceActivity": "MORPHO governs the framework; risk is delegated to independent vault curators.",
+            "auditHistory": "Morpho Blue is audited and formally verified; minimal immutable core reduces attack surface.",
+            "deployment": {
+                "chains": ["Ethereum", "Base"],
+                "evmCompatible": "yes",
+                "notes": "EVM-optimized smart contracts (docs.morpho.org).",
+            },
+        },
+        member_coins=[
+            {
+                "slug": "morpho",
+                "name": "MORPHO",
+                "symbol": "MORPHO",
+                "category": "Token",
+                "role": "DAO governance token",
+                "subCategory": "Governance Token",
+            },
+        ],
+    ),
+    "spark": _net(
+        name="Spark",
+        symbol="SPK",
+        tagline="Stablecoin-native credit stack tied to the Sky/Maker ecosystem.",
+        description=(
+            "Spark is a lending system built mainly around stablecoin liquidity, borrowing "
+            "and yield (SparkLend + Spark Savings), routing USDS/DAI liquidity from the "
+            "Sky/Maker ecosystem at scale."
+        ),
+        differentiator=(
+            "Not just general lending — its edge is the Sky/Maker connection (DAI/USDS): how "
+            "it creates, routes, lends and manages stablecoin liquidity."
+        ),
+        sub_sector="Stablecoin-Native Credit Stack",
+        official_docs="https://docs.spark.fi",
+        website="https://spark.fi",
+        twitter="https://x.com/sparkdotfi",
+        github="https://github.com/marsfoundation",
+        chains=["Ethereum"],
+        competitors=[
+            _AAVE_COMPETITOR,
+            {
+                "name": "Sky (Savings Rate)",
+                "slug": "sky",
+                "rank": 2,
+                "positioning": "Parent stablecoin ecosystem (USDS/DAI).",
+                "similarities": "Spark is the lending arm of the Sky/Maker stablecoin stack.",
+                "differences": "Sky issues USDS/DAI; Spark lends and routes that liquidity.",
+            },
+            {
+                "name": "Morpho",
+                "slug": "morpho",
+                "rank": 3,
+                "positioning": "Customizable lending infrastructure.",
+                "similarities": "Both offer curated stablecoin lending markets.",
+                "differences": "Morpho is asset-agnostic infra; Spark is stablecoin-first and Sky-aligned.",
+            },
+        ],
+        lending={
+            "collateralAssets": ["ETH", "wstETH", "weETH", "WBTC", "cbBTC", "USDS", "DAI"],
+            "loanAssets": ["USDS", "DAI", "USDC"],
+            "stablecoinExposure": ["USDS", "DAI", "USDC"],
+            "oracles": ["Chainlink"],
+            "riskParameters": (
+                "SparkLend started from Aave V3 architecture — per-asset LTV, liquidation "
+                "threshold/penalty and caps, tuned for stablecoin liquidity."
+            ),
+            "liquidations": "Aave-V3-style health-factor liquidations by keepers.",
+            "badDebt": "Backstopped by the Sky/Maker surplus buffer and risk parameters.",
+            "governanceActivity": "Governed via Spark + Sky governance (USDS/DAI risk and savings rate).",
+            "auditHistory": "Forked from audited Aave V3 code with additional Spark-specific audits.",
+            "deployment": {
+                "chains": ["Ethereum", "Ethereum-compatible networks"],
+                "evmCompatible": "yes",
+                "notes": "Part of the Sky/Maker ecosystem; EVM-oriented (IQ.wiki).",
+            },
+        },
+        member_coins=[
+            {
+                "slug": "spk",
+                "name": "Spark",
+                "symbol": "SPK",
+                "category": "Token",
+                "role": "Governance token",
+                "subCategory": "Governance Token",
+            },
+            {
+                "slug": "sky",
+                "name": "USDS",
+                "symbol": "USDS",
+                "category": "Stablecoin",
+                "role": "Primary stablecoin liquidity (Sky)",
+                "subCategory": "Stablecoin",
+            },
+        ],
+    ),
+    "compound": _net(
+        name="Compound",
+        symbol="COMP",
+        tagline="Simple, battle-tested money markets (Compound III).",
+        description=(
+            "Compound is one of the original DeFi lending protocols. Compound III simplifies "
+            "each market to a single borrowable base asset with other assets posted purely "
+            "as collateral."
+        ),
+        differentiator=(
+            "Compound III is simpler than Aave — one base borrowable asset per market makes "
+            "risk easier to understand, at the cost of multi-asset flexibility."
+        ),
+        sub_sector="Money Markets",
+        official_docs="https://docs.compound.finance",
+        website="https://compound.finance",
+        twitter="https://x.com/compoundfinance",
+        github="https://github.com/compound-finance",
+        chains=["Ethereum", "Base", "Arbitrum One", "Optimism", "Polygon", "Mantle"],
+        competitors=[
+            _AAVE_COMPETITOR,
+            {
+                "name": "Morpho",
+                "slug": "morpho",
+                "rank": 2,
+                "positioning": "Customizable lending infrastructure.",
+                "similarities": "Both are trusted EVM lending venues.",
+                "differences": "Morpho is modular/isolated; Compound III is intentionally simple.",
+            },
+        ],
+        lending={
+            "collateralAssets": ["ETH", "wstETH", "WBTC", "cbBTC", "COMP", "LINK"],
+            "loanAssets": ["USDC", "USDT", "ETH"],
+            "stablecoinExposure": ["USDC", "USDT"],
+            "oracles": ["Chainlink"],
+            "riskParameters": (
+                "Per-market: one base borrowable asset, collateral factors and liquidation "
+                "factors per collateral, supply caps."
+            ),
+            "liquidations": "Absorb/buy collateral liquidation mechanism in Compound III.",
+            "badDebt": "Reserves buffer shortfalls; conservative collateral factors limit exposure.",
+            "governanceActivity": "Active COMP governance — new markets and parameter proposals.",
+            "auditHistory": "Long-running, heavily audited protocol with a strong track record.",
+            "deployment": {
+                "chains": ["Ethereum", "Base", "Arbitrum", "Optimism", "Polygon", "Mantle", "Ronin", "Unichain"],
+                "evmCompatible": "yes",
+                "notes": "Compound III is built for EVM-compatible deployments (docs.compound.finance).",
+            },
+        },
+        member_coins=[
+            {
+                "slug": "comp",
+                "name": "Compound",
+                "symbol": "COMP",
+                "category": "Token",
+                "role": "DAO governance token",
+                "subCategory": "Governance Token",
+            },
+        ],
+    ),
+    "fluid": _net(
+        name="Fluid",
+        symbol="FLUID",
+        tagline="Capital-efficient lending + DEX hybrid on a shared liquidity layer.",
+        description=(
+            "Fluid (formerly Instadapp) combines lending, vaults and DEX liquidity through a "
+            "shared liquidity layer, so the same capital can support lending and trading."
+        ),
+        differentiator=(
+            "Capital efficiency: a shared liquidity layer lets collateral, debt, lending "
+            "liquidity and trading liquidity work together — more efficient but more complex."
+        ),
+        sub_sector="Liquidity Hybrid",
+        official_docs="https://docs.fluid.io",
+        website="https://fluid.io",
+        twitter="https://x.com/0xfluid",
+        github="https://github.com/Instadapp",
+        chains=["Ethereum", "Arbitrum One", "Base", "Polygon"],
+        competitors=[
+            _AAVE_COMPETITOR,
+            {
+                "name": "Morpho",
+                "slug": "morpho",
+                "rank": 2,
+                "positioning": "Customizable lending infrastructure.",
+                "similarities": "Both push capital efficiency beyond simple pools.",
+                "differences": "Fluid fuses lending with DEX liquidity; Morpho isolates lending markets.",
+            },
+        ],
+        lending={
+            "collateralAssets": ["ETH", "wstETH", "weETH", "WBTC", "USDC", "USDT"],
+            "loanAssets": ["USDC", "USDT", "ETH", "GHO"],
+            "stablecoinExposure": ["USDC", "USDT", "GHO"],
+            "oracles": ["Chainlink"],
+            "riskParameters": (
+                "Vault-based: per-vault LTV/liquidation thresholds with a smart-debt/smart-collateral "
+                "design sharing liquidity with the DEX."
+            ),
+            "liquidations": "Efficient partial liquidations enabled by the shared liquidity layer.",
+            "badDebt": "Minimized via tight liquidation bands and shared liquidity buffers.",
+            "governanceActivity": "FLUID governs the liquidity layer and new vault/DEX markets.",
+            "auditHistory": "Audited; newer architecture so complexity is the main analytical risk.",
+            "deployment": {
+                "chains": ["Ethereum", "Arbitrum", "Base", "Polygon"],
+                "evmCompatible": "yes",
+                "notes": "Live across EVM chains (Support - Eco).",
+            },
+        },
+        member_coins=[
+            {
+                "slug": "fluid",
+                "name": "Fluid",
+                "symbol": "FLUID",
+                "category": "Token",
+                "role": "Governance token (ex-INST)",
+                "subCategory": "Governance Token",
+            },
+        ],
+    ),
+    "venus": _net(
+        name="Venus",
+        symbol="XVS",
+        tagline="Leading money market on BNB Chain.",
+        description=(
+            "Venus is a major pooled money market, strongly associated with BNB Chain, that "
+            "also issues the VAI stablecoin and supports cross-chain XVS."
+        ),
+        differentiator=(
+            "Competes by ecosystem (BNB Chain) rather than directly on Ethereum; similar "
+            "pooled model to JustLend but BNB-centric."
+        ),
+        sub_sector="Money Markets",
+        official_docs="https://docs.venus.io",
+        website="https://venus.io",
+        twitter="https://x.com/VenusProtocol",
+        github="https://github.com/VenusProtocol",
+        chains=["BNB Chain", "Ethereum", "Arbitrum One", "Optimism", "zkSync"],
+        competitors=[
+            {
+                "name": "JustLend",
+                "slug": "justlend",
+                "rank": 1,
+                "positioning": "Chain-specific lending leader (Tron).",
+                "similarities": "Both are ecosystem-leading pooled money markets off Ethereum.",
+                "differences": "Venus leads BNB Chain; JustLend leads Tron.",
+            },
+            _AAVE_COMPETITOR,
+        ],
+        lending={
+            "collateralAssets": ["BNB", "ETH", "BTCB", "USDC", "USDT"],
+            "loanAssets": ["USDT", "USDC", "VAI", "BNB"],
+            "stablecoinExposure": ["USDT", "USDC", "VAI"],
+            "oracles": ["Chainlink", "Binance Oracle", "Pyth"],
+            "riskParameters": "Pool + isolated-pool model with per-asset collateral factors and caps.",
+            "liquidations": "Keeper liquidations on BNB Chain when shortfall occurs.",
+            "badDebt": "Historically incurred and managed bad debt (e.g. legacy large-position events); reserves + risk fund.",
+            "governanceActivity": "Active XVS governance — isolated pools, parameters, VAI module.",
+            "auditHistory": "Audited; has navigated past risk incidents on BNB Chain.",
+            "deployment": {
+                "chains": ["BNB Chain", "Ethereum", "Arbitrum", "Base", "Optimism", "opBNB", "zkSync"],
+                "evmCompatible": "yes",
+                "notes": "Core lending is BNB-Chain-centric (EVM-compatible); XVS bridges cross-chain (github.com).",
+            },
+        },
+        member_coins=[
+            {
+                "slug": "xvs",
+                "name": "Venus",
+                "symbol": "XVS",
+                "category": "Token",
+                "role": "Governance token",
+                "subCategory": "Governance Token",
+            },
+        ],
+    ),
+    "justlend": _net(
+        name="JustLend",
+        symbol="JST",
+        tagline="The largest lending market on Tron.",
+        description=(
+            "JustLend DAO is the dominant pooled money market on Tron, especially for USDT "
+            "lending, and part of the broader JUST ecosystem."
+        ),
+        differentiator=(
+            "Big by lending TVL on Tron (notably USDT); not an Ethereum/L2 competitor — "
+            "its data pipeline is Tron/TVM rather than EVM."
+        ),
+        sub_sector="Money Markets",
+        official_docs="https://docs.justlend.org",
+        website="https://justlend.org",
+        twitter="https://x.com/DeFi_JUST",
+        chains=["Tron"],
+        competitors=[
+            {
+                "name": "Venus",
+                "slug": "venus",
+                "rank": 1,
+                "positioning": "Chain-specific lending leader (BNB Chain).",
+                "similarities": "Both are ecosystem-leading pooled money markets off Ethereum.",
+                "differences": "JustLend leads Tron; Venus leads BNB Chain.",
+            },
+            _AAVE_COMPETITOR,
+        ],
+        lending={
+            "collateralAssets": ["TRX", "BTC", "USDT", "USDD"],
+            "loanAssets": ["USDT", "USDD", "TRX"],
+            "stablecoinExposure": ["USDT", "USDD"],
+            "oracles": ["WinkLink"],
+            "riskParameters": "Pooled money market with per-asset collateral factors; large USDT market.",
+            "liquidations": "Keeper liquidations on Tron.",
+            "badDebt": "Managed via reserves; concentration in USDT is the key exposure.",
+            "governanceActivity": "Governed by the JUST ecosystem / JST holders.",
+            "auditHistory": "Audited; largest Tron lending venue by TVL.",
+            "deployment": {
+                "chains": ["Tron"],
+                "evmCompatible": "no",
+                "notes": "Tron/TVM ecosystem — Solidity-style but indexing/data differs from Ethereum (docs.justlend.org).",
+            },
+        },
+        member_coins=[
+            {
+                "slug": "jst",
+                "name": "JUST",
+                "symbol": "JST",
+                "category": "Token",
+                "role": "Governance token",
+                "subCategory": "Governance Token",
+            },
+        ],
+    ),
+    "kamino": _net(
+        name="Kamino",
+        symbol="KMNO",
+        tagline="Solana-native lending with isolated/curated markets.",
+        description=(
+            "Kamino Finance is a major Solana lending and liquidity protocol where markets "
+            "and vaults are separated by asset, risk profile and strategy."
+        ),
+        differentiator=(
+            "Solana-native isolated/curated lending — a major cross-chain competitor, but "
+            "metrics come from Solana programs/accounts rather than EVM contracts."
+        ),
+        sub_sector="Isolated / Curated Lending",
+        official_docs="https://docs.kamino.finance",
+        website="https://kamino.finance",
+        twitter="https://x.com/KaminoFinance",
+        chains=["Solana"],
+        competitors=[
+            {
+                "name": "Morpho",
+                "slug": "morpho",
+                "rank": 1,
+                "positioning": "Customizable lending infrastructure.",
+                "similarities": "Both use isolated markets and curated vaults.",
+                "differences": "Kamino is Solana-native; Morpho is EVM.",
+            },
+            _AAVE_COMPETITOR,
+        ],
+        lending={
+            "collateralAssets": ["SOL", "JitoSOL", "mSOL", "BTC", "ETH", "USDC"],
+            "loanAssets": ["USDC", "USDT", "SOL"],
+            "stablecoinExposure": ["USDC", "USDT", "PYUSD"],
+            "oracles": ["Pyth", "Switchboard"],
+            "riskParameters": "Isolated/curated markets with per-market risk configuration and caps.",
+            "liquidations": "Permissionless liquidations within isolated markets.",
+            "badDebt": "Isolated to individual markets; conservative caps on long-tail assets.",
+            "governanceActivity": "KMNO governs markets and incentives.",
+            "auditHistory": "Audited Solana programs; Solana outage risk is a distinct consideration.",
+            "deployment": {
+                "chains": ["Solana"],
+                "evmCompatible": "no",
+                "notes": "Solana-native; metrics from Solana programs/accounts, not EVM (Solana DeFi).",
+            },
+        },
+        member_coins=[
+            {
+                "slug": "kmno",
+                "name": "Kamino",
+                "symbol": "KMNO",
+                "category": "Token",
+                "role": "Governance token",
+                "subCategory": "Governance Token",
+            },
+        ],
+    ),
+    "maple": _net(
+        name="Maple Finance",
+        symbol="SYRUP",
+        tagline="Onchain institutional / private credit.",
+        description=(
+            "Maple Finance runs onchain lending pools to vetted borrowers — institutions, "
+            "funds and businesses — closer to a blockchain-based credit marketplace than "
+            "open overcollateralized DeFi lending."
+        ),
+        differentiator=(
+            "Institutional / private-credit model: borrower quality, repayment history, "
+            "collateral ratios, defaults, pool managers and loan terms matter most."
+        ),
+        sub_sector="Institutional / Private Credit",
+        official_docs="https://docs.maple.finance",
+        website="https://maple.finance",
+        twitter="https://x.com/maplefinance",
+        github="https://github.com/maple-labs",
+        chains=["Ethereum", "Solana", "Base", "Arbitrum One"],
+        competitors=[
+            _AAVE_COMPETITOR,
+            {
+                "name": "Morpho",
+                "slug": "morpho",
+                "rank": 2,
+                "positioning": "Customizable lending infrastructure.",
+                "similarities": "Both can host curated/credit-style vaults.",
+                "differences": "Maple is institutional private credit (offchain underwriting); Morpho is permissionless onchain markets.",
+            },
+        ],
+        lending={
+            "collateralAssets": ["BTC", "ETH", "Tokenized T-bills", "Undercollateralized (vetted)"],
+            "loanAssets": ["USDC", "USDT"],
+            "stablecoinExposure": ["USDC", "USDT"],
+            "oracles": ["Off-chain underwriting + Chainlink for onchain collateral"],
+            "riskParameters": (
+                "Borrower quality, repayment history, collateral ratio, defaults, pool managers "
+                "and loan terms — credit-market metrics, not pure overcollateralization."
+            ),
+            "liquidations": "Workout/recovery process on default rather than instant onchain liquidation.",
+            "badDebt": "Most important metric here — tracked via defaults and loan-loss history per pool.",
+            "governanceActivity": "SYRUP governance + Maple pool delegates / managers.",
+            "auditHistory": "Audited; has experienced and worked out borrower defaults historically.",
+            "deployment": {
+                "chains": ["Ethereum", "Solana", "Base", "Arbitrum"],
+                "evmCompatible": "mixed",
+                "notes": "EVM deployments plus Solana exposure — treat as cross-ecosystem (Support - Eco).",
+            },
+        },
+        member_coins=[
+            {
+                "slug": "syrup",
+                "name": "Syrup",
+                "symbol": "SYRUP",
+                "category": "Token",
+                "role": "Governance / staking token (ex-MPL)",
+                "subCategory": "Governance Token",
+            },
+        ],
+    ),
+}

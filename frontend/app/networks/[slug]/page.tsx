@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { ArrowUpRight, BookOpen } from "lucide-react";
 
 import {
+  CompetitorsSection,
   InvestmentRoundsSection,
+  LendingMetricsSection,
   OrgStructureSection,
   PartnershipsSection,
   RisksSection,
@@ -191,6 +193,8 @@ export default async function NetworkProfilePage({ params }: PageProps) {
         badges={
           <>
             <Badge tone="neon">Network</Badge>
+            {profile.sector && <Badge tone="electric">{profile.sector}</Badge>}
+            {profile.subSector && <Badge tone="signal">{profile.subSector}</Badge>}
             <Badge tone="neutral">{profile.memberCoins.length} coins</Badge>
             <SecurityBadge
               info={deriveSecurityStatus({
@@ -272,6 +276,11 @@ export default async function NetworkProfilePage({ params }: PageProps) {
           )}
 
           <div className="space-y-8">
+            <LendingMetricsSection lending={profile.lending} />
+            <CompetitorsSection
+              competitors={profile.competitors}
+              networkName={profile.name}
+            />
             <OrgStructureSection org={profile.orgStructure} />
             {profile.typedRisks ? (
               <TypedRiskList risks={profile.typedRisks} />

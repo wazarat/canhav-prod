@@ -862,6 +862,116 @@ export interface ScaleLabels {
   coins?: string;
 }
 
+/* -------------------------------------------------------------------------- */
+/* Network taxonomy hierarchy                                                 */
+/* Network → subCategory (what kind of thing) → sector (what it does) →       */
+/* subSector (functional leaf). This is the protocol-level taxonomy, distinct */
+/* from the coin-level subtypes (StablecoinSubCategory / TokenSubCategory).   */
+/* -------------------------------------------------------------------------- */
+
+/** The "Subcategory" level — what kind of network this is. */
+export type NetworkSubCategory = "Protocol" | "Chain" | "Rollup" | "Appchain";
+
+/**
+ * The functional "Sub-sub-category" — what the network does. Seeded with
+ * "Lending"; the rest mirror the coming-soon `CategorySlug` partitions so the
+ * taxonomy expands as those sectors go live.
+ */
+export type NetworkSector =
+  | "Lending"
+  | "Perpetuals"
+  | "Yield"
+  | "DEX"
+  | "Options"
+  | "Stablecoin"
+  | "RWA";
+
+/**
+ * Lending sub-sectors (PDF §"Further sub categories within lending"). The leaf
+ * of the taxonomy for `sector === "Lending"` networks.
+ */
+export type LendingSubSector =
+  | "Money Markets"
+  | "Isolated / Curated Lending"
+  | "Stablecoin-Native Credit Stack"
+  | "Liquidity Hybrid"
+  | "Institutional / Private Credit";
+
+/**
+ * A ranked competitor of a network, ordered top→bottom by relevance. Used to
+ * help users pick which lending platform to research more deeply.
+ */
+export interface Competitor {
+  name: string;
+  /** Network slug when the competitor is also tracked on-platform. */
+  slug?: string | null;
+  /** 1-based rank; lower = more direct/important competitor. */
+  rank: number;
+  /** One-line positioning (the "competitive slide" summary). */
+  positioning: string;
+  /** Where it overlaps with this network. */
+  similarities: string;
+  /** The differentiating factor vs. this network. */
+  differences: string;
+}
+
+/** A chain/ecosystem deployment row (PDF chain-compatibility table). */
+export interface ChainDeployment {
+  /** Chains / ecosystems the protocol is live on. */
+  chains: string[];
+  /** EVM compatibility note ("Yes", "No", "Mixed", with detail). */
+  evmCompatible: "yes" | "no" | "mixed";
+  notes?: string;
+}
+
+/**
+ * Lending-specific metrics block (PDF §"metrics we should be including"). Live
+ * fields are filled by the DeFiLlama cron pass (`Sourced<>`); curated fields
+ * (bad debt, liquidations, oracle deps, risk params) are static research that
+ * DeFiLlama does not expose. Everything is optional/nullable so partial data
+ * renders honestly.
+ */
+export interface LendingMetrics {
+  /** Total value supplied / deposits (USD). */
+  tvlUsd?: Sourced<number | null>;
+  /** Total outstanding borrows (USD). */
+  totalBorrowsUsd?: Sourced<number | null>;
+  /** Borrowed / supplied (0–100). */
+  utilizationPct?: Sourced<number | null>;
+  /** Blended supply APY (%). */
+  supplyApyPct?: Sourced<number | null>;
+  /** Blended variable borrow APY (%). */
+  borrowApyPct?: Sourced<number | null>;
+  /** Net interest margin / spread (borrow − supply, %). */
+  netInterestMarginPct?: Sourced<number | null>;
+  /** Protocol revenue (30d, USD) — mirrors ProtocolFeesRevenue when mapped. */
+  revenue30dUsd?: Sourced<number | null>;
+  /** Fees generated (30d, USD). */
+  fees30dUsd?: Sourced<number | null>;
+  /** Active users / wallets. */
+  activeUsers?: Sourced<number | null>;
+  /** Collateral assets supported (curated). */
+  collateralAssets?: string[];
+  /** Loan assets supported (curated). */
+  loanAssets?: string[];
+  /** Notable stablecoin exposure (e.g. USDC, USDT, DAI, USDS). */
+  stablecoinExposure?: string[];
+  /** Oracle dependencies (e.g. Chainlink, RedStone, Pyth, internal). */
+  oracles?: string[];
+  /** Risk parameters summary (LTV, liq. threshold/penalty, caps) — curated. */
+  riskParameters?: string | null;
+  /** Liquidations signal / recent activity (curated). */
+  liquidations?: string | null;
+  /** Bad debt — one of the most important lending-risk metrics (curated). */
+  badDebt?: string | null;
+  /** Governance activity (parameter changes, new markets) — curated. */
+  governanceActivity?: string | null;
+  /** Audit / exploit history (curated). */
+  auditHistory?: string | null;
+  /** Chain / ecosystem deployment. */
+  deployment?: ChainDeployment | null;
+}
+
 export interface NetworkProfile {
   category: "Network";
   slug: string;
@@ -887,6 +997,17 @@ export interface NetworkProfile {
   currentScale: CurrentScale;
   /** Per-entity labels for the headline stat row (defaults to USD.AI copy when omitted). */
   scaleLabels?: ScaleLabels;
+  /* --- Taxonomy hierarchy (Network → subCategory → sector → subSector) --- */
+  /** What kind of network this is. Defaults to "Protocol" when omitted. */
+  subCategory?: NetworkSubCategory | null;
+  /** Functional sector (e.g. "Lending"); null for the legacy umbrella networks. */
+  sector?: NetworkSector | null;
+  /** Sector-specific leaf (e.g. a `LendingSubSector` when sector === "Lending"). */
+  subSector?: string | null;
+  /** Ranked competitors (top→bottom) — surfaced for `sector === "Lending"`. */
+  competitors?: Competitor[];
+  /** Lending-specific metrics block (live + curated) — `sector === "Lending"`. */
+  lending?: LendingMetrics | null;
   memberCoins: MemberCoinRef[];
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Protocol fees/revenue when this entity maps to a Llama protocol (DeFi Llama). */

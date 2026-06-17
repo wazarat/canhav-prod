@@ -4,7 +4,7 @@ import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
-import type { EntityProfile, TokenProfile } from "@/lib/types";
+import type { NetworkProfile, TokenProfile } from "@/lib/types";
 import { cn, formatPct, formatUsdCompact } from "@/lib/utils";
 
 function formatPrice(value: number | null | undefined): string {
@@ -43,7 +43,7 @@ function MarketCells({ profile }: { profile: TokenProfile }) {
 
 interface TokenTableProps {
   profiles: TokenProfile[];
-  entities?: EntityProfile[];
+  entities?: NetworkProfile[];
   showStatus?: boolean;
   emptyHint?: string;
 }
@@ -108,7 +108,7 @@ export function TokenTable({
               <TD>
                 {p.entitySlug ? (
                   <Link
-                    href={`/entities/${p.entitySlug}`}
+                    href={`/networks/${p.entitySlug}`}
                     className="text-xs text-electric-400 hover:underline"
                   >
                     {entityName(p.entitySlug)}

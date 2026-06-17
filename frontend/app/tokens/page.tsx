@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { TokenTable } from "@/components/tokens/TokenTable";
 import { StatCard } from "@/components/ui/StatCard";
-import { getApprovedEntities, getApprovedTokens } from "@/lib/data";
+import { getApprovedNetworks, getApprovedTokens } from "@/lib/data";
 
 export const metadata = {
   title: "Tokens",
@@ -13,7 +13,7 @@ export const metadata = {
 export const revalidate = 300;
 
 export default async function TokensPage() {
-  const [profiles, entities] = await Promise.all([getApprovedTokens(), getApprovedEntities()]);
+  const [profiles, entities] = await Promise.all([getApprovedTokens(), getApprovedNetworks()]);
 
   const types = new Set(profiles.map((p) => p.tokenType));
 

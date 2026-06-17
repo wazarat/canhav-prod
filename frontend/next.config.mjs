@@ -4,6 +4,13 @@ const nextConfig = {
   // The ERC-8004 spawn bridge (app/api/agent/spawn) imports the standalone
   // `agent-service` TypeScript package; Next must transpile its source.
   transpilePackages: ["canhav-agent-service"],
+  // `/entities` was renamed to `/networks`. Preserve bookmarks / external links.
+  async redirects() {
+    return [
+      { source: "/entities", destination: "/networks", permanent: true },
+      { source: "/entities/:slug", destination: "/networks/:slug", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       {

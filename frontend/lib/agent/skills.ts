@@ -1,8 +1,8 @@
 import "server-only";
 
 import {
-  getApprovedEntities,
-  getApprovedEntityBySlug,
+  getApprovedNetworks,
+  getApprovedNetworkBySlug,
   getApprovedRwaBySlug,
   getApprovedRwas,
   getApprovedStablecoinBySlug,
@@ -16,7 +16,7 @@ import type {
   AgentSkillAction,
   AgentSkillFact,
   AgentSkillSection,
-  EntityProfile,
+  NetworkProfile,
   RwaProfile,
   SourceRef,
   StablecoinProfile,
@@ -54,7 +54,7 @@ export interface PlatformSkill extends AgentSkill {
 }
 
 export const SKILL_GROUPS: { id: SkillGroup; label: string }[] = [
-  { id: "entity", label: "Entities" },
+  { id: "entity", label: "Networks" },
   { id: "stablecoin", label: "Stablecoins" },
   { id: "rwa", label: "RWAs" },
   { id: "token", label: "Tokens" },
@@ -89,7 +89,7 @@ function compactNumber(value: number | null | undefined): string | null {
   return new Intl.NumberFormat("en-US", { notation: "compact" }).format(value);
 }
 
-function buildFacts(profile: EntityProfile): AgentSkillFact[] {
+function buildFacts(profile: NetworkProfile): AgentSkillFact[] {
   const meta = profile.arbitrumPortalMetadata;
   const security = deriveSecurityStatus({
     isPubliclyAudited: meta.isPubliclyAudited,
@@ -134,7 +134,7 @@ function buildFacts(profile: EntityProfile): AgentSkillFact[] {
   return facts;
 }
 
-function buildSections(profile: EntityProfile): AgentSkillSection[] {
+function buildSections(profile: NetworkProfile): AgentSkillSection[] {
   const sections: AgentSkillSection[] = [];
 
   const overview = [profile.description, profile.longDescription].filter(Boolean).join("\n\n");
@@ -179,7 +179,7 @@ function buildSections(profile: EntityProfile): AgentSkillSection[] {
   return sections;
 }
 
-function buildActions(profile: EntityProfile): AgentSkillAction[] {
+function buildActions(profile: NetworkProfile): AgentSkillAction[] {
   const slug = profile.slug;
   return [
     {
@@ -190,8 +190,8 @@ function buildActions(profile: EntityProfile): AgentSkillAction[] {
     },
     {
       name: "listMembers",
-      description: "List the member coins (stablecoins / tokens / RWAs) under this entity.",
-      signature: `research_listByCategory({ category: "entities" })`,
+      description: "List the member coins (stablecoins / tokens / RWAs) under this network.",
+      signature: `research_listByCategory({ category: "networks" })`,
       readOnly: true,
     },
     {
@@ -209,7 +209,7 @@ function buildActions(profile: EntityProfile): AgentSkillAction[] {
   ];
 }
 
-function buildSources(profile: EntityProfile): SourceRef[] {
+function buildSources(profile: NetworkProfile): SourceRef[] {
   if (profile.sources?.length) return profile.sources;
   const sources: SourceRef[] = [];
   if (profile.website) sources.push({ label: "Website", url: profile.website });
@@ -229,7 +229,7 @@ const GLOSSARY: { term: string; definition: string }[] = [
 ];
 
 /** Deterministically derive an AgentSkill from an umbrella Entity profile. */
-export function buildSkillFromEntity(profile: EntityProfile): PlatformSkill {
+export function buildSkillFromEntity(profile: NetworkProfile): PlatformSkill {
   return {
     id: entitySkillId(profile.slug),
     group: "entity",
@@ -445,15 +445,15 @@ export function buildSkillFromToken(profile: TokenProfile): PlatformSkill {
 
 /** All platform skills (entities + stablecoins + RWAs + tokens), grouped order. */
 export async function getAgentSkills(): Promise<PlatformSkill[]> {
-  const [entities, stablecoins, rwas, tokens] = await Promise.all([
-    getApprovedEntities(),
+  const [networks, stablecoins, rwas, tokens] = await Promise.all([
+    getApprovedNetworks(),
     getApprovedStablecoins(),
     getApprovedRwas(),
     getApprovedTokens(),
   ]);
   const byTitle = (a: PlatformSkill, b: PlatformSkill) => a.title.localeCompare(b.title);
   return [
-    ...entities.map(buildSkillFromEntity).sort(byTitle),
+    ...networks.map(buildSkillFromEntity).sort(byTitle),
     ...stablecoins.map(buildSkillFromStablecoin).sort(byTitle),
     ...rwas.map(buildSkillFromRwa).sort(byTitle),
     ...tokens.map(buildSkillFromToken).sort(byTitle),
@@ -462,8 +462,8 @@ export async function getAgentSkills(): Promise<PlatformSkill[]> {
 
 /** Entity-derived skills only (the mintable, agent-binding skills). */
 export async function getEntityAgentSkills(): Promise<PlatformSkill[]> {
-  const entities = await getApprovedEntities();
-  return entities.map(buildSkillFromEntity).sort((a, b) => a.title.localeCompare(b.title));
+  const networks = await getApprovedNetworks();
+  return networks.map(buildSkillFromEntity).sort((a, b) => a.title.localeCompare(b.title));
 }
 
 /**
@@ -489,6 +489,6 @@ export async function getAgentSkillById(id: string): Promise<PlatformSkill | nul
     }
     return null;
   }
-  const entity = await getApprovedEntityBySlug(id);
+  const entity = await getApprovedNetworkBySlug(id);
   return entity ? buildSkillFromEntity(entity) : null;
 }

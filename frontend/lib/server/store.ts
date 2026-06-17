@@ -4,8 +4,8 @@ import path from "node:path";
 import { repoRoot } from "@/lib/server/env";
 import { hasUpstash, readAllItemsFromRedis } from "@/lib/server/redis";
 import type {
-  EntityProfile,
-  EntityRisk,
+  NetworkProfile,
+  NetworkRisk,
   RiskCategory,
   RwaProfile,
   StablecoinProfile,
@@ -78,7 +78,7 @@ export function setStatusLocal(
   return item;
 }
 
-function parseRisks(raw: unknown): EntityRisk[] {
+function parseRisks(raw: unknown): NetworkRisk[] {
   if (!Array.isArray(raw)) return [];
   return raw.map((item) => {
     if (typeof item === "string") {
@@ -134,14 +134,14 @@ export interface LiveStore {
   stablecoins: StablecoinProfile[];
   rwas: RwaProfile[];
   tokens: TokenProfile[];
-  entities: EntityProfile[];
+  networks: NetworkProfile[];
 }
 
 export async function readLiveStore(): Promise<LiveStore> {
   const stablecoins: StablecoinProfile[] = [];
   const rwas: RwaProfile[] = [];
   const tokens: TokenProfile[] = [];
-  const entities: EntityProfile[] = [];
+  const networks: NetworkProfile[] = [];
 
   for (const raw of await readItems()) {
     const item = raw as Record<string, any>;
@@ -201,13 +201,14 @@ export async function readLiveStore(): Promise<LiveStore> {
         offchainFacts: item.OffchainFacts ?? undefined,
         agentSkill: item.AgentSkill ?? undefined,
       } as TokenProfile);
-    } else if (item.Category === "Entity") {
-      entities.push({
-        category: "Entity",
+    } else if (item.Category === "Network" || item.Category === "Entity") {
+      // Accept legacy "Entity" records until the prod store is re-seeded.
+      networks.push({
+        category: "Network",
         slug: String(item.Slug ?? ""),
         name: String(item.Name ?? ""),
         symbol: String(item.Symbol ?? ""),
-        status: (item.Status ?? "APPROVED") as EntityProfile["status"],
+        status: (item.Status ?? "APPROVED") as NetworkProfile["status"],
         tagline: String(item.Tagline ?? ""),
         description: String(item.Description ?? ""),
         differentiator: String(item.Differentiator ?? ""),
@@ -266,13 +267,13 @@ export async function readLiveStore(): Promise<LiveStore> {
         agentSkill: item.AgentSkill ?? undefined,
         createdAt: String(item.CreatedAt ?? ""),
         updatedAt: String(item.UpdatedAt ?? ""),
-      } as EntityProfile);
+      } as NetworkProfile);
     }
   }
 
   stablecoins.sort((a, b) => a.name.localeCompare(b.name));
   rwas.sort((a, b) => a.name.localeCompare(b.name));
   tokens.sort((a, b) => a.name.localeCompare(b.name));
-  entities.sort((a, b) => a.name.localeCompare(b.name));
-  return { stablecoins, rwas, tokens, entities };
+  networks.sort((a, b) => a.name.localeCompare(b.name));
+  return { stablecoins, rwas, tokens, networks };
 }

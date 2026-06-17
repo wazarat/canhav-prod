@@ -5,9 +5,9 @@ import { Card, CardTitle } from "@/components/ui/Card";
 import { DataPanel } from "@/components/ui/DataPanel";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import type {
-  EntityComponent,
-  EntityEvent,
-  EntityRisk,
+  NetworkComponent,
+  NetworkEvent,
+  NetworkRisk,
   FaqItem,
   InvestmentRound,
   OrgUnit,
@@ -36,7 +36,7 @@ function SectionHeading({
   );
 }
 
-export function ComponentsSection({ components }: { components: EntityComponent[] }) {
+export function ComponentsSection({ components }: { components: NetworkComponent[] }) {
   if (!components.length) return null;
   const title =
     components.length === 1 ? "Main component" : `Main components (${components.length})`;
@@ -128,7 +128,7 @@ export function OrgStructureSection({ org }: { org: OrgUnit[] }) {
   );
 }
 
-function riskBorderTone(category: EntityRisk["category"]): string {
+function riskBorderTone(category: NetworkRisk["category"]): string {
   switch (category) {
     case "Smart Contract":
     case "Systemic":
@@ -141,7 +141,7 @@ function riskBorderTone(category: EntityRisk["category"]): string {
   }
 }
 
-export function RisksSection({ risks }: { risks: EntityRisk[] }) {
+export function RisksSection({ risks }: { risks: NetworkRisk[] }) {
   if (!risks.length) return null;
   return (
     <section id="risks" className="scroll-mt-24 space-y-4">
@@ -194,7 +194,7 @@ export function EventsSection({ events }: { events: TimelineEntry[] }) {
     <section id="timeline" className="scroll-mt-24 space-y-4">
       <SectionHeading
         title="Timeline & news"
-        subtitle="Key milestones in the entity's history."
+        subtitle="Key milestones in the network's history."
       />
       {showLegend && (
         <p className="text-xs text-ink-400">
@@ -354,18 +354,18 @@ export function PartnershipsSection({ partnerships }: { partnerships: Partnershi
 
 export function TradFiComparisonSection({
   rows,
-  entityName,
+  networkName,
 }: {
   rows: TradFiRow[];
-  entityName?: string;
+  networkName?: string;
 }) {
   if (!rows.length) return null;
-  const similarityHeader = entityName
-    ? `Similarity to ${entityName}`
-    : "Similarity to entity";
-  const subtitle = entityName
-    ? `How ${entityName} maps onto established TradFi structures, and where it diverges.`
-    : "How this entity maps onto established TradFi structures, and where it diverges.";
+  const similarityHeader = networkName
+    ? `Similarity to ${networkName}`
+    : "Similarity to network";
+  const subtitle = networkName
+    ? `How ${networkName} maps onto established TradFi structures, and where it diverges.`
+    : "How this network maps onto established TradFi structures, and where it diverges.";
   return (
     <section id="tradfi" className="scroll-mt-24 space-y-4">
       <SectionHeading
@@ -397,12 +397,12 @@ export function TradFiComparisonSection({
 }
 
 /** Build section nav items based on which sections have content. */
-export function buildEntitySectionNav(profile: {
-  components: EntityComponent[];
+export function buildNetworkSectionNav(profile: {
+  components: NetworkComponent[];
   faq: FaqItem[];
-  events: EntityEvent[];
+  events: NetworkEvent[];
   orgStructure: OrgUnit[];
-  risks: EntityRisk[];
+  risks: NetworkRisk[];
   investmentRounds: InvestmentRound[];
   partnerships: Partnership[];
   tradFiComparison: TradFiRow[];

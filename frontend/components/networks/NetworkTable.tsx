@@ -5,20 +5,20 @@ import { Badge } from "@/components/ui/Badge";
 import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import { categoryBadgeTone } from "@/lib/categoryTone";
-import type { EntityProfile } from "@/lib/types";
+import type { NetworkProfile } from "@/lib/types";
 import { formatUsdCompact } from "@/lib/utils";
 
-interface EntityTableProps {
-  profiles: EntityProfile[];
+interface NetworkTableProps {
+  profiles: NetworkProfile[];
   showStatus?: boolean;
   emptyHint?: string;
 }
 
-export function EntityTable({ profiles, showStatus = false, emptyHint }: EntityTableProps) {
+export function NetworkTable({ profiles, showStatus = false, emptyHint }: NetworkTableProps) {
   if (profiles.length === 0) {
     return (
       <div className="glass rounded-2xl px-6 py-12 text-center text-sm text-ink-300">
-        {emptyHint ?? "No entities to display yet."}
+        {emptyHint ?? "No networks to display yet."}
       </div>
     );
   }
@@ -28,7 +28,7 @@ export function EntityTable({ profiles, showStatus = false, emptyHint }: EntityT
       <Table>
         <THead>
           <tr>
-            <TH>Entity</TH>
+            <TH>Network</TH>
             <TH>Coins</TH>
             <TH className="text-right">TVL</TH>
             {showStatus && <TH>Status</TH>}
@@ -44,7 +44,7 @@ export function EntityTable({ profiles, showStatus = false, emptyHint }: EntityT
               <TD>
                 <div className="flex items-center gap-2">
                   <Link
-                    href={`/entities/${p.slug}`}
+                    href={`/networks/${p.slug}`}
                     className="font-medium text-ink-50 transition-colors hover:text-electric-400"
                   >
                     {p.name}

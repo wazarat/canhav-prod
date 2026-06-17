@@ -11,7 +11,7 @@ export default function NotFound() {
       </h1>
       <p className="max-w-md text-sm text-ink-300">
         This profile may be pending approval, or the page doesn&apos;t exist. Only approved
-        entities are exposed publicly.
+        networks are exposed publicly.
       </p>
       <Button asChild>
         <Link href="/">Back to dashboard</Link>

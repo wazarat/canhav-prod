@@ -58,6 +58,12 @@ export const maxDuration = 300;
 const CATEGORY_STABLECOIN = "Stablecoin";
 const CATEGORY_RWA = "RWA";
 const CATEGORY_TOKEN = "Token";
+// Networks were renamed from "Entity"; accept the legacy value until the prod
+// store is re-seeded (mirrors lib/server/store.ts).
+const CATEGORY_NETWORK = "Network";
+const CATEGORY_NETWORK_LEGACY = "Entity";
+const isNetworkCategory = (c: string) =>
+  c === CATEGORY_NETWORK || c === CATEGORY_NETWORK_LEGACY;
 const COINGECKO_DELAY_MS = 1_500; // free-tier etiquette between lookups
 const HISTORY_DAYS = 90; // stored peg/TVL history window
 
@@ -307,8 +313,8 @@ async function refreshLlamaDimensions(
     notes.push("fees/rev");
   }
 
-  // DEX volume (entities + tokens that are DEXes).
-  if (category === "Entity" || category === CATEGORY_TOKEN) {
+  // DEX volume (networks + tokens that are DEXes).
+  if (isNetworkCategory(category) || category === CATEGORY_TOKEN) {
     const dex = await fetchLlamaDexVolume(slug);
     if (dex) {
       item.DexVolume = { ...dex, source: "defillama", updatedAt: nowIso() };
@@ -564,7 +570,7 @@ export async function GET(req: Request): Promise<NextResponse> {
             borrowApyPct: rates.variableBorrowApyPct,
           });
         }
-      } else if (category === "Entity" && slug === "aave") {
+      } else if (isNetworkCategory(category) && slug === "aave") {
         const gho = await fetchReserveRatesForSlug("gho");
         if (gho && gho.supplyApyPct !== null) {
           item.CurrentScale = { ...(item.CurrentScale ?? {}), aprPct: gho.supplyApyPct };
@@ -593,7 +599,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     return null;
   };
   for (const item of items) {
-    if (item.Category !== "Entity") continue;
+    if (!isNetworkCategory(String(item.Category ?? ""))) continue;
     if ((item.CurrentScale?.tvlUsd ?? null) != null) continue;
     const members: { category?: string; slug?: string }[] = item.MemberCoins ?? [];
     let total = 0;
@@ -614,7 +620,7 @@ export async function GET(req: Request): Promise<NextResponse> {
 
   // Refresh public surfaces + each touched detail page.
   revalidatePath("/");
-  revalidatePath("/entities");
+  revalidatePath("/networks");
   revalidatePath("/stablecoins");
   revalidatePath("/rwas");
   revalidatePath("/tokens");
@@ -627,8 +633,8 @@ export async function GET(req: Request): Promise<NextResponse> {
           : "/stablecoins";
     revalidatePath(`${base}/${slug}`);
   }
-  // Entity detail pages embed member-coin live data, so refresh them too.
-  revalidatePath("/entities/[slug]", "page");
+  // Network detail pages embed member-coin live data, so refresh them too.
+  revalidatePath("/networks/[slug]", "page");
 
   return NextResponse.json({
     ok: true,

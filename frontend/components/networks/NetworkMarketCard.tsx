@@ -3,7 +3,7 @@ import { DataSourceDot } from "@/components/ui/DataSourceDot";
 import type { TokenMarket } from "@/lib/types";
 import { formatPct, formatUsdCompact } from "@/lib/utils";
 
-interface EntityMarketCardProps {
+interface NetworkMarketCardProps {
   market: TokenMarket;
   symbol: string;
   id?: string;
@@ -31,11 +31,11 @@ function MarketRow({
   );
 }
 
-export function EntityMarketCard({
+export function NetworkMarketCard({
   market,
   symbol,
   id = "market",
-}: EntityMarketCardProps) {
+}: NetworkMarketCardProps) {
   const price = market.priceUsd.value;
   const change = market.change24hPct?.value;
 

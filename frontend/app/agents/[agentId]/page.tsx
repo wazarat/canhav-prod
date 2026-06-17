@@ -179,7 +179,7 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
         {profile.entitySlug && (
           <p className="text-sm text-ink-300">
             <Link
-              href={`/entities/${profile.entitySlug}`}
+              href={`/networks/${profile.entitySlug}`}
               className="font-medium text-electric-400 hover:text-electric-300"
             >
               {profile.name.replace(/ — Research Skill$/, "")}

@@ -4,8 +4,8 @@ import { tool, type ToolSet } from "ai";
 import { z } from "zod";
 
 import {
-  getApprovedEntities,
-  getApprovedEntityBySlug,
+  getApprovedNetworks,
+  getApprovedNetworkBySlug,
   getApprovedRwaBySlug,
   getApprovedRwas,
   getApprovedStablecoinBySlug,
@@ -74,7 +74,7 @@ const schemas = {
   research_getToken: z.object({ slug: z.string().describe("Token slug, e.g. 'jlp'.") }),
   research_getRwa: z.object({ slug: z.string().describe("RWA protocol slug, e.g. 'centrifuge'.") }),
   research_listByCategory: z.object({
-    category: z.enum(["entities", "stablecoins", "rwas", "tokens"]),
+    category: z.enum(["networks", "stablecoins", "rwas", "tokens"]),
   }),
   research_getHistory: z.object({
     slug: z.string(),
@@ -129,8 +129,8 @@ type Args<K extends keyof typeof schemas> = z.infer<(typeof schemas)[K]>;
 /* -------------------------------------------------------------------------- */
 
 async function execGetEntity(a: Args<"research_getEntity">) {
-  const p = await getApprovedEntityBySlug(a.slug);
-  if (!p) return { found: false, summary: `No CanHav entity for "${a.slug}".` };
+  const p = await getApprovedNetworkBySlug(a.slug);
+  if (!p) return { found: false, summary: `No CanHav network for "${a.slug}".` };
   return {
     found: true,
     slug: p.slug,
@@ -244,8 +244,8 @@ async function execGetRwa(a: Args<"research_getRwa">) {
 
 async function execList(a: Args<"research_listByCategory">) {
   const items =
-    a.category === "entities"
-      ? await getApprovedEntities()
+    a.category === "networks"
+      ? await getApprovedNetworks()
       : a.category === "stablecoins"
         ? await getApprovedStablecoins()
         : a.category === "rwas"
@@ -533,7 +533,7 @@ export async function buildAgentTools(
       execute: safe("research_getRwa", execGetRwa),
     }),
     research_listByCategory: tool({
-      description: "List all CanHav profiles in a category (entities/stablecoins/rwas/tokens).",
+      description: "List all CanHav profiles in a category (networks/stablecoins/rwas/tokens).",
       inputSchema: schemas.research_listByCategory,
       execute: safe("research_listByCategory", execList),
     }),
@@ -636,7 +636,7 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
   { name: "research_getStablecoin", description: "Read a stablecoin by slug.", sample: { slug: "usdc" } },
   { name: "research_getToken", description: "Read a token by slug.", sample: { slug: "jlp" } },
   { name: "research_getRwa", description: "Read an RWA protocol by slug.", sample: { slug: "centrifuge" } },
-  { name: "research_listByCategory", description: "List profiles in a category.", sample: { category: "entities" } },
+  { name: "research_listByCategory", description: "List profiles in a category.", sample: { category: "networks" } },
   { name: "research_getHistory", description: "Historical peg/TVL series for a slug.", sample: { slug: "usdc", metric: "peg" } },
   {
     name: "chain_readLive",

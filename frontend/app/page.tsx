@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/Button";
 import { StatCard } from "@/components/ui/StatCard";
 import {
   CATEGORIES,
-  getAllEntities,
+  getAllNetworks,
   getAllRwas,
   getAllStablecoins,
   getAllTokens,
-  getApprovedEntities,
+  getApprovedNetworks,
   getApprovedStablecoins,
   pegDeviationBps,
 } from "@/lib/data";
@@ -20,20 +20,20 @@ import { formatUsdCompact } from "@/lib/utils";
 export const revalidate = 300;
 
 export default async function DashboardPage() {
-  const [approved, allStablecoins, allRwas, allEntities, allTokens, approvedEntities] =
+  const [approved, allStablecoins, allRwas, allNetworks, allTokens, approvedNetworks] =
     await Promise.all([
       getApprovedStablecoins(),
       getAllStablecoins(),
       getAllRwas(),
-      getAllEntities(),
+      getAllNetworks(),
       getAllTokens(),
-      getApprovedEntities(),
+      getApprovedNetworks(),
     ]);
   const activeCategories = CATEGORIES.filter((c) => c.status === "active").length;
-  const featuredEntity = approvedEntities[0] ?? null;
+  const featuredNetwork = approvedNetworks[0] ?? null;
 
   const trackedBySlug: Record<string, number> = {
-    entities: allEntities.length,
+    networks: allNetworks.length,
     stablecoins: allStablecoins.length,
     rwas: allRwas.length,
     tokens: allTokens.length,
@@ -64,13 +64,13 @@ export default async function DashboardPage() {
           <span className="text-gradient-brand">DeFi ecosystem</span>.
         </h1>
         <p className="text-lg text-ink-300">
-          Research-grade taxonomy and datasets across stablecoins, RWAs, entities, tokens, lending,
+          Research-grade taxonomy and datasets across stablecoins, RWAs, networks, tokens, lending,
           perpetuals and more — published as soon as data is ingested and synced.
         </p>
         <div className="flex flex-wrap gap-3">
           <Button asChild>
-            <Link href="/entities">
-              Explore entities
+            <Link href="/networks">
+              Explore networks
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
@@ -83,10 +83,10 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      {/* Featured entity */}
-      {featuredEntity && (
+      {/* Featured network */}
+      {featuredNetwork && (
         <section>
-          <Link href={`/entities/${featuredEntity.slug}`} className="block">
+          <Link href={`/networks/${featuredNetwork.slug}`} className="block">
             <div className="group glass relative overflow-hidden rounded-2xl border border-neon-500/30 p-6 transition-all duration-200 hover:border-neon-500/60 hover:glow-ring md:p-8">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="max-w-2xl space-y-3">
@@ -94,17 +94,17 @@ export default async function DashboardPage() {
                     <span className="grid h-9 w-9 place-items-center rounded-xl border border-neon-500/30 bg-neon-500/10 text-neon-400">
                       <Network className="h-5 w-5" />
                     </span>
-                    <Badge tone="neon">Featured entity</Badge>
+                    <Badge tone="neon">Featured network</Badge>
                   </div>
                   <h2 className="font-display text-2xl font-semibold tracking-tight text-ink-50">
-                    {featuredEntity.name}
+                    {featuredNetwork.name}
                     <ArrowUpRight className="ml-1 inline h-5 w-5 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neon-400" />
                   </h2>
                   <p className="text-sm leading-relaxed text-ink-300">
-                    {featuredEntity.description}
+                    {featuredNetwork.description}
                   </p>
                   <div className="flex flex-wrap gap-1.5 pt-1">
-                    {featuredEntity.memberCoins.map((c) => (
+                    {featuredNetwork.memberCoins.map((c) => (
                       <Badge key={c.slug} tone={c.category === "Token" ? "neon" : "electric"}>
                         {c.symbol}
                       </Badge>
@@ -115,7 +115,7 @@ export default async function DashboardPage() {
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wider text-ink-300">TVL</p>
                     <p className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink-50">
-                      {formatUsdCompact(featuredEntity.currentScale.tvlUsd)}
+                      {formatUsdCompact(featuredNetwork.currentScale.tvlUsd)}
                     </p>
                   </div>
                   <div>
@@ -123,8 +123,8 @@ export default async function DashboardPage() {
                       sUSDai APR
                     </p>
                     <p className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink-50">
-                      {featuredEntity.currentScale.aprPct != null
-                        ? `${featuredEntity.currentScale.aprPct.toFixed(2)}%`
+                      {featuredNetwork.currentScale.aprPct != null
+                        ? `${featuredNetwork.currentScale.aprPct.toFixed(2)}%`
                         : "—"}
                     </p>
                   </div>

@@ -28,7 +28,7 @@ import { LaunchAgentButton } from "@/components/agent/LaunchAgentButton";
 import { getSession } from "@/lib/auth/session";
 import { getAgentProfile, getAttachedSkillIds, type AgentProfile } from "@/lib/agent/memory";
 import { listOwnedAgentIds } from "@/lib/agent/ownership";
-import { getApprovedEntities } from "@/lib/data";
+import { getApprovedNetworks } from "@/lib/data";
 import { userAgentId } from "@/lib/agent/user-agent";
 
 export const metadata = {
@@ -129,7 +129,7 @@ export default async function AgentsPage() {
   );
 
   // Group agents by project (Entity). Unbound agents fall into "General research".
-  const entities = await getApprovedEntities();
+  const entities = await getApprovedNetworks();
   const entityNameBySlug = new Map(entities.map((e) => [e.slug, e.name]));
   const projectGroups = new Map<
     string,
@@ -299,7 +299,7 @@ export default async function AgentsPage() {
                   </h3>
                   {group.slug && (
                     <Link
-                      href={`/entities/${group.slug}`}
+                      href={`/networks/${group.slug}`}
                       className="text-[10px] font-medium text-electric-400 transition-colors hover:text-electric-300"
                     >
                       View project

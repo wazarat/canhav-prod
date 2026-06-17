@@ -18,7 +18,7 @@ import type { CategoryDef, CategorySlug } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<CategorySlug, LucideIcon> = {
-  entities: Network,
+  networks: Network,
   stablecoins: Coins,
   rwas: Landmark,
   tokens: CircleDollarSign,

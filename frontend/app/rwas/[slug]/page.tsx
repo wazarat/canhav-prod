@@ -18,7 +18,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { agentConfigStatus } from "@/lib/agent/config";
-import { getApprovedRwas, getApprovedRwaBySlug, getEntityBySlug } from "@/lib/data";
+import { getApprovedRwas, getApprovedRwaBySlug, getNetworkBySlug } from "@/lib/data";
 import { deriveSecurityStatus } from "@/lib/security";
 
 interface PageProps {
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function RwaProfilePage({ params }: PageProps) {
   const profile = await getApprovedRwaBySlug(params.slug);
   if (!profile) notFound();
-  const entity = profile.entitySlug ? await getEntityBySlug(profile.entitySlug) : null;
+  const entity = profile.entitySlug ? await getNetworkBySlug(profile.entitySlug) : null;
   const agentStatus = agentConfigStatus();
 
   return (
@@ -73,7 +73,7 @@ export default async function RwaProfilePage({ params }: PageProps) {
               })}
             />
             {entity && (
-              <Link href={`/entities/${entity.slug}`}>
+              <Link href={`/networks/${entity.slug}`}>
                 <Badge tone="electric">Part of {entity.name}</Badge>
               </Link>
             )}

@@ -13,10 +13,13 @@ import {
   PartnershipsSection,
   RisksSection,
   TradFiComparisonSection,
-  buildEntitySectionNav,
-} from "@/components/entities/EntitySections";
-import { EntityMarketCard } from "@/components/entities/EntityMarketCard";
-import { MemberCoins } from "@/components/entities/MemberCoins";
+  buildNetworkSectionNav,
+} from "@/components/networks/NetworkSections";
+import { NetworkMarketCard } from "@/components/networks/NetworkMarketCard";
+import { MemberCoins } from "@/components/networks/MemberCoins";
+import { TvlFlowWidget } from "@/components/networks/dashboard/TvlFlowWidget";
+import { FeesWidget } from "@/components/networks/dashboard/FeesWidget";
+import { TimelineWidget } from "@/components/networks/dashboard/TimelineWidget";
 import { CombinedVerdictCard } from "@/components/agent/CombinedVerdictCard";
 import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
@@ -31,11 +34,12 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionNav } from "@/components/ui/SectionNav";
 import { StatCard } from "@/components/ui/StatCard";
 import { Card } from "@/components/ui/Card";
-import { getApprovedEntities, getApprovedEntityBySlug, getEntityMemberCoins } from "@/lib/data";
+import { getApprovedNetworks, getApprovedNetworkBySlug, getNetworkMemberCoins } from "@/lib/data";
 import { buildSkillFromEntity } from "@/lib/agent/skills";
 import { deriveSecurityStatus } from "@/lib/security";
 import { getCoinLiveData } from "@/lib/server/coin";
-import type { EntityProfile } from "@/lib/types";
+import { buildFeesSummary, buildTvlFlow } from "@/lib/networks/metrics";
+import type { NetworkProfile } from "@/lib/types";
 import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
 
 interface PageProps {
@@ -45,46 +49,70 @@ interface PageProps {
 export const revalidate = 300;
 
 export async function generateStaticParams() {
-  return (await getApprovedEntities()).map((p) => ({ slug: p.slug }));
+  return (await getApprovedNetworks()).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const profile = await getApprovedEntityBySlug(params.slug);
+  const profile = await getApprovedNetworkBySlug(params.slug);
   if (!profile) return { title: "Not found" };
   return { title: profile.name, description: profile.description };
 }
 
-function MemberCoinsSkeleton() {
+function DashboardBandSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {Array.from({ length: 2 }).map((_, i) => (
-        <div key={i} className="h-44 animate-pulse rounded-2xl bg-ink-800/50" />
-      ))}
+    <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-2">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div key={i} className="h-44 animate-pulse rounded-2xl bg-ink-800/50" />
+        ))}
+      </div>
+      <div className="space-y-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-40 animate-pulse rounded-2xl bg-ink-800/50" />
+        ))}
+      </div>
     </div>
   );
 }
 
-async function MemberCoinsSection({ entity }: { entity: EntityProfile }) {
-  const members = await getEntityMemberCoins(entity);
+/**
+ * Dashboard band: member-coin cards (click to expand for live data) on the left,
+ * a stacked rail of derived widgets (24h value flow, fees paid, timeline) on the
+ * right — DeFi-Llama-style, so the headline signal is visible without scrolling.
+ */
+async function DashboardBand({ network }: { network: NetworkProfile }) {
+  const members = await getNetworkMemberCoins(network);
   const coins = await Promise.all(
     members
       .filter((m) => m.profile !== null)
       .map((m) => getCoinLiveData(m.profile!, m.ref.role)),
   );
+  const flow = buildTvlFlow(coins);
+  const fees = buildFeesSummary(network);
+  const timeline = network.timeline ?? network.events ?? [];
 
-  if (coins.length === 0) {
-    return (
-      <Card className="text-sm text-ink-300">
-        Member coins are staged but not yet approved. They&apos;ll appear here (with live
-        CoinGecko + Alchemy data) once approved.
-      </Card>
-    );
-  }
-
-  return <MemberCoins coins={coins} />;
+  return (
+    <div className="grid gap-6 lg:grid-cols-3">
+      <div className="lg:col-span-2">
+        {coins.length === 0 ? (
+          <Card className="text-sm text-ink-300">
+            Member coins are staged but not yet approved. They&apos;ll appear here (with live
+            CoinGecko + Alchemy data) once approved.
+          </Card>
+        ) : (
+          <MemberCoins coins={coins} />
+        )}
+      </div>
+      <div className="space-y-4">
+        <TvlFlowWidget flow={flow} />
+        <FeesWidget fees={fees} />
+        <TimelineWidget entries={timeline} />
+      </div>
+    </div>
+  );
 }
 
-function EntityAvatar({ profile }: { profile: EntityProfile }) {
+function NetworkAvatar({ profile }: { profile: NetworkProfile }) {
   const logoUrl = profile.arbitrumPortalMetadata?.logoUrl;
   const initial = profile.name.charAt(0).toUpperCase();
 
@@ -106,8 +134,8 @@ function EntityAvatar({ profile }: { profile: EntityProfile }) {
   );
 }
 
-export default async function EntityProfilePage({ params }: PageProps) {
-  const profile = await getApprovedEntityBySlug(params.slug);
+export default async function NetworkProfilePage({ params }: PageProps) {
+  const profile = await getApprovedNetworkBySlug(params.slug);
   if (!profile) notFound();
 
   const entitySkill = profile.agentSkill ?? buildSkillFromEntity(profile);
@@ -154,7 +182,7 @@ export default async function EntityProfilePage({ params }: PageProps) {
     hint: "Member products",
   });
 
-  const sectionNavItems = buildEntitySectionNav(profile);
+  const sectionNavItems = buildNetworkSectionNav(profile);
 
   const ctaClass =
     "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors";
@@ -166,13 +194,13 @@ export default async function EntityProfilePage({ params }: PageProps) {
       <PageHeader
         breadcrumbs={[
           { label: "Dashboard", href: "/" },
-          { label: "Entities", href: "/entities" },
+          { label: "Networks", href: "/networks" },
           { label: profile.name },
         ]}
         title={profile.name}
         badges={
           <>
-            <Badge tone="neon">Entity</Badge>
+            <Badge tone="neon">Network</Badge>
             <Badge tone="neutral">{profile.memberCoins.length} coins</Badge>
             <SecurityBadge
               info={deriveSecurityStatus({
@@ -231,24 +259,26 @@ export default async function EntityProfilePage({ params }: PageProps) {
       {/* Mobile section nav */}
       <SectionNav items={sectionNavItems} className="lg:hidden" />
 
+      {/* Dashboard band — member coins + derived widgets, the headline signal
+          without scrolling. Deeper research lives below. */}
+      <section id="member-coins" className="scroll-mt-24 space-y-3">
+        <div className="border-b border-ink-800/60 pb-2">
+          <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
+            {profile.name} dashboard
+          </h2>
+          <p className="mt-1 text-sm text-ink-300">
+            Coins under {profile.name} (click a card for live data), 24h value flow, and fees.
+          </p>
+        </div>
+        <Suspense fallback={<DashboardBandSkeleton />}>
+          <DashboardBand network={profile} />
+        </Suspense>
+      </section>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
-          <section id="member-coins" className="scroll-mt-24 space-y-4">
-            <div className="border-b border-ink-800/60 pb-2">
-              <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
-                Coins under {profile.name}
-              </h2>
-              <p className="mt-1 text-sm text-ink-300">
-                Open a full profile or use Quick view for live CoinGecko + Alchemy data.
-              </p>
-            </div>
-            <Suspense fallback={<MemberCoinsSkeleton />}>
-              <MemberCoinsSection entity={profile} />
-            </Suspense>
-          </section>
-
           {profile.market && (
-            <EntityMarketCard market={profile.market} symbol={profile.symbol} />
+            <NetworkMarketCard market={profile.market} symbol={profile.symbol} />
           )}
 
           {profile.longDescription && (
@@ -293,7 +323,7 @@ export default async function EntityProfilePage({ params }: PageProps) {
             <PartnershipsSection partnerships={profile.partnerships} />
             <TradFiComparisonSection
               rows={profile.tradFiComparison}
-              entityName={profile.name}
+              networkName={profile.name}
             />
             <AgentSkillCard skill={entitySkill} />
             {profile.sources && <SourcesFooter sources={profile.sources} />}
@@ -306,7 +336,7 @@ export default async function EntityProfilePage({ params }: PageProps) {
           </div>
 
           <div className="flex items-center gap-3 px-1">
-            <EntityAvatar profile={profile} />
+            <NetworkAvatar profile={profile} />
             <div>
               <p className="text-sm font-medium text-ink-50">{profile.name}</p>
               <p className="text-xs text-ink-400">{profile.symbol}</p>

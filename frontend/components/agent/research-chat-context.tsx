@@ -33,7 +33,7 @@ interface ResearchChatContextValue {
 
 const ResearchChatContext = createContext<ResearchChatContextValue | null>(null);
 
-const DATA_PREFIXES = ["/entities", "/stablecoins", "/rwas", "/tokens"];
+const DATA_PREFIXES = ["/networks", "/stablecoins", "/rwas", "/tokens"];
 
 function isDataRoute(pathname: string): boolean {
   return DATA_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));

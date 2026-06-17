@@ -4,7 +4,7 @@ import { Logo } from "@/components/ui/Logo";
 
 const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
-  { href: "/entities", label: "Entities" },
+  { href: "/networks", label: "Networks" },
   { href: "/stablecoins", label: "Stablecoins" },
   { href: "/rwas", label: "RWAs" },
   { href: "/tokens", label: "Tokens" },

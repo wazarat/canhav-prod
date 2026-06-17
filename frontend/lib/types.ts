@@ -30,7 +30,7 @@ export type PegTarget = "USD" | "EUR" | "GBP" | "AUD" | "CAD" | "HKD" | "ISK";
 
 /** Top-level taxonomy categories. */
 export type CategorySlug =
-  | "entities"
+  | "networks"
   | "stablecoins"
   | "rwas"
   | "tokens"
@@ -747,10 +747,10 @@ export interface TokenProfile {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Entities — top-tier umbrella protocols that group several coins            */
+/* Networks — top-tier umbrella protocols that group several coins            */
 /* -------------------------------------------------------------------------- */
 
-export interface EntityComponent {
+export interface NetworkComponent {
   name: string;
   description: string;
 }
@@ -823,12 +823,12 @@ export type RiskCategory =
   | "Regulatory"
   | "Systemic";
 
-export interface EntityRisk {
+export interface NetworkRisk {
   category: RiskCategory;
   description: string;
 }
 
-export interface EntityEvent {
+export interface NetworkEvent {
   date: string;
   title: string;
   description: string;
@@ -862,8 +862,8 @@ export interface ScaleLabels {
   coins?: string;
 }
 
-export interface EntityProfile {
-  category: "Entity";
+export interface NetworkProfile {
+  category: "Network";
   slug: string;
   name: string;
   symbol: string;
@@ -876,12 +876,12 @@ export interface EntityProfile {
   twitter: string | null;
   discord: string | null;
   github: string | null;
-  components: EntityComponent[];
+  components: NetworkComponent[];
   faq: FaqItem[];
   orgStructure: OrgUnit[];
   tradFiComparison: TradFiRow[];
-  risks: EntityRisk[];
-  events: EntityEvent[];
+  risks: NetworkRisk[];
+  events: NetworkEvent[];
   investmentRounds: InvestmentRound[];
   partnerships: Partnership[];
   currentScale: CurrentScale;

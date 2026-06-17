@@ -135,8 +135,8 @@ export default async function AgentCardPage({
           <h2 className="font-display text-base font-semibold text-ink-50">Scope</h2>
           {card.entity && (
             <p className="text-sm text-ink-300">
-              Entity:{" "}
-              <Link href={`/entities/${card.entity}`} className="text-electric-400 hover:text-electric-300">
+              Network:{" "}
+              <Link href={`/networks/${card.entity}`} className="text-electric-400 hover:text-electric-300">
                 {card.entity}
               </Link>
             </p>

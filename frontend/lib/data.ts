@@ -1,7 +1,7 @@
 import { readLiveStore } from "@/lib/server/store";
 import type {
   CategoryDef,
-  EntityProfile,
+  NetworkProfile,
   RwaProfile,
   StablecoinProfile,
   TokenProfile,
@@ -161,49 +161,49 @@ export async function getTokenBySlug(slug: string): Promise<TokenProfile | null>
 }
 
 /* -------------------------------------------------------------------------- */
-/* Entity accessors (top-tier umbrella protocols)                             */
+/* Network accessors (top-tier umbrella protocols)                            */
 /* -------------------------------------------------------------------------- */
 
-export async function getAllEntities(): Promise<EntityProfile[]> {
-  const { entities } = await readLiveStore();
-  return [...entities].sort((a, b) => a.name.localeCompare(b.name));
+export async function getAllNetworks(): Promise<NetworkProfile[]> {
+  const { networks } = await readLiveStore();
+  return [...networks].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function getApprovedEntities(): Promise<EntityProfile[]> {
+export async function getApprovedNetworks(): Promise<NetworkProfile[]> {
   const store = await readLiveStore();
-  const entities = [...store.entities].sort((a, b) => a.name.localeCompare(b.name));
-  return enrichEntitiesWithTvl(entities, store);
+  const networks = [...store.networks].sort((a, b) => a.name.localeCompare(b.name));
+  return enrichNetworksWithTvl(networks, store);
 }
 
-export async function getApprovedEntityBySlug(slug: string): Promise<EntityProfile | null> {
+export async function getApprovedNetworkBySlug(slug: string): Promise<NetworkProfile | null> {
   const store = await readLiveStore();
-  const entity = store.entities.find((p) => p.slug === slug) ?? null;
-  if (!entity) return null;
-  return enrichEntitiesWithTvl([entity], store)[0] ?? entity;
+  const network = store.networks.find((p) => p.slug === slug) ?? null;
+  if (!network) return null;
+  return enrichNetworksWithTvl([network], store)[0] ?? network;
 }
 
 /**
- * Entity headline TVL is a curated static seed for most entities, but a few ship
+ * Network headline TVL is a curated static seed for most networks, but a few ship
  * with `tvlUsd: null` (e.g. Monerium, Pleasing Market). When it's missing we
- * derive it from the entity's member coins already in the store — no network, so
+ * derive it from the network's member coins already in the store — no network, so
  * it self-heals offline and in production:
  *   - Stablecoin: circulating supply (peg-target units, treated ~ USD)
  *   - RWA:        total value locked (USD)
  *   - Token:      market cap (USD)
- * Curated seeds are never overwritten, and entities whose members aren't tracked
+ * Curated seeds are never overwritten, and networks whose members aren't tracked
  * by any source (e.g. Stably) keep their honest empty state (null).
  */
-function enrichEntitiesWithTvl(
-  entities: EntityProfile[],
+function enrichNetworksWithTvl(
+  networks: NetworkProfile[],
   store: { stablecoins: StablecoinProfile[]; rwas: RwaProfile[]; tokens: TokenProfile[] },
-): EntityProfile[] {
-  if (!entities.some((e) => e.currentScale.tvlUsd == null)) return entities;
+): NetworkProfile[] {
+  if (!networks.some((e) => e.currentScale.tvlUsd == null)) return networks;
 
   const stablecoinBySlug = new Map(store.stablecoins.map((p) => [p.slug, p]));
   const rwaBySlug = new Map(store.rwas.map((p) => [p.slug, p]));
   const tokenBySlug = new Map(store.tokens.map((p) => [p.slug, p]));
 
-  const memberValueUsd = (ref: EntityProfile["memberCoins"][number]): number | null => {
+  const memberValueUsd = (ref: NetworkProfile["memberCoins"][number]): number | null => {
     if (ref.category === "Stablecoin") {
       return stablecoinBySlug.get(ref.slug)?.totalSupply?.value ?? null;
     }
@@ -213,34 +213,34 @@ function enrichEntitiesWithTvl(
     return tokenBySlug.get(ref.slug)?.market?.marketCapUsd?.value ?? null;
   };
 
-  return entities.map((entity) => {
-    if (entity.currentScale.tvlUsd != null) return entity;
+  return networks.map((network) => {
+    if (network.currentScale.tvlUsd != null) return network;
     let total = 0;
     let found = false;
-    for (const ref of entity.memberCoins) {
+    for (const ref of network.memberCoins) {
       const value = memberValueUsd(ref);
       if (value != null && value > 0) {
         total += value;
         found = true;
       }
     }
-    if (!found) return entity;
-    return { ...entity, currentScale: { ...entity.currentScale, tvlUsd: total } };
+    if (!found) return network;
+    return { ...network, currentScale: { ...network.currentScale, tvlUsd: total } };
   });
 }
 
-export async function getEntityBySlug(slug: string): Promise<EntityProfile | null> {
-  return getApprovedEntityBySlug(slug);
+export async function getNetworkBySlug(slug: string): Promise<NetworkProfile | null> {
+  return getApprovedNetworkBySlug(slug);
 }
 
 /**
- * Resolve an entity's member coins to their store profiles.
+ * Resolve a network's member coins to their store profiles.
  */
-export async function getEntityMemberCoins(
-  entity: EntityProfile,
+export async function getNetworkMemberCoins(
+  network: NetworkProfile,
 ): Promise<
   {
-    ref: EntityProfile["memberCoins"][number];
+    ref: NetworkProfile["memberCoins"][number];
     profile: StablecoinProfile | TokenProfile | RwaProfile | null;
   }[]
 > {
@@ -249,7 +249,7 @@ export async function getEntityMemberCoins(
     getAllTokens(),
     getAllRwas(),
   ]);
-  return entity.memberCoins.map((ref) => {
+  return network.memberCoins.map((ref) => {
     const profile =
       ref.category === "Stablecoin"
         ? (stablecoins.find((p) => p.slug === ref.slug) ?? null)
@@ -266,8 +266,8 @@ export async function getEntityMemberCoins(
 
 export const CATEGORIES: CategoryDef[] = [
   {
-    slug: "entities",
-    label: "Entities",
+    slug: "networks",
+    label: "Networks",
     description:
       "Umbrella protocols that group stablecoins, RWAs, and tokens under one issuer.",
     status: "active",

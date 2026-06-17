@@ -43,10 +43,10 @@ export function ProfileCard({ profile }: { profile: StablecoinProfile }) {
               label="Issuer"
               value={
                 <Link
-                  href={`/entities/${profile.entitySlug}`}
+                  href={`/networks/${profile.entitySlug}`}
                   className="text-electric-400 hover:underline"
                 >
-                  View entity
+                  View network
                 </Link>
               }
             />

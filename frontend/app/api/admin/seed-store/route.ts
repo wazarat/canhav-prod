@@ -84,7 +84,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   }
 
   revalidatePath("/");
-  revalidatePath("/entities");
+  revalidatePath("/networks");
   revalidatePath("/stablecoins");
   revalidatePath("/rwas");
   revalidatePath("/tokens");

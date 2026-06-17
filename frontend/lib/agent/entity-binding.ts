@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getApprovedEntityBySlug } from "@/lib/data";
+import { getApprovedNetworkBySlug } from "@/lib/data";
 import type { AgentProductRef } from "@/lib/agent/memory";
 
 /**
@@ -26,7 +26,7 @@ export interface EntityBinding {
 
 /** Resolve an Entity slug into the agent's product binding + research scope. */
 export async function resolveEntityBinding(slug: string): Promise<EntityBinding | null> {
-  const entity = await getApprovedEntityBySlug(slug);
+  const entity = await getApprovedNetworkBySlug(slug);
   if (!entity) return null;
 
   const associatedProducts: AgentProductRef[] = entity.memberCoins.map((c) => ({

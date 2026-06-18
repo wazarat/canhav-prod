@@ -150,6 +150,26 @@ CLASSIFICATION: Dict[str, Dict[str, str]] = {
     "ondo-gm": {"AssetSubtype": "tokenized-equity", "PegMechanism": "rwa-collateral"},
     # Stably's roadmap tokenized gold (conceptual — see ingest_rwas description).
     "stably-gold": {"AssetSubtype": "tokenized-commodity", "PegMechanism": "rwa-collateral"},
+    # --- DEX governance tokens (PDF "DEX + RWA Sector Expansion" §3) ---
+    "uni": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "crv": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "bal": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "aero": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "cake": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "joe": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "sushi": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "ray": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "rune": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "hype": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "dydx-gov": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "gmx-gov": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "drift": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "gns": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    # --- RWA governance tokens (PDF "DEX + RWA Sector Expansion" §4) ---
+    "cfg": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "gfi": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "cpool": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "reg": {"AssetSubtype": "governance", "PegMechanism": "none"},
 }
 
 

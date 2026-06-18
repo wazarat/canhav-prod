@@ -38,6 +38,8 @@ from entity_specs_batch import BATCH_ENTITY_SPECS  # noqa: E402
 from entity_specs_batch_2 import BATCH_2_ENTITY_SPECS  # noqa: E402
 from lending_specs import LENDING_ENTITY_SPECS  # noqa: E402
 from stablecoin_specs import STABLECOIN_ENTITY_SPECS  # noqa: E402
+from dex_specs import DEX_ENTITY_SPECS  # noqa: E402
+from rwa_specs import RWA_ENTITY_SPECS  # noqa: E402
 
 DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
 DOWNLOADS_CSV = Path.home() / "Downloads" / "Arbitrum Ecosystem - scrape v2.csv"
@@ -1045,6 +1047,13 @@ ENTITY_SPECS.update(LENDING_ENTITY_SPECS)
 # Digital, M^0, Agora, Bitget, GMO Trust, Liquity, Curve (crvUSD), Lista, Reserve,
 # Frax, Resolv, Falcon, Cap, Elixir, Anzen, Mountain Protocol.
 ENTITY_SPECS.update(STABLECOIN_ENTITY_SPECS)
+# DEX cohort (PDF "DEX + RWA Sector Expansion" §3): Uniswap, Curve, Balancer,
+# Aerodrome, PancakeSwap, Trader Joe, SushiSwap, Raydium, THORChain, Hyperliquid,
+# dYdX, GMX, Drift, Gains Network — Jupiter is retro-tagged below.
+ENTITY_SPECS.update(DEX_ENTITY_SPECS)
+# RWA cohort (PDF "DEX + RWA Sector Expansion" §4): Securitize, Centrifuge,
+# Goldfinch, RealT, Clearpool, Toucan, Lofty.ai, Franklin Templeton.
+ENTITY_SPECS.update(RWA_ENTITY_SPECS)
 
 # Stablecoin sub-sector backfill for the pre-existing issuers (PDF §2). Primary
 # stablecoin issuers also get sector="Stablecoin"; cross-tagged protocols keep
@@ -1098,6 +1107,78 @@ for _slug, _sectors in _SECONDARY_SECTORS.items():
     _spec = ENTITY_SPECS.get(_slug)
     if _spec is not None:
         _spec["secondary_sectors"] = _sectors
+
+# --- DEX + RWA Sector Expansion (PDF §6) ----------------------------------
+# Retro-tag the existing Jupiter umbrella as a primary DEX (Aggregator); its
+# Stablecoin (JupUSD) + Perpetuals cross-tags are already in _SECONDARY_SECTORS.
+_jupiter = ENTITY_SPECS.get("jupiter")
+if _jupiter is not None:
+    _jupiter["sector"] = "DEX"
+    _jupiter["dex_sub_sector"] = "Aggregator"
+    _jupiter["dex_secondary_tags"] = ["Solana-Native", "Routing-Layer", "Spot", "Perps"]
+    _jupiter["dex"] = {
+        "tvlUsd": {"value": None, "dataSource": "derived", "sourceLabel": "DefiLlama", "updatedAt": None},
+        "volume30dUsd": {"value": None, "dataSource": "derived", "sourceLabel": "DefiLlama", "updatedAt": None},
+        "governanceToken": "JUP",
+        "auditHistory": "Audited Solana programs; OtterSec / Sec3 reviews across products.",
+        "deployment": {
+            "chains": ["Solana"],
+            "evmCompatible": "no",
+            "notes": "Solana-native vertically integrated trading stack (aggregator, perps, lend, stablecoin, launchpad).",
+        },
+        "subSectorMetrics": {
+            "kind": "aggregator",
+            "integratedDexes": {"value": None, "dataSource": "derived", "sourceLabel": "Jupiter docs", "updatedAt": None},
+            "routingAlgo": "Metis smart order router across Solana liquidity venues.",
+            "topRoutedVenues": [{"venue": "Raydium", "sharePct": 55}],
+        },
+    }
+
+# Additive cross-sector tags for the new DEX/RWA entities (PDF §6). Centrifuge,
+# Clearpool, and Goldfinch are private-credit RWA shops that also function as
+# lending venues; PancakeSwap and Hyperliquid run perps alongside their DEX.
+_EXPANSION_SECONDARY_SECTORS: Dict[str, List[str]] = {
+    "centrifuge": ["Lending"],
+    "clearpool": ["Lending"],
+    "goldfinch": ["Lending"],
+    "pancakeswap": ["Perpetuals"],
+    "hyperliquid": ["Perpetuals"],
+}
+for _slug, _sectors in _EXPANSION_SECONDARY_SECTORS.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["secondary_sectors"] = _sectors
+
+# RWA sub-sector backfill for entities whose primary sector is set elsewhere
+# (PDF §6). Ondo + Pleasing Market become primary RWA umbrellas (keeping their
+# Stablecoin cross-tag); Mountain Protocol stays a primary Stablecoin issuer and
+# only gains the RWA sub-sector + Wound-Down marker.
+_RWA_PRIMARY_BACKFILL: Dict[str, Any] = {
+    "ondo-finance": ("Tokenized Treasuries", ["Institutional-Gated", "Yield-Bearing"]),
+    "pleasing-market": ("Tokenized Commodities", ["Real-World-Custody"]),
+}
+for _slug, (_subsector, _tags) in _RWA_PRIMARY_BACKFILL.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["sector"] = "RWA"
+        _spec["rwa_sub_sector"] = _subsector
+        _spec["rwa_secondary_tags"] = _tags
+        # Preserve the Stablecoin cross-tag while surfacing under RWA primary.
+        _existing = set(_spec.get("secondary_sectors") or [])
+        _existing.add("Stablecoin")
+        _spec["secondary_sectors"] = sorted(_existing)
+
+_RWA_SECONDARY_BACKFILL: Dict[str, Any] = {
+    "mountain-protocol": ("Tokenized Treasuries", ["Wound-Down"]),
+}
+for _slug, (_subsector, _tags) in _RWA_SECONDARY_BACKFILL.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["rwa_sub_sector"] = _subsector
+        _spec["rwa_secondary_tags"] = _tags
+        _existing = set(_spec.get("secondary_sectors") or [])
+        _existing.add("RWA")
+        _spec["secondary_sectors"] = sorted(_existing)
 
 
 def build_entity_item(
@@ -1170,6 +1251,14 @@ def build_entity_item(
         "StablecoinSubSector": spec.get("stablecoin_sub_sector"),
         "StablecoinSecondaryTags": spec.get("stablecoin_secondary_tags"),
         "Stablecoin": spec.get("stablecoin"),
+        # DEX taxonomy + metrics (PDF "DEX + RWA Sector Expansion" §1/§3).
+        "DexSubSector": spec.get("dex_sub_sector"),
+        "DexSecondaryTags": spec.get("dex_secondary_tags"),
+        "Dex": spec.get("dex"),
+        # RWA taxonomy + metrics (PDF "DEX + RWA Sector Expansion" §1/§4).
+        "RwaSubSector": spec.get("rwa_sub_sector"),
+        "RwaSecondaryTags": spec.get("rwa_secondary_tags"),
+        "Rwa": spec.get("rwa"),
         "MemberCoins": spec["member_coins"],
         "ArbitrumPortalMetadata": {
             "portalUrl": _clean(row.get("Portal URL")) or defaults.get("portalUrl"),

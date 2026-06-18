@@ -669,6 +669,350 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         "discord": None,
         "github": "https://github.com/maple-labs",
     },
+    # ---- DEX governance tokens (PDF "DEX + RWA Sector Expansion" §3) -----
+    "uni": {
+        "name": "Uniswap",
+        "symbol": "UNI",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of the Uniswap Protocol; UNI holders steer fee "
+            "switches, treasury, and deployments across Uniswap's V3/V4 markets."
+        ),
+        "entitySlug": "uniswap",
+        "coingecko": "https://www.coingecko.com/en/coins/uniswap",
+        "contractAddress": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Base", "Optimism", "Polygon"],
+        "website": "https://uniswap.org",
+        "twitter": "https://x.com/Uniswap",
+        "discord": None,
+        "github": "https://github.com/Uniswap",
+    },
+    "crv": {
+        "name": "Curve DAO Token",
+        "symbol": "CRV",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Curve Finance; lock CRV into veCRV to direct "
+            "gauge emissions and earn protocol fees / bribes."
+        ),
+        "entitySlug": "curve-finance",
+        "coingecko": "https://www.coingecko.com/en/coins/curve-dao-token",
+        "contractAddress": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Optimism", "Polygon", "Base"],
+        "website": "https://curve.fi",
+        "twitter": "https://x.com/CurveFinance",
+        "discord": None,
+        "github": "https://github.com/curvefi",
+    },
+    "bal": {
+        "name": "Balancer",
+        "symbol": "BAL",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Balancer; lock 80/20 BAL/WETH into veBAL to "
+            "direct gauge emissions and earn protocol revenue."
+        ),
+        "entitySlug": "balancer",
+        "coingecko": "https://www.coingecko.com/en/coins/balancer",
+        "contractAddress": "0xba100000625a3754423978a60c9317c58a424e3D",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Polygon", "Optimism", "Base"],
+        "website": "https://balancer.fi",
+        "twitter": "https://x.com/Balancer",
+        "discord": None,
+        "github": "https://github.com/balancer",
+    },
+    "aero": {
+        "name": "Aerodrome",
+        "symbol": "AERO",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Aerodrome Finance on Base; lock into veAERO to "
+            "vote on emissions and earn bribes/fees (ve(3,3) model)."
+        ),
+        "entitySlug": "aerodrome",
+        "coingecko": "https://www.coingecko.com/en/coins/aerodrome-finance",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Base"],
+        "website": "https://aerodrome.finance",
+        "twitter": "https://x.com/aerodromefi",
+        "discord": None,
+        "github": None,
+    },
+    "cake": {
+        "name": "PancakeSwap",
+        "symbol": "CAKE",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance + utility token of PancakeSwap, the dominant BNB-chain "
+            "DEX; used for staking, gauges, and IFO participation."
+        ),
+        "entitySlug": "pancakeswap",
+        "coingecko": "https://www.coingecko.com/en/coins/pancakeswap-token",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["BNB Chain", "Ethereum", "Arbitrum One", "Base"],
+        "website": "https://pancakeswap.finance",
+        "twitter": "https://x.com/PancakeSwap",
+        "discord": None,
+        "github": "https://github.com/pancakeswap",
+    },
+    "joe": {
+        "name": "JOE",
+        "symbol": "JOE",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Trader Joe (LFJ); stake as sJOE for USDC fee "
+            "share or veJOE for boosted yield."
+        ),
+        "entitySlug": "trader-joe",
+        "coingecko": "https://www.coingecko.com/en/coins/joe",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Avalanche", "Arbitrum One", "BNB Chain"],
+        "website": "https://lfj.gg",
+        "twitter": "https://x.com/LFJ_gg",
+        "discord": None,
+        "github": None,
+    },
+    "sushi": {
+        "name": "Sushi",
+        "symbol": "SUSHI",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of SushiSwap; stake to xSUSHI to accrue a share of "
+            "protocol fees across 40+ chains."
+        ),
+        "entitySlug": "sushiswap",
+        "coingecko": "https://www.coingecko.com/en/coins/sushi",
+        "contractAddress": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Polygon", "Optimism", "Base"],
+        "website": "https://www.sushi.com",
+        "twitter": "https://x.com/SushiSwap",
+        "discord": None,
+        "github": "https://github.com/sushiswap",
+    },
+    "ray": {
+        "name": "Raydium",
+        "symbol": "RAY",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance + utility token of Raydium, Solana's hybrid AMM that "
+            "shares liquidity with the OpenBook order book."
+        ),
+        "entitySlug": "raydium",
+        "coingecko": "https://www.coingecko.com/en/coins/raydium",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Solana"],
+        "website": "https://raydium.io",
+        "twitter": "https://x.com/RaydiumProtocol",
+        "discord": None,
+        "github": None,
+    },
+    "rune": {
+        "name": "THORChain",
+        "symbol": "RUNE",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Settlement + governance asset of THORChain; bonded by node operators "
+            "and paired in every liquidity pool for native cross-chain swaps."
+        ),
+        "entitySlug": "thorchain",
+        "coingecko": "https://www.coingecko.com/en/coins/thorchain",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["THORChain"],
+        "website": "https://thorchain.org",
+        "twitter": "https://x.com/THORChain",
+        "discord": None,
+        "github": None,
+    },
+    "hype": {
+        "name": "Hyperliquid",
+        "symbol": "HYPE",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Hyperliquid, the purpose-built L1 with a fully "
+            "on-chain order book and the deepest on-chain perp liquidity."
+        ),
+        "entitySlug": "hyperliquid",
+        "coingecko": "https://www.coingecko.com/en/coins/hyperliquid",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Hyperliquid L1"],
+        "website": "https://hyperliquid.xyz",
+        "twitter": "https://x.com/HyperliquidX",
+        "discord": None,
+        "github": None,
+    },
+    "dydx-gov": {
+        "name": "dYdX",
+        "symbol": "DYDX",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance + staking token of the dYdX Chain; secures the Cosmos "
+            "appchain and governs permissionless perpetual market listings."
+        ),
+        "entitySlug": "dydx",
+        "coingecko": "https://www.coingecko.com/en/coins/dydx-chain",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["dYdX Chain", "Ethereum"],
+        "website": "https://dydx.exchange",
+        "twitter": "https://x.com/dYdX",
+        "discord": None,
+        "github": "https://github.com/dydxprotocol",
+    },
+    "gmx-gov": {
+        "name": "GMX",
+        "symbol": "GMX",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance + fee-share token of GMX; stake for esGMX vesting and a "
+            "share of trading fees from the GLP/GM pools."
+        ),
+        "entitySlug": "gmx",
+        "coingecko": "https://www.coingecko.com/en/coins/gmx",
+        "contractAddress": "0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a",
+        "csvParentSlug": None,
+        "chains": ["Arbitrum One", "Avalanche"],
+        "website": "https://gmx.io",
+        "twitter": "https://x.com/GMX_IO",
+        "discord": None,
+        "github": "https://github.com/gmx-io",
+    },
+    "drift": {
+        "name": "Drift",
+        "symbol": "DRIFT",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Drift Protocol, the leading Solana-native perps "
+            "DEX; stake as sDRIFT for fee discounts and revenue share."
+        ),
+        "entitySlug": "drift-protocol",
+        "coingecko": "https://www.coingecko.com/en/coins/drift-protocol",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Solana"],
+        "website": "https://drift.trade",
+        "twitter": "https://x.com/DriftProtocol",
+        "discord": None,
+        "github": None,
+    },
+    "gns": {
+        "name": "Gains Network",
+        "symbol": "GNS",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Gains Network (gTrade); also collateralizes the "
+            "gGNS vault backing its synthetic leveraged markets."
+        ),
+        "entitySlug": "gains-network",
+        "coingecko": "https://www.coingecko.com/en/coins/gains-network",
+        "contractAddress": "0x18c11FD286C5EC11c3b683Caa813B77f5163A122",
+        "csvParentSlug": None,
+        "chains": ["Arbitrum One", "Polygon", "Base"],
+        "website": "https://gains.trade",
+        "twitter": "https://x.com/GainsNetwork_io",
+        "discord": None,
+        "github": None,
+    },
+    # ---- RWA governance tokens (PDF "DEX + RWA Sector Expansion" §4) -----
+    "cfg": {
+        "name": "Centrifuge",
+        "symbol": "CFG",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Centrifuge; governs the protocol that tokenizes "
+            "real-world private-credit pools via bankruptcy-remote SPVs."
+        ),
+        "entitySlug": "centrifuge",
+        "coingecko": "https://www.coingecko.com/en/coins/centrifuge",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Centrifuge Chain", "Ethereum"],
+        "website": "https://centrifuge.io",
+        "twitter": "https://x.com/centrifuge",
+        "discord": None,
+        "github": "https://github.com/centrifuge",
+    },
+    "gfi": {
+        "name": "Goldfinch",
+        "symbol": "GFI",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Goldfinch; used for staking, backer incentives, "
+            "and governance of its uncollateralized private-credit protocol."
+        ),
+        "entitySlug": "goldfinch",
+        "coingecko": "https://www.coingecko.com/en/coins/goldfinch",
+        "contractAddress": "0xdab396cCF3d84Cf2D07C4454e10C8A6F5b008D2b",
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
+        "website": "https://goldfinch.finance",
+        "twitter": "https://x.com/goldfinch_fi",
+        "discord": None,
+        "github": "https://github.com/goldfinch-eng",
+    },
+    "cpool": {
+        "name": "Clearpool",
+        "symbol": "CPOOL",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Clearpool; governs its institutional "
+            "uncollateralized lending pools and Credit Vaults."
+        ),
+        "entitySlug": "clearpool",
+        "coingecko": "https://www.coingecko.com/en/coins/clearpool",
+        "contractAddress": "0x66761Fa41377003622aEE3c7675Fc7b5c1C2FaC5",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Polygon", "Optimism", "Base"],
+        "website": "https://clearpool.finance",
+        "twitter": "https://x.com/ClearpoolFin",
+        "discord": None,
+        "github": None,
+    },
+    "reg": {
+        "name": "RealToken Ecosystem Governance",
+        "symbol": "REG",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of the RealT ecosystem; governs the fractional "
+            "real-estate platform that streams daily rental yield on-chain."
+        ),
+        "entitySlug": "realt",
+        "coingecko": "https://www.coingecko.com/en/coins/realtoken-ecosystem-governance",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Gnosis Chain", "Ethereum"],
+        "website": "https://realt.co",
+        "twitter": "https://x.com/RealTPlatform",
+        "discord": None,
+        "github": None,
+    },
 }
 
 

@@ -937,6 +937,69 @@ export type StablecoinSecondaryTag =
   | "Wound-Down"
   | "Recently-Exploited";
 
+/**
+ * DEX sub-sectors. The leaf of the taxonomy for `sector === "DEX"` entities,
+ * mirroring the LendingTag / StablecoinSubSector pattern.
+ */
+export type DexSubSector =
+  | "AMM" // Uniswap V2-style x*y=k, Balancer weighted, SushiSwap classic
+  | "Concentrated Liquidity" // Uniswap V3/V4, PancakeSwap Infinity, Trader Joe Liquidity Book
+  | "Stableswap" // Curve, Saddle, Wombat
+  | "Aggregator" // Jupiter, 1inch, ParaSwap, CowSwap
+  | "Orderbook" // Hyperliquid, dYdX, Phoenix
+  | "Hybrid AMM + Orderbook" // Raydium, Drift
+  | "Perpetuals" // GMX, Gains Network, Aevo, Pacifica
+  | "ve(3,3)" // Aerodrome, Velodrome, Equalizer
+  | "Cross-Chain Native"; // THORChain, Maya, Chainflip
+
+/** Secondary cross-cutting tags for a DEX entity (0+ apply). */
+export type DexSecondaryTag =
+  | "Spot"
+  | "Perps"
+  | "Derivatives"
+  | "Multi-Chain"
+  | "Non-EVM"
+  | "Solana-Native"
+  | "L2-Native"
+  | "Appchain"
+  | "MEV-Resistant"
+  | "veTokenomics"
+  | "Hooks"
+  | "CLMM"
+  | "Routing-Layer"
+  | "Wound-Down"
+  | "Recently-Exploited";
+
+/**
+ * RWA sub-sectors. Entity-level taxonomy, complementary to the coin-level
+ * `RwaAssetClass`. An RWA *entity* groups one or many products, each of which
+ * carries its own AssetClass.
+ */
+export type RwaSubSector =
+  | "Tokenized Treasuries" // Ondo OUSG, Franklin BENJI, Mountain USDM, Hashnote USYC
+  | "Tokenized Equities" // Dinari dSHARE, Ondo GM (TSLA/SPY/QQQ/NVDA)
+  | "Tokenized Commodities" // Pleasing Market PGOLD, Kinesis KAU/KAG, Paxos PAXG
+  | "Real Estate" // RealT, Lofty, Estate Protocol
+  | "Private Credit" // Centrifuge, Goldfinch, Clearpool, Florence
+  | "Carbon / ESG" // Toucan BCT/NCT, KlimaDAO
+  | "Tokenization Infrastructure" // Securitize, Backed Finance, Tokeny, Polymath
+  | "Structured Products" // Chateau Capital, dualMint
+  | "Event Finance" // Atmosphera (weather/climate-linked notes)
+  | "Stablecoins & FX"; // Aryze, currency-only RWA shops
+
+/** Secondary cross-cutting tags for an RWA entity (0+ apply). */
+export type RwaSecondaryTag =
+  | "Institutional-Gated" // Reg D 506(c), 3(c)(7), KYC-only mint
+  | "Permissioned" // whitelist required for transfers
+  | "Compliance-Heavy" // SEC-registered transfer agent, MiFID, similar
+  | "Multi-Chain"
+  | "Non-EVM"
+  | "Hybrid-Chain"
+  | "Yield-Bearing"
+  | "Real-World-Custody" // physical asset custody (gold vault, real estate deeds)
+  | "DAO-Governed"
+  | "Wound-Down";
+
 /** Fiat-Backed Regulated sub-sector metrics (Circle, Paxos, First Digital). */
 export interface StablecoinFiatBackedMetrics {
   kind: "fiat-backed";
@@ -992,6 +1055,170 @@ export type StablecoinSubSectorMetrics =
   | StablecoinSyntheticMetrics
   | StablecoinRwaBackedMetrics
   | StablecoinEMoneyMetrics;
+
+/* -------------------------------------------------------------------------- */
+/* DEX sector — sub-sector-specific metric blocks (spec §1/§7)                */
+/* -------------------------------------------------------------------------- */
+
+/** AMM / CLMM metrics (Uniswap, Curve, Balancer, PancakeSwap, Aerodrome). */
+export interface DexAmmMetrics {
+  kind: "amm";
+  pools?: Sourced<number | null>;
+  topPools?: { name: string; tvlUsd?: number; volume24h?: number }[];
+  feeTierStructure?: string | null;
+}
+
+/** Orderbook metrics (Hyperliquid spot/CLOB, dYdX). */
+export interface DexOrderbookMetrics {
+  kind: "orderbook";
+  markets?: Sourced<number | null>;
+  makerRebatePct?: Sourced<number | null>;
+  takerFeePct?: Sourced<number | null>;
+  openInterestUsd?: Sourced<number | null>;
+}
+
+/** Perpetuals metrics (GMX, Gains, Drift). */
+export interface DexPerpsMetrics {
+  kind: "perps";
+  markets?: Sourced<number | null>;
+  openInterestUsd?: Sourced<number | null>;
+  fundingRateModel?: string | null;
+  maxLeverage?: Sourced<number | null>;
+  liquidationsVolume30dUsd?: Sourced<number | null>;
+}
+
+/** Aggregator metrics (Jupiter, 1inch). */
+export interface DexAggregatorMetrics {
+  kind: "aggregator";
+  integratedDexes?: Sourced<number | null>;
+  routingAlgo?: string | null;
+  topRoutedVenues?: { venue: string; sharePct?: number }[];
+}
+
+/** Cross-chain native swap metrics (THORChain, Maya). */
+export interface DexCrossChainMetrics {
+  kind: "cross-chain";
+  integratedChains?: Sourced<number | null>;
+  nativeAssetsSupported?: string[];
+  bridgeArchitecture?: string | null;
+}
+
+/** Discriminated union of sub-sector-specific DEX metric blocks. */
+export type DexSubSectorMetrics =
+  | DexAmmMetrics
+  | DexOrderbookMetrics
+  | DexPerpsMetrics
+  | DexAggregatorMetrics
+  | DexCrossChainMetrics;
+
+/* -------------------------------------------------------------------------- */
+/* RWA sector — sub-sector-specific metric blocks (spec §1/§7)                */
+/* -------------------------------------------------------------------------- */
+
+/** Tokenized Treasuries metrics (Ondo, Franklin, Mountain, Securitize BUIDL). */
+export interface RwaTreasuryMetrics {
+  kind: "treasuries";
+  underlyingAssets?: string[];
+  duration?: string | null;
+  yieldDistribution?: "rebase" | "exchange-rate" | "off-chain" | null;
+  fundStructure?: string | null;
+  navUsd?: Sourced<number | null>;
+  custodian?: string | null;
+}
+
+/** Private Credit metrics (Centrifuge, Goldfinch, Clearpool). */
+export interface RwaPrivateCreditMetrics {
+  kind: "private-credit";
+  activeBorrowers?: Sourced<number | null>;
+  cumulativeOriginationsUsd?: Sourced<number | null>;
+  defaultRatePct?: Sourced<number | null>;
+  averageMaturityDays?: Sourced<number | null>;
+  trancheStructure?: string | null;
+}
+
+/** Real Estate metrics (RealT, Lofty, Estate Protocol). */
+export interface RwaRealEstateMetrics {
+  kind: "real-estate";
+  propertiesCount?: Sourced<number | null>;
+  averagePropertyValueUsd?: Sourced<number | null>;
+  rentalYieldRangePct?: string | null;
+  geographicScope?: string | null;
+  custodyStructure?: string | null;
+}
+
+/** Tokenized Commodities metrics (Pleasing Market, Kinesis, Paxos). */
+export interface RwaCommoditiesMetrics {
+  kind: "commodities";
+  underlyingCommodity?: string | null;
+  custodyVault?: string | null;
+  redemptionMinimum?: string | null;
+  oracleProvider?: string | null;
+}
+
+/** Carbon / ESG metrics (Toucan, KlimaDAO). */
+export interface RwaCarbonMetrics {
+  kind: "carbon";
+  creditsTokenizedTonnes?: Sourced<number | null>;
+  registryPartners?: string[];
+  vintageRangeYears?: string | null;
+}
+
+/** Tokenization Infrastructure metrics (Securitize, Backed, Tokeny). */
+export interface RwaTokenizationInfraMetrics {
+  kind: "tokenization-infra";
+  fundsHosted?: Sourced<number | null>;
+  totalAumUsd?: Sourced<number | null>;
+  registeredJurisdictions?: string[];
+  topClients?: string[];
+}
+
+/** Discriminated union of sub-sector-specific RWA metric blocks. */
+export type RwaSubSectorMetrics =
+  | RwaTreasuryMetrics
+  | RwaPrivateCreditMetrics
+  | RwaRealEstateMetrics
+  | RwaCommoditiesMetrics
+  | RwaCarbonMetrics
+  | RwaTokenizationInfraMetrics;
+
+/**
+ * DEX-entity metrics block (sector === "DEX"). Mirrors the `StablecoinMetrics`
+ * pattern: live fields (TVL/volume) are filled by the DeFi Llama cron in
+ * Phase 2; curated fields (deployment, audit, sub-sector panel) are static
+ * research. Everything optional so partial data renders honestly.
+ */
+export interface DexMetrics {
+  /** Total value locked (USD) — live from DeFi Llama or curated. */
+  tvlUsd?: Sourced<number | null>;
+  /** Trailing 30-day trading volume (USD). */
+  volume30dUsd?: Sourced<number | null>;
+  /** Governance / primary token symbol. */
+  governanceToken?: string | null;
+  /** Audit / security history (curated). */
+  auditHistory?: string | null;
+  /** Chain / ecosystem deployment. */
+  deployment?: ChainDeployment | null;
+  /** Sub-sector-specific specialized metric panel. */
+  subSectorMetrics?: DexSubSectorMetrics | null;
+}
+
+/**
+ * RWA-entity metrics block (sector === "RWA"). Mirrors `StablecoinMetrics`.
+ * `aumUsd` is filled live where a Llama/rwa.xyz mapping exists (Phase 2); the
+ * curated string/array fields are static research. Everything optional.
+ */
+export interface RwaMetrics {
+  /** Assets under management / TVL (USD) — live or curated. */
+  aumUsd?: Sourced<number | null>;
+  /** Regulatory status summary (curated). */
+  regulatoryStatus?: string | null;
+  /** Audit / attestation history (curated). */
+  auditHistory?: string | null;
+  /** Chain / ecosystem deployment. */
+  deployment?: ChainDeployment | null;
+  /** Sub-sector-specific specialized metric panel. */
+  subSectorMetrics?: RwaSubSectorMetrics | null;
+}
 
 /** A risk/incident row for a stablecoin issuer (depeg, exploit, audit). */
 export interface StablecoinRiskEvent {
@@ -1257,6 +1484,18 @@ export interface NetworkProfile {
   stablecoinSecondaryTags?: StablecoinSecondaryTag[];
   /** Stablecoin-issuer metrics block (live + curated) — `sector === "Stablecoin"`. */
   stablecoin?: StablecoinMetrics | null;
+  /** DEX primary sub-sector (when sector === "DEX", or as a secondary marker). */
+  dexSubSector?: DexSubSector | null;
+  /** DEX secondary tags (0+): Spot, Perps, Multi-Chain, CLMM, etc. */
+  dexSecondaryTags?: DexSecondaryTag[];
+  /** DEX-entity metrics block (live + curated) — `sector === "DEX"`. */
+  dex?: DexMetrics | null;
+  /** RWA primary sub-sector (when sector === "RWA", or as a secondary marker). */
+  rwaSubSector?: RwaSubSector | null;
+  /** RWA secondary tags (0+): Institutional-Gated, Permissioned, etc. */
+  rwaSecondaryTags?: RwaSecondaryTag[];
+  /** RWA-entity metrics block (live + curated) — `sector === "RWA"`. */
+  rwa?: RwaMetrics | null;
   memberCoins: MemberCoinRef[];
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Protocol fees/revenue when this entity maps to a Llama protocol (DeFi Llama). */

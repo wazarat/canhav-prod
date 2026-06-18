@@ -238,6 +238,12 @@ export async function readLiveStore(): Promise<LiveStore> {
         stablecoinSubSector: item.StablecoinSubSector ?? null,
         stablecoinSecondaryTags: item.StablecoinSecondaryTags ?? undefined,
         stablecoin: item.Stablecoin ?? null,
+        dexSubSector: item.DexSubSector ?? null,
+        dexSecondaryTags: item.DexSecondaryTags ?? undefined,
+        dex: item.Dex ?? null,
+        rwaSubSector: item.RwaSubSector ?? null,
+        rwaSecondaryTags: item.RwaSecondaryTags ?? undefined,
+        rwa: item.Rwa ?? null,
         currentScale: {
           tvlUsd: null,
           users: null,

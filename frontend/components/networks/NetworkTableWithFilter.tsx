@@ -42,18 +42,32 @@ export function NetworkTableWithFilter({
     return [...set].sort();
   }, [profiles]);
 
-  // Lending tags available for the selected sector.
-  const lendingTags = useMemo(() => {
+  // Sub-sector / tags available for the selected sector. Sector-aware so DEX
+  // and RWA surface their own sub-sector + secondary tags, not just lending tags.
+  const sectorTags = useMemo(() => {
     if (sector === "all") return [];
     const set = new Set<string>();
     for (const p of profiles) {
       if (!matchesSectorTag(p, sector)) continue;
-      for (const t of p.tags ?? (p.subSector ? [p.subSector] : [])) set.add(t);
+      for (const t of tagsForSector(p, sector)) set.add(t);
     }
     return [...set].sort();
   }, [profiles, sector]);
 
-  function profileTags(p: NetworkProfile): string[] {
+  // The sub-sector + secondary-tag vocabulary for a profile under a given sector.
+  function tagsForSector(p: NetworkProfile, s: string): string[] {
+    if (s === "DEX") {
+      return [p.dexSubSector, ...(p.dexSecondaryTags ?? [])].filter(Boolean) as string[];
+    }
+    if (s === "RWA") {
+      return [p.rwaSubSector, ...(p.rwaSecondaryTags ?? [])].filter(Boolean) as string[];
+    }
+    if (s === "Stablecoin") {
+      return [p.stablecoinSubSector, ...(p.stablecoinSecondaryTags ?? [])].filter(
+        Boolean,
+      ) as string[];
+    }
+    // Lending + default: multi-tag vocabulary, falling back to subSector.
     return p.tags ?? (p.subSector ? [p.subSector] : []);
   }
 
@@ -77,7 +91,9 @@ export function NetworkTableWithFilter({
       const matchesCategory =
         category === "all" || p.memberCoins.some((c) => c.category === category);
       const matchesSector = sector === "all" || matchesSectorTag(p, sector);
-      const matchesTag = tagFilter === "all" || profileTags(p).includes(tagFilter);
+      const matchesTag =
+        tagFilter === "all" ||
+        (sector !== "all" && tagsForSector(p, sector).includes(tagFilter));
       return matchesQuery && matchesCategory && matchesSector && matchesTag;
     });
   }, [profiles, query, category, sector, tagFilter]);
@@ -155,7 +171,7 @@ export function NetworkTableWithFilter({
             ))}
           </div>
 
-          {lendingTags.length > 0 && (
+          {sectorTags.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 pl-1">
               <span className="text-xs font-medium uppercase tracking-wide text-ink-500">
                 Tag
@@ -172,7 +188,7 @@ export function NetworkTableWithFilter({
               >
                 All
               </button>
-              {lendingTags.map((s) => (
+              {sectorTags.map((s) => (
                 <button
                   key={s}
                   type="button"

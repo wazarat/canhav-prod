@@ -41,13 +41,23 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from app.config import get_env, load_env  # noqa: E402
 from app.db import get_repository, schema  # noqa: E402
-from app.live import aave, alchemy, coingecko, rwa_registry  # noqa: E402
+from app.live import aave, alchemy, coingecko, defillama, rwa_registry  # noqa: E402
 
 
 def _now_iso() -> str:
     from datetime import datetime, timezone
 
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _to_sourced(result: dict) -> dict:
+    """Convert a DeFi Llama result dict to the frontend `Sourced<>` shape."""
+    return {
+        "value": result.get("value"),
+        "dataSource": "live",
+        "sourceLabel": "DeFi Llama",
+        "updatedAt": result.get("updatedAt"),
+    }
 
 
 def _slug_of(item: dict) -> str:
@@ -214,6 +224,59 @@ def main(argv: List[str]) -> int:
                     aave_updated += 1
     if aave_updated:
         print(f"Aave rates : refreshed {aave_updated} item(s) (supply/borrow APY).")
+
+    # --- DEX networks: DeFi Llama live TVL + 30d volume -------------------
+    # Mirror of the TS cron DEX pass. Overlays live protocol TVL + volume onto
+    # the curated `Dex` block, preserving curated fields. Keyless; fails soft.
+    dex_updated = 0
+    for item in items:
+        if item.get("Category") != schema.CATEGORY_ENTITY:
+            continue
+        if item.get("Sector") != "DEX":
+            continue
+        slug = _slug_of(item)
+        if defillama.llama_protocol_for_slug(slug) is None:
+            continue
+        tvl = defillama.fetch_protocol_tvl(slug)
+        vol = defillama.fetch_dex_volume(slug)
+        live = {}
+        if tvl["value"] is not None:
+            live["tvlUsd"] = _to_sourced(tvl)
+        if vol["value"] is not None:
+            live["volume30dUsd"] = _to_sourced(vol)
+        if live and not args.dry_run:
+            item["Dex"] = {**(item.get("Dex") or {}), **live}
+            if tvl["value"] is not None:
+                item["CurrentScale"] = {**(item.get("CurrentScale") or {}), "tvlUsd": tvl["value"]}
+            item["UpdatedAt"] = _now_iso()
+            repo.put_item(item)
+            dex_updated += 1
+        elif live:
+            dex_updated += 1
+    if dex_updated:
+        print(f"DEX live   : refreshed {dex_updated} item(s) (TVL/volume).")
+
+    # --- RWA networks: DeFi Llama live AUM (protocol TVL) ------------------
+    rwa_updated = 0
+    for item in items:
+        if item.get("Category") != schema.CATEGORY_ENTITY:
+            continue
+        if item.get("Sector") != "RWA":
+            continue
+        slug = _slug_of(item)
+        if defillama.llama_protocol_for_slug(slug) is None:
+            continue
+        tvl = defillama.fetch_protocol_tvl(slug)
+        if tvl["value"] is None:
+            continue
+        if not args.dry_run:
+            item["Rwa"] = {**(item.get("Rwa") or {}), "aumUsd": _to_sourced(tvl)}
+            item["CurrentScale"] = {**(item.get("CurrentScale") or {}), "tvlUsd": tvl["value"]}
+            item["UpdatedAt"] = _now_iso()
+            repo.put_item(item)
+        rwa_updated += 1
+    if rwa_updated:
+        print(f"RWA live   : refreshed {rwa_updated} item(s) (AUM/TVL).")
 
     print("History (peg/TVL series) left untouched — Dune is wired but not active yet.")
 

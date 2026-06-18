@@ -1,0 +1,153 @@
+"""
+DeFi Llama overlay — protocol TVL + DEX trading volume.  [Step 4 / Sector expansion]
+
+Python parity for the canonical TS cron (``frontend/app/api/cron/refresh``). The
+TS cron is what production runs; this mirror keeps the local Python pipeline
+(``refresh_live.py``) in sync for offline dev and parity checks.
+
+  - ``fetch_protocol_tvl(slug)`` reads the latest protocol TVL (USD) from
+    ``api.llama.fi/protocol/{slug}`` — used for DEX ``tvlUsd`` and RWA ``aumUsd``.
+  - ``fetch_dex_volume(slug)`` reads the 30-day trading volume from
+    ``api.llama.fi/summary/dexs/{protocol}``.
+
+Slug maps mirror ``LLAMA_PROTOCOL_SLUGS`` / ``LLAMA_DEX_SLUGS`` in
+``frontend/lib/server/defillama.ts``. Keep the two in sync.
+
+Stdlib only (``urllib``); keyless public API. Fails soft: any network/lookup
+miss returns ``None`` rather than raising, so the runner can skip and continue.
+"""
+
+from __future__ import annotations
+
+import json
+import urllib.error
+import urllib.request
+from datetime import datetime, timezone
+from typing import Optional
+
+LLAMA_API_BASE = "https://api.llama.fi"
+
+# Curated slug -> DeFi Llama protocol slug (TVL series). Mirror of
+# LLAMA_PROTOCOL_SLUGS in defillama.ts (DEX + RWA sector-expansion subset).
+LLAMA_PROTOCOL_SLUGS: dict[str, Optional[str]] = {
+    # DEX networks — parent-protocol TVL.
+    "uniswap": "uniswap",
+    "curve-finance": "curve-finance",
+    "balancer": "balancer",
+    "aerodrome": "aerodrome-slipstream",  # parent "aerodrome" 400s # verify
+    "pancakeswap": "pancakeswap",
+    "trader-joe": "lfj",  # verify (LFJ, fka Trader Joe)
+    "sushiswap": "sushiswap",
+    "raydium": "raydium",
+    "thorchain": "thorchain-dex",
+    "hyperliquid": "hyperliquid",
+    "dydx": "dydx",
+    "gmx": "gmx",
+    "drift-protocol": "drift-trade",
+    "gains-network": "gains-network",
+    # RWA networks — issuer/protocol TVL.
+    "securitize": "securitize",
+    "centrifuge": "centrifuge-protocol",
+    "goldfinch": "goldfinch",
+    "clearpool": "clearpool",
+    "realt": "realt",
+    "lofty-ai": "lofty",
+    "toucan-protocol": "toucan-protocol",
+    # Verified absent — covered via on-chain supply x $1 NAV instead.
+    "franklin-templeton": None,
+}
+
+# Curated slug -> DeFi Llama DEX protocol slug (volume). Mirror of
+# LLAMA_DEX_SLUGS in defillama.ts. summary/dexs fails soft, so unverified slugs
+# simply yield no live volume. # verify
+LLAMA_DEX_SLUGS: dict[str, Optional[str]] = {
+    "uniswap": "uniswap",
+    "curve-finance": "curve-dex",
+    "balancer": "balancer",
+    "aerodrome": "aerodrome-slipstream",
+    "pancakeswap": "pancakeswap",
+    "trader-joe": "lfj",
+    "sushiswap": "sushiswap",
+    "raydium": "raydium",
+    "thorchain": "thorchain-dex",
+}
+
+
+def llama_protocol_for_slug(slug: str) -> Optional[str]:
+    return LLAMA_PROTOCOL_SLUGS.get(slug)
+
+
+def llama_dex_for_slug(slug: str) -> Optional[str]:
+    return LLAMA_DEX_SLUGS.get(slug)
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _get_json(url: str, *, timeout: float = 30.0) -> Optional[dict]:
+    req = urllib.request.Request(
+        url,
+        headers={"Accept": "application/json", "User-Agent": "canhav-research/1.0"},
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except (urllib.error.URLError, TimeoutError, ValueError):
+        return None
+
+
+def _num(value) -> Optional[float]:
+    if isinstance(value, (int, float)) and value == value:  # not NaN
+        return float(value)
+    if isinstance(value, str):
+        try:
+            return float(value)
+        except ValueError:
+            return None
+    return None
+
+
+def fetch_protocol_tvl(slug: str) -> dict:
+    """
+    Return the latest protocol TVL (USD) for a curated slug as a Sourced dict.
+
+    ``value`` is ``None`` when the slug is unmapped or the call fails. Prefers the
+    protocol-wide ``tvl`` series tail (mirrors the TS cron's day-1 fetch).
+    """
+    empty = {"value": None, "source": "defillama", "updatedAt": None}
+    protocol = llama_protocol_for_slug(slug)
+    if not protocol:
+        return empty
+    data = _get_json(f"{LLAMA_API_BASE}/protocol/{protocol}")
+    if not isinstance(data, dict):
+        return empty
+    series = data.get("tvl")
+    if not isinstance(series, list) or not series:
+        return empty
+    last = series[-1]
+    value = _num(last.get("totalLiquidityUSD")) if isinstance(last, dict) else None
+    if value is None or value <= 0:
+        return empty
+    return {"value": value, "source": "defillama", "updatedAt": _now_iso()}
+
+
+def fetch_dex_volume(slug: str) -> dict:
+    """
+    Return the 30-day DEX trading volume (USD) for a curated slug as a Sourced dict.
+
+    Llama exposes ``total30d`` on ``summary/dexs/{protocol}``. ``value`` is
+    ``None`` when the slug is unmapped or the call fails.
+    """
+    empty = {"value": None, "source": "defillama", "updatedAt": None}
+    protocol = llama_dex_for_slug(slug)
+    if not protocol:
+        return empty
+    data = _get_json(f"{LLAMA_API_BASE}/summary/dexs/{protocol}")
+    if not isinstance(data, dict):
+        return empty
+    value = _num(data.get("total30d"))
+    if value is None or value <= 0:
+        return empty
+    return {"value": value, "source": "defillama", "updatedAt": _now_iso()}

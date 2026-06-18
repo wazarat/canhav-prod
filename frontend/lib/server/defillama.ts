@@ -122,6 +122,28 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
   "chateau-capital": "chateau", // chateau.capital
   "florence-finance": "florence-finance",
   pgold: "pleasing-gold", // listed but adapter reports 0 — CoinGecko mcap covers it
+  // DEX networks (sector expansion) — parent-protocol TVL (verified 2026-06-18).
+  uniswap: "uniswap",
+  "curve-finance": "curve-finance",
+  balancer: "balancer",
+  aerodrome: "aerodrome-slipstream", // parent "aerodrome" 400s; Slipstream is the live CLMM // verify
+  pancakeswap: "pancakeswap",
+  "trader-joe": "lfj", // verify (LFJ, fka Trader Joe)
+  sushiswap: "sushiswap",
+  raydium: "raydium",
+  thorchain: "thorchain-dex",
+  hyperliquid: "hyperliquid",
+  dydx: "dydx",
+  gmx: "gmx",
+  "drift-protocol": "drift-trade",
+  "gains-network": "gains-network",
+  // RWA networks (sector expansion) — issuer/protocol TVL (verified 2026-06-18).
+  securitize: "securitize",
+  goldfinch: "goldfinch",
+  clearpool: "clearpool",
+  realt: "realt",
+  "lofty-ai": "lofty",
+  "toucan-protocol": "toucan-protocol",
   // Verified absent:
   arcton: null,
   atmosphera: null,
@@ -172,6 +194,16 @@ export const LLAMA_DEX_SLUGS: Record<string, string | null> = {
   jupiter: "jupiter-aggregator", // Jupiter (Solana) aggregator volume // verify
   uniswap: "uniswap", // verify
   camelot: "camelot", // Arbitrum-native DEX // verify
+  // Spot / AMM DEX networks (sector expansion) — trading volume. summary/dexs
+  // fails soft, so unverified slugs simply yield no live volume. // verify
+  "curve-finance": "curve-dex",
+  balancer: "balancer",
+  aerodrome: "aerodrome-slipstream",
+  pancakeswap: "pancakeswap",
+  "trader-joe": "lfj",
+  sushiswap: "sushiswap",
+  raydium: "raydium",
+  thorchain: "thorchain-dex",
 };
 
 /**

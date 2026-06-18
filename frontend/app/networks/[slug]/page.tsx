@@ -9,6 +9,8 @@ import {
   LendingMetricsSection,
   LendingTagMetricsSection,
   StablecoinMetricsSection,
+  DexMetricsSection,
+  RwaMetricsSection,
   OrgStructureSection,
   PartnershipsSection,
   RisksSection,
@@ -288,6 +290,8 @@ export default async function NetworkProfilePage({ params }: PageProps) {
               stablecoin={profile.stablecoin}
               memberCoins={profile.memberCoins}
             />
+            <DexMetricsSection dex={profile.dex} />
+            <RwaMetricsSection rwa={profile.rwa} />
             <CompetitorsSection
               competitors={profile.competitors}
               networkName={profile.name}

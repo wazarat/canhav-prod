@@ -6,6 +6,8 @@ import { DataPanel } from "@/components/ui/DataPanel";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import type {
   Competitor,
+  DexMetrics,
+  DexSubSectorMetrics,
   LendingMetrics,
   LendingTag,
   LendingTagMetrics,
@@ -17,6 +19,8 @@ import type {
   InvestmentRound,
   OrgUnit,
   Partnership,
+  RwaMetrics,
+  RwaSubSectorMetrics,
   Sourced,
   StablecoinMetrics,
   StablecoinSubSectorMetrics,
@@ -1006,6 +1010,290 @@ export function StablecoinMetricsSection({
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/* DEX sector — entity metrics + sub-sector panel                             */
+/* -------------------------------------------------------------------------- */
+
+const DEX_KIND_LABEL: Record<DexSubSectorMetrics["kind"], string> = {
+  amm: "Pools & fee tiers",
+  orderbook: "Markets & fees",
+  perps: "Perp markets & risk",
+  aggregator: "Routing & venues",
+  "cross-chain": "Cross-chain swaps",
+};
+
+/** Render the sub-sector-specific panel for a DEX entity. */
+function DexSubSectorPanel({ m }: { m: DexSubSectorMetrics }) {
+  return (
+    <DataPanel title={DEX_KIND_LABEL[m.kind]}>
+      <div className="divide-y divide-ink-800/60">
+        {m.kind === "amm" && (
+          <>
+            <TagMetricRow label="Pools" value={m.pools?.value} />
+            {m.topPools && m.topPools.length > 0 && (
+              <CuratedRow
+                label="Top pools"
+                chips={m.topPools.map((p) =>
+                  p.tvlUsd != null ? `${p.name} · ${fmtUsd(p.tvlUsd)}` : p.name,
+                )}
+              />
+            )}
+            <CuratedRow label="Fee tier structure" text={m.feeTierStructure} />
+          </>
+        )}
+        {m.kind === "orderbook" && (
+          <>
+            <TagMetricRow label="Markets" value={m.markets?.value} />
+            <TagMetricRow
+              label="Open interest"
+              value={m.openInterestUsd?.value != null ? fmtUsd(m.openInterestUsd.value) : null}
+            />
+            <TagMetricRow
+              label="Maker rebate"
+              value={m.makerRebatePct?.value != null ? `${m.makerRebatePct.value}%` : null}
+            />
+            <TagMetricRow
+              label="Taker fee"
+              value={m.takerFeePct?.value != null ? `${m.takerFeePct.value}%` : null}
+            />
+          </>
+        )}
+        {m.kind === "perps" && (
+          <>
+            <TagMetricRow label="Markets" value={m.markets?.value} />
+            <TagMetricRow
+              label="Open interest"
+              value={m.openInterestUsd?.value != null ? fmtUsd(m.openInterestUsd.value) : null}
+            />
+            <TagMetricRow
+              label="Max leverage"
+              value={m.maxLeverage?.value != null ? `${m.maxLeverage.value}x` : null}
+            />
+            <CuratedRow label="Funding-rate model" text={m.fundingRateModel} />
+            <TagMetricRow
+              label="Liquidations (30d)"
+              value={
+                m.liquidationsVolume30dUsd?.value != null
+                  ? fmtUsd(m.liquidationsVolume30dUsd.value)
+                  : null
+              }
+            />
+          </>
+        )}
+        {m.kind === "aggregator" && (
+          <>
+            <TagMetricRow label="Integrated DEXs" value={m.integratedDexes?.value} />
+            <CuratedRow label="Routing algorithm" text={m.routingAlgo} />
+            {m.topRoutedVenues && m.topRoutedVenues.length > 0 && (
+              <CuratedRow
+                label="Top routed venues"
+                chips={m.topRoutedVenues.map((v) =>
+                  v.sharePct != null ? `${v.venue} · ${v.sharePct}%` : v.venue,
+                )}
+              />
+            )}
+          </>
+        )}
+        {m.kind === "cross-chain" && (
+          <>
+            <TagMetricRow label="Integrated chains" value={m.integratedChains?.value} />
+            <CuratedRow label="Native assets supported" chips={m.nativeAssetsSupported} />
+            <CuratedRow label="Bridge architecture" text={m.bridgeArchitecture} />
+          </>
+        )}
+      </div>
+    </DataPanel>
+  );
+}
+
+export function DexMetricsSection({ dex }: { dex?: DexMetrics | null }) {
+  if (!dex) return null;
+  const dep = dex.deployment;
+  const chainCount = dep?.chains?.length ?? null;
+  return (
+    <section id="dex" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="DEX metrics"
+        subtitle="Live TVL and trading volume (DeFi Llama) plus curated deployment and audit facts."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <MetricTile label="TVL" sourced={dex.tvlUsd} kind="usd" />
+        <MetricTile label="Volume (30d)" sourced={dex.volume30dUsd} kind="usd" />
+        <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+          <p className="text-xs uppercase tracking-wide text-ink-500">Governance token</p>
+          <p className="mt-1 font-mono text-lg text-ink-50">{dex.governanceToken ?? "—"}</p>
+          <p className="mt-1 text-[10px] text-ink-500">Curated</p>
+        </div>
+        <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+          <p className="text-xs uppercase tracking-wide text-ink-500"># Chains</p>
+          <p className="mt-1 font-mono text-lg text-ink-50">{chainCount ?? "—"}</p>
+          <p className="mt-1 text-[10px] text-ink-500">Curated deployment</p>
+        </div>
+      </div>
+
+      {dex.subSectorMetrics && <DexSubSectorPanel m={dex.subSectorMetrics} />}
+
+      {(dex.auditHistory || dep) && (
+        <DataPanel title="Security & deployment">
+          <div className="divide-y divide-ink-800/60">
+            <CuratedRow label="Audit / security history" text={dex.auditHistory} />
+            {dep && (
+              <CuratedRow
+                label={`Chains${dep.evmCompatible ? ` · EVM: ${dep.evmCompatible}` : ""}`}
+                chips={dep.chains}
+              />
+            )}
+            {dep?.notes && <CuratedRow label="Deployment notes" text={dep.notes} />}
+          </div>
+        </DataPanel>
+      )}
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* RWA sector — entity metrics + sub-sector panel                             */
+/* -------------------------------------------------------------------------- */
+
+const RWA_KIND_LABEL: Record<RwaSubSectorMetrics["kind"], string> = {
+  treasuries: "Fund & treasury details",
+  "private-credit": "Credit book",
+  "real-estate": "Property portfolio",
+  commodities: "Commodity & custody",
+  carbon: "Carbon credits",
+  "tokenization-infra": "Tokenization platform",
+};
+
+/** Render the sub-sector-specific panel for an RWA entity. */
+function RwaSubSectorPanel({ m }: { m: RwaSubSectorMetrics }) {
+  return (
+    <DataPanel title={RWA_KIND_LABEL[m.kind]}>
+      <div className="divide-y divide-ink-800/60">
+        {m.kind === "treasuries" && (
+          <>
+            <CuratedRow label="Underlying assets" chips={m.underlyingAssets} />
+            <CuratedRow label="Duration" text={m.duration} />
+            <TagMetricRow label="Yield distribution" value={m.yieldDistribution} />
+            <CuratedRow label="Fund structure" text={m.fundStructure} />
+            <TagMetricRow
+              label="NAV"
+              value={m.navUsd?.value != null ? fmtUsd(m.navUsd.value) : null}
+            />
+            <CuratedRow label="Custodian" text={m.custodian} />
+          </>
+        )}
+        {m.kind === "private-credit" && (
+          <>
+            <TagMetricRow label="Active borrowers" value={m.activeBorrowers?.value} />
+            <TagMetricRow
+              label="Cumulative originations"
+              value={
+                m.cumulativeOriginationsUsd?.value != null
+                  ? fmtUsd(m.cumulativeOriginationsUsd.value)
+                  : null
+              }
+            />
+            <TagMetricRow
+              label="Default rate"
+              value={m.defaultRatePct?.value != null ? `${m.defaultRatePct.value}%` : null}
+            />
+            <TagMetricRow
+              label="Avg maturity (days)"
+              value={m.averageMaturityDays?.value}
+            />
+            <CuratedRow label="Tranche structure" text={m.trancheStructure} />
+          </>
+        )}
+        {m.kind === "real-estate" && (
+          <>
+            <TagMetricRow label="Properties" value={m.propertiesCount?.value} />
+            <TagMetricRow
+              label="Avg property value"
+              value={
+                m.averagePropertyValueUsd?.value != null
+                  ? fmtUsd(m.averagePropertyValueUsd.value)
+                  : null
+              }
+            />
+            <CuratedRow label="Rental yield range" text={m.rentalYieldRangePct} />
+            <CuratedRow label="Geographic scope" text={m.geographicScope} />
+            <CuratedRow label="Custody structure" text={m.custodyStructure} />
+          </>
+        )}
+        {m.kind === "commodities" && (
+          <>
+            <CuratedRow label="Underlying commodity" text={m.underlyingCommodity} />
+            <CuratedRow label="Custody vault" text={m.custodyVault} />
+            <CuratedRow label="Redemption minimum" text={m.redemptionMinimum} />
+            <CuratedRow label="Oracle provider" text={m.oracleProvider} />
+          </>
+        )}
+        {m.kind === "carbon" && (
+          <>
+            <TagMetricRow
+              label="Tonnes tokenized"
+              value={m.creditsTokenizedTonnes?.value}
+            />
+            <CuratedRow label="Registry partners" chips={m.registryPartners} />
+            <CuratedRow label="Vintage range" text={m.vintageRangeYears} />
+          </>
+        )}
+        {m.kind === "tokenization-infra" && (
+          <>
+            <TagMetricRow label="Funds hosted" value={m.fundsHosted?.value} />
+            <TagMetricRow
+              label="Total AUM hosted"
+              value={m.totalAumUsd?.value != null ? fmtUsd(m.totalAumUsd.value) : null}
+            />
+            <CuratedRow label="Registered jurisdictions" chips={m.registeredJurisdictions} />
+            <CuratedRow label="Top clients" chips={m.topClients} />
+          </>
+        )}
+      </div>
+    </DataPanel>
+  );
+}
+
+export function RwaMetricsSection({ rwa }: { rwa?: RwaMetrics | null }) {
+  if (!rwa) return null;
+  const dep = rwa.deployment;
+  const chainCount = dep?.chains?.length ?? null;
+  return (
+    <section id="rwa" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="RWA metrics"
+        subtitle="Live assets-under-management (DeFi Llama) plus curated regulatory and custody facts."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <MetricTile label="AUM / TVL" sourced={rwa.aumUsd} kind="usd" />
+        <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+          <p className="text-xs uppercase tracking-wide text-ink-500"># Chains</p>
+          <p className="mt-1 font-mono text-lg text-ink-50">{chainCount ?? "—"}</p>
+          <p className="mt-1 text-[10px] text-ink-500">Curated deployment</p>
+        </div>
+      </div>
+
+      {(rwa.regulatoryStatus || rwa.auditHistory || dep) && (
+        <DataPanel title="Regulatory, custody & deployment">
+          <div className="divide-y divide-ink-800/60">
+            <CuratedRow label="Regulatory status" text={rwa.regulatoryStatus} />
+            <CuratedRow label="Audit / attestation history" text={rwa.auditHistory} />
+            {dep && (
+              <CuratedRow
+                label={`Chains${dep.evmCompatible ? ` · EVM: ${dep.evmCompatible}` : ""}`}
+                chips={dep.chains}
+              />
+            )}
+            {dep?.notes && <CuratedRow label="Deployment notes" text={dep.notes} />}
+          </div>
+        </DataPanel>
+      )}
+
+      {rwa.subSectorMetrics && <RwaSubSectorPanel m={rwa.subSectorMetrics} />}
+    </section>
+  );
+}
+
 export function CompetitorsSection({
   competitors,
   networkName,
@@ -1084,6 +1372,8 @@ export function buildNetworkSectionNav(profile: {
   agentSkill?: unknown;
   lending?: unknown;
   stablecoin?: unknown;
+  dex?: unknown;
+  rwa?: unknown;
   competitors?: unknown[];
 }) {
   const items: { id: string; label: string; researchTab?: string }[] = [];
@@ -1099,6 +1389,8 @@ export function buildNetworkSectionNav(profile: {
   if (profile.memberCoins.length) items.push({ id: "member-coins", label: "Dashboard" });
   if (profile.lending) items.push({ id: "lending", label: "Lending" });
   if (profile.stablecoin) items.push({ id: "stablecoin", label: "Stablecoin" });
+  if (profile.dex) items.push({ id: "dex", label: "DEX" });
+  if (profile.rwa) items.push({ id: "rwa", label: "RWA" });
   if (profile.competitors?.length) items.push({ id: "competitors", label: "Competitors" });
   if (hasResearch) items.push({ id: "research-hub", label: "Research" });
   if (profile.market) items.push({ id: "market", label: "Market" });

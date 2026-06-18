@@ -26,6 +26,7 @@ import {
   fetchLlamaStablecoinPrices,
   fetchLlamaYieldChart,
   llamaLendingProjectForSlug,
+  llamaProtocolForSlug,
   type LlamaPool,
   resolveLlamaYieldPool,
 } from "@/lib/server/defillama";
@@ -673,6 +674,84 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
   }
 
+  // --- DEX networks: DeFi Llama live TVL + volume --------------------------
+  // For each network tagged sector "DEX", overlay live protocol TVL and 30d
+  // trading volume onto the curated `Dex` block. Curated fields (governance
+  // token, audit history, deployment, subSectorMetrics) are preserved. Open
+  // interest / funding stay curated (no derivatives feed this phase).
+  const dexItems = items.filter(
+    (it) =>
+      isNetworkCategory(String(it.Category ?? "")) &&
+      String(it.Sector ?? "") === "DEX" &&
+      llamaProtocolForSlug(String(it.Slug ?? "")) !== null,
+  );
+  const dexResults: { slug: string; tvlUsd: number | null; volume30dUsd: number | null }[] = [];
+  if (dexItems.length > 0) {
+    const sourced = (value: number | null) => ({
+      value,
+      dataSource: "live" as const,
+      sourceLabel: "DeFi Llama",
+      updatedAt: nowIso(),
+    });
+    for (const item of dexItems) {
+      const slug = String(item.Slug ?? "");
+      const tvl = await fetchLlamaProtocolTvl(slug, 1);
+      const tvlUsd = tvl && tvl.points.length > 0 ? tvl.points[tvl.points.length - 1].value : null;
+      const dexVol = await fetchLlamaDexVolume(slug);
+      const volume30dUsd = dexVol?.volume30dUsd ?? null;
+
+      const live: Record<string, unknown> = {
+        ...(tvlUsd != null ? { tvlUsd: sourced(tvlUsd) } : {}),
+        ...(volume30dUsd != null ? { volume30dUsd: sourced(volume30dUsd) } : {}),
+      };
+
+      if (Object.keys(live).length > 0) {
+        // Preserve curated fields; overlay live (Sourced) fields.
+        item.Dex = { ...(item.Dex ?? {}), ...live };
+        if (tvlUsd != null) {
+          item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
+        }
+        item.UpdatedAt = nowIso();
+        await putItem(item);
+        updated += 1;
+        dexResults.push({ slug, tvlUsd, volume30dUsd });
+      }
+    }
+  }
+
+  // --- RWA networks: DeFi Llama live AUM (protocol TVL) --------------------
+  // For each network tagged sector "RWA", overlay live protocol TVL as `aumUsd`
+  // onto the curated `Rwa` block. Curated fields (regulatory status, audit
+  // history, deployment, subSectorMetrics) are preserved.
+  const rwaNetworkItems = items.filter(
+    (it) =>
+      isNetworkCategory(String(it.Category ?? "")) &&
+      String(it.Sector ?? "") === "RWA" &&
+      llamaProtocolForSlug(String(it.Slug ?? "")) !== null,
+  );
+  const rwaResults: { slug: string; aumUsd: number | null }[] = [];
+  if (rwaNetworkItems.length > 0) {
+    const sourced = (value: number | null) => ({
+      value,
+      dataSource: "live" as const,
+      sourceLabel: "DeFi Llama",
+      updatedAt: nowIso(),
+    });
+    for (const item of rwaNetworkItems) {
+      const slug = String(item.Slug ?? "");
+      const tvl = await fetchLlamaProtocolTvl(slug, 1);
+      const aumUsd = tvl && tvl.points.length > 0 ? tvl.points[tvl.points.length - 1].value : null;
+      if (aumUsd != null) {
+        item.Rwa = { ...(item.Rwa ?? {}), aumUsd: sourced(aumUsd) };
+        item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd: aumUsd };
+        item.UpdatedAt = nowIso();
+        await putItem(item);
+        updated += 1;
+        rwaResults.push({ slug, aumUsd });
+      }
+    }
+  }
+
   // --- Chain-native lending overlays (Morpho, Kamino, TronGrid, Helius) --------
   const integrationStatus: Record<string, string> = {
     morpho: "skipped",
@@ -835,6 +914,8 @@ export async function GET(req: Request): Promise<NextResponse> {
     results,
     aave: aaveResults,
     lending: lendingResults,
+    dex: dexResults,
+    rwa: rwaResults,
     integrations: integrationStatus,
   });
 }

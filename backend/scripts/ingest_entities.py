@@ -37,6 +37,7 @@ if str(SCRIPTS_ROOT) not in sys.path:
 from entity_specs_batch import BATCH_ENTITY_SPECS  # noqa: E402
 from entity_specs_batch_2 import BATCH_2_ENTITY_SPECS  # noqa: E402
 from lending_specs import LENDING_ENTITY_SPECS  # noqa: E402
+from stablecoin_specs import STABLECOIN_ENTITY_SPECS  # noqa: E402
 
 DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
 DOWNLOADS_CSV = Path.home() / "Downloads" / "Arbitrum Ecosystem - scrape v2.csv"
@@ -1040,6 +1041,10 @@ ENTITY_SPECS.update(BATCH_2_ENTITY_SPECS)
 # Lending cohort (PDF Week 7+8): Morpho, Spark, Compound, Fluid, Venus,
 # JustLend, Kamino, Maple — Aave is reclassified in BATCH_2_ENTITY_SPECS.
 ENTITY_SPECS.update(LENDING_ENTITY_SPECS)
+# Stablecoin cohort (PDF "Stablecoin Sector Expansion"): Circle, Paxos, First
+# Digital, M^0, Agora, Bitget, GMO Trust, Liquity, Curve (crvUSD), Lista, Reserve,
+# Frax, Resolv, Falcon, Cap, Elixir, Anzen, Mountain Protocol.
+ENTITY_SPECS.update(STABLECOIN_ENTITY_SPECS)
 
 
 def build_entity_item(
@@ -1097,11 +1102,19 @@ def build_entity_item(
         "SubCategory": spec.get("sub_category", "Protocol"),
         "Sector": spec.get("sector"),
         "SubSector": spec.get("sub_sector"),
-        "Tags": spec.get("tags") or ([spec["sub_sector"]] if spec.get("sub_sector") else []),
+        # Lending `Tags` vocabulary only; an explicit (possibly empty) list wins
+        # over the sub_sector fallback so stablecoin issuers don't pollute it.
+        "Tags": spec["tags"]
+        if spec.get("tags") is not None
+        else ([spec["sub_sector"]] if spec.get("sub_sector") else []),
         # Ranked competitors (top->bottom) + lending-specific metrics block.
         "Competitors": spec.get("competitors", []),
         "Lending": spec.get("lending"),
         "LendingTagMetrics": spec.get("lending_tag_metrics") or None,
+        # Stablecoin-issuer taxonomy + metrics (PDF "Stablecoin Sector Expansion").
+        "StablecoinSubSector": spec.get("stablecoin_sub_sector"),
+        "StablecoinSecondaryTags": spec.get("stablecoin_secondary_tags"),
+        "Stablecoin": spec.get("stablecoin"),
         "MemberCoins": spec["member_coins"],
         "ArbitrumPortalMetadata": {
             "portalUrl": _clean(row.get("Portal URL")) or defaults.get("portalUrl"),

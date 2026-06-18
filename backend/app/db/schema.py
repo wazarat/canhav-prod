@@ -106,6 +106,7 @@ PEG_AUD = "AUD"
 PEG_CAD = "CAD"
 PEG_HKD = "HKD"
 PEG_ISK = "ISK"
+PEG_JPY = "JPY"
 
 
 def category_pk(category: str) -> str:

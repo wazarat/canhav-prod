@@ -234,6 +234,9 @@ export async function readLiveStore(): Promise<LiveStore> {
         competitors: item.Competitors ?? [],
         lending: item.Lending ?? null,
         lendingTagMetrics: item.LendingTagMetrics ?? null,
+        stablecoinSubSector: item.StablecoinSubSector ?? null,
+        stablecoinSecondaryTags: item.StablecoinSecondaryTags ?? undefined,
+        stablecoin: item.Stablecoin ?? null,
         currentScale: {
           tvlUsd: null,
           users: null,

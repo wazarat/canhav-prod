@@ -40,7 +40,7 @@ export function formatPeg(value: number | null | undefined): string {
   return value.toFixed(4);
 }
 
-/** Currency symbol for a stablecoin peg target (USD/EUR/GBP/AUD/CAD/HKD/ISK). */
+/** Currency symbol for a stablecoin peg target (USD/EUR/GBP/AUD/CAD/HKD/ISK/JPY). */
 export function pegSymbol(pegTarget: string | null | undefined): string {
   switch (pegTarget) {
     case "EUR":
@@ -55,6 +55,8 @@ export function pegSymbol(pegTarget: string | null | undefined): string {
       return "HK$";
     case "ISK":
       return "kr";
+    case "JPY":
+      return "¥";
     default:
       return "$";
   }

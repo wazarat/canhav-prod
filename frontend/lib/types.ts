@@ -26,7 +26,7 @@ export interface SecurityInfo {
   source: string;
 }
 
-export type PegTarget = "USD" | "EUR" | "GBP" | "AUD" | "CAD" | "HKD" | "ISK";
+export type PegTarget = "USD" | "EUR" | "GBP" | "AUD" | "CAD" | "HKD" | "ISK" | "JPY";
 
 /** Top-level taxonomy categories. */
 export type CategorySlug =
@@ -913,6 +913,122 @@ export type LendingTag =
 export type LendingSubSector = LendingTag;
 
 /**
+ * Stablecoin sub-sectors. The leaf of the taxonomy for `sector === "Stablecoin"`
+ * entities. Mirrors the lending pattern.
+ */
+export type StablecoinSubSector =
+  | "Fiat-Backed Regulated"
+  | "E-Money Regulated"
+  | "Decentralized CDP"
+  | "Synthetic Yield-Bearing"
+  | "RWA-Backed Stable"
+  | "Cross-Chain / Omnichain";
+
+/**
+ * Secondary tag — a stablecoin issuer can simultaneously belong to one primary
+ * sub-sector and 0–2 secondary tags.
+ */
+export type StablecoinSecondaryTag =
+  | "Yield-Bearing"
+  | "Institutional-Gated"
+  | "Multi-Currency"
+  | "Exchange-Native"
+  | "RWA-Backed"
+  | "Wound-Down"
+  | "Recently-Exploited";
+
+/** Fiat-Backed Regulated sub-sector metrics (Circle, Paxos, First Digital). */
+export interface StablecoinFiatBackedMetrics {
+  kind: "fiat-backed";
+  reserveCustodian?: string | null;
+  reserveBreakdown?: { asset: string; pct: number }[];
+  attestationCadence?: "daily" | "weekly" | "monthly" | "quarterly" | null;
+  attestor?: string | null;
+  realtimeReserveOracle?: string | null;
+}
+
+/** Decentralized CDP sub-sector metrics (Sky, Liquity, Curve, Lista). */
+export interface StablecoinDecentralizedCDPMetrics {
+  kind: "decentralized-cdp";
+  collateralAssets?: string[];
+  minCollateralRatioPct?: Sourced<number | null>;
+  stabilityFeePct?: Sourced<number | null>;
+  savingsRatePct?: Sourced<number | null>;
+  liquidationMechanism?: string | null;
+  governanceToken?: string | null;
+}
+
+/** Synthetic Yield-Bearing sub-sector metrics (Ethena, Resolv, Falcon, Frax). */
+export interface StablecoinSyntheticMetrics {
+  kind: "synthetic";
+  hedgeVenues?: string[];
+  fundingRateExposure?: string | null;
+  insuranceFundUsd?: Sourced<number | null>;
+  yieldSources?: string[];
+}
+
+/** RWA-Backed sub-sector metrics (Ondo, USD.AI, Anzen, Mountain). */
+export interface StablecoinRwaBackedMetrics {
+  kind: "rwa-backed";
+  underlyingAssets?: string[];
+  custodian?: string | null;
+  yieldDistribution?: "rebase" | "exchange-rate" | "off-chain" | null;
+  nav?: Sourced<number | null>;
+}
+
+/** E-Money Regulated sub-sector metrics (Monerium, GMO Trust). */
+export interface StablecoinEMoneyMetrics {
+  kind: "e-money";
+  emiLicense?: string | null;
+  fiatRails?: string[];
+  ibanSupport?: boolean;
+  redemptionCadence?: string | null;
+}
+
+/** Discriminated union of sub-sector-specific stablecoin metric blocks. */
+export type StablecoinSubSectorMetrics =
+  | StablecoinFiatBackedMetrics
+  | StablecoinDecentralizedCDPMetrics
+  | StablecoinSyntheticMetrics
+  | StablecoinRwaBackedMetrics
+  | StablecoinEMoneyMetrics;
+
+/** A risk/incident row for a stablecoin issuer (depeg, exploit, audit). */
+export interface StablecoinRiskEvent {
+  date: string;
+  type: string;
+  impact: string;
+  link?: string | null;
+}
+
+/**
+ * Stablecoin-issuer metrics block (sector === "Stablecoin"). Mirrors the
+ * `LendingMetrics` pattern: `current_supply_usd` is filled live by the DeFi
+ * Llama cron; curated fields (reserves, peg mechanism, audits, risk events)
+ * are static research. Everything optional so partial data renders honestly.
+ */
+export interface StablecoinMetrics {
+  /** Circulating supply (USD-equivalent) — live from DeFi Llama or curated. */
+  currentSupplyUsd?: Sourced<number | null>;
+  /** How the peg is maintained (curated). */
+  pegMechanism?: string | null;
+  /** Reserve / collateral composition summary (curated). */
+  reserves?: string | null;
+  /** Audit / attestation history (curated). */
+  auditHistory?: string | null;
+  /** Issuer transparency / attestation page URL. */
+  attestationUrl?: string | null;
+  /** Chainlink Proof-of-Reserves (or equivalent) page URL. */
+  proofOfReservesUrl?: string | null;
+  /** Risk / incident timeline (depegs, exploits, wind-downs). */
+  riskEvents?: StablecoinRiskEvent[];
+  /** Chain / ecosystem deployment. */
+  deployment?: ChainDeployment | null;
+  /** Sub-sector-specific specialized metric panel. */
+  subSectorMetrics?: StablecoinSubSectorMetrics | null;
+}
+
+/**
  * A ranked competitor of a network, ordered top→bottom by relevance. Used to
  * help users pick which lending platform to research more deeply.
  */
@@ -1129,6 +1245,12 @@ export interface NetworkProfile {
   lending?: LendingMetrics | null;
   /** Tag-specific curated metric blocks (Isolated/Curated, Spark SSR, etc.). */
   lendingTagMetrics?: LendingTagMetrics | null;
+  /** Stablecoin primary sub-sector (when sector === "Stablecoin", or as a secondary marker). */
+  stablecoinSubSector?: StablecoinSubSector | null;
+  /** Stablecoin secondary tags (0–2): Yield-Bearing, Multi-Currency, Wound-Down, etc. */
+  stablecoinSecondaryTags?: StablecoinSecondaryTag[];
+  /** Stablecoin-issuer metrics block (live + curated) — `sector === "Stablecoin"`. */
+  stablecoin?: StablecoinMetrics | null;
   memberCoins: MemberCoinRef[];
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Protocol fees/revenue when this entity maps to a Llama protocol (DeFi Llama). */

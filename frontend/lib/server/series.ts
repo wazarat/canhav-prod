@@ -100,6 +100,8 @@ export function pegVsCurrency(pegTarget: StablecoinProfile["pegTarget"]): string
       return "cad";
     case "HKD":
       return "hkd";
+    case "JPY":
+      return "jpy";
     default:
       return "usd";
   }

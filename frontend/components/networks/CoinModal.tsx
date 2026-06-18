@@ -159,16 +159,45 @@ export function CoinModal({ coin, onClose }: { coin: CoinLiveData; onClose: () =
                 <DataRow
                   label={coin.links.explorerLabel}
                   value={
-                    <a
-                      href={coin.links.explorer ?? "#"}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-mono text-electric-400 hover:underline"
-                    >
-                      {truncateAddress(coin.contractAddress)}
-                    </a>
+                    coin.contractAddress ? (
+                      <a
+                        href={coin.links.explorer ?? "#"}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-mono text-electric-400 hover:underline"
+                      >
+                        {truncateAddress(coin.contractAddress)}
+                      </a>
+                    ) : (
+                      "—"
+                    )
                   }
                 />
+                {coin.deployments.length > 1 && (
+                  <div className="space-y-2 border-t border-ink-800/60 pt-3">
+                    <p className="text-xs font-medium uppercase tracking-wide text-ink-500">
+                      Deployments
+                    </p>
+                    {coin.deployments.map((dep) => (
+                      <DataRow
+                        key={`${dep.chain}-${dep.address}`}
+                        label={
+                          dep.label ? `${dep.chain} (${dep.label})` : dep.chain
+                        }
+                        value={
+                          <a
+                            href={dep.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-mono text-electric-400 hover:underline"
+                          >
+                            {truncateAddress(dep.address)}
+                          </a>
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
                 <DataRow
                   label="Last refreshed"
                   value={coin.onchain?.updatedAt ? timeAgo(coin.onchain.updatedAt) : "—"}

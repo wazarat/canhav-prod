@@ -29,9 +29,24 @@ import {
   type LlamaPool,
   resolveLlamaYieldPool,
 } from "@/lib/server/defillama";
+import { fetchHeliusTokenSupply, hasHelius, KMNO_MINT } from "@/lib/server/helius";
+import {
+  fetchKaminoLiveMetrics,
+  kaminoMetricsToLendingOverlay,
+} from "@/lib/server/kamino";
+import {
+  fetchMorphoLiveMetrics,
+  morphoMetricsToLendingOverlay,
+  morphoMetricsToTagOverlay,
+} from "@/lib/server/morpho";
 import { hasUpstash, putItem, readAllItemsFromRedis } from "@/lib/server/redis";
 import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
 import { pegVsCurrency } from "@/lib/server/series";
+import {
+  fetchJustLendLiveMetrics,
+  hasTronGrid,
+  justLendMetricsToLendingOverlay,
+} from "@/lib/server/trongrid";
 import type { StablecoinProfile } from "@/lib/types";
 
 /**
@@ -658,6 +673,107 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
   }
 
+  // --- Chain-native lending overlays (Morpho, Kamino, TronGrid, Helius) --------
+  const integrationStatus: Record<string, string> = {
+    morpho: "skipped",
+    kamino: "skipped",
+    trongrid: hasTronGrid() ? "pending" : "missing_key",
+    helius: hasHelius() ? "pending" : "missing_key",
+  };
+
+  const morphoMetrics = await fetchMorphoLiveMetrics();
+  if (morphoMetrics?.tvlUsd != null) {
+    integrationStatus.morpho = "ok";
+    const morphoItem = items.find(
+      (it) => isNetworkCategory(String(it.Category ?? "")) && String(it.Slug ?? "") === "morpho",
+    );
+    if (morphoItem) {
+      morphoItem.Lending = {
+        ...(morphoItem.Lending ?? {}),
+        ...morphoMetricsToLendingOverlay(morphoMetrics),
+      };
+      morphoItem.LendingTagMetrics = {
+        ...(morphoItem.LendingTagMetrics ?? {}),
+        ...morphoMetricsToTagOverlay(morphoMetrics),
+      };
+      morphoItem.CurrentScale = {
+        ...(morphoItem.CurrentScale ?? {}),
+        tvlUsd: morphoMetrics.tvlUsd,
+      };
+      morphoItem.UpdatedAt = nowIso();
+      await putItem(morphoItem);
+      updated += 1;
+    }
+  } else if (morphoMetrics === null) {
+    integrationStatus.morpho = "error";
+  }
+
+  const kaminoMetrics = await fetchKaminoLiveMetrics();
+  if (kaminoMetrics?.tvlUsd != null) {
+    integrationStatus.kamino = "ok";
+    const kaminoItem = items.find(
+      (it) => isNetworkCategory(String(it.Category ?? "")) && String(it.Slug ?? "") === "kamino",
+    );
+    if (kaminoItem) {
+      kaminoItem.Lending = {
+        ...(kaminoItem.Lending ?? {}),
+        ...kaminoMetricsToLendingOverlay(kaminoMetrics),
+      };
+      kaminoItem.CurrentScale = {
+        ...(kaminoItem.CurrentScale ?? {}),
+        tvlUsd: kaminoMetrics.tvlUsd,
+      };
+      kaminoItem.UpdatedAt = nowIso();
+      await putItem(kaminoItem);
+      updated += 1;
+    }
+  } else if (kaminoMetrics === null) {
+    integrationStatus.kamino = "error";
+  }
+
+  if (hasTronGrid()) {
+    const justLendMetrics = await fetchJustLendLiveMetrics();
+    if (justLendMetrics) {
+      integrationStatus.trongrid = "ok";
+      const justItem = items.find(
+        (it) => isNetworkCategory(String(it.Category ?? "")) && String(it.Slug ?? "") === "justlend",
+      );
+      if (justItem) {
+        justItem.Lending = {
+          ...(justItem.Lending ?? {}),
+          ...justLendMetricsToLendingOverlay(justLendMetrics),
+        };
+        justItem.UpdatedAt = nowIso();
+        await putItem(justItem);
+        updated += 1;
+      }
+    } else {
+      integrationStatus.trongrid = "error";
+    }
+  }
+
+  if (hasHelius()) {
+    const kmnoSupply = await fetchHeliusTokenSupply(KMNO_MINT);
+    if (kmnoSupply?.supply != null) {
+      integrationStatus.helius = "ok";
+      const kmnoItem = items.find(
+        (it) => String(it.Category ?? "") === CATEGORY_TOKEN && String(it.Slug ?? "") === "kmno",
+      );
+      if (kmnoItem) {
+        kmnoItem.TotalSupply = {
+          value: kmnoSupply.supply,
+          source: "helius",
+          updatedAt: nowIso(),
+        };
+        kmnoItem.UpdatedAt = nowIso();
+        await putItem(kmnoItem);
+        updated += 1;
+      }
+    } else {
+      integrationStatus.helius = "error";
+    }
+  }
+
   // --- Entity headline TVL aggregation --------------------------------------
   // A few entities ship with CurrentScale.tvlUsd = null (e.g. Monerium, Pleasing
   // Market). Derive it from the member-coin metrics refreshed above so the value
@@ -719,5 +835,6 @@ export async function GET(req: Request): Promise<NextResponse> {
     results,
     aave: aaveResults,
     lending: lendingResults,
+    integrations: integrationStatus,
   });
 }

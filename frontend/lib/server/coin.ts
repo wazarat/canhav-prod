@@ -14,6 +14,7 @@ import type {
   PegMechanism,
   RwaProfile,
   StablecoinProfile,
+  TokenDeployment,
   TokenProfile,
 } from "@/lib/types";
 
@@ -36,6 +37,14 @@ export interface CoinOnchain {
   updatedAt: string | null;
 }
 
+export interface CoinDeploymentLink {
+  chain: string;
+  address: string;
+  label?: string;
+  url: string;
+  explorerLabel: string;
+}
+
 export interface CoinLiveData {
   slug: string;
   name: string;
@@ -50,6 +59,7 @@ export interface CoinLiveData {
   description: string;
   contractAddress: string | null;
   chains: string[];
+  deployments: CoinDeploymentLink[];
   profilePath: string;
   /** Whether the coin is reported live by the Arbitrum Portal metadata. */
   isLive: boolean;
@@ -66,12 +76,63 @@ export interface CoinLiveData {
   };
 }
 
-function explorerLink(chains: string[], address: string | null): { url: string | null; label: string } {
-  if (!address) return { url: null, label: "Explorer" };
-  if (chains.some((c) => c.toLowerCase().includes("solana"))) {
+function chainExplorer(chain: string, address: string): { url: string; label: string } {
+  const c = chain.toLowerCase();
+  if (c.includes("solana")) {
     return { url: `https://solscan.io/token/${address}`, label: "Solscan" };
   }
-  return { url: `https://arbiscan.io/token/${address}`, label: "Arbiscan" };
+  if (c.includes("tron")) {
+    return { url: `https://tronscan.org/#/token20/${address}`, label: "Tronscan" };
+  }
+  if (c.includes("bnb")) {
+    return { url: `https://bscscan.com/token/${address}`, label: "BscScan" };
+  }
+  if (c === "base") {
+    return { url: `https://basescan.org/token/${address}`, label: "Basescan" };
+  }
+  if (c.includes("ethereum") || c === "eth") {
+    return { url: `https://etherscan.io/token/${address}`, label: "Etherscan" };
+  }
+  if (c.includes("arbitrum")) {
+    return { url: `https://arbiscan.io/token/${address}`, label: "Arbiscan" };
+  }
+  if (c.includes("polygon")) {
+    return { url: `https://polygonscan.com/token/${address}`, label: "Polygonscan" };
+  }
+  if (c.includes("optimism")) {
+    return { url: `https://optimistic.etherscan.io/token/${address}`, label: "Optimistic Etherscan" };
+  }
+  return { url: `https://etherscan.io/token/${address}`, label: "Explorer" };
+}
+
+function explorerLink(chains: string[], address: string | null): { url: string | null; label: string } {
+  if (!address) return { url: null, label: "Explorer" };
+  const primaryChain = chains[0] ?? "Ethereum";
+  const { url, label } = chainExplorer(primaryChain, address);
+  return { url, label };
+}
+
+function buildDeploymentLinks(
+  primaryChain: string,
+  primaryAddress: string | null,
+  extra: TokenDeployment[] | undefined,
+): CoinDeploymentLink[] {
+  const out: CoinDeploymentLink[] = [];
+  if (primaryAddress) {
+    const { url, label } = chainExplorer(primaryChain, primaryAddress);
+    out.push({ chain: primaryChain, address: primaryAddress, url, explorerLabel: label });
+  }
+  for (const dep of extra ?? []) {
+    const { url, label } = chainExplorer(dep.chain, dep.address);
+    out.push({
+      chain: dep.chain,
+      address: dep.address,
+      label: dep.label,
+      url,
+      explorerLabel: label,
+    });
+  }
+  return out;
 }
 
 export async function getCoinLiveData(
@@ -105,6 +166,14 @@ export async function getCoinLiveData(
     "lendingMarket" in profile ? (profile.lendingMarket ?? null) : null;
 
   const chains = profile.arbitrumPortalMetadata.chains ?? [];
+  const primaryChain = chains[0] ?? "Ethereum";
+  const extraDeployments =
+    profile.category === "RWA" ? undefined : profile.deployments;
+  const deployments = buildDeploymentLinks(
+    primaryChain,
+    address,
+    extraDeployments,
+  );
   const explorer = explorerLink(chains, address);
   const profilePath =
     profile.category === "Stablecoin"
@@ -128,6 +197,7 @@ export async function getCoinLiveData(
     description: profile.description,
     contractAddress: address,
     chains,
+    deployments,
     profilePath,
     isLive: profile.arbitrumPortalMetadata.isLive ?? false,
     hasAlchemy: hasAlchemy(),

@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { getApprovedNetworks } from "@/lib/data";
-import { cn, formatUsdCompact } from "@/lib/utils";
+import { formatUsdCompact } from "@/lib/utils";
 
 export const metadata = {
   title: "Networks",
@@ -28,7 +28,6 @@ export default async function NetworksPage() {
     .filter((p) => (p.currentScale.tvlUsd ?? 0) > 0)
     .sort((a, b) => (b.currentScale.tvlUsd ?? 0) - (a.currentScale.tvlUsd ?? 0))
     .slice(0, 8);
-  const maxTvl = ranked.length ? (ranked[0].currentScale.tvlUsd ?? 1) : 1;
 
   return (
     <div className="container space-y-8 py-12">
@@ -84,25 +83,16 @@ export default async function NetworksPage() {
           <div className="space-y-2.5">
             {ranked.map((p) => {
               const tvl = p.currentScale.tvlUsd ?? 0;
-              const pct = (tvl / maxTvl) * 100;
               return (
                 <Link
                   key={p.slug}
                   href={`/networks/${p.slug}`}
-                  className="group block space-y-1"
+                  className="group flex items-center justify-between gap-3 rounded-lg py-1 text-sm"
                 >
-                  <div className="flex items-center justify-between gap-3 text-sm">
-                    <span className="font-medium text-ink-200 transition-colors group-hover:text-electric-400">
-                      {p.name}
-                    </span>
-                    <span className="font-mono text-ink-100">{formatUsdCompact(tvl)}</span>
-                  </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-ink-800/70">
-                    <div
-                      className={cn("h-full rounded-full bg-electric-500/70")}
-                      style={{ width: `${Math.max(pct, 2)}%` }}
-                    />
-                  </div>
+                  <span className="font-medium text-ink-200 transition-colors group-hover:text-electric-400">
+                    {p.name}
+                  </span>
+                  <span className="font-mono text-ink-100">{formatUsdCompact(tvl)}</span>
                 </Link>
               );
             })}

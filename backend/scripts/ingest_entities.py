@@ -1097,9 +1097,11 @@ def build_entity_item(
         "SubCategory": spec.get("sub_category", "Protocol"),
         "Sector": spec.get("sector"),
         "SubSector": spec.get("sub_sector"),
+        "Tags": spec.get("tags") or ([spec["sub_sector"]] if spec.get("sub_sector") else []),
         # Ranked competitors (top->bottom) + lending-specific metrics block.
         "Competitors": spec.get("competitors", []),
         "Lending": spec.get("lending"),
+        "LendingTagMetrics": spec.get("lending_tag_metrics") or None,
         "MemberCoins": spec["member_coins"],
         "ArbitrumPortalMetadata": {
             "portalUrl": _clean(row.get("Portal URL")) or defaults.get("portalUrl"),

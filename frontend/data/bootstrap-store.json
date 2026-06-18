@@ -1,9 +1,9 @@
 {
   "_meta": {
     "backend": "local",
-    "count": 91,
+    "count": 95,
     "table": "canhav-research",
-    "updatedAt": "2026-06-17T19:33:57Z"
+    "updatedAt": "2026-06-18T12:42:23Z"
   },
   "items": {
     "CATEGORY#Entity|PROTOCOL#aave": {
@@ -25,7 +25,7 @@
       "Category": "Entity",
       "Competitors": [
         {
-          "differences": "Morpho Blue creates isolated markets (collateral, loan asset, oracle, liquidation settings) with MetaMorpho vaults allocated by curators — more modular and risk-specific than Aave's broad pooled markets.",
+          "differences": "Morpho Blue creates isolated markets (collateral, loan asset, oracle, liquidation settings) with MetaMorpho vaults allocated by curators \u2014 more modular and risk-specific than Aave's broad pooled markets.",
           "name": "Morpho",
           "positioning": "Customizable lending infrastructure.",
           "rank": 1,
@@ -33,7 +33,7 @@
           "slug": "morpho"
         },
         {
-          "differences": "Edge is the Sky/Maker stablecoin ecosystem — focused on USDS/DAI liquidity, savings products, and stablecoin borrowing at scale.",
+          "differences": "Edge is the Sky/Maker stablecoin ecosystem \u2014 focused on USDS/DAI liquidity, savings products, and stablecoin borrowing at scale.",
           "name": "Spark / SparkLend",
           "positioning": "Stablecoin-native lending stack.",
           "rank": 2,
@@ -41,7 +41,7 @@
           "slug": "spark"
         },
         {
-          "differences": "Compound III uses one base borrowable asset per market with other assets as collateral — simpler to reason about but less flexible than Aave's multi-asset pools.",
+          "differences": "Compound III uses one base borrowable asset per market with other assets as collateral \u2014 simpler to reason about but less flexible than Aave's multi-asset pools.",
           "name": "Compound",
           "positioning": "Simple, battle-tested lending.",
           "rank": 3,
@@ -49,7 +49,7 @@
           "slug": "compound"
         },
         {
-          "differences": "Combines lending, vaults, and DEX liquidity through a shared liquidity layer — more capital-efficient but more complex to analyze.",
+          "differences": "Combines lending, vaults, and DEX liquidity through a shared liquidity layer \u2014 more capital-efficient but more complex to analyze.",
           "name": "Fluid",
           "positioning": "Capital-efficient lending + DEX hybrid.",
           "rank": 4,
@@ -81,7 +81,7 @@
           "slug": "kamino"
         },
         {
-          "differences": "Institutional / private-credit model — vetted borrowers, loan terms, repayment history and pool managers rather than open overcollateralized lending.",
+          "differences": "Institutional / private-credit model \u2014 vetted borrowers, loan terms, repayment history and pool managers rather than open overcollateralized lending.",
           "name": "Maple Finance",
           "positioning": "Institutional credit, not just overcollateralized DeFi.",
           "rank": 8,
@@ -91,11 +91,11 @@
       ],
       "Components": [
         {
-          "description": "Core/Prime/Plus/Horizon markets: supply assets to pools, borrow against collateral, earn real-time interest. Not a token — the protocol product.",
+          "description": "Core/Prime/Plus/Horizon markets: supply assets to pools, borrow against collateral, earn real-time interest. Not a token \u2014 the protocol product.",
           "name": "Lending markets"
         },
         {
-          "description": "Interest-bearing deposit receipts (e.g. aUSDC) minted on supply — accrue yield, redeemable for underlying + interest.",
+          "description": "Interest-bearing deposit receipts (e.g. aUSDC) minted on supply \u2014 accrue yield, redeemable for underlying + interest.",
           "name": "aTokens"
         },
         {
@@ -103,7 +103,7 @@
           "name": "GHO"
         },
         {
-          "description": "GHO savings product — yield-bearing, not the stablecoin itself. New sGHO experience live May 2026.",
+          "description": "GHO savings product \u2014 yield-bearing, not the stablecoin itself. New sGHO experience live May 2026.",
           "name": "sGHO / StkGHO"
         },
         {
@@ -121,7 +121,7 @@
         "users": null
       },
       "Description": "Aave is a multichain non-custodial lending protocol for supplying, borrowing, and earning interest. The Aave DAO governs parameters, listings, and emissions; Aave Labs is the primary development company.",
-      "Differentiator": "Scale and breadth: large multichain lending network plus native overcollateralized stablecoin (GHO), staking/backstop mechanics (stkAAVE → Umbrella), and institutional/RWA lending (Horizon) under DAO governance.",
+      "Differentiator": "Scale and breadth: large multichain lending network plus native overcollateralized stablecoin (GHO), staking/backstop mechanics (stkAAVE \u2192 Umbrella), and institutional/RWA lending (Horizon) under DAO governance.",
       "Discord": "https://discord.com/invite/aave",
       "Events": [
         {
@@ -151,7 +151,7 @@
       ],
       "Faq": [
         {
-          "answer": "GHO is the overcollateralized stablecoin. sGHO is the yield-bearing savings wrapper — same pattern as USDe/sUSDe or USDS/sUSDS.",
+          "answer": "GHO is the overcollateralized stablecoin. sGHO is the yield-bearing savings wrapper \u2014 same pattern as USDe/sUSDe or USDS/sUSDS.",
           "pinned": true,
           "question": "What is the GHO / sGHO distinction?"
         },
@@ -197,10 +197,21 @@
             "zkSync"
           ],
           "evmCompatible": "yes",
-          "notes": "Mainly EVM/multi-chain; has also explored Aptos/Move deployments — check the specific market."
+          "notes": "Mainly EVM/multi-chain; has also explored Aptos/Move deployments \u2014 check the specific market."
         },
-        "governanceActivity": "Active Aave DAO — risk-parameter updates, new listings, Aavenomics buybacks, and the Aave V4 direction.",
+        "governanceActivity": "Active Aave DAO \u2014 risk-parameter updates, new listings, Aavenomics buybacks, and the Aave V4 direction.",
+        "governanceDetail": {
+          "notes": "Active Aave DAO \u2014 risk updates, listings, Aavenomics buybacks, Aave V4.",
+          "proposals": null,
+          "treasuryUsd": null,
+          "voterTurnoutPct": null
+        },
         "liquidations": "On-chain liquidations by keepers once a position's health factor drops below 1; penalties vary by asset risk tier.",
+        "liquidations30d": {
+          "count": null,
+          "notes": "On-chain keeper liquidations when health factor drops below 1.",
+          "volumeUsd": null
+        },
         "loanAssets": [
           "USDC",
           "USDT",
@@ -218,7 +229,16 @@
           "USDT",
           "DAI",
           "GHO"
-        ]
+        ],
+        "stablecoinExposurePct": 70
+      },
+      "LendingTagMetrics": {
+        "moneyMarkets": {
+          "eModeUsage": "e-Mode enabled for correlated assets (stablecoins, ETH LSTs) across major chains.",
+          "emissionsPerAsset": "AAVE/stkAAVE incentives vary by market; stablecoin markets receive significant emissions.",
+          "notes": "Broadest multi-chain money market by TVL and asset coverage.",
+          "reserveFactorSummary": "Reserve factors 10\u201330% per asset; isolation mode and e-mode tiers available."
+        }
       },
       "LongDescription": null,
       "Market": null,
@@ -342,7 +362,7 @@
         {
           "amountLabel": null,
           "date": "2026-06-04",
-          "description": "Treasury balances routed to Veda vault → Aave Plasma V3 (up to 6% APY).",
+          "description": "Treasury balances routed to Veda vault \u2192 Aave Plasma V3 (up to 6% APY).",
           "name": "Whop"
         },
         {
@@ -394,14 +414,17 @@
       "SubCategory": "Protocol",
       "SubSector": "Money Markets",
       "Symbol": "AAVE",
-      "Tagline": "Savings for Everyone — open-source non-custodial liquidity protocol.",
+      "Tagline": "Savings for Everyone \u2014 open-source non-custodial liquidity protocol.",
+      "Tags": [
+        "Money Markets"
+      ],
       "Timeline": [
         {
           "date": "2020-10",
           "description": "LEND migrates to AAVE at 100:1, fixing a 16M max supply and launching the Aave governance token.",
           "link": "https://aave.com",
           "status": "executed",
-          "title": "LEND → AAVE migration"
+          "title": "LEND \u2192 AAVE migration"
         },
         {
           "date": "2022",
@@ -457,7 +480,7 @@
       ],
       "Twitter": "https://twitter.com/aaveaave",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Entity|PROTOCOL#compound": {
@@ -484,7 +507,7 @@
       "Category": "Entity",
       "Competitors": [
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market \u2014 brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -512,7 +535,7 @@
         "users": null
       },
       "Description": "Compound is one of the original DeFi lending protocols. Compound III simplifies each market to a single borrowable base asset with other assets posted purely as collateral.",
-      "Differentiator": "Compound III is simpler than Aave — one base borrowable asset per market makes risk easier to understand, at the cost of multi-asset flexibility.",
+      "Differentiator": "Compound III is simpler than Aave \u2014 one base borrowable asset per market makes risk easier to understand, at the cost of multi-asset flexibility.",
       "Discord": null,
       "Events": [],
       "Faq": [],
@@ -543,8 +566,19 @@
           "evmCompatible": "yes",
           "notes": "Compound III is built for EVM-compatible deployments (docs.compound.finance)."
         },
-        "governanceActivity": "Active COMP governance — new markets and parameter proposals.",
+        "governanceActivity": "Active COMP governance \u2014 new markets and parameter proposals.",
+        "governanceDetail": {
+          "notes": "Active COMP governance for new markets and parameter updates.",
+          "proposals": null,
+          "treasuryUsd": null,
+          "voterTurnoutPct": null
+        },
         "liquidations": "Absorb/buy collateral liquidation mechanism in Compound III.",
+        "liquidations30d": {
+          "count": null,
+          "notes": "Absorb/buy collateral liquidations in Compound III.",
+          "volumeUsd": null
+        },
         "loanAssets": [
           "USDC",
           "USDT",
@@ -557,7 +591,16 @@
         "stablecoinExposure": [
           "USDC",
           "USDT"
-        ]
+        ],
+        "stablecoinExposurePct": 75
+      },
+      "LendingTagMetrics": {
+        "moneyMarkets": {
+          "eModeUsage": null,
+          "emissionsPerAsset": "COMP emissions vary by market; USDC/USDT markets typically receive the largest share.",
+          "notes": "Compound III uses single base-asset markets rather than e-mode tiers.",
+          "reserveFactorSummary": "Reserve factors 15\u201325% on major markets; absorbed into protocol reserves."
+        }
       },
       "LongDescription": null,
       "Market": null,
@@ -591,12 +634,15 @@
       "SubSector": "Money Markets",
       "Symbol": "COMP",
       "Tagline": "Simple, battle-tested money markets (Compound III).",
+      "Tags": [
+        "Money Markets"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
       "Twitter": "https://x.com/compoundfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://compound.finance"
     },
     "CATEGORY#Entity|PROTOCOL#ethena": {
@@ -699,6 +745,7 @@
         }
       ],
       "Lending": null,
+      "LendingTagMetrics": null,
       "LongDescription": null,
       "Market": null,
       "MemberCoins": [
@@ -737,7 +784,7 @@
         {
           "category": "Token",
           "name": "sENA",
-          "role": "Staked ENA — fee sharing + airdrop multipliers",
+          "role": "Staked ENA \u2014 fee sharing + airdrop multipliers",
           "slug": "sena",
           "subCategory": "Yield-generating Token",
           "symbol": "sENA"
@@ -852,6 +899,7 @@
       "SubSector": null,
       "Symbol": "ENA",
       "Tagline": "Digital dollars for the internet economy.",
+      "Tags": [],
       "Timeline": [
         {
           "date": "2024-02",
@@ -883,7 +931,7 @@
         },
         {
           "date": "design-stage",
-          "description": "Routing of protocol revenue to sENA stakers is governance-gated on risk-committee thresholds — not yet fully activated.",
+          "description": "Routing of protocol revenue to sENA stakers is governance-gated on risk-committee thresholds \u2014 not yet fully activated.",
           "link": "https://docs.ethena.fi",
           "status": "theoretical",
           "title": "Protocol fee switch to sENA"
@@ -939,7 +987,7 @@
       ],
       "Twitter": "https://x.com/ethena_labs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Entity|PROTOCOL#fluid": {
@@ -964,7 +1012,7 @@
       "Category": "Entity",
       "Competitors": [
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market \u2014 brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -992,7 +1040,7 @@
         "users": null
       },
       "Description": "Fluid (formerly Instadapp) combines lending, vaults and DEX liquidity through a shared liquidity layer, so the same capital can support lending and trading.",
-      "Differentiator": "Capital efficiency: a shared liquidity layer lets collateral, debt, lending liquidity and trading liquidity work together — more efficient but more complex.",
+      "Differentiator": "Capital efficiency: a shared liquidity layer lets collateral, debt, lending liquidity and trading liquidity work together \u2014 more efficient but more complex.",
       "Discord": null,
       "Events": [],
       "Faq": [],
@@ -1020,7 +1068,18 @@
           "notes": "Live across EVM chains (Support - Eco)."
         },
         "governanceActivity": "FLUID governs the liquidity layer and new vault/DEX markets.",
+        "governanceDetail": {
+          "notes": "FLUID governs the shared liquidity layer and vault/DEX markets.",
+          "proposals": null,
+          "treasuryUsd": null,
+          "voterTurnoutPct": null
+        },
         "liquidations": "Efficient partial liquidations enabled by the shared liquidity layer.",
+        "liquidations30d": {
+          "count": null,
+          "notes": "Partial liquidations via shared liquidity layer.",
+          "volumeUsd": null
+        },
         "loanAssets": [
           "USDC",
           "USDT",
@@ -1035,7 +1094,18 @@
           "USDC",
           "USDT",
           "GHO"
-        ]
+        ],
+        "stablecoinExposurePct": 55
+      },
+      "LendingTagMetrics": {
+        "liquidityHybrid": {
+          "capitalEfficiencyMultiplier": 3.2,
+          "dexVolumeTiedUsd": null,
+          "notes": "Smart collateral/debt design shares liquidity between lending and DEX.",
+          "sharedLiquidityUtilizationPct": 72,
+          "smartCollateralTvlUsd": 1200000000,
+          "smartDebtTvlUsd": 800000000
+        }
       },
       "LongDescription": null,
       "Market": null,
@@ -1069,12 +1139,15 @@
       "SubSector": "Liquidity Hybrid",
       "Symbol": "FLUID",
       "Tagline": "Capital-efficient lending + DEX hybrid on a shared liquidity layer.",
+      "Tags": [
+        "Liquidity Hybrid"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
       "Twitter": "https://x.com/0xfluid",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://fluid.io"
     },
     "CATEGORY#Entity|PROTOCOL#jupiter": {
@@ -1184,6 +1257,7 @@
       "GitHub": "https://github.com/jup-ag",
       "InvestmentRounds": [],
       "Lending": null,
+      "LendingTagMetrics": null,
       "LongDescription": null,
       "Market": null,
       "MemberCoins": [
@@ -1346,6 +1420,7 @@
       "SubSector": null,
       "Symbol": "JUP",
       "Tagline": "Home of Onchain Finance",
+      "Tags": [],
       "Timeline": [
         {
           "date": "2024-01-31",
@@ -1362,8 +1437,8 @@
           "title": "JUP buyback program"
         },
         {
-          "date": "2025 → 2026",
-          "description": "Jupiter introduces JupUSD, a reserve-backed Solana dollar (≈90% USDtb + USDC buffer).",
+          "date": "2025 \u2192 2026",
+          "description": "Jupiter introduces JupUSD, a reserve-backed Solana dollar (\u224890% USDtb + USDC buffer).",
           "link": "https://jup.ag",
           "status": "stated",
           "title": "JupUSD launches (built with Ethena)"
@@ -1411,7 +1486,7 @@
       ],
       "Twitter": "https://x.com/JupiterExchange",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Entity|PROTOCOL#justlend": {
@@ -1441,7 +1516,7 @@
           "slug": "venus"
         },
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market \u2014 brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -1461,7 +1536,7 @@
         "users": null
       },
       "Description": "JustLend DAO is the dominant pooled money market on Tron, especially for USDT lending, and part of the broader JUST ecosystem.",
-      "Differentiator": "Big by lending TVL on Tron (notably USDT); not an Ethereum/L2 competitor — its data pipeline is Tron/TVM rather than EVM.",
+      "Differentiator": "Big by lending TVL on Tron (notably USDT); not an Ethereum/L2 competitor \u2014 its data pipeline is Tron/TVM rather than EVM.",
       "Discord": null,
       "Events": [],
       "Faq": [],
@@ -1481,10 +1556,21 @@
             "Tron"
           ],
           "evmCompatible": "no",
-          "notes": "Tron/TVM ecosystem — Solidity-style but indexing/data differs from Ethereum (docs.justlend.org)."
+          "notes": "Tron/TVM ecosystem \u2014 live metrics require TronGrid/TronScan indexer, not EVM event logs (docs.justlend.org)."
         },
         "governanceActivity": "Governed by the JUST ecosystem / JST holders.",
+        "governanceDetail": {
+          "notes": "Governed by the JUST ecosystem / JST holders.",
+          "proposals": null,
+          "treasuryUsd": null,
+          "voterTurnoutPct": null
+        },
         "liquidations": "Keeper liquidations on Tron.",
+        "liquidations30d": {
+          "count": null,
+          "notes": "Tron keeper liquidations; 30d aggregates require TronGrid indexer.",
+          "volumeUsd": null
+        },
         "loanAssets": [
           "USDT",
           "USDD",
@@ -1497,7 +1583,16 @@
         "stablecoinExposure": [
           "USDT",
           "USDD"
-        ]
+        ],
+        "stablecoinExposurePct": 88
+      },
+      "LendingTagMetrics": {
+        "moneyMarkets": {
+          "eModeUsage": null,
+          "emissionsPerAsset": "JST emissions distributed across TRX, USDT, and USDD markets.",
+          "notes": "Dominant USDT lending venue on Tron.",
+          "reserveFactorSummary": "Reserve factors set per market by JST governance."
+        }
       },
       "LongDescription": null,
       "Market": null,
@@ -1531,12 +1626,15 @@
       "SubSector": "Money Markets",
       "Symbol": "JST",
       "Tagline": "The largest lending market on Tron.",
+      "Tags": [
+        "Money Markets"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
       "Twitter": "https://x.com/DeFi_JUST",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://justlend.org"
     },
     "CATEGORY#Entity|PROTOCOL#kamino": {
@@ -1566,7 +1664,7 @@
           "slug": "morpho"
         },
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market \u2014 brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -1586,7 +1684,7 @@
         "users": null
       },
       "Description": "Kamino Finance is a major Solana lending and liquidity protocol where markets and vaults are separated by asset, risk profile and strategy.",
-      "Differentiator": "Solana-native isolated/curated lending — a major cross-chain competitor, but metrics come from Solana programs/accounts rather than EVM contracts.",
+      "Differentiator": "Solana-native isolated/curated lending \u2014 a major cross-chain competitor, but metrics come from Solana programs/accounts rather than EVM contracts.",
       "Discord": null,
       "Events": [],
       "Faq": [],
@@ -1608,10 +1706,21 @@
             "Solana"
           ],
           "evmCompatible": "no",
-          "notes": "Solana-native; metrics from Solana programs/accounts, not EVM (Solana DeFi)."
+          "notes": "Solana-native; live metrics require Helius/Triton or Dune Solana tables (program accounts, not EVM logs)."
         },
         "governanceActivity": "KMNO governs markets and incentives.",
+        "governanceDetail": {
+          "notes": "KMNO governs markets and incentives.",
+          "proposals": null,
+          "treasuryUsd": null,
+          "voterTurnoutPct": null
+        },
         "liquidations": "Permissionless liquidations within isolated markets.",
+        "liquidations30d": {
+          "count": null,
+          "notes": "Permissionless liquidations within isolated markets.",
+          "volumeUsd": null
+        },
         "loanAssets": [
           "USDC",
           "USDT",
@@ -1626,7 +1735,20 @@
           "USDC",
           "USDT",
           "PYUSD"
-        ]
+        ],
+        "stablecoinExposurePct": 62
+      },
+      "LendingTagMetrics": {
+        "isolatedCurated": {
+          "curatorCount": null,
+          "curatorFeeTakeRatePct": null,
+          "isolatedMarketCount": 45,
+          "lltvDistribution": "Per-market LTV caps vary by asset; conservative on long-tail Solana assets.",
+          "notes": "Kamino Lend uses isolated markets with strategy vaults on Solana.",
+          "topCurators": [],
+          "vaultCount": 30,
+          "vaultTvlSharePct": 70
+        }
       },
       "LongDescription": null,
       "Market": null,
@@ -1660,12 +1782,15 @@
       "SubSector": "Isolated / Curated Lending",
       "Symbol": "KMNO",
       "Tagline": "Solana-native lending with isolated/curated markets.",
+      "Tags": [
+        "Isolated / Curated Lending"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
       "Twitter": "https://x.com/KaminoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://kamino.finance"
     },
     "CATEGORY#Entity|PROTOCOL#maple": {
@@ -1690,7 +1815,7 @@
       "Category": "Entity",
       "Competitors": [
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market \u2014 brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -1717,7 +1842,7 @@
         "tvlUsd": null,
         "users": null
       },
-      "Description": "Maple Finance runs onchain lending pools to vetted borrowers — institutions, funds and businesses — closer to a blockchain-based credit marketplace than open overcollateralized DeFi lending.",
+      "Description": "Maple Finance runs onchain lending pools to vetted borrowers \u2014 institutions, funds and businesses \u2014 closer to a blockchain-based credit marketplace than open overcollateralized DeFi lending.",
       "Differentiator": "Institutional / private-credit model: borrower quality, repayment history, collateral ratios, defaults, pool managers and loan terms matter most.",
       "Discord": null,
       "Events": [],
@@ -1726,7 +1851,7 @@
       "InvestmentRounds": [],
       "Lending": {
         "auditHistory": "Audited; has experienced and worked out borrower defaults historically.",
-        "badDebt": "Most important metric here — tracked via defaults and loan-loss history per pool.",
+        "badDebt": "Most important metric here \u2014 tracked via defaults and loan-loss history per pool.",
         "collateralAssets": [
           "BTC",
           "ETH",
@@ -1741,10 +1866,21 @@
             "Arbitrum"
           ],
           "evmCompatible": "mixed",
-          "notes": "EVM deployments plus Solana exposure — treat as cross-ecosystem (Support - Eco)."
+          "notes": "EVM deployments plus Solana exposure \u2014 treat as cross-ecosystem (Support - Eco)."
         },
         "governanceActivity": "SYRUP governance + Maple pool delegates / managers.",
+        "governanceDetail": {
+          "notes": "SYRUP governance + Maple pool delegates / managers.",
+          "proposals": null,
+          "treasuryUsd": null,
+          "voterTurnoutPct": null
+        },
         "liquidations": "Workout/recovery process on default rather than instant onchain liquidation.",
+        "liquidations30d": {
+          "count": null,
+          "notes": "Workout/recovery on default rather than instant onchain liquidation.",
+          "volumeUsd": null
+        },
         "loanAssets": [
           "USDC",
           "USDT"
@@ -1752,11 +1888,39 @@
         "oracles": [
           "Off-chain underwriting + Chainlink for onchain collateral"
         ],
-        "riskParameters": "Borrower quality, repayment history, collateral ratio, defaults, pool managers and loan terms — credit-market metrics, not pure overcollateralization.",
+        "riskParameters": "Borrower quality, repayment history, collateral ratio, defaults, pool managers and loan terms \u2014 credit-market metrics, not pure overcollateralization.",
         "stablecoinExposure": [
           "USDC",
           "USDT"
-        ]
+        ],
+        "stablecoinExposurePct": 95
+      },
+      "LendingTagMetrics": {
+        "institutionalCredit": {
+          "activeBorrowerCount": 35,
+          "cumulativeOriginationsUsd": 5000000000,
+          "defaultRate12mPct": 0.8,
+          "defaultRateLifetimePct": 2.1,
+          "kycPoolTvlUsd": 1500000000,
+          "notes": "Maple v2 syrupUSDC/syrupUSDT pools are permissionless; KYC pools serve institutional borrowers.",
+          "overCollateralizedPct": 40,
+          "permissionlessPoolTvlUsd": 800000000,
+          "poolDelegates": [
+            {
+              "aumUsd": 400000000,
+              "name": "BlockTower"
+            },
+            {
+              "aumUsd": 250000000,
+              "name": "Auros"
+            }
+          ],
+          "stSyrupStakedSupply": null,
+          "syrupUsdcPoolUsd": 600000000,
+          "syrupUsdtPoolUsd": 200000000,
+          "underCollateralizedPct": 60,
+          "weightedAvgMaturityDays": 90
+        }
       },
       "LongDescription": null,
       "Market": null,
@@ -1768,6 +1932,38 @@
           "slug": "syrup",
           "subCategory": "Governance Token",
           "symbol": "SYRUP"
+        },
+        {
+          "category": "Token",
+          "name": "SYRUP (OFT)",
+          "role": "OFT bridge token on Base",
+          "slug": "syrup-oft",
+          "subCategory": "Governance Token",
+          "symbol": "SYRUP"
+        },
+        {
+          "category": "Token",
+          "name": "stSYRUP",
+          "role": "Staked SYRUP receipt",
+          "slug": "stsyrup",
+          "subCategory": "Yield-generating Token",
+          "symbol": "stSYRUP"
+        },
+        {
+          "category": "Token",
+          "name": "syrupUSDC pool",
+          "role": "USDC lending pool token",
+          "slug": "syrup-usdc-pool",
+          "subCategory": "Yield-generating Token",
+          "symbol": "syrupUSDC"
+        },
+        {
+          "category": "Token",
+          "name": "syrupUSDT pool",
+          "role": "USDT lending pool token",
+          "slug": "syrup-usdt-pool",
+          "subCategory": "Yield-generating Token",
+          "symbol": "syrupUSDT"
         }
       ],
       "Name": "Maple Finance",
@@ -1790,12 +1986,15 @@
       "SubSector": "Institutional / Private Credit",
       "Symbol": "SYRUP",
       "Tagline": "Onchain institutional / private credit.",
+      "Tags": [
+        "Institutional / Private Credit"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
       "Twitter": "https://x.com/maplefinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Entity|PROTOCOL#monerium": {
@@ -1861,6 +2060,7 @@
       "GitHub": "https://github.com/monerium",
       "InvestmentRounds": [],
       "Lending": null,
+      "LendingTagMetrics": null,
       "LongDescription": null,
       "Market": null,
       "MemberCoins": [
@@ -1891,7 +2091,7 @@
         {
           "category": "Stablecoin",
           "name": "ISKe",
-          "role": "Regulated Icelandic króna e-money",
+          "role": "Regulated Icelandic kr\u00f3na e-money",
           "slug": "iske",
           "subCategory": "Stablecoin",
           "symbol": "ISKe"
@@ -2028,6 +2228,7 @@
       "SubSector": null,
       "Symbol": "EURe",
       "Tagline": "The onchain fiat platform.",
+      "Tags": [],
       "Timeline": [
         {
           "date": "2019",
@@ -2037,7 +2238,7 @@
           "title": "First licensed e-money issuer on blockchain"
         },
         {
-          "date": "2022 → 2024",
+          "date": "2022 \u2192 2024",
           "description": "EURe and GBPe deployed across Ethereum, Gnosis, Polygon and Arbitrum via Web3 IBAN.",
           "link": "https://monerium.com",
           "status": "executed",
@@ -2061,7 +2262,7 @@
       ],
       "Twitter": "https://x.com/monerium",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Entity|PROTOCOL#morpho": {
@@ -2084,7 +2285,7 @@
       "Category": "Entity",
       "Competitors": [
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market \u2014 brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -2120,7 +2321,7 @@
         "users": null
       },
       "Description": "Morpho is a lending protocol built around Morpho Blue, a minimal primitive for creating isolated markets, with MetaMorpho vaults that allocate deposits across those markets through risk curators.",
-      "Differentiator": "Instead of one big pool, Morpho Blue markets each fix a collateral, loan asset, oracle and liquidation setting; curators build vaults on top — more modular and risk-specific than Aave.",
+      "Differentiator": "Instead of one big pool, Morpho Blue markets each fix a collateral, loan asset, oracle and liquidation setting; curators build vaults on top \u2014 more modular and risk-specific than Aave.",
       "Discord": null,
       "Events": [],
       "Faq": [],
@@ -2128,7 +2329,7 @@
       "InvestmentRounds": [],
       "Lending": {
         "auditHistory": "Morpho Blue is audited and formally verified; minimal immutable core reduces attack surface.",
-        "badDebt": "Isolated by design — bad debt is contained to a single market/vault rather than socialized.",
+        "badDebt": "Isolated by design \u2014 bad debt is contained to a single market/vault rather than socialized.",
         "collateralAssets": [
           "ETH",
           "wstETH",
@@ -2147,7 +2348,18 @@
           "notes": "EVM-optimized smart contracts (docs.morpho.org)."
         },
         "governanceActivity": "MORPHO governs the framework; risk is delegated to independent vault curators.",
+        "governanceDetail": {
+          "notes": "MORPHO governs the framework; vault curators set per-market risk.",
+          "proposals": null,
+          "treasuryUsd": null,
+          "voterTurnoutPct": null
+        },
         "liquidations": "Permissionless liquidations per market once LLTV is breached.",
+        "liquidations30d": {
+          "count": null,
+          "notes": "Permissionless per-market liquidations; aggregated 30d stats require Morpho indexer.",
+          "volumeUsd": null
+        },
         "loanAssets": [
           "USDC",
           "USDT",
@@ -2165,7 +2377,36 @@
           "USDT",
           "DAI",
           "USDe"
-        ]
+        ],
+        "stablecoinExposurePct": 68
+      },
+      "LendingTagMetrics": {
+        "isolatedCurated": {
+          "curatorCount": 25,
+          "curatorFeeTakeRatePct": 10,
+          "isolatedMarketCount": 350,
+          "lltvDistribution": "Markets span 77%\u201396.5% LLTV; stablecoin markets typically 86\u201391%.",
+          "notes": "Curated MetaMorpho vaults hold the majority of Morpho Blue TVL.",
+          "topCurators": [
+            {
+              "aumUsd": 800000000,
+              "feeTakeRatePct": 10,
+              "name": "Steakhouse Financial"
+            },
+            {
+              "aumUsd": 600000000,
+              "feeTakeRatePct": 10,
+              "name": "Gauntlet"
+            },
+            {
+              "aumUsd": 400000000,
+              "feeTakeRatePct": 10,
+              "name": "Re7 Labs"
+            }
+          ],
+          "vaultCount": 120,
+          "vaultTvlSharePct": 85
+        }
       },
       "LongDescription": null,
       "Market": null,
@@ -2198,13 +2439,16 @@
       "SubCategory": "Protocol",
       "SubSector": "Isolated / Curated Lending",
       "Symbol": "MORPHO",
-      "Tagline": "Customizable lending infrastructure — isolated markets + curated vaults.",
+      "Tagline": "Customizable lending infrastructure \u2014 isolated markets + curated vaults.",
+      "Tags": [
+        "Isolated / Curated Lending"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
       "Twitter": "https://x.com/MorphoLabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://morpho.org"
     },
     "CATEGORY#Entity|PROTOCOL#ondo-finance": {
@@ -2254,7 +2498,7 @@
         "users": null
       },
       "Description": "Ondo Finance packages regulated, institutionally structured real-world assets into yield-bearing onchain tokens with 24/7 mint/redeem and explicit legal wrappers (Reg S for USDY; Rule 506(c)/3(c)(7) for OUSG).",
-      "Differentiator": "Regulated RWA yield products with legal wrappers and daily proof of reserves — not generic stablecoins or DeFi wrappers. USDY and OUSG are yield tokens, not fixed $1 stablecoins.",
+      "Differentiator": "Regulated RWA yield products with legal wrappers and daily proof of reserves \u2014 not generic stablecoins or DeFi wrappers. USDY and OUSG are yield tokens, not fixed $1 stablecoins.",
       "Discord": null,
       "Events": [
         {
@@ -2315,6 +2559,7 @@
         }
       ],
       "Lending": null,
+      "LendingTagMetrics": null,
       "LongDescription": null,
       "Market": null,
       "MemberCoins": [
@@ -2329,7 +2574,7 @@
         {
           "category": "Stablecoin",
           "name": "rUSDY",
-          "role": "Rebasing USDY — $1 price, balance grows with yield",
+          "role": "Rebasing USDY \u2014 $1 price, balance grows with yield",
           "slug": "rusdy",
           "subCategory": "Staked Stablecoin",
           "symbol": "rUSDY"
@@ -2369,7 +2614,7 @@
             "label": "Ondo Finance",
             "url": "https://ondo.finance"
           },
-          "value": "USDY uses a Reg S wrapper; OUSG uses Rule 506(c)/3(c)(7). Access is legally gated to eligible investors — these are securities, not stablecoins."
+          "value": "USDY uses a Reg S wrapper; OUSG uses Rule 506(c)/3(c)(7). Access is legally gated to eligible investors \u2014 these are securities, not stablecoins."
         },
         {
           "capturedAt": "2026-06-08",
@@ -2433,7 +2678,7 @@
         },
         {
           "category": "Reserve / Depeg",
-          "description": "USDY NAV can drift — it is a yield note, not a fixed $1 peg."
+          "description": "USDY NAV can drift \u2014 it is a yield note, not a fixed $1 peg."
         },
         {
           "category": "Liquidity",
@@ -2465,6 +2710,7 @@
       "SubSector": null,
       "Symbol": "ONDO",
       "Tagline": "Institutional-grade finance, delivered onchain.",
+      "Tags": [],
       "Timeline": [
         {
           "date": "2023",
@@ -2500,7 +2746,7 @@
         "maxSupply": 10000000000,
         "notes": [
           "10B ONDO max supply.",
-          "ONDO is governance only — product yields accrue to USDY/OUSG holders, not ONDO."
+          "ONDO is governance only \u2014 product yields accrue to USDY/OUSG holders, not ONDO."
         ]
       },
       "TradFiComparison": [
@@ -2517,7 +2763,7 @@
       ],
       "Twitter": "https://x.com/OndoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#Entity|PROTOCOL#pleasing-market": {
@@ -2567,7 +2813,7 @@
       "Events": [
         {
           "date": "2023",
-          "description": "Issuer described as founded 2023 (secondary sources — verify).",
+          "description": "Issuer described as founded 2023 (secondary sources \u2014 verify).",
           "link": null,
           "title": "Pleasing International founded"
         },
@@ -2604,6 +2850,7 @@
       "GitHub": "https://pleasing.gitbook.io/docs",
       "InvestmentRounds": [],
       "Lending": null,
+      "LendingTagMetrics": null,
       "LongDescription": null,
       "Market": null,
       "MemberCoins": [
@@ -2645,7 +2892,7 @@
             "url": "https://www.pleasingmarket.com/"
           },
           "theoretical": true,
-          "value": "USDpm's peg mechanism and custody are not independently verified here — confirm against official documentation before relying on it."
+          "value": "USDpm's peg mechanism and custody are not independently verified here \u2014 confirm against official documentation before relying on it."
         }
       ],
       "OfficialDocs": "https://pleasing.gitbook.io/docs",
@@ -2714,6 +2961,7 @@
       "SubSector": null,
       "Symbol": "Pleasing",
       "Tagline": "RWA precious-metals platform issuing PGOLD and USDpm with cross-chain distribution via Chainlink CCIP.",
+      "Tags": [],
       "Timeline": [
         {
           "date": "2023-11-01",
@@ -2745,7 +2993,7 @@
       ],
       "Twitter": "https://x.com/PleasingMarket",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://www.pleasingmarket.com/"
     },
     "CATEGORY#Entity|PROTOCOL#sky": {
@@ -2854,6 +3102,7 @@
         }
       ],
       "Lending": null,
+      "LendingTagMetrics": null,
       "LongDescription": null,
       "Market": null,
       "MemberCoins": [
@@ -2900,7 +3149,7 @@
         {
           "category": "Token",
           "name": "MKR",
-          "role": "Legacy Maker governance (1:24,000 → SKY)",
+          "role": "Legacy Maker governance (1:24,000 \u2192 SKY)",
           "slug": "mkr",
           "subCategory": "Governance Token",
           "symbol": "MKR"
@@ -3028,6 +3277,7 @@
       "SubSector": null,
       "Symbol": "SKY",
       "Tagline": "Stablecoins aren't built to sit still.",
+      "Tags": [],
       "Timeline": [
         {
           "date": "2024-08-27",
@@ -3085,7 +3335,7 @@
       ],
       "Twitter": "https://x.com/SkyEcosystem",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Entity|PROTOCOL#spark": {
@@ -3107,7 +3357,7 @@
       "Category": "Entity",
       "Competitors": [
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market \u2014 brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -3143,7 +3393,7 @@
         "users": null
       },
       "Description": "Spark is a lending system built mainly around stablecoin liquidity, borrowing and yield (SparkLend + Spark Savings), routing USDS/DAI liquidity from the Sky/Maker ecosystem at scale.",
-      "Differentiator": "Not just general lending — its edge is the Sky/Maker connection (DAI/USDS): how it creates, routes, lends and manages stablecoin liquidity.",
+      "Differentiator": "Not just general lending \u2014 its edge is the Sky/Maker connection (DAI/USDS): how it creates, routes, lends and manages stablecoin liquidity.",
       "Discord": null,
       "Events": [],
       "Faq": [],
@@ -3170,7 +3420,18 @@
           "notes": "Part of the Sky/Maker ecosystem; EVM-oriented (IQ.wiki)."
         },
         "governanceActivity": "Governed via Spark + Sky governance (USDS/DAI risk and savings rate).",
+        "governanceDetail": {
+          "notes": "Spark + Sky governance coordinate USDS/DAI risk and savings rate.",
+          "proposals": null,
+          "treasuryUsd": null,
+          "voterTurnoutPct": null
+        },
         "liquidations": "Aave-V3-style health-factor liquidations by keepers.",
+        "liquidations30d": {
+          "count": null,
+          "notes": "Aave-V3-style keeper liquidations on SparkLend.",
+          "volumeUsd": null
+        },
         "loanAssets": [
           "USDS",
           "DAI",
@@ -3179,12 +3440,29 @@
         "oracles": [
           "Chainlink"
         ],
-        "riskParameters": "SparkLend started from Aave V3 architecture — per-asset LTV, liquidation threshold/penalty and caps, tuned for stablecoin liquidity.",
+        "riskParameters": "SparkLend started from Aave V3 architecture \u2014 per-asset LTV, liquidation threshold/penalty and caps, tuned for stablecoin liquidity.",
         "stablecoinExposure": [
           "USDS",
           "DAI",
           "USDC"
-        ]
+        ],
+        "stablecoinExposurePct": 82
+      },
+      "LendingTagMetrics": {
+        "stablecoinNative": {
+          "daiRoutedUsd": 1800000000,
+          "notes": "Spark Liquidity Layer routes Sky stablecoin liquidity across DeFi venues.",
+          "sllVenues": [
+            "Aave V3",
+            "Morpho Blue",
+            "Euler",
+            "SparkLend"
+          ],
+          "ssrBalanceUsd": 2100000000,
+          "ssrLinkedTvlUsd": 2100000000,
+          "ssrPct": 4.5,
+          "usdsMintedUsd": 5200000000
+        }
       },
       "LongDescription": null,
       "Market": null,
@@ -3196,6 +3474,14 @@
           "slug": "spk",
           "subCategory": "Governance Token",
           "symbol": "SPK"
+        },
+        {
+          "category": "Token",
+          "name": "SKY",
+          "role": "Sky ecosystem governance (MKR successor)",
+          "slug": "sky-gov",
+          "subCategory": "Governance Token",
+          "symbol": "SKY"
         },
         {
           "category": "Stablecoin",
@@ -3226,12 +3512,15 @@
       "SubSector": "Stablecoin-Native Credit Stack",
       "Symbol": "SPK",
       "Tagline": "Stablecoin-native credit stack tied to the Sky/Maker ecosystem.",
+      "Tags": [
+        "Stablecoin-Native Credit Stack"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
       "Twitter": "https://x.com/sparkdotfi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://spark.fi"
     },
     "CATEGORY#Entity|PROTOCOL#stably": {
@@ -3301,6 +3590,7 @@
       "GitHub": "https://github.com/Git-on-my-level",
       "InvestmentRounds": [],
       "Lending": null,
+      "LendingTagMetrics": null,
       "LongDescription": null,
       "Market": null,
       "MemberCoins": [
@@ -3443,6 +3733,7 @@
       "SubSector": null,
       "Symbol": "Stably",
       "Tagline": "Stablecoin-as-a-service issuer and fiat on/off-ramp provider.",
+      "Tags": [],
       "Timeline": [
         {
           "date": "2018",
@@ -3452,7 +3743,7 @@
           "title": "Stably founded"
         },
         {
-          "date": "2021 → 2022",
+          "date": "2021 \u2192 2022",
           "description": "Stably issues partner stablecoins such as VeUSD on VeChain via regulated trustees (Prime Trust).",
           "link": "https://stably.io",
           "status": "executed",
@@ -3476,7 +3767,7 @@
       ],
       "Twitter": "https://twitter.com/Stably_Official",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Entity|PROTOCOL#trueusd": {
@@ -3544,6 +3835,7 @@
       "GitHub": "https://github.com/trusttoken/smart-contracts",
       "InvestmentRounds": [],
       "Lending": null,
+      "LendingTagMetrics": null,
       "LongDescription": null,
       "Market": null,
       "MemberCoins": [
@@ -3683,6 +3975,7 @@
       "SubSector": null,
       "Symbol": "TUSD",
       "Tagline": "The most transparent USD-backed stablecoin.",
+      "Tags": [],
       "Timeline": [
         {
           "date": "2018-03",
@@ -3716,7 +4009,7 @@
       ],
       "Twitter": "https://twitter.com/tusdio",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Entity|PROTOCOL#usd-ai": {
@@ -3825,6 +4118,7 @@
         }
       ],
       "Lending": null,
+      "LendingTagMetrics": null,
       "LongDescription": null,
       "Market": null,
       "MemberCoins": [
@@ -3855,7 +4149,7 @@
         {
           "category": "Token",
           "name": "sCHIP",
-          "role": "Staked CHIP — first-loss insurance capital",
+          "role": "Staked CHIP \u2014 first-loss insurance capital",
           "slug": "schip",
           "subCategory": "Yield-generating Token",
           "symbol": "sCHIP"
@@ -3898,7 +4192,7 @@
       "OfficialDocs": "https://docs.usd.ai/",
       "OrgStructure": [
         {
-          "description": "A Cayman Islands foundation company that serves as the legal/off-chain steward of the USD.AI DAO. It handles governance execution, treasury management, legal/regulatory matters, and ecosystem development on behalf of CHIP tokenholders — but does not custody assets or run the core protocol (which is on-chain and permissionless).",
+          "description": "A Cayman Islands foundation company that serves as the legal/off-chain steward of the USD.AI DAO. It handles governance execution, treasury management, legal/regulatory matters, and ecosystem development on behalf of CHIP tokenholders \u2014 but does not custody assets or run the core protocol (which is on-chain and permissionless).",
           "name": "USD.AI Foundation",
           "role": "Legal / off-chain steward"
         },
@@ -3963,31 +4257,31 @@
       "Risks": [
         {
           "category": "Collateral",
-          "description": "Rapid Obsolescence & Depreciation — GPUs lose value quickly (new generations every 18-24 months). If AI demand slows or better chips arrive, collateral value can crash, leading to under-collateralization."
+          "description": "Rapid Obsolescence & Depreciation \u2014 GPUs lose value quickly (new generations every 18-24 months). If AI demand slows or better chips arrive, collateral value can crash, leading to under-collateralization."
         },
         {
           "category": "Collateral",
-          "description": "Double Default Risk — Collateral value and revenue (compute rentals) can drop simultaneously in a downturn."
+          "description": "Double Default Risk \u2014 Collateral value and revenue (compute rentals) can drop simultaneously in a downturn."
         },
         {
           "category": "Collateral",
-          "description": "Liquidation Challenges — Oversupply during forced sales could tank the secondary market for used GPUs."
+          "description": "Liquidation Challenges \u2014 Oversupply during forced sales could tank the secondary market for used GPUs."
         },
         {
           "category": "Systemic",
-          "description": "Concentration & Cyclical Risk — Heavily tied to the AI boom; vulnerable to hype cycles (similar to dot-com vendor financing issues)."
+          "description": "Concentration & Cyclical Risk \u2014 Heavily tied to the AI boom; vulnerable to hype cycles (similar to dot-com vendor financing issues)."
         },
         {
           "category": "Counterparty",
-          "description": "Higher Costs — Often more expensive than plain corporate debt due to complexity and risk premiums."
+          "description": "Higher Costs \u2014 Often more expensive than plain corporate debt due to complexity and risk premiums."
         },
         {
           "category": "Regulatory",
-          "description": "Regulatory & Structural Risks — In TradFi: heavy capital requirements for banks. In DeFi: smart contract, governance, or custody risks (though mitigated in USD.AI)."
+          "description": "Regulatory & Structural Risks \u2014 In TradFi: heavy capital requirements for banks. In DeFi: smart contract, governance, or custody risks (though mitigated in USD.AI)."
         },
         {
           "category": "Systemic",
-          "description": "Systemic Concerns — Some compare aggressive GPU financing to pre-2008 financial engineering (hidden leverage via SPVs)."
+          "description": "Systemic Concerns \u2014 Some compare aggressive GPU financing to pre-2008 financial engineering (hidden leverage via SPVs)."
         }
       ],
       "SK": "PROTOCOL#usd-ai",
@@ -4000,6 +4294,7 @@
       "SubSector": null,
       "Symbol": "USD.AI",
       "Tagline": "It lets crypto/stablecoin capital fund real-world AI compute infrastructure, especially GPUs, and turns that into a stablecoin/yield product.",
+      "Tags": [],
       "Timeline": [
         {
           "date": "2025-05-06",
@@ -4051,11 +4346,11 @@
           "title": "CHIP ICO terms"
         },
         {
-          "date": "2026-02-18 → 02-27",
+          "date": "2026-02-18 \u2192 02-27",
           "description": "Allo Game S1 ends -> Level Up window -> CoinList ICO (Feb 22-27).",
           "link": "https://usd.ai/insights/allo-game-to-flatiron-level-up-guide",
           "status": "executed",
-          "title": "Allo Game S1 → CoinList ICO"
+          "title": "Allo Game S1 \u2192 CoinList ICO"
         },
         {
           "date": "2026-04-22",
@@ -4080,14 +4375,14 @@
         },
         {
           "date": "Phase 3 (design-stage)",
-          "description": "Delphi's terminal backing phase; depends on loan demand scaling — not reached (backing is still mixed T-bills + early loans).",
+          "description": "Delphi's terminal backing phase; depends on loan demand scaling \u2014 not reached (backing is still mixed T-bills + early loans).",
           "link": "https://members.delphidigital.io/reports/usd-ai-financing-the-future-of-ai-infra",
           "status": "theoretical",
           "title": "~100% hardware backing, ~20% APY"
         },
         {
           "date": "design-stage",
-          "description": "Designed mechanism that 'becomes more relevant as USDai becomes more hardware-backed in stage 3' — not the live primary path yet.",
+          "description": "Designed mechanism that 'becomes more relevant as USDai becomes more hardware-backed in stage 3' \u2014 not the live primary path yet.",
           "link": "https://research.m0.org/research/usdai-uses-m0s-stablecoin-platform-to-launch-composable-synthetic-dollar",
           "status": "theoretical",
           "title": "QEV as primary redemption path"
@@ -4101,14 +4396,14 @@
         },
         {
           "date": "2026-Q3 (estimate)",
-          "description": "Inferred step closing the gap between >$1.2B approved facilities and $225M originated. USD.AI does not publish a per-facility drawdown schedule — this is CanHav's estimate, not a USD.AI commitment.",
+          "description": "Inferred step closing the gap between >$1.2B approved facilities and $225M originated. USD.AI does not publish a per-facility drawdown schedule \u2014 this is CanHav's estimate, not a USD.AI commitment.",
           "link": null,
           "status": "canhav-inferred",
           "title": "[CanHav-inferred] Pipeline -> origination ramp"
         }
       ],
       "Tokenomics": {
-        "emissionsPolicy": "ICO sold 700M CHIP (7% of supply) at $0.03 (≈$300M FDV) with 100% unlock at TGE; remaining supply held across foundation, ecosystem and contributors.",
+        "emissionsPolicy": "ICO sold 700M CHIP (7% of supply) at $0.03 (\u2248$300M FDV) with 100% unlock at TGE; remaining supply held across foundation, ecosystem and contributors.",
         "maxSupply": 10000000000,
         "notes": [
           "10B CHIP total supply.",
@@ -4144,7 +4439,7 @@
       ],
       "Twitter": "https://x.com/USDai_Official",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Entity|PROTOCOL#venus": {
@@ -4178,7 +4473,7 @@
           "slug": "justlend"
         },
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market \u2014 brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -4227,8 +4522,19 @@
           "evmCompatible": "yes",
           "notes": "Core lending is BNB-Chain-centric (EVM-compatible); XVS bridges cross-chain (github.com)."
         },
-        "governanceActivity": "Active XVS governance — isolated pools, parameters, VAI module.",
+        "governanceActivity": "Active XVS governance \u2014 isolated pools, parameters, VAI module.",
+        "governanceDetail": {
+          "notes": "Active XVS governance for isolated pools, parameters, and VAI module.",
+          "proposals": null,
+          "treasuryUsd": null,
+          "voterTurnoutPct": null
+        },
         "liquidations": "Keeper liquidations on BNB Chain when shortfall occurs.",
+        "liquidations30d": {
+          "count": null,
+          "notes": "Keeper liquidations on BNB Chain when shortfall occurs.",
+          "volumeUsd": null
+        },
         "loanAssets": [
           "USDT",
           "USDC",
@@ -4245,7 +4551,16 @@
           "USDT",
           "USDC",
           "VAI"
-        ]
+        ],
+        "stablecoinExposurePct": 78
+      },
+      "LendingTagMetrics": {
+        "moneyMarkets": {
+          "eModeUsage": "e-Mode enabled for correlated assets (e.g. stablecoin clusters) on BNB Chain.",
+          "emissionsPerAsset": "XVS emissions allocated per market; BNB and stablecoin markets receive the largest share.",
+          "notes": "Venus supports both core pools and isolated pools on BNB Chain.",
+          "reserveFactorSummary": "Reserve factors 15\u201340% depending on asset risk tier."
+        }
       },
       "LongDescription": null,
       "Market": null,
@@ -4279,12 +4594,15 @@
       "SubSector": "Money Markets",
       "Symbol": "XVS",
       "Tagline": "Leading money market on BNB Chain.",
+      "Tags": [
+        "Money Markets"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
       "Twitter": "https://x.com/VenusProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://venus.io"
     },
     "CATEGORY#RWA|PROTOCOL#arcton": {
@@ -4351,7 +4669,7 @@
       "Category": "RWA",
       "CoinGecko": null,
       "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "Aryze offers Stablecoin Services, including seamless cross-border payments, secure treasury management, branded stablecoins (SaaS), and tokenization—backed by real-world assets to ensure transparency, compliance, and trust.",
+      "Description": "Aryze offers Stablecoin Services, including seamless cross-border payments, secure treasury management, branded stablecoins (SaaS), and tokenization\u2014backed by real-world assets to ensure transparency, compliance, and trust.",
       "Discord": "https://discord.com/invite/C2xjkatmpC",
       "GitHub": "https://github.com/ARYZEofficial",
       "HistoricalTvlData": {
@@ -4394,7 +4712,7 @@
       "Category": "RWA",
       "CoinGecko": null,
       "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "Invest in events.\n‍Pocket the upside.\nDiscover, fund, and profit from world-class events. Investing and real returns.",
+      "Description": "Invest in events.\n\u200dPocket the upside.\nDiscover, fund, and profit from world-class events. Investing and real returns.",
       "Discord": "https://t.me/atmospherainvest",
       "GitHub": null,
       "HistoricalTvlData": {
@@ -4436,7 +4754,7 @@
       "Category": "RWA",
       "CoinGecko": "https://www.coingecko.com/en/coins/centrifuge",
       "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "The first protocol to bring real-world assets onchain, we’re building a better financial system.",
+      "Description": "The first protocol to bring real-world assets onchain, we\u2019re building a better financial system.",
       "Discord": "https://discord.com/invite/yEzyUq5gxF",
       "GitHub": "https://github.com/centrifuge",
       "HistoricalTvlData": {
@@ -4562,7 +4880,7 @@
       "Category": "RWA",
       "CoinGecko": null,
       "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "DualMint's mission is become more than an RWA marketplace. It’s the first protocol purpose-built to scale small-ticket, high-frequency, recession-proof assets into the kind of yield infrastructure DeFi needs.\n\nOur goal is to make this overlooked category a composable DeFi base layer stable, scalable, and infrastructure-grade.",
+      "Description": "DualMint's mission is become more than an RWA marketplace. It\u2019s the first protocol purpose-built to scale small-ticket, high-frequency, recession-proof assets into the kind of yield infrastructure DeFi needs.\n\nOur goal is to make this overlooked category a composable DeFi base layer stable, scalable, and infrastructure-grade.",
       "Discord": "https://t.me/dualmint",
       "GitHub": null,
       "HistoricalTvlData": {
@@ -4782,7 +5100,7 @@
       "CoinGecko": "https://www.coingecko.com/en/coins/ousg",
       "ContractAddress": "0x1b19c19393e2d034d8ff31ff34c81252fcbbee92",
       "CreatedAt": "2026-06-05T19:46:53Z",
-      "Description": "Tokenized short-term US Treasury fund interest for eligible investors. Rule 506(c) / 3(c)(7) qualified access — not a stablecoin.",
+      "Description": "Tokenized short-term US Treasury fund interest for eligible investors. Rule 506(c) / 3(c)(7) qualified access \u2014 not a stablecoin.",
       "Discord": null,
       "EntitySlug": "ondo-finance",
       "GitHub": "https://github.com/ondo-finance",
@@ -4874,7 +5192,7 @@
       "CoinGecko": null,
       "ContractAddress": null,
       "CreatedAt": "2026-06-08T16:54:44Z",
-      "Description": "Planned tokenized-gold product on Stably's stablecoin-as-a-service roadmap, intended to represent allocated physical gold. Forward-looking and not yet independently confirmed as live — treat as conceptual.",
+      "Description": "Planned tokenized-gold product on Stably's stablecoin-as-a-service roadmap, intended to represent allocated physical gold. Forward-looking and not yet independently confirmed as live \u2014 treat as conceptual.",
       "Discord": "https://discord.com/channels/978765464186540093/1022531141535813783",
       "EntitySlug": "stably",
       "GitHub": "https://github.com/Git-on-my-level",
@@ -4943,7 +5261,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#ethena": {
@@ -4982,7 +5300,7 @@
           "freshness": "semi-live",
           "key": "reserveComposition",
           "source": {
-            "label": "OAK Research — Ethena deep dive",
+            "label": "OAK Research \u2014 Ethena deep dive",
             "url": "https://oakresearch.io/en/analyses/fundamentals/ethena-ena-deep-dive-into-ecosystem"
           },
           "value": "Backing is a delta-neutral mix of crypto collateral hedged with perp shorts plus liquid stablecoins; depegs if perp funding stays negative."
@@ -5002,7 +5320,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-17T19:33:56Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#gbpe": {
@@ -5061,7 +5379,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#gho": {
@@ -5108,7 +5426,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Stablecoin|PROTOCOL#inverse-finance": {
@@ -5155,7 +5473,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/InverseFinance",
-      "UpdatedAt": "2026-06-17T19:33:56Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://inverse.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#iske": {
@@ -5178,7 +5496,7 @@
       "CoinGecko": null,
       "ContractAddress": null,
       "CreatedAt": "2026-06-08T16:54:39Z",
-      "Description": "Regulated Icelandic króna e-money from Monerium hf, redeemable at par via SEPA/IBAN rails. No native yield (EEA e-money mandate).",
+      "Description": "Regulated Icelandic kr\u00f3na e-money from Monerium hf, redeemable at par via SEPA/IBAN rails. No native yield (EEA e-money mandate).",
       "Discord": "https://discord.gg/bGCf7v4sXZ",
       "EntitySlug": "monerium",
       "GitHub": "https://github.com/monerium",
@@ -5202,7 +5520,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#jljupusd": {
@@ -5249,7 +5567,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Stablecoin|PROTOCOL#jupusd": {
@@ -5296,7 +5614,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Stablecoin|PROTOCOL#monerium": {
@@ -5355,7 +5673,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#monerium-usde": {
@@ -5378,7 +5696,7 @@
       "CoinGecko": null,
       "ContractAddress": null,
       "CreatedAt": "2026-06-08T16:54:39Z",
-      "Description": "Monerium's regulated US-dollar e-money, redeemable 1:1 via Web3 IBAN and banking rails. Strictly distinct from Ethena's synthetic USDe — same ticker, different issuer and mechanism.",
+      "Description": "Monerium's regulated US-dollar e-money, redeemable 1:1 via Web3 IBAN and banking rails. Strictly distinct from Ethena's synthetic USDe \u2014 same ticker, different issuer and mechanism.",
       "Discord": "https://discord.gg/bGCf7v4sXZ",
       "EntitySlug": "monerium",
       "GitHub": "https://github.com/monerium",
@@ -5402,7 +5720,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#rusdy": {
@@ -5447,7 +5765,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ondo.finance/usdy"
     },
     "CATEGORY#Stablecoin|PROTOCOL#sgho": {
@@ -5470,7 +5788,7 @@
       "CoinGecko": null,
       "ContractAddress": null,
       "CreatedAt": "2026-06-05T19:46:53Z",
-      "Description": "GHO savings product — yield-bearing wrapper, not the stablecoin itself. New sGHO experience live May 2026; legacy savings rebranded StkGHO.",
+      "Description": "GHO savings product \u2014 yield-bearing wrapper, not the stablecoin itself. New sGHO experience live May 2026; legacy savings rebranded StkGHO.",
       "Discord": "https://discord.com/invite/aave",
       "EntitySlug": "aave",
       "GitHub": "https://github.com/aave/aave-protocol",
@@ -5506,7 +5824,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Stablecoin|PROTOCOL#sky": {
@@ -5527,7 +5845,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": null,
-      "ContractAddress": null,
+      "ContractAddress": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
       "CreatedAt": "2026-06-01T17:25:02Z",
       "Description": "Primary Sky dollar (DAI successor). ERC-20 with 1:1 USDC swap and base for sUSDS yield wrapper.",
       "Discord": null,
@@ -5565,7 +5883,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stably": {
@@ -5612,7 +5930,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Stably_Official",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stkgho": {
@@ -5671,7 +5989,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stusds": {
@@ -5718,7 +6036,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susdai": {
@@ -5777,7 +6095,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susde": {
@@ -5819,7 +6137,7 @@
             "label": "Ethena docs",
             "url": "https://docs.ethena.fi"
           },
-          "value": "sUSDe accrues Ethena protocol revenue — perpetual funding/basis on the delta-neutral hedge plus yield on liquid stablecoin reserves."
+          "value": "sUSDe accrues Ethena protocol revenue \u2014 perpetual funding/basis on the delta-neutral hedge plus yield on liquid stablecoin reserves."
         }
       ],
       "PK": "CATEGORY#Stablecoin",
@@ -5836,7 +6154,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susds": {
@@ -5895,7 +6213,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#taud": {
@@ -5942,7 +6260,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#tcad": {
@@ -5989,7 +6307,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#tether": {
@@ -6036,7 +6354,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Tether_to/",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://tether.to/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#tgbp": {
@@ -6083,7 +6401,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#thkd": {
@@ -6130,7 +6448,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#trueusd": {
@@ -6189,7 +6507,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdai": {
@@ -6248,7 +6566,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdc": {
@@ -6296,7 +6614,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/circle",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://www.circle.com/en/usdc"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdpm": {
@@ -6319,7 +6637,7 @@
       "CoinGecko": null,
       "ContractAddress": null,
       "CreatedAt": "2026-06-05T19:46:53Z",
-      "Description": "Synthetic USD stablecoin connecting on-chain liquidity to the Pleasing gold ecosystem. Peg model and custody unverified — confirm from official docs.",
+      "Description": "Synthetic USD stablecoin connecting on-chain liquidity to the Pleasing gold ecosystem. Peg model and custody unverified \u2014 confirm from official docs.",
       "Discord": "https://t.me/pleasing_golden",
       "EntitySlug": "pleasing-market",
       "GitHub": "https://pleasing.gitbook.io/docs",
@@ -6343,7 +6661,7 @@
         "value": null
       },
       "Twitter": "https://x.com/PleasingMarket",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://www.pleasingmarket.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdsc": {
@@ -6390,7 +6708,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Stably_Official",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdt0": {
@@ -6413,7 +6731,7 @@
       "CoinGecko": null,
       "ContractAddress": null,
       "CreatedAt": "2026-06-01T17:25:02Z",
-      "Description": "The unified liquidity protocol bringing Tether’s stablecoin assets to the most popular blockchains.",
+      "Description": "The unified liquidity protocol bringing Tether\u2019s stablecoin assets to the most popular blockchains.",
       "Discord": null,
       "EntitySlug": null,
       "GitHub": null,
@@ -6437,7 +6755,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDT0_to",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://usdt0.to/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdtb": {
@@ -6484,7 +6802,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#veusd": {
@@ -6531,7 +6849,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Stably_Official",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Token|PROTOCOL#aave-gov": {
@@ -6614,7 +6932,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Token|PROTOCOL#ausdc": {
@@ -6657,7 +6975,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Token|PROTOCOL#ausdt": {
@@ -6700,7 +7018,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Token|PROTOCOL#aweth": {
@@ -6743,7 +7061,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Token|PROTOCOL#chip": {
@@ -6766,7 +7084,7 @@
       "CoinGecko": null,
       "ContractAddress": null,
       "CreatedAt": "2026-06-03T14:29:05Z",
-      "Description": "CHIP is the governance token of USD.AI. CHIP holders steer the protocol's DAO — collateral parameters, risk policy, treasury and ecosystem development — executed off-chain by the USD.AI Foundation. It is distributed via the USD.AI ICO (Permian Labs).",
+      "Description": "CHIP is the governance token of USD.AI. CHIP holders steer the protocol's DAO \u2014 collateral parameters, risk policy, treasury and ecosystem development \u2014 executed off-chain by the USD.AI Foundation. It is distributed via the USD.AI ICO (Permian Labs).",
       "Discord": "https://t.me/usdaiofficial",
       "EntitySlug": "usd-ai",
       "GitHub": "https://github.com/metastreet-labs",
@@ -6816,7 +7134,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:58Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Token|PROTOCOL#comp": {
@@ -6860,7 +7178,7 @@
         "value": null
       },
       "Twitter": "https://x.com/compoundfinance",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://compound.finance"
     },
     "CATEGORY#Token|PROTOCOL#ena": {
@@ -6942,7 +7260,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Token|PROTOCOL#fluid": {
@@ -6985,7 +7303,7 @@
         "value": null
       },
       "Twitter": "https://x.com/0xfluid",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://fluid.io"
     },
     "CATEGORY#Token|PROTOCOL#iusde": {
@@ -7039,7 +7357,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Token|PROTOCOL#jlp": {
@@ -7133,7 +7451,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://jup.ag/perps",
       "YieldMechanics": {
         "currentApyPct": 20.0,
@@ -7162,7 +7480,7 @@
       "AuditURL": null,
       "Category": "Token",
       "CoinGecko": "https://www.coingecko.com/en/coins/just",
-      "ContractAddress": null,
+      "ContractAddress": "TCFLL5dx5ZJdKnWuesXxi1VPwjLVmWZZy9",
       "CreatedAt": "2026-06-17T19:33:57Z",
       "Description": "Governance token of JustLend DAO, the largest lending market on Tron (notably for USDT). JST governs parameters across the JUST ecosystem.",
       "Discord": null,
@@ -7182,7 +7500,7 @@
         "value": null
       },
       "Twitter": "https://x.com/DeFi_JUST",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://justlend.org"
     },
     "CATEGORY#Token|PROTOCOL#jup": {
@@ -7255,7 +7573,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Token|PROTOCOL#jupsol": {
@@ -7297,7 +7615,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://jup.ag/stake"
     },
     "CATEGORY#Token|PROTOCOL#kmno": {
@@ -7337,7 +7655,7 @@
         "value": null
       },
       "Twitter": "https://x.com/KaminoFinance",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://kamino.finance"
     },
     "CATEGORY#Token|PROTOCOL#mkr": {
@@ -7379,7 +7697,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Token|PROTOCOL#morpho": {
@@ -7400,8 +7718,19 @@
       "AuditURL": null,
       "Category": "Token",
       "CoinGecko": "https://www.coingecko.com/en/coins/morpho",
-      "ContractAddress": "0x9994e35db50125e0df82e4c2dde62496ce330999",
+      "ContractAddress": "0x58D97B57BB95320F9a05dC918Aef65434969c2B2",
       "CreatedAt": "2026-06-17T19:33:57Z",
+      "Deployments": [
+        {
+          "address": "0xBAa5CC21fd487B8Fcc2F632f3F4E8D37262a0842",
+          "chain": "Base"
+        },
+        {
+          "address": "0x9994E35Db50125E0DF82e4c2dde62496CE330999",
+          "chain": "Ethereum",
+          "label": "legacy"
+        }
+      ],
       "Description": "Governance token of the Morpho protocol. MORPHO holders govern the Morpho Blue lending primitive, market creation, and the MetaMorpho vault framework.",
       "Discord": null,
       "EntitySlug": "morpho",
@@ -7420,7 +7749,7 @@
         "value": null
       },
       "Twitter": "https://x.com/MorphoLabs",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://morpho.org"
     },
     "CATEGORY#Token|PROTOCOL#ondo-gov": {
@@ -7474,7 +7803,7 @@
         "maxSupply": 10000000000,
         "notes": [
           "10B ONDO max supply.",
-          "Governance only — not a yield-bearing asset."
+          "Governance only \u2014 not a yield-bearing asset."
         ]
       },
       "TotalSupply": {
@@ -7483,7 +7812,7 @@
         "value": null
       },
       "Twitter": "https://x.com/OndoFinance",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#Token|PROTOCOL#schip": {
@@ -7506,7 +7835,7 @@
       "CoinGecko": null,
       "ContractAddress": null,
       "CreatedAt": "2026-06-08T16:54:44Z",
-      "Description": "Staked CHIP: USD.AI's decentralized insurance module. Earns rewards but serves as first-loss capital — slashed first if a GPU compute borrower defaults, shielding sUSDai depositors from hardware-loan losses.",
+      "Description": "Staked CHIP: USD.AI's decentralized insurance module. Earns rewards but serves as first-loss capital \u2014 slashed first if a GPU compute borrower defaults, shielding sUSDai depositors from hardware-loan losses.",
       "Discord": "https://t.me/usdaiofficial",
       "EntitySlug": "usd-ai",
       "GitHub": "https://github.com/metastreet-labs",
@@ -7537,7 +7866,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://usd.ai",
       "YieldMechanics": {
         "currentApyPct": 10.0,
@@ -7601,7 +7930,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Token|PROTOCOL#sky-gov": {
@@ -7622,7 +7951,7 @@
       "AuditURL": null,
       "Category": "Token",
       "CoinGecko": "https://www.coingecko.com/en/coins/sky",
-      "ContractAddress": null,
+      "ContractAddress": "0x56072C95FAA701256059aa122697B133aDEd9279",
       "CreatedAt": "2026-06-05T19:28:30Z",
       "Description": "Sky governance token (MKR successor). Stake to earn rewards or borrow USDS. Supply ~23.46B after the Sep 2024 migration.",
       "Discord": null,
@@ -7664,7 +7993,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Token|PROTOCOL#spk": {
@@ -7684,7 +8013,7 @@
       "AuditURL": null,
       "Category": "Token",
       "CoinGecko": "https://www.coingecko.com/en/coins/spark",
-      "ContractAddress": null,
+      "ContractAddress": "0xc20059e0317DE91738d13af027DfC4a50781b066",
       "CreatedAt": "2026-06-17T19:33:57Z",
       "Description": "Governance token of Spark, the Sky/Maker-aligned stablecoin lending stack (SparkLend + Spark Savings). Governs risk parameters and USDS/DAI liquidity.",
       "Discord": null,
@@ -7704,7 +8033,7 @@
         "value": null
       },
       "Twitter": "https://x.com/sparkdotfi",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://spark.fi"
     },
     "CATEGORY#Token|PROTOCOL#stkaave": {
@@ -7758,7 +8087,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
       "YieldMechanics": {
         "currentApyPct": 5.0,
@@ -7790,7 +8119,7 @@
       "CoinGecko": null,
       "ContractAddress": null,
       "CreatedAt": "2026-06-08T15:53:21Z",
-      "Description": "Staked Aave Balancer Pool Token (80 AAVE / 20 wstETH). A legacy Safety Module backstop that provides a secondary security layer — slashed first to cover shortfalls — while earning Balancer swap fees plus AAVE incentives. Superseded by Umbrella; positions remain on-chain on Ethereum.",
+      "Description": "Staked Aave Balancer Pool Token (80 AAVE / 20 wstETH). A legacy Safety Module backstop that provides a secondary security layer \u2014 slashed first to cover shortfalls \u2014 while earning Balancer swap fees plus AAVE incentives. Superseded by Umbrella; positions remain on-chain on Ethereum.",
       "Discord": "https://discord.com/invite/aave",
       "EntitySlug": "aave",
       "GitHub": "https://github.com/aave/aave-protocol",
@@ -7821,7 +8150,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
       "YieldMechanics": {
         "currentApyPct": 5.0,
@@ -7832,6 +8161,46 @@
         "payoutAsset": "Balancer fees + AAVE incentives; slashed first on shortfall (legacy Safety Module)",
         "yieldSource": "Balancer 80/20 AAVE-wstETH pool swap fees plus AAVE incentives (legacy)"
       }
+    },
+    "CATEGORY#Token|PROTOCOL#stsyrup": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "Yield-generating Token"
+      },
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": null,
+      "ContractAddress": "0xc7E8b36E0766D9B04c93De68A9D47dD11f260B45",
+      "CreatedAt": "2026-06-18T12:41:59Z",
+      "Description": "Staked SYRUP receipt token. SYRUP holders stake into stSYRUP to participate in Maple governance and fee sharing.",
+      "Discord": null,
+      "EntitySlug": "maple",
+      "GitHub": "https://github.com/maple-labs",
+      "Name": "stSYRUP",
+      "PK": "CATEGORY#Token",
+      "SK": "PROTOCOL#stsyrup",
+      "Slug": "stsyrup",
+      "Status": "APPROVED",
+      "SubCategory": "Yield-generating Token",
+      "Symbol": "stSYRUP",
+      "TokenType": "Yield",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/maplefinance",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
+      "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#syrup": {
       "ArbitrumPortalMetadata": {
@@ -7853,8 +8222,15 @@
       "AuditURL": null,
       "Category": "Token",
       "CoinGecko": "https://www.coingecko.com/en/coins/syrup",
-      "ContractAddress": "0x643c4e15d7d62ad0abec4a9bd4b001aa3ef52d66",
+      "ContractAddress": "0x643C4E15d7d62Ad0aBeC4a9BD4b001aA3Ef52d66",
       "CreatedAt": "2026-06-17T19:33:57Z",
+      "Deployments": [
+        {
+          "address": "0x688AEe022AA544f150678B8E5720b6b96a9E9a2F",
+          "chain": "Base",
+          "label": "OFT"
+        }
+      ],
       "Description": "Governance and staking token of Maple Finance (SYRUP, migrated from MPL). Maple runs onchain institutional / private-credit lending pools.",
       "Discord": null,
       "EntitySlug": "maple",
@@ -7873,7 +8249,127 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
+      "Website": "https://maple.finance"
+    },
+    "CATEGORY#Token|PROTOCOL#syrup-oft": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Base"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "Governance Token"
+      },
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/syrup",
+      "ContractAddress": "0x688AEe022AA544f150678B8E5720b6b96a9E9a2F",
+      "CreatedAt": "2026-06-18T12:41:59Z",
+      "Description": "OFT (Omnichain Fungible Token) deployment of SYRUP on Base, bridged from the canonical Ethereum SYRUP token via LayerZero.",
+      "Discord": null,
+      "EntitySlug": "maple",
+      "GitHub": "https://github.com/maple-labs",
+      "Name": "SYRUP (OFT)",
+      "PK": "CATEGORY#Token",
+      "SK": "PROTOCOL#syrup-oft",
+      "Slug": "syrup-oft",
+      "Status": "APPROVED",
+      "SubCategory": "Governance Token",
+      "Symbol": "SYRUP",
+      "TokenType": "Governance",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/maplefinance",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
+      "Website": "https://maple.finance"
+    },
+    "CATEGORY#Token|PROTOCOL#syrup-usdc-pool": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "Yield-generating Token"
+      },
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": null,
+      "ContractAddress": "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b",
+      "CreatedAt": "2026-06-18T12:41:59Z",
+      "Description": "Maple syrupUSDC institutional lending pool \u2014 permissionless USDC lending pool token on Ethereum.",
+      "Discord": null,
+      "EntitySlug": "maple",
+      "GitHub": "https://github.com/maple-labs",
+      "Name": "syrupUSDC pool",
+      "PK": "CATEGORY#Token",
+      "SK": "PROTOCOL#syrup-usdc-pool",
+      "Slug": "syrup-usdc-pool",
+      "Status": "APPROVED",
+      "SubCategory": "Yield-generating Token",
+      "Symbol": "syrupUSDC",
+      "TokenType": "Yield",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/maplefinance",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
+      "Website": "https://maple.finance"
+    },
+    "CATEGORY#Token|PROTOCOL#syrup-usdt-pool": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "Yield-generating Token"
+      },
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": null,
+      "ContractAddress": "0x356B8d89c1e1239Cbbb9dE4815c39A1474d5BA7D",
+      "CreatedAt": "2026-06-18T12:41:59Z",
+      "Description": "Maple syrupUSDT institutional lending pool \u2014 permissionless USDT lending pool token on Ethereum.",
+      "Discord": null,
+      "EntitySlug": "maple",
+      "GitHub": "https://github.com/maple-labs",
+      "Name": "syrupUSDT pool",
+      "PK": "CATEGORY#Token",
+      "SK": "PROTOCOL#syrup-usdt-pool",
+      "Slug": "syrup-usdt-pool",
+      "Status": "APPROVED",
+      "SubCategory": "Yield-generating Token",
+      "Symbol": "syrupUSDT",
+      "TokenType": "Yield",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/maplefinance",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#true": {
@@ -7913,7 +8409,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://monerium.com"
     },
     "CATEGORY#Token|PROTOCOL#usdy": {
@@ -7939,7 +8435,7 @@
       "CoinGecko": "https://www.coingecko.com/en/coins/ondo-us-dollar-yield",
       "ContractAddress": "0x35e050d3c0ec2d29d269a8ecea763a183bdf9a9d",
       "CreatedAt": "2026-06-05T19:46:53Z",
-      "Description": "Yield-bearing bearer note secured by short-term Treasuries and bank deposits. NOT a stablecoin — value accrues via NAV/yield. Reg S (non-US persons); 24/7 mint/redeem for eligible users.",
+      "Description": "Yield-bearing bearer note secured by short-term Treasuries and bank deposits. NOT a stablecoin \u2014 value accrues via NAV/yield. Reg S (non-US persons); 24/7 mint/redeem for eligible users.",
       "Discord": null,
       "EntitySlug": "ondo-finance",
       "GitHub": "https://github.com/ondo-finance",
@@ -7970,7 +8466,7 @@
         "value": null
       },
       "Twitter": "https://x.com/OndoFinance",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://ondo.finance/usdy",
       "YieldMechanics": {
         "currentApyPct": 5.0,
@@ -8003,7 +8499,7 @@
       "AuditURL": null,
       "Category": "Token",
       "CoinGecko": "https://www.coingecko.com/en/coins/venus",
-      "ContractAddress": null,
+      "ContractAddress": "0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63",
       "CreatedAt": "2026-06-17T19:33:57Z",
       "Description": "Governance token of Venus Protocol, the leading money market on BNB Chain. XVS governs markets, risk parameters, and the VAI stablecoin module.",
       "Discord": null,
@@ -8023,7 +8519,7 @@
         "value": null
       },
       "Twitter": "https://x.com/VenusProtocol",
-      "UpdatedAt": "2026-06-17T19:33:57Z",
+      "UpdatedAt": "2026-06-18T12:41:59Z",
       "Website": "https://venus.io"
     }
   }

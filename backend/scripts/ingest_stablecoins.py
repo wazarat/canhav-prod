@@ -83,6 +83,7 @@ ENTITY_PARENT_PATCHES: Dict[str, Dict[str, str]] = {
             "Primary Sky dollar (DAI successor). ERC-20 with 1:1 USDC swap and base "
             "for sUSDS yield wrapper."
         ),
+        "contractAddress": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
     },
     "monerium": {
         "name": "EURe",
@@ -507,6 +508,9 @@ def entity_coin_item(
     item["CoinGecko"] = spec.get("coingecko")
     item["ContractAddress"] = spec.get("contractAddress")
     item["EntitySlug"] = entity_slug
+    deployments = spec.get("deployments")
+    if deployments:
+        item["Deployments"] = deployments
     if website:
         item["Website"] = website
     if twitter:

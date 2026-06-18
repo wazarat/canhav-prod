@@ -68,6 +68,7 @@ NETWORK_SECTORS = (
 )
 
 # Lending sub-sectors (PDF "Further sub categories within lending").
+# Also used as lending tags — networks may carry multiple tags from this set.
 LENDING_SUBSECTORS = (
     "Money Markets",
     "Isolated / Curated Lending",
@@ -75,6 +76,7 @@ LENDING_SUBSECTORS = (
     "Liquidity Hybrid",
     "Institutional / Private Credit",
 )
+LENDING_TAGS = LENDING_SUBSECTORS
 
 # Derived RWA asset classes (the CSV labels everything "Real World Assets
 # (RWAs)"; the finer classification is assigned during ingestion).

@@ -635,6 +635,12 @@ export async function GET(req: Request): Promise<NextResponse> {
           ? { revenue30dUsd: sourced(feesRev.revenue30dUsd) }
           : {}),
         ...(feesRev?.fees30dUsd != null ? { fees30dUsd: sourced(feesRev.fees30dUsd) } : {}),
+        ...(feesRev?.revenue30dUsd != null
+          ? { revenueAnnualizedUsd: sourced(feesRev.revenue30dUsd * 12) }
+          : {}),
+        ...(feesRev?.fees30dUsd != null
+          ? { feesAnnualizedUsd: sourced(feesRev.fees30dUsd * 12) }
+          : {}),
       };
 
       if (Object.keys(live).length > 0) {

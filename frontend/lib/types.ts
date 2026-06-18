@@ -182,6 +182,13 @@ export interface ArbitrumPortalMetadata {
   foundedDate: string | null;
 }
 
+/** Per-chain token deployment (same symbol, different address). */
+export interface TokenDeployment {
+  chain: string;
+  address: string;
+  label?: string;
+}
+
 export interface StablecoinProfile {
   category: "Stablecoin";
   slug: string;
@@ -204,6 +211,8 @@ export interface StablecoinProfile {
   auditUrl: string | null;
   /** Resolved Arbitrum token contract address (CoinGecko, Step 4 B2). */
   contractAddress?: string | null;
+  /** Additional chain deployments when the stablecoin exists on multiple networks. */
+  deployments?: TokenDeployment[];
   /** Slug of the parent umbrella Entity (e.g. "usd-ai"), if grouped. */
   entitySlug?: string | null;
   totalSupply: TotalSupply;
@@ -720,6 +729,8 @@ export interface TokenProfile {
   coingecko: string | null;
   auditUrl: string | null;
   contractAddress?: string | null;
+  /** Additional chain deployments when the token exists on multiple networks. */
+  deployments?: TokenDeployment[];
   /** Slug of the parent umbrella Entity (e.g. "usd-ai"). */
   entitySlug?: string | null;
   totalSupply: TotalSupply;
@@ -887,15 +898,19 @@ export type NetworkSector =
   | "RWA";
 
 /**
- * Lending sub-sectors (PDF §"Further sub categories within lending"). The leaf
- * of the taxonomy for `sector === "Lending"` networks.
+ * Lending tags (formerly single subSector). Networks may carry multiple tags
+ * from this vocabulary — e.g. a Solana protocol can be both non-EVM and
+ * Isolated / Curated Lending.
  */
-export type LendingSubSector =
+export type LendingTag =
   | "Money Markets"
   | "Isolated / Curated Lending"
   | "Stablecoin-Native Credit Stack"
   | "Liquidity Hybrid"
   | "Institutional / Private Credit";
+
+/** @deprecated Use LendingTag — kept as alias for backward compatibility. */
+export type LendingSubSector = LendingTag;
 
 /**
  * A ranked competitor of a network, ordered top→bottom by relevance. Used to
@@ -924,6 +939,96 @@ export interface ChainDeployment {
   notes?: string;
 }
 
+/** 30-day liquidation activity (curated or live when available). */
+export interface Liquidations30d {
+  volumeUsd?: number | null;
+  count?: number | null;
+  notes?: string | null;
+}
+
+/** Structured governance activity (curated). */
+export interface GovernanceActivityDetail {
+  proposals?: number | null;
+  voterTurnoutPct?: number | null;
+  treasuryUsd?: number | null;
+  notes?: string | null;
+}
+
+/** Top curator / pool delegate row for tag-specific panels. */
+export interface CuratorAumRow {
+  name: string;
+  aumUsd?: number | null;
+  feeTakeRatePct?: number | null;
+}
+
+/** Isolated / Curated Lending tag metrics (Morpho, Kamino). */
+export interface IsolatedCuratedLendingMetrics {
+  isolatedMarketCount?: number | null;
+  vaultCount?: number | null;
+  curatorCount?: number | null;
+  topCurators?: CuratorAumRow[];
+  lltvDistribution?: string | null;
+  vaultTvlSharePct?: number | null;
+  curatorFeeTakeRatePct?: number | null;
+  notes?: string | null;
+}
+
+/** Stablecoin-Native Credit Stack tag metrics (Spark). */
+export interface StablecoinNativeMetrics {
+  usdsMintedUsd?: number | null;
+  daiRoutedUsd?: number | null;
+  ssrPct?: number | null;
+  ssrBalanceUsd?: number | null;
+  sllVenues?: string[];
+  ssrLinkedTvlUsd?: number | null;
+  notes?: string | null;
+}
+
+/** Liquidity Hybrid tag metrics (Fluid). */
+export interface LiquidityHybridMetrics {
+  capitalEfficiencyMultiplier?: number | null;
+  smartCollateralTvlUsd?: number | null;
+  smartDebtTvlUsd?: number | null;
+  dexVolumeTiedUsd?: number | null;
+  sharedLiquidityUtilizationPct?: number | null;
+  notes?: string | null;
+}
+
+/** Institutional / Private Credit tag metrics (Maple). */
+export interface InstitutionalCreditMetrics {
+  activeBorrowerCount?: number | null;
+  defaultRateLifetimePct?: number | null;
+  defaultRate12mPct?: number | null;
+  weightedAvgMaturityDays?: number | null;
+  kycPoolTvlUsd?: number | null;
+  permissionlessPoolTvlUsd?: number | null;
+  overCollateralizedPct?: number | null;
+  underCollateralizedPct?: number | null;
+  poolDelegates?: CuratorAumRow[];
+  cumulativeOriginationsUsd?: number | null;
+  syrupUsdcPoolUsd?: number | null;
+  syrupUsdtPoolUsd?: number | null;
+  stSyrupStakedSupply?: number | null;
+  notes?: string | null;
+}
+
+/** Money Markets tag metrics (Aave, Compound, Venus, JustLend). */
+export interface MoneyMarketsMetrics {
+  emissionsPerAsset?: string | null;
+  reserveFactorSummary?: string | null;
+  eModeUsage?: string | null;
+  notes?: string | null;
+}
+
+/** Tag-specific metric blocks keyed by lending tag vocabulary. */
+export interface LendingTagMetrics {
+  isolatedCurated?: IsolatedCuratedLendingMetrics | null;
+  stablecoinNative?: StablecoinNativeMetrics | null;
+  liquidityHybrid?: LiquidityHybridMetrics | null;
+  institutionalCredit?: InstitutionalCreditMetrics | null;
+  moneyMarkets?: MoneyMarketsMetrics | null;
+}
+
 /**
  * Lending-specific metrics block (PDF §"metrics we should be including"). Live
  * fields are filled by the DeFiLlama cron pass (`Sourced<>`); curated fields
@@ -948,24 +1053,36 @@ export interface LendingMetrics {
   revenue30dUsd?: Sourced<number | null>;
   /** Fees generated (30d, USD). */
   fees30dUsd?: Sourced<number | null>;
-  /** Active users / wallets. */
+  /** Protocol revenue (annualized, USD) — curated or derived from 30d. */
+  revenueAnnualizedUsd?: Sourced<number | null>;
+  /** Fees generated (annualized, USD) — curated or derived from 30d. */
+  feesAnnualizedUsd?: Sourced<number | null>;
+  /** Active users / wallets (30d). */
   activeUsers?: Sourced<number | null>;
+  /** Unique borrowers (30d). */
+  uniqueBorrowers30d?: Sourced<number | null>;
   /** Collateral assets supported (curated). */
   collateralAssets?: string[];
   /** Loan assets supported (curated). */
   loanAssets?: string[];
   /** Notable stablecoin exposure (e.g. USDC, USDT, DAI, USDS). */
   stablecoinExposure?: string[];
+  /** Stablecoin share of TVL (%). */
+  stablecoinExposurePct?: number | null;
   /** Oracle dependencies (e.g. Chainlink, RedStone, Pyth, internal). */
   oracles?: string[];
   /** Risk parameters summary (LTV, liq. threshold/penalty, caps) — curated. */
   riskParameters?: string | null;
   /** Liquidations signal / recent activity (curated). */
   liquidations?: string | null;
+  /** 30-day liquidation volume and count. */
+  liquidations30d?: Liquidations30d | null;
   /** Bad debt — one of the most important lending-risk metrics (curated). */
   badDebt?: string | null;
-  /** Governance activity (parameter changes, new markets) — curated. */
+  /** Governance activity summary (curated text). */
   governanceActivity?: string | null;
+  /** Structured governance metrics (proposals, turnout, treasury). */
+  governanceDetail?: GovernanceActivityDetail | null;
   /** Audit / exploit history (curated). */
   auditHistory?: string | null;
   /** Chain / ecosystem deployment. */
@@ -1002,12 +1119,16 @@ export interface NetworkProfile {
   subCategory?: NetworkSubCategory | null;
   /** Functional sector (e.g. "Lending"); null for the legacy umbrella networks. */
   sector?: NetworkSector | null;
-  /** Sector-specific leaf (e.g. a `LendingSubSector` when sector === "Lending"). */
+  /** Sector-specific leaf (e.g. a `LendingTag` when sector === "Lending"). */
   subSector?: string | null;
+  /** Lending tags — multi-tag taxonomy; supersedes single subSector when present. */
+  tags?: LendingTag[];
   /** Ranked competitors (top→bottom) — surfaced for `sector === "Lending"`. */
   competitors?: Competitor[];
   /** Lending-specific metrics block (live + curated) — `sector === "Lending"`. */
   lending?: LendingMetrics | null;
+  /** Tag-specific curated metric blocks (Isolated/Curated, Spark SSR, etc.). */
+  lendingTagMetrics?: LendingTagMetrics | null;
   memberCoins: MemberCoinRef[];
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Protocol fees/revenue when this entity maps to a Llama protocol (DeFi Llama). */

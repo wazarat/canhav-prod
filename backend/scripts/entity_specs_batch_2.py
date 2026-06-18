@@ -837,6 +837,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         "sub_category": "Protocol",
         "sector": "Lending",
         "sub_sector": "Money Markets",
+        "tags": ["Money Markets"],
         "competitors": [
             {
                 "name": "Morpho",
@@ -954,6 +955,26 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                     "Mainly EVM/multi-chain; has also explored Aptos/Move deployments — check the "
                     "specific market."
                 ),
+            },
+            "stablecoinExposurePct": 70,
+            "liquidations30d": {
+                "volumeUsd": None,
+                "count": None,
+                "notes": "On-chain keeper liquidations when health factor drops below 1.",
+            },
+            "governanceDetail": {
+                "proposals": None,
+                "voterTurnoutPct": None,
+                "treasuryUsd": None,
+                "notes": "Active Aave DAO — risk updates, listings, Aavenomics buybacks, Aave V4.",
+            },
+        },
+        "lending_tag_metrics": {
+            "moneyMarkets": {
+                "emissionsPerAsset": "AAVE/stkAAVE incentives vary by market; stablecoin markets receive significant emissions.",
+                "reserveFactorSummary": "Reserve factors 10–30% per asset; isolation mode and e-mode tiers available.",
+                "eModeUsage": "e-Mode enabled for correlated assets (stablecoins, ETH LSTs) across major chains.",
+                "notes": "Broadest multi-chain money market by TVL and asset coverage.",
             },
         },
         "member_coins": [

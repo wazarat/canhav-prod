@@ -28,7 +28,7 @@ export function NetworkTableWithFilter({
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<MemberCoinCategory | "all">("all");
   const [sector, setSector] = useState<string | "all">("all");
-  const [subSector, setSubSector] = useState<string | "all">("all");
+  const [tagFilter, setTagFilter] = useState<string | "all">("all");
 
   // Sectors present in the data (e.g. "Lending"), for the taxonomy filter row.
   const sectors = useMemo(() => {
@@ -37,15 +37,20 @@ export function NetworkTableWithFilter({
     return [...set].sort();
   }, [profiles]);
 
-  // Sub-sectors available for the selected sector (e.g. lending sub-sectors).
-  const subSectors = useMemo(() => {
+  // Lending tags available for the selected sector.
+  const lendingTags = useMemo(() => {
     if (sector === "all") return [];
     const set = new Set<string>();
     for (const p of profiles) {
-      if (p.sector === sector && p.subSector) set.add(p.subSector);
+      if (p.sector !== sector) continue;
+      for (const t of p.tags ?? (p.subSector ? [p.subSector] : [])) set.add(t);
     }
     return [...set].sort();
   }, [profiles, sector]);
+
+  function profileTags(p: NetworkProfile): string[] {
+    return p.tags ?? (p.subSector ? [p.subSector] : []);
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -62,10 +67,10 @@ export function NetworkTableWithFilter({
       const matchesCategory =
         category === "all" || p.memberCoins.some((c) => c.category === category);
       const matchesSector = sector === "all" || p.sector === sector;
-      const matchesSubSector = subSector === "all" || p.subSector === subSector;
-      return matchesQuery && matchesCategory && matchesSector && matchesSubSector;
+      const matchesTag = tagFilter === "all" || profileTags(p).includes(tagFilter);
+      return matchesQuery && matchesCategory && matchesSector && matchesTag;
     });
-  }, [profiles, query, category, sector, subSector]);
+  }, [profiles, query, category, sector, tagFilter]);
 
   return (
     <div className="space-y-4">
@@ -109,7 +114,7 @@ export function NetworkTableWithFilter({
               type="button"
               onClick={() => {
                 setSector("all");
-                setSubSector("all");
+                setTagFilter("all");
               }}
               className={cn(
                 "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
@@ -126,7 +131,7 @@ export function NetworkTableWithFilter({
                 type="button"
                 onClick={() => {
                   setSector(s);
-                  setSubSector("all");
+                  setTagFilter("all");
                 }}
                 className={cn(
                   "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
@@ -140,31 +145,31 @@ export function NetworkTableWithFilter({
             ))}
           </div>
 
-          {subSectors.length > 0 && (
+          {lendingTags.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 pl-1">
               <span className="text-xs font-medium uppercase tracking-wide text-ink-500">
-                Type
+                Tag
               </span>
               <button
                 type="button"
-                onClick={() => setSubSector("all")}
+                onClick={() => setTagFilter("all")}
                 className={cn(
                   "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                  subSector === "all"
+                  tagFilter === "all"
                     ? "border-signal-400/50 bg-signal-400/10 text-signal-400"
                     : "border-ink-700/60 bg-ink-900/40 text-ink-300 hover:border-ink-600 hover:text-ink-100",
                 )}
               >
                 All
               </button>
-              {subSectors.map((s) => (
+              {lendingTags.map((s) => (
                 <button
                   key={s}
                   type="button"
-                  onClick={() => setSubSector(s)}
+                  onClick={() => setTagFilter(s)}
                   className={cn(
                     "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                    subSector === s
+                    tagFilter === s
                       ? "border-signal-400/50 bg-signal-400/10 text-signal-400"
                       : "border-ink-700/60 bg-ink-900/40 text-ink-300 hover:border-ink-600 hover:text-ink-100",
                   )}

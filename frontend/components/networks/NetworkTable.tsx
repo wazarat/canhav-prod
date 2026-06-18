@@ -56,7 +56,11 @@ export function NetworkTable({ profiles, showStatus = false, emptyHint }: Networ
                 {p.sector && (
                   <div className="mt-1.5 flex flex-wrap items-center gap-1">
                     <Badge tone="electric">{p.sector}</Badge>
-                    {p.subSector && <Badge tone="neutral">{p.subSector}</Badge>}
+                    {(p.tags ?? (p.subSector ? [p.subSector] : [])).map((tag) => (
+                      <Badge key={tag} tone="neutral">
+                        {tag}
+                      </Badge>
+                    ))}
                   </div>
                 )}
                 <p className="mt-1 text-xs text-ink-400">

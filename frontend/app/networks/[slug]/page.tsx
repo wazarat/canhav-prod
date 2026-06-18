@@ -7,6 +7,7 @@ import {
   CompetitorsSection,
   InvestmentRoundsSection,
   LendingMetricsSection,
+  LendingTagMetricsSection,
   OrgStructureSection,
   PartnershipsSection,
   RisksSection,
@@ -194,7 +195,11 @@ export default async function NetworkProfilePage({ params }: PageProps) {
           <>
             <Badge tone="neon">Network</Badge>
             {profile.sector && <Badge tone="electric">{profile.sector}</Badge>}
-            {profile.subSector && <Badge tone="signal">{profile.subSector}</Badge>}
+            {(profile.tags ?? (profile.subSector ? [profile.subSector] : [])).map((tag) => (
+              <Badge key={tag} tone="signal">
+                {tag}
+              </Badge>
+            ))}
             <Badge tone="neutral">{profile.memberCoins.length} coins</Badge>
             <SecurityBadge
               info={deriveSecurityStatus({
@@ -277,6 +282,7 @@ export default async function NetworkProfilePage({ params }: PageProps) {
 
           <div className="space-y-8">
             <LendingMetricsSection lending={profile.lending} />
+            <LendingTagMetricsSection tags={profile.tags} metrics={profile.lendingTagMetrics} />
             <CompetitorsSection
               competitors={profile.competitors}
               networkName={profile.name}

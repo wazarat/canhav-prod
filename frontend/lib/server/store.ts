@@ -106,6 +106,7 @@ function common(item: Record<string, any>) {
     coingecko: item.CoinGecko ?? null,
     auditUrl: item.AuditURL ?? null,
     contractAddress: item.ContractAddress ?? null,
+    deployments: item.Deployments ?? undefined,
     entitySlug: item.EntitySlug ?? null,
     // Fine-grained classification + provenance (additive; absent on old records).
     assetSubtype: item.AssetSubtype ?? null,
@@ -229,8 +230,10 @@ export async function readLiveStore(): Promise<LiveStore> {
         subCategory: item.SubCategory ?? null,
         sector: item.Sector ?? null,
         subSector: item.SubSector ?? null,
+        tags: item.Tags ?? (item.SubSector ? [item.SubSector] : []),
         competitors: item.Competitors ?? [],
         lending: item.Lending ?? null,
+        lendingTagMetrics: item.LendingTagMetrics ?? null,
         currentScale: {
           tvlUsd: null,
           users: null,

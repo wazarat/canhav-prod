@@ -139,7 +139,7 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         ),
         "entitySlug": SKY_PARENT_SLUG,
         "coingecko": "https://www.coingecko.com/en/coins/sky",
-        "contractAddress": None,
+        "contractAddress": "0x56072C95FAA701256059aa122697B133aDEd9279",
         "csvParentSlug": SKY_PARENT_SLUG,
         "chains": None,
         "website": None,
@@ -434,7 +434,18 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         ),
         "entitySlug": "morpho",
         "coingecko": "https://www.coingecko.com/en/coins/morpho",
-        "contractAddress": "0x9994e35db50125e0df82e4c2dde62496ce330999",
+        "contractAddress": "0x58D97B57BB95320F9a05dC918Aef65434969c2B2",
+        "deployments": [
+            {
+                "chain": "Base",
+                "address": "0xBAa5CC21fd487B8Fcc2F632f3F4E8D37262a0842",
+            },
+            {
+                "chain": "Ethereum",
+                "address": "0x9994E35Db50125E0DF82e4c2dde62496CE330999",
+                "label": "legacy",
+            },
+        ],
         "csvParentSlug": None,
         "chains": ["Ethereum", "Base"],
         "website": "https://morpho.org",
@@ -453,7 +464,7 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         ),
         "entitySlug": "spark",
         "coingecko": "https://www.coingecko.com/en/coins/spark",
-        "contractAddress": None,
+        "contractAddress": "0xc20059e0317DE91738d13af027DfC4a50781b066",
         "csvParentSlug": None,
         "chains": ["Ethereum"],
         "website": "https://spark.fi",
@@ -510,7 +521,7 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         ),
         "entitySlug": "venus",
         "coingecko": "https://www.coingecko.com/en/coins/venus",
-        "contractAddress": None,
+        "contractAddress": "0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63",
         "csvParentSlug": None,
         "chains": ["BNB Chain", "Ethereum", "Arbitrum One", "Optimism", "zkSync"],
         "website": "https://venus.io",
@@ -529,7 +540,7 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         ),
         "entitySlug": "justlend",
         "coingecko": "https://www.coingecko.com/en/coins/just",
-        "contractAddress": None,
+        "contractAddress": "TCFLL5dx5ZJdKnWuesXxi1VPwjLVmWZZy9",
         "csvParentSlug": None,
         "chains": ["Tron"],
         "website": "https://justlend.org",
@@ -567,9 +578,92 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         ),
         "entitySlug": "maple",
         "coingecko": "https://www.coingecko.com/en/coins/syrup",
-        "contractAddress": "0x643c4e15d7d62ad0abec4a9bd4b001aa3ef52d66",
+        "contractAddress": "0x643C4E15d7d62Ad0aBeC4a9BD4b001aA3Ef52d66",
+        "deployments": [
+            {
+                "chain": "Base",
+                "address": "0x688AEe022AA544f150678B8E5720b6b96a9E9a2F",
+                "label": "OFT",
+            },
+        ],
         "csvParentSlug": None,
         "chains": ["Ethereum", "Solana", "Base", "Arbitrum One"],
+        "website": "https://maple.finance",
+        "twitter": "https://x.com/maplefinance",
+        "discord": None,
+        "github": "https://github.com/maple-labs",
+    },
+    "syrup-oft": {
+        "name": "SYRUP (OFT)",
+        "symbol": "SYRUP",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "OFT (Omnichain Fungible Token) deployment of SYRUP on Base, bridged from "
+            "the canonical Ethereum SYRUP token via LayerZero."
+        ),
+        "entitySlug": "maple",
+        "coingecko": "https://www.coingecko.com/en/coins/syrup",
+        "contractAddress": "0x688AEe022AA544f150678B8E5720b6b96a9E9a2F",
+        "csvParentSlug": None,
+        "chains": ["Base"],
+        "website": "https://maple.finance",
+        "twitter": "https://x.com/maplefinance",
+        "discord": None,
+        "github": "https://github.com/maple-labs",
+    },
+    "stsyrup": {
+        "name": "stSYRUP",
+        "symbol": "stSYRUP",
+        "tokenType": "Yield",
+        "subCategory": "Yield-generating Token",
+        "description": (
+            "Staked SYRUP receipt token. SYRUP holders stake into stSYRUP to participate "
+            "in Maple governance and fee sharing."
+        ),
+        "entitySlug": "maple",
+        "coingecko": None,
+        "contractAddress": "0xc7E8b36E0766D9B04c93De68A9D47dD11f260B45",
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
+        "website": "https://maple.finance",
+        "twitter": "https://x.com/maplefinance",
+        "discord": None,
+        "github": "https://github.com/maple-labs",
+    },
+    "syrup-usdc-pool": {
+        "name": "syrupUSDC pool",
+        "symbol": "syrupUSDC",
+        "tokenType": "Yield",
+        "subCategory": "Yield-generating Token",
+        "description": (
+            "Maple syrupUSDC institutional lending pool — permissionless USDC lending "
+            "pool token on Ethereum."
+        ),
+        "entitySlug": "maple",
+        "coingecko": None,
+        "contractAddress": "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b",
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
+        "website": "https://maple.finance",
+        "twitter": "https://x.com/maplefinance",
+        "discord": None,
+        "github": "https://github.com/maple-labs",
+    },
+    "syrup-usdt-pool": {
+        "name": "syrupUSDT pool",
+        "symbol": "syrupUSDT",
+        "tokenType": "Yield",
+        "subCategory": "Yield-generating Token",
+        "description": (
+            "Maple syrupUSDT institutional lending pool — permissionless USDT lending "
+            "pool token on Ethereum."
+        ),
+        "entitySlug": "maple",
+        "coingecko": None,
+        "contractAddress": "0x356B8d89c1e1239Cbbb9dE4815c39A1474d5BA7D",
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
         "website": "https://maple.finance",
         "twitter": "https://x.com/maplefinance",
         "discord": None,
@@ -931,6 +1025,9 @@ def token_item(slug: str, parent_row: Optional[Dict[str, str]], created_at: str)
         value = spec.get(spec_key)
         if value is not None:
             item[store_key] = value
+    deployments = spec.get("deployments")
+    if deployments:
+        item["Deployments"] = deployments
     return item
 
 

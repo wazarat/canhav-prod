@@ -66,6 +66,8 @@ def _net(
     lending: Dict[str, Any],
     member_coins: List[Dict[str, Any]],
     chains: List[str],
+    tags: Optional[List[str]] = None,
+    lending_tag_metrics: Optional[Dict[str, Any]] = None,
     official_docs: Optional[str] = None,
     website: Optional[str] = None,
     twitter: Optional[str] = None,
@@ -77,6 +79,7 @@ def _net(
 ) -> Dict[str, Any]:
     """Build a lending-network spec, filling the editorial defaults that
     `build_entity_item` expects so each entry stays focused on real content."""
+    tag_list = tags if tags is not None else [sub_sector]
     return {
         "name": name,
         "symbol": symbol,
@@ -102,9 +105,11 @@ def _net(
         # Taxonomy hierarchy.
         "sub_category": "Protocol",
         "sector": "Lending",
-        "sub_sector": sub_sector,
+        "sub_sector": tag_list[0],
+        "tags": tag_list,
         "competitors": competitors,
         "lending": lending,
+        "lending_tag_metrics": lending_tag_metrics or {},
         "member_coins": member_coins,
         "portal_defaults": _portal_defaults(chains),
     }
@@ -182,6 +187,34 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "evmCompatible": "yes",
                 "notes": "EVM-optimized smart contracts (docs.morpho.org).",
             },
+            "stablecoinExposurePct": 68,
+            "liquidations30d": {
+                "volumeUsd": None,
+                "count": None,
+                "notes": "Permissionless per-market liquidations; aggregated 30d stats require Morpho indexer.",
+            },
+            "governanceDetail": {
+                "proposals": None,
+                "voterTurnoutPct": None,
+                "treasuryUsd": None,
+                "notes": "MORPHO governs the framework; vault curators set per-market risk.",
+            },
+        },
+        lending_tag_metrics={
+            "isolatedCurated": {
+                "isolatedMarketCount": 350,
+                "vaultCount": 120,
+                "curatorCount": 25,
+                "topCurators": [
+                    {"name": "Steakhouse Financial", "aumUsd": 800_000_000, "feeTakeRatePct": 10},
+                    {"name": "Gauntlet", "aumUsd": 600_000_000, "feeTakeRatePct": 10},
+                    {"name": "Re7 Labs", "aumUsd": 400_000_000, "feeTakeRatePct": 10},
+                ],
+                "lltvDistribution": "Markets span 77%–96.5% LLTV; stablecoin markets typically 86–91%.",
+                "vaultTvlSharePct": 85,
+                "curatorFeeTakeRatePct": 10,
+                "notes": "Curated MetaMorpho vaults hold the majority of Morpho Blue TVL.",
+            },
         },
         member_coins=[
             {
@@ -250,6 +283,29 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "evmCompatible": "yes",
                 "notes": "Part of the Sky/Maker ecosystem; EVM-oriented (IQ.wiki).",
             },
+            "stablecoinExposurePct": 82,
+            "liquidations30d": {
+                "volumeUsd": None,
+                "count": None,
+                "notes": "Aave-V3-style keeper liquidations on SparkLend.",
+            },
+            "governanceDetail": {
+                "proposals": None,
+                "voterTurnoutPct": None,
+                "treasuryUsd": None,
+                "notes": "Spark + Sky governance coordinate USDS/DAI risk and savings rate.",
+            },
+        },
+        lending_tag_metrics={
+            "stablecoinNative": {
+                "usdsMintedUsd": 5_200_000_000,
+                "daiRoutedUsd": 1_800_000_000,
+                "ssrPct": 4.5,
+                "ssrBalanceUsd": 2_100_000_000,
+                "sllVenues": ["Aave V3", "Morpho Blue", "Euler", "SparkLend"],
+                "ssrLinkedTvlUsd": 2_100_000_000,
+                "notes": "Spark Liquidity Layer routes Sky stablecoin liquidity across DeFi venues.",
+            },
         },
         member_coins=[
             {
@@ -258,6 +314,14 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "symbol": "SPK",
                 "category": "Token",
                 "role": "Governance token",
+                "subCategory": "Governance Token",
+            },
+            {
+                "slug": "sky-gov",
+                "name": "SKY",
+                "symbol": "SKY",
+                "category": "Token",
+                "role": "Sky ecosystem governance (MKR successor)",
                 "subCategory": "Governance Token",
             },
             {
@@ -318,6 +382,26 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "evmCompatible": "yes",
                 "notes": "Compound III is built for EVM-compatible deployments (docs.compound.finance).",
             },
+            "stablecoinExposurePct": 75,
+            "liquidations30d": {
+                "volumeUsd": None,
+                "count": None,
+                "notes": "Absorb/buy collateral liquidations in Compound III.",
+            },
+            "governanceDetail": {
+                "proposals": None,
+                "voterTurnoutPct": None,
+                "treasuryUsd": None,
+                "notes": "Active COMP governance for new markets and parameter updates.",
+            },
+        },
+        lending_tag_metrics={
+            "moneyMarkets": {
+                "emissionsPerAsset": "COMP emissions vary by market; USDC/USDT markets typically receive the largest share.",
+                "reserveFactorSummary": "Reserve factors 15–25% on major markets; absorbed into protocol reserves.",
+                "eModeUsage": None,
+                "notes": "Compound III uses single base-asset markets rather than e-mode tiers.",
+            },
         },
         member_coins=[
             {
@@ -377,6 +461,28 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "evmCompatible": "yes",
                 "notes": "Live across EVM chains (Support - Eco).",
             },
+            "stablecoinExposurePct": 55,
+            "liquidations30d": {
+                "volumeUsd": None,
+                "count": None,
+                "notes": "Partial liquidations via shared liquidity layer.",
+            },
+            "governanceDetail": {
+                "proposals": None,
+                "voterTurnoutPct": None,
+                "treasuryUsd": None,
+                "notes": "FLUID governs the shared liquidity layer and vault/DEX markets.",
+            },
+        },
+        lending_tag_metrics={
+            "liquidityHybrid": {
+                "capitalEfficiencyMultiplier": 3.2,
+                "smartCollateralTvlUsd": 1_200_000_000,
+                "smartDebtTvlUsd": 800_000_000,
+                "dexVolumeTiedUsd": None,
+                "sharedLiquidityUtilizationPct": 72,
+                "notes": "Smart collateral/debt design shares liquidity between lending and DEX.",
+            },
         },
         member_coins=[
             {
@@ -433,6 +539,26 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "evmCompatible": "yes",
                 "notes": "Core lending is BNB-Chain-centric (EVM-compatible); XVS bridges cross-chain (github.com).",
             },
+            "stablecoinExposurePct": 78,
+            "liquidations30d": {
+                "volumeUsd": None,
+                "count": None,
+                "notes": "Keeper liquidations on BNB Chain when shortfall occurs.",
+            },
+            "governanceDetail": {
+                "proposals": None,
+                "voterTurnoutPct": None,
+                "treasuryUsd": None,
+                "notes": "Active XVS governance for isolated pools, parameters, and VAI module.",
+            },
+        },
+        lending_tag_metrics={
+            "moneyMarkets": {
+                "emissionsPerAsset": "XVS emissions allocated per market; BNB and stablecoin markets receive the largest share.",
+                "reserveFactorSummary": "Reserve factors 15–40% depending on asset risk tier.",
+                "eModeUsage": "e-Mode enabled for correlated assets (e.g. stablecoin clusters) on BNB Chain.",
+                "notes": "Venus supports both core pools and isolated pools on BNB Chain.",
+            },
         },
         member_coins=[
             {
@@ -486,7 +612,30 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "deployment": {
                 "chains": ["Tron"],
                 "evmCompatible": "no",
-                "notes": "Tron/TVM ecosystem — Solidity-style but indexing/data differs from Ethereum (docs.justlend.org).",
+                "notes": (
+                    "Tron/TVM ecosystem — live metrics require TronGrid/TronScan indexer, "
+                    "not EVM event logs (docs.justlend.org)."
+                ),
+            },
+            "stablecoinExposurePct": 88,
+            "liquidations30d": {
+                "volumeUsd": None,
+                "count": None,
+                "notes": "Tron keeper liquidations; 30d aggregates require TronGrid indexer.",
+            },
+            "governanceDetail": {
+                "proposals": None,
+                "voterTurnoutPct": None,
+                "treasuryUsd": None,
+                "notes": "Governed by the JUST ecosystem / JST holders.",
+            },
+        },
+        lending_tag_metrics={
+            "moneyMarkets": {
+                "emissionsPerAsset": "JST emissions distributed across TRX, USDT, and USDD markets.",
+                "reserveFactorSummary": "Reserve factors set per market by JST governance.",
+                "eModeUsage": None,
+                "notes": "Dominant USDT lending venue on Tron.",
             },
         },
         member_coins=[
@@ -541,7 +690,34 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "deployment": {
                 "chains": ["Solana"],
                 "evmCompatible": "no",
-                "notes": "Solana-native; metrics from Solana programs/accounts, not EVM (Solana DeFi).",
+                "notes": (
+                    "Solana-native; live metrics require Helius/Triton or Dune Solana tables "
+                    "(program accounts, not EVM logs)."
+                ),
+            },
+            "stablecoinExposurePct": 62,
+            "liquidations30d": {
+                "volumeUsd": None,
+                "count": None,
+                "notes": "Permissionless liquidations within isolated markets.",
+            },
+            "governanceDetail": {
+                "proposals": None,
+                "voterTurnoutPct": None,
+                "treasuryUsd": None,
+                "notes": "KMNO governs markets and incentives.",
+            },
+        },
+        lending_tag_metrics={
+            "isolatedCurated": {
+                "isolatedMarketCount": 45,
+                "vaultCount": 30,
+                "curatorCount": None,
+                "topCurators": [],
+                "lltvDistribution": "Per-market LTV caps vary by asset; conservative on long-tail Solana assets.",
+                "vaultTvlSharePct": 70,
+                "curatorFeeTakeRatePct": None,
+                "notes": "Kamino Lend uses isolated markets with strategy vaults on Solana.",
             },
         },
         member_coins=[
@@ -603,6 +779,39 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "evmCompatible": "mixed",
                 "notes": "EVM deployments plus Solana exposure — treat as cross-ecosystem (Support - Eco).",
             },
+            "stablecoinExposurePct": 95,
+            "liquidations30d": {
+                "volumeUsd": None,
+                "count": None,
+                "notes": "Workout/recovery on default rather than instant onchain liquidation.",
+            },
+            "governanceDetail": {
+                "proposals": None,
+                "voterTurnoutPct": None,
+                "treasuryUsd": None,
+                "notes": "SYRUP governance + Maple pool delegates / managers.",
+            },
+        },
+        lending_tag_metrics={
+            "institutionalCredit": {
+                "activeBorrowerCount": 35,
+                "defaultRateLifetimePct": 2.1,
+                "defaultRate12mPct": 0.8,
+                "weightedAvgMaturityDays": 90,
+                "kycPoolTvlUsd": 1_500_000_000,
+                "permissionlessPoolTvlUsd": 800_000_000,
+                "overCollateralizedPct": 40,
+                "underCollateralizedPct": 60,
+                "poolDelegates": [
+                    {"name": "BlockTower", "aumUsd": 400_000_000},
+                    {"name": "Auros", "aumUsd": 250_000_000},
+                ],
+                "cumulativeOriginationsUsd": 5_000_000_000,
+                "syrupUsdcPoolUsd": 600_000_000,
+                "syrupUsdtPoolUsd": 200_000_000,
+                "stSyrupStakedSupply": None,
+                "notes": "Maple v2 syrupUSDC/syrupUSDT pools are permissionless; KYC pools serve institutional borrowers.",
+            },
         },
         member_coins=[
             {
@@ -612,6 +821,38 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "category": "Token",
                 "role": "Governance / staking token (ex-MPL)",
                 "subCategory": "Governance Token",
+            },
+            {
+                "slug": "syrup-oft",
+                "name": "SYRUP (OFT)",
+                "symbol": "SYRUP",
+                "category": "Token",
+                "role": "OFT bridge token on Base",
+                "subCategory": "Governance Token",
+            },
+            {
+                "slug": "stsyrup",
+                "name": "stSYRUP",
+                "symbol": "stSYRUP",
+                "category": "Token",
+                "role": "Staked SYRUP receipt",
+                "subCategory": "Yield-generating Token",
+            },
+            {
+                "slug": "syrup-usdc-pool",
+                "name": "syrupUSDC pool",
+                "symbol": "syrupUSDC",
+                "category": "Token",
+                "role": "USDC lending pool token",
+                "subCategory": "Yield-generating Token",
+            },
+            {
+                "slug": "syrup-usdt-pool",
+                "name": "syrupUSDT pool",
+                "symbol": "syrupUSDT",
+                "category": "Token",
+                "role": "USDT lending pool token",
+                "subCategory": "Yield-generating Token",
             },
         ],
     ),

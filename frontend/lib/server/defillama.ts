@@ -76,17 +76,16 @@ export const LLAMA_STABLECOIN_IDS: Record<string, number | null> = {
  * absent. Slugs verified against https://api.llama.fi/protocols on 2026-06-12.
  */
 export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
-  // Lending networks (PDF Week 7+8) — protocol TVL series. Verify against
-  // https://api.llama.fi/protocols. `// verify` ones fail soft to null.
+  // Lending networks (PDF Week 7+8) — protocol TVL series (verified 2026-06-18).
   aave: "aave-v3",
-  morpho: "morpho-blue", // verify
-  spark: "spark", // verify
-  compound: "compound-v3", // verify
-  fluid: "fluid", // verify
-  venus: "venus-core-pool", // verify
-  justlend: "justlend", // verify
-  kamino: "kamino-lend", // verify
-  maple: "maple", // verify
+  morpho: "morpho-blue",
+  spark: "spark",
+  compound: "compound-v3",
+  fluid: "fluid",
+  venus: "venus-core-pool",
+  justlend: "justlend",
+  kamino: "kamino-lend",
+  maple: "maple",
   centrifuge: "centrifuge-protocol",
   dinari: "dinari",
   "estate-protocol": "estate-protocol",
@@ -113,16 +112,15 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
  */
 export const LLAMA_FEES_SLUGS: Record<string, string | null> = {
   aave: "aave-v3", // Aave V3 fees/revenue
-  // Lending networks (PDF Week 7+8) — fees/revenue adapters. Verify against
-  // https://defillama.com/fees. `// verify` ones fail soft to null.
-  morpho: "morpho-blue", // verify
-  spark: "spark", // verify
-  compound: "compound-v3", // verify
-  fluid: "fluid", // verify
-  venus: "venus-finance", // verify
-  justlend: "justlend", // verify
-  kamino: "kamino-lend", // verify
-  maple: "maple", // verify
+  // Lending networks (PDF Week 7+8) — fees/revenue adapters (verified 2026-06-18).
+  morpho: "morpho-blue",
+  spark: "spark",
+  compound: "compound-v3",
+  fluid: "fluid",
+  venus: "venus",
+  justlend: "justlend",
+  kamino: "kamino-lend",
+  maple: "maple",
   ethena: "ethena", // Ethena (USDe yield)
   sky: "sky-lending", // Sky / MakerDAO lending fees // verify
   "sky-gov": "sky-lending", // verify
@@ -658,14 +656,14 @@ export async function fetchLlamaPools(revalidate?: number): Promise<LlamaPool[]>
  */
 export const LLAMA_LENDING_PROJECTS: Record<string, string | null> = {
   aave: "aave-v3",
-  morpho: "morpho-blue", // verify
-  spark: "sparklend", // verify
-  compound: "compound-v3", // verify
-  fluid: "fluid-lending", // verify
-  venus: "venus-core-pool", // verify
-  justlend: "justlend", // verify
-  kamino: "kamino-lend", // verify
-  maple: "maple", // verify
+  morpho: "morpho-blue",
+  spark: "sparklend",
+  compound: "compound-v3",
+  fluid: "fluid-lending",
+  venus: "venus-core-pool",
+  justlend: "justlend",
+  kamino: "kamino-lend",
+  maple: "maple",
 };
 
 export function llamaLendingProjectForSlug(slug: string): string | null {

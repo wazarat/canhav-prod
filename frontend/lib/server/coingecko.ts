@@ -113,36 +113,36 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   eurc: "euro-coin",
   usdp: "paxos-standard",
   pyusd: "paypal-usd",
-  usdg: "global-dollar", // verify
-  usdl: null, // wound down 2025
+  usdg: "global-dollar",
+  usdl: "lift-dollar", // wound down 2025 but still listed
   fdusd: "first-digital-usd",
-  m0: "m-by-m0", // verify
-  ausd: "agora-dollar", // verify
+  m0: "wrappedm-by-m0", // WrappedM proxy; plain M unlisted on CoinGecko
+  ausd: "agora-dollar",
   bgusd: null, // exchange-native, not on CoinGecko
-  zusd: "zusd", // verify
+  zusd: "zusd",
   gyen: "gyen",
   lusd: "liquity-usd",
-  bold: "liquity-bold", // verify
+  bold: "liquity-bold",
   crvusd: "crvusd",
-  scrvusd: "savings-crvusd", // verify
-  lisusd: "lista-usd", // verify
-  rsv: "reserve", // verify
-  eusd: "electronic-usd", // verify
-  rgusd: null, // verify
+  scrvusd: "savings-crvusd",
+  lisusd: "helio-protocol-hay", // Lista USD (formerly Helio HAY)
+  rsv: "reserve",
+  eusd: "electronic-usd",
+  rgusd: "revenue-generating-usd",
   frax: "frax",
-  frxusd: "frax-usd", // verify
-  sfrax: "staked-frax", // verify
+  frxusd: "frax-usd",
+  sfrax: "staked-frax",
   usr: "resolv-usr",
-  stusr: null, // verify
-  rlp: "resolv-rlp", // verify
-  usdf: "falcon-usd", // verify
-  susdf: null,
-  cusd: null, // Cap cUSD post-mainnet; id "cusd" collides with Celo Dollar
+  stusr: null, // only wstUSR listed (off-peg/illiquid feed) — left unmapped
+  rlp: "resolv-rlp",
+  usdf: null, // falcon-finance-usd listed but returns no price — left unmapped
+  susdf: null, // sUSDf not listed on CoinGecko
+  cusd: "cap-usd", // Cap USD (distinct id from Celo Dollar)
   deusd: "elixir-deusd",
-  sdeusd: null, // verify
+  sdeusd: "elixir-staked-deusd",
   usdz: "anzen-usdz",
-  susdz: null,
-  usdm: "mountain-protocol-usd",
+  susdz: "anzen-staked-usdz",
+  usdm: "mountain-protocol-usdm",
 };
 
 export interface TokenResolution {

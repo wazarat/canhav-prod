@@ -9,6 +9,7 @@ import type {
   LendingMetrics,
   LendingTag,
   LendingTagMetrics,
+  MemberCoinRef,
   NetworkComponent,
   NetworkEvent,
   NetworkRisk,
@@ -17,6 +18,8 @@ import type {
   OrgUnit,
   Partnership,
   Sourced,
+  StablecoinMetrics,
+  StablecoinSubSectorMetrics,
   TimelineEntry,
   TimelineStatus,
   TradFiRow,
@@ -792,6 +795,217 @@ export function LendingTagMetricsSection({
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/* Stablecoin sector — issuer metrics + sub-sector panel                      */
+/* -------------------------------------------------------------------------- */
+
+const STABLECOIN_KIND_LABEL: Record<StablecoinSubSectorMetrics["kind"], string> = {
+  "fiat-backed": "Reserve composition",
+  "decentralized-cdp": "Collateral & CDP parameters",
+  synthetic: "Hedge book & yield",
+  "rwa-backed": "Underlying RWA",
+  "e-money": "Fiat rails",
+};
+
+/** Render the sub-sector-specific panel for a stablecoin issuer. */
+function StablecoinSubSectorPanel({ m }: { m: StablecoinSubSectorMetrics }) {
+  const title = STABLECOIN_KIND_LABEL[m.kind];
+  return (
+    <DataPanel title={title}>
+      <div className="divide-y divide-ink-800/60">
+        {m.kind === "fiat-backed" && (
+          <>
+            <CuratedRow label="Reserve custodian" text={m.reserveCustodian} />
+            {m.reserveBreakdown && m.reserveBreakdown.length > 0 && (
+              <CuratedRow
+                label="Reserve breakdown"
+                chips={m.reserveBreakdown.map((r) => `${r.asset} · ${r.pct}%`)}
+              />
+            )}
+            <TagMetricRow label="Attestation cadence" value={m.attestationCadence} />
+            <CuratedRow label="Attestor" text={m.attestor} />
+            <CuratedRow label="Realtime reserve oracle" text={m.realtimeReserveOracle} />
+          </>
+        )}
+        {m.kind === "decentralized-cdp" && (
+          <>
+            <CuratedRow label="Collateral assets" chips={m.collateralAssets} />
+            <TagMetricRow
+              label="Min collateral ratio"
+              value={m.minCollateralRatioPct?.value != null ? `${m.minCollateralRatioPct.value}%` : null}
+            />
+            <TagMetricRow
+              label="Stability fee"
+              value={m.stabilityFeePct?.value != null ? `${m.stabilityFeePct.value}%` : null}
+            />
+            <TagMetricRow
+              label="Savings rate"
+              value={m.savingsRatePct?.value != null ? `${m.savingsRatePct.value}%` : null}
+            />
+            <CuratedRow label="Liquidation mechanism" text={m.liquidationMechanism} />
+            <CuratedRow label="Governance token" text={m.governanceToken} />
+          </>
+        )}
+        {m.kind === "synthetic" && (
+          <>
+            <CuratedRow label="Hedge venues" chips={m.hedgeVenues} />
+            <CuratedRow label="Funding-rate exposure" text={m.fundingRateExposure} />
+            <TagMetricRow
+              label="Insurance fund"
+              value={m.insuranceFundUsd?.value != null ? fmtUsd(m.insuranceFundUsd.value) : null}
+            />
+            <CuratedRow label="Yield sources" chips={m.yieldSources} />
+          </>
+        )}
+        {m.kind === "rwa-backed" && (
+          <>
+            <CuratedRow label="Underlying assets" chips={m.underlyingAssets} />
+            <CuratedRow label="Custodian" text={m.custodian} />
+            <TagMetricRow label="Yield distribution" value={m.yieldDistribution} />
+            <TagMetricRow
+              label="NAV"
+              value={m.nav?.value != null ? fmtUsd(m.nav.value) : null}
+            />
+          </>
+        )}
+        {m.kind === "e-money" && (
+          <>
+            <CuratedRow label="EMI license" text={m.emiLicense} />
+            <CuratedRow label="Fiat rails" chips={m.fiatRails} />
+            <TagMetricRow label="IBAN support" value={m.ibanSupport == null ? null : m.ibanSupport ? "Yes" : "No"} />
+            <CuratedRow label="Redemption cadence" text={m.redemptionCadence} />
+          </>
+        )}
+      </div>
+    </DataPanel>
+  );
+}
+
+export function StablecoinMetricsSection({
+  stablecoin,
+  memberCoins,
+}: {
+  stablecoin?: StablecoinMetrics | null;
+  memberCoins?: MemberCoinRef[];
+}) {
+  if (!stablecoin) return null;
+  const dep = stablecoin.deployment;
+  const chainCount = dep?.chains?.length ?? null;
+  const coins = (memberCoins ?? []).filter((c) => c.category === "Stablecoin");
+  const events = stablecoin.riskEvents ?? [];
+
+  return (
+    <section id="stablecoin" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Stablecoin metrics"
+        subtitle="Live circulating supply (DeFi Llama) plus curated reserves, peg mechanism, and risk facts."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <MetricTile label="Circulating supply" sourced={stablecoin.currentSupplyUsd} kind="usd" />
+        <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+          <p className="text-xs uppercase tracking-wide text-ink-500"># Chains</p>
+          <p className="mt-1 font-mono text-lg text-ink-50">{chainCount ?? "—"}</p>
+          <p className="mt-1 text-[10px] text-ink-500">Curated deployment</p>
+        </div>
+      </div>
+
+      <DataPanel title="Reserves, peg & risk">
+        <div className="divide-y divide-ink-800/60">
+          <CuratedRow label="Peg mechanism" text={stablecoin.pegMechanism} />
+          <CuratedRow label="Reserves / collateral" text={stablecoin.reserves} />
+          <CuratedRow label="Audit / attestation history" text={stablecoin.auditHistory} />
+          {dep && (
+            <CuratedRow
+              label={`Chains${dep.evmCompatible ? ` · EVM: ${dep.evmCompatible}` : ""}`}
+              chips={dep.chains}
+            />
+          )}
+          {dep?.notes && <CuratedRow label="Deployment notes" text={dep.notes} />}
+        </div>
+      </DataPanel>
+
+      {stablecoin.subSectorMetrics && (
+        <StablecoinSubSectorPanel m={stablecoin.subSectorMetrics} />
+      )}
+
+      {coins.length > 0 && (
+        <TableShell>
+          <Table className="min-w-[560px]">
+            <THead>
+              <tr>
+                <TH>Symbol</TH>
+                <TH>Name</TH>
+                <TH>Role</TH>
+                <TH>Class</TH>
+              </tr>
+            </THead>
+            <TBody>
+              {coins.map((c) => (
+                <TR key={c.slug}>
+                  <TD className="font-mono font-medium text-ink-50">{c.symbol}</TD>
+                  <TD className="text-ink-200">
+                    <a
+                      href={`/stablecoins/${c.slug}`}
+                      className="inline-flex items-center gap-0.5 transition-colors hover:text-electric-400"
+                    >
+                      {c.name}
+                      <ArrowUpRight className="h-3 w-3" />
+                    </a>
+                  </TD>
+                  <TD className="text-ink-300">{c.role}</TD>
+                  <TD className="text-ink-300">{c.subCategory ?? "—"}</TD>
+                </TR>
+              ))}
+            </TBody>
+          </Table>
+        </TableShell>
+      )}
+
+      {events.length > 0 && (
+        <DataPanel title="Risk timeline">
+          <div className="divide-y divide-ink-800/60">
+            {events.map((e, i) => (
+              <div key={`${e.date}-${i}`} className="py-3 first:pt-0 last:pb-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs text-ink-400">{e.date}</span>
+                  <Badge tone="warning">{e.type}</Badge>
+                </div>
+                <p className="mt-1 text-sm leading-relaxed text-ink-300">
+                  {e.impact}
+                  {e.link && (
+                    <a
+                      href={e.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ml-1 inline-flex items-center gap-0.5 text-electric-400 hover:underline"
+                    >
+                      source
+                      <ArrowUpRight className="h-3 w-3" />
+                    </a>
+                  )}
+                </p>
+              </div>
+            ))}
+          </div>
+        </DataPanel>
+      )}
+
+      {stablecoin.attestationUrl || stablecoin.proofOfReservesUrl ? (
+        <DataPanel title="Sources">
+          <div className="divide-y divide-ink-800/60">
+            {stablecoin.attestationUrl && (
+              <CuratedRow label="Attestation page" text={stablecoin.attestationUrl} />
+            )}
+            {stablecoin.proofOfReservesUrl && (
+              <CuratedRow label="Proof of Reserves" text={stablecoin.proofOfReservesUrl} />
+            )}
+          </div>
+        </DataPanel>
+      ) : null}
+    </section>
+  );
+}
+
 export function CompetitorsSection({
   competitors,
   networkName,
@@ -869,6 +1083,7 @@ export function buildNetworkSectionNav(profile: {
   offchainFacts?: unknown[];
   agentSkill?: unknown;
   lending?: unknown;
+  stablecoin?: unknown;
   competitors?: unknown[];
 }) {
   const items: { id: string; label: string; researchTab?: string }[] = [];
@@ -883,6 +1098,7 @@ export function buildNetworkSectionNav(profile: {
 
   if (profile.memberCoins.length) items.push({ id: "member-coins", label: "Dashboard" });
   if (profile.lending) items.push({ id: "lending", label: "Lending" });
+  if (profile.stablecoin) items.push({ id: "stablecoin", label: "Stablecoin" });
   if (profile.competitors?.length) items.push({ id: "competitors", label: "Competitors" });
   if (hasResearch) items.push({ id: "research-hub", label: "Research" });
   if (profile.market) items.push({ id: "market", label: "Market" });

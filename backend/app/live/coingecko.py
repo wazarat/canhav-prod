@@ -105,36 +105,36 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     "eurc": "euro-coin",
     "usdp": "paxos-standard",
     "pyusd": "paypal-usd",
-    "usdg": "global-dollar",  # verify
-    "usdl": None,
+    "usdg": "global-dollar",
+    "usdl": "lift-dollar",
     "fdusd": "first-digital-usd",
-    "m0": "m-by-m0",  # verify
-    "ausd": "agora-dollar",  # verify
-    "bgusd": None,
-    "zusd": "zusd",  # verify
+    "m0": "wrappedm-by-m0",  # WrappedM proxy; plain M unlisted on CoinGecko
+    "ausd": "agora-dollar",
+    "bgusd": None,  # Bitget BGUSD not listed on CoinGecko
+    "zusd": "zusd",
     "gyen": "gyen",
     "lusd": "liquity-usd",
-    "bold": "liquity-bold",  # verify
+    "bold": "liquity-bold",
     "crvusd": "crvusd",
-    "scrvusd": "savings-crvusd",  # verify
-    "lisusd": "lista-usd",  # verify
-    "rsv": "reserve",  # verify
-    "eusd": "electronic-usd",  # verify
-    "rgusd": None,  # verify
+    "scrvusd": "savings-crvusd",
+    "lisusd": "helio-protocol-hay",  # Lista USD (formerly Helio HAY)
+    "rsv": "reserve",
+    "eusd": "electronic-usd",
+    "rgusd": "revenue-generating-usd",
     "frax": "frax",
-    "frxusd": "frax-usd",  # verify
-    "sfrax": "staked-frax",  # verify
+    "frxusd": "frax-usd",
+    "sfrax": "staked-frax",
     "usr": "resolv-usr",
-    "stusr": None,  # verify
-    "rlp": "resolv-rlp",  # verify
-    "usdf": "falcon-usd",  # verify
-    "susdf": None,
-    "cusd": None,  # collides with Celo Dollar
+    "stusr": None,  # only wstUSR listed (off-peg/illiquid feed) — left unmapped
+    "rlp": "resolv-rlp",
+    "usdf": None,  # falcon-finance-usd listed but returns no price — left unmapped
+    "susdf": None,  # sUSDf not listed on CoinGecko
+    "cusd": "cap-usd",  # Cap USD (distinct id from Celo Dollar)
     "deusd": "elixir-deusd",
-    "sdeusd": None,  # verify
+    "sdeusd": "elixir-staked-deusd",
     "usdz": "anzen-usdz",
-    "susdz": None,
-    "usdm": "mountain-protocol-usd",
+    "susdz": "anzen-staked-usdz",
+    "usdm": "mountain-protocol-usdm",
 }
 
 

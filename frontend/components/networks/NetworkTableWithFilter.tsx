@@ -31,9 +31,14 @@ export function NetworkTableWithFilter({
   const [tagFilter, setTagFilter] = useState<string | "all">("all");
 
   // Sectors present in the data (e.g. "Lending"), for the taxonomy filter row.
+  // Includes secondary (cross-tagged) sectors so multi-sector entities surface
+  // under every sector they belong to.
   const sectors = useMemo(() => {
     const set = new Set<string>();
-    for (const p of profiles) if (p.sector) set.add(p.sector);
+    for (const p of profiles) {
+      if (p.sector) set.add(p.sector);
+      for (const s of p.secondarySectors ?? []) set.add(s);
+    }
     return [...set].sort();
   }, [profiles]);
 
@@ -42,7 +47,7 @@ export function NetworkTableWithFilter({
     if (sector === "all") return [];
     const set = new Set<string>();
     for (const p of profiles) {
-      if (p.sector !== sector) continue;
+      if (!matchesSectorTag(p, sector)) continue;
       for (const t of p.tags ?? (p.subSector ? [p.subSector] : [])) set.add(t);
     }
     return [...set].sort();
@@ -50,6 +55,11 @@ export function NetworkTableWithFilter({
 
   function profileTags(p: NetworkProfile): string[] {
     return p.tags ?? (p.subSector ? [p.subSector] : []);
+  }
+
+  // Primary OR secondary sector match (additive cross-tagging).
+  function matchesSectorTag(p: NetworkProfile, s: string): boolean {
+    return p.sector === s || (p.secondarySectors as string[] | undefined)?.includes(s) === true;
   }
 
   const filtered = useMemo(() => {
@@ -66,7 +76,7 @@ export function NetworkTableWithFilter({
         );
       const matchesCategory =
         category === "all" || p.memberCoins.some((c) => c.category === category);
-      const matchesSector = sector === "all" || p.sector === sector;
+      const matchesSector = sector === "all" || matchesSectorTag(p, sector);
       const matchesTag = tagFilter === "all" || profileTags(p).includes(tagFilter);
       return matchesQuery && matchesCategory && matchesSector && matchesTag;
     });

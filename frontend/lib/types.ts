@@ -1235,6 +1235,12 @@ export interface NetworkProfile {
   subCategory?: NetworkSubCategory | null;
   /** Functional sector (e.g. "Lending"); null for the legacy umbrella networks. */
   sector?: NetworkSector | null;
+  /**
+   * Additional sectors this entity also belongs to (additive cross-tagging).
+   * The primary stays `sector`; e.g. Sky is primary "Stablecoin" with
+   * secondary `["Lending"]`. Filters OR primary + secondary.
+   */
+  secondarySectors?: NetworkSector[];
   /** Sector-specific leaf (e.g. a `LendingTag` when sector === "Lending"). */
   subSector?: string | null;
   /** Lending tags — multi-tag taxonomy; supersedes single subSector when present. */

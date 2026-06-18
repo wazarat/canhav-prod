@@ -69,15 +69,36 @@ export const LLAMA_STABLECOIN_IDS: Record<string, number | null> = {
   usdt0: null,
   veusd: null,
   usdsc: null,
-  // Stablecoin Sector Expansion (PDF §3). Numeric Llama ids are not yet verified
-  // for these new coins, so they are intentionally left UNMAPPED here (omitted)
-  // rather than set to a guessed id: `llamaStablecoinIdForSlug` returns null for
-  // unmapped slugs, so the cron falls back to CoinGecko price + Alchemy on-chain
-  // `totalSupply()` for live supply. To enable Llama peg history + per-chain
-  // circulating for any of them, look up the id at
-  // https://stablecoins.llama.fi/stablecoins and add it below, e.g.:
-  //   pyusd: <id>, fdusd: <id>, crvusd: <id>, lusd: <id>, frax: <id>,
-  //   usdf: <id>, usdp: <id>, usdg: <id>, eurc: <id>, usdm: <id>, ...
+  // Stablecoin Sector Expansion (PDF §3). Numeric ids verified against
+  // https://stablecoins.llama.fi/stablecoins on 2026-06-18, disambiguated by
+  // issuer name (several symbols collide, e.g. USDF/USDP/BOLD/eUSD/cUSD).
+  pyusd: 120, // PayPal USD
+  fdusd: 119, // First Digital USD
+  usdp: 11, // Pax Dollar (Paxos)
+  usdg: 286, // Global Dollar (Paxos/GDN)
+  eurc: 50, // EURC (Circle)
+  m0: 213, // M by M0
+  ausd: 205, // Agora Dollar
+  zusd: 43, // GMO ZUSD
+  gyen: 122, // GMO GYEN
+  lusd: 8, // Liquity USD
+  bold: 269, // Liquity BOLD (V2; 227 is legacy BOLD)
+  crvusd: 110, // Curve crvUSD
+  lisusd: 79, // Lista USD
+  rsv: 25, // Reserve
+  eusd: 106, // Reserve Electronic Dollar (eUSD)
+  rgusd: 190, // Reserve Revenue Generating USD
+  frax: 6, // Frax
+  frxusd: 235, // Frax USD
+  usr: 197, // Resolv USD
+  usdf: 246, // Falcon USD (246 = Falcon; 219 is Astherus USDF)
+  cusd: 296, // Cap cUSD
+  deusd: 210, // Elixir deUSD
+  usdz: 202, // Anzen USDz
+  // Still unmapped (no clean Llama match; cron falls back to CoinGecko +
+  // Alchemy totalSupply): scrvusd, sfrax, stusr, rlp, susdf, sdeusd, susdz,
+  // bgusd (Bitget, exchange-native), usdm (Mountain — name collides with
+  // several other USDM entries on Llama).
 };
 
 /**

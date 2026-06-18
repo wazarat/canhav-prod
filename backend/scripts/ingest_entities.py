@@ -1077,6 +1077,28 @@ for _slug, (_subsector, _tags) in _STABLECOIN_SECONDARY_BACKFILL.items():
         _spec["stablecoin_sub_sector"] = _subsector
         _spec["stablecoin_secondary_tags"] = _tags
 
+# Cross-sector tagging (PDF §5). Additive: the primary `sector` is unchanged;
+# these are the *additional* NetworkSectors an entity also belongs to so it
+# surfaces under each. Lifecycle/exchange markers (Wound-Down, Exchange-Native)
+# are secondary *tags* not sectors, so Mountain and Bitget get none here.
+_SECONDARY_SECTORS: Dict[str, List[str]] = {
+    # Primary Stablecoin issuers that also operate in other sectors.
+    "sky": ["Lending"],
+    "ethena": ["RWA", "Yield"],
+    "usd-ai": ["RWA"],
+    "frax": ["RWA"],
+    # Protocols whose primary sector stays put but also issue a stablecoin.
+    "jupiter": ["Stablecoin", "Perpetuals"],
+    "ondo-finance": ["Stablecoin"],
+    "aave": ["Stablecoin"],
+    "pleasing-market": ["Stablecoin"],
+    "inverse-finance": ["Stablecoin"],
+}
+for _slug, _sectors in _SECONDARY_SECTORS.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["secondary_sectors"] = _sectors
+
 
 def build_entity_item(
     slug: str, spec: Dict[str, Any], parent_row: Optional[Dict[str, str]], created_at: str
@@ -1132,6 +1154,8 @@ def build_entity_item(
         # legacy umbrella networks and set for the lending cohort.
         "SubCategory": spec.get("sub_category", "Protocol"),
         "Sector": spec.get("sector"),
+        # Additive cross-sector tags (PDF §5); primary `Sector` is unchanged.
+        "SecondarySectors": spec.get("secondary_sectors"),
         "SubSector": spec.get("sub_sector"),
         # Lending `Tags` vocabulary only; an explicit (possibly empty) list wins
         # over the sub_sector fallback so stablecoin issuers don't pollute it.

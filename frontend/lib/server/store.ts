@@ -229,6 +229,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         scaleLabels: item.ScaleLabels ?? undefined,
         subCategory: item.SubCategory ?? null,
         sector: item.Sector ?? null,
+        secondarySectors: item.SecondarySectors ?? undefined,
         subSector: item.SubSector ?? null,
         tags: item.Tags ?? (item.SubSector ? [item.SubSector] : []),
         competitors: item.Competitors ?? [],

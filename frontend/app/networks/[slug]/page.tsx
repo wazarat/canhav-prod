@@ -8,6 +8,7 @@ import {
   InvestmentRoundsSection,
   LendingMetricsSection,
   LendingTagMetricsSection,
+  StablecoinMetricsSection,
   OrgStructureSection,
   PartnershipsSection,
   RisksSection,
@@ -283,6 +284,10 @@ export default async function NetworkProfilePage({ params }: PageProps) {
           <div className="space-y-8">
             <LendingMetricsSection lending={profile.lending} />
             <LendingTagMetricsSection tags={profile.tags} metrics={profile.lendingTagMetrics} />
+            <StablecoinMetricsSection
+              stablecoin={profile.stablecoin}
+              memberCoins={profile.memberCoins}
+            />
             <CompetitorsSection
               competitors={profile.competitors}
               networkName={profile.name}

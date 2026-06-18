@@ -100,6 +100,41 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     "usdsc": None,
     "ondo-gm": None,
     "stably-gold": None,
+    # Stablecoin Sector Expansion (PDF §3) — kept in sync with the TS map.
+    # Confident ids set; `verify` ones to confirm before relying on live data.
+    "eurc": "euro-coin",
+    "usdp": "paxos-standard",
+    "pyusd": "paypal-usd",
+    "usdg": "global-dollar",  # verify
+    "usdl": None,
+    "fdusd": "first-digital-usd",
+    "m0": "m-by-m0",  # verify
+    "ausd": "agora-dollar",  # verify
+    "bgusd": None,
+    "zusd": "zusd",  # verify
+    "gyen": "gyen",
+    "lusd": "liquity-usd",
+    "bold": "liquity-bold",  # verify
+    "crvusd": "crvusd",
+    "scrvusd": "savings-crvusd",  # verify
+    "lisusd": "lista-usd",  # verify
+    "rsv": "reserve",  # verify
+    "eusd": "electronic-usd",  # verify
+    "rgusd": None,  # verify
+    "frax": "frax",
+    "frxusd": "frax-usd",  # verify
+    "sfrax": "staked-frax",  # verify
+    "usr": "resolv-usr",
+    "stusr": None,  # verify
+    "rlp": "resolv-rlp",  # verify
+    "usdf": "falcon-usd",  # verify
+    "susdf": None,
+    "cusd": None,  # collides with Celo Dollar
+    "deusd": "elixir-deusd",
+    "sdeusd": None,  # verify
+    "usdz": "anzen-usdz",
+    "susdz": None,
+    "usdm": "mountain-protocol-usd",
 }
 
 

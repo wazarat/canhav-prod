@@ -108,6 +108,41 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   kmno: "kamino",
   syrup: "syrup", // Maple SYRUP // verify
   vai: null,
+  // Stablecoin Sector Expansion (PDF §3). Confident ids set; `// verify` ones
+  // should be confirmed before relying on live price/supply (cron fails soft).
+  eurc: "euro-coin",
+  usdp: "paxos-standard",
+  pyusd: "paypal-usd",
+  usdg: "global-dollar", // verify
+  usdl: null, // wound down 2025
+  fdusd: "first-digital-usd",
+  m0: "m-by-m0", // verify
+  ausd: "agora-dollar", // verify
+  bgusd: null, // exchange-native, not on CoinGecko
+  zusd: "zusd", // verify
+  gyen: "gyen",
+  lusd: "liquity-usd",
+  bold: "liquity-bold", // verify
+  crvusd: "crvusd",
+  scrvusd: "savings-crvusd", // verify
+  lisusd: "lista-usd", // verify
+  rsv: "reserve", // verify
+  eusd: "electronic-usd", // verify
+  rgusd: null, // verify
+  frax: "frax",
+  frxusd: "frax-usd", // verify
+  sfrax: "staked-frax", // verify
+  usr: "resolv-usr",
+  stusr: null, // verify
+  rlp: "resolv-rlp", // verify
+  usdf: "falcon-usd", // verify
+  susdf: null,
+  cusd: null, // Cap cUSD post-mainnet; id "cusd" collides with Celo Dollar
+  deusd: "elixir-deusd",
+  sdeusd: null, // verify
+  usdz: "anzen-usdz",
+  susdz: null,
+  usdm: "mountain-protocol-usd",
 };
 
 export interface TokenResolution {

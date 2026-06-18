@@ -69,6 +69,15 @@ export const LLAMA_STABLECOIN_IDS: Record<string, number | null> = {
   usdt0: null,
   veusd: null,
   usdsc: null,
+  // Stablecoin Sector Expansion (PDF §3). Numeric Llama ids are not yet verified
+  // for these new coins, so they are intentionally left UNMAPPED here (omitted)
+  // rather than set to a guessed id: `llamaStablecoinIdForSlug` returns null for
+  // unmapped slugs, so the cron falls back to CoinGecko price + Alchemy on-chain
+  // `totalSupply()` for live supply. To enable Llama peg history + per-chain
+  // circulating for any of them, look up the id at
+  // https://stablecoins.llama.fi/stablecoins and add it below, e.g.:
+  //   pyusd: <id>, fdusd: <id>, crvusd: <id>, lusd: <id>, frax: <id>,
+  //   usdf: <id>, usdp: <id>, usdg: <id>, eurc: <id>, usdm: <id>, ...
 };
 
 /**

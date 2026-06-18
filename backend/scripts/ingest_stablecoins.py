@@ -66,6 +66,13 @@ JUPITER_PARENT_SLUG = "jupiter"
 # Umbrella entities whose primary CSV stablecoin row doubles as a member product.
 ENTITY_PARENT_SLUGS = frozenset({"ethena", "sky", "monerium", "stably", "trueusd"})
 
+# TARGET coins whose parent umbrella Entity has a *different* slug than the coin
+# (e.g. the USDC coin belongs to the Circle entity). These get EntitySlug set to
+# the entity slug below instead of the coin slug.
+TARGET_ENTITY_OVERRIDES: Dict[str, str] = {
+    "usdc": "circle",
+}
+
 # Field patches applied to CSV-derived parent stablecoins when seeding entities.
 ENTITY_PARENT_PATCHES: Dict[str, Dict[str, str]] = {
     "ethena": {
@@ -356,6 +363,393 @@ BATCH_ENTITY_COINS: Dict[str, Dict[str, Dict[str, str]]] = {
             "description": "Tokenized Hong Kong Dollar from TrustToken.",
         },
     },
+    # ---- Stablecoin Sector Expansion (PDF §3) -----------------------------
+    # New issuer cohorts. The primary coin for `circle` is the existing `usdc`
+    # TARGET (re-tagged with EntitySlug="circle" below); only EURC is added here.
+    "circle": {
+        "eurc": {
+            "name": "Euro Coin",
+            "symbol": "EURC",
+            "pegTarget": schema.PEG_EUR,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/euro-coin",
+            "contractAddress": "0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c",
+            "website": "https://www.circle.com/eurc",
+            "description": (
+                "Circle's regulated euro stablecoin, fully reserved and redeemable 1:1; "
+                "MiCA-compliant EU e-money."
+            ),
+        },
+    },
+    "paxos": {
+        "usdp": {
+            "name": "Pax Dollar",
+            "symbol": "USDP",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/paxos-standard",
+            "contractAddress": "0x8E870D67F660D95d5be530380D0eC0bd388289E1",
+            "website": "https://paxos.com",
+            "description": "Paxos-native NYDFS-regulated USD stablecoin.",
+        },
+        "pyusd": {
+            "name": "PayPal USD",
+            "symbol": "PYUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/paypal-usd",
+            "contractAddress": "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
+            "website": "https://paxos.com",
+            "description": "PayPal-branded dollar issued by Paxos on Ethereum, Solana and Arbitrum.",
+        },
+        "usdg": {
+            "name": "Global Dollar",
+            "symbol": "USDG",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/global-dollar",
+            "contractAddress": "0x8f1B19622a888C53C8eE4f7D7B4Dc8fA9D7B7C1b",
+            "website": "https://paxos.com",
+            "description": "Global Dollar Network stablecoin (Paxos), Solana-primary; fastest-growing.",
+        },
+        "usdl": {
+            "name": "Lift Dollar",
+            "symbol": "USDL",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://paxos.com",
+            "description": "Yield-bearing Paxos dollar, wound down in 2025.",
+        },
+    },
+    "first-digital": {
+        "fdusd": {
+            "name": "First Digital USD",
+            "symbol": "FDUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/first-digital-usd",
+            "contractAddress": "0xc5f0f7b66764F6ec8C8Dff7BA683102295E16409",
+            "website": "https://firstdigitallabs.com",
+            "description": (
+                "Hong Kong trust-custody dollar, BSC-primary; recovered partially from "
+                "its April 2025 depeg."
+            ),
+        },
+    },
+    "m-zero": {
+        "m0": {
+            "name": "M by M^0",
+            "symbol": "M",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": "0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b",
+            "website": "https://m0.org",
+            "description": (
+                "Modular institutional dollar designed as the underlying asset other "
+                "stablecoin products build on, via a permissioned minter network."
+            ),
+        },
+    },
+    "agora": {
+        "ausd": {
+            "name": "Agora Dollar",
+            "symbol": "AUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/agora-dollar",
+            "contractAddress": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+            "website": "https://www.agora.finance",
+            "description": "Revenue-sharing institutional dollar; reserves via VanEck, custody at State Street.",
+        },
+    },
+    "bitget": {
+        "bgusd": {
+            "name": "Bitget USD",
+            "symbol": "BGUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://www.bitget.com",
+            "description": "Exchange-native yield-bearing dollar for Bitget users (launched May 2025).",
+        },
+    },
+    "gmo-trust": {
+        "zusd": {
+            "name": "ZUSD",
+            "symbol": "ZUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/zusd",
+            "contractAddress": "0xC56C2b7e71B54d38Aab6d52E94a04Cbfa8F604fA",
+            "website": "https://stablecoin.z.com",
+            "description": "NY-trust regulated USD stablecoin from GMO Trust.",
+        },
+        "gyen": {
+            "name": "GYEN",
+            "symbol": "GYEN",
+            "pegTarget": schema.PEG_JPY,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/gyen",
+            "contractAddress": "0x07e0EDf8ce600FB51d44F51E3348D77D67F298ae",
+            "website": "https://stablecoin.z.com",
+            "description": "First and only NYDFS-regulated Japanese yen stablecoin (winding down).",
+        },
+    },
+    "liquity": {
+        "lusd": {
+            "name": "Liquity USD",
+            "symbol": "LUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/liquity-usd",
+            "contractAddress": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+            "website": "https://www.liquity.org",
+            "description": "Immutable zero-interest CDP dollar (Liquity V1), ETH-collateralized.",
+        },
+        "bold": {
+            "name": "BOLD",
+            "symbol": "BOLD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/liquity-bold",
+            "contractAddress": "0x6440f144b7e50D6A8439336510312d2F54beB01D",
+            "website": "https://www.liquity.org",
+            "description": "Liquity V2 dollar with user-set borrow rates and wstETH/rETH collateral.",
+        },
+    },
+    "curve-stablecoin": {
+        "crvusd": {
+            "name": "crvUSD",
+            "symbol": "crvUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/crvusd",
+            "contractAddress": "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E",
+            "website": "https://crvusd.curve.fi",
+            "description": "Curve's overcollateralized dollar using the LLAMMA soft-liquidation AMM.",
+        },
+        "scrvusd": {
+            "name": "Savings crvUSD",
+            "symbol": "scrvUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/savings-crvusd",
+            "contractAddress": "0x0655977FEb2f289A4aB78af67BAB0d17aab84367",
+            "website": "https://crvusd.curve.fi",
+            "description": "Yield-bearing crvUSD savings wrapper (appreciating exchange rate).",
+        },
+    },
+    "lista-dao": {
+        "lisusd": {
+            "name": "Lista USD",
+            "symbol": "lisUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/lista-usd",
+            "contractAddress": "0x0782b6d8c4551B9760e74c0545a9bCD90bdc41E5",
+            "website": "https://lista.org",
+            "description": "BNB Chain-native CDP dollar; collateral earns liquid-staking yield.",
+        },
+    },
+    "reserve": {
+        "rsv": {
+            "name": "Reserve",
+            "symbol": "RSV",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": "0x196f4727526eA7FB1e17b2071B3d8eAa38486988",
+            "website": "https://reserve.org",
+            "description": "Original Reserve stablecoin (legacy).",
+        },
+        "eusd": {
+            "name": "Electronic Dollar",
+            "symbol": "eUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/electronic-dollar",
+            "contractAddress": "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F",
+            "website": "https://reserve.org",
+            "description": "Flagship RToken dollar backed by a yield-bearing collateral basket.",
+        },
+        "rgusd": {
+            "name": "Revenue Generating USD",
+            "symbol": "rgUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": "0xFe0D6D83033e313691E96909d2188C150b834285",
+            "website": "https://reserve.org",
+            "description": "Yield-distributing RToken on Ethereum, Arbitrum and Base.",
+        },
+    },
+    "frax": {
+        "frax": {
+            "name": "Frax",
+            "symbol": "FRAX",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/frax",
+            "contractAddress": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+            "website": "https://frax.finance",
+            "description": "Original hybrid algo-collateral Frax dollar (declining supply).",
+        },
+        "frxusd": {
+            "name": "Frax USD",
+            "symbol": "frxUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/frax-usd",
+            "contractAddress": None,
+            "website": "https://frax.finance",
+            "description": "RWA-backed Frax dollar reserved in BlackRock BUIDL / Reg D structures.",
+        },
+        "sfrax": {
+            "name": "Staked FRAX",
+            "symbol": "sFRAX",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/staked-frax",
+            "contractAddress": "0xA663B02CF0a4b149d2aD41910CB81e23e1c41c32",
+            "website": "https://frax.finance",
+            "description": "Yield-bearing FRAX (appreciating exchange rate).",
+        },
+    },
+    "resolv": {
+        "usr": {
+            "name": "Resolv USD",
+            "symbol": "USR",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/resolv-usr",
+            "contractAddress": "0x66a1E37c9b0eAddca17d3662a6a260b8f54Beac6",
+            "website": "https://resolv.xyz",
+            "description": (
+                "Delta-neutral synthetic dollar; collapsed from a ~$700M peak after the "
+                "March 2026 $23M private-key exploit."
+            ),
+        },
+        "stusr": {
+            "name": "Staked Resolv USD",
+            "symbol": "stUSR",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": None,
+            "contractAddress": "0x6B9dE9C2B64f8A97D3b55eeC7088e2cEe48dBc43",
+            "website": "https://resolv.xyz",
+            "description": "Yield-bearing USR (appreciating exchange rate).",
+        },
+        "rlp": {
+            "name": "Resolv Liquidity Pool Token",
+            "symbol": "RLP",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": None,
+            "contractAddress": "0x4956b52aE2fF65D74CA2d61207523288e4528f96",
+            "website": "https://resolv.xyz",
+            "description": "Leveraged risk/insurance tranche that backstops USR (variable value).",
+        },
+    },
+    "falcon": {
+        "usdf": {
+            "name": "Falcon USD",
+            "symbol": "USDf",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/falcon-usd",
+            "contractAddress": "0xFa2B947eEc368f42195f24F36d2aF29f7c24CeC2",
+            "website": "https://falcon.finance",
+            "description": "Universal-collateral synthetic dollar (top-10 by supply).",
+        },
+        "susdf": {
+            "name": "Staked Falcon USD",
+            "symbol": "sUSDf",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": None,
+            "contractAddress": "0xc8CF6D7991f15525488b2A83Df53468D682Ba4B0",
+            "website": "https://falcon.finance",
+            "description": "Yield-bearing USDf (appreciating exchange rate).",
+        },
+    },
+    "cap": {
+        "cusd": {
+            "name": "Cap USD",
+            "symbol": "cUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://cap.app",
+            "description": (
+                "Non-custodial synthetic dollar where institutional agents generate yield "
+                "via EigenLayer-secured restaking (contract TBD post-mainnet)."
+            ),
+        },
+    },
+    "elixir": {
+        "deusd": {
+            "name": "deUSD",
+            "symbol": "deUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": None,
+            "contractAddress": "0x15700B564Ca08D9439C58cA5053166E8317aa138",
+            "website": "https://www.elixir.xyz",
+            "description": "Wound-down synthetic dollar (shut down Q1 2026 after the Stream Finance loss).",
+        },
+        "sdeusd": {
+            "name": "Staked deUSD",
+            "symbol": "sdeUSD",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://www.elixir.xyz",
+            "description": "Wound-down staked deUSD.",
+        },
+    },
+    "anzen": {
+        "usdz": {
+            "name": "Anzen USDz",
+            "symbol": "USDz",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/anzen-usdz",
+            "contractAddress": "0x04D5ddf5f3a8939889F84A17e8A3e3c6A1b87B0a",
+            "website": "https://www.anzen.finance",
+            "description": "Private-credit-backed RWA dollar targeting 8-12% APY.",
+        },
+        "susdz": {
+            "name": "Staked Anzen USDz",
+            "symbol": "sUSDz",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Staked Stablecoin",
+            "coingecko": None,
+            "contractAddress": None,
+            "website": "https://www.anzen.finance",
+            "description": "Yield-bearing USDz (appreciating exchange rate).",
+        },
+    },
+    "mountain-protocol": {
+        "usdm": {
+            "name": "Mountain Protocol USD",
+            "symbol": "USDM",
+            "pegTarget": schema.PEG_USD,
+            "subCategory": "Stablecoin",
+            "coingecko": "https://www.coingecko.com/en/coins/mountain-protocol-usd",
+            "contractAddress": "0x59D9356E565Ab3A36dD77763Fc0d87fEaf85508C",
+            "website": "https://mountainprotocol.com",
+            "description": (
+                "Regulated daily-rebase T-bill dollar; winding down post Anchorage "
+                "acquisition (collapsed from a ~$150M peak)."
+            ),
+        },
+    },
 }
 
 USD_AI_COINS: Dict[str, Dict[str, str]] = {
@@ -603,7 +997,10 @@ def main(argv: List[str]) -> int:
         existing = repo.get_item(pk, schema.protocol_sk(slug))
         created_at = (existing or {}).get("CreatedAt") or _now_iso()
         item = row_to_item(row, created_at)
-        if slug in ENTITY_PARENT_SLUGS:
+        if slug in TARGET_ENTITY_OVERRIDES:
+            # Coin whose parent Entity slug differs from the coin slug (USDC -> Circle).
+            item["EntitySlug"] = TARGET_ENTITY_OVERRIDES[slug]
+        elif slug in ENTITY_PARENT_SLUGS:
             item["EntitySlug"] = slug
             patch = ENTITY_PARENT_PATCHES.get(slug, {})
             if patch.get("name"):

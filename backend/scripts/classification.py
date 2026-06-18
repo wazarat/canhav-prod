@@ -76,6 +76,45 @@ CLASSIFICATION: Dict[str, Dict[str, str]] = {
     "rusdy": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "algorithmic-rebase"},
     # Stably's deprecated original token, kept live for backward compatibility.
     "usdsc": {"AssetSubtype": "legacy", "PegMechanism": "fiat-reserve"},
+    # --- Stablecoin Sector Expansion (PDF §3) ---
+    # Fiat-backed regulated dollars (Circle EURC, Paxos, First Digital, M^0, Agora, Bitget).
+    "eurc": {"AssetSubtype": "e-money", "PegMechanism": "fiat-reserve"},
+    "usdp": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    "pyusd": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    "usdg": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    "usdl": {"AssetSubtype": "legacy", "PegMechanism": "fiat-reserve"},
+    "fdusd": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    "m0": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    "ausd": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    "bgusd": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "fiat-reserve"},
+    # GMO Trust multi-currency e-money (USD + JPY).
+    "zusd": {"AssetSubtype": "e-money", "PegMechanism": "fiat-reserve"},
+    "gyen": {"AssetSubtype": "e-money", "PegMechanism": "fiat-reserve"},
+    # Decentralized CDP dollars (Liquity, Curve, Lista, Reserve).
+    "lusd": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "overcollateralized"},
+    "bold": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "overcollateralized"},
+    "crvusd": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "overcollateralized"},
+    "scrvusd": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "overcollateralized"},
+    "lisusd": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "overcollateralized"},
+    "rsv": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "overcollateralized"},
+    "eusd": {"AssetSubtype": "fiat-stablecoin", "PegMechanism": "overcollateralized"},
+    "rgusd": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "overcollateralized"},
+    # Synthetic yield-bearing (Frax, Resolv, Falcon, Cap, Elixir wound-down).
+    "frax": {"AssetSubtype": "synthetic-dollar", "PegMechanism": "overcollateralized"},
+    "frxusd": {"AssetSubtype": "rwa-backed-stable", "PegMechanism": "rwa-collateral"},
+    "sfrax": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "rwa-collateral"},
+    "usr": {"AssetSubtype": "synthetic-dollar", "PegMechanism": "delta-neutral-hedge"},
+    "stusr": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "delta-neutral-hedge"},
+    "rlp": {"AssetSubtype": "insurance-firstloss", "PegMechanism": "none"},
+    "usdf": {"AssetSubtype": "synthetic-dollar", "PegMechanism": "overcollateralized"},
+    "susdf": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "overcollateralized"},
+    "cusd": {"AssetSubtype": "synthetic-dollar", "PegMechanism": "rwa-collateral"},
+    "deusd": {"AssetSubtype": "legacy", "PegMechanism": "delta-neutral-hedge"},
+    "sdeusd": {"AssetSubtype": "legacy", "PegMechanism": "delta-neutral-hedge"},
+    # RWA-backed (Anzen private credit, Mountain T-bill rebase).
+    "usdz": {"AssetSubtype": "rwa-backed-stable", "PegMechanism": "rwa-collateral"},
+    "susdz": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "rwa-collateral"},
+    "usdm": {"AssetSubtype": "rwa-backed-stable", "PegMechanism": "rwa-collateral"},
     # --- Tokens ---
     "chip": {"AssetSubtype": "governance", "PegMechanism": "none"},
     "jup": {"AssetSubtype": "governance", "PegMechanism": "none"},
@@ -243,6 +282,67 @@ COIN_OFFCHAIN_FACTS: Dict[str, List[Dict[str, Any]]] = {
             "semi-live",
             "Aave",
             "https://aave.com",
+        ),
+    ],
+    # --- Stablecoin Sector Expansion (PDF §3) ---
+    "pyusd": [
+        _fact(
+            "reserveComposition",
+            "Fully reserved by U.S. dollar deposits, Treasuries and cash equivalents; "
+            "issued by Paxos under its NYDFS trust charter with monthly Withum attestations.",
+            "semi-live",
+            "Paxos transparency",
+            "https://paxos.com/transparency",
+        ),
+    ],
+    "fdusd": [
+        _fact(
+            "riskEvent",
+            "FDUSD briefly depegged in April 2025 amid solvency allegations; supply fell "
+            "from a ~$3B 2024 peak before partially recovering.",
+            "static",
+            "First Digital",
+            "https://firstdigitallabs.com",
+        ),
+    ],
+    "usr": [
+        _fact(
+            "riskEvent",
+            "Resolv suffered a ~$23M exploit via a compromised private key in March 2026; "
+            "USR collapsed from a ~$700M peak and a post-exploit re-audit is underway.",
+            "static",
+            "Resolv post-mortem",
+            "https://resolv.xyz",
+        ),
+    ],
+    "frxusd": [
+        _fact(
+            "reserveComposition",
+            "frxUSD reserves sit in bankruptcy-remote Reg D structures via Securitize / "
+            "BlackRock BUIDL — Frax's institutional RWA bridge.",
+            "semi-live",
+            "Frax docs",
+            "https://docs.frax.finance",
+        ),
+    ],
+    "usdm": [
+        _fact(
+            "lifecycle",
+            "Mountain Protocol was acquired by Anchorage Digital in April 2025; USDM is "
+            "winding down, with supply collapsed from a ~$150M peak.",
+            "static",
+            "Mountain Protocol",
+            "https://mountainprotocol.com",
+        ),
+    ],
+    "deusd": [
+        _fact(
+            "lifecycle",
+            "Elixir fully shut down in Q1 2026 after a $68-93M Stream Finance loss; deUSD "
+            "is discontinued.",
+            "static",
+            "Elixir",
+            "https://www.elixir.xyz",
         ),
     ],
 }

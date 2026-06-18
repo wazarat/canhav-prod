@@ -1046,6 +1046,37 @@ ENTITY_SPECS.update(LENDING_ENTITY_SPECS)
 # Frax, Resolv, Falcon, Cap, Elixir, Anzen, Mountain Protocol.
 ENTITY_SPECS.update(STABLECOIN_ENTITY_SPECS)
 
+# Stablecoin sub-sector backfill for the pre-existing issuers (PDF §2). Primary
+# stablecoin issuers also get sector="Stablecoin"; cross-tagged protocols keep
+# their primary sector and only gain the stablecoin sub-sector + secondary tags.
+_STABLECOIN_PRIMARY_BACKFILL: Dict[str, Any] = {
+    "tether": ("Fiat-Backed Regulated", []),
+    "ethena": ("Synthetic Yield-Bearing", ["RWA-Backed", "Yield-Bearing"]),
+    "sky": ("Decentralized CDP", ["Yield-Bearing"]),
+    "monerium": ("E-Money Regulated", ["Multi-Currency"]),
+    "stably": ("Fiat-Backed Regulated", []),
+    "trueusd": ("Fiat-Backed Regulated", ["Multi-Currency"]),
+    "usd-ai": ("RWA-Backed Stable", ["RWA-Backed"]),
+}
+_STABLECOIN_SECONDARY_BACKFILL: Dict[str, Any] = {
+    "jupiter": ("Synthetic Yield-Bearing", ["RWA-Backed"]),
+    "ondo-finance": ("RWA-Backed Stable", []),
+    "aave": ("Decentralized CDP", []),
+    "pleasing-market": ("Fiat-Backed Regulated", []),
+    "inverse-finance": ("Decentralized CDP", []),
+}
+for _slug, (_subsector, _tags) in _STABLECOIN_PRIMARY_BACKFILL.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["sector"] = "Stablecoin"
+        _spec["stablecoin_sub_sector"] = _subsector
+        _spec["stablecoin_secondary_tags"] = _tags
+for _slug, (_subsector, _tags) in _STABLECOIN_SECONDARY_BACKFILL.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["stablecoin_sub_sector"] = _subsector
+        _spec["stablecoin_secondary_tags"] = _tags
+
 
 def build_entity_item(
     slug: str, spec: Dict[str, Any], parent_row: Optional[Dict[str, str]], created_at: str

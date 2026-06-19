@@ -225,6 +225,29 @@ def main(argv: List[str]) -> int:
     if aave_updated:
         print(f"Aave rates : refreshed {aave_updated} item(s) (supply/borrow APY).")
 
+    # --- Lending networks: DeFi Llama live protocol TVL --------------------
+    # Run before DEX/RWA so a slow DEX volume fetch cannot block lending TVL.
+    lending_updated = 0
+    for item in items:
+        if item.get("Category") != schema.CATEGORY_ENTITY:
+            continue
+        if item.get("Sector") != "Lending":
+            continue
+        slug = _slug_of(item)
+        if defillama.llama_lending_project_for_slug(slug) is None:
+            continue
+        tvl = defillama.fetch_protocol_tvl(slug)
+        if tvl["value"] is None:
+            continue
+        if not args.dry_run:
+            item["Lending"] = {**(item.get("Lending") or {}), "tvlUsd": _to_sourced(tvl)}
+            item["CurrentScale"] = {**(item.get("CurrentScale") or {}), "tvlUsd": tvl["value"]}
+            item["UpdatedAt"] = _now_iso()
+            repo.put_item(item)
+        lending_updated += 1
+    if lending_updated:
+        print(f"Lending live: refreshed {lending_updated} item(s) (protocol TVL).")
+
     # --- DEX networks: DeFi Llama live TVL + 30d volume -------------------
     # Mirror of the TS cron DEX pass. Overlays live protocol TVL + volume onto
     # the curated `Dex` block, preserving curated fields. Keyless; fails soft.

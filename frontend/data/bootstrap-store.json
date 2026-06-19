@@ -1,9 +1,9 @@
 {
   "_meta": {
     "backend": "local",
-    "count": 197,
+    "count": 187,
     "table": "canhav-research",
-    "updatedAt": "2026-06-19T17:04:30Z"
+    "updatedAt": "2026-06-19T18:33:19Z"
   },
   "items": {
     "CATEGORY#Entity|PROTOCOL#aave": {
@@ -114,11 +114,11 @@
       ],
       "CreatedAt": "2026-06-05T19:46:53Z",
       "CurrentScale": {
-        "aprPct": null,
+        "aprPct": 4.9556612606856065,
         "loanPipelineUsd": null,
         "partnerships": 2,
         "targetAprPct": null,
-        "tvlUsd": 12480000000,
+        "tvlUsd": 12237462429.0,
         "users": null
       },
       "Description": "Aave is a multichain non-custodial lending protocol for supplying, borrowing, and earning interest. The Aave DAO governs parameters, listings, and emissions; Aave Labs is the primary development company.",
@@ -234,7 +234,13 @@
           "DAI",
           "GHO"
         ],
-        "stablecoinExposurePct": 70
+        "stablecoinExposurePct": 70,
+        "tvlUsd": {
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:47Z",
+          "value": 12237462429.0
+        }
       },
       "LendingTagMetrics": {
         "moneyMarkets": {
@@ -412,6 +418,7 @@
       "RwaSubSector": null,
       "SK": "PROTOCOL#aave",
       "ScaleLabels": {
+        "apr": "GHO supply APY",
         "tvl": "Protocol TVL"
       },
       "SecondarySectors": [
@@ -493,7 +500,7 @@
       ],
       "Twitter": "https://twitter.com/aaveaave",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:47Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Entity|PROTOCOL#aerodrome": {
@@ -533,7 +540,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 310000000,
+        "tvlUsd": 161374948.0,
         "users": null
       },
       "Description": "Aerodrome is a Solidly-fork ve(3,3) DEX on Base, the dominant venue on the Coinbase L2 by volume. It captures emissions-driven sticky liquidity and offers Slipstream concentrated liquidity.",
@@ -559,16 +566,16 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 310000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:31:35Z",
+          "value": 161374948.0
         },
         "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": null
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:31:35Z",
+          "value": 17451932840.0
         }
       },
       "DexSecondaryTags": [
@@ -641,7 +648,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/aerodromefi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:31:35Z",
       "Website": "https://aerodrome.finance"
     },
     "CATEGORY#Entity|PROTOCOL#agora": {
@@ -803,7 +810,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/withAUSD",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://www.agora.finance"
     },
     "CATEGORY#Entity|PROTOCOL#anzen": {
@@ -964,7 +971,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/AnzenFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://www.anzen.finance"
     },
     "CATEGORY#Entity|PROTOCOL#arcton": {
@@ -1071,7 +1078,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://arcton.com"
     },
     "CATEGORY#Entity|PROTOCOL#aryze": {
@@ -1179,7 +1186,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://aryze.io"
     },
     "CATEGORY#Entity|PROTOCOL#atmosphera": {
@@ -1284,7 +1291,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://atmosphera.com"
     },
     "CATEGORY#Entity|PROTOCOL#balancer": {
@@ -1330,7 +1337,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 136000000,
+        "tvlUsd": 139740780.0,
         "users": null
       },
       "Description": "Balancer is a generalized AMM supporting up to 8 assets per pool with arbitrary weights (not just 50/50), used for index-style pools and structured liquidity. V3 (2024+) added hooks.",
@@ -1360,16 +1367,16 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 136000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:31:44Z",
+          "value": 139740780.0
         },
         "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": null
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:31:44Z",
+          "value": 502789621.0
         }
       },
       "DexSecondaryTags": [
@@ -1442,7 +1449,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Balancer",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:31:44Z",
       "Website": "https://balancer.fi"
     },
     "CATEGORY#Entity|PROTOCOL#bitget": {
@@ -1589,7 +1596,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/bitgetglobal",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://www.bitget.com"
     },
     "CATEGORY#Entity|PROTOCOL#cap": {
@@ -1737,7 +1744,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/capmoney_",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://cap.app"
     },
     "CATEGORY#Entity|PROTOCOL#centrifuge": {
@@ -1781,7 +1788,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 1790000000,
+        "tvlUsd": 1633773806.0,
         "users": null
       },
       "Description": "Centrifuge tokenizes illiquid real-world business assets (invoices, mortgages, trade finance) through bankruptcy-remote SPV structures. DROP/TIN senior-junior tranche tokens link legal collateral to on-chain investors; JAAA and JTRSY add tokenized CLO and Treasury exposure.",
@@ -1830,10 +1837,10 @@
       "Rwa": {
         "auditHistory": "SRLabs, Trail of Bits.",
         "aumUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
-          "updatedAt": null,
-          "value": 1790000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:33Z",
+          "value": 1633773806.0
         },
         "deployment": {
           "chains": [
@@ -1908,7 +1915,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/centrifuge",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:33Z",
       "Website": "https://centrifuge.io"
     },
     "CATEGORY#Entity|PROTOCOL#chateau-capital": {
@@ -2015,7 +2022,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://chateau.capital"
     },
     "CATEGORY#Entity|PROTOCOL#circle": {
@@ -2188,7 +2195,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/circle",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://www.circle.com"
     },
     "CATEGORY#Entity|PROTOCOL#clearpool": {
@@ -2236,7 +2243,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 60000000,
+        "tvlUsd": 26568863.0,
         "users": null
       },
       "Description": "Clearpool runs institutional uncollateralized lending — whitelisted institutional borrowers access dynamic-rate pools where utilization sets interest. It introduced 'Credit Vaults' for permissioned single-borrower exposure; cpUSD is tied to Credit Vault yields.",
@@ -2285,10 +2292,10 @@
       "Rwa": {
         "auditHistory": "Peckshield, ChainSecurity.",
         "aumUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
-          "updatedAt": null,
-          "value": 60000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:34Z",
+          "value": 26568863.0
         },
         "deployment": {
           "chains": [
@@ -2361,7 +2368,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ClearpoolFin",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:34Z",
       "Website": "https://clearpool.finance"
     },
     "CATEGORY#Entity|PROTOCOL#compound": {
@@ -2413,7 +2420,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": null,
+        "tvlUsd": 1059404580.0,
         "users": null
       },
       "Description": "Compound is one of the original DeFi lending protocols. Compound III simplifies each market to a single borrowable base asset with other assets posted purely as collateral.",
@@ -2477,7 +2484,13 @@
           "USDC",
           "USDT"
         ],
-        "stablecoinExposurePct": 75
+        "stablecoinExposurePct": 75,
+        "tvlUsd": {
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:47Z",
+          "value": 1059404580.0
+        }
       },
       "LendingTagMetrics": {
         "moneyMarkets": {
@@ -2534,7 +2547,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/compoundfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:47Z",
       "Website": "https://compound.finance"
     },
     "CATEGORY#Entity|PROTOCOL#curve-finance": {
@@ -2584,7 +2597,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 1440000000,
+        "tvlUsd": 1420530529.75665,
         "users": null
       },
       "Description": "Curve's stableswap invariant is optimized for trades between like-pegged assets (stablecoins, LSTs). It pioneered vote-escrow tokenomics where governance power is bought with locked CRV (veCRV) and runs its own crvUSD CDP stablecoin.",
@@ -2614,16 +2627,16 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 1440000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:31:53Z",
+          "value": 1420530529.75665
         },
         "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": null
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:31:54Z",
+          "value": 3847189530.0
         }
       },
       "DexSecondaryTags": [
@@ -2698,7 +2711,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/CurveFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:31:54Z",
       "Website": "https://curve.fi"
     },
     "CATEGORY#Entity|PROTOCOL#curve-stablecoin": {
@@ -2879,7 +2892,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/CurveFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://crvusd.curve.fi"
     },
     "CATEGORY#Entity|PROTOCOL#dinari": {
@@ -2987,7 +3000,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://dinari.com"
     },
     "CATEGORY#Entity|PROTOCOL#drift-protocol": {
@@ -3026,7 +3039,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 205000000,
+        "tvlUsd": 5456265.0,
         "users": null
       },
       "Description": "Drift is the leading Solana-native perps DEX. It combines an on-chain orderbook (DLOB) with an AMM (vAMM) fallback so liquidity providers and just-in-time market makers can both serve fills.",
@@ -3069,10 +3082,10 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 205000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:31:55Z",
+          "value": 5456265.0
         },
         "volume30dUsd": {
           "dataSource": "derived",
@@ -3152,7 +3165,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/DriftProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:31:55Z",
       "Website": "https://drift.trade"
     },
     "CATEGORY#Entity|PROTOCOL#dualmint": {
@@ -3259,7 +3272,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://dualmint.com"
     },
     "CATEGORY#Entity|PROTOCOL#dydx": {
@@ -3299,7 +3312,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 135000000,
+        "tvlUsd": 134824328.0,
         "users": null
       },
       "Description": "dYdX is the original decentralized perps pioneer. V4 runs on its own Cosmos appchain with decentralized, validator-driven order matching and strong BTC/ETH perp liquidity targeted at professional traders.",
@@ -3342,10 +3355,10 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 135000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:31Z",
+          "value": 134824328.0
         },
         "volume30dUsd": {
           "dataSource": "derived",
@@ -3425,7 +3438,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/dYdX",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:31Z",
       "Website": "https://dydx.exchange"
     },
     "CATEGORY#Entity|PROTOCOL#elixir": {
@@ -3584,7 +3597,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/elixir",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://www.elixir.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#estate-protocol": {
@@ -3692,7 +3705,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://estateprotocol.com"
     },
     "CATEGORY#Entity|PROTOCOL#ethena": {
@@ -3732,6 +3745,7 @@
           "name": "ENA"
         }
       ],
+      "ContractAddress": "0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
       "CreatedAt": "2026-06-05T19:28:30Z",
       "CurrentScale": {
         "aprPct": 11.3,
@@ -4054,7 +4068,7 @@
       ],
       "Twitter": "https://x.com/ethena_labs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:35Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Entity|PROTOCOL#falcon": {
@@ -4215,7 +4229,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/FalconStable",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://falcon.finance"
     },
     "CATEGORY#Entity|PROTOCOL#first-digital": {
@@ -4377,7 +4391,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/FDLabsHQ",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://firstdigitallabs.com"
     },
     "CATEGORY#Entity|PROTOCOL#florence-finance": {
@@ -4484,7 +4498,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://florence.finance"
     },
     "CATEGORY#Entity|PROTOCOL#fluid": {
@@ -4527,6 +4541,7 @@
         }
       ],
       "Components": [],
+      "ContractAddress": "0x61e030a56d33e8260fdd81f03b162a79fe3449cd",
       "CreatedAt": "2026-06-17T19:33:57Z",
       "CurrentScale": {
         "aprPct": null,
@@ -4534,7 +4549,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": null,
+        "tvlUsd": 700272844.0,
         "users": null
       },
       "Description": "Fluid (formerly Instadapp) combines lending, vaults and DEX liquidity through a shared liquidity layer, so the same capital can support lending and trading.",
@@ -4596,7 +4611,13 @@
           "USDT",
           "GHO"
         ],
-        "stablecoinExposurePct": 55
+        "stablecoinExposurePct": 55,
+        "tvlUsd": {
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:47Z",
+          "value": 700272844.0
+        }
       },
       "LendingTagMetrics": {
         "liquidityHybrid": {
@@ -4655,7 +4676,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/0xfluid",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:47Z",
       "Website": "https://fluid.io"
     },
     "CATEGORY#Entity|PROTOCOL#franklin-templeton": {
@@ -4695,6 +4716,7 @@
         }
       ],
       "Components": [],
+      "ContractAddress": "0xb9e4765bce2609bc1949592059b17ea72fee6c6a",
       "CreatedAt": "2026-06-19T16:38:20Z",
       "CurrentScale": {
         "aprPct": null,
@@ -4807,7 +4829,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/FTI_US",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://www.franklintempleton.com"
     },
     "CATEGORY#Entity|PROTOCOL#frax": {
@@ -4985,7 +5007,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/fraxfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://frax.finance"
     },
     "CATEGORY#Entity|PROTOCOL#gains-network": {
@@ -5026,7 +5048,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 13300000,
+        "tvlUsd": 13870413.0,
         "users": null
       },
       "Description": "Gains Network (gTrade) offers synthetic leveraged trading backed by gToken LP vaults; it supports very high leverage (up to 150x) across crypto, forex, and equities/indices, accessible to retail with low minimums.",
@@ -5071,10 +5093,10 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 13300000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:31:59Z",
+          "value": 13870413.0
         },
         "volume30dUsd": {
           "dataSource": "derived",
@@ -5155,7 +5177,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/GainsNetwork_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:31:59Z",
       "Website": "https://gains.trade"
     },
     "CATEGORY#Entity|PROTOCOL#gmo-trust": {
@@ -5321,7 +5343,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/gmotrust",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://stablecoin.z.com"
     },
     "CATEGORY#Entity|PROTOCOL#gmx": {
@@ -5361,7 +5383,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 177000000,
+        "tvlUsd": 175492936.0,
         "users": null
       },
       "Description": "GMX uses multi-asset liquidity pools (GLP V1, GM V2) where LPs are the counterparty to traders; oracle-based pricing means zero price-impact trades up to pool depth. V2 added isolated-market GM pools.",
@@ -5405,10 +5427,10 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 177000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:31:57Z",
+          "value": 175492936.0
         },
         "volume30dUsd": {
           "dataSource": "derived",
@@ -5490,7 +5512,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/GMX_IO",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:31:57Z",
       "Website": "https://gmx.io"
     },
     "CATEGORY#Entity|PROTOCOL#goldfinch": {
@@ -5529,7 +5551,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 57000000,
+        "tvlUsd": 1638835.0,
         "users": null
       },
       "Description": "Goldfinch provides uncollateralized crypto loans to real-world businesses in emerging markets via 'trust through consensus' — human backers assess borrower creditworthiness instead of crypto over-collateralization. It pivoted to institutional-grade 'Goldfinch Prime' private-credit funds in 2024. FIDU is the senior-pool LP token.",
@@ -5578,10 +5600,10 @@
       "Rwa": {
         "auditHistory": "Certik, Trail of Bits.",
         "aumUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
-          "updatedAt": null,
-          "value": 57000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:35Z",
+          "value": 1638835.0
         },
         "deployment": {
           "chains": [
@@ -5650,7 +5672,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/goldfinch_fi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:35Z",
       "Website": "https://goldfinch.finance"
     },
     "CATEGORY#Entity|PROTOCOL#hyperliquid": {
@@ -5690,7 +5712,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 6030000000,
+        "tvlUsd": 5996616859.0,
         "users": null
       },
       "Description": "Hyperliquid is a purpose-built L1 with a fully on-chain CLOB — ~200k orders/sec throughput, sub-second finality, and the deepest on-chain perp liquidity in 2026 (typically >70% of on-chain perp volume). HyperEVM extends programmability.",
@@ -5733,10 +5755,10 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 6030000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:31:59Z",
+          "value": 5996616859.0
         },
         "volume30dUsd": {
           "dataSource": "derived",
@@ -5818,7 +5840,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/HyperliquidX",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:31:59Z",
       "Website": "https://hyperliquid.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#inverse-finance": {
@@ -5959,7 +5981,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/InverseFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://inverse.finance"
     },
     "CATEGORY#Entity|PROTOCOL#jupiter": {
@@ -6357,7 +6379,7 @@
       ],
       "Twitter": "https://x.com/JupiterExchange",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:35Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Entity|PROTOCOL#justlend": {
@@ -6404,7 +6426,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": null,
+        "tvlUsd": 3049781558.0,
         "users": null
       },
       "Description": "JustLend DAO is the dominant pooled money market on Tron, especially for USDT lending, and part of the broader JUST ecosystem.",
@@ -6459,7 +6481,13 @@
           "USDT",
           "USDD"
         ],
-        "stablecoinExposurePct": 88
+        "stablecoinExposurePct": 88,
+        "tvlUsd": {
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:48Z",
+          "value": 3049781558.0
+        }
       },
       "LendingTagMetrics": {
         "moneyMarkets": {
@@ -6516,7 +6544,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/DeFi_JUST",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:48Z",
       "Website": "https://justlend.org"
     },
     "CATEGORY#Entity|PROTOCOL#kamino": {
@@ -6563,7 +6591,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": null,
+        "tvlUsd": 1073191929.0,
         "users": null
       },
       "Description": "Kamino Finance is a major Solana lending and liquidity protocol where markets and vaults are separated by asset, risk profile and strategy.",
@@ -6622,7 +6650,13 @@
           "USDT",
           "PYUSD"
         ],
-        "stablecoinExposurePct": 62
+        "stablecoinExposurePct": 62,
+        "tvlUsd": {
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:48Z",
+          "value": 1073191929.0
+        }
       },
       "LendingTagMetrics": {
         "isolatedCurated": {
@@ -6683,7 +6717,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/KaminoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:48Z",
       "Website": "https://kamino.finance"
     },
     "CATEGORY#Entity|PROTOCOL#liquity": {
@@ -6860,7 +6894,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/LiquityProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://www.liquity.org"
     },
     "CATEGORY#Entity|PROTOCOL#lista-dao": {
@@ -7020,7 +7054,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/lista_dao",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://lista.org"
     },
     "CATEGORY#Entity|PROTOCOL#lofty-ai": {
@@ -7059,7 +7093,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 99600000,
+        "tvlUsd": 99653850.0,
         "users": null
       },
       "Description": "Lofty.ai offers fractional US real estate on Algorand — sub-cent transactions, a $50 minimum, and per-property ASA (Algorand Standard Asset) governance. Daily rental yield is distributed in USDC.",
@@ -7099,10 +7133,10 @@
       "Rwa": {
         "auditHistory": "Algorand Foundation reviewed.",
         "aumUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
-          "updatedAt": null,
-          "value": 99600000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:36Z",
+          "value": 99653850.0
         },
         "deployment": {
           "chains": [
@@ -7160,7 +7194,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/lofty_ai",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:36Z",
       "Website": "https://www.lofty.ai"
     },
     "CATEGORY#Entity|PROTOCOL#m-zero": {
@@ -7317,7 +7351,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/m0foundation",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://m0.org"
     },
     "CATEGORY#Entity|PROTOCOL#maple": {
@@ -7367,7 +7401,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": null,
+        "tvlUsd": 2057865100.0,
         "users": null
       },
       "Description": "Maple Finance runs onchain lending pools to vetted borrowers — institutions, funds and businesses — closer to a blockchain-based credit marketplace than open overcollateralized DeFi lending.",
@@ -7424,7 +7458,13 @@
           "USDC",
           "USDT"
         ],
-        "stablecoinExposurePct": 95
+        "stablecoinExposurePct": 95,
+        "tvlUsd": {
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:48Z",
+          "value": 2057865100.0
+        }
       },
       "LendingTagMetrics": {
         "institutionalCredit": {
@@ -7534,7 +7574,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/maplefinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:48Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Entity|PROTOCOL#monerium": {
@@ -7815,7 +7855,7 @@
       ],
       "Twitter": "https://x.com/monerium",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:35Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Entity|PROTOCOL#morpho": {
@@ -7871,7 +7911,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": null,
+        "tvlUsd": 6882116047.0,
         "users": null
       },
       "Description": "Morpho is a lending protocol built around Morpho Blue, a minimal primitive for creating isolated markets, with MetaMorpho vaults that allocate deposits across those markets through risk curators.",
@@ -7935,7 +7975,13 @@
           "DAI",
           "USDe"
         ],
-        "stablecoinExposurePct": 68
+        "stablecoinExposurePct": 68,
+        "tvlUsd": {
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:49Z",
+          "value": 6882116047.0
+        }
       },
       "LendingTagMetrics": {
         "isolatedCurated": {
@@ -8012,7 +8058,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/MorphoLabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:49Z",
       "Website": "https://morpho.org"
     },
     "CATEGORY#Entity|PROTOCOL#mountain-protocol": {
@@ -8179,7 +8225,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/MountainUSDM",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://mountainprotocol.com"
     },
     "CATEGORY#Entity|PROTOCOL#ondo-finance": {
@@ -8226,7 +8272,7 @@
         "loanPipelineUsd": null,
         "partnerships": 3,
         "targetAprPct": null,
-        "tvlUsd": 2140000000,
+        "tvlUsd": 3667855993.0,
         "users": null
       },
       "Description": "Ondo Finance packages regulated, institutionally structured real-world assets into yield-bearing onchain tokens with 24/7 mint/redeem and explicit legal wrappers (Reg S for USDY; Rule 506(c)/3(c)(7) for OUSG).",
@@ -8432,7 +8478,14 @@
           "description": "ONDO tokenholder governance over protocol parameters."
         }
       ],
-      "Rwa": null,
+      "Rwa": {
+        "aumUsd": {
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:38Z",
+          "value": 3667855993.0
+        }
+      },
       "RwaSecondaryTags": [
         "Institutional-Gated",
         "Yield-Bearing"
@@ -8510,7 +8563,7 @@
       ],
       "Twitter": "https://x.com/OndoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:38Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#Entity|PROTOCOL#pancakeswap": {
@@ -8557,7 +8610,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 2130000000,
+        "tvlUsd": 2097712368.0,
         "users": null
       },
       "Description": "PancakeSwap is the dominant DEX in the BNB ecosystem — retail-focused with gamification (lotteries, predictions, NFTs) plus its Infinity CLMM and a perps DEX.",
@@ -8586,16 +8639,16 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 2130000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:09Z",
+          "value": 2097712368.0
         },
         "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 25100000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:09Z",
+          "value": 25173244452.0
         }
       },
       "DexSecondaryTags": [
@@ -8672,7 +8725,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/PancakeSwap",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:09Z",
       "Website": "https://pancakeswap.finance"
     },
     "CATEGORY#Entity|PROTOCOL#paxos": {
@@ -8855,7 +8908,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/paxos",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Entity|PROTOCOL#pleasing-market": {
@@ -9100,7 +9153,7 @@
       ],
       "Twitter": "https://x.com/PleasingMarket",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://www.pleasingmarket.com/"
     },
     "CATEGORY#Entity|PROTOCOL#raydium": {
@@ -9139,7 +9192,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 841000000,
+        "tvlUsd": 821326982.0,
         "users": null
       },
       "Description": "Raydium is Solana's major AMM with a hybrid model — it shares liquidity with the OpenBook central limit order book, so AMM and orderbook flow benefit each other. It is the dominant venue for Solana meme-coin liquidity.",
@@ -9164,16 +9217,16 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 841000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:12Z",
+          "value": 821326982.0
         },
         "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": null
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:12Z",
+          "value": 4198572392.0
         }
       },
       "DexSecondaryTags": [
@@ -9246,7 +9299,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/RaydiumProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:12Z",
       "Website": "https://raydium.io"
     },
     "CATEGORY#Entity|PROTOCOL#realt": {
@@ -9286,7 +9339,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 156900000,
+        "tvlUsd": 156775599.0,
         "users": null
       },
       "Description": "RealT offers pure fractional real estate; tokens represent ownership slices of US residential/commercial properties via Delaware LLCs, with daily rental yields paid in stablecoins (xDai / USDC) directly to wallet. Hundreds of per-property RealTokens each trade as their own ERC-20.",
@@ -9335,10 +9388,10 @@
       "Rwa": {
         "auditHistory": "Property-level legal opinions; on-chain audits by Hexens.",
         "aumUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
-          "updatedAt": null,
-          "value": 156900000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:40Z",
+          "value": 156775599.0
         },
         "deployment": {
           "chains": [
@@ -9397,7 +9450,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/RealTPlatform",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:40Z",
       "Website": "https://realt.co"
     },
     "CATEGORY#Entity|PROTOCOL#reserve": {
@@ -9578,7 +9631,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/reserveprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://reserve.org"
     },
     "CATEGORY#Entity|PROTOCOL#resolv": {
@@ -9759,7 +9812,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ResolvLabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://resolv.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#securitize": {
@@ -9806,7 +9859,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 4000000000,
+        "tvlUsd": 4406322488.0,
         "users": null
       },
       "Description": "Securitize is the leading SEC-registered transfer agent for tokenized securities. It powers BlackRock BUIDL (the largest tokenized Treasury fund) plus Apollo, KKR, Hamilton Lane, and VanEck product launches. Product tokens include BUIDL, ACRED (Apollo private credit), sBUIDL, and VBILL (VanEck Treasuries).",
@@ -9846,10 +9899,10 @@
       "Rwa": {
         "auditHistory": "Big-4 fund attestations; contract audits by ChainSecurity, Halborn.",
         "aumUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
-          "updatedAt": null,
-          "value": 4000000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:42Z",
+          "value": 4406322488.0
         },
         "deployment": {
           "chains": [
@@ -9919,7 +9972,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Securitize",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:42Z",
       "Website": "https://securitize.io"
     },
     "CATEGORY#Entity|PROTOCOL#sky": {
@@ -10276,7 +10329,7 @@
       ],
       "Twitter": "https://x.com/SkyEcosystem",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:35Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Entity|PROTOCOL#spark": {
@@ -10331,7 +10384,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": null,
+        "tvlUsd": 4607751302.7471695,
         "users": null
       },
       "Description": "Spark is a lending system built mainly around stablecoin liquidity, borrowing and yield (SparkLend + Spark Savings), routing USDS/DAI liquidity from the Sky/Maker ecosystem at scale.",
@@ -10391,7 +10444,13 @@
           "DAI",
           "USDC"
         ],
-        "stablecoinExposurePct": 82
+        "stablecoinExposurePct": 82,
+        "tvlUsd": {
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:50Z",
+          "value": 4607751302.7471695
+        }
       },
       "LendingTagMetrics": {
         "stablecoinNative": {
@@ -10476,7 +10535,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/sparkdotfi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:50Z",
       "Website": "https://spark.fi"
     },
     "CATEGORY#Entity|PROTOCOL#stably": {
@@ -10734,7 +10793,7 @@
       ],
       "Twitter": "https://twitter.com/Stably_Official",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Entity|PROTOCOL#sushiswap": {
@@ -10784,7 +10843,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 82000000,
+        "tvlUsd": 32407552.0,
         "users": null
       },
       "Description": "SushiSwap maintains an aggressive multi-chain presence (40+ chains). SushiXSwap enables cross-chain swaps between assets on entirely different chains in one transaction.",
@@ -10814,16 +10873,16 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 82000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:22Z",
+          "value": 32407552.0
         },
         "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": null
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:22Z",
+          "value": 24112738.0
         }
       },
       "DexSecondaryTags": [
@@ -10896,7 +10955,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/SushiSwap",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:22Z",
       "Website": "https://www.sushi.com"
     },
     "CATEGORY#Entity|PROTOCOL#tether": {
@@ -11047,7 +11106,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Tether_to",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://tether.to"
     },
     "CATEGORY#Entity|PROTOCOL#thorchain": {
@@ -11095,7 +11154,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 54000000,
+        "tvlUsd": 51981230.0,
         "users": null
       },
       "Description": "THORChain is an independent Cosmos-SDK L1 enabling native cross-chain swaps (native BTC <-> native ETH <-> native BNB, etc.) with no wrapping, using threshold-signature (TSS) vaults per supported chain.",
@@ -11134,10 +11193,10 @@
           ]
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 54000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:24Z",
+          "value": 51981230.0
         },
         "volume30dUsd": {
           "dataSource": "derived",
@@ -11222,7 +11281,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/THORChain",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:24Z",
       "Website": "https://thorchain.org"
     },
     "CATEGORY#Entity|PROTOCOL#toucan-protocol": {
@@ -11263,7 +11322,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 618000,
+        "tvlUsd": 526517.0,
         "users": null
       },
       "Description": "Toucan Protocol tokenizes verified carbon credits (BCT / NCT pool tokens), bridging credits from registries like Verra onto chain for transparent on-chain offsetting and liquid carbon markets. BCT admin was transferred to KlimaDAO in 2024.",
@@ -11308,10 +11367,10 @@
       "Rwa": {
         "auditHistory": "Code4rena, Hexens.",
         "aumUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
-          "updatedAt": null,
-          "value": 618000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:43Z",
+          "value": 526517.0
         },
         "deployment": {
           "chains": [
@@ -11365,7 +11424,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/toucanprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:43Z",
       "Website": "https://toucan.earth"
     },
     "CATEGORY#Entity|PROTOCOL#trader-joe": {
@@ -11406,7 +11465,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 23000000,
+        "tvlUsd": 24197611.0,
         "users": null
       },
       "Description": "Trader Joe (LFJ) uses a 'Liquidity Book' architecture of discrete price bins — zero slippage within a bin plus dynamic fees that adjust to volatility to protect LPs from impermanent loss.",
@@ -11433,16 +11492,16 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 23000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:29Z",
+          "value": 24197611.0
         },
         "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": null
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:29Z",
+          "value": 487239545.0
         }
       },
       "DexSecondaryTags": [
@@ -11515,7 +11574,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/LFJ_gg",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:29Z",
       "Website": "https://lfj.gg"
     },
     "CATEGORY#Entity|PROTOCOL#trueusd": {
@@ -11770,7 +11829,7 @@
       ],
       "Twitter": "https://twitter.com/tusdio",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:35Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Entity|PROTOCOL#uniswap": {
@@ -11820,7 +11879,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 3120000000,
+        "tvlUsd": 3042247104.0,
         "users": null
       },
       "Description": "Uniswap is the leading automated market maker. V3 introduced concentrated-liquidity ranges; V4 introduced 'hooks' that let pools embed custom logic (TWAMM, dynamic fees, on-chain limit orders) without forking the core contract.",
@@ -11850,16 +11909,16 @@
           }
         },
         "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 3120000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:29Z",
+          "value": 3042247104.0
         },
         "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 42600000000
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:30Z",
+          "value": 43437432215.0
         }
       },
       "DexSecondaryTags": [
@@ -11935,7 +11994,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Uniswap",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:30Z",
       "Website": "https://uniswap.org"
     },
     "CATEGORY#Entity|PROTOCOL#usd-ai": {
@@ -12383,7 +12442,7 @@
       ],
       "Twitter": "https://x.com/USDai_Official",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:35Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Entity|PROTOCOL#usdt0": {
@@ -12418,6 +12477,7 @@
         }
       ],
       "Components": [],
+      "ContractAddress": "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
       "CreatedAt": "2026-06-19T17:04:02Z",
       "CurrentScale": {
         "aprPct": null,
@@ -12527,7 +12587,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Tether_to",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:10:36Z",
       "Website": "https://tether.to"
     },
     "CATEGORY#Entity|PROTOCOL#venus": {
@@ -12578,7 +12638,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": null,
+        "tvlUsd": 1023911126.0,
         "users": null
       },
       "Description": "Venus is a major pooled money market, strongly associated with BNB Chain, that also issues the VAI stablecoin and supports cross-chain XVS.",
@@ -12644,7 +12704,13 @@
           "USDC",
           "VAI"
         ],
-        "stablecoinExposurePct": 78
+        "stablecoinExposurePct": 78,
+        "tvlUsd": {
+          "dataSource": "live",
+          "sourceLabel": "DeFi Llama",
+          "updatedAt": "2026-06-19T18:32:51Z",
+          "value": 1023911126.0
+        }
       },
       "LendingTagMetrics": {
         "moneyMarkets": {
@@ -12701,434 +12767,8 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/VenusProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-19T17:04:27Z",
+      "UpdatedAt": "2026-06-19T18:32:51Z",
       "Website": "https://venus.io"
-    },
-    "CATEGORY#RWA|PROTOCOL#arcton": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": "https://portal-data.arbitrum.io/images/projects/arcton-banner.webp",
-        "chains": [
-          "Arbitrum One"
-        ],
-        "foundedDate": "May 01 2021, 04:00 AM EDT",
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/arcton-logo.webp",
-        "portalUrl": "https://portal.arbitrum.io/projects/arcton",
-        "subCategory": "Real World Assets (RWAs)"
-      },
-      "AssetClass": "Tokenized Equities",
-      "AssetSubtype": "tokenized-equity",
-      "AuditURL": null,
-      "Category": "RWA",
-      "CoinGecko": "We dont have  a token",
-      "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "The first trading platform for startup IPOs",
-      "Discord": "https://discord.gg/jeDBheXM",
-      "GitHub": null,
-      "HistoricalTvlData": {
-        "points": [],
-        "source": "dune",
-        "updatedAt": null
-      },
-      "Name": "Arcton",
-      "PK": "CATEGORY#RWA",
-      "PegMechanism": "rwa-collateral",
-      "SK": "PROTOCOL#arcton",
-      "Slug": "arcton",
-      "Status": "APPROVED",
-      "Symbol": "ARC",
-      "TotalValueLocked": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://twitter.com/Arctonhq",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
-      "Website": "https://arcton.com/"
-    },
-    "CATEGORY#RWA|PROTOCOL#aryze": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": "https://portal-data.arbitrum.io/images/projects/aryze-banner.webp",
-        "chains": [
-          "Arbitrum One"
-        ],
-        "foundedDate": "June 01 2017, 04:00 AM EDT",
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/aryze-logo.webp",
-        "portalUrl": "https://portal.arbitrum.io/projects/aryze",
-        "subCategory": "Real World Assets (RWAs)"
-      },
-      "AssetClass": "Stablecoins & FX",
-      "AssetSubtype": "rwa-backed-stable",
-      "AuditURL": null,
-      "Category": "RWA",
-      "CoinGecko": null,
-      "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "Aryze offers Stablecoin Services, including seamless cross-border payments, secure treasury management, branded stablecoins (SaaS), and tokenization—backed by real-world assets to ensure transparency, compliance, and trust.",
-      "Discord": "https://discord.com/invite/C2xjkatmpC",
-      "GitHub": "https://github.com/ARYZEofficial",
-      "HistoricalTvlData": {
-        "points": [],
-        "source": "dune",
-        "updatedAt": null
-      },
-      "Name": "Aryze",
-      "PK": "CATEGORY#RWA",
-      "PegMechanism": "rwa-collateral",
-      "SK": "PROTOCOL#aryze",
-      "Slug": "aryze",
-      "Status": "APPROVED",
-      "Symbol": "ARYZE",
-      "TotalValueLocked": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://x.com/ARYZEofficial",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
-      "Website": "https://www.aryze.io/"
-    },
-    "CATEGORY#RWA|PROTOCOL#atmosphera": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": "https://portal-data.arbitrum.io/images/projects/atmosphera-banner.webp",
-        "chains": [
-          "Arbitrum One"
-        ],
-        "foundedDate": "October 10 2025, 12:00 AM EDT",
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/atmosphera-logo.webp",
-        "portalUrl": "https://portal.arbitrum.io/projects/atmosphera",
-        "subCategory": "Real World Assets (RWAs)"
-      },
-      "AssetClass": "Event Finance",
-      "AuditURL": null,
-      "Category": "RWA",
-      "CoinGecko": null,
-      "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "Invest in events.\n‍Pocket the upside.\nDiscover, fund, and profit from world-class events. Investing and real returns.",
-      "Discord": "https://t.me/atmospherainvest",
-      "GitHub": null,
-      "HistoricalTvlData": {
-        "points": [],
-        "source": "dune",
-        "updatedAt": null
-      },
-      "Name": "Atmosphera",
-      "PK": "CATEGORY#RWA",
-      "SK": "PROTOCOL#atmosphera",
-      "Slug": "atmosphera",
-      "Status": "APPROVED",
-      "Symbol": "ATMO",
-      "TotalValueLocked": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
-      "Website": "https://atmosphera.live/"
-    },
-    "CATEGORY#RWA|PROTOCOL#centrifuge": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": "https://portal-data.arbitrum.io/images/projects/centrifuge-banner.webp",
-        "chains": [
-          "Arbitrum One"
-        ],
-        "foundedDate": "June 01 2017, 04:00 AM EDT",
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/centrifuge-logo.webp",
-        "portalUrl": "https://portal.arbitrum.io/projects/centrifuge",
-        "subCategory": "Real World Assets (RWAs)"
-      },
-      "AssetClass": "Private Credit",
-      "AuditURL": null,
-      "Category": "RWA",
-      "CoinGecko": "https://www.coingecko.com/en/coins/centrifuge",
-      "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "The first protocol to bring real-world assets onchain, we’re building a better financial system.",
-      "Discord": "https://discord.com/invite/yEzyUq5gxF",
-      "GitHub": "https://github.com/centrifuge",
-      "HistoricalTvlData": {
-        "points": [],
-        "source": "dune",
-        "updatedAt": null
-      },
-      "Name": "Centrifuge",
-      "PK": "CATEGORY#RWA",
-      "SK": "PROTOCOL#centrifuge",
-      "Slug": "centrifuge",
-      "Status": "APPROVED",
-      "Symbol": "CFG",
-      "TotalValueLocked": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://twitter.com/centrifuge",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
-      "Website": "https://centrifuge.io/"
-    },
-    "CATEGORY#RWA|PROTOCOL#chateau-capital": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": "https://portal-data.arbitrum.io/images/projects/chateau-capital-banner.webp",
-        "chains": [
-          "Arbitrum One"
-        ],
-        "foundedDate": "May 01 2023, 04:00 AM EDT",
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/chateau-capital-logo.webp",
-        "portalUrl": "https://portal.arbitrum.io/projects/chateau-capital",
-        "subCategory": "Real World Assets (RWAs)"
-      },
-      "AssetClass": "Structured Products",
-      "AuditURL": null,
-      "Category": "RWA",
-      "CoinGecko": null,
-      "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "Chateau allows DeFi users to invest in institutional-grade equity, debt, and derivatives on chain.",
-      "Discord": null,
-      "GitHub": "https://github.com/chateau-capital/ca",
-      "HistoricalTvlData": {
-        "points": [],
-        "source": "dune",
-        "updatedAt": null
-      },
-      "Name": "Chateau Capital",
-      "PK": "CATEGORY#RWA",
-      "SK": "PROTOCOL#chateau-capital",
-      "Slug": "chateau-capital",
-      "Status": "APPROVED",
-      "Symbol": "CHAT",
-      "TotalValueLocked": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://twitter.com/Chateau_capital",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
-      "Website": "https://www.chateau.capital/"
-    },
-    "CATEGORY#RWA|PROTOCOL#dinari": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": "https://portal-data.arbitrum.io/images/projects/dinari-banner.webp",
-        "chains": [
-          "Arbitrum One"
-        ],
-        "foundedDate": "October 01 2021, 04:00 AM EDT",
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/dinari-logo.webp",
-        "portalUrl": "https://portal.arbitrum.io/projects/dinari",
-        "subCategory": "Real World Assets (RWAs)"
-      },
-      "AssetClass": "Tokenized Equities",
-      "AssetSubtype": "tokenized-equity",
-      "AuditURL": null,
-      "Category": "RWA",
-      "CoinGecko": null,
-      "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "Dinari dShares are 1:1 backed Real World Asset tokens of stocks, ETFs, bonds, REITs, and other assets. Dinari is an SEC registered transfer agent, and hold a reserve in a treausury vault which is audited regularly by a Big 4 Accounting firm, and has raised $7.5million seed funding from top investors including 500 Global, SIG, etc",
-      "Discord": "https://discord.gg/dinari",
-      "GitHub": "https://github.com/dinaricrypto/sbt-contracts",
-      "HistoricalTvlData": {
-        "points": [],
-        "source": "dune",
-        "updatedAt": null
-      },
-      "Name": "Dinari",
-      "PK": "CATEGORY#RWA",
-      "PegMechanism": "rwa-collateral",
-      "SK": "PROTOCOL#dinari",
-      "Slug": "dinari",
-      "Status": "APPROVED",
-      "Symbol": "dSHARE",
-      "TotalValueLocked": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://twitter.com/DinariGlobal",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
-      "Website": "https://dinari.com/"
-    },
-    "CATEGORY#RWA|PROTOCOL#dualmint": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": "https://portal-data.arbitrum.io/images/projects/dualmint-banner.webp",
-        "chains": [],
-        "foundedDate": "April 01 2022, 04:00 AM EDT",
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/dualmint-logo.webp",
-        "portalUrl": "https://portal.arbitrum.io/projects/dualmint",
-        "subCategory": "Real World Assets (RWAs)"
-      },
-      "AssetClass": "Multi-Asset",
-      "AuditURL": null,
-      "Category": "RWA",
-      "CoinGecko": null,
-      "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "DualMint's mission is become more than an RWA marketplace. It’s the first protocol purpose-built to scale small-ticket, high-frequency, recession-proof assets into the kind of yield infrastructure DeFi needs.\n\nOur goal is to make this overlooked category a composable DeFi base layer stable, scalable, and infrastructure-grade.",
-      "Discord": "https://t.me/dualmint",
-      "GitHub": null,
-      "HistoricalTvlData": {
-        "points": [],
-        "source": "dune",
-        "updatedAt": null
-      },
-      "Name": "DualMint",
-      "PK": "CATEGORY#RWA",
-      "SK": "PROTOCOL#dualmint",
-      "Slug": "dualmint",
-      "Status": "APPROVED",
-      "Symbol": "DMINT",
-      "TotalValueLocked": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://x.com/dualmintrwa",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
-      "Website": "https://www.dualmint.com"
-    },
-    "CATEGORY#RWA|PROTOCOL#estate-protocol": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": "https://portal-data.arbitrum.io/images/projects/estate-protocol-banner.webp",
-        "chains": [
-          "Arbitrum One"
-        ],
-        "foundedDate": "January 01 2022, 05:00 AM EST",
-        "isArbitrumNative": true,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/estate-protocol-logo.webp",
-        "portalUrl": "https://portal.arbitrum.io/projects/estate-protocol",
-        "subCategory": "Real World Assets (RWAs)"
-      },
-      "AssetClass": "Real Estate",
-      "AuditURL": null,
-      "Category": "RWA",
-      "CoinGecko": null,
-      "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "Earn yields from institutional grade tokenized real estate",
-      "Discord": "https://discord.com/invite/FRANJG3QZu",
-      "GitHub": "https://github.com/Estate-Protocol-Home",
-      "HistoricalTvlData": {
-        "points": [],
-        "source": "dune",
-        "updatedAt": null
-      },
-      "Name": "Estate Protocol",
-      "PK": "CATEGORY#RWA",
-      "SK": "PROTOCOL#estate-protocol",
-      "Slug": "estate-protocol",
-      "Status": "APPROVED",
-      "Symbol": "EST",
-      "TotalValueLocked": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://twitter.com/EstateProtocol",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
-      "Website": "https://www.estateprotocol.com/"
-    },
-    "CATEGORY#RWA|PROTOCOL#florence-finance": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": "https://portal-data.arbitrum.io/images/projects/florence-finance-banner.webp",
-        "chains": [
-          "Arbitrum One"
-        ],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/florence-finance-logo.webp",
-        "portalUrl": "https://portal.arbitrum.io/projects/florence-finance",
-        "subCategory": "Real World Assets (RWAs)"
-      },
-      "AssetClass": "Private Credit",
-      "AuditURL": null,
-      "Category": "RWA",
-      "CoinGecko": null,
-      "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "Florence Finance belongs to the Real World Assets (RWAs) category.",
-      "Discord": "https://discord.gg/ykKMD9U5GB",
-      "GitHub": "https://github.com/florence-finance",
-      "HistoricalTvlData": {
-        "points": [],
-        "source": "dune",
-        "updatedAt": null
-      },
-      "Name": "Florence Finance",
-      "PK": "CATEGORY#RWA",
-      "SK": "PROTOCOL#florence-finance",
-      "Slug": "florence-finance",
-      "Status": "APPROVED",
-      "Symbol": "FLR",
-      "TotalValueLocked": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://x.com/FinanceFlorence?s=20",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
-      "Website": "https://florence.finance/"
-    },
-    "CATEGORY#RWA|PROTOCOL#franklin-templeton": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": "https://portal-data.arbitrum.io/images/projects/franklin-templeton-banner.webp",
-        "chains": [
-          "Arbitrum One"
-        ],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/franklin-templeton-logo.webp",
-        "portalUrl": "https://portal.arbitrum.io/projects/franklin-templeton",
-        "subCategory": "Real World Assets (RWAs)"
-      },
-      "AssetClass": "Treasuries & Funds",
-      "AssetSubtype": "tokenized-treasury",
-      "AuditURL": null,
-      "Category": "RWA",
-      "CoinGecko": null,
-      "CreatedAt": "2026-06-02T15:04:57Z",
-      "Description": "Digital Assets Technology - Digital Assets Investment Strategies - Node Operations.",
-      "Discord": null,
-      "GitHub": null,
-      "HistoricalTvlData": {
-        "points": [],
-        "source": "dune",
-        "updatedAt": null
-      },
-      "Name": "Franklin Templeton",
-      "PK": "CATEGORY#RWA",
-      "PegMechanism": "rwa-collateral",
-      "SK": "PROTOCOL#franklin-templeton",
-      "Slug": "franklin-templeton",
-      "Status": "APPROVED",
-      "Symbol": "BENJI",
-      "TotalValueLocked": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://x.com/FTDA_US",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
-      "Website": "https://www.franklinresources.com/"
     },
     "CATEGORY#RWA|PROTOCOL#ondo-gm": {
       "ArbitrumPortalMetadata": {
@@ -13174,7 +12814,7 @@
         "value": null
       },
       "Twitter": "https://x.com/OndoFinance",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#RWA|PROTOCOL#ousg": {
@@ -13221,7 +12861,7 @@
         "value": null
       },
       "Twitter": "https://x.com/OndoFinance",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#RWA|PROTOCOL#pgold": {
@@ -13243,7 +12883,7 @@
       "AuditURL": null,
       "Category": "RWA",
       "CoinGecko": "https://www.coingecko.com/en/coins/pleasing-gold",
-      "ContractAddress": null,
+      "ContractAddress": "0x3e76bb02286bfeaa89dd35f11253f2cbce634f91",
       "CreatedAt": "2026-06-05T19:46:53Z",
       "Description": "Tokenized physical gold: 1 troy oz LBMA-certified gold per token with physical redemption. Cross-chain via Chainlink CCIP.",
       "Discord": "https://t.me/pleasing_golden",
@@ -13267,7 +12907,10 @@
         "value": null
       },
       "Twitter": "https://x.com/PleasingMarket",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
+      "VaultAddresses": [
+        "0x3e76bb02286bfeaa89dd35f11253f2cbce634f91"
+      ],
       "Website": "https://www.pleasingmarket.com/"
     },
     "CATEGORY#RWA|PROTOCOL#stably-gold": {
@@ -13313,7 +12956,7 @@
         "value": null
       },
       "Twitter": "https://x.com/StablyHQ",
-      "UpdatedAt": "2026-06-19T17:04:30Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://stably.io"
     },
     "CATEGORY#Stablecoin|PROTOCOL#ausd": {
@@ -13332,7 +12975,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": "https://www.coingecko.com/en/coins/agora-dollar",
-      "ContractAddress": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+      "ContractAddress": "0x00000000efe302beaa2b3e6e1b18d08d69a9012a",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "Revenue-sharing institutional dollar; reserves via VanEck, custody at State Street.",
       "Discord": null,
@@ -13358,7 +13001,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.agora.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#bgusd": {
@@ -13405,7 +13048,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/bitgetglobal",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.bitget.com/en/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#bold": {
@@ -13452,7 +13095,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/LiquityProtocol",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://liquity.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#crvusd": {
@@ -13471,7 +13114,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": "https://www.coingecko.com/en/coins/crvusd",
-      "ContractAddress": "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E",
+      "ContractAddress": "0x498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "Curve's overcollateralized dollar using the LLAMMA soft-liquidation AMM.",
       "Discord": null,
@@ -13497,7 +13140,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://crvusd.curve.fi"
     },
     "CATEGORY#Stablecoin|PROTOCOL#cusd": {
@@ -13542,7 +13185,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://cap.app"
     },
     "CATEGORY#Stablecoin|PROTOCOL#dai": {
@@ -13589,7 +13232,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#deusd": {
@@ -13646,7 +13289,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.elixir.xyz"
     },
     "CATEGORY#Stablecoin|PROTOCOL#ethena": {
@@ -13667,7 +13310,7 @@
       "AuditURL": "https://docs.ethena.fi/resources/audits",
       "Category": "Stablecoin",
       "CoinGecko": null,
-      "ContractAddress": null,
+      "ContractAddress": "0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
       "CreatedAt": "2026-06-01T17:25:02Z",
       "Description": "Synthetic dollar pegged via delta-hedging BTC/ETH spot plus perp shorts and liquid stables. Not fiat-backed. Mint/redeem KYC-gated to market makers.",
       "Discord": null,
@@ -13705,7 +13348,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#eurc": {
@@ -13750,7 +13393,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.circle.com/eurc"
     },
     "CATEGORY#Stablecoin|PROTOCOL#eusd": {
@@ -13769,7 +13412,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": "https://www.coingecko.com/en/coins/electronic-dollar",
-      "ContractAddress": "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F",
+      "ContractAddress": "0x12275dcb9048680c4be40942ea4d92c74c63b844",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "Flagship RToken dollar backed by a yield-bearing collateral basket.",
       "Discord": null,
@@ -13795,7 +13438,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://reserve.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#fdusd": {
@@ -13814,7 +13457,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": "https://www.coingecko.com/en/coins/first-digital-usd",
-      "ContractAddress": "0xc5f0f7b66764F6ec8C8Dff7BA683102295E16409",
+      "ContractAddress": "0x93c9932e4afa59201f0b5e63f7d816516f1669fe",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "Hong Kong trust-custody dollar, BSC-primary; recovered partially from its April 2025 depeg.",
       "Discord": null,
@@ -13852,7 +13495,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://firstdigitallabs.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#frax": {
@@ -13873,7 +13516,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": "https://www.coingecko.com/en/coins/frax",
-      "ContractAddress": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+      "ContractAddress": "0x17fc002b466eec40dae837fc4be5c67993ddbd6f",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "Original hybrid algo-collateral Frax dollar (declining supply).",
       "Discord": "https://discord.gg/EvY6MMKgmA",
@@ -13899,7 +13542,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/fraxfinance",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://app.frax.finance/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#frxusd": {
@@ -13920,7 +13563,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": "https://www.coingecko.com/en/coins/frax-usd",
-      "ContractAddress": null,
+      "ContractAddress": "0x80eede496655fb9047dd39d9f418d5483ed600df",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "RWA-backed Frax dollar reserved in BlackRock BUIDL / Reg D structures.",
       "Discord": "https://discord.gg/EvY6MMKgmA",
@@ -13958,7 +13601,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/fraxfinance",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://app.frax.finance/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#gbpe": {
@@ -14017,7 +13660,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#gho": {
@@ -14038,7 +13681,7 @@
       "AuditURL": "https://github.com/aave/aave-v3-core/blob/master/audits/23-12-2022_SigmaPrime_AaveV3-0-1.pdf",
       "Category": "Stablecoin",
       "CoinGecko": "https://www.coingecko.com/en/coins/gho",
-      "ContractAddress": null,
+      "ContractAddress": "0x7dff72693f6a4149b17e7c6314655f6a9f7c8b33",
       "CreatedAt": "2026-06-05T19:46:53Z",
       "Description": "Native Aave overcollateralized stablecoin minted by locking approved collateral via Aave lending markets.",
       "Discord": "https://discord.com/invite/aave",
@@ -14048,6 +13691,14 @@
         "points": [],
         "source": "dune",
         "updatedAt": null
+      },
+      "LendingMarket": {
+        "source": "aave",
+        "supplyApyPct": 4.9556612606856065,
+        "underlyingSymbol": null,
+        "updatedAt": "2026-06-19T18:31:30Z",
+        "utilizationPct": 90.36267138702972,
+        "variableBorrowApyPct": 6.1278432450074805
       },
       "Name": "GHO",
       "PK": "CATEGORY#Stablecoin",
@@ -14064,7 +13715,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:31:30Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Stablecoin|PROTOCOL#gyen": {
@@ -14109,7 +13760,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://stablecoin.z.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#inverse-finance": {
@@ -14130,7 +13781,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": null,
-      "ContractAddress": null,
+      "ContractAddress": "0x6a7661795c374c0bfc635934efaddff3a7ee23b6",
       "CreatedAt": "2026-06-01T17:25:02Z",
       "Description": "Inverse Finance belongs to the Stablecoin and Lending/Borrowing categories.",
       "Discord": "https://discord.gg/nQEzGuvcaT",
@@ -14156,7 +13807,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/InverseFinance",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://inverse.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#iske": {
@@ -14203,7 +13854,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#jljupusd": {
@@ -14250,7 +13901,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Stablecoin|PROTOCOL#jupusd": {
@@ -14297,7 +13948,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Stablecoin|PROTOCOL#lisusd": {
@@ -14342,7 +13993,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://lista.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#lusd": {
@@ -14363,7 +14014,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": "https://www.coingecko.com/en/coins/liquity-usd",
-      "ContractAddress": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+      "ContractAddress": "0x93b346b6bc2548da6a1e7d98e9a421b42541425b",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "Immutable zero-interest CDP dollar (Liquity V1), ETH-collateralized.",
       "Discord": "https://discord.gg/WQMEcgHBpc",
@@ -14389,7 +14040,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/LiquityProtocol",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://liquity.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#m0": {
@@ -14408,7 +14059,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": null,
-      "ContractAddress": "0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b",
+      "ContractAddress": "0x437cc33344a0b27a429f795ff6b469c72698b291",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "Modular institutional dollar designed as the underlying asset other stablecoin products build on, via a permissioned minter network.",
       "Discord": null,
@@ -14434,7 +14085,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://m0.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#monerium": {
@@ -14493,7 +14144,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#monerium-usde": {
@@ -14540,7 +14191,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#pyusd": {
@@ -14597,7 +14248,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#rgusd": {
@@ -14642,7 +14293,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://reserve.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#rlp": {
@@ -14687,7 +14338,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://resolv.xyz"
     },
     "CATEGORY#Stablecoin|PROTOCOL#rsv": {
@@ -14732,7 +14383,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://reserve.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#rusdy": {
@@ -14777,7 +14428,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://ondo.finance/usdy"
     },
     "CATEGORY#Stablecoin|PROTOCOL#scrvusd": {
@@ -14822,7 +14473,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://crvusd.curve.fi"
     },
     "CATEGORY#Stablecoin|PROTOCOL#sdeusd": {
@@ -14867,7 +14518,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.elixir.xyz"
     },
     "CATEGORY#Stablecoin|PROTOCOL#sfrax": {
@@ -14914,7 +14565,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/fraxfinance",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://app.frax.finance/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#sgho": {
@@ -14973,7 +14624,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Stablecoin|PROTOCOL#sky": {
@@ -15032,7 +14683,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stably": {
@@ -15079,7 +14730,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Stably_Official",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stkgho": {
@@ -15138,7 +14789,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stusds": {
@@ -15185,7 +14836,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stusr": {
@@ -15230,7 +14881,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://resolv.xyz"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susdai": {
@@ -15289,7 +14940,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susde": {
@@ -15348,7 +14999,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susdf": {
@@ -15393,7 +15044,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://falcon.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susds": {
@@ -15452,7 +15103,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susdz": {
@@ -15471,7 +15122,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": null,
-      "ContractAddress": null,
+      "ContractAddress": "0x1b2c29e3897b8f9170c98440a483e90e715c879d",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "Yield-bearing USDz (appreciating exchange rate).",
       "Discord": null,
@@ -15497,7 +15148,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.anzen.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#taud": {
@@ -15544,7 +15195,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#tcad": {
@@ -15591,7 +15242,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#tether": {
@@ -15638,7 +15289,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Tether_to/",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://tether.to/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#tgbp": {
@@ -15685,7 +15336,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#thkd": {
@@ -15732,7 +15383,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#trueusd": {
@@ -15791,7 +15442,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdai": {
@@ -15850,7 +15501,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdc": {
@@ -15898,7 +15549,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/circle",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.circle.com/en/usdc"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdf": {
@@ -15943,7 +15594,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://falcon.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdg": {
@@ -15988,7 +15639,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdl": {
@@ -16033,7 +15684,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdm": {
@@ -16052,7 +15703,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": "https://www.coingecko.com/en/coins/mountain-protocol-usd",
-      "ContractAddress": "0x59D9356E565Ab3A36dD77763Fc0d87fEaf85508C",
+      "ContractAddress": "0x59d9356e565ab3a36dd77763fc0d87feaf85508c",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "Regulated daily-rebase T-bill dollar; winding down post Anchorage acquisition (collapsed from a ~$150M peak).",
       "Discord": null,
@@ -16090,7 +15741,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://mountainprotocol.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdp": {
@@ -16135,7 +15786,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdpm": {
@@ -16182,7 +15833,7 @@
         "value": null
       },
       "Twitter": "https://x.com/PleasingMarket",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.pleasingmarket.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdsc": {
@@ -16229,7 +15880,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Stably_Official",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdt0": {
@@ -16276,7 +15927,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDT0_to",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://usdt0.to/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdtb": {
@@ -16323,7 +15974,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdz": {
@@ -16368,7 +16019,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.anzen.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usr": {
@@ -16387,7 +16038,7 @@
       "AuditURL": null,
       "Category": "Stablecoin",
       "CoinGecko": "https://www.coingecko.com/en/coins/resolv-usr",
-      "ContractAddress": "0x66a1E37c9b0eAddca17d3662a6a260b8f54Beac6",
+      "ContractAddress": "0x2492d0006411af6c8bbb1c8afc1b0197350a79e9",
       "CreatedAt": "2026-06-18T14:17:47Z",
       "Description": "Delta-neutral synthetic dollar; collapsed from a ~$700M peak after the March 2026 $23M private-key exploit.",
       "Discord": null,
@@ -16425,7 +16076,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://resolv.xyz"
     },
     "CATEGORY#Stablecoin|PROTOCOL#veusd": {
@@ -16472,7 +16123,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Stably_Official",
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Stablecoin|PROTOCOL#zusd": {
@@ -16517,7 +16168,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-19T17:04:28Z",
+      "UpdatedAt": "2026-06-19T18:10:37Z",
       "Website": "https://stablecoin.z.com"
     },
     "CATEGORY#Token|PROTOCOL#aave-gov": {
@@ -16600,7 +16251,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Token|PROTOCOL#aero": {
@@ -16642,7 +16293,7 @@
         "value": null
       },
       "Twitter": "https://x.com/aerodromefi",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://aerodrome.finance"
     },
     "CATEGORY#Token|PROTOCOL#ausdc": {
@@ -16670,6 +16321,14 @@
       "Discord": "https://discord.com/invite/aave",
       "EntitySlug": "aave",
       "GitHub": "https://github.com/aave/aave-protocol",
+      "LendingMarket": {
+        "source": "aave",
+        "supplyApyPct": 1.9865468704574285,
+        "underlyingSymbol": null,
+        "updatedAt": "2026-06-19T18:31:31Z",
+        "utilizationPct": 70.12631543004952,
+        "variableBorrowApyPct": 3.1658011847416123
+      },
       "Name": "Aave aUSDC",
       "PK": "CATEGORY#Token",
       "PegMechanism": "none",
@@ -16685,8 +16344,17 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
-      "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
+      "UpdatedAt": "2026-06-19T18:31:31Z",
+      "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
+      "YieldMechanics": {
+        "currentApyPct": 1.9865468704574285,
+        "dataSource": "live",
+        "emissionsBased": false,
+        "feeShareToHoldersPct": 0,
+        "isAutoCompounding": true,
+        "payoutAsset": "Accrues continuously into the aToken balance (redeemable for the underlying + interest)",
+        "yieldSource": "Aave V3 supply APY on USDC (interest paid by borrowers)"
+      }
     },
     "CATEGORY#Token|PROTOCOL#ausdt": {
       "ArbitrumPortalMetadata": {
@@ -16713,6 +16381,14 @@
       "Discord": "https://discord.com/invite/aave",
       "EntitySlug": "aave",
       "GitHub": "https://github.com/aave/aave-protocol",
+      "LendingMarket": {
+        "source": "aave",
+        "supplyApyPct": 2.3390415580056167,
+        "underlyingSymbol": null,
+        "updatedAt": "2026-06-19T18:31:31Z",
+        "utilizationPct": 76.0098349487515,
+        "variableBorrowApyPct": 3.4376418241624185
+      },
       "Name": "Aave aUSDT",
       "PK": "CATEGORY#Token",
       "PegMechanism": "none",
@@ -16728,8 +16404,17 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
-      "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
+      "UpdatedAt": "2026-06-19T18:31:31Z",
+      "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
+      "YieldMechanics": {
+        "currentApyPct": 2.3390415580056167,
+        "dataSource": "live",
+        "emissionsBased": false,
+        "feeShareToHoldersPct": 0,
+        "isAutoCompounding": true,
+        "payoutAsset": "Accrues continuously into the aToken balance (redeemable for the underlying + interest)",
+        "yieldSource": "Aave V3 supply APY on USDT (interest paid by borrowers)"
+      }
     },
     "CATEGORY#Token|PROTOCOL#aweth": {
       "ArbitrumPortalMetadata": {
@@ -16756,6 +16441,14 @@
       "Discord": "https://discord.com/invite/aave",
       "EntitySlug": "aave",
       "GitHub": "https://github.com/aave/aave-protocol",
+      "LendingMarket": {
+        "source": "aave",
+        "supplyApyPct": 1.0695897887902373,
+        "underlyingSymbol": null,
+        "updatedAt": "2026-06-19T18:31:31Z",
+        "utilizationPct": 57.66669581137924,
+        "variableBorrowApyPct": 2.194237335558036
+      },
       "Name": "Aave aWETH",
       "PK": "CATEGORY#Token",
       "PegMechanism": "none",
@@ -16771,8 +16464,17 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
-      "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
+      "UpdatedAt": "2026-06-19T18:31:31Z",
+      "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
+      "YieldMechanics": {
+        "currentApyPct": 1.0695897887902373,
+        "dataSource": "live",
+        "emissionsBased": false,
+        "feeShareToHoldersPct": 0,
+        "isAutoCompounding": true,
+        "payoutAsset": "Accrues continuously into the aToken balance (redeemable for the underlying + interest)",
+        "yieldSource": "Aave V3 supply APY on WETH (interest paid by borrowers)"
+      }
     },
     "CATEGORY#Token|PROTOCOL#bal": {
       "ArbitrumPortalMetadata": {
@@ -16817,7 +16519,7 @@
         "value": null
       },
       "Twitter": "https://x.com/Balancer",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://balancer.fi"
     },
     "CATEGORY#Token|PROTOCOL#cake": {
@@ -16862,7 +16564,7 @@
         "value": null
       },
       "Twitter": "https://x.com/PancakeSwap",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://pancakeswap.finance"
     },
     "CATEGORY#Token|PROTOCOL#cfg": {
@@ -16905,7 +16607,7 @@
         "value": null
       },
       "Twitter": "https://x.com/centrifuge",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://centrifuge.io"
     },
     "CATEGORY#Token|PROTOCOL#chip": {
@@ -16978,7 +16680,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Token|PROTOCOL#comp": {
@@ -17003,7 +16705,7 @@
       "AuditURL": null,
       "Category": "Token",
       "CoinGecko": "https://www.coingecko.com/en/coins/compound",
-      "ContractAddress": "0xc00e94cb662c3520282e6f5717214004a7f26888",
+      "ContractAddress": "0x354a6da3fcde098f8389cad84b0182725c6c91de",
       "CreatedAt": "2026-06-17T19:33:57Z",
       "Description": "Governance token of Compound. COMP holders propose and vote on market parameters and upgrades for the Compound III money markets.",
       "Discord": null,
@@ -17024,7 +16726,7 @@
         "value": null
       },
       "Twitter": "https://x.com/compoundfinance",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://compound.finance"
     },
     "CATEGORY#Token|PROTOCOL#cpool": {
@@ -17070,7 +16772,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ClearpoolFin",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://clearpool.finance"
     },
     "CATEGORY#Token|PROTOCOL#crv": {
@@ -17116,7 +16818,7 @@
         "value": null
       },
       "Twitter": "https://x.com/CurveFinance",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://curve.fi"
     },
     "CATEGORY#Token|PROTOCOL#drift": {
@@ -17158,7 +16860,7 @@
         "value": null
       },
       "Twitter": "https://x.com/DriftProtocol",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://drift.trade"
     },
     "CATEGORY#Token|PROTOCOL#dydx-gov": {
@@ -17201,7 +16903,7 @@
         "value": null
       },
       "Twitter": "https://x.com/dYdX",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://dydx.exchange"
     },
     "CATEGORY#Token|PROTOCOL#ena": {
@@ -17222,7 +16924,7 @@
       "AuditURL": "https://docs.ethena.fi/resources/audits",
       "Category": "Token",
       "CoinGecko": "https://www.coingecko.com/en/coins/ethena",
-      "ContractAddress": "0x57e114B691Db790C35207b2e685D4A43181e6061",
+      "ContractAddress": "0x58538e6a46e07434d7e7375bc268d3cb839c0133",
       "CreatedAt": "2026-06-05T19:28:30Z",
       "Description": "Governance token for Ethena protocol parameters, treasury, and ecosystem development. ERC-20 on Ethereum and bridged networks.",
       "Discord": null,
@@ -17283,7 +16985,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Token|PROTOCOL#fluid": {
@@ -17307,7 +17009,7 @@
       "AuditURL": null,
       "Category": "Token",
       "CoinGecko": "https://www.coingecko.com/en/coins/fluid",
-      "ContractAddress": "0x6f40d4a6237c257fff2db00fa0510deeecd303eb",
+      "ContractAddress": "0x61e030a56d33e8260fdd81f03b162a79fe3449cd",
       "CreatedAt": "2026-06-17T19:33:57Z",
       "Description": "Governance token of Fluid (formerly Instadapp / INST). Governs the shared liquidity layer combining lending, vaults, and DEX liquidity.",
       "Discord": null,
@@ -17328,7 +17030,7 @@
         "value": null
       },
       "Twitter": "https://x.com/0xfluid",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://fluid.io"
     },
     "CATEGORY#Token|PROTOCOL#gfi": {
@@ -17370,7 +17072,7 @@
         "value": null
       },
       "Twitter": "https://x.com/goldfinch_fi",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://goldfinch.finance"
     },
     "CATEGORY#Token|PROTOCOL#gmx-gov": {
@@ -17413,7 +17115,7 @@
         "value": null
       },
       "Twitter": "https://x.com/GMX_IO",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://gmx.io"
     },
     "CATEGORY#Token|PROTOCOL#gns": {
@@ -17457,7 +17159,7 @@
         "value": null
       },
       "Twitter": "https://x.com/GainsNetwork_io",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://gains.trade"
     },
     "CATEGORY#Token|PROTOCOL#hype": {
@@ -17499,7 +17201,7 @@
         "value": null
       },
       "Twitter": "https://x.com/HyperliquidX",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://hyperliquid.xyz"
     },
     "CATEGORY#Token|PROTOCOL#iusde": {
@@ -17553,7 +17255,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Token|PROTOCOL#jlp": {
@@ -17647,7 +17349,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://jup.ag/perps",
       "YieldMechanics": {
         "currentApyPct": 20.0,
@@ -17700,7 +17402,7 @@
         "value": null
       },
       "Twitter": "https://x.com/LFJ_gg",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://lfj.gg"
     },
     "CATEGORY#Token|PROTOCOL#jst": {
@@ -17742,7 +17444,7 @@
         "value": null
       },
       "Twitter": "https://x.com/DeFi_JUST",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://justlend.org"
     },
     "CATEGORY#Token|PROTOCOL#jup": {
@@ -17815,7 +17517,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Token|PROTOCOL#jupsol": {
@@ -17857,7 +17559,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://jup.ag/stake"
     },
     "CATEGORY#Token|PROTOCOL#kmno": {
@@ -17899,7 +17601,7 @@
         "value": null
       },
       "Twitter": "https://x.com/KaminoFinance",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://kamino.finance"
     },
     "CATEGORY#Token|PROTOCOL#mkr": {
@@ -17941,7 +17643,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Token|PROTOCOL#morpho": {
@@ -17963,7 +17665,7 @@
       "AuditURL": null,
       "Category": "Token",
       "CoinGecko": "https://www.coingecko.com/en/coins/morpho",
-      "ContractAddress": "0x58D97B57BB95320F9a05dC918Aef65434969c2B2",
+      "ContractAddress": "0x40bd670a58238e6e230c430bbb5ce6ec0d40df48",
       "CreatedAt": "2026-06-17T19:33:57Z",
       "Deployments": [
         {
@@ -17995,7 +17697,7 @@
         "value": null
       },
       "Twitter": "https://x.com/MorphoLabs",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://morpho.org"
     },
     "CATEGORY#Token|PROTOCOL#ondo-gov": {
@@ -18058,7 +17760,7 @@
         "value": null
       },
       "Twitter": "https://x.com/OndoFinance",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#Token|PROTOCOL#ray": {
@@ -18100,7 +17802,7 @@
         "value": null
       },
       "Twitter": "https://x.com/RaydiumProtocol",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://raydium.io"
     },
     "CATEGORY#Token|PROTOCOL#reg": {
@@ -18143,7 +17845,7 @@
         "value": null
       },
       "Twitter": "https://x.com/RealTPlatform",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://realt.co"
     },
     "CATEGORY#Token|PROTOCOL#rune": {
@@ -18185,7 +17887,7 @@
         "value": null
       },
       "Twitter": "https://x.com/THORChain",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://thorchain.org"
     },
     "CATEGORY#Token|PROTOCOL#schip": {
@@ -18239,7 +17941,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://usd.ai",
       "YieldMechanics": {
         "currentApyPct": 10.0,
@@ -18303,7 +18005,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Token|PROTOCOL#sky-gov": {
@@ -18366,7 +18068,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Token|PROTOCOL#spk": {
@@ -18408,7 +18110,7 @@
         "value": null
       },
       "Twitter": "https://x.com/sparkdotfi",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://spark.fi"
     },
     "CATEGORY#Token|PROTOCOL#stkaave": {
@@ -18462,7 +18164,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
       "YieldMechanics": {
         "currentApyPct": 5.0,
@@ -18525,7 +18227,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
       "YieldMechanics": {
         "currentApyPct": 5.0,
@@ -18576,7 +18278,7 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#sushi": {
@@ -18622,7 +18324,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SushiSwap",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://www.sushi.com"
     },
     "CATEGORY#Token|PROTOCOL#syrup": {
@@ -18674,7 +18376,7 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#syrup-oft": {
@@ -18716,7 +18418,7 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#syrup-usdc-pool": {
@@ -18758,7 +18460,7 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#syrup-usdt-pool": {
@@ -18800,7 +18502,7 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#true": {
@@ -18842,7 +18544,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://monerium.com"
     },
     "CATEGORY#Token|PROTOCOL#uni": {
@@ -18888,7 +18590,7 @@
         "value": null
       },
       "Twitter": "https://x.com/Uniswap",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://uniswap.org"
     },
     "CATEGORY#Token|PROTOCOL#usdy": {
@@ -18945,7 +18647,7 @@
         "value": null
       },
       "Twitter": "https://x.com/OndoFinance",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://ondo.finance/usdy",
       "YieldMechanics": {
         "currentApyPct": 5.0,
@@ -19000,7 +18702,7 @@
         "value": null
       },
       "Twitter": "https://x.com/VenusProtocol",
-      "UpdatedAt": "2026-06-19T17:04:29Z",
+      "UpdatedAt": "2026-06-19T18:10:38Z",
       "Website": "https://venus.io"
     }
   }

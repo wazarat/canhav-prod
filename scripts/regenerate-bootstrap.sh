@@ -31,6 +31,9 @@ fi
 echo ">>> validate_taxonomy.py --store"
 "${PYTHON_BIN}" scripts/validate_taxonomy.py --store
 
+echo ">>> refresh_live.py (live TVL overlay)"
+"${PYTHON_BIN}" scripts/refresh_live.py || echo "WARN: refresh_live.py failed (live overlay only)"
+
 echo ">>> export_bootstrap.py"
 "${PYTHON_BIN}" scripts/export_bootstrap.py
 

@@ -257,6 +257,20 @@ def main(argv: List[str]) -> int:
     repo = get_repository()
     pk = schema.category_pk(schema.CATEGORY_RWA)
 
+    entity_slugs = {
+        (it.get("Slug") or schema.slug_from_sk(it.get(schema.SK, "")))
+        for it in repo.all()
+        if it.get("Category") == schema.CATEGORY_ENTITY
+    }
+
+    # Remove legacy RWA rows superseded by promoted Entity profiles.
+    deleted: List[str] = []
+    for slug in sorted(entity_slugs):
+        if slug in TARGETS and repo.delete_item(pk, schema.protocol_sk(slug)):
+            deleted.append(slug)
+    if deleted:
+        print(f"Removed {len(deleted)} promoted-entity RWA duplicate(s): {', '.join(deleted)}")
+
     # Collect matching rows by slug (CSV is the source of truth).
     matched: Dict[str, Dict[str, str]] = {}
     with csv_path.open("r", encoding="utf-8", newline="") as fh:
@@ -268,6 +282,8 @@ def main(argv: List[str]) -> int:
 
     staged: List[str] = []
     for slug in TARGETS:
+        if slug in entity_slugs:
+            continue
         row = matched.get(slug)
         if row is None:
             continue
@@ -352,7 +368,7 @@ def main(argv: List[str]) -> int:
         f"+ {len(entity_staged)} entity RWA products as APPROVED."
     )
 
-    missing = [s for s in TARGETS if s not in staged]
+    missing = [s for s in TARGETS if s not in staged and s not in entity_slugs]
     if missing:
         print(f"WARNING: missing from CSV: {', '.join(missing)}", file=sys.stderr)
         return 2

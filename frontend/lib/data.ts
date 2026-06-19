@@ -215,6 +215,12 @@ function enrichNetworksWithTvl(
 
   return networks.map((network) => {
     if (network.currentScale.tvlUsd != null) return network;
+
+    const lendingTvl = network.lending?.tvlUsd?.value;
+    if (lendingTvl != null && lendingTvl > 0) {
+      return { ...network, currentScale: { ...network.currentScale, tvlUsd: lendingTvl } };
+    }
+
     let total = 0;
     let found = false;
     for (const ref of network.memberCoins) {

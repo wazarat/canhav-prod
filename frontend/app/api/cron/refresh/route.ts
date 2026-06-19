@@ -822,6 +822,14 @@ export async function GET(req: Request): Promise<NextResponse> {
           ...(justItem.Lending ?? {}),
           ...justLendMetricsToLendingOverlay(justLendMetrics),
         };
+        const lendingTvl = (justItem.Lending as { tvlUsd?: { value?: number | null } } | undefined)
+          ?.tvlUsd?.value;
+        if (lendingTvl != null) {
+          justItem.CurrentScale = {
+            ...(justItem.CurrentScale ?? {}),
+            tvlUsd: lendingTvl,
+          };
+        }
         justItem.UpdatedAt = nowIso();
         await putItem(justItem);
         updated += 1;

@@ -27,6 +27,16 @@ STORE_PATH = BACKEND_ROOT / "data" / "store.json"
 FIRST_CLASS_COIN_CATEGORIES = frozenset({"Stablecoin", "Token"})
 
 
+def _entity_member_coin_keys(item: Dict[str, Any]) -> Set[Tuple[str, str]]:
+    keys: Set[Tuple[str, str]] = set()
+    for ref in item.get("MemberCoins") or []:
+        ref_slug = ref.get("slug")
+        ref_cat = ref.get("category")
+        if ref_slug and ref_cat:
+            keys.add((ref_cat, ref_slug))
+    return keys
+
+
 def _sector_subsector_sets(sector: Optional[str]) -> Tuple[Optional[Tuple[str, ...]], Optional[Tuple[str, ...]]]:
     if sector == "Lending":
         return schema.LENDING_SUBSECTORS, schema.LENDING_TAGS
@@ -98,13 +108,18 @@ def validate_entity_specs(specs: Dict[str, Dict[str, Any]]) -> List[str]:
 
 def validate_store_items(items: Dict[str, Any]) -> Tuple[List[str], List[str]]:
     """Validate store items; return (errors, gap_warnings)."""
+    from ingest_entities import SINGLE_MEMBER_COIN_ENTITIES  # noqa: E402
+
     errors: List[str] = []
     gaps: List[str] = []
     entity_slugs: Set[str] = set()
+    entity_member_keys: Dict[str, Set[Tuple[str, str]]] = {}
 
     for key, item in items.items():
         if item.get("Category") in ("Entity", "Network"):
-            entity_slugs.add(item.get("Slug", ""))
+            slug = item.get("Slug", "")
+            entity_slugs.add(slug)
+            entity_member_keys[slug] = _entity_member_coin_keys(item)
 
     for key, item in items.items():
         cat = item.get("Category")
@@ -125,7 +140,11 @@ def validate_store_items(items: Dict[str, Any]) -> Tuple[List[str], List[str]]:
             }
             validate_entity_spec(slug, spec_like, errors)
 
-            for ref in item.get("MemberCoins") or []:
+            member_coins = item.get("MemberCoins") or []
+            if slug in SINGLE_MEMBER_COIN_ENTITIES and len(member_coins) > 1:
+                errors.append(f"{slug}: more than one MemberCoin ({len(member_coins)})")
+
+            for ref in member_coins:
                 ref_slug = ref.get("slug")
                 ref_cat = ref.get("category")
                 found = any(
@@ -134,6 +153,15 @@ def validate_store_items(items: Dict[str, Any]) -> Tuple[List[str], List[str]]:
                 )
                 if not found:
                     errors.append(f"{slug}: MemberCoin {ref_cat}/{ref_slug} not in store")
+
+        if cat == "RWA":
+            if slug in entity_slugs:
+                entity_keys = entity_member_keys.get(slug, set())
+                if ("RWA", slug) not in entity_keys:
+                    errors.append(
+                        f"{slug}: legacy RWA row duplicates Entity slug "
+                        "(remove from ingest_rwas TARGETS or add to MemberCoins)"
+                    )
 
         if cat in FIRST_CLASS_COIN_CATEGORIES:
             subtype = item.get("AssetSubtype")
@@ -151,6 +179,33 @@ def validate_store_items(items: Dict[str, Any]) -> Tuple[List[str], List[str]]:
             entity_slug = item.get("EntitySlug")
             if entity_slug and entity_slug not in entity_slugs:
                 errors.append(f"{slug}: EntitySlug {entity_slug!r} not found")
+            elif entity_slug and entity_slug in SINGLE_MEMBER_COIN_ENTITIES:
+                coin_key = (cat, slug)
+                if coin_key not in entity_member_keys.get(entity_slug, set()):
+                    errors.append(
+                        f"{slug}: EntitySlug {entity_slug!r} not listed in "
+                        f"{entity_slug}.MemberCoins"
+                    )
+
+    for entity_slug, member_keys in entity_member_keys.items():
+        if entity_slug not in SINGLE_MEMBER_COIN_ENTITIES:
+            continue
+        for ref_cat, ref_slug in member_keys:
+            coin = next(
+                (
+                    i
+                    for i in items.values()
+                    if i.get("Slug") == ref_slug and i.get("Category") == ref_cat
+                ),
+                None,
+            )
+            if coin is None:
+                continue
+            if coin.get("EntitySlug") != entity_slug:
+                errors.append(
+                    f"{entity_slug}: MemberCoin {ref_cat}/{ref_slug} missing "
+                    f"EntitySlug back-link (have {coin.get('EntitySlug')!r})"
+                )
 
     return errors, gaps
 

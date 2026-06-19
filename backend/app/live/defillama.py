@@ -28,8 +28,18 @@ from typing import Optional
 LLAMA_API_BASE = "https://api.llama.fi"
 
 # Curated slug -> DeFi Llama protocol slug (TVL series). Mirror of
-# LLAMA_PROTOCOL_SLUGS in defillama.ts (DEX + RWA sector-expansion subset).
+# LLAMA_PROTOCOL_SLUGS in defillama.ts (lending + DEX + RWA subset).
 LLAMA_PROTOCOL_SLUGS: dict[str, Optional[str]] = {
+    # Lending networks (PDF Week 7+8) — protocol TVL series (verified 2026-06-18).
+    "aave": "aave-v3",
+    "morpho": "morpho-blue",
+    "spark": "spark",
+    "compound": "compound-v3",
+    "fluid": "fluid",
+    "venus": "venus-core-pool",
+    "justlend": "justlend",
+    "kamino": "kamino-lend",
+    "maple": "maple",
     # DEX networks — parent-protocol TVL.
     "uniswap": "uniswap",
     "curve-finance": "curve-finance",
@@ -77,8 +87,27 @@ LLAMA_DEX_SLUGS: dict[str, Optional[str]] = {
 }
 
 
+# Curated slug -> DeFi Llama yields/borrow project id. Mirror of
+# LLAMA_LENDING_PROJECTS in defillama.ts (borrow-pool aggregation).
+LLAMA_LENDING_PROJECTS: dict[str, Optional[str]] = {
+    "aave": "aave-v3",
+    "morpho": "morpho-blue",
+    "spark": "sparklend",
+    "compound": "compound-v3",
+    "fluid": "fluid-lending",
+    "venus": "venus-core-pool",
+    "justlend": "justlend",
+    "kamino": "kamino-lend",
+    "maple": "maple",
+}
+
+
 def llama_protocol_for_slug(slug: str) -> Optional[str]:
     return LLAMA_PROTOCOL_SLUGS.get(slug)
+
+
+def llama_lending_project_for_slug(slug: str) -> Optional[str]:
+    return LLAMA_LENDING_PROJECTS.get(slug)
 
 
 def llama_dex_for_slug(slug: str) -> Optional[str]:
@@ -98,7 +127,7 @@ def _get_json(url: str, *, timeout: float = 30.0) -> Optional[dict]:
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8"))
-    except (urllib.error.URLError, TimeoutError, ValueError):
+    except (urllib.error.URLError, TimeoutError, ValueError, OSError):
         return None
 
 

@@ -37,6 +37,12 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Card } from "@/components/ui/Card";
 import { getApprovedNetworks, getApprovedNetworkBySlug } from "@/lib/data";
 import { buildSkillFromEntity } from "@/lib/agent/skills";
+import {
+  getNetworkTaxonomyBadges,
+  secondarySectorBadgeTone,
+  sectorBadgeTone,
+  subSectorBadgeTone,
+} from "@/lib/networkTaxonomy";
 import { deriveSecurityStatus } from "@/lib/security";
 import { loadNetworkDashboardData } from "@/lib/networks/dashboard-data";
 import type { NetworkProfile } from "@/lib/types";
@@ -135,6 +141,7 @@ export default async function NetworkProfilePage({ params }: PageProps) {
   const profile = await getApprovedNetworkBySlug(params.slug);
   if (!profile) notFound();
 
+  const taxonomy = getNetworkTaxonomyBadges(profile);
   const entitySkill = profile.agentSkill ?? buildSkillFromEntity(profile);
   const scale = profile.currentScale;
   const labels = profile.scaleLabels ?? {};
@@ -197,9 +204,16 @@ export default async function NetworkProfilePage({ params }: PageProps) {
         badges={
           <>
             <Badge tone="neon">Network</Badge>
-            {profile.sector && <Badge tone="electric">{profile.sector}</Badge>}
-            {(profile.tags ?? (profile.subSector ? [profile.subSector] : [])).map((tag) => (
-              <Badge key={tag} tone="signal">
+            {taxonomy.primarySector && (
+              <Badge tone={sectorBadgeTone(taxonomy.primarySector)}>{taxonomy.primarySector}</Badge>
+            )}
+            {taxonomy.secondarySectors.map((sector) => (
+              <Badge key={sector} tone={secondarySectorBadgeTone()}>
+                {sector}
+              </Badge>
+            ))}
+            {taxonomy.subSectorTags.map((tag) => (
+              <Badge key={tag} tone={subSectorBadgeTone()}>
                 {tag}
               </Badge>
             ))}

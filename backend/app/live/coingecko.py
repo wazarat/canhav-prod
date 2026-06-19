@@ -38,11 +38,11 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     # Stablecoins
     "ethena": "ethena-usde",
     "susde": "ethena-staked-usde",
-    "usdtb": None,
+    "usdtb": "usdtb",
     "ena": "ethena",
     "inverse-finance": "dola-usd",
     "monerium": "monerium-eur-money",
-    "gbpe": None,
+    "gbpe": "monerium-gbp-emoney",
     "sky": "usds",
     "susds": "susds",
     "dai": "dai",
@@ -52,7 +52,6 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     "veusd": "veusd",
     "tether": "tether",
     "trueusd": "true-usd",
-    "usd-ai": None,
     "usdai": "usdai",
     "susdai": "susdai",
     "chip": None,
@@ -75,7 +74,7 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     "usdt0": "usdt0",
     # RWAs (most have no CoinGecko-listed Arbitrum token yet)
     "arcton": None,
-    "aryze": None,
+    "aryze": "aryze-eusd",
     "atmosphera": None,
     "centrifuge": "centrifuge",
     "chateau-capital": None,
@@ -135,6 +134,16 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     "usdz": "anzen-usdz",
     "susdz": "anzen-staked-usdz",
     "usdm": "mountain-protocol-usdm",
+    # Lending-network governance tokens (kept in sync with frontend/lib/server/coingecko.ts).
+    "morpho": "morpho",
+    "comp": "compound-governance-token",
+    "spk": "spark",
+    "fluid": "instadapp",
+    "xvs": "venus",
+    "jst": "just",
+    "kmno": "kamino",
+    "syrup": "syrup",
+    "vai": None,
 }
 
 

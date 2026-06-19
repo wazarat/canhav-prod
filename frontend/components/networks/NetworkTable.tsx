@@ -5,6 +5,12 @@ import { Badge } from "@/components/ui/Badge";
 import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import { categoryBadgeTone } from "@/lib/categoryTone";
+import {
+  getNetworkTaxonomyBadges,
+  secondarySectorBadgeTone,
+  sectorBadgeTone,
+  subSectorBadgeTone,
+} from "@/lib/networkTaxonomy";
 import type { NetworkProfile } from "@/lib/types";
 import { formatUsdCompact } from "@/lib/utils";
 
@@ -36,7 +42,9 @@ export function NetworkTable({ profiles, showStatus = false, emptyHint }: Networ
           </tr>
         </THead>
         <TBody>
-          {profiles.map((p) => (
+          {profiles.map((p) => {
+            const taxonomy = getNetworkTaxonomyBadges(p);
+            return (
             <TR
               key={p.slug}
               className="border-l-2 border-l-transparent hover:border-l-electric-500/60"
@@ -53,11 +61,18 @@ export function NetworkTable({ profiles, showStatus = false, emptyHint }: Networ
                 <p className="mt-0.5 line-clamp-1 max-w-[320px] text-xs text-ink-300">
                   {p.description}
                 </p>
-                {p.sector && (
+                {taxonomy.primarySector && (
                   <div className="mt-1.5 flex flex-wrap items-center gap-1">
-                    <Badge tone="electric">{p.sector}</Badge>
-                    {(p.tags ?? (p.subSector ? [p.subSector] : [])).map((tag) => (
-                      <Badge key={tag} tone="neutral">
+                    <Badge tone={sectorBadgeTone(taxonomy.primarySector)}>
+                      {taxonomy.primarySector}
+                    </Badge>
+                    {taxonomy.secondarySectors.map((sector) => (
+                      <Badge key={sector} tone={secondarySectorBadgeTone()}>
+                        {sector}
+                      </Badge>
+                    ))}
+                    {taxonomy.subSectorTags.map((tag) => (
+                      <Badge key={tag} tone={subSectorBadgeTone()}>
                         {tag}
                       </Badge>
                     ))}
@@ -116,7 +131,8 @@ export function NetworkTable({ profiles, showStatus = false, emptyHint }: Networ
                 </div>
               </TD>
             </TR>
-          ))}
+            );
+          })}
         </TBody>
       </Table>
     </TableShell>

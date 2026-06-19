@@ -622,6 +622,14 @@ ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "bannerUrl": None,
             "portalUrl": None,
         },
+        # Primary Lending per ontology §6.1 / §7; stablecoin sub-sector is secondary.
+        "sub_category": "Protocol",
+        "sector": "Lending",
+        "sub_sector": "Institutional / Private Credit",
+        "tags": ["Institutional / Private Credit"],
+        "secondary_sectors": ["Stablecoin", "RWA"],
+        "stablecoin_sub_sector": "RWA-Backed Stable",
+        "stablecoin_secondary_tags": ["RWA-Backed"],
     },
     "jupiter": {
         "name": "Jupiter",
@@ -1059,20 +1067,19 @@ ENTITY_SPECS.update(RWA_ENTITY_SPECS)
 # stablecoin issuers also get sector="Stablecoin"; cross-tagged protocols keep
 # their primary sector and only gain the stablecoin sub-sector + secondary tags.
 _STABLECOIN_PRIMARY_BACKFILL: Dict[str, Any] = {
-    "tether": ("Fiat-Backed Regulated", []),
     "ethena": ("Synthetic Yield-Bearing", ["RWA-Backed", "Yield-Bearing"]),
     "sky": ("Decentralized CDP", ["Yield-Bearing"]),
     "monerium": ("E-Money Regulated", ["Multi-Currency"]),
     "stably": ("Fiat-Backed Regulated", []),
     "trueusd": ("Fiat-Backed Regulated", ["Multi-Currency"]),
-    "usd-ai": ("RWA-Backed Stable", ["RWA-Backed"]),
 }
 _STABLECOIN_SECONDARY_BACKFILL: Dict[str, Any] = {
     "jupiter": ("Synthetic Yield-Bearing", ["RWA-Backed"]),
     "ondo-finance": ("RWA-Backed Stable", []),
     "aave": ("Decentralized CDP", []),
     "pleasing-market": ("Fiat-Backed Regulated", []),
-    "inverse-finance": ("Decentralized CDP", []),
+    "curve-finance": ("Decentralized CDP", []),
+    "spark": ("Decentralized CDP", ["Yield-Bearing"]),
 }
 for _slug, (_subsector, _tags) in _STABLECOIN_PRIMARY_BACKFILL.items():
     _spec = ENTITY_SPECS.get(_slug)
@@ -1093,15 +1100,20 @@ for _slug, (_subsector, _tags) in _STABLECOIN_SECONDARY_BACKFILL.items():
 _SECONDARY_SECTORS: Dict[str, List[str]] = {
     # Primary Stablecoin issuers that also operate in other sectors.
     "sky": ["Lending"],
+    "spark": ["Stablecoin"],
     "ethena": ["RWA", "Yield"],
-    "usd-ai": ["RWA"],
+    "anzen": ["RWA"],
     "frax": ["RWA"],
+    "mountain-protocol": ["RWA"],
+    # Primary Lending with stablecoin / RWA cross-tags.
+    "usd-ai": ["Stablecoin", "RWA"],
+    "maple": ["RWA"],
     # Protocols whose primary sector stays put but also issue a stablecoin.
     "jupiter": ["Stablecoin", "Perpetuals"],
+    "curve-finance": ["Stablecoin"],
     "ondo-finance": ["Stablecoin"],
     "aave": ["Stablecoin"],
     "pleasing-market": ["Stablecoin"],
-    "inverse-finance": ["Stablecoin"],
 }
 for _slug, _sectors in _SECONDARY_SECTORS.items():
     _spec = ENTITY_SPECS.get(_slug)
@@ -1181,6 +1193,19 @@ for _slug, (_subsector, _tags) in _RWA_SECONDARY_BACKFILL.items():
         _existing = set(_spec.get("secondary_sectors") or [])
         _existing.add("RWA")
         _spec["secondary_sectors"] = sorted(_existing)
+
+# High-cardinality RWA parents — child entity slugs populated as data lands.
+_CHILD_ENTITIES: Dict[str, List[str]] = {
+    "realt": [],
+    "lofty-ai": [],
+    "centrifuge": [],
+    "securitize": [],
+    "clearpool": [],
+}
+for _slug, _children in _CHILD_ENTITIES.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["child_entities"] = _children
 
 
 def build_entity_item(
@@ -1262,6 +1287,7 @@ def build_entity_item(
         "RwaSecondaryTags": spec.get("rwa_secondary_tags"),
         "Rwa": spec.get("rwa"),
         "MemberCoins": spec["member_coins"],
+        "ChildEntities": spec.get("child_entities"),
         "ArbitrumPortalMetadata": {
             "portalUrl": _clean(row.get("Portal URL")) or defaults.get("portalUrl"),
             "logoUrl": _clean(row.get("Logo URL")) or defaults.get("logoUrl"),
@@ -1313,6 +1339,16 @@ def main(argv: List[str]) -> int:
     print(
         f"Published {len(ENTITY_SPECS)} entities ({total_coins} member coins total) as APPROVED."
     )
+
+    from validate_taxonomy import validate_entity_specs  # noqa: E402
+
+    spec_errors = validate_entity_specs(ENTITY_SPECS)
+    if spec_errors:
+        print("TAXONOMY VALIDATION FAILED:", file=sys.stderr)
+        for err in spec_errors:
+            print(f"  - {err}", file=sys.stderr)
+        return 1
+    print("Taxonomy validation: OK")
     return 0
 
 

@@ -244,6 +244,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         rwaSubSector: item.RwaSubSector ?? null,
         rwaSecondaryTags: item.RwaSecondaryTags ?? undefined,
         rwa: item.Rwa ?? null,
+        childEntities: item.ChildEntities ?? undefined,
         currentScale: {
           tvlUsd: null,
           users: null,

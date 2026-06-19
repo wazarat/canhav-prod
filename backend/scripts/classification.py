@@ -137,9 +137,7 @@ CLASSIFICATION: Dict[str, Dict[str, str]] = {
     "mkr": {"AssetSubtype": "legacy", "PegMechanism": "none"},
     # USD.AI staked-CHIP insurance / first-loss capital.
     "schip": {"AssetSubtype": "insurance-firstloss", "PegMechanism": "none"},
-    # NB: Monerium `true` (digital identifier / utility) has no clean AssetSubtype
-    # bucket, so it is intentionally left unmapped (assetSubtype stays null).
-    # --- RWAs (only the ones that map cleanly to the AssetSubtype union) ---
+    # Monerium digital identifier / utility token.
     "pgold": {"AssetSubtype": "tokenized-commodity", "PegMechanism": "rwa-collateral"},
     "ousg": {"AssetSubtype": "institutional-gated", "PegMechanism": "rwa-collateral"},
     "franklin-templeton": {"AssetSubtype": "tokenized-treasury", "PegMechanism": "rwa-collateral"},
@@ -170,6 +168,22 @@ CLASSIFICATION: Dict[str, Dict[str, str]] = {
     "gfi": {"AssetSubtype": "governance", "PegMechanism": "none"},
     "cpool": {"AssetSubtype": "governance", "PegMechanism": "none"},
     "reg": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    # --- Lending governance tokens ---
+    "comp": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "fluid": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "jst": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "kmno": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "morpho": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "spk": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "xvs": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "inv": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    "true": {"AssetSubtype": "governance", "PegMechanism": "none"},
+    # Maple syrup vault / pool receipts
+    "syrup": {"AssetSubtype": "yield-bearing-stable", "PegMechanism": "rwa-collateral"},
+    "stsyrup": {"AssetSubtype": "staked-governance", "PegMechanism": "none"},
+    "syrup-oft": {"AssetSubtype": "lp-receipt", "PegMechanism": "none"},
+    "syrup-usdc-pool": {"AssetSubtype": "lp-receipt", "PegMechanism": "none"},
+    "syrup-usdt-pool": {"AssetSubtype": "lp-receipt", "PegMechanism": "none"},
 }
 
 

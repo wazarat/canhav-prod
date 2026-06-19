@@ -553,3 +553,114 @@ RWA_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         member_coins=[],
     ),
 }
+
+
+def _seed(
+    *,
+    slug: str,
+    name: str,
+    symbol: str,
+    tagline: str,
+    sub_sector: str,
+    secondary_tags: List[str],
+    website: str,
+    description: str = "",
+) -> Dict[str, Any]:
+    """Minimal long-tail RWA entity card (ontology §6.4)."""
+    return _net(
+        name=name,
+        symbol=symbol,
+        tagline=tagline,
+        description=description or tagline,
+        differentiator=tagline,
+        sub_sector=sub_sector,
+        secondary_tags=secondary_tags,
+        regulatory_status="",
+        rwa={
+            "aumUsd": _sourced(None),
+            "regulatoryStatus": None,
+            "auditHistory": None,
+            "deployment": {"chains": [], "evmCompatible": "mixed", "notes": "Seed card — expand as data lands."},
+            "subSectorMetrics": {"kind": sub_sector.lower().replace(" / ", "-").replace(" ", "-")},
+        },
+        member_coins=[],
+        chains=[],
+        website=website,
+    )
+
+
+# Long-tail RWA seeds (ontology §6.4) — promote to full cards as data lands.
+RWA_ENTITY_SPECS.update({
+    "arcton": _seed(
+        slug="arcton",
+        name="Arcton",
+        symbol="ARCTON",
+        tagline="Tokenized pre-IPO and private equity access.",
+        sub_sector="Tokenized Equities",
+        secondary_tags=["Institutional-Gated"],
+        website="https://arcton.com",
+    ),
+    "aryze": _seed(
+        slug="aryze",
+        name="Aryze",
+        symbol="ARYZE",
+        tagline="Multi-currency RWA stablecoins and FX tokens.",
+        sub_sector="Stablecoins & FX",
+        secondary_tags=["Multi-Currency", "Compliance-Heavy"],
+        website="https://aryze.io",
+    ),
+    "atmosphera": _seed(
+        slug="atmosphera",
+        name="Atmosphera",
+        symbol="ATMOS",
+        tagline="Event and weather-linked structured finance.",
+        sub_sector="Event Finance",
+        secondary_tags=[],
+        website="https://atmosphera.com",
+    ),
+    "chateau-capital": _seed(
+        slug="chateau-capital",
+        name="Chateau Capital",
+        symbol="CHATEAU",
+        tagline="Structured RWA credit products.",
+        sub_sector="Structured Products",
+        secondary_tags=["Institutional-Gated"],
+        website="https://chateau.capital",
+    ),
+    "dinari": _seed(
+        slug="dinari",
+        name="Dinari",
+        symbol="DINARI",
+        tagline="Tokenized US equities as dShares.",
+        sub_sector="Tokenized Equities",
+        secondary_tags=["Compliance-Heavy", "Multi-Chain"],
+        website="https://dinari.com",
+    ),
+    "dualmint": _seed(
+        slug="dualmint",
+        name="DualMint",
+        symbol="DUAL",
+        tagline="Tokenization infrastructure for real-world assets.",
+        sub_sector="Tokenization Infrastructure",
+        secondary_tags=["Permissioned"],
+        website="https://dualmint.com",
+    ),
+    "estate-protocol": _seed(
+        slug="estate-protocol",
+        name="Estate Protocol",
+        symbol="ESTATE",
+        tagline="Fractional commercial real estate on-chain.",
+        sub_sector="Real Estate",
+        secondary_tags=["Real-World-Custody", "Permissioned"],
+        website="https://estateprotocol.com",
+    ),
+    "florence-finance": _seed(
+        slug="florence-finance",
+        name="Florence Finance",
+        symbol="FF",
+        tagline="SME invoice financing on-chain.",
+        sub_sector="Private Credit",
+        secondary_tags=["Permissioned"],
+        website="https://florence.finance",
+    ),
+})

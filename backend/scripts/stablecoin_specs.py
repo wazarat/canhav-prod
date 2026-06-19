@@ -1084,4 +1084,138 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             _coin("usdm", "Mountain Protocol USD", "USDM", "Daily-rebase T-bill dollar (winding down)"),
         ],
     ),
+    # ---- Fiat-Backed Regulated (pre-existing coins, net-new entity rows) ---
+    "tether": _net(
+        name="Tether",
+        symbol="USDT",
+        tagline="The largest stablecoin by circulating supply.",
+        description=(
+            "Tether issues USDT, a fiat-backed dollar stablecoin redeemable 1:1 against "
+            "reserves held in cash, cash equivalents, and short-term U.S. Treasuries."
+        ),
+        differentiator=(
+            "Deepest exchange liquidity and broadest chain deployment of any "
+            "stablecoin; reserve attestations published by BDO / Moore Cayman."
+        ),
+        sub_sector="Fiat-Backed Regulated",
+        secondary_tags=["Multi-Chain", "Hybrid-Chain"],
+        regulatory_status="Registered MSB (FinCEN); BVI FSC oversight for Tether Ltd.",
+        official_docs="https://tether.to/en/transparency",
+        website="https://tether.to",
+        twitter="https://x.com/Tether_to",
+        chains=["Ethereum", "Tron", "Solana", "Arbitrum", "Polygon", "BNB Chain"],
+        competitors=[_USDC_COMPETITOR],
+        stablecoin={
+            "reserves": "Cash, cash equivalents, and short-term U.S. Treasuries.",
+            "pegMechanism": "Fiat reserve, 1:1 mint/redeem.",
+            "auditHistory": "Quarterly attestations (BDO / Moore Cayman).",
+            "attestationUrl": "https://tether.to/en/transparency",
+            "proofOfReservesUrl": None,
+            "currentSupplyUsd": _sourced(None),
+            "riskEvents": [],
+            "deployment": {
+                "chains": ["Ethereum", "Tron", "Solana", "Arbitrum", "Polygon", "+10 more"],
+                "evmCompatible": "mixed",
+                "notes": "USDT native on Tron and many EVM chains; largest stablecoin by supply.",
+            },
+            "subSectorMetrics": {
+                "kind": "fiat-backed",
+                "reserveCustodian": "Multiple regulated custodians",
+                "reserveBreakdown": [],
+                "attestationCadence": "quarterly",
+                "attestor": "BDO / Moore Cayman",
+                "realtimeReserveOracle": None,
+            },
+        },
+        member_coins=[
+            _coin("tether", "Tether USD", "USDT", "Primary fiat-backed dollar"),
+        ],
+    ),
+    "usdt0": _net(
+        name="USDT0",
+        symbol="USDT0",
+        tagline="Omnichain USDT via LayerZero.",
+        description=(
+            "USDT0 is the omnichain extension of Tether's USDT, deployed via LayerZero "
+            "OFT to move native USDT liquidity across supported chains."
+        ),
+        differentiator=(
+            "Native omnichain USDT rail using LayerZero OFT — not a wrapped bridge token."
+        ),
+        sub_sector="Cross-Chain / Omnichain",
+        secondary_tags=["Multi-Chain"],
+        regulatory_status="Issued under Tether Ltd. reserve framework.",
+        official_docs="https://tether.to",
+        website="https://tether.to",
+        twitter="https://x.com/Tether_to",
+        chains=["Ethereum", "Arbitrum", "Optimism", "Polygon"],
+        competitors=[_USDT_COMPETITOR],
+        stablecoin={
+            "reserves": "Backed by Tether USDT reserves (omnichain representation).",
+            "pegMechanism": "Fiat reserve via parent USDT.",
+            "auditHistory": "Inherits Tether quarterly attestations.",
+            "attestationUrl": "https://tether.to/en/transparency",
+            "proofOfReservesUrl": None,
+            "currentSupplyUsd": _sourced(None),
+            "riskEvents": [],
+            "deployment": {
+                "chains": ["Ethereum", "Arbitrum", "Optimism", "Polygon"],
+                "evmCompatible": "yes",
+                "notes": "LayerZero OFT omnichain USDT.",
+            },
+            "subSectorMetrics": {
+                "kind": "fiat-backed",
+                "reserveCustodian": "Tether Ltd.",
+                "attestationCadence": "quarterly",
+                "attestor": "BDO / Moore Cayman",
+            },
+        },
+        member_coins=[
+            _coin("usdt0", "USDT0", "USDT0", "Omnichain USDT (LayerZero)"),
+        ],
+    ),
+    # ---- Decentralized CDP (Inverse Finance) -----------------------------
+    "inverse-finance": _net(
+        name="Inverse Finance",
+        symbol="INV",
+        tagline="Decentralized CDP issuer of DOLA.",
+        description=(
+            "Inverse Finance issues DOLA, an overcollateralized decentralized stablecoin, "
+            "alongside INV governance and FiRM fixed-rate lending markets."
+        ),
+        differentiator=(
+            "DOLA CDP stack plus FiRM fixed-rate borrowing — distinct from Aave-style "
+            "variable-rate money markets."
+        ),
+        sub_sector="Decentralized CDP",
+        secondary_tags=["DAO-Governed"],
+        regulatory_status="Decentralized on-chain protocol; no issuer license.",
+        official_docs="https://docs.inverse.finance",
+        website="https://inverse.finance",
+        twitter="https://x.com/InverseFinance",
+        github="https://github.com/InverseFinance",
+        chains=["Ethereum"],
+        stablecoin={
+            "reserves": "Overcollateralized crypto collateral (DOLA CDP).",
+            "pegMechanism": "Overcollateralized mint against crypto.",
+            "auditHistory": "Per Inverse docs.",
+            "attestationUrl": None,
+            "proofOfReservesUrl": None,
+            "currentSupplyUsd": _sourced(None),
+            "riskEvents": [],
+            "deployment": {
+                "chains": ["Ethereum"],
+                "evmCompatible": "yes",
+                "notes": "DOLA + FiRM on Ethereum mainnet.",
+            },
+            "subSectorMetrics": {
+                "kind": "decentralized-cdp",
+                "collateralAssets": ["ETH", "wBTC", "yVault tokens"],
+                "governanceToken": "INV",
+            },
+        },
+        member_coins=[
+            _coin("inverse-finance", "Inverse Finance DOLA", "DOLA", "Overcollateralized stablecoin"),
+        ],
+    ),
 }

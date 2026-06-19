@@ -513,11 +513,22 @@ class EntityProfile(BaseModel):
     # Taxonomy hierarchy (Network -> subCategory -> sector -> subSector).
     subCategory: Optional[str] = "Protocol"
     sector: Optional[str] = None
+    secondarySectors: List[str] = Field(default_factory=list)
     subSector: Optional[str] = None
-    # Ranked competitors (top->bottom) + lending-specific metrics; passthrough
-    # dicts written by the seed scripts / TS cron (mirrors protocolFeesRevenue).
+    tags: List[str] = Field(default_factory=list)
+    stablecoinSubSector: Optional[str] = None
+    stablecoinSecondaryTags: List[str] = Field(default_factory=list)
+    dexSubSector: Optional[str] = None
+    dexSecondaryTags: List[str] = Field(default_factory=list)
+    rwaSubSector: Optional[str] = None
+    rwaSecondaryTags: List[str] = Field(default_factory=list)
+    childEntities: List[str] = Field(default_factory=list)
+    # Ranked competitors (top->bottom) + sector metrics; passthrough dicts.
     competitors: List[dict] = Field(default_factory=list)
     lending: Optional[dict] = None
+    stablecoin: Optional[dict] = None
+    dex: Optional[dict] = None
+    rwa: Optional[dict] = None
     memberCoins: List[MemberCoinRef] = Field(default_factory=list)
     # DeFi Llama overlays (written by the cron); passthrough dicts. Options /
     # open-interest are scaffolded for the coming-soon options/perpetuals categories.
@@ -558,9 +569,21 @@ class EntityProfile(BaseModel):
             "ScaleLabels": self.scaleLabels.model_dump() if self.scaleLabels else None,
             "SubCategory": self.subCategory,
             "Sector": self.sector,
+            "SecondarySectors": self.secondarySectors or None,
             "SubSector": self.subSector,
+            "Tags": self.tags or None,
+            "StablecoinSubSector": self.stablecoinSubSector,
+            "StablecoinSecondaryTags": self.stablecoinSecondaryTags or None,
+            "DexSubSector": self.dexSubSector,
+            "DexSecondaryTags": self.dexSecondaryTags or None,
+            "RwaSubSector": self.rwaSubSector,
+            "RwaSecondaryTags": self.rwaSecondaryTags or None,
+            "ChildEntities": self.childEntities or None,
             "Competitors": self.competitors,
             "Lending": self.lending,
+            "Stablecoin": self.stablecoin,
+            "Dex": self.dex,
+            "Rwa": self.rwa,
             "Partnerships": [p.model_dump() for p in self.partnerships],
             "CurrentScale": self.currentScale.model_dump(),
             "MemberCoins": [m.model_dump() for m in self.memberCoins],
@@ -604,9 +627,21 @@ class EntityProfile(BaseModel):
             else None,
             subCategory=item.get("SubCategory", "Protocol"),
             sector=item.get("Sector"),
+            secondarySectors=item.get("SecondarySectors") or [],
             subSector=item.get("SubSector"),
+            tags=item.get("Tags") or [],
+            stablecoinSubSector=item.get("StablecoinSubSector"),
+            stablecoinSecondaryTags=item.get("StablecoinSecondaryTags") or [],
+            dexSubSector=item.get("DexSubSector"),
+            dexSecondaryTags=item.get("DexSecondaryTags") or [],
+            rwaSubSector=item.get("RwaSubSector"),
+            rwaSecondaryTags=item.get("RwaSecondaryTags") or [],
+            childEntities=item.get("ChildEntities") or [],
             competitors=item.get("Competitors") or [],
             lending=item.get("Lending"),
+            stablecoin=item.get("Stablecoin"),
+            dex=item.get("Dex"),
+            rwa=item.get("Rwa"),
             memberCoins=[MemberCoinRef(**m) for m in (item.get("MemberCoins") or [])],
             protocolFeesRevenue=item.get("ProtocolFeesRevenue"),
             dexVolume=item.get("DexVolume"),

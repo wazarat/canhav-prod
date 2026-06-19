@@ -932,6 +932,10 @@ export type StablecoinSecondaryTag =
   | "Yield-Bearing"
   | "Institutional-Gated"
   | "Multi-Currency"
+  | "Multi-Chain"
+  | "Hybrid-Chain"
+  | "Compliance-Heavy"
+  | "DAO-Governed"
   | "Exchange-Native"
   | "RWA-Backed"
   | "Wound-Down"
@@ -993,6 +997,7 @@ export type RwaSecondaryTag =
   | "Permissioned" // whitelist required for transfers
   | "Compliance-Heavy" // SEC-registered transfer agent, MiFID, similar
   | "Multi-Chain"
+  | "Multi-Currency"
   | "Non-EVM"
   | "Hybrid-Chain"
   | "Yield-Bearing"
@@ -1496,6 +1501,8 @@ export interface NetworkProfile {
   rwaSecondaryTags?: RwaSecondaryTag[];
   /** RWA-entity metrics block (live + curated) — `sector === "RWA"`. */
   rwa?: RwaMetrics | null;
+  /** High-cardinality child entity slugs (RealT properties, Centrifuge pools, …). */
+  childEntities?: string[];
   memberCoins: MemberCoinRef[];
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Protocol fees/revenue when this entity maps to a Llama protocol (DeFi Llama). */

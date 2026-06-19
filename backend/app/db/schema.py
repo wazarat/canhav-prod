@@ -78,8 +78,140 @@ LENDING_SUBSECTORS = (
 )
 LENDING_TAGS = LENDING_SUBSECTORS
 
-# Derived RWA asset classes (the CSV labels everything "Real World Assets
-# (RWAs)"; the finer classification is assigned during ingestion).
+# Legacy primary sectors — prefer DEX sub-sector "Perpetuals" + secondarySectors.
+LEGACY_NETWORK_SECTORS = ("Perpetuals", "Yield", "Options")
+
+STABLECOIN_SUBSECTORS = (
+    "Fiat-Backed Regulated",
+    "E-Money Regulated",
+    "Decentralized CDP",
+    "Synthetic Yield-Bearing",
+    "RWA-Backed Stable",
+    "Cross-Chain / Omnichain",
+)
+
+STABLECOIN_SECONDARY_TAGS = (
+    "Yield-Bearing",
+    "Institutional-Gated",
+    "Multi-Currency",
+    "Multi-Chain",
+    "Hybrid-Chain",
+    "Compliance-Heavy",
+    "DAO-Governed",
+    "Exchange-Native",
+    "RWA-Backed",
+    "Wound-Down",
+    "Recently-Exploited",
+)
+
+DEX_SUBSECTORS = (
+    "AMM",
+    "Concentrated Liquidity",
+    "Stableswap",
+    "Aggregator",
+    "Orderbook",
+    "Hybrid AMM + Orderbook",
+    "Perpetuals",
+    "ve(3,3)",
+    "Cross-Chain Native",
+)
+
+DEX_SECONDARY_TAGS = (
+    "Spot",
+    "Perps",
+    "Derivatives",
+    "Multi-Chain",
+    "Non-EVM",
+    "Solana-Native",
+    "L2-Native",
+    "Appchain",
+    "MEV-Resistant",
+    "veTokenomics",
+    "Hooks",
+    "CLMM",
+    "Routing-Layer",
+    "Wound-Down",
+    "Recently-Exploited",
+)
+
+RWA_SUBSECTORS = (
+    "Tokenized Treasuries",
+    "Tokenized Equities",
+    "Tokenized Commodities",
+    "Real Estate",
+    "Private Credit",
+    "Carbon / ESG",
+    "Tokenization Infrastructure",
+    "Structured Products",
+    "Event Finance",
+    "Stablecoins & FX",
+)
+
+RWA_SECONDARY_TAGS = (
+    "Institutional-Gated",
+    "Permissioned",
+    "Compliance-Heavy",
+    "Multi-Chain",
+    "Multi-Currency",
+    "Non-EVM",
+    "Hybrid-Chain",
+    "Yield-Bearing",
+    "Real-World-Custody",
+    "DAO-Governed",
+    "Wound-Down",
+)
+
+ASSET_SUBTYPES = (
+    "fiat-stablecoin",
+    "synthetic-dollar",
+    "e-money",
+    "yield-bearing-stable",
+    "rwa-backed-stable",
+    "governance",
+    "staked-governance",
+    "insurance-firstloss",
+    "lp-receipt",
+    "lst",
+    "institutional-gated",
+    "tokenized-commodity",
+    "tokenized-equity",
+    "tokenized-treasury",
+    "legacy",
+    "conceptual",
+)
+
+PEG_MECHANISMS = (
+    "fiat-reserve",
+    "overcollateralized",
+    "delta-neutral-hedge",
+    "rwa-collateral",
+    "algorithmic-rebase",
+    "none",
+)
+
+# Cross-sector matrix (ontology §7): slug -> required secondary sectors.
+CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
+    "aave": ("Stablecoin",),
+    "sky": ("Lending",),
+    "spark": ("Stablecoin",),
+    "curve-finance": ("Stablecoin",),
+    "jupiter": ("Stablecoin", "Perpetuals"),
+    "pancakeswap": ("Perpetuals",),
+    "hyperliquid": ("Perpetuals",),
+    "ondo-finance": ("Stablecoin",),
+    "pleasing-market": ("Stablecoin",),
+    "mountain-protocol": ("RWA",),
+    "ethena": ("RWA", "Yield"),
+    "anzen": ("RWA",),
+    "usd-ai": ("Stablecoin", "RWA"),
+    "frax": ("RWA",),
+    "centrifuge": ("Lending",),
+    "goldfinch": ("Lending",),
+    "clearpool": ("Lending",),
+    "maple": ("RWA",),
+}
+
+# Derived RWA asset classes (coin-level; distinct from entity RwaSubSector).
 RWA_ASSET_CLASSES = (
     "Tokenized Equities",
     "Private Credit",

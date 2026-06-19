@@ -17,8 +17,15 @@
 #
 # REDIS_URL resolution order:
 #   1. Existing env var REDIS_URL
-#   2. frontend/.env.local   (run `vercel env pull frontend/.env.local` first)
-#   3. backend/.env
+#   2. frontend/.env.production.local  (paste rediss://… from Upstash; see below)
+#   3. frontend/.env.local
+#   4. backend/.env
+#
+# Sensitive Vercel vars (including REDIS_URL) are pulled as empty placeholders by
+# `vercel env pull` — you must paste the real value manually:
+#   Upstash console → your database → Connect → Redis → copy the rediss:// URL
+#   into frontend/.env.production.local as REDIS_URL="rediss://..."
+#   (Also set it on Vercel if the dashboard value is blank.)
 # REDIS_STORE_KEY is optional (default: canhav:store). It MUST match the key the
 # frontend reads.
 
@@ -43,11 +50,11 @@ done
 # --- load REDIS_URL / REDIS_STORE_KEY from env files if not already set ------
 # Only pulls these two keys; does not export the whole env file.
 load_key_from_file() {
-  # $1 = var name, $2 = file path
-  local var="$1" file="$2" line val
+  # $1 = export as var name, $2 = file path, $3 = optional source key in file (default $1)
+  local var="$1" file="$2" key="${3:-$1}" line val
   [ -n "${!var:-}" ] && return 0
   [ -f "$file" ] || return 0
-  line="$(grep -E "^[[:space:]]*${var}=" "$file" | tail -1 || true)"
+  line="$(grep -E "^[[:space:]]*${key}=" "$file" | tail -1 || true)"
   [ -z "$line" ] && return 0
   val="${line#*=}"
   # strip surrounding quotes and trailing CR/whitespace
@@ -55,15 +62,28 @@ load_key_from_file() {
   [ -n "$val" ] && export "$var=$val"
 }
 
-for f in "${REPO_ROOT}/frontend/.env.local" "${BACKEND_DIR}/.env"; do
+for f in \
+  "${REPO_ROOT}/frontend/.env.production.local" \
+  "${REPO_ROOT}/frontend/.env.local" \
+  "${BACKEND_DIR}/.env"; do
   load_key_from_file REDIS_URL "$f"
   load_key_from_file REDIS_STORE_KEY "$f"
 done
 
+# Upstash integration often sets KV_URL to the same rediss:// string as REDIS_URL.
+if [ -z "${REDIS_URL:-}" ]; then
+  load_key_from_file REDIS_URL "${REPO_ROOT}/frontend/.env.production.local" KV_URL
+  [ -z "${REDIS_URL:-}" ] && load_key_from_file REDIS_URL "${REPO_ROOT}/frontend/.env.local" KV_URL
+fi
+
 # --- preconditions -----------------------------------------------------------
 if [ -z "${REDIS_URL:-}" ]; then
-  echo "ERROR: REDIS_URL is not set and was not found in frontend/.env.local or backend/.env." >&2
-  echo "       Run 'vercel env pull frontend/.env.local' or export REDIS_URL=rediss://... first." >&2
+  echo "ERROR: REDIS_URL is not set." >&2
+  echo "       Sensitive vars are NOT populated by 'vercel env pull' — paste manually:" >&2
+  echo "         1. Upstash console → database → Connect → Redis → copy rediss:// URL" >&2
+  echo "         2. Add to frontend/.env.production.local:" >&2
+  echo '              REDIS_URL="rediss://default:...@....upstash.io:6379"' >&2
+  echo "         3. Re-run: SEED_YES=1 ./scripts/seed-prod.sh --refresh" >&2
   exit 1
 fi
 case "$REDIS_URL" in
@@ -120,6 +140,24 @@ run_ingest "ingest_entities.py"
 run_ingest "ingest_stablecoins.py"
 run_ingest "ingest_tokens.py"
 run_ingest "ingest_rwas.py"
+
+CSV_PATH="${HOME}/Downloads/Protocol-Symbol-Chain-Contract.csv"
+if [ -f "$CSV_PATH" ]; then
+  echo ""
+  echo ">>> ingest_protocol_coins.py"
+  out="$("${PYTHON_BIN}" "${BACKEND_DIR}/scripts/ingest_protocol_coins.py" 2>&1 | tee /dev/stderr)" || \
+    echo "WARNING: ingest_protocol_coins.py failed (contract overlay only)." >&2
+else
+  echo ""
+  echo ">>> skipping ingest_protocol_coins.py (CSV not found at ${CSV_PATH})"
+fi
+
+echo ""
+echo ">>> validate_taxonomy.py"
+"${PYTHON_BIN}" "${BACKEND_DIR}/scripts/validate_taxonomy.py" || {
+  echo "FATAL: taxonomy validation failed." >&2
+  exit 1
+}
 
 if [ "$RUN_REFRESH" -eq 1 ]; then
   echo ""

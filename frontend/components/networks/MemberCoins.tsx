@@ -55,12 +55,25 @@ function supplyApyPct(coin: CoinLiveData): number | null {
   return null;
 }
 
-/** True when the card can show price/mcap, yield APY, or an underlying reference price. */
+function hasSupplyMetric(coin: CoinLiveData): boolean {
+  return (
+    coin.circulatingSupplyUsd != null ||
+    (coin.onchain?.supply != null && coin.onchain.supply > 0)
+  );
+}
+
+function hasTvlMetric(coin: CoinLiveData): boolean {
+  return coin.tvlUsd != null && coin.tvlUsd > 0;
+}
+
+/** True when the card can show price/mcap, yield, ref price, supply, or TVL. */
 function hasCoinMetrics(coin: CoinLiveData): boolean {
   return (
     hasSpotMarketData(coin) ||
     supplyApyPct(coin) != null ||
-    coin.referencePrice != null
+    coin.referencePrice != null ||
+    hasSupplyMetric(coin) ||
+    hasTvlMetric(coin)
   );
 }
 
@@ -140,6 +153,20 @@ function MemberCoinCard({
                 Supply APY{" "}
                 <span className="font-mono text-ink-100">{apy.toFixed(2)}%</span>
               </span>
+            ) : hasTvlMetric(coin) ? (
+              <span>
+                TVL{" "}
+                <span className="font-mono text-ink-100">
+                  {formatUsdCompact(coin.tvlUsd)}
+                </span>
+              </span>
+            ) : hasSupplyMetric(coin) ? (
+              <span>
+                Supply{" "}
+                <span className="font-mono text-ink-100">
+                  {formatUsdCompact(coin.circulatingSupplyUsd)}
+                </span>
+              </span>
             ) : null}
             {coin.referencePrice != null && coin.referencePriceLabel && (
               <span>
@@ -155,6 +182,25 @@ function MemberCoinCard({
         )}
         {apy != null && hasSpotMarketData(coin) && (
           <Badge tone="positive">{apy.toFixed(2)}% supply APY</Badge>
+        )}
+        {apy != null && !hasSpotMarketData(coin) && coin.referencePrice != null && (
+          <Badge tone="positive">{apy.toFixed(2)}% APY</Badge>
+        )}
+        {hasSupplyMetric(coin) && hasSpotMarketData(coin) && (
+          <span>
+            Supply{" "}
+            <span className="font-mono text-ink-100">
+              {formatUsdCompact(coin.circulatingSupplyUsd)}
+            </span>
+          </span>
+        )}
+        {hasTvlMetric(coin) && hasSpotMarketData(coin) && (
+          <span>
+            TVL{" "}
+            <span className="font-mono text-ink-100">
+              {formatUsdCompact(coin.tvlUsd)}
+            </span>
+          </span>
         )}
       </div>
 

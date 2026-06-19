@@ -354,8 +354,9 @@ async function refreshLlamaDimensions(
     }
   }
 
-  // Yields APY (tokens). aTokens are owned by the on-chain Aave pass below.
-  if (category === CATEGORY_TOKEN && !AAVE_ATOKEN_SLUGS.has(slug)) {
+  // Yields APY (tokens + yield-bearing stablecoins). aTokens owned by Aave pass.
+  const yieldCategories = new Set([CATEGORY_TOKEN, CATEGORY_STABLECOIN]);
+  if (yieldCategories.has(category) && !AAVE_ATOKEN_SLUGS.has(slug)) {
     const pool = resolveLlamaYieldPool(slug, pools);
     if (pool && pool.apyPct !== null) {
       const apyHistory = await fetchLlamaYieldChart(pool.poolId, HISTORY_DAYS);
@@ -377,9 +378,10 @@ async function refreshLlamaDimensions(
     }
   }
 
-  // Coins price fallback (tokens unlisted on CoinGecko but with a known address).
+  // Coins price fallback (unlisted on CoinGecko but with a known address).
+  const priceFallbackCategories = new Set([CATEGORY_TOKEN, CATEGORY_STABLECOIN]);
   if (
-    category === CATEGORY_TOKEN &&
+    priceFallbackCategories.has(category) &&
     (item.Market?.priceUsd?.value ?? null) == null &&
     item.ContractAddress
   ) {
@@ -493,11 +495,11 @@ export async function GET(req: Request): Promise<NextResponse> {
 
     let mutated = false;
 
-    // Persist the CoinGecko market block on token profiles so it lives in the
-    // store (agent-readable) instead of only being fetched at render time.
-    // Independent of address resolution: Solana-side tokens (JUP, JLP) have
-    // market data but no Arbitrum contract.
-    if (category === CATEGORY_TOKEN && resolution && resolution.priceUsd !== null) {
+    // Persist CoinGecko market block (agent-readable + bootstrap export).
+    // Independent of address: Solana tokens and Ethereum-only stables have
+    // market data but may lack an Arbitrum contract.
+    const marketCategories = new Set([CATEGORY_TOKEN, CATEGORY_STABLECOIN]);
+    if (marketCategories.has(category) && resolution && resolution.priceUsd !== null) {
       item.Market = buildTokenMarket(resolution);
       mutated = true;
       if (row.metric === null) row.metric = resolution.priceUsd;

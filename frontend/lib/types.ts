@@ -226,6 +226,10 @@ export interface StablecoinProfile {
   offchainFacts?: OffchainFact[];
   /** Live Aave V3 lending rates when this coin is an Aave reserve (e.g. GHO). */
   lendingMarket?: LendingMarket | null;
+  /** Cron-written CoinGecko market block (receipt tokens, gov-adjacent stables). */
+  market?: TokenMarket;
+  /** Cron-written yield overlay (Llama pools for sUSDe, scrvUSD, etc.). */
+  yieldMechanics?: YieldMechanics;
   /** Protocol fees/revenue when this coin maps to a Llama protocol (DeFi Llama). */
   protocolFeesRevenue?: ProtocolFeesRevenue | null;
   createdAt: string;
@@ -304,6 +308,8 @@ export interface RwaProfile {
   historicalTvlData: HistoricalTvlData;
   /** Cross-chain TVL footprint (DeFi Llama; written by the cron). */
   chainDistribution?: ChainDistribution | null;
+  /** Cron-written CoinGecko market block when listed. */
+  market?: TokenMarket;
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Curated off-chain facts (issuer, custody, gating) with provenance. */
   offchainFacts?: OffchainFact[];

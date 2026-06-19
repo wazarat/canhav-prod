@@ -544,51 +544,104 @@ def print_member_coin_report(reports: List[Dict[str, Any]]) -> None:
                 print(f"    - {issue['suggested_action']}: {issue['detail']}")
 
 
-def _is_lending_cohort_entity(item: Dict[str, Any]) -> bool:
-    sector = item.get("Sector")
+def _matches_sector_cohort(item: Dict[str, Any], sector: str) -> bool:
+    primary = item.get("Sector")
     secondary = item.get("SecondarySectors") or []
-    return sector == "Lending" or "Lending" in secondary
+    return primary == sector or sector in secondary
+
+
+def _is_lending_cohort_entity(item: Dict[str, Any]) -> bool:
+    return _matches_sector_cohort(item, "Lending")
+
+
+def _is_stablecoin_cohort_entity(item: Dict[str, Any]) -> bool:
+    return _matches_sector_cohort(item, "Stablecoin")
+
+
+def _is_rwa_cohort_entity(item: Dict[str, Any]) -> bool:
+    return _matches_sector_cohort(item, "RWA")
+
+
+def _is_dex_cohort_entity(item: Dict[str, Any]) -> bool:
+    return _matches_sector_cohort(item, "DEX")
+
+
+# Slugs with no public listing — validation passes; UI shows honest empty state.
+PRE_LAUNCH_EXCEPTIONS: Dict[str, str] = {
+    "chip": "USD.AI governance — not listed on CoinGecko",
+    "schip": "USD.AI staked governance — not listed",
+    "iusde": "Ethena institutional USDe — KYC-gated",
+    "stusr": "Only illiquid wstUSR on CoinGecko",
+    "sgho": "sGHO pre-launch",
+    "stkgho": "stkGHO pre-launch",
+    "jljupusd": "Jupiter pre-launch JLP-USD",
+    "bgusd": "Bitget exchange-native — no public listing",
+    "ondo-gm": "Ondo Global Markets — Reg S / 506(c) gated",
+    "monerium-usde": "Monerium regulated e-money — no Arbitrum CG deployment",
+    "iske": "Monerium ISK e-money — no Arbitrum CG deployment",
+    "true": "Monerium TRUE governance — unlisted",
+    "stably": "Stably wound down",
+    "usdsc": "Stably USDSC wound down",
+    "stably-gold": "Stably gold product wound down",
+    "tgbp": "TrueUSD regional FX — no liquid CG feed",
+    "taud": "TrueUSD regional FX — no liquid CG feed",
+    "tcad": "TrueUSD regional FX — no liquid CG feed",
+    "thkd": "TrueUSD regional FX — no liquid CG feed",
+}
 
 
 def _coin_has_live_data_path(slug: str, coin: Dict[str, Any]) -> bool:
     """True when a member coin has at least one live-data path (CG, contract, market, yield)."""
     from app.live.coingecko import COINGECKO_IDS  # noqa: E402
 
-    pre_launch = {"sgho", "stkgho"}
-    if slug in pre_launch:
+    if slug in PRE_LAUNCH_EXCEPTIONS:
         return True
 
     if COINGECKO_IDS.get(slug):
-        return True
-    if coin.get("ContractAddress"):
-        market = coin.get("Market") or {}
-        if (market.get("priceUsd") or {}).get("value") is not None:
-            return True
-        if (market.get("marketCapUsd") or {}).get("value") is not None:
-            return True
-        if coin.get("LendingMarket"):
-            return True
-        if coin.get("YieldMechanics"):
-            return True
-        # Contract without market yet — cron/Llama may still fill on next run
         return True
     if coin.get("LendingMarket"):
         return True
     if coin.get("YieldMechanics"):
         return True
+
     market = coin.get("Market") or {}
     if (market.get("priceUsd") or {}).get("value") is not None:
         return True
+    if (market.get("marketCapUsd") or {}).get("value") is not None:
+        return True
+
+    ts = coin.get("TotalSupply") or {}
+    if (ts.get("value") or 0) > 0:
+        return True
+
+    tvl = coin.get("TotalValueLocked") or {}
+    if (tvl.get("value") or 0) > 0:
+        return True
+
+    peg = coin.get("HistoricalPegData") or {}
+    if peg.get("points"):
+        return True
+
+    if coin.get("ChainDistribution"):
+        return True
+
+    if coin.get("ContractAddress"):
+        # Contract without market yet — cron/Llama may still fill on next run
+        return True
+
     return False
 
 
-def report_member_coin_data_gaps(items: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Flag lending-cohort member coins missing any live-data path."""
+def _gaps_for_cohort(
+    items: Dict[str, Any],
+    cohort_name: str,
+    predicate: Any,
+) -> List[Dict[str, Any]]:
     gaps: List[Dict[str, Any]] = []
     for item in items.values():
         if item.get("Category") not in ("Entity", "Network"):
             continue
-        if not _is_lending_cohort_entity(item):
+        if not predicate(item):
             continue
         entity_slug = item.get("Slug", "")
         for ref in item.get("MemberCoins") or []:
@@ -598,6 +651,7 @@ def report_member_coin_data_gaps(items: Dict[str, Any]) -> List[Dict[str, Any]]:
             if coin is None:
                 gaps.append(
                     {
+                        "cohort": cohort_name,
                         "entity": entity_slug,
                         "coin_slug": ref_slug,
                         "category": ref_cat,
@@ -608,6 +662,7 @@ def report_member_coin_data_gaps(items: Dict[str, Any]) -> List[Dict[str, Any]]:
             if not _coin_has_live_data_path(ref_slug, coin):
                 gaps.append(
                     {
+                        "cohort": cohort_name,
                         "entity": entity_slug,
                         "coin_slug": ref_slug,
                         "category": ref_cat,
@@ -617,17 +672,41 @@ def report_member_coin_data_gaps(items: Dict[str, Any]) -> List[Dict[str, Any]]:
     return gaps
 
 
+def report_member_coin_data_gaps(items: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Flag member coins missing any live-data path across Lending/Stablecoin/RWA/DEX."""
+    gaps: List[Dict[str, Any]] = []
+    for cohort_name, predicate in [
+        ("Lending", _is_lending_cohort_entity),
+        ("Stablecoin", _is_stablecoin_cohort_entity),
+        ("RWA", _is_rwa_cohort_entity),
+        ("DEX", _is_dex_cohort_entity),
+    ]:
+        gaps.extend(_gaps_for_cohort(items, cohort_name, predicate))
+    return gaps
+
+
 def print_member_coin_data_gap_report(gaps: List[Dict[str, Any]]) -> None:
     if not gaps:
-        print("\nMember-coin data gaps: none in Lending cohort.")
+        print("\nMember-coin data gaps: none across Lending/Stablecoin/RWA/DEX cohorts.")
         return
-    print(f"\nMember-coin data gaps ({len(gaps)}):\n")
+
+    by_cohort: Dict[str, List[Dict[str, Any]]] = {}
     for row in gaps:
-        print(
-            f"  {row['entity']:<14} "
-            f"{row['category']}/{row['coin_slug']:<20} "
-            f"{row['issue']}"
-        )
+        by_cohort.setdefault(row["cohort"], []).append(row)
+
+    print(f"\nMember-coin data gaps ({len(gaps)} total):\n")
+    for cohort_name in ("Lending", "Stablecoin", "RWA", "DEX"):
+        cohort_gaps = by_cohort.get(cohort_name, [])
+        if not cohort_gaps:
+            print(f"  {cohort_name}: none")
+            continue
+        print(f"  {cohort_name} ({len(cohort_gaps)}):")
+        for row in cohort_gaps:
+            print(
+                f"    {row['entity']:<14} "
+                f"{row['category']}/{row['coin_slug']:<20} "
+                f"{row['issue']}"
+            )
 
 
 def load_entity_specs() -> Dict[str, Dict[str, Any]]:

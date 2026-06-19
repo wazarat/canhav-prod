@@ -161,6 +161,8 @@ export async function readLiveStore(): Promise<LiveStore> {
         chainDistribution: item.ChainDistribution ?? undefined,
         issuanceMeta: item.IssuanceMeta ?? undefined,
         lendingMarket: item.LendingMarket ?? undefined,
+        market: item.Market ?? undefined,
+        yieldMechanics: item.YieldMechanics ?? undefined,
       } as StablecoinProfile);
     } else if (item.Category === "RWA") {
       rwas.push({
@@ -179,6 +181,7 @@ export async function readLiveStore(): Promise<LiveStore> {
           updatedAt: null,
         },
         chainDistribution: item.ChainDistribution ?? undefined,
+        market: item.Market ?? undefined,
       } as RwaProfile);
     } else if (item.Category === "Token") {
       tokens.push({

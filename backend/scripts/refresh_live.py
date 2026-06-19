@@ -111,6 +111,28 @@ def _aggregate_entity_tvl(items: list, item: dict) -> Optional[float]:
     return total if found else None
 
 
+def _build_market_block(resolution: dict) -> dict:
+    """Build a live Market block from a CoinGecko TokenResolution dict."""
+    def sourced(value):
+        return {
+            "value": value,
+            "dataSource": "live",
+            "sourceLabel": "CoinGecko",
+            "updatedAt": _now_iso(),
+        }
+
+    return {
+        "priceUsd": sourced(resolution.get("priceUsd")),
+        "marketCapUsd": sourced(resolution.get("marketCapUsd")),
+        "volume24hUsd": sourced(resolution.get("volume24hUsd")),
+        "change24hPct": sourced(resolution.get("change24hPct")),
+        "fdvUsd": sourced(resolution.get("fdvUsd")),
+        "circulatingSupply": sourced(resolution.get("circulatingSupply")),
+        "totalSupply": sourced(resolution.get("totalSupplyUnits")),
+        "maxSupply": sourced(resolution.get("maxSupply")),
+    }
+
+
 def refresh_item(item: dict, *, has_alchemy: bool, dry_run: bool) -> dict:
     """Return a per-item result row; mutates ``item`` in place (unless dry-run)."""
     slug = _slug_of(item)
@@ -120,6 +142,7 @@ def refresh_item(item: dict, *, has_alchemy: bool, dry_run: bool) -> dict:
     address: Optional[str] = None
     decimals = None
     price = None
+    resolution = None
 
     # 1. CoinGecko resolution (only when a coin id is mapped for this slug).
     if coingecko.COINGECKO_IDS.get(slug):
@@ -131,6 +154,18 @@ def refresh_item(item: dict, *, has_alchemy: bool, dry_run: bool) -> dict:
             address = resolution.get("address")
             decimals = resolution.get("decimals")
             price = resolution.get("priceUsd")
+
+    # Persist market block for tokens + stablecoins (independent of address).
+    if (
+        not dry_run
+        and resolution
+        and resolution.get("priceUsd") is not None
+        and category in (schema.CATEGORY_TOKEN, schema.CATEGORY_STABLECOIN)
+    ):
+        item["Market"] = _build_market_block(resolution)
+        row["metric"] = resolution.get("priceUsd")
+        if not row["note"]:
+            row["note"] = "market block"
 
     # 2. RWA registry fallback: most RWA tokens aren't on CoinGecko, so pin their
     #    Arbitrum address/price here. Only used when CoinGecko yielded no address.
@@ -156,6 +191,8 @@ def refresh_item(item: dict, *, has_alchemy: bool, dry_run: bool) -> dict:
                 if coingecko.COINGECKO_IDS.get(slug)
                 else "no CoinGecko mapping or registry entry"
             )
+        if not dry_run and item.get("Market"):
+            item["UpdatedAt"] = _now_iso()
         return row
 
     if not dry_run:
@@ -165,14 +202,18 @@ def refresh_item(item: dict, *, has_alchemy: bool, dry_run: bool) -> dict:
 
     if not has_alchemy:
         row["note"] = "address persisted; ALCHEMY_API_KEY missing (metric skipped)"
+        if not dry_run:
+            item["UpdatedAt"] = _now_iso()
         return row
 
-    if category == schema.CATEGORY_STABLECOIN:
+    if category in (schema.CATEGORY_STABLECOIN, schema.CATEGORY_TOKEN):
         result = alchemy.fetch_total_supply(address, decimals=decimals)
         if not dry_run:
-            item["TotalSupply"] = dict(result)
-        row["metric"] = result["value"]
-        row["note"] = "TotalSupply" if result["value"] is not None else "supply call failed"
+            current = item.get("TotalSupply") or {}
+            if result["value"] is not None or current.get("value") is None:
+                item["TotalSupply"] = dict(result)
+        row["metric"] = result["value"] if result["value"] is not None else row["metric"]
+        row["note"] = "TotalSupply" if result["value"] is not None else row["note"] or "supply call failed"
     elif category == schema.CATEGORY_RWA:
         holdings = [{"address": address, "decimals": decimals, "priceUsd": price}]
         result = alchemy.fetch_total_value_locked(holdings)
@@ -280,11 +321,71 @@ def main(argv: List[str]) -> int:
     if aave_updated:
         print(f"Aave rates : refreshed {aave_updated} item(s) (supply/borrow APY).")
 
-    # --- Token Llama price fallback (Ethereum + Arbitrum contract keys) --------
+    # --- Yield pool APY (tokens + yield-bearing stablecoins) -----------------
+    yield_updated = 0
+    if not args.dry_run:
+        pools = defillama.fetch_yield_pools()
+        aave_atokens = set(aave.ATOKEN_SLUGS)
+        for item in items:
+            cat = item.get("Category")
+            slug = _slug_of(item)
+            if cat not in (schema.CATEGORY_TOKEN, schema.CATEGORY_STABLECOIN):
+                continue
+            if slug in aave_atokens:
+                continue
+            pool = defillama.resolve_yield_pool(slug, pools)
+            if not pool:
+                continue
+            apy = defillama._num(pool.get("apy"))
+            if apy is None or apy <= 0:
+                continue
+            item["YieldMechanics"] = {
+                "currentApyPct": apy,
+                "feeShareToHoldersPct": 0,
+                "yieldSource": (
+                    f"DeFi Llama pool — {pool.get('project')} "
+                    f"{pool.get('symbol')} on {pool.get('chain')}"
+                ),
+                "isAutoCompounding": True,
+                "emissionsBased": (defillama._num(pool.get("apyReward")) or 0) > 0,
+                "payoutAsset": "Accrues into the pool position (base APY; rewards where applicable)",
+                "dataSource": "live",
+            }
+            item["UpdatedAt"] = _now_iso()
+            repo.put_item(item)
+            yield_updated += 1
+    if yield_updated:
+        print(f"Yield pools: refreshed {yield_updated} item(s) (Llama APY).")
+
+    # --- Stablecoin Llama supply fallback (when Alchemy/CG miss) ------------
+    stable_supply_updated = 0
+    if not args.dry_run:
+        for item in items:
+            if item.get("Category") != schema.CATEGORY_STABLECOIN:
+                continue
+            slug = _slug_of(item)
+            current = item.get("TotalSupply") or {}
+            if current.get("value") is not None:
+                continue
+            circulating = defillama.fetch_stablecoin_circulating(slug)
+            if circulating is None or circulating <= 0:
+                continue
+            item["TotalSupply"] = {
+                "value": circulating,
+                "source": "defillama",
+                "updatedAt": _now_iso(),
+            }
+            item["UpdatedAt"] = _now_iso()
+            repo.put_item(item)
+            stable_supply_updated += 1
+    if stable_supply_updated:
+        print(f"Stable supply: refreshed {stable_supply_updated} item(s) (Llama fallback).")
+
+    # --- Token + stablecoin Llama price fallback ---------------------------
     llama_price_updated = 0
     if not args.dry_run:
         for item in items:
-            if item.get("Category") != schema.CATEGORY_TOKEN:
+            if item.get("Category") not in (schema.CATEGORY_TOKEN, schema.CATEGORY_STABLECOIN):
                 continue
             market = item.get("Market") or {}
             if (market.get("priceUsd") or {}).get("value") is not None:

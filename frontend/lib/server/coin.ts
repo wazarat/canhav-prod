@@ -45,6 +45,25 @@ const ATOKEN_REF_LABEL: Record<string, string> = {
   aweth: "WETH ref.",
 };
 
+/** Yield-bearing receipt slugs -> underlying CoinGecko id for reference price. */
+const RECEIPT_UNDERLYING_COIN_ID: Record<string, string> = {
+  susde: "ethena-usde",
+  scrvusd: "crvusd",
+  susds: "usds",
+  sfrax: "frax-usd",
+  sdeusd: "elixir-deusd",
+  susdz: "anzen-usdz",
+};
+
+const RECEIPT_REF_LABEL: Record<string, string> = {
+  susde: "USDe ref.",
+  scrvusd: "crvUSD ref.",
+  susds: "USDS ref.",
+  sfrax: "frxUSD ref.",
+  sdeusd: "deUSD ref.",
+  susdz: "USDz ref.",
+};
+
 export interface CoinOnchain {
   supply: number | null;
   decimals: number | null;
@@ -85,9 +104,13 @@ export interface CoinLiveData {
   lendingMarket: LendingMarket | null;
   /** Cron-written yield overlay (Aave aTokens, Llama pools, etc.). */
   yieldMechanics: YieldMechanics | null;
-  /** Underlying spot reference for aTokens (not the aToken price itself). */
+  /** Underlying spot reference for aTokens / yield receipts (not receipt price). */
   referencePrice: number | null;
   referencePriceLabel: string | null;
+  /** Circulating supply in USD (store TotalSupply × price, or on-chain supply). */
+  circulatingSupplyUsd: number | null;
+  /** RWA TVL / AUM proxy in USD from store or on-chain. */
+  tvlUsd: number | null;
   links: {
     website: string | null;
     coingecko: string | null;
@@ -222,7 +245,9 @@ export async function getCoinLiveData(
     (profile.contractAddress || "").trim().toLowerCase() || null;
   const address = storedAddress ?? token.address;
   const coinId = coinIdForSlug(profile.slug);
-  const underlyingCoinId = ATOKEN_UNDERLYING_COIN_ID[profile.slug];
+  const underlyingCoinId =
+    ATOKEN_UNDERLYING_COIN_ID[profile.slug] ??
+    RECEIPT_UNDERLYING_COIN_ID[profile.slug];
 
   const [liveMarket, underlyingMarket, supply, metadata] = await Promise.all([
     coinId ? fetchMarketData(coinId, LIVE_REVALIDATE) : Promise.resolve(null),
@@ -236,27 +261,57 @@ export async function getCoinLiveData(
   ]);
 
   const storedMarket =
-    profile.category === "Token" ? profile.market : undefined;
+    "market" in profile ? profile.market : undefined;
   const market = mergeMarketData(liveMarket, storedMarket, token.priceUsd);
 
-  const onchain: CoinOnchain | null = address
-    ? {
-        supply: supply.value,
-        decimals: metadata?.decimals ?? token.decimals,
-        symbol: metadata?.symbol ?? null,
-        updatedAt: supply.updatedAt,
-      }
-    : null;
+  const storedSupply =
+    profile.category === "Stablecoin" || profile.category === "Token"
+      ? profile.totalSupply?.value ?? null
+      : null;
+  const supplyUpdatedAt =
+    profile.category === "Stablecoin" || profile.category === "Token"
+      ? profile.totalSupply?.updatedAt ?? null
+      : null;
+  const effectiveSupply = supply.value ?? storedSupply;
+  const priceForSupply =
+    market?.currentPrice ?? token.priceUsd ?? underlyingMarket?.currentPrice ?? null;
+
+  const onchain: CoinOnchain | null =
+    address || effectiveSupply !== null
+      ? {
+          supply: effectiveSupply,
+          decimals: metadata?.decimals ?? token.decimals,
+          symbol: metadata?.symbol ?? null,
+          updatedAt: supply.updatedAt ?? supplyUpdatedAt,
+        }
+      : null;
 
   const lendingMarket =
     "lendingMarket" in profile ? (profile.lendingMarket ?? null) : null;
 
   const yieldMechanics =
-    profile.category === "Token" ? (profile.yieldMechanics ?? null) : null;
+    "yieldMechanics" in profile ? (profile.yieldMechanics ?? null) : null;
 
   const referencePrice = underlyingMarket?.currentPrice ?? null;
   const referencePriceLabel =
-    referencePrice !== null ? (ATOKEN_REF_LABEL[profile.slug] ?? null) : null;
+    referencePrice !== null
+      ? (ATOKEN_REF_LABEL[profile.slug] ??
+          RECEIPT_REF_LABEL[profile.slug] ??
+          null)
+      : null;
+
+  const circulatingSupplyUsd =
+    effectiveSupply !== null && priceForSupply !== null
+      ? effectiveSupply * priceForSupply
+      : null;
+
+  const storedTvl =
+    profile.category === "RWA" ? profile.totalValueLocked?.value ?? null : null;
+  const tvlUsd =
+    storedTvl ??
+    (profile.category === "RWA" && effectiveSupply !== null && priceForSupply !== null
+      ? effectiveSupply * priceForSupply
+      : null);
 
   const chains = profile.arbitrumPortalMetadata.chains ?? [];
   const primaryChain = chains[0] ?? "Ethereum";
@@ -300,6 +355,8 @@ export async function getCoinLiveData(
     yieldMechanics,
     referencePrice,
     referencePriceLabel,
+    circulatingSupplyUsd,
+    tvlUsd,
     links: {
       website: profile.website,
       coingecko: profile.coingecko,

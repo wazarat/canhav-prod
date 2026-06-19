@@ -51,9 +51,8 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   jupsol: "jupiter-staked-sol",
   jupusd: "jupusd",
   jljupusd: null,
-  // Pleasing USD — not yet live on CoinGecko (verified 2026-06-12); supply +
-  // peg history come from DeFi Llama instead (lib/server/defillama.ts, id 341).
-  usdpm: null,
+  // Pleasing USD — supply/peg via DeFi Llama (id 341); CG id for market data.
+  usdpm: "pleasing-usd",
   gho: "gho",
   sgho: null,
   usdy: "ondo-us-dollar-yield",
@@ -92,10 +91,26 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   thkd: null,
   "monerium-usde": null,
   iske: null,
-  rusdy: null,
+  rusdy: "rebasing-ondo-us-dollar-yield",
   usdsc: null,
   "ondo-gm": null,
   "stably-gold": null,
+  reg: "realtoken-ecosystem-governance",
+  // DEX governance tokens (PDF "DEX Sector Expansion" §3).
+  uni: "uniswap",
+  crv: "curve-dao-token",
+  bal: "balancer",
+  aero: "aerodrome-finance",
+  cake: "pancakeswap-token",
+  sushi: "sushi",
+  ray: "raydium",
+  "dydx-gov": "dydx-chain",
+  drift: "drift-protocol",
+  "gmx-gov": "gmx",
+  hype: "hyperliquid",
+  gns: "gains-network",
+  joe: "joe",
+  rune: "thorchain",
   // Lending-network governance tokens (PDF Week 7+8). Ids verified via the
   // CoinGecko /search endpoint; `// verify` ones should be confirmed before
   // relying on live price/supply (the cron fails soft to null otherwise).

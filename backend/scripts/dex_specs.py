@@ -808,3 +808,27 @@ DEX_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         ],
     ),
 }
+
+# Per-network MemberCoin audit registry (expected count + rationale).
+# Used by validate_taxonomy.py --report-member-coins; does not enforce caps at ingest.
+DEX_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
+    "uniswap": {"expected": 1, "rationale": "UNI governance"},
+    "curve-finance": {"expected": 1, "rationale": "CRV governance (crvUSD is separate entity)"},
+    "balancer": {"expected": 1, "rationale": "BAL governance"},
+    "aerodrome": {"expected": 1, "rationale": "AERO governance"},
+    "pancakeswap": {"expected": 1, "rationale": "CAKE governance"},
+    "trader-joe": {"expected": 1, "rationale": "JOE governance"},
+    "sushiswap": {"expected": 1, "rationale": "SUSHI governance"},
+    "raydium": {"expected": 1, "rationale": "RAY governance"},
+    "thorchain": {"expected": 1, "rationale": "RUNE settlement asset"},
+    "hyperliquid": {"expected": 1, "rationale": "HYPE governance"},
+    "dydx": {"expected": 1, "rationale": "DYDX governance"},
+    "gmx": {"expected": 1, "rationale": "GMX governance"},
+    "drift-protocol": {"expected": 1, "rationale": "DRIFT governance"},
+    "gains-network": {"expected": 1, "rationale": "GNS governance"},
+    "jupiter": {
+        "expected": "multi",
+        "rationale": "JUP + JLP + JupUSD + JLP-USD + JupSOL",
+        "action_hint": "review_multi_coin",
+    },
+}

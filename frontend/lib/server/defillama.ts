@@ -224,10 +224,15 @@ export interface LlamaYieldHint {
 export const LLAMA_YIELD_POOLS: Record<string, LlamaYieldHint | null> = {
   // Aave V3 reserves are covered on-chain (lib/server/aave.ts); these are for
   // tokens whose yield is best sourced from a Llama pool instead.
-  susde: { project: "ethena", symbol: "SUSDE" }, // verify
-  susds: { project: "sky", symbol: "SUSDS" }, // verify
-  usdy: { project: "ondo-finance", symbol: "USDY" }, // verify
-  jlp: { project: "jupiter-perpetuals", symbol: "JLP", chain: "Solana" }, // verify
+  susde: { project: "ethena-usde", symbol: "SUSDE" },
+  susds: { project: "sky-lending", symbol: "SUSDS" },
+  stusds: { project: "pendle", symbol: "STUSDS" },
+  scrvusd: { project: "crvusd", symbol: "SCRVUSD" },
+  sfrax: { project: "frax", symbol: "SFRAX" },
+  susdz: { project: "anzen-v2", symbol: "SUSDZ" },
+  sdeusd: { project: "elixir", symbol: "SDEUSD" },
+  usdy: { project: "ondo-finance", symbol: "USDY" },
+  jlp: { project: "jupiter-perpetuals", symbol: "JLP", chain: "Solana" },
 };
 
 export function llamaStablecoinIdForSlug(slug: string): number | null {

@@ -230,3 +230,102 @@ def fetch_coin_price(coin_key: str) -> Optional[float]:
     if not isinstance(coin, dict):
         return None
     return _num(coin.get("price"))
+
+
+# Yield pool hints — mirror of LLAMA_YIELD_POOLS in defillama.ts.
+LLAMA_YIELD_POOLS: dict[str, Optional[dict]] = {
+    "susde": {"project": "ethena-usde", "symbol": "SUSDE"},
+    "susds": {"project": "sky-lending", "symbol": "SUSDS"},
+    "stusds": {"project": "pendle", "symbol": "STUSDS"},
+    "scrvusd": {"project": "crvusd", "symbol": "SCRVUSD"},
+    "sfrax": {"project": "frax", "symbol": "SFRAX"},
+    "susdz": {"project": "anzen-v2", "symbol": "SUSDZ"},
+    "sdeusd": {"project": "elixir", "symbol": "SDEUSD"},
+    "usdy": {"project": "ondo-finance", "symbol": "USDY"},
+    "jlp": {"project": "jupiter-perpetuals", "symbol": "JLP", "chain": "Solana"},
+}
+
+YIELDS_BASE = "https://yields.llama.fi"
+
+
+def fetch_yield_pools() -> list:
+    data = _get_json(f"{YIELDS_BASE}/pools")
+    if not isinstance(data, dict):
+        return []
+    pools = data.get("data")
+    return pools if isinstance(pools, list) else []
+
+
+def resolve_yield_pool(slug: str, pools: list) -> Optional[dict]:
+    hint = LLAMA_YIELD_POOLS.get(slug)
+    if not hint:
+        return None
+    pool_id = hint.get("poolId")
+    if pool_id:
+        for p in pools:
+            if isinstance(p, dict) and p.get("pool") == pool_id:
+                return p
+        return None
+    candidates = [p for p in pools if isinstance(p, dict)]
+    if hint.get("project"):
+        proj = str(hint["project"]).lower()
+        candidates = [p for p in candidates if str(p.get("project", "")).lower() == proj]
+    if hint.get("symbol"):
+        sym = str(hint["symbol"]).lower()
+        candidates = [p for p in candidates if str(p.get("symbol", "")).lower() == sym]
+    if hint.get("chain"):
+        chain = str(hint["chain"]).lower()
+        candidates = [p for p in candidates if str(p.get("chain", "")).lower() == chain]
+    if not candidates:
+        return None
+    if not hint.get("chain"):
+        candidates.sort(
+            key=lambda p: (
+                1 if str(p.get("chain", "")).lower() == "arbitrum" else 0,
+                _num(p.get("tvlUsd")) or 0,
+            ),
+            reverse=True,
+        )
+    else:
+        candidates.sort(key=lambda p: _num(p.get("tvlUsd")) or 0, reverse=True)
+    return candidates[0]
+
+
+STABLECOINS_BASE = "https://stablecoins.llama.fi"
+
+# Minimal mirror of LLAMA_STABLECOIN_IDS — supply fallback when Alchemy/CG miss.
+LLAMA_STABLECOIN_IDS: dict[str, Optional[int]] = {
+    "usdpm": 341,
+}
+
+
+def fetch_stablecoin_circulating(slug: str) -> Optional[float]:
+    """Latest circulating supply (USD peg units) from DeFi Llama stablecoin index."""
+    asset_id = LLAMA_STABLECOIN_IDS.get(slug)
+    if asset_id is None:
+        return None
+    data = _get_json(f"{STABLECOINS_BASE}/stablecoin/{asset_id}")
+    if not isinstance(data, dict):
+        return None
+    balances = data.get("chainBalances")
+    if not isinstance(balances, dict):
+        return None
+    total = 0.0
+    found = False
+    for chain_data in balances.values():
+        if not isinstance(chain_data, dict):
+            continue
+        tokens = chain_data.get("tokens")
+        if not isinstance(tokens, list) or not tokens:
+            continue
+        last = tokens[-1]
+        if not isinstance(last, dict):
+            continue
+        circ = last.get("circulating")
+        if isinstance(circ, dict):
+            for v in circ.values():
+                n = _num(v)
+                if n is not None:
+                    total += n
+                    found = True
+    return total if found else None

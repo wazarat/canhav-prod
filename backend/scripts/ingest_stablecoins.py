@@ -242,7 +242,7 @@ BATCH_ENTITY_COINS: Dict[str, Dict[str, Dict[str, str]]] = {
             "pegTarget": schema.PEG_USD,
             "subCategory": "Stablecoin",
             "coingecko": None,
-            "contractAddress": None,
+            "contractAddress": "0xc8fb643d18f1e53698cfda5c8fdf0cdc03c1dbec",
             "description": (
                 "Synthetic USD stablecoin connecting on-chain liquidity to the Pleasing "
                 "gold ecosystem. Peg model and custody unverified — confirm from official docs."

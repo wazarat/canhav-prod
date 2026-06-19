@@ -46,6 +46,8 @@ LLAMA_PROTOCOL_SLUGS: dict[str, Optional[str]] = {
     "drift-protocol": "drift-trade",
     "gains-network": "gains-network",
     # RWA networks — issuer/protocol TVL.
+    "ondo-finance": "ondo-finance",
+    "pleasing-market": "pleasing-gold",
     "securitize": "securitize",
     "centrifuge": "centrifuge-protocol",
     "goldfinch": "goldfinch",
@@ -61,7 +63,9 @@ LLAMA_PROTOCOL_SLUGS: dict[str, Optional[str]] = {
 # LLAMA_DEX_SLUGS in defillama.ts. summary/dexs fails soft, so unverified slugs
 # simply yield no live volume. # verify
 LLAMA_DEX_SLUGS: dict[str, Optional[str]] = {
+    "jupiter": None,  # Jupiter aggregator - no working volume adapter on DeFi Llama
     "uniswap": "uniswap",
+    "camelot": "camelot",  # Arbitrum-native DEX # verify
     "curve-finance": "curve-dex",
     "balancer": "balancer",
     "aerodrome": "aerodrome-slipstream",

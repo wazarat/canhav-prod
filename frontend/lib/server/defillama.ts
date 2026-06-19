@@ -138,6 +138,8 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
   "drift-protocol": "drift-trade",
   "gains-network": "gains-network",
   // RWA networks (sector expansion) — issuer/protocol TVL (verified 2026-06-18).
+  "ondo-finance": "ondo-finance",
+  "pleasing-market": "pleasing-gold",
   securitize: "securitize",
   goldfinch: "goldfinch",
   clearpool: "clearpool",
@@ -191,7 +193,7 @@ export const LLAMA_FEES_SLUGS: Record<string, string | null> = {
  * no volume adapter. Verify against https://defillama.com/dexs.
  */
 export const LLAMA_DEX_SLUGS: Record<string, string | null> = {
-  jupiter: "jupiter-aggregator", // Jupiter (Solana) aggregator volume // verify
+  jupiter: null, // Jupiter aggregator - no working volume adapter on DeFi Llama
   uniswap: "uniswap", // verify
   camelot: "camelot", // Arbitrum-native DEX // verify
   // Spot / AMM DEX networks (sector expansion) — trading volume. summary/dexs

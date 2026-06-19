@@ -1143,6 +1143,8 @@ _EXPANSION_SECONDARY_SECTORS: Dict[str, List[str]] = {
     "goldfinch": ["Lending"],
     "pancakeswap": ["Perpetuals"],
     "hyperliquid": ["Perpetuals"],
+    "gmx": ["Perpetuals"],
+    "gains-network": ["Perpetuals"],
 }
 for _slug, _sectors in _EXPANSION_SECONDARY_SECTORS.items():
     _spec = ENTITY_SPECS.get(_slug)

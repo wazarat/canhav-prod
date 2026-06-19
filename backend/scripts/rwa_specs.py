@@ -664,3 +664,10 @@ RWA_ENTITY_SPECS.update({
         website="https://florence.finance",
     ),
 })
+
+# Cross-tagged RWA entities with secondary Lending sector — MemberCoin audit entries.
+RWA_LENDING_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
+    "centrifuge": {"expected": 1, "rationale": "CFG governance"},
+    "clearpool": {"expected": 1, "rationale": "CPOOL governance"},
+    "goldfinch": {"expected": 1, "rationale": "GFI governance"},
+}

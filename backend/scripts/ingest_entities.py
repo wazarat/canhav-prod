@@ -1207,27 +1207,9 @@ for _slug, _children in _CHILD_ENTITIES.items():
     if _spec is not None:
         _spec["child_entities"] = _children
 
-# Lending + RWA protocols that ship exactly one governance/product token link.
-SINGLE_MEMBER_COIN_ENTITIES = frozenset({
-    "centrifuge",
-    "clearpool",
-    "compound",
-    "fluid",
-    "goldfinch",
-    "justlend",
-    "kamino",
-    "morpho",
-    "venus",
-})
-
-
 def build_entity_item(
     slug: str, spec: Dict[str, Any], parent_row: Optional[Dict[str, str]], created_at: str
 ) -> dict:
-    member_coins = spec.get("member_coins") or []
-    if slug in SINGLE_MEMBER_COIN_ENTITIES and len(member_coins) > 1:
-        raise ValueError(f"{slug}: expected at most 1 MemberCoin, got {len(member_coins)}")
-
     row = parent_row or {}
     defaults = spec["portal_defaults"]
     now = _now_iso()

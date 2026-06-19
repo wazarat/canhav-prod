@@ -308,6 +308,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             },
         },
         member_coins=[
+            # SPK governance + cross-refs to Sky parent (sky-gov, USDS have EntitySlug=sky).
             {
                 "slug": "spk",
                 "name": "Spark",
@@ -560,6 +561,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "notes": "Venus supports both core pools and isolated pools on BNB Chain.",
             },
         },
+        # XVS governance only; VAI is a product stablecoin (mentioned in copy, not MemberCoin).
         member_coins=[
             {
                 "slug": "xvs",
@@ -813,6 +815,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "notes": "Maple v2 syrupUSDC/syrupUSDT pools are permissionless; KYC pools serve institutional borrowers.",
             },
         },
+        # Intentionally multi-coin: SYRUP ecosystem + pool tokens (see LENDING_MEMBER_COIN_AUDIT).
         member_coins=[
             {
                 "slug": "syrup",
@@ -856,4 +859,39 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             },
         ],
     ),
+}
+
+# Per-network MemberCoin audit registry (expected count + rationale).
+# Used by validate_taxonomy.py --report-member-coins; does not enforce caps at ingest.
+LENDING_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
+    "aave": {
+        "expected": "multi",
+        "rationale": "GHO/sGHO/stkGHO + AAVE/stkAAVE + aToken receipts",
+    },
+    "compound": {"expected": 1, "rationale": "COMP governance only"},
+    "justlend": {"expected": 1, "rationale": "JST governance only"},
+    "venus": {
+        "expected": 1,
+        "rationale": "XVS governance; VAI is product stablecoin (copy only, not MemberCoin)",
+    },
+    "morpho": {"expected": 1, "rationale": "MORPHO governance"},
+    "kamino": {"expected": 1, "rationale": "KMNO governance"},
+    "spark": {
+        "expected": 3,
+        "rationale": "SPK + cross-refs to Sky parent (sky-gov, USDS)",
+        "notes": "sky-gov/USDS EntitySlug=sky, not spark — intentional parent link",
+    },
+    "fluid": {"expected": 1, "rationale": "FLUID governance"},
+    "maple": {
+        "expected": "multi",
+        "rationale": "SYRUP/stSYRUP/OFT + syrupUSDC/syrupUSDT pool tokens",
+        "action_hint": "review_multi_coin",
+    },
+}
+
+from rwa_specs import RWA_LENDING_MEMBER_COIN_AUDIT  # noqa: E402
+
+ALL_LENDING_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
+    **LENDING_MEMBER_COIN_AUDIT,
+    **RWA_LENDING_MEMBER_COIN_AUDIT,
 }

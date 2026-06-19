@@ -50,6 +50,13 @@ AAVE_RESERVES: Dict[str, str] = {
 }
 ATOKEN_SLUGS = {"ausdc", "ausdt", "aweth"}
 
+# Canonical Aave V3 Arbitrum aToken addresses (bgd-labs address book).
+ATOKEN_CONTRACTS: Dict[str, str] = {
+    "ausdc": "0x625E765fa5a82f5870032b31a019831D17832d365",
+    "ausdt": "0x6ab707Aca74e9E62665E9AAaA7152A0709A3B0ed",
+    "aweth": "0xe50fA9b3c56FfB159cB0FcA61F5c9D250e60Eb70",
+}
+
 
 class LendingMarketResult(TypedDict):
     supplyApyPct: Optional[float]

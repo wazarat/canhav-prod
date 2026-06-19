@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { fetchReserveRatesForSlug, hasAave, isAaveReserveSlug } from "@/lib/server/aave";
+import { fetchReserveRatesForSlug, hasAave, isAaveReserveSlug, aTokenAddressForSlug } from "@/lib/server/aave";
 import { fetchTotalSupply, fetchTotalValueLocked } from "@/lib/server/alchemy";
 import {
   resolveForSlug,
@@ -12,11 +12,11 @@ import {
 } from "@/lib/server/coingecko";
 import {
   aggregateLendingBorrow,
-  arbCoinKey,
   fetchLlamaBorrowPools,
   fetchLlamaCoinChart,
   fetchLlamaCoinPercentage,
   fetchLlamaCoinPrice,
+  llamaCoinKeysForAddress,
   fetchLlamaDexVolume,
   fetchLlamaFeesRevenue,
   fetchLlamaPools,
@@ -383,31 +383,42 @@ async function refreshLlamaDimensions(
     (item.Market?.priceUsd?.value ?? null) == null &&
     item.ContractAddress
   ) {
-    const key = arbCoinKey(String(item.ContractAddress));
-    const price = await fetchLlamaCoinPrice(key);
-    if (price && price.priceUsd !== null) {
-      const sourced = (value: number | null) => ({
-        value,
-        dataSource: "live" as const,
-        sourceLabel: "DeFi Llama",
-        updatedAt: nowIso(),
-      });
-      const pct = await fetchLlamaCoinPercentage(key);
-      item.Market = {
-        ...(item.Market ?? {}),
-        priceUsd: sourced(price.priceUsd),
-        change24hPct: sourced(pct),
-      };
-      const chart = await fetchLlamaCoinChart(key, HISTORY_DAYS);
-      if (chart.length >= 2) {
-        item.PriceHistory = {
-          points: chart.map((p) => ({ date: p.date, price: p.value })),
-          dataSource: "live",
+    const portal = item.ArbitrumPortalMetadata ?? {};
+    const chains = (portal.chains as string[] | undefined) ?? item.Chains ?? [];
+    const primaryChain = chains[0] ?? "Ethereum";
+    const keys = llamaCoinKeysForAddress(String(item.ContractAddress), primaryChain);
+    let applied = false;
+    for (const key of keys) {
+      const price = await fetchLlamaCoinPrice(key);
+      if (price && price.priceUsd !== null) {
+        const sourced = (value: number | null) => ({
+          value,
+          dataSource: "live" as const,
+          sourceLabel: "DeFi Llama",
           updatedAt: nowIso(),
+        });
+        const pct = await fetchLlamaCoinPercentage(key);
+        item.Market = {
+          ...(item.Market ?? {}),
+          priceUsd: sourced(price.priceUsd),
+          change24hPct: sourced(pct),
         };
+        const chart = await fetchLlamaCoinChart(key, HISTORY_DAYS);
+        if (chart.length >= 2) {
+          item.PriceHistory = {
+            points: chart.map((p) => ({ date: p.date, price: p.value })),
+            dataSource: "live",
+            updatedAt: nowIso(),
+          };
+        }
+        mutated = true;
+        notes.push("llama price");
+        applied = true;
+        break;
       }
-      mutated = true;
-      notes.push("llama price");
+    }
+    if (!applied) {
+      // keys tried but no price — leave for next run
     }
   }
 
@@ -578,6 +589,10 @@ export async function GET(req: Request): Promise<NextResponse> {
         const rates = await fetchReserveRatesForSlug(slug);
         if (rates && rates.supplyApyPct !== null) {
           item.LendingMarket = { ...rates };
+          const aTokenAddr = aTokenAddressForSlug(slug);
+          if (aTokenAddr) {
+            item.ContractAddress = aTokenAddr.toLowerCase();
+          }
           if (AAVE_ATOKEN_SLUGS.has(slug)) {
             const underlying = rates.underlyingSymbol ?? slug.replace(/^a/, "").toUpperCase();
             item.YieldMechanics = {

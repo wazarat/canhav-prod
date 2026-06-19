@@ -544,6 +544,92 @@ def print_member_coin_report(reports: List[Dict[str, Any]]) -> None:
                 print(f"    - {issue['suggested_action']}: {issue['detail']}")
 
 
+def _is_lending_cohort_entity(item: Dict[str, Any]) -> bool:
+    sector = item.get("Sector")
+    secondary = item.get("SecondarySectors") or []
+    return sector == "Lending" or "Lending" in secondary
+
+
+def _coin_has_live_data_path(slug: str, coin: Dict[str, Any]) -> bool:
+    """True when a member coin has at least one live-data path (CG, contract, market, yield)."""
+    from app.live.coingecko import COINGECKO_IDS  # noqa: E402
+
+    pre_launch = {"sgho", "stkgho"}
+    if slug in pre_launch:
+        return True
+
+    if COINGECKO_IDS.get(slug):
+        return True
+    if coin.get("ContractAddress"):
+        market = coin.get("Market") or {}
+        if (market.get("priceUsd") or {}).get("value") is not None:
+            return True
+        if (market.get("marketCapUsd") or {}).get("value") is not None:
+            return True
+        if coin.get("LendingMarket"):
+            return True
+        if coin.get("YieldMechanics"):
+            return True
+        # Contract without market yet — cron/Llama may still fill on next run
+        return True
+    if coin.get("LendingMarket"):
+        return True
+    if coin.get("YieldMechanics"):
+        return True
+    market = coin.get("Market") or {}
+    if (market.get("priceUsd") or {}).get("value") is not None:
+        return True
+    return False
+
+
+def report_member_coin_data_gaps(items: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Flag lending-cohort member coins missing any live-data path."""
+    gaps: List[Dict[str, Any]] = []
+    for item in items.values():
+        if item.get("Category") not in ("Entity", "Network"):
+            continue
+        if not _is_lending_cohort_entity(item):
+            continue
+        entity_slug = item.get("Slug", "")
+        for ref in item.get("MemberCoins") or []:
+            ref_slug = ref.get("slug", "")
+            ref_cat = ref.get("category", "")
+            coin = _find_store_item(items, ref_cat, ref_slug)
+            if coin is None:
+                gaps.append(
+                    {
+                        "entity": entity_slug,
+                        "coin_slug": ref_slug,
+                        "category": ref_cat,
+                        "issue": "missing store item",
+                    }
+                )
+                continue
+            if not _coin_has_live_data_path(ref_slug, coin):
+                gaps.append(
+                    {
+                        "entity": entity_slug,
+                        "coin_slug": ref_slug,
+                        "category": ref_cat,
+                        "issue": "no CoinGecko map, contract, market, or yield overlay",
+                    }
+                )
+    return gaps
+
+
+def print_member_coin_data_gap_report(gaps: List[Dict[str, Any]]) -> None:
+    if not gaps:
+        print("\nMember-coin data gaps: none in Lending cohort.")
+        return
+    print(f"\nMember-coin data gaps ({len(gaps)}):\n")
+    for row in gaps:
+        print(
+            f"  {row['entity']:<14} "
+            f"{row['category']}/{row['coin_slug']:<20} "
+            f"{row['issue']}"
+        )
+
+
 def load_entity_specs() -> Dict[str, Dict[str, Any]]:
     from ingest_entities import ENTITY_SPECS  # noqa: E402
 
@@ -554,6 +640,7 @@ def main(argv: List[str]) -> int:
     report_gaps = "--report-gaps" in argv
     report_member_coins_flag = "--report-member-coins" in argv
     report_missing_tvl_flag = "--report-missing-tvl" in argv
+    report_member_coin_data_flag = "--report-member-coin-data" in argv
     use_store = "--store" in argv
 
     if use_store:
@@ -602,6 +689,16 @@ def main(argv: List[str]) -> int:
             return 1
         tvl_reports = report_missing_tvl(items)
         print_missing_tvl_report(tvl_reports)
+
+    if report_member_coin_data_flag:
+        if not items:
+            print(
+                "ERROR: --report-member-coin-data requires --store (reads store.json).",
+                file=sys.stderr,
+            )
+            return 1
+        data_gaps = report_member_coin_data_gaps(items)
+        print_member_coin_data_gap_report(data_gaps)
 
     return 1 if errors else 0
 

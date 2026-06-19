@@ -138,6 +138,18 @@ const RESERVE_BY_SLUG: Record<string, { symbols: string[]; underlying?: Address 
   aweth: { symbols: ["WETH"] },
 };
 
+/** Canonical Aave V3 Arbitrum aToken addresses (bgd-labs address book). */
+const ATOKEN_BY_SLUG: Record<string, Address> = {
+  ausdc: "0x625E765fa5a82f5870032b31a019831D17832d365",
+  ausdt: "0x6ab707Aca74e9E62665E9AAaA7152A0709A3B0ed",
+  aweth: "0xe50fA9b3c56FfB159cB0FcA61F5c9D250e60Eb70",
+};
+
+/** aToken contract on Arbitrum for member-coin slugs that map to a reserves. */
+export function aTokenAddressForSlug(slug: string): Address | null {
+  return ATOKEN_BY_SLUG[slug] ?? null;
+}
+
 /** True when a slug maps to a known Aave V3 reserve we can read rates for. */
 export function isAaveReserveSlug(slug: string): boolean {
   return slug in RESERVE_BY_SLUG;

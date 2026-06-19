@@ -197,3 +197,36 @@ def fetch_dex_volume(slug: str) -> dict:
     if value is None or value <= 0:
         return empty
     return {"value": value, "source": "defillama", "updatedAt": _now_iso()}
+
+
+COINS_BASE = "https://coins.llama.fi"
+
+
+def arb_coin_key(address: str) -> str:
+    return f"arbitrum:{address.strip().lower()}"
+
+
+def eth_coin_key(address: str) -> str:
+    return f"ethereum:{address.strip().lower()}"
+
+
+def llama_coin_keys_for_address(address: str, primary_chain: Optional[str] = None) -> list[str]:
+    addr = address.strip().lower()
+    chain = (primary_chain or "").lower()
+    if "ethereum" in chain and "arbitrum" not in chain:
+        return [eth_coin_key(addr), arb_coin_key(addr)]
+    return [arb_coin_key(addr), eth_coin_key(addr)]
+
+
+def fetch_coin_price(coin_key: str) -> Optional[float]:
+    """Current USD price for a ``{chain}:{address}`` Llama coin key."""
+    data = _get_json(f"{COINS_BASE}/prices/current/{coin_key}")
+    if not isinstance(data, dict):
+        return None
+    coins = data.get("coins")
+    if not isinstance(coins, dict):
+        return None
+    coin = coins.get(coin_key)
+    if not isinstance(coin, dict):
+        return None
+    return _num(coin.get("price"))

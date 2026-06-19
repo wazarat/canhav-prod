@@ -939,6 +939,27 @@ export function arbCoinKey(address: string): string {
   return `arbitrum:${address.trim().toLowerCase()}`;
 }
 
+/** Build a Llama coin key for an Ethereum mainnet contract address. */
+export function ethCoinKey(address: string): string {
+  return `ethereum:${address.trim().toLowerCase()}`;
+}
+
+/** Llama coin keys to try for a token contract (Arbitrum first, then Ethereum). */
+export function llamaCoinKeysForAddress(
+  address: string,
+  primaryChain?: string | null,
+): string[] {
+  const addr = address.trim().toLowerCase();
+  const keys: string[] = [];
+  const chain = (primaryChain ?? "").toLowerCase();
+  if (chain.includes("ethereum") && !chain.includes("arbitrum")) {
+    keys.push(ethCoinKey(addr), arbCoinKey(addr));
+  } else {
+    keys.push(arbCoinKey(addr), ethCoinKey(addr));
+  }
+  return keys;
+}
+
 export interface LlamaCoinPrice {
   priceUsd: number | null;
   symbol: string | null;

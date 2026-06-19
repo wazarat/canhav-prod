@@ -143,6 +143,11 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     "jst": "just",
     "kmno": "kamino",
     "syrup": "syrup",
+    "syrup-oft": "syrup",
+    "cfg": "centrifuge",
+    "gfi": "goldfinch",
+    "cpool": "clearpool",
+    "stsyrup": None,
     "vai": None,
 }
 

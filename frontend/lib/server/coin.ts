@@ -15,7 +15,9 @@ import type {
   RwaProfile,
   StablecoinProfile,
   TokenDeployment,
+  TokenMarket,
   TokenProfile,
+  YieldMechanics,
 } from "@/lib/types";
 
 /**
@@ -29,6 +31,19 @@ import type {
  */
 
 const LIVE_REVALIDATE = 300;
+
+/** aToken slugs -> CoinGecko id for underlying reference price on member-coin cards. */
+const ATOKEN_UNDERLYING_COIN_ID: Record<string, string> = {
+  ausdc: "usd-coin",
+  ausdt: "tether",
+  aweth: "weth",
+};
+
+const ATOKEN_REF_LABEL: Record<string, string> = {
+  ausdc: "USDC ref.",
+  ausdt: "USDT ref.",
+  aweth: "WETH ref.",
+};
 
 export interface CoinOnchain {
   supply: number | null;
@@ -68,6 +83,11 @@ export interface CoinLiveData {
   onchain: CoinOnchain | null;
   /** Live Aave V3 reserve rates when this coin is an Aave reserve, else null. */
   lendingMarket: LendingMarket | null;
+  /** Cron-written yield overlay (Aave aTokens, Llama pools, etc.). */
+  yieldMechanics: YieldMechanics | null;
+  /** Underlying spot reference for aTokens (not the aToken price itself). */
+  referencePrice: number | null;
+  referencePriceLabel: string | null;
   links: {
     website: string | null;
     coingecko: string | null;
@@ -135,23 +155,89 @@ function buildDeploymentLinks(
   return out;
 }
 
+function storedMarketToLive(stored: TokenMarket | undefined): MarketData | null {
+  if (!stored) return null;
+  const price = stored.priceUsd?.value ?? null;
+  const mcap = stored.marketCapUsd?.value ?? null;
+  if (price === null && mcap === null) return null;
+  return {
+    coinId: "",
+    currentPrice: price,
+    marketCap: mcap,
+    marketCapRank: null,
+    totalVolume: stored.volume24hUsd?.value ?? null,
+    circulatingSupply: stored.circulatingSupply?.value ?? null,
+    totalSupply: stored.totalSupply?.value ?? null,
+    maxSupply: stored.maxSupply?.value ?? null,
+    ath: null,
+    atl: null,
+    priceChange24h: stored.change24hPct?.value ?? null,
+    priceChange7d: null,
+    priceChange30d: null,
+    fullyDilutedValuation: stored.fdvUsd?.value ?? null,
+    source: "coingecko",
+  };
+}
+
+function mergeMarketData(
+  live: MarketData | null,
+  stored: TokenMarket | undefined,
+  resolvePriceUsd: number | null,
+): MarketData | null {
+  const fromStored = storedMarketToLive(stored);
+  if (!live && !fromStored && resolvePriceUsd === null) return null;
+
+  const currentPrice =
+    live?.currentPrice ?? fromStored?.currentPrice ?? resolvePriceUsd ?? null;
+  const marketCap = live?.marketCap ?? fromStored?.marketCap ?? null;
+
+  if (currentPrice === null && marketCap === null) return null;
+
+  return {
+    coinId: live?.coinId ?? fromStored?.coinId ?? "",
+    currentPrice,
+    marketCap,
+    marketCapRank: live?.marketCapRank ?? fromStored?.marketCapRank ?? null,
+    totalVolume: live?.totalVolume ?? fromStored?.totalVolume ?? null,
+    circulatingSupply: live?.circulatingSupply ?? fromStored?.circulatingSupply ?? null,
+    totalSupply: live?.totalSupply ?? fromStored?.totalSupply ?? null,
+    maxSupply: live?.maxSupply ?? fromStored?.maxSupply ?? null,
+    ath: live?.ath ?? fromStored?.ath ?? null,
+    atl: live?.atl ?? fromStored?.atl ?? null,
+    priceChange24h: live?.priceChange24h ?? fromStored?.priceChange24h ?? null,
+    priceChange7d: live?.priceChange7d ?? fromStored?.priceChange7d ?? null,
+    priceChange30d: live?.priceChange30d ?? fromStored?.priceChange30d ?? null,
+    fullyDilutedValuation:
+      live?.fullyDilutedValuation ?? fromStored?.fullyDilutedValuation ?? null,
+    source: "coingecko",
+  };
+}
+
 export async function getCoinLiveData(
   profile: StablecoinProfile | TokenProfile | RwaProfile,
   role = "",
 ): Promise<CoinLiveData> {
   const token = await resolveEntityToken(profile);
-  const address = token.address;
+  const storedAddress =
+    (profile.contractAddress || "").trim().toLowerCase() || null;
+  const address = storedAddress ?? token.address;
   const coinId = coinIdForSlug(profile.slug);
+  const underlyingCoinId = ATOKEN_UNDERLYING_COIN_ID[profile.slug];
 
-  const [liveMarket, supply, metadata] = await Promise.all([
+  const [liveMarket, underlyingMarket, supply, metadata] = await Promise.all([
     coinId ? fetchMarketData(coinId, LIVE_REVALIDATE) : Promise.resolve(null),
+    underlyingCoinId
+      ? fetchMarketData(underlyingCoinId, LIVE_REVALIDATE)
+      : Promise.resolve(null),
     address && hasAlchemy()
       ? fetchTotalSupply(address, token.decimals, LIVE_REVALIDATE)
       : Promise.resolve<MetricResult>({ value: null, source: "alchemy", updatedAt: null }),
     address && hasAlchemy() ? fetchTokenMetadata(address) : Promise.resolve(null),
   ]);
 
-  const market = liveMarket;
+  const storedMarket =
+    profile.category === "Token" ? profile.market : undefined;
+  const market = mergeMarketData(liveMarket, storedMarket, token.priceUsd);
 
   const onchain: CoinOnchain | null = address
     ? {
@@ -164,6 +250,13 @@ export async function getCoinLiveData(
 
   const lendingMarket =
     "lendingMarket" in profile ? (profile.lendingMarket ?? null) : null;
+
+  const yieldMechanics =
+    profile.category === "Token" ? (profile.yieldMechanics ?? null) : null;
+
+  const referencePrice = underlyingMarket?.currentPrice ?? null;
+  const referencePriceLabel =
+    referencePrice !== null ? (ATOKEN_REF_LABEL[profile.slug] ?? null) : null;
 
   const chains = profile.arbitrumPortalMetadata.chains ?? [];
   const primaryChain = chains[0] ?? "Ethereum";
@@ -204,6 +297,9 @@ export async function getCoinLiveData(
     market,
     onchain,
     lendingMarket,
+    yieldMechanics,
+    referencePrice,
+    referencePriceLabel,
     links: {
       website: profile.website,
       coingecko: profile.coingecko,

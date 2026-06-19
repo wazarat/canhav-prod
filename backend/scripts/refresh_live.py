@@ -144,6 +144,11 @@ def refresh_item(item: dict, *, has_alchemy: bool, dry_run: bool) -> dict:
 
     row["address"] = address
 
+    # Curated ingest address when CoinGecko is unmapped or has no Arbitrum deployment.
+    if not address and item.get("ContractAddress"):
+        address = str(item["ContractAddress"]).strip().lower() or None
+        row["address"] = address
+
     if not address:
         if not row["note"]:
             row["note"] = (
@@ -237,6 +242,9 @@ def main(argv: List[str]) -> int:
                 if rates and rates["supplyApyPct"] is not None:
                     if not args.dry_run:
                         item["LendingMarket"] = dict(rates)
+                        a_token = aave.ATOKEN_CONTRACTS.get(slug)
+                        if a_token:
+                            item["ContractAddress"] = a_token.lower()
                         if slug in aave.ATOKEN_SLUGS:
                             underlying = slug[1:].upper()
                             item["YieldMechanics"] = {
@@ -271,6 +279,40 @@ def main(argv: List[str]) -> int:
                     aave_updated += 1
     if aave_updated:
         print(f"Aave rates : refreshed {aave_updated} item(s) (supply/borrow APY).")
+
+    # --- Token Llama price fallback (Ethereum + Arbitrum contract keys) --------
+    llama_price_updated = 0
+    if not args.dry_run:
+        for item in items:
+            if item.get("Category") != schema.CATEGORY_TOKEN:
+                continue
+            market = item.get("Market") or {}
+            if (market.get("priceUsd") or {}).get("value") is not None:
+                continue
+            addr = item.get("ContractAddress")
+            if not addr:
+                continue
+            portal = item.get("ArbitrumPortalMetadata") or {}
+            chains = portal.get("chains") or item.get("Chains") or []
+            primary = chains[0] if chains else "Ethereum"
+            for key in defillama.llama_coin_keys_for_address(str(addr), primary):
+                price = defillama.fetch_coin_price(key)
+                if price is not None:
+                    item["Market"] = {
+                        **market,
+                        "priceUsd": {
+                            "value": price,
+                            "dataSource": "live",
+                            "sourceLabel": "DeFi Llama",
+                            "updatedAt": _now_iso(),
+                        },
+                    }
+                    item["UpdatedAt"] = _now_iso()
+                    repo.put_item(item)
+                    llama_price_updated += 1
+                    break
+    if llama_price_updated:
+        print(f"Llama price: refreshed {llama_price_updated} token(s) (contract price fallback).")
 
     # --- Lending networks: DeFi Llama live protocol TVL --------------------
     # Run before DEX/RWA so a slow DEX volume fetch cannot block lending TVL.

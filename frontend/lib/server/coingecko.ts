@@ -101,12 +101,17 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   // relying on live price/supply (the cron fails soft to null otherwise).
   morpho: "morpho",
   comp: "compound-governance-token",
-  spk: "spark", // Spark (SPK) // verify
-  fluid: "instadapp", // Fluid (ex-INST) // verify
+  spk: "spark",
+  fluid: "instadapp", // Fluid governance (ex-INST; fluid id has no CG market feed)
   xvs: "venus",
   jst: "just",
   kmno: "kamino",
-  syrup: "syrup", // Maple SYRUP // verify
+  syrup: "syrup",
+  "syrup-oft": "syrup",
+  cfg: "centrifuge",
+  gfi: "goldfinch",
+  cpool: "clearpool",
+  stsyrup: null, // not on CoinGecko — Llama ethereum price fallback
   vai: null,
   // Stablecoin Sector Expansion (PDF §3). Confident ids set; `// verify` ones
   // should be confirmed before relying on live price/supply (cron fails soft).

@@ -90,6 +90,18 @@ function nowIso(): string {
   return new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 }
 
+/** RWA coin TVL: history series tail, then cron-written TotalValueLocked. */
+function rwaLatestTvlUsd(member: Record<string, any>): number | null {
+  const points = member.HistoricalTvlData?.points;
+  if (Array.isArray(points) && points.length > 0) {
+    const last = points[points.length - 1]?.value;
+    if (typeof last === "number" && last > 0) return last;
+  }
+  const tvl = member.TotalValueLocked?.value;
+  if (typeof tvl === "number" && tvl > 0) return tvl;
+  return null;
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -730,6 +742,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       llamaProtocolForSlug(String(it.Slug ?? "")) !== null,
   );
   const rwaResults: { slug: string; aumUsd: number | null }[] = [];
+  const rwaMissingAum: string[] = [];
   if (rwaNetworkItems.length > 0) {
     const sourced = (value: number | null) => ({
       value,
@@ -748,6 +761,8 @@ export async function GET(req: Request): Promise<NextResponse> {
         await putItem(item);
         updated += 1;
         rwaResults.push({ slug, aumUsd });
+      } else {
+        rwaMissingAum.push(slug);
       }
     }
   }
@@ -871,10 +886,11 @@ export async function GET(req: Request): Promise<NextResponse> {
     );
     if (!member) return null;
     if (ref.category === CATEGORY_STABLECOIN) return member.TotalSupply?.value ?? null;
-    if (ref.category === CATEGORY_RWA) return member.TotalValueLocked?.value ?? null;
+    if (ref.category === CATEGORY_RWA) return rwaLatestTvlUsd(member);
     if (ref.category === CATEGORY_TOKEN) return member.Market?.marketCapUsd?.value ?? null;
     return null;
   };
+  let stablecoinSupplyUpdated = 0;
   for (const item of items) {
     if (!isNetworkCategory(String(item.Category ?? ""))) continue;
     if ((item.CurrentScale?.tvlUsd ?? null) != null) continue;
@@ -890,6 +906,16 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
     if (!found) continue;
     item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd: total };
+    if (String(item.Sector ?? "") === "Stablecoin") {
+      const sourced = {
+        value: total,
+        dataSource: "live" as const,
+        sourceLabel: "Member supply sum",
+        updatedAt: nowIso(),
+      };
+      item.Stablecoin = { ...(item.Stablecoin ?? {}), currentSupplyUsd: sourced };
+      stablecoinSupplyUpdated += 1;
+    }
     item.UpdatedAt = nowIso();
     await putItem(item);
     updated += 1;
@@ -924,6 +950,8 @@ export async function GET(req: Request): Promise<NextResponse> {
     lending: lendingResults,
     dex: dexResults,
     rwa: rwaResults,
+    rwaMissingAum,
+    stablecoinSupplyUpdated,
     integrations: integrationStatus,
   });
 }

@@ -665,9 +665,40 @@ RWA_ENTITY_SPECS.update({
     ),
 })
 
-# Cross-tagged RWA entities with secondary Lending sector — MemberCoin audit entries.
+# Cross-tagged RWA entities with secondary Lending sector — kept for import compat.
 RWA_LENDING_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
-    "centrifuge": {"expected": 1, "rationale": "CFG governance"},
+    "centrifuge": {"expected": 1, "rationale": "CFG governance (product RWAs not MemberCoins)"},
     "clearpool": {"expected": 1, "rationale": "CPOOL governance"},
     "goldfinch": {"expected": 1, "rationale": "GFI governance"},
+}
+
+# RWA-sector MemberCoin audit registry (includes cross-tagged lending+RWA entities).
+RWA_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
+    **RWA_LENDING_MEMBER_COIN_AUDIT,
+    "ondo-finance": {
+        "expected": "multi",
+        "rationale": "USDY/rUSDY/OUSG/ONDO-GOV/ONDO-GM",
+        "action_hint": "review_multi_coin",
+    },
+    "pleasing-market": {
+        "expected": "multi",
+        "rationale": "PGOLD + USDpm",
+        "action_hint": "review_multi_coin",
+    },
+    "securitize": {"expected": 0, "rationale": "BUIDL etc. copy-only per spec scope"},
+    "realt": {"expected": 1, "rationale": "REG governance"},
+    "lofty-ai": {"expected": 0, "rationale": "Algorand properties; no on-chain member coins"},
+    "toucan-protocol": {"expected": 0, "rationale": "BCT/NCT pools; no MemberCoins in scope"},
+    "franklin-templeton": {
+        "expected": 0,
+        "rationale": "BENJI tracked on-chain via registry, not MemberCoin",
+    },
+    "arcton": {"expected": 0, "rationale": "Long-tail seed"},
+    "aryze": {"expected": 0, "rationale": "Long-tail seed"},
+    "atmosphera": {"expected": 0, "rationale": "Long-tail seed"},
+    "chateau-capital": {"expected": 0, "rationale": "Long-tail seed"},
+    "dinari": {"expected": 0, "rationale": "Long-tail seed"},
+    "dualmint": {"expected": 0, "rationale": "Long-tail seed"},
+    "estate-protocol": {"expected": 0, "rationale": "Long-tail seed"},
+    "florence-finance": {"expected": 0, "rationale": "Long-tail seed"},
 }

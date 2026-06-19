@@ -972,6 +972,34 @@ def main(argv: List[str]) -> int:
     repo = get_repository()
     pk = schema.category_pk(schema.CATEGORY_STABLECOIN)
 
+    # Promoted stablecoin-issuer entities: drop stale Stablecoin/{slug} rows when
+    # the Entity owns the slug but the coin is not a MemberCoin (mirrors ingest_rwas).
+    from stablecoin_specs import STABLECOIN_ENTITY_SPECS  # noqa: E402
+
+    entity_slugs: set[str] = set()
+    entity_member_keys: Dict[str, set] = {}
+    for item in repo.all():
+        if item.get("Category") != schema.CATEGORY_ENTITY:
+            continue
+        slug = item.get("Slug", "")
+        if not slug:
+            continue
+        entity_slugs.add(slug)
+        entity_member_keys[slug] = {
+            (r.get("category"), r.get("slug"))
+            for r in item.get("MemberCoins") or []
+            if r.get("category") and r.get("slug")
+        }
+
+    promoted_deleted = 0
+    for slug in STABLECOIN_ENTITY_SPECS:
+        if slug not in entity_slugs or slug in ENTITY_PARENT_SLUGS:
+            continue
+        if ("Stablecoin", slug) in entity_member_keys.get(slug, set()):
+            continue
+        if repo.delete_item(pk, schema.protocol_sk(slug)):
+            promoted_deleted += 1
+
     # Collect matching rows by slug (CSV is the source of truth). The legacy
     # "usd-ai" row is captured to source the two USD.AI coins below.
     matched: Dict[str, Dict[str, str]] = {}
@@ -1117,6 +1145,11 @@ def main(argv: List[str]) -> int:
     total_staged = len(staged) + len(usd_ai_staged) + len(jupiter_staged) + len(batch_staged)
     total_targets = len(TARGETS) + len(USD_AI_COINS) + len(JUPITER_COINS) + batch_count
     print(f"Published {total_staged} / {total_targets} target stablecoins as APPROVED.")
+    if promoted_deleted:
+        print(
+            f"Removed {promoted_deleted} promoted-entity Stablecoin duplicate(s) "
+            "(Entity owns slug; coin not a MemberCoin)."
+        )
     if removed_legacy:
         print(f"Removed legacy '{USD_AI_PARENT_SLUG}' stablecoin (superseded by USDai + sUSDai).")
 

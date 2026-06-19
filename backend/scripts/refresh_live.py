@@ -64,6 +64,53 @@ def _slug_of(item: dict) -> str:
     return item.get("Slug") or schema.slug_from_sk(item.get(schema.SK, ""))
 
 
+def _find_member_item(items: list, category: str, slug: str) -> Optional[dict]:
+    for it in items:
+        if it.get("Category") == category and _slug_of(it) == slug:
+            return it
+    return None
+
+
+def _member_metric_usd(items: list, ref: dict) -> Optional[float]:
+    cat = ref.get("category")
+    ref_slug = ref.get("slug")
+    if not cat or not ref_slug:
+        return None
+    member = _find_member_item(items, cat, ref_slug)
+    if member is None:
+        return None
+    if cat == schema.CATEGORY_STABLECOIN:
+        ts = member.get("TotalSupply") or {}
+        value = ts.get("value")
+    elif cat == schema.CATEGORY_RWA:
+        hist = member.get("HistoricalTvlData") or {}
+        points = hist.get("points") or []
+        value = points[-1].get("value") if points else None
+        if value is None:
+            tvl = member.get("TotalValueLocked") or {}
+            value = tvl.get("value")
+    elif cat == schema.CATEGORY_TOKEN:
+        market = member.get("Market") or {}
+        mcap = market.get("marketCapUsd") or {}
+        value = mcap.get("value")
+    else:
+        return None
+    if value is not None and value > 0:
+        return float(value)
+    return None
+
+
+def _aggregate_entity_tvl(items: list, item: dict) -> Optional[float]:
+    total = 0.0
+    found = False
+    for ref in item.get("MemberCoins") or []:
+        value = _member_metric_usd(items, ref)
+        if value is not None:
+            total += value
+            found = True
+    return total if found else None
+
+
 def refresh_item(item: dict, *, has_alchemy: bool, dry_run: bool) -> dict:
     """Return a per-item result row; mutates ``item`` in place (unless dry-run)."""
     slug = _slug_of(item)
@@ -300,6 +347,38 @@ def main(argv: List[str]) -> int:
         rwa_updated += 1
     if rwa_updated:
         print(f"RWA live   : refreshed {rwa_updated} item(s) (AUM/TVL).")
+
+    # --- Entity headline TVL aggregation ------------------------------------
+    # Mirror of the TS cron tail pass: derive CurrentScale.tvlUsd from member
+    # coins when the headline is still null (e.g. Monerium, Pleasing Market).
+    # For Stablecoin-sector entities, also persist stablecoin.currentSupplyUsd.
+    aggregated = 0
+    stablecoin_supply = 0
+    for item in items:
+        if item.get("Category") != schema.CATEGORY_ENTITY:
+            continue
+        scale = item.get("CurrentScale") or {}
+        if scale.get("tvlUsd") is not None:
+            continue
+        total = _aggregate_entity_tvl(items, item)
+        if total is None:
+            continue
+        if not args.dry_run:
+            item["CurrentScale"] = {**scale, "tvlUsd": total}
+            if item.get("Sector") == "Stablecoin":
+                stable = dict(item.get("Stablecoin") or {})
+                stable["currentSupplyUsd"] = _to_sourced(
+                    {"value": total, "updatedAt": _now_iso()}
+                )
+                item["Stablecoin"] = stable
+                stablecoin_supply += 1
+            item["UpdatedAt"] = _now_iso()
+            repo.put_item(item)
+        aggregated += 1
+    if aggregated:
+        print(f"Entity TVL : aggregated {aggregated} item(s) from member coins.")
+    if stablecoin_supply:
+        print(f"Stablecoin live: wrote currentSupplyUsd on {stablecoin_supply} issuer(s).")
 
     print("History (peg/TVL series) left untouched — Dune is wired but not active yet.")
 

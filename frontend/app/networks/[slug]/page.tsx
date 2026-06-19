@@ -141,6 +141,9 @@ export default async function NetworkProfilePage({ params }: PageProps) {
   const profile = await getApprovedNetworkBySlug(params.slug);
   if (!profile) notFound();
 
+  const dashboardPreview = await loadNetworkDashboardData(profile);
+  const resolvedCoinCount = dashboardPreview.coins.length;
+
   const taxonomy = getNetworkTaxonomyBadges(profile);
   const entitySkill = profile.agentSkill ?? buildSkillFromEntity(profile);
   const scale = profile.currentScale;
@@ -181,8 +184,11 @@ export default async function NetworkProfilePage({ params }: PageProps) {
   }
   statCards.push({
     label: coinsLabel,
-    value: `${profile.memberCoins.length}`,
-    hint: "Member products",
+    value: `${resolvedCoinCount}`,
+    hint:
+      resolvedCoinCount !== profile.memberCoins.length
+        ? `${profile.memberCoins.length} staged`
+        : "Member products",
   });
 
   const sectionNavItems = buildNetworkSectionNav(profile);
@@ -217,7 +223,7 @@ export default async function NetworkProfilePage({ params }: PageProps) {
                 {tag}
               </Badge>
             ))}
-            <Badge tone="neutral">{profile.memberCoins.length} coins</Badge>
+            <Badge tone="neutral">{resolvedCoinCount} coins</Badge>
             <SecurityBadge
               info={deriveSecurityStatus({
                 isPubliclyAudited: profile.arbitrumPortalMetadata?.isPubliclyAudited,
@@ -354,12 +360,12 @@ export default async function NetworkProfilePage({ params }: PageProps) {
             {scale.partnerships != null && (
               <DataRow label={partnershipsLabel} value={`${scale.partnerships}+`} />
             )}
-            {profile.memberCoins.length > 0 && (
+            {resolvedCoinCount > 0 && (
               <DataRow
                 label="Member coins"
                 value={
                   <a href="#member-coins" className="text-electric-400 hover:underline">
-                    {profile.memberCoins.length} products →
+                    {resolvedCoinCount} products →
                   </a>
                 }
               />

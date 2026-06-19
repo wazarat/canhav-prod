@@ -5,11 +5,12 @@ import { Badge } from "@/components/ui/Badge";
 import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import { latestTvl, tvlChangePct, tvlTrend, type TvlTrend } from "@/lib/data";
-import type { RwaProfile } from "@/lib/types";
+import type { NetworkProfile, RwaProfile } from "@/lib/types";
 import { formatUsdCompact } from "@/lib/utils";
 
 interface RwaTableProps {
   profiles: RwaProfile[];
+  entities?: NetworkProfile[];
   /** Staging view shows the approval status column. */
   showStatus?: boolean;
   emptyHint?: string;
@@ -43,7 +44,14 @@ function TvlCell({ profile }: { profile: RwaProfile }) {
   );
 }
 
-export function RwaTable({ profiles, showStatus = false, emptyHint }: RwaTableProps) {
+export function RwaTable({
+  profiles,
+  entities = [],
+  showStatus = false,
+  emptyHint,
+}: RwaTableProps) {
+  const entityName = (slug: string | null | undefined) =>
+    entities.find((e) => e.slug === slug)?.name ?? slug ?? null;
   if (profiles.length === 0) {
     return (
       <div className="glass rounded-2xl px-6 py-12 text-center text-sm text-ink-300">
@@ -59,6 +67,7 @@ export function RwaTable({ profiles, showStatus = false, emptyHint }: RwaTablePr
           <tr>
             <TH>Protocol</TH>
             <TH>Asset class</TH>
+            <TH>Issuer</TH>
             <TH className="text-right">TVL</TH>
             <TH>30d trend</TH>
             {showStatus && <TH>Status</TH>}
@@ -86,6 +95,18 @@ export function RwaTable({ profiles, showStatus = false, emptyHint }: RwaTablePr
               </TD>
               <TD>
                 <Badge tone="neon">{p.assetClass}</Badge>
+              </TD>
+              <TD>
+                {p.entitySlug ? (
+                  <Link
+                    href={`/networks/${p.entitySlug}`}
+                    className="text-xs text-electric-400 hover:underline"
+                  >
+                    {entityName(p.entitySlug)}
+                  </Link>
+                ) : (
+                  <span className="text-ink-400">—</span>
+                )}
               </TD>
               <TD className="text-right">
                 <TvlCell profile={p} />

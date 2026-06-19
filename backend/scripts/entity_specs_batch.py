@@ -211,7 +211,7 @@ BATCH_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             },
         ],
         "current_scale": {
-            "tvlUsd": 5_600_000_000,
+            "tvlUsd": None,
             "users": 117_000,
             "aprPct": 11.3,
             "targetAprPct": None,
@@ -581,7 +581,7 @@ BATCH_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             },
         ],
         "current_scale": {
-            "tvlUsd": 15_490_000_000,
+            "tvlUsd": None,
             "users": 64_000,
             "aprPct": None,
             "targetAprPct": None,
@@ -1119,7 +1119,7 @@ BATCH_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             },
         ],
         "current_scale": {
-            "tvlUsd": 494_100_000,
+            "tvlUsd": None,
             "users": 663_000,
             "aprPct": None,
             "targetAprPct": None,

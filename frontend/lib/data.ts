@@ -208,7 +208,9 @@ function enrichNetworksWithTvl(
       return stablecoinBySlug.get(ref.slug)?.totalSupply?.value ?? null;
     }
     if (ref.category === "RWA") {
-      return rwaBySlug.get(ref.slug)?.totalValueLocked?.value ?? null;
+      const profile = rwaBySlug.get(ref.slug);
+      if (!profile) return null;
+      return latestTvl(profile);
     }
     return tokenBySlug.get(ref.slug)?.market?.marketCapUsd?.value ?? null;
   };
@@ -219,6 +221,16 @@ function enrichNetworksWithTvl(
     const lendingTvl = network.lending?.tvlUsd?.value;
     if (lendingTvl != null && lendingTvl > 0) {
       return { ...network, currentScale: { ...network.currentScale, tvlUsd: lendingTvl } };
+    }
+
+    const rwaAum = network.rwa?.aumUsd?.value;
+    if (rwaAum != null && rwaAum > 0) {
+      return { ...network, currentScale: { ...network.currentScale, tvlUsd: rwaAum } };
+    }
+
+    const stableSupply = network.stablecoin?.currentSupplyUsd?.value;
+    if (stableSupply != null && stableSupply > 0) {
+      return { ...network, currentScale: { ...network.currentScale, tvlUsd: stableSupply } };
     }
 
     let total = 0;

@@ -5,7 +5,7 @@ import { MockDataBanner } from "@/components/MockDataBanner";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { StablecoinTable } from "@/components/stablecoins/StablecoinTable";
 import { StatCard } from "@/components/ui/StatCard";
-import { getApprovedStablecoins, LIVE_METRICS_PENDING, pegDeviationBps } from "@/lib/data";
+import { getApprovedStablecoins, getAllNetworks, LIVE_METRICS_PENDING, pegDeviationBps } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
 
 export const metadata = {
@@ -16,6 +16,7 @@ export const revalidate = 300;
 
 export default async function StablecoinsPage() {
   const profiles = await getApprovedStablecoins();
+  const entities = await getAllNetworks();
 
   const aggregateSupply = profiles.reduce((sum, p) => sum + (p.totalSupply.value ?? 0), 0);
   const deviations = profiles
@@ -59,7 +60,7 @@ export default async function StablecoinsPage() {
         <StatCard label="Peg targets" value={`${usdCount + eurCount > 0 ? "USD / EUR" : "—"}`} hint="Multi-currency" />
       </section>
 
-      <StablecoinTable profiles={profiles} emptyHint="No stablecoins in the store yet." />
+      <StablecoinTable profiles={profiles} entities={entities} emptyHint="No stablecoins in the store yet." />
 
       <ResearchChatScope />
     </div>

@@ -1388,8 +1388,18 @@ def main(argv: List[str]) -> int:
     repo = get_repository()
     pk = schema.category_pk(schema.CATEGORY_TOKEN)
 
+    entity_slugs = {
+        item.get("Slug", "")
+        for item in repo.all()
+        if item.get("Category") == schema.CATEGORY_ENTITY and item.get("Slug")
+    }
+
     staged: List[str] = []
+    skipped_entity_owned: List[str] = []
     for slug, spec in TOKENS.items():
+        if slug in entity_slugs:
+            skipped_entity_owned.append(slug)
+            continue
         csv_parent = spec.get("csvParentSlug")
         parent_row = csv_rows.get(csv_parent) if csv_parent else None
         existing = repo.get_item(pk, schema.protocol_sk(slug))
@@ -1408,6 +1418,11 @@ def main(argv: List[str]) -> int:
         print(f"{schema.STATUS_PENDING:<18}{spec['symbol']:<10}{spec['name']}")
     print("-" * 64)
     print(f"Published {len(staged)} / {len(TOKENS)} token(s) as APPROVED.")
+    if skipped_entity_owned:
+        print(
+            f"Skipped {len(skipped_entity_owned)} token(s) whose slug matches a "
+            f"promoted Entity profile: {', '.join(skipped_entity_owned)}"
+        )
     return 0
 
 

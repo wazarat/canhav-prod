@@ -215,7 +215,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Deloitte monthly attestations.",
             "attestationUrl": "https://www.circle.com/transparency",
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(75_400_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [
                 {
                     "date": "2023-03",
@@ -276,7 +276,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "WithumSmith+Brown monthly attestations.",
             "attestationUrl": "https://paxos.com/transparency",
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(5_500_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["Ethereum", "Solana", "Arbitrum", "BSC", "Gnosis", "Ink", "X Layer", "Hyperliquid"],
@@ -328,7 +328,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Prescient Assurance monthly attestations.",
             "attestationUrl": "https://firstdigitallabs.com",
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(352_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [
                 {
                     "date": "2025-04",
@@ -381,7 +381,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": None,
             "attestationUrl": "https://m0.org",
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(337_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["Ethereum", "Arbitrum", "Optimism", "Solana", "Noble", "Hyperliquid L1", "Monad", "Plume"],
@@ -430,7 +430,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": None,
             "attestationUrl": "https://www.agora.finance",
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(149_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["Ethereum", "Avalanche", "BSC", "Mantle", "Polygon", "Immutable", "Sui", "Plasma", "Plume", "Monad"],
@@ -527,7 +527,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": None,
             "attestationUrl": "https://stablecoin.z.com",
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(700_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [
                 {
                     "date": "2025",
@@ -581,7 +581,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Trail of Bits, ChainSecurity, Coinspect (multiple rounds).",
             "attestationUrl": None,
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(28_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["Ethereum", "Arbitrum", "Optimism", "Polygon", "BSC", "Avalanche", "ZKsync", "Scroll", "Polygon zkEVM"],
@@ -629,7 +629,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "ChainSecurity, MixBytes.",
             "attestationUrl": None,
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(222_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["Ethereum", "Base", "Optimism", "BSC", "Arbitrum", "Polygon", "Gnosis", "ZKsync", "Sonic", "Fraxtal"],
@@ -676,7 +676,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Multiple third-party audits (per Lista docs).",
             "attestationUrl": None,
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(75_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["BSC"],
@@ -723,7 +723,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Multiple audits (per Reserve docs).",
             "attestationUrl": None,
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(300_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["Ethereum", "Base", "Arbitrum", "Gnosis"],
@@ -773,7 +773,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Trail of Bits, Certik, ChainSecurity.",
             "attestationUrl": "https://frax.finance",
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(310_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["Ethereum", "Arbitrum", "Optimism", "Avalanche", "BSC", "Blast", "Linea", "Movement", "X Layer"],
@@ -819,7 +819,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Pashov Audit Group, MixBytes, Pessimistic; post-exploit re-audit underway.",
             "attestationUrl": None,
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(1_300_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [
                 {
                     "date": "2026-03",
@@ -872,7 +872,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Pashov Audit Group.",
             "attestationUrl": None,
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(1_300_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["Ethereum", "BSC"],
@@ -918,7 +918,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Per Cap docs (pre/post-mainnet).",
             "attestationUrl": None,
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(500_000_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["Ethereum"],
@@ -1012,7 +1012,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Per Anzen docs.",
             "attestationUrl": "https://www.anzen.finance",
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(7_900_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [],
             "deployment": {
                 "chains": ["Ethereum", "Base", "Blast", "Manta"],
@@ -1058,7 +1058,7 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "auditHistory": "Per Mountain docs.",
             "attestationUrl": "https://mountainprotocol.com",
             "proofOfReservesUrl": None,
-            "currentSupplyUsd": _sourced(1_400_000),
+            "currentSupplyUsd": _sourced(None),
             "riskEvents": [
                 {
                     "date": "2025-04",
@@ -1218,4 +1218,44 @@ STABLECOIN_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             _coin("inverse-finance", "Inverse Finance DOLA", "DOLA", "Overcollateralized stablecoin"),
         ],
     ),
+}
+
+# Per-issuer MemberCoin audit registry. Used by validate_taxonomy.py --report-member-coins;
+# does not enforce caps at ingest (multi-coin is normal for issuers).
+STABLECOIN_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
+    "circle": {"expected": "multi", "rationale": "USDC + EURC"},
+    "paxos": {"expected": "multi", "rationale": "USDP/PYUSD/USDG/USDL"},
+    "first-digital": {"expected": 1, "rationale": "FDUSD"},
+    "m-zero": {"expected": 1, "rationale": "M underlying dollar"},
+    "agora": {"expected": 1, "rationale": "AUSD"},
+    "bitget": {"expected": 1, "rationale": "BGUSD"},
+    "gmo-trust": {"expected": "multi", "rationale": "ZUSD + GYEN"},
+    "liquity": {"expected": "multi", "rationale": "LUSD + BOLD"},
+    "curve-stablecoin": {"expected": "multi", "rationale": "crvUSD + scrvUSD"},
+    "lista-dao": {"expected": 1, "rationale": "lisUSD"},
+    "reserve": {"expected": "multi", "rationale": "RSV + eUSD + rgUSD"},
+    "frax": {"expected": "multi", "rationale": "FRAX + frxUSD + sFRAX"},
+    "resolv": {"expected": "multi", "rationale": "USR + stUSR + RLP"},
+    "falcon": {"expected": "multi", "rationale": "USDf + sUSDf"},
+    "cap": {"expected": 1, "rationale": "cUSD"},
+    "elixir": {"expected": "multi", "rationale": "deUSD + sdeUSD (wound-down)"},
+    "anzen": {"expected": "multi", "rationale": "USDz + sUSDz"},
+    "mountain-protocol": {"expected": 1, "rationale": "USDM"},
+    "tether": {"expected": 1, "rationale": "USDT"},
+    "usdt0": {"expected": 1, "rationale": "USDT0 omnichain"},
+    "inverse-finance": {"expected": 1, "rationale": "DOLA"},
+    # Umbrella entities (dual Entity + Stablecoin partition by design).
+    "ethena": {
+        "expected": "multi",
+        "rationale": "USDe + sUSDe + USDtb + ENA governance",
+        "action_hint": "review_multi_coin",
+    },
+    "sky": {
+        "expected": "multi",
+        "rationale": "USDS + sUSDS + SKY governance",
+        "action_hint": "review_multi_coin",
+    },
+    "monerium": {"expected": "multi", "rationale": "EURe + GBPe + ISKe + multi-currency"},
+    "stably": {"expected": "multi", "rationale": "USDS.s + VeUSD + USDSC + XAUs"},
+    "trueusd": {"expected": "multi", "rationale": "TUSD + TGBP/TAUD/TCAD/THKD"},
 }

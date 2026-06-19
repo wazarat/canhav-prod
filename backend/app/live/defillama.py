@@ -65,8 +65,21 @@ LLAMA_PROTOCOL_SLUGS: dict[str, Optional[str]] = {
     "realt": "realt",
     "lofty-ai": "lofty",
     "toucan-protocol": "toucan-protocol",
-    # Verified absent — covered via on-chain supply x $1 NAV instead.
+    # RWA expansion + coin-level slugs (mirrors defillama.ts).
+    "dinari": "dinari",
+    "estate-protocol": "estate-protocol",
+    "chateau-capital": "chateau",
+    "florence-finance": "florence-finance",
+    "pgold": "pleasing-gold",
+    # Verified absent — covered via on-chain supply x $1 NAV or CoinGecko instead.
+    "arcton": None,
+    "atmosphera": None,
+    "aryze": None,
+    "dualmint": None,
     "franklin-templeton": None,
+    "ousg": None,
+    "ondo-gm": None,
+    "stably-gold": None,
 }
 
 # Curated slug -> DeFi Llama DEX protocol slug (volume). Mirror of

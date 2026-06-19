@@ -37,6 +37,11 @@ RWA_ADDRESSES: dict[str, RwaTokenEntry] = {
         "pegged": True,
         "note": "BENJI money-market fund token on Arbitrum One; TVL = on-chain supply x $1.00.",
     },
+    # Pleasing Gold (PGOLD) — Arbitrum One. Verified: CoinGecko platforms.
+    "pgold": {
+        "address": "0x3e76bb02286bfeaa89dd35f11253f2cbce634f91",
+        "note": "PGOLD tokenized gold on Arbitrum One; price resolved live via CoinGecko.",
+    },
 }
 
 

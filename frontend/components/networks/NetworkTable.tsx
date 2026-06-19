@@ -11,16 +11,23 @@ import {
   sectorBadgeTone,
   subSectorBadgeTone,
 } from "@/lib/networkTaxonomy";
-import type { NetworkProfile } from "@/lib/types";
+import type { NetworkProfile, MemberCoinCategory } from "@/lib/types";
 import { formatUsdCompact } from "@/lib/utils";
 
 interface NetworkTableProps {
   profiles: NetworkProfile[];
   showStatus?: boolean;
   emptyHint?: string;
+  /** When set, dim coin badges that don't match the active category filter. */
+  coinCategoryFilter?: MemberCoinCategory | "all";
 }
 
-export function NetworkTable({ profiles, showStatus = false, emptyHint }: NetworkTableProps) {
+export function NetworkTable({
+  profiles,
+  showStatus = false,
+  emptyHint,
+  coinCategoryFilter = "all",
+}: NetworkTableProps) {
   if (profiles.length === 0) {
     return (
       <div className="glass rounded-2xl px-6 py-12 text-center text-sm text-ink-300">
@@ -85,7 +92,15 @@ export function NetworkTable({ profiles, showStatus = false, emptyHint }: Networ
               <TD>
                 <div className="flex flex-wrap gap-1">
                   {p.memberCoins.map((c) => (
-                    <Badge key={c.slug} tone={categoryBadgeTone(c.category)}>
+                    <Badge
+                      key={c.slug}
+                      tone={categoryBadgeTone(c.category)}
+                      className={
+                        coinCategoryFilter !== "all" && c.category !== coinCategoryFilter
+                          ? "opacity-35"
+                          : undefined
+                      }
+                    >
                       {c.symbol}
                     </Badge>
                   ))}

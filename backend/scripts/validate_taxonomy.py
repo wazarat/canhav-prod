@@ -7,6 +7,7 @@ Usage:
     python3 backend/scripts/validate_taxonomy.py --store      # validate local store.json
     python3 backend/scripts/validate_taxonomy.py --report-gaps
     python3 backend/scripts/validate_taxonomy.py --store --report-member-coins
+    python3 backend/scripts/validate_taxonomy.py --store --report-missing-tvl
 
 Stdlib only.
 """
@@ -27,7 +28,10 @@ from app.db import schema  # noqa: E402
 
 STORE_PATH = BACKEND_ROOT / "data" / "store.json"
 
-FIRST_CLASS_COIN_CATEGORIES = frozenset({"Stablecoin", "Token"})
+FIRST_CLASS_COIN_CATEGORIES = frozenset({"Stablecoin", "Token", "RWA"})
+
+# Umbrella issuers that intentionally share slug with Stablecoin partition row.
+STABLECOIN_UMBRELLA_SLUGS = frozenset({"ethena", "sky", "monerium", "stably", "trueusd"})
 
 SUGGESTED_ACTIONS = (
     "ok",
@@ -52,6 +56,19 @@ def _is_lending_entity(item: Dict[str, Any]) -> bool:
     sector = item.get("Sector")
     secondary = item.get("SecondarySectors") or []
     return sector == "Lending" or "Lending" in secondary
+
+
+def _is_audited_entity(item: Dict[str, Any], audit_slugs: Set[str]) -> bool:
+    slug = item.get("Slug", "")
+    if slug not in audit_slugs:
+        return False
+    sector = item.get("Sector")
+    secondary = item.get("SecondarySectors") or []
+    if sector in ("Lending", "Stablecoin", "RWA"):
+        return True
+    if any(s in ("Lending", "Stablecoin", "RWA") for s in secondary):
+        return True
+    return slug in audit_slugs
 
 
 def _find_store_item(items: Dict[str, Any], category: str, slug: str) -> Optional[Dict[str, Any]]:
@@ -202,9 +219,10 @@ def validate_store_items(items: Dict[str, Any]) -> Tuple[List[str], List[str]]:
 
 
 def report_member_coins(items: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Audit MemberCoin associations for lending-sector entities."""
-    from lending_specs import ALL_LENDING_MEMBER_COIN_AUDIT  # noqa: E402
+    """Audit MemberCoin associations for lending, stablecoin, and RWA entities."""
+    from lending_specs import ALL_MEMBER_COIN_AUDIT  # noqa: E402
 
+    audit_slugs = set(ALL_MEMBER_COIN_AUDIT.keys())
     entity_slugs: Set[str] = set()
     entity_items: Dict[str, Dict[str, Any]] = {}
     entity_member_keys: Dict[str, Set[Tuple[str, str]]] = {}
@@ -216,7 +234,7 @@ def report_member_coins(items: Dict[str, Any]) -> List[Dict[str, Any]]:
             entity_items[slug] = item
             entity_member_keys[slug] = _entity_member_coin_keys(item)
 
-    # Coins indexed by EntitySlug for back-link checks.
+    # Coins indexed by EntitySlug for back-link checks (Stablecoin, Token, RWA).
     coins_by_entity: Dict[str, List[Tuple[str, str, Dict[str, Any]]]] = {}
     for item in items.values():
         cat = item.get("Category")
@@ -230,14 +248,14 @@ def report_member_coins(items: Dict[str, Any]) -> List[Dict[str, Any]]:
 
     reports: List[Dict[str, Any]] = []
 
-    for slug in sorted(ALL_LENDING_MEMBER_COIN_AUDIT):
+    for slug in sorted(ALL_MEMBER_COIN_AUDIT):
         item = entity_items.get(slug)
         if item is None:
             continue
-        if not _is_lending_entity(item):
+        if not _is_audited_entity(item, audit_slugs):
             continue
 
-        audit = ALL_LENDING_MEMBER_COIN_AUDIT[slug]
+        audit = ALL_MEMBER_COIN_AUDIT[slug]
         member_coins = item.get("MemberCoins") or []
         member_keys = entity_member_keys.get(slug, set())
         issues: List[Dict[str, str]] = []
@@ -249,6 +267,23 @@ def report_member_coins(items: Dict[str, Any]) -> List[Dict[str, Any]]:
                 {
                     "suggested_action": "duplicate_partition",
                     "detail": f"RWA/{slug} duplicates Entity slug but is not a MemberCoin",
+                }
+            )
+
+        # duplicate_partition: Stablecoin row for full issuer entity (not umbrella dual-partition).
+        stable_dup = _find_store_item(items, "Stablecoin", slug)
+        if (
+            stable_dup is not None
+            and slug not in STABLECOIN_UMBRELLA_SLUGS
+            and ("Stablecoin", slug) not in member_keys
+        ):
+            issues.append(
+                {
+                    "suggested_action": "duplicate_partition",
+                    "detail": (
+                        f"Stablecoin/{slug} duplicates Entity slug but is not a MemberCoin "
+                        "(umbrella dual-partition excluded)"
+                    ),
                 }
             )
 
@@ -264,7 +299,7 @@ def report_member_coins(items: Dict[str, Any]) -> List[Dict[str, Any]]:
                     }
                 )
 
-        # missing_back_link: Token/Stablecoin with EntitySlug=this entity not in MemberCoins.
+        # missing_back_link: coin with EntitySlug=this entity not in MemberCoins.
         for coin_cat, coin_slug, coin in coins_by_entity.get(slug, []):
             if (coin_cat, coin_slug) not in member_keys:
                 issues.append(
@@ -277,7 +312,7 @@ def report_member_coins(items: Dict[str, Any]) -> List[Dict[str, Any]]:
                     }
                 )
 
-        # review_multi_coin: count vs audit expectations.
+        # review_multi_coin: informational count vs audit expectations (not a hard cap).
         count = len(member_coins)
         expected = audit.get("expected")
         action_hint = audit.get("action_hint")
@@ -292,18 +327,25 @@ def report_member_coins(items: Dict[str, Any]) -> List[Dict[str, Any]]:
                     "detail": audit.get("rationale", "intentional multi-coin"),
                 }
             )
-        elif expected == 1 and count > 1:
+        elif expected == 1 and count != 1:
             issues.append(
                 {
                     "suggested_action": "review_multi_coin",
-                    "detail": f"expected 1 MemberCoin, have {count}",
+                    "detail": f"audit notes 1 coin; have {count} ({audit.get('rationale', '')})",
+                }
+            )
+        elif expected == 0 and count > 0:
+            issues.append(
+                {
+                    "suggested_action": "review_multi_coin",
+                    "detail": f"audit notes 0 MemberCoins; have {count}",
                 }
             )
         elif isinstance(expected, int) and expected not in (0, 1) and count != expected:
             issues.append(
                 {
                     "suggested_action": "review_multi_coin",
-                    "detail": f"expected {expected} MemberCoins, have {count}",
+                    "detail": f"audit notes {expected} MemberCoins; have {count}",
                 }
             )
 
@@ -342,12 +384,140 @@ def report_member_coins(items: Dict[str, Any]) -> List[Dict[str, Any]]:
     return reports
 
 
+def _member_supply_sum(
+    item: Dict[str, Any],
+    items: Dict[str, Any],
+) -> Optional[float]:
+    """Sum member-coin metrics for headline TVL derivation."""
+    total = 0.0
+    found = False
+    for ref in item.get("MemberCoins") or []:
+        cat = ref.get("category")
+        ref_slug = ref.get("slug")
+        member = _find_store_item(items, cat, ref_slug)
+        if member is None:
+            continue
+        value: Optional[float] = None
+        if cat == "Stablecoin":
+            ts = member.get("TotalSupply") or {}
+            value = ts.get("value")
+        elif cat == "RWA":
+            hist = member.get("HistoricalTvlData") or {}
+            points = hist.get("points") or []
+            if points:
+                value = points[-1].get("value")
+            if value is None:
+                tvl = member.get("TotalValueLocked") or {}
+                value = tvl.get("value")
+        elif cat == "Token":
+            market = member.get("Market") or {}
+            mcap = market.get("marketCapUsd") or {}
+            value = mcap.get("value")
+        if value is not None and value > 0:
+            total += float(value)
+            found = True
+    return total if found else None
+
+
+def _tvl_source_hint(item: Dict[str, Any], items: Dict[str, Any]) -> str:
+    sector = item.get("Sector")
+    slug = item.get("Slug", "")
+    scale = item.get("CurrentScale") or {}
+    if scale.get("tvlUsd") is not None:
+        return "CurrentScale.tvlUsd"
+    if sector == "Lending":
+        lending = item.get("Lending") or {}
+        tvl = lending.get("tvlUsd") or {}
+        if tvl.get("value") is not None:
+            return "Lending.tvlUsd"
+    if sector == "RWA":
+        rwa = item.get("Rwa") or {}
+        aum = rwa.get("aumUsd") or {}
+        if aum.get("value") is not None:
+            return "Rwa.aumUsd"
+    if sector == "Stablecoin":
+        stable = item.get("Stablecoin") or {}
+        supply = stable.get("currentSupplyUsd") or {}
+        if supply.get("value") is not None:
+            return "Stablecoin.currentSupplyUsd"
+    member_sum = _member_supply_sum(item, items)
+    if member_sum is not None:
+        return "member_sum"
+    try:
+        from app.live import defillama  # noqa: E402
+
+        if defillama.llama_lending_project_for_slug(slug):
+            return "llama_lending_mapped"
+        if defillama.llama_protocol_for_slug(slug):
+            return "llama_protocol_mapped"
+    except ImportError:
+        pass
+    return "none"
+
+
+def report_missing_tvl(items: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """List entities with no resolvable headline TVL after refresh paths."""
+    from lending_specs import ALL_MEMBER_COIN_AUDIT  # noqa: E402
+
+    reports: List[Dict[str, Any]] = []
+    for item in items.values():
+        if item.get("Category") not in ("Entity", "Network"):
+            continue
+        slug = item.get("Slug", "")
+        sector = item.get("Sector")
+        if sector not in ("Lending", "Stablecoin", "RWA", "DEX") and slug not in ALL_MEMBER_COIN_AUDIT:
+            continue
+
+        scale = item.get("CurrentScale") or {}
+        headline = scale.get("tvlUsd")
+        source = _tvl_source_hint(item, items)
+        member_sum = _member_supply_sum(item, items)
+
+        if headline is not None or source not in ("none", "member_sum") or member_sum is not None:
+            if headline is not None:
+                continue
+            if member_sum is not None:
+                continue
+            if source != "none":
+                continue
+
+        reports.append(
+            {
+                "slug": slug,
+                "sector": sector,
+                "member_coin_count": len(item.get("MemberCoins") or []),
+                "tvl_source": source,
+                "llama_hint": source if source.startswith("llama_") else None,
+            }
+        )
+
+    return reports
+
+
+def print_missing_tvl_report(reports: List[Dict[str, Any]]) -> None:
+    if not reports:
+        print("\nMissing TVL: none in audited sectors.")
+        return
+    print(f"\nMissing TVL ({len(reports)} entities):\n")
+    header = f"{'slug':<22} {'sector':<12} {'members':>7}  {'hint'}"
+    print(header)
+    print("-" * len(header))
+    for row in reports:
+        hint = row.get("llama_hint") or row.get("tvl_source") or "none"
+        print(
+            f"{row['slug']:<22} "
+            f"{(row['sector'] or ''):<12} "
+            f"{row['member_coin_count']:>7}  "
+            f"{hint}"
+        )
+
+
 def print_member_coin_report(reports: List[Dict[str, Any]]) -> None:
     if not reports:
-        print("No lending-sector entities found in audit cohort.")
+        print("No audited entities found in MemberCoin cohort.")
         return
 
-    print(f"\nMemberCoin audit ({len(reports)} lending entities):\n")
+    print(f"\nMemberCoin audit ({len(reports)} entities):\n")
     header = f"{'slug':<14} {'sector':<10} {'count':>5}  {'action':<22}  coins"
     print(header)
     print("-" * len(header))
@@ -383,6 +553,7 @@ def load_entity_specs() -> Dict[str, Dict[str, Any]]:
 def main(argv: List[str]) -> int:
     report_gaps = "--report-gaps" in argv
     report_member_coins_flag = "--report-member-coins" in argv
+    report_missing_tvl_flag = "--report-missing-tvl" in argv
     use_store = "--store" in argv
 
     if use_store:
@@ -421,6 +592,16 @@ def main(argv: List[str]) -> int:
             return 1
         reports = report_member_coins(items)
         print_member_coin_report(reports)
+
+    if report_missing_tvl_flag:
+        if not items:
+            print(
+                "ERROR: --report-missing-tvl requires --store (reads store.json).",
+                file=sys.stderr,
+            )
+            return 1
+        tvl_reports = report_missing_tvl(items)
+        print_missing_tvl_report(tvl_reports)
 
     return 1 if errors else 0
 

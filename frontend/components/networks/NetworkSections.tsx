@@ -1386,7 +1386,7 @@ export function buildNetworkSectionNav(profile: {
     profile.events.length ||
     profile.tokenomics;
 
-  if (profile.memberCoins.length) items.push({ id: "member-coins", label: "Dashboard" });
+  if (profile.memberCoins.length) items.push({ id: "member-coins", label: "Member coins" });
   if (profile.lending) items.push({ id: "lending", label: "Lending" });
   if (profile.stablecoin) items.push({ id: "stablecoin", label: "Stablecoin" });
   if (profile.dex) items.push({ id: "dex", label: "DEX" });

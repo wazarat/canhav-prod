@@ -5,7 +5,7 @@ import { MockDataBanner } from "@/components/MockDataBanner";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { RwaTable } from "@/components/rwas/RwaTable";
 import { StatCard } from "@/components/ui/StatCard";
-import { getApprovedRwas, LIVE_METRICS_PENDING } from "@/lib/data";
+import { getApprovedRwas, getAllNetworks, LIVE_METRICS_PENDING } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
 
 export const metadata = {
@@ -16,6 +16,7 @@ export const revalidate = 300;
 
 export default async function RwasPage() {
   const profiles = await getApprovedRwas();
+  const entities = await getAllNetworks();
 
   const aggregateTvl = profiles.reduce((sum, p) => sum + (p.totalValueLocked.value ?? 0), 0);
   const assetClasses = new Set(profiles.map((p) => p.assetClass));
@@ -50,7 +51,7 @@ export default async function RwasPage() {
         <StatCard label="In store" value={`${profiles.length}`} hint="Synced from ingest" />
       </section>
 
-      <RwaTable profiles={profiles} emptyHint="No RWA protocols in the store yet." />
+      <RwaTable profiles={profiles} entities={entities} emptyHint="No RWA protocols in the store yet." />
 
       <ResearchChatScope />
     </div>

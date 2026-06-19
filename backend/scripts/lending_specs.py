@@ -889,9 +889,14 @@ LENDING_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
     },
 }
 
-from rwa_specs import RWA_LENDING_MEMBER_COIN_AUDIT  # noqa: E402
+from rwa_specs import RWA_MEMBER_COIN_AUDIT  # noqa: E402
+from stablecoin_specs import STABLECOIN_MEMBER_COIN_AUDIT  # noqa: E402
 
-ALL_LENDING_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
+ALL_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
     **LENDING_MEMBER_COIN_AUDIT,
-    **RWA_LENDING_MEMBER_COIN_AUDIT,
+    **STABLECOIN_MEMBER_COIN_AUDIT,
+    **RWA_MEMBER_COIN_AUDIT,
 }
+
+# Back-compat alias for scripts that imported the lending-only name.
+ALL_LENDING_MEMBER_COIN_AUDIT = ALL_MEMBER_COIN_AUDIT

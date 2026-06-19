@@ -5,11 +5,12 @@ import { Badge } from "@/components/ui/Badge";
 import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import { latestPegPrice, pegDeviationBps, pegHealth } from "@/lib/data";
-import type { StablecoinProfile } from "@/lib/types";
+import type { NetworkProfile, StablecoinProfile } from "@/lib/types";
 import { cn, formatPeg, formatUsdCompact, pegSymbol } from "@/lib/utils";
 
 interface StablecoinTableProps {
   profiles: StablecoinProfile[];
+  entities?: NetworkProfile[];
   /** Staging view shows the approval status column. */
   showStatus?: boolean;
   emptyHint?: string;
@@ -39,7 +40,14 @@ function PegCell({ profile }: { profile: StablecoinProfile }) {
   );
 }
 
-export function StablecoinTable({ profiles, showStatus = false, emptyHint }: StablecoinTableProps) {
+export function StablecoinTable({
+  profiles,
+  entities = [],
+  showStatus = false,
+  emptyHint,
+}: StablecoinTableProps) {
+  const entityName = (slug: string | null | undefined) =>
+    entities.find((e) => e.slug === slug)?.name ?? slug ?? null;
   if (profiles.length === 0) {
     return (
       <div className="glass rounded-2xl px-6 py-12 text-center text-sm text-ink-300">
@@ -55,6 +63,7 @@ export function StablecoinTable({ profiles, showStatus = false, emptyHint }: Sta
           <tr>
             <TH>Protocol</TH>
             <TH>Symbol</TH>
+            <TH>Issuer</TH>
             <TH>Peg</TH>
             <TH className="text-right">Circulating supply</TH>
             <TH>Peg target</TH>
@@ -89,6 +98,18 @@ export function StablecoinTable({ profiles, showStatus = false, emptyHint }: Sta
                 </TD>
                 <TD>
                   <span className="font-mono text-xs text-ink-200">{p.symbol}</span>
+                </TD>
+                <TD>
+                  {p.entitySlug ? (
+                    <Link
+                      href={`/networks/${p.entitySlug}`}
+                      className="text-xs text-electric-400 hover:underline"
+                    >
+                      {entityName(p.entitySlug)}
+                    </Link>
+                  ) : (
+                    <span className="text-ink-400">—</span>
+                  )}
                 </TD>
                 <TD>
                   <PegCell profile={p} />

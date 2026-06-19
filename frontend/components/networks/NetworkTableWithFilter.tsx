@@ -211,6 +211,7 @@ export function NetworkTableWithFilter({
       <NetworkTable
         profiles={filtered}
         showStatus={showStatus}
+        coinCategoryFilter={category}
         emptyHint={
           filtered.length === 0 && profiles.length > 0
             ? "No networks match your search."

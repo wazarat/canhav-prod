@@ -1,5 +1,5 @@
 import type { BadgeTone } from "@/components/ui/Badge";
-import type { CreditTag, NetworkProfile, StakingSubSector } from "@/lib/types";
+import type { CreditTag, NetworkProfile, RwaSecondaryTag, StakingSubSector } from "@/lib/types";
 
 export interface NetworkTaxonomyBadges {
   primarySector: string | null;
@@ -15,6 +15,15 @@ export const STAKING_PRIMARY_TAGS: StakingSubSector[] = [
   "Liquid Staking",
   "Restaking",
   "Liquid Restaking",
+];
+
+/** RWA attribute-tag vocabulary for the network-tab filter row (5-tag revamp). */
+export const RWA_SECONDARY_TAGS: RwaSecondaryTag[] = [
+  "Institutional-Gated",
+  "Yield-Bearing",
+  "Real-World-Custody",
+  "DAO-Governed",
+  "Multi-Chain",
 ];
 
 /** Sector chip tone per ontology §9. */
@@ -78,7 +87,7 @@ export function filterTagsForSector(profile: NetworkProfile, sector: string): st
     return profile.dexSubSector ? [profile.dexSubSector] : [];
   }
   if (sector === "RWA") {
-    return profile.rwaSubSector ? [profile.rwaSubSector] : [];
+    return profile.rwaSecondaryTags ?? [];
   }
   if (sector === "Stablecoin") {
     return profile.stablecoinSubSector ? [profile.stablecoinSubSector] : [];
@@ -88,11 +97,12 @@ export function filterTagsForSector(profile: NetworkProfile, sector: string): st
 
 /**
  * Fixed primary tag vocabulary for filter chip rows. Returns null when tags
- * should be derived dynamically from profile data (DEX/RWA/Stablecoin secondaries).
+ * should be derived dynamically from profile data (DEX/Stablecoin secondaries).
  */
 export function sectorFilterTagOptions(sector: string): string[] | null {
   if (sector === "Credit") return [...CREDIT_PRIMARY_TAGS];
   if (sector === "Staking") return [...STAKING_PRIMARY_TAGS];
+  if (sector === "RWA") return [...RWA_SECONDARY_TAGS];
   return null;
 }
 

@@ -9827,7 +9827,9 @@
       },
       "RwaSecondaryTags": [
         "Institutional-Gated",
-        "Yield-Bearing"
+        "Yield-Bearing",
+        "Real-World-Custody",
+        "Multi-Chain"
       ],
       "RwaSubSector": "Tokenized Treasuries",
       "SK": "PROTOCOL#ondo-finance",
@@ -12812,8 +12814,10 @@
         }
       ],
       "Rwa": null,
-      "RwaSecondaryTags": null,
-      "RwaSubSector": null,
+      "RwaSecondaryTags": [
+        "Real-World-Custody"
+      ],
+      "RwaSubSector": "Tokenized Commodities",
       "SK": "PROTOCOL#stably",
       "ScaleLabels": {
         "apr": "Yield",
@@ -12823,9 +12827,9 @@
         "tvl": "Supply",
         "users": "Holders"
       },
-      "SecondarySectors": null,
-      "Sector": "Stablecoin",
-      "Slug": "stably",
+      "SecondarySectors": [
+        "RWA"
+      ],
       "Sources": null,
       "Stablecoin": null,
       "StablecoinSecondaryTags": [],

@@ -1193,7 +1193,11 @@ for _slug, _sectors in _EXPANSION_SECONDARY_SECTORS.items():
 # Stablecoin cross-tag); Mountain Protocol stays a primary Stablecoin issuer and
 # only gains the RWA sub-sector + Wound-Down marker.
 _RWA_PRIMARY_BACKFILL: Dict[str, Any] = {
-    "ondo-finance": ("Tokenized Treasuries", ["Institutional-Gated", "Yield-Bearing"]),
+    # Umbrella covers OUSG (Treasuries) + Global Markets (equities) — union of §4 tags.
+    "ondo-finance": (
+        "Tokenized Treasuries",
+        ["Institutional-Gated", "Yield-Bearing", "Real-World-Custody", "Multi-Chain"],
+    ),
     "pleasing-market": ("Tokenized Commodities", ["Real-World-Custody"]),
 }
 for _slug, (_subsector, _tags) in _RWA_PRIMARY_BACKFILL.items():
@@ -1211,6 +1215,8 @@ for _slug, (_subsector, _tags) in _RWA_PRIMARY_BACKFILL.items():
 # the 5-tag set and tracked via status / OffchainFact instead.
 _RWA_SECONDARY_BACKFILL: Dict[str, Any] = {
     "mountain-protocol": ("Tokenized Treasuries", []),
+    # Stably Gold (XAUs) — commodity RWA on the stablecoin umbrella.
+    "stably": ("Tokenized Commodities", ["Real-World-Custody"]),
 }
 for _slug, (_subsector, _tags) in _RWA_SECONDARY_BACKFILL.items():
     _spec = ENTITY_SPECS.get(_slug)

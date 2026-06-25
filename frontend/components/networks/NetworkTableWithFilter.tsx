@@ -50,8 +50,8 @@ export function NetworkTableWithFilter({
     return [...set].sort();
   }, [profiles]);
 
-  // Sub-sector / tags available for the selected sector. Credit and Staking use
-  // fixed primary-tag vocabularies; DEX/RWA/Stablecoin derive from profile data.
+  // Sub-sector / tags for the selected sector. Credit, Staking, and RWA use fixed
+  // vocabularies; DEX/Stablecoin derive from profile data.
   const sectorTags = useMemo(() => {
     if (sector === "all") return [];
     const fixed = sectorFilterTagOptions(sector);

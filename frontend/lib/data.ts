@@ -253,6 +253,13 @@ function enrichNetworksWithTvl(
       return { ...network, currentScale: { ...network.currentScale, tvlUsd: derivativesTvl } };
     }
 
+    // Other entities (e.g. tokenless Sherlock / Cozy / Votium) source their headline
+    // number from protocol TVL (DeFi Llama) rather than aggregated member-coin mcap.
+    const otherTvl = network.other?.tvlUsd?.value;
+    if (otherTvl != null && otherTvl > 0) {
+      return { ...network, currentScale: { ...network.currentScale, tvlUsd: otherTvl } };
+    }
+
     let total = 0;
     let found = false;
     for (const ref of network.memberCoins) {

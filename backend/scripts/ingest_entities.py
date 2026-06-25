@@ -43,6 +43,7 @@ from rwa_specs import RWA_ENTITY_SPECS  # noqa: E402
 from staking_specs import STAKING_ENTITY_SPECS  # noqa: E402
 from liquidity_specs import LIQUIDITY_ENTITY_SPECS  # noqa: E402
 from derivatives_specs import DERIVATIVES_ENTITY_SPECS  # noqa: E402
+from other_specs import OTHER_ENTITY_SPECS  # noqa: E402
 
 DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
 DOWNLOADS_CSV = Path.home() / "Downloads" / "Arbitrum Ecosystem - scrape v2.csv"
@@ -1077,6 +1078,10 @@ ENTITY_SPECS.update(LIQUIDITY_ENTITY_SPECS)
 # The in-platform perp venues (GMX, Gains, Hyperliquid) + Ethena are extend-existing
 # (below); dYdX (Cosmos) and Drift (Solana) are excluded as non-EVM.
 ENTITY_SPECS.update(DERIVATIVES_ENTITY_SPECS)
+# Other cohort (canhav-other-spec §3/§4): Nexus, Sherlock, InsurAce, Neptune, Cozy,
+# Ease (Underwriting); Votium, Hidden Hand, Paladin, Stake DAO (Governance).
+# Convex & Aura are extend-existing (below) — primary Liquidity/Vaults already in store.
+ENTITY_SPECS.update(OTHER_ENTITY_SPECS)
 
 # Stablecoin sub-sector backfill for the pre-existing issuers (PDF §2). Primary
 # stablecoin issuers also get sector="Stablecoin"; cross-tagged protocols keep
@@ -1357,6 +1362,43 @@ for _slug, _deriv in _DERIVATIVES_EXTEND_EXISTING.items():
             _existing.append("Derivatives")
         _spec["secondary_sectors"] = _existing
 
+# Other extend-existing (canhav-other-spec §0): Convex & Aura keep primary
+# Liquidity/Vaults and gain secondary Other/Governance + Vote-Aggregator tag.
+_OTHER_EXTEND_EXISTING: Dict[str, Dict[str, Any]] = {
+    "convex-finance": {
+        "other_sub_sector": "Governance",
+        "other_secondary_tags": ["Vote-Aggregator"],
+        "other": {
+            "deployment": {
+                "chains": ["Ethereum", "Arbitrum", "Polygon"],
+                "evmCompatible": "yes",
+            },
+            "targetProtocols": ["Curve", "Frax", "Prisma"],
+        },
+    },
+    "aura": {
+        "other_sub_sector": "Governance",
+        "other_secondary_tags": ["Vote-Aggregator"],
+        "other": {
+            "deployment": {
+                "chains": ["Ethereum", "Arbitrum", "Optimism", "Base", "Polygon", "Gnosis"],
+                "evmCompatible": "yes",
+            },
+            "targetProtocols": ["Balancer"],
+        },
+    },
+}
+for _slug, _other in _OTHER_EXTEND_EXISTING.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["other_sub_sector"] = _other["other_sub_sector"]
+        _spec["other_secondary_tags"] = _other["other_secondary_tags"]
+        _spec["other"] = _other.get("other")
+        _existing = list(_spec.get("secondary_sectors") or [])
+        if "Other" not in _existing:
+            _existing.append("Other")
+        _spec["secondary_sectors"] = _existing
+
 
 def build_entity_item(
     slug: str, spec: Dict[str, Any], parent_row: Optional[Dict[str, str]], created_at: str
@@ -1449,6 +1491,10 @@ def build_entity_item(
         "DerivativesSubSector": spec.get("derivatives_sub_sector"),
         "DerivativesSecondaryTags": spec.get("derivatives_secondary_tags"),
         "Derivatives": spec.get("derivatives"),
+        # Other taxonomy + metrics (canhav-other-spec §1).
+        "OtherSubSector": spec.get("other_sub_sector"),
+        "OtherSecondaryTags": spec.get("other_secondary_tags"),
+        "Other": spec.get("other"),
         "MemberCoins": spec["member_coins"],
         "ChildEntities": spec.get("child_entities"),
         "ArbitrumPortalMetadata": {

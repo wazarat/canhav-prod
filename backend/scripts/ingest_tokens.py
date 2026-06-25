@@ -1155,6 +1155,142 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         "discord": None,
         "github": None,
     },
+    # ---- Other sector tokens (canhav-other-spec §6) -----------------------
+    # Underwriting + Governance entity tokens. Sherlock, Cozy, Votium are tokenless.
+    "wnxm": {
+        "name": "Wrapped NXM",
+        "symbol": "wNXM",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Wrapped transferable form of Nexus Mutual membership (NXM). NXM itself "
+            "is non-transferable; wNXM trades on secondary markets and represents "
+            "mutual membership + governance in the Nexus capital pool."
+        ),
+        "entitySlug": "nexus-mutual",
+        "coingecko": "https://www.coingecko.com/en/coins/wrapped-nxm",
+        "contractAddress": "0x04fa0d235c2abf4bcfceb7bf7fc7aedaa0ef19f06",
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
+        "website": "https://nexusmutual.io",
+        "twitter": "https://x.com/NexusMutual",
+        "discord": None,
+        "github": "https://github.com/NexusMutual",
+    },
+    "insur": {
+        "name": "InsurAce",
+        "symbol": "INSUR",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance + staking token of InsurAce, a multi-chain DeFi insurance "
+            "protocol with portfolio-level cover and a pooled capital model."
+        ),
+        "entitySlug": "insurace",
+        "coingecko": "https://www.coingecko.com/en/coins/insurace",
+        "contractAddress": "0x1440D19436bEeaF85178960255FE0112Df1fE9Ed",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "BSC", "Polygon", "Arbitrum One"],
+        "website": "https://www.insurace.io",
+        "twitter": "https://x.com/InsurAce_io",
+        "discord": None,
+        "github": "https://github.com/InsurAce-Protocol",
+    },
+    "npm": {
+        "name": "Neptune Mutual",
+        "symbol": "NPM",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Neptune Mutual, a parametric cover protocol where "
+            "payouts trigger on predefined on-chain loss conditions."
+        ),
+        "entitySlug": "neptune-mutual",
+        "coingecko": "https://www.coingecko.com/en/coins/neptune-mutual",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "BSC"],
+        "website": "https://neptune-mutual.com",
+        "twitter": "https://x.com/neptune_mutual",
+        "discord": None,
+        "github": "https://github.com/neptune-mutual",
+    },
+    "ease": {
+        "name": "Ease.org",
+        "symbol": "EASE",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Ease.org (formerly Armor), a reciprocal coverage "
+            "vault protocol for DeFi portfolio protection."
+        ),
+        "entitySlug": "ease-org",
+        "coingecko": "https://www.coingecko.com/en/coins/ease",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
+        "website": "https://ease.org",
+        "twitter": "https://x.com/EaseDeFi",
+        "discord": None,
+        "github": "https://github.com/EaseDeFi",
+    },
+    "btrfly": {
+        "name": "Redacted",
+        "symbol": "BTRFLY",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Redacted Cartel (Hidden Hand), operating bribe "
+            "marketplaces for vote-escrow protocols across Curve, Balancer, and Frax."
+        ),
+        "entitySlug": "hidden-hand",
+        "coingecko": "https://www.coingecko.com/en/coins/redacted",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
+        "website": "https://redacted.finance",
+        "twitter": "https://x.com/redactedcartel",
+        "discord": None,
+        "github": "https://github.com/redacted-cartel",
+    },
+    "pal": {
+        "name": "Paladin",
+        "symbol": "PAL",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Paladin, operating Paladin Vote bribe marketplaces "
+            "and liquid locker products for vote-escrow governance positions."
+        ),
+        "entitySlug": "paladin",
+        "coingecko": "https://www.coingecko.com/en/coins/paladin",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Optimism", "Polygon"],
+        "website": "https://paladin.vote",
+        "twitter": "https://x.com/PaladinVote",
+        "discord": None,
+        "github": "https://github.com/PaladinFinance",
+    },
+    "sdt": {
+        "name": "Stake DAO",
+        "symbol": "SDT",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Stake DAO, a liquid locker and vote-aggregator "
+            "spanning Curve, Balancer, and Frax vote-escrow ecosystems."
+        ),
+        "entitySlug": "stake-dao",
+        "coingecko": "https://www.coingecko.com/en/coins/stake-dao",
+        "contractAddress": "0x73967a8225dcAce00BF043d887F1d5c0baC96927",
+        "csvParentSlug": "stake-dao",
+        "chains": ["Ethereum", "Arbitrum One", "Polygon", "Optimism"],
+        "website": "https://stakedao.org",
+        "twitter": "https://x.com/StakeDAOHQ",
+        "discord": "https://discord.com/invite/stakedaohq",
+        "github": "https://github.com/StakeDAO",
+    },
     # ---- RWA governance tokens (PDF "DEX + RWA Sector Expansion" §4) -----
     "cfg": {
         "name": "Centrifuge",

@@ -188,6 +188,18 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
   "jones-dao": "jones-dao",
   "rage-trade": "rage-trade-v1",
   "neutra-finance": "neutral-trade",
+  // Other sector (canhav-other-spec §3/§4). Convex & Aura mapped above (Liquidity);
+  // extend-existing here for secondary Other/Governance cron overlay.
+  "nexus-mutual": "nexus-mutual",
+  sherlock: "sherlock",
+  insurace: "insurace",
+  "neptune-mutual": "neptune-mutual",
+  "cozy-finance": "cozy-earn",
+  "ease-org": "easedefi.org",
+  votium: null, // no DeFi Llama adapter as of 2026-06-25
+  "hidden-hand": "hidden-hand",
+  paladin: "paladin-vote",
+  "stake-dao": "stake-dao",
   // RWA networks (sector expansion) — issuer/protocol TVL (verified 2026-06-18).
   "ondo-finance": "ondo-finance",
   "pleasing-market": "pleasing-gold",

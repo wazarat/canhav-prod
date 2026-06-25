@@ -905,7 +905,8 @@ export type NetworkSector =
   | "RWA"
   | "Staking"
   | "Liquidity"
-  | "Derivatives";
+  | "Derivatives"
+  | "Other";
 
 /** Credit-sector tags (replaces the legacy 5-value lending taxonomy). */
 export type CreditTag =
@@ -1052,6 +1053,21 @@ export type DerivativesSecondaryTag =
   | "Synthetic-Assets" // Synthetix synths
   | "Auto-Strategy" // DOVs / managed vaults (Ribbon, Jones)
   | "Funding-Rate-Yield" // delta-neutral funding capture (Ethena)
+  | "Multi-Chain";
+
+/** "Other" primary sub-sector — the two specialized tags. */
+export type OtherSubSector =
+  | "Underwriting" // decentralized insurance / coverage pools (Nexus, Sherlock, InsurAce…)
+  | "Governance"; // governance bribes & meta-governance (Convex, Votium, Aura…)
+
+/** "Other" cross-cutting secondary tags (0+, multi-select). */
+export type OtherSecondaryTag =
+  | "Parametric-Cover" // automatic, on-chain-trigger payouts (Neptune, Cozy)
+  | "Claims-Assessed" // member-voted claims (Nexus)
+  | "Audit-Coverage" // coverage tied to audits (Sherlock)
+  | "Bribe-Marketplace" // Votium, Hidden Hand, Paladin Quest
+  | "Vote-Aggregator" // locks tokens to amass voting power (Convex, Aura, Stake DAO)
+  | "Liquid-Locker" // retains voter rights via liquid wrapper (Stake DAO)
   | "Multi-Chain";
 
 /** Fiat-Backed Regulated sub-sector metrics (Circle, Paxos, First Digital). */
@@ -1440,6 +1456,53 @@ export interface DerivativesMetrics {
   deployment?: ChainDeployment | null;
 }
 
+/**
+ * Other-entity metrics block (sector === "Other"). Mirrors the
+ * `DerivativesMetrics` pattern: Tier-1 fields are filled live by the DeFi Llama +
+ * CoinGecko cron; Tier-2 fields are schema-reserved and stay curated/null until
+ * indexers are wired. Everything optional so partial data renders honestly.
+ */
+export interface OtherMetrics {
+  /* --- Tier 1: LIVE (DeFi Llama + CoinGecko) --- */
+  /** Protocol TVL (USD) — DeFi Llama /protocol/{slug} (capital pool / locked value). */
+  tvlUsd?: Sourced<number | null>;
+  /** TVL change over 1d / 7d (%). */
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  /** Protocol fees / revenue — DeFi Llama /summary/fees/{slug}. */
+  feesRevenue?: ProtocolFeesRevenue | null;
+  /** Governance token price (USD) — CoinGecko. */
+  tokenPriceUsd?: Sourced<number | null>;
+  /** Governance token market cap (USD) — CoinGecko. */
+  marketCapUsd?: Sourced<number | null>;
+  /** Market share within sub-sector (%) — derived across the tag set. */
+  marketSharePct?: number | null;
+  /* --- Tier 2: SCHEMA RESERVED (curated/theoretical) --- */
+  /** Total active coverage (USD) — Underwriting. */
+  activeCoverUsd?: Sourced<number | null>;
+  /** Underwriting capital backstop (USD) — Underwriting. */
+  capitalPoolUsd?: Sourced<number | null>;
+  /** Historical claims paid (USD) — curated Underwriting. */
+  claimsPaidUsd?: Sourced<number | null>;
+  /** Cover model: claims-assessed | parametric | reciprocal. */
+  coverModel?: string | null;
+  /** Protocols underwritten — curated Underwriting. */
+  coveredProtocols?: string[];
+  /** Voting power controlled (e.g. % of veCRV) — curated Governance. */
+  votingPowerControlled?: string | null;
+  /** Target protocols (Curve, Balancer, Frax…) — curated Governance. */
+  targetProtocols?: string[];
+  /** Bribe marketplace throughput (USD) — curated Governance. */
+  bribeVolumeUsd?: Sourced<number | null>;
+  /** Value of locked gov tokens (USD) — curated Governance. */
+  lockedTokenValueUsd?: Sourced<number | null>;
+  /** Structured governance metrics (reuse existing type). */
+  governanceDetail?: GovernanceActivityDetail | null;
+  /** Audit / exploit history (curated). */
+  auditHistory?: string | null;
+  /** Chain / ecosystem deployment (reuse existing type). */
+  deployment?: ChainDeployment | null;
+}
+
 /** A risk/incident row for a stablecoin issuer (depeg, exploit, audit). */
 export interface StablecoinRiskEvent {
   date: string;
@@ -1798,6 +1861,12 @@ export interface NetworkProfile {
   derivativesSecondaryTags?: DerivativesSecondaryTag[];
   /** Derivatives-entity metrics block (live + curated) — `sector === "Derivatives"`. */
   derivatives?: DerivativesMetrics | null;
+  /** Other primary sub-sector (when sector === "Other", or as a secondary marker). */
+  otherSubSector?: OtherSubSector | null;
+  /** Other secondary tags (0+): Parametric-Cover, Vote-Aggregator, etc. */
+  otherSecondaryTags?: OtherSecondaryTag[];
+  /** Other-entity metrics block (live + curated) — `sector === "Other"`. */
+  other?: OtherMetrics | null;
   /** High-cardinality child entity slugs (RealT properties, Centrifuge pools, …). */
   childEntities?: string[];
   memberCoins: MemberCoinRef[];

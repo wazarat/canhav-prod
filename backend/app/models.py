@@ -528,6 +528,8 @@ class EntityProfile(BaseModel):
     liquiditySecondaryTags: List[str] = Field(default_factory=list)
     derivativesSubSector: Optional[str] = None
     derivativesSecondaryTags: List[str] = Field(default_factory=list)
+    otherSubSector: Optional[str] = None
+    otherSecondaryTags: List[str] = Field(default_factory=list)
     childEntities: List[str] = Field(default_factory=list)
     # Ranked competitors (top->bottom) + sector metrics; passthrough dicts.
     competitors: List[dict] = Field(default_factory=list)
@@ -540,6 +542,7 @@ class EntityProfile(BaseModel):
     rwa: Optional[dict] = None
     liquidity: Optional[dict] = None
     derivatives: Optional[dict] = None
+    other: Optional[dict] = None
     memberCoins: List[MemberCoinRef] = Field(default_factory=list)
     # DeFi Llama overlays (written by the cron); passthrough dicts. Options /
     # open-interest are scaffolded for the coming-soon options/perpetuals categories.
@@ -595,6 +598,8 @@ class EntityProfile(BaseModel):
             "LiquiditySecondaryTags": self.liquiditySecondaryTags or None,
             "DerivativesSubSector": self.derivativesSubSector,
             "DerivativesSecondaryTags": self.derivativesSecondaryTags or None,
+            "OtherSubSector": self.otherSubSector,
+            "OtherSecondaryTags": self.otherSecondaryTags or None,
             "ChildEntities": self.childEntities or None,
             "Competitors": self.competitors,
             "Lending": self.lending,
@@ -605,6 +610,7 @@ class EntityProfile(BaseModel):
             "Staking": self.staking,
             "Liquidity": self.liquidity,
             "Derivatives": self.derivatives,
+            "Other": self.other,
             "Partnerships": [p.model_dump() for p in self.partnerships],
             "CurrentScale": self.currentScale.model_dump(),
             "MemberCoins": [m.model_dump() for m in self.memberCoins],
@@ -663,6 +669,8 @@ class EntityProfile(BaseModel):
             liquiditySecondaryTags=item.get("LiquiditySecondaryTags") or [],
             derivativesSubSector=item.get("DerivativesSubSector"),
             derivativesSecondaryTags=item.get("DerivativesSecondaryTags") or [],
+            otherSubSector=item.get("OtherSubSector"),
+            otherSecondaryTags=item.get("OtherSecondaryTags") or [],
             childEntities=item.get("ChildEntities") or [],
             competitors=item.get("Competitors") or [],
             lending=item.get("Lending"),
@@ -673,6 +681,7 @@ class EntityProfile(BaseModel):
             staking=item.get("Staking"),
             liquidity=item.get("Liquidity"),
             derivatives=item.get("Derivatives"),
+            other=item.get("Other"),
             memberCoins=[MemberCoinRef(**m) for m in (item.get("MemberCoins") or [])],
             protocolFeesRevenue=item.get("ProtocolFeesRevenue"),
             dexVolume=item.get("DexVolume"),

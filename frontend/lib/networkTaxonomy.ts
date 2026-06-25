@@ -4,6 +4,7 @@ import type {
   DerivativesSubSector,
   LiquiditySubSector,
   NetworkProfile,
+  OtherSubSector,
   RwaSecondaryTag,
   StakingSubSector,
 } from "@/lib/types";
@@ -34,6 +35,9 @@ export const DERIVATIVES_PRIMARY_TAGS: DerivativesSubSector[] = [
   "Delta-Neutral",
 ];
 
+/** Primary Other tag vocabulary for the network-tab filter row. */
+export const OTHER_PRIMARY_TAGS: OtherSubSector[] = ["Underwriting", "Governance"];
+
 /** RWA attribute-tag vocabulary for the network-tab filter row (5-tag revamp). */
 export const RWA_SECONDARY_TAGS: RwaSecondaryTag[] = [
   "Institutional-Gated",
@@ -60,6 +64,8 @@ export function sectorBadgeTone(sector: string | null | undefined): BadgeTone {
       return "electric";
     case "Derivatives":
       return "warning";
+    case "Other":
+      return "neutral";
     default:
       return "neutral";
   }
@@ -108,6 +114,11 @@ export function tagsForSector(profile: NetworkProfile, sector: string): string[]
       Boolean,
     ) as string[];
   }
+  if (sector === "Other") {
+    return [profile.otherSubSector, ...(profile.otherSecondaryTags ?? [])].filter(
+      Boolean,
+    ) as string[];
+  }
   return profile.tags ?? (profile.subSector ? [profile.subSector] : []);
 }
 
@@ -121,6 +132,9 @@ export function filterTagsForSector(profile: NetworkProfile, sector: string): st
   }
   if (sector === "Derivatives") {
     return profile.derivativesSubSector ? [profile.derivativesSubSector] : [];
+  }
+  if (sector === "Other") {
+    return profile.otherSubSector ? [profile.otherSubSector] : [];
   }
   if (sector === "Credit") {
     return profile.tags ?? (profile.subSector ? [profile.subSector] : []);
@@ -146,6 +160,7 @@ export function sectorFilterTagOptions(sector: string): string[] | null {
   if (sector === "Staking") return [...STAKING_PRIMARY_TAGS];
   if (sector === "Liquidity") return [...LIQUIDITY_PRIMARY_TAGS];
   if (sector === "Derivatives") return [...DERIVATIVES_PRIMARY_TAGS];
+  if (sector === "Other") return [...OTHER_PRIMARY_TAGS];
   if (sector === "RWA") return [...RWA_SECONDARY_TAGS];
   return null;
 }

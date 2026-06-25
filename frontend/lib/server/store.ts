@@ -288,6 +288,9 @@ export async function readLiveStore(): Promise<LiveStore> {
         derivativesSubSector: item.DerivativesSubSector ?? null,
         derivativesSecondaryTags: item.DerivativesSecondaryTags ?? undefined,
         derivatives: item.Derivatives ?? null,
+        otherSubSector: item.OtherSubSector ?? null,
+        otherSecondaryTags: item.OtherSecondaryTags ?? undefined,
+        other: item.Other ?? null,
         childEntities: item.ChildEntities ?? undefined,
         currentScale: {
           tvlUsd: null,

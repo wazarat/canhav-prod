@@ -68,6 +68,7 @@ NETWORK_SECTORS = (
     "Staking",
     "Liquidity",
     "Derivatives",
+    "Other",
 )
 
 # Credit-sector tags (replaces the legacy 5-value lending taxonomy).
@@ -212,6 +213,22 @@ DERIVATIVES_SECONDARY_TAGS = (
     "Synthetic-Assets",    # Synthetix synths
     "Auto-Strategy",       # DOVs / managed vaults (Ribbon, Jones)
     "Funding-Rate-Yield",  # delta-neutral funding capture (Ethena)
+    "Multi-Chain",
+)
+
+# Other sub-sectors — Underwriting + Governance (canhav-other-spec §1.2).
+OTHER_SUBSECTORS = (
+    "Underwriting",  # decentralized insurance / coverage pools
+    "Governance",    # governance bribes & meta-governance
+)
+
+OTHER_SECONDARY_TAGS = (
+    "Parametric-Cover",
+    "Claims-Assessed",
+    "Audit-Coverage",
+    "Bribe-Marketplace",
+    "Vote-Aggregator",
+    "Liquid-Locker",
     "Multi-Chain",
 )
 

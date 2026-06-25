@@ -54,6 +54,8 @@ import { collectAllLiquidityMetrics } from "@/lib/server/liquidity";
 import { LIQUIDITY_SEED } from "@/data/liquidity-seed";
 import { collectAllDerivativesMetrics } from "@/lib/server/derivatives";
 import { DERIVATIVES_SEED } from "@/data/derivatives-seed";
+import { collectAllOtherMetrics } from "@/lib/server/other";
+import { OTHER_SEED } from "@/data/other-seed";
 import { pegVsCurrency } from "@/lib/server/series";
 import {
   fetchJustLendLiveMetrics,
@@ -1388,6 +1390,39 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
   }
 
+  // --- Other networks: DeFi Llama + CoinGecko Tier-1 metrics ------------------
+  // For each network tagged sector "Other" (primary, e.g. Nexus/Sherlock, or
+  // secondary, e.g. Convex/Aura), overlay live Tier-1 Other metrics (tvlUsd,
+  // tvlChangePct, fees, token price/mcap, derived marketSharePct) onto the curated
+  // `Other` block. Tier-2 underwriting/governance fields stay curated/null. The
+  // headline CurrentScale.tvlUsd is only written for PRIMARY-Other entities, so
+  // extend-existing Convex/Aura keep their Liquidity-pass headline TVL.
+  const otherResults: { slug: string; tvlUsd: number | null }[] = [];
+  const otherItems = items.filter(
+    (it) =>
+      isNetworkCategory(String(it.Category ?? "")) &&
+      (String(it.Sector ?? "") === "Other" ||
+        (Array.isArray(it.SecondarySectors) && it.SecondarySectors.includes("Other"))),
+  );
+  if (otherItems.length > 0) {
+    const metricsBySlug = await collectAllOtherMetrics(OTHER_SEED);
+    for (const item of otherItems) {
+      const slug = String(item.Slug ?? "");
+      const live = metricsBySlug.get(slug);
+      if (!live || Object.keys(live).length === 0) continue;
+      item.Other = { ...(item.Other ?? {}), ...live };
+      const tvlUsd = live.tvlUsd?.value ?? null;
+      if (tvlUsd != null && String(item.Sector ?? "") === "Other") {
+        item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
+        syncUniversalTvlFromCurrentScale(item, "DeFi Llama other TVL");
+      }
+      item.UpdatedAt = nowIso();
+      await putItem(item);
+      updated += 1;
+      otherResults.push({ slug, tvlUsd });
+    }
+  }
+
   // --- Universal metrics: consistent Tier-1 block for EVERY network ----------
   const networkItems = items.filter((it) => isNetworkCategory(String(it.Category ?? "")));
   const llamaMetaBySlug = new Map<string, LlamaProtocolMeta | null>();
@@ -1684,6 +1719,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     staking: stakingResults,
     liquidity: liquidityResults,
     derivatives: derivativesResults,
+    other: otherResults,
     dex: dexResults,
     rwa: rwaResults,
     universal: universalResults,

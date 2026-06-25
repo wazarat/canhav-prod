@@ -286,6 +286,15 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   "jones-dao": "jones-dao",
   "rage-trade": null, // tokenless — TVL sourced from DeFi Llama only
   "neutra-finance": null, // tokenless — TVL sourced from DeFi Llama only
+  // Other sector — governance / underwriting tokens (verified 2026-06-25).
+  // Convex & Aura already mapped above (Liquidity). Sherlock, Cozy, Votium tokenless.
+  "nexus-mutual": "wrapped-nxm",
+  insurace: "insurace",
+  "neptune-mutual": "neptune-mutual",
+  "ease-org": "ease",
+  "hidden-hand": "redacted",
+  paladin: "paladin",
+  "stake-dao": "stake-dao",
   // Stablecoin issuers / TradFi — no meaningful governance token for universals.
   tether: null,
   circle: null,

@@ -7311,7 +7311,19 @@
       ],
       "Components": [],
       "CreatedAt": "2026-06-17T19:33:57Z",
-      "CreditTagMetrics": null,
+      "CreditTagMetrics": {
+        "lending": {
+          "collateralAssets": [
+            "TRX",
+            "BTC",
+            "USDT",
+            "USDD"
+          ],
+          "oracles": [
+            "WinkLink"
+          ]
+        }
+      },
       "CurrentScale": {
         "aprPct": null,
         "loanPipelineUsd": null,
@@ -7420,10 +7432,12 @@
       "StakingSubSector": null,
       "Status": "APPROVED",
       "SubCategory": "Protocol",
-      "SubSector": null,
+      "SubSector": "Lending",
       "Symbol": "JST",
       "Tagline": "The largest lending market on Tron.",
-      "Tags": [],
+      "Tags": [
+        "Lending"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
@@ -7470,7 +7484,23 @@
       ],
       "Components": [],
       "CreatedAt": "2026-06-17T19:33:57Z",
-      "CreditTagMetrics": null,
+      "CreditTagMetrics": {
+        "lending": {
+          "collateralAssets": [
+            "SOL",
+            "JitoSOL",
+            "mSOL",
+            "BTC",
+            "ETH",
+            "USDC"
+          ],
+          "isolatedMarketCount": 45,
+          "oracles": [
+            "Pyth",
+            "Switchboard"
+          ]
+        }
+      },
       "CurrentScale": {
         "aprPct": null,
         "loanPipelineUsd": null,
@@ -7583,10 +7613,12 @@
       "StakingSubSector": null,
       "Status": "APPROVED",
       "SubCategory": "Protocol",
-      "SubSector": null,
+      "SubSector": "Lending",
       "Symbol": "KMNO",
       "Tagline": "Solana-native lending with isolated/curated markets.",
-      "Tags": [],
+      "Tags": [
+        "Lending"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
@@ -8666,7 +8698,19 @@
       ],
       "Components": [],
       "CreatedAt": "2026-06-17T19:33:57Z",
-      "CreditTagMetrics": null,
+      "CreditTagMetrics": {
+        "lending": {
+          "collateralAssets": [
+            "BTC",
+            "ETH",
+            "Tokenized T-bills",
+            "Undercollateralized (vetted)"
+          ],
+          "oracles": [
+            "Off-chain underwriting + Chainlink for onchain collateral"
+          ]
+        }
+      },
       "CurrentScale": {
         "aprPct": null,
         "loanPipelineUsd": null,
@@ -8811,10 +8855,12 @@
       "StakingSubSector": null,
       "Status": "APPROVED",
       "SubCategory": "Protocol",
-      "SubSector": null,
+      "SubSector": "Lending",
       "Symbol": "SYRUP",
       "Tagline": "Onchain institutional / private credit.",
-      "Tags": [],
+      "Tags": [
+        "Lending"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
@@ -9585,7 +9631,10 @@
       },
       "Audits": null,
       "Category": "Entity",
-      "ChildEntities": null,
+      "ChildEntities": [
+        "ondo-gm",
+        "ousg"
+      ],
       "Competitors": [],
       "Components": [
         {
@@ -9745,6 +9794,26 @@
             "url": "https://ondo.finance"
           },
           "value": "Ondo Global Markets tokenizes US equities and ETFs (e.g. TSLA, SPY, QQQ, NVDA) 1:1 against custodied shares for 24/7 on-chain trading."
+        },
+        {
+          "capturedAt": "2026-06-25",
+          "freshness": "static",
+          "key": "ousgProductTaxonomy",
+          "source": {
+            "label": "RWA revamp spec §4",
+            "url": "https://ondo.finance"
+          },
+          "value": "Tokenized Treasuries · Institutional-Gated, Yield-Bearing, Real-World-Custody"
+        },
+        {
+          "capturedAt": "2026-06-25",
+          "freshness": "static",
+          "key": "ondoGmProductTaxonomy",
+          "source": {
+            "label": "RWA revamp spec §4",
+            "url": "https://ondo.finance"
+          },
+          "value": "Tokenized Equities · Institutional-Gated, Yield-Bearing, Multi-Chain"
         }
       ],
       "OfficialDocs": "https://docs.ondo.finance/",
@@ -10823,10 +10892,12 @@
       "StakingSubSector": null,
       "Status": "APPROVED",
       "SubCategory": "Protocol",
-      "SubSector": null,
+      "SubSector": "Lending",
       "Symbol": "RDNT",
       "Tagline": "Omnichain money market via LayerZero.",
-      "Tags": [],
+      "Tags": [
+        "Lending"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
@@ -11880,7 +11951,10 @@
       "CreatedAt": "2026-06-25T15:43:10Z",
       "CreditTagMetrics": {
         "fixedIncome": {
-          "mechanism": "Zero-coupon / yield stripping (PT/YT)"
+          "mechanism": "Zero-coupon / yield stripping (PT/YT)",
+          "maturities": [
+            "Varies per Sense Space maturity"
+          ]
         }
       },
       "CurrentScale": {
@@ -12549,7 +12623,10 @@
       "CreatedAt": "2026-06-25T15:43:10Z",
       "CreditTagMetrics": {
         "fixedIncome": {
-          "mechanism": "Permissionless yield tokenization (PT/YT)"
+          "mechanism": "Permissionless yield tokenization (PT/YT)",
+          "maturities": [
+            "Varies per market (permissionless creation)"
+          ]
         }
       },
       "CurrentScale": {
@@ -15231,7 +15308,22 @@
       ],
       "Components": [],
       "CreatedAt": "2026-06-17T19:33:57Z",
-      "CreditTagMetrics": null,
+      "CreditTagMetrics": {
+        "lending": {
+          "collateralAssets": [
+            "BNB",
+            "ETH",
+            "BTCB",
+            "USDC",
+            "USDT"
+          ],
+          "oracles": [
+            "Chainlink",
+            "Binance Oracle",
+            "Pyth"
+          ]
+        }
+      },
       "CurrentScale": {
         "aprPct": null,
         "loanPipelineUsd": null,
@@ -15351,10 +15443,12 @@
       "StakingSubSector": null,
       "Status": "APPROVED",
       "SubCategory": "Protocol",
-      "SubSector": null,
+      "SubSector": "Lending",
       "Symbol": "XVS",
       "Tagline": "Leading money market on BNB Chain.",
-      "Tags": [],
+      "Tags": [
+        "Lending"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],

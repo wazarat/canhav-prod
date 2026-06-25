@@ -41,6 +41,7 @@ import { getApprovedNetworks, getApprovedNetworkBySlug } from "@/lib/data";
 import { buildSkillFromEntity } from "@/lib/agent/skills";
 import {
   getNetworkTaxonomyBadges,
+  isNonEvmRwa,
   secondarySectorBadgeTone,
   sectorBadgeTone,
   subSectorBadgeTone,
@@ -231,6 +232,7 @@ export default async function NetworkProfilePage({ params }: PageProps) {
                 {tag}
               </Badge>
             ))}
+            {isNonEvmRwa(profile) && <Badge tone="warning">Non-EVM</Badge>}
             <Badge tone="neutral">{resolvedCoinCount} coins</Badge>
             <SecurityBadge
               info={deriveSecurityStatus({

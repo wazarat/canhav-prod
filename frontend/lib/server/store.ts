@@ -269,7 +269,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         tags: item.Tags ?? (item.SubSector ? [item.SubSector] : []),
         competitors: item.Competitors ?? [],
         lending: item.Lending ?? null,
-        creditTagMetrics: item.CreditTagMetrics ?? item.LendingTagMetrics ?? null,
+        creditTagMetrics: item.CreditTagMetrics ?? null,
         stablecoinSubSector: item.StablecoinSubSector ?? null,
         stablecoinSecondaryTags: item.StablecoinSecondaryTags ?? undefined,
         stablecoin: item.Stablecoin ?? null,

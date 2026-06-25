@@ -1040,7 +1040,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       const tvl = await fetchLlamaProtocolTvl(slug, 1);
       const tvlUsd = tvl && tvl.points.length > 0 ? tvl.points[tvl.points.length - 1].value : null;
       const ctm: Record<string, any> = {
-        ...(item.CreditTagMetrics ?? item.LendingTagMetrics ?? {}),
+        ...(item.CreditTagMetrics ?? {}),
       };
       let wrote = false;
 
@@ -1253,7 +1253,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         ...morphoMetricsToLendingOverlay(morphoMetrics),
       };
       morphoItem.CreditTagMetrics = {
-        ...(morphoItem.CreditTagMetrics ?? morphoItem.LendingTagMetrics ?? {}),
+        ...(morphoItem.CreditTagMetrics ?? {}),
         ...morphoMetricsToTagOverlay(morphoMetrics),
       };
       morphoItem.CurrentScale = {

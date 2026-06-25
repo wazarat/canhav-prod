@@ -54,6 +54,11 @@ export function subSectorBadgeTone(): BadgeTone {
   return "neutral";
 }
 
+/** Whether an RWA entity runs on a non-EVM chain (structural flag, not a taxonomy tag). */
+export function isNonEvmRwa(profile: NetworkProfile): boolean {
+  return profile.rwa?.deployment?.evmCompatible === "no";
+}
+
 /** Tags for a profile under a given sector (primary + secondary — used for entity badges). */
 export function tagsForSector(profile: NetworkProfile, sector: string): string[] {
   if (sector === "DEX") {

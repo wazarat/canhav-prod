@@ -7,6 +7,7 @@ import { NetworkTable } from "@/components/networks/NetworkTable";
 import type { NetworkProfile, MemberCoinCategory } from "@/lib/types";
 import {
   filterTagsForSector,
+  isNonEvmRwa,
   sectorFilterTagOptions,
   tagsForSector,
 } from "@/lib/networkTaxonomy";
@@ -70,13 +71,13 @@ export function NetworkTableWithFilter({
   }
 
   // Structural EVM-compatibility flag (replaces the dropped "Non-EVM" tag).
-  function isNonEvmRwa(p: NetworkProfile): boolean {
-    return p.rwa?.deployment?.evmCompatible === "no";
+  function matchesNonEvmRwa(p: NetworkProfile): boolean {
+    return isNonEvmRwa(p);
   }
 
   // Whether any RWA entity in scope is non-EVM (controls toggle visibility).
   const hasNonEvmRwa = useMemo(
-    () => profiles.some((p) => matchesSectorTag(p, "RWA") && isNonEvmRwa(p)),
+    () => profiles.some((p) => matchesSectorTag(p, "RWA") && matchesNonEvmRwa(p)),
     [profiles],
   );
 
@@ -99,7 +100,7 @@ export function NetworkTableWithFilter({
         tagFilter === "all" ||
         (sector !== "all" && filterTagsForSector(p, sector).includes(tagFilter));
       // Hide non-EVM RWA entities from default views unless explicitly included.
-      const matchesEvm = includeNonEvm || !isNonEvmRwa(p);
+      const matchesEvm = includeNonEvm || !matchesNonEvmRwa(p);
       return matchesQuery && matchesCategory && matchesSector && matchesTag && matchesEvm;
     });
   }, [profiles, query, category, sector, tagFilter, includeNonEvm]);

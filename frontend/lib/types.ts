@@ -910,12 +910,6 @@ export type CreditTag =
   | "Leveraged Yield" // Gearbox, Stella, Extra Finance
   | "Fixed Income"; // Pendle, Notional, Spectra, Sense
 
-/** @deprecated Use CreditTag. Kept as an alias during the Lending→Credit migration. */
-export type LendingTag = CreditTag;
-
-/** @deprecated Use CreditTag — kept as alias for backward compatibility. */
-export type LendingSubSector = CreditTag;
-
 /**
  * Stablecoin sub-sectors. The leaf of the taxonomy for `sector === "Stablecoin"`
  * entities. Mirrors the lending pattern.
@@ -947,7 +941,7 @@ export type StablecoinSecondaryTag =
 
 /**
  * DEX sub-sectors. The leaf of the taxonomy for `sector === "DEX"` entities,
- * mirroring the LendingTag / StablecoinSubSector pattern.
+ * mirroring the CreditTag / StablecoinSubSector pattern.
  */
 export type DexSubSector =
   | "AMM" // Uniswap V2-style x*y=k, Balancer weighted, SushiSwap classic
@@ -1440,9 +1434,6 @@ export interface FixedIncomeMetrics {
   mechanism?: string | null; // curated ("PT/YT split", "fCash", "zero-coupon")
   markets?: number | null; // curated count of active markets
 }
-
-/** @deprecated Use CreditTagMetrics — kept as alias during the Lending→Credit migration. */
-export type LendingTagMetrics = CreditTagMetrics;
 
 /**
  * Lending-specific metrics block (PDF §"metrics we should be including"). Live

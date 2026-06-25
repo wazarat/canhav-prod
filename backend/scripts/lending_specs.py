@@ -112,7 +112,7 @@ def _net(
     moneyMarkets) have no home in the new CreditTagMetrics shape and are dropped;
     re-authoring curated tag metrics for the new Credit tags is deferred.
     """
-    if tags is not None:
+    if tags is not None and len(tags) > 0:
         tag_list = _migrate_credit_tags(tags)
     else:
         tag_list = _migrate_credit_tags([sub_sector])
@@ -569,7 +569,6 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "pooled model to JustLend but BNB-centric."
         ),
         sub_sector="Money Markets",
-        tags=[],
         official_docs="https://docs.venus.io",
         website="https://venus.io",
         twitter="https://x.com/VenusProtocol",
@@ -647,7 +646,6 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "its data pipeline is Tron/TVM rather than EVM."
         ),
         sub_sector="Money Markets",
-        tags=[],
         official_docs="https://docs.justlend.org",
         website="https://justlend.org",
         twitter="https://x.com/DeFi_JUST",
@@ -726,7 +724,6 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "metrics come from Solana programs/accounts rather than EVM contracts."
         ),
         sub_sector="Isolated / Curated Lending",
-        tags=[],
         official_docs="https://docs.kamino.finance",
         website="https://kamino.finance",
         twitter="https://x.com/KaminoFinance",
@@ -785,6 +782,13 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "notes": "Kamino Lend uses isolated markets with strategy vaults on Solana.",
             },
         },
+        credit_tag_metrics={
+            "lending": {
+                "collateralAssets": ["SOL", "JitoSOL", "mSOL", "BTC", "ETH", "USDC"],
+                "oracles": ["Pyth", "Switchboard"],
+                "isolatedMarketCount": 45,
+            },
+        },
         member_coins=[
             {
                 "slug": "kmno",
@@ -810,7 +814,6 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "collateral ratios, defaults, pool managers and loan terms matter most."
         ),
         sub_sector="Institutional / Private Credit",
-        tags=[],
         official_docs="https://docs.maple.finance",
         website="https://maple.finance",
         twitter="https://x.com/maplefinance",
@@ -936,7 +939,6 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "LayerZero rather than confined to a single network's liquidity."
         ),
         sub_sector="Money Markets",
-        tags=[],
         chains=["Arbitrum", "Ethereum", "BSC", "Base"],
         official_docs="https://docs.radiant.capital",
         website="https://radiant.capital",
@@ -1123,6 +1125,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         credit_tag_metrics={
             "fixedIncome": {
                 "mechanism": "Permissionless yield tokenization (PT/YT)",
+                "maturities": ["Varies per market (permissionless creation)"],
             },
         },
     ),
@@ -1148,6 +1151,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         credit_tag_metrics={
             "fixedIncome": {
                 "mechanism": "Zero-coupon / yield stripping (PT/YT)",
+                "maturities": ["Varies per Sense Space maturity"],
             },
         },
     ),

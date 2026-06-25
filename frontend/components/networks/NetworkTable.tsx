@@ -7,6 +7,7 @@ import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Tab
 import { categoryBadgeTone } from "@/lib/categoryTone";
 import {
   getNetworkTaxonomyBadges,
+  isNonEvmRwa,
   secondarySectorBadgeTone,
   sectorBadgeTone,
   subSectorBadgeTone,
@@ -89,6 +90,9 @@ export function NetworkTable({
                         {tag}
                       </Badge>
                     ))}
+                    {isNonEvmRwa(p) && (
+                      <Badge tone="warning">Non-EVM</Badge>
+                    )}
                   </div>
                 )}
                 <p className="mt-1 text-xs text-ink-400">

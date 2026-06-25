@@ -1229,6 +1229,7 @@ for _slug, (_subsector, _tags) in _RWA_SECONDARY_BACKFILL.items():
 
 # High-cardinality RWA parents — child entity slugs populated as data lands.
 _CHILD_ENTITIES: Dict[str, List[str]] = {
+    "ondo-finance": ["ondo-gm", "ousg"],
     "realt": [],
     "lofty-ai": [],
     "centrifuge": [],
@@ -1239,6 +1240,36 @@ for _slug, _children in _CHILD_ENTITIES.items():
     _spec = ENTITY_SPECS.get(_slug)
     if _spec is not None:
         _spec["child_entities"] = _children
+
+# Ondo product-level RWA taxonomy (spec §4): umbrella carries union tags; child
+# slugs link to RWA coin records; OffchainFacts document per-product classification.
+_ONDO_SPEC = ENTITY_SPECS.get("ondo-finance")
+if _ONDO_SPEC is not None:
+    _existing_facts = list(_ONDO_SPEC.get("offchain_facts") or [])
+    _existing_facts.extend(
+        [
+            {
+                "key": "ousgProductTaxonomy",
+                "value": (
+                    "Tokenized Treasuries · Institutional-Gated, Yield-Bearing, "
+                    "Real-World-Custody"
+                ),
+                "freshness": "static",
+                "capturedAt": "2026-06-25",
+                "source": {"label": "RWA revamp spec §4", "url": "https://ondo.finance"},
+            },
+            {
+                "key": "ondoGmProductTaxonomy",
+                "value": (
+                    "Tokenized Equities · Institutional-Gated, Yield-Bearing, Multi-Chain"
+                ),
+                "freshness": "static",
+                "capturedAt": "2026-06-25",
+                "source": {"label": "RWA revamp spec §4", "url": "https://ondo.finance"},
+            },
+        ]
+    )
+    _ONDO_SPEC["offchain_facts"] = _existing_facts
 
 def build_entity_item(
     slug: str, spec: Dict[str, Any], parent_row: Optional[Dict[str, str]], created_at: str

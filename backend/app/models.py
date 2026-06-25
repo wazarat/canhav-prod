@@ -650,7 +650,7 @@ class EntityProfile(BaseModel):
             childEntities=item.get("ChildEntities") or [],
             competitors=item.get("Competitors") or [],
             lending=item.get("Lending"),
-            creditTagMetrics=item.get("CreditTagMetrics") or item.get("LendingTagMetrics"),
+            creditTagMetrics=item.get("CreditTagMetrics"),
             stablecoin=item.get("Stablecoin"),
             dex=item.get("Dex"),
             rwa=item.get("Rwa"),

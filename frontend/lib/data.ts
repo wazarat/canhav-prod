@@ -233,6 +233,11 @@ function enrichNetworksWithTvl(
       return { ...network, currentScale: { ...network.currentScale, tvlUsd: stableSupply } };
     }
 
+    const stakingTvl = network.staking?.totalStakedUsd?.value;
+    if (stakingTvl != null && stakingTvl > 0) {
+      return { ...network, currentScale: { ...network.currentScale, tvlUsd: stakingTvl } };
+    }
+
     let total = 0;
     let found = false;
     for (const ref of network.memberCoins) {

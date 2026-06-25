@@ -1,9 +1,9 @@
 {
   "_meta": {
     "backend": "local",
-    "count": 213,
+    "count": 234,
     "table": "canhav-research",
-    "updatedAt": "2026-06-25T18:00:24Z"
+    "updatedAt": "2026-06-25T18:30:00Z"
   },
   "items": {
     "CATEGORY#Entity|PROTOCOL#aave": {
@@ -852,7 +852,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Ankr Staked ETH",
+          "role": "Ankr's multi-chain liquid staking token for ETH.",
+          "slug": "ankreth",
+          "subCategory": "LST",
+          "symbol": "ankrETH"
+        }
+      ],
       "Name": "Ankr",
       "OffchainFacts": null,
       "OfficialDocs": "https://www.ankr.com/docs",
@@ -1602,7 +1611,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Bedrock uniETH",
+          "role": "Bedrock's LST-backed liquid restaking token.",
+          "slug": "unieth",
+          "subCategory": "LST",
+          "symbol": "uniETH"
+        }
+      ],
       "Name": "Bedrock",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.bedrock.technology",
@@ -1698,7 +1716,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Wrapped Beacon ETH",
+          "role": "Binance's exchange-native liquid staking token for ETH.",
+          "slug": "wbeth",
+          "subCategory": "LST",
+          "symbol": "wBETH"
+        }
+      ],
       "Name": "Binance",
       "OffchainFacts": null,
       "OfficialDocs": "https://www.binance.com/en/wbeth",
@@ -2732,7 +2759,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Coinbase Wrapped Staked ETH",
+          "role": "Coinbase's exchange-native liquid staking token for ETH.",
+          "slug": "cbeth",
+          "subCategory": "LST",
+          "symbol": "cbETH"
+        }
+      ],
       "Name": "Coinbase",
       "OffchainFacts": null,
       "OfficialDocs": "https://www.coinbase.com/cbeth",
@@ -3920,7 +3956,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "EigenLayer",
+          "role": "Intersubjective work/governance token of EigenLayer (EigenCloud).",
+          "slug": "eigen",
+          "subCategory": "Governance Token",
+          "symbol": "EIGEN"
+        }
+      ],
       "Name": "EigenLayer",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.eigencloud.xyz",
@@ -4654,7 +4699,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Wrapped eETH",
+          "role": "ether.fi's wrapped liquid restaking token.",
+          "slug": "weeth",
+          "subCategory": "LST",
+          "symbol": "weETH"
+        }
+      ],
       "Name": "Ether.fi",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.ether.fi",
@@ -5645,6 +5699,14 @@
           "slug": "sfrax",
           "subCategory": "Staked Stablecoin",
           "symbol": "sFRAX"
+        },
+        {
+          "category": "Token",
+          "name": "Staked Frax ETH",
+          "role": "Yield-bearing staked frxETH (Frax liquid staking).",
+          "slug": "sfrxeth",
+          "subCategory": "LST",
+          "symbol": "sfrxETH"
         }
       ],
       "Name": "Frax Finance",
@@ -5986,7 +6048,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Gearbox Protocol",
+          "role": "Governance token of the Gearbox leverage protocol.",
+          "slug": "gear",
+          "subCategory": "Governance Token",
+          "symbol": "GEAR"
+        }
+      ],
       "Name": "Gearbox",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.gearbox.fi",
@@ -7700,7 +7771,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Kelp rsETH",
+          "role": "Kelp DAO's LST-backed liquid restaking token.",
+          "slug": "rseth",
+          "subCategory": "LST",
+          "symbol": "rsETH"
+        }
+      ],
       "Name": "Kelp DAO",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.kelpdao.xyz",
@@ -7795,7 +7875,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Lido Staked ETH",
+          "role": "Liquid staking token for ETH staked via Lido.",
+          "slug": "steth",
+          "subCategory": "LST",
+          "symbol": "stETH"
+        }
+      ],
       "Name": "Lido",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.lido.fi",
@@ -8537,7 +8626,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Mantle Staked ETH",
+          "role": "Liquid staking token of the Mantle LSP.",
+          "slug": "meth",
+          "subCategory": "LST",
+          "symbol": "mETH"
+        }
+      ],
       "Name": "Mantle",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.mantle.xyz/meth",
@@ -9479,7 +9577,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Notional Finance",
+          "role": "Governance token of the Notional fixed-rate lending protocol.",
+          "slug": "note",
+          "subCategory": "Governance Token",
+          "symbol": "NOTE"
+        }
+      ],
       "Name": "Notional Finance",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.notional.finance",
@@ -10261,7 +10368,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Pendle",
+          "role": "Governance/utility token of the Pendle yield-tokenization protocol.",
+          "slug": "pendle",
+          "subCategory": "Governance Token",
+          "symbol": "PENDLE"
+        }
+      ],
       "Name": "Pendle Finance",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.pendle.finance",
@@ -10595,7 +10711,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Puffer pufETH",
+          "role": "Puffer's native liquid restaking token.",
+          "slug": "pufeth",
+          "subCategory": "LST",
+          "symbol": "pufETH"
+        }
+      ],
       "Name": "Puffer Finance",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.puffer.fi",
@@ -10740,7 +10865,16 @@
       },
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Radiant Capital",
+          "role": "Governance token of the cross-chain Radiant money market.",
+          "slug": "rdnt",
+          "subCategory": "Governance Token",
+          "symbol": "RDNT"
+        }
+      ],
       "Name": "Radiant Capital",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.radiant.capital",
@@ -11127,7 +11261,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Renzo Restaked ETH",
+          "role": "Renzo's EigenLayer liquid restaking token.",
+          "slug": "ezeth",
+          "subCategory": "LST",
+          "symbol": "ezETH"
+        }
+      ],
       "Name": "Renzo",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.renzoprotocol.com",
@@ -11590,7 +11733,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Rocket Pool ETH",
+          "role": "Liquid staking token from Rocket Pool's permissionless node network.",
+          "slug": "reth",
+          "subCategory": "LST",
+          "symbol": "rETH"
+        }
+      ],
       "Name": "Rocket Pool",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.rocketpool.net",
@@ -12855,7 +13007,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Stader ETHx",
+          "role": "Stader's multi-pool liquid staking token for ETH.",
+          "slug": "ethx",
+          "subCategory": "LST",
+          "symbol": "ETHx"
+        }
+      ],
       "Name": "Stader Labs",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.staderlabs.com",
@@ -12951,7 +13112,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "StakeWise osETH",
+          "role": "StakeWise V3 over-collateralized staked ETH token.",
+          "slug": "oseth",
+          "subCategory": "LST",
+          "symbol": "osETH"
+        }
+      ],
       "Name": "StakeWise",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.stakewise.io",
@@ -13313,7 +13483,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "Swell ETH",
+          "role": "Swell's liquid staking token for ETH.",
+          "slug": "sweth",
+          "subCategory": "LST",
+          "symbol": "swETH"
+        }
+      ],
       "Name": "Swell",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.swellnetwork.io",
@@ -15325,7 +15504,16 @@
       "Lending": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "category": "Token",
+          "name": "YieldNest Restaked ETH",
+          "role": "YieldNest's LST-backed liquid restaking token.",
+          "slug": "yneth",
+          "subCategory": "LST",
+          "symbol": "ynETH"
+        }
+      ],
       "Name": "YieldNest",
       "OffchainFacts": null,
       "OfficialDocs": "https://docs.yieldnest.finance",
@@ -18897,6 +19085,50 @@
       "UpdatedAt": "2026-06-25T17:57:47Z",
       "Website": "https://aerodrome.finance"
     },
+    "CATEGORY#Token|PROTOCOL#ankreth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "BNB Chain",
+          "Arbitrum One"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/ankreth",
+      "ContractAddress": "0xe95a203b1a91a908f9b9ce46459d101078c2c3cb",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "ankrETH is Ankr's non-rebasing liquid staking token for ETH; its exchange rate appreciates with staking rewards and it is bridged across multiple chains.",
+      "Discord": null,
+      "EntitySlug": "ankr",
+      "GitHub": "https://github.com/Ankr-network",
+      "Name": "Ankr Staked ETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#ankreth",
+      "Slug": "ankreth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "ankrETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/ankr",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.ankr.com/staking"
+    },
     "CATEGORY#Token|PROTOCOL#ausdc": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": "https://portal-data.arbitrum.io/images/projects/aave-banner.webp",
@@ -19116,6 +19348,50 @@
       "Twitter": "https://x.com/PancakeSwap",
       "UpdatedAt": "2026-06-25T17:57:47Z",
       "Website": "https://pancakeswap.finance"
+    },
+    "CATEGORY#Token|PROTOCOL#cbeth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Base",
+          "Arbitrum One"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/coinbase-wrapped-staked-eth",
+      "ContractAddress": "0xbe9895146f7af43049ca1c1ae358b0541ea49704",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "cbETH is Coinbase's wrapped staked ETH, a non-rebasing liquid staking token whose ETH exchange rate grows with staking rewards earned via Coinbase.",
+      "Discord": null,
+      "EntitySlug": "coinbase-cbeth",
+      "GitHub": null,
+      "Name": "Coinbase Wrapped Staked ETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#cbeth",
+      "Slug": "cbeth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "cbETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/coinbase",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.coinbase.com/cbeth"
     },
     "CATEGORY#Token|PROTOCOL#cfg": {
       "ArbitrumPortalMetadata": {
@@ -19456,6 +19732,48 @@
       "UpdatedAt": "2026-06-25T17:57:47Z",
       "Website": "https://dydx.exchange"
     },
+    "CATEGORY#Token|PROTOCOL#eigen": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "Governance Token"
+      },
+      "AssetSubtype": "governance",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/eigenlayer",
+      "ContractAddress": "0xec53bf9167f50cdeb3ae105f56099aaab9061f83",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "EIGEN is the universal intersubjective work token of EigenLayer (now EigenCloud), used to secure Actively Validated Services alongside restaked ETH. Note: the network's headline figure is restaked TVL, not EIGEN market cap.",
+      "Discord": null,
+      "EntitySlug": "eigenlayer",
+      "GitHub": "https://github.com/Layr-Labs",
+      "Name": "EigenLayer",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#eigen",
+      "Slug": "eigen",
+      "Status": "APPROVED",
+      "SubCategory": "Governance Token",
+      "Symbol": "EIGEN",
+      "TokenType": "Governance",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/eigenlayer",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.eigenlayer.xyz"
+    },
     "CATEGORY#Token|PROTOCOL#ena": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": "https://portal-data.arbitrum.io/images/projects/ethena-banner.webp",
@@ -19537,6 +19855,93 @@
       "Twitter": "https://x.com/ethena_labs",
       "UpdatedAt": "2026-06-25T17:59:39Z",
       "Website": "https://ethena.fi/"
+    },
+    "CATEGORY#Token|PROTOCOL#ethx": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/stader-ethx",
+      "ContractAddress": "0xa35b1b31ce002fbf2058d22f30f95d405200a15b",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "ETHx is Stader Labs' liquid staking token for ETH, backed by a permissioned and permissionless operator structure designed to lower the staking deposit barrier.",
+      "Discord": null,
+      "EntitySlug": "stader",
+      "GitHub": "https://github.com/stader-labs",
+      "Name": "Stader ETHx",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#ethx",
+      "Slug": "ethx",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "ETHx",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/staderlabs",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.staderlabs.com"
+    },
+    "CATEGORY#Token|PROTOCOL#ezeth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Arbitrum One",
+          "Blast",
+          "Base"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/renzo-restaked-eth",
+      "ContractAddress": "0xbf5495efe5db9ce00f80364c8b423567e58d2110",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "ezETH is Renzo's liquid restaking token, an EigenLayer strategy-manager position that abstracts operator/AVS selection while accruing staking and restaking rewards.",
+      "Discord": null,
+      "EntitySlug": "renzo",
+      "GitHub": "https://github.com/Renzo-Protocol",
+      "Name": "Renzo Restaked ETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#ezeth",
+      "Slug": "ezeth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "ezETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/RenzoProtocol",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.renzoprotocol.com"
     },
     "CATEGORY#Token|PROTOCOL#fluid": {
       "ArbitrumPortalMetadata": {
@@ -19632,6 +20037,50 @@
       "Twitter": "https://x.com/0xfluid",
       "UpdatedAt": "2026-06-25T17:59:40Z",
       "Website": "https://fluid.io"
+    },
+    "CATEGORY#Token|PROTOCOL#gear": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Arbitrum One",
+          "Optimism"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "Governance Token"
+      },
+      "AssetSubtype": "governance",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/gearbox",
+      "ContractAddress": "0xba3335588d9403515223f109edc4eb7269a9ab5d",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "Governance token of Gearbox, a composable leverage protocol whose Credit Accounts let users borrow up to ~10x to farm across integrated DeFi strategies.",
+      "Discord": null,
+      "EntitySlug": "gearbox",
+      "GitHub": "https://github.com/Gearbox-protocol",
+      "Name": "Gearbox Protocol",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#gear",
+      "Slug": "gear",
+      "Status": "APPROVED",
+      "SubCategory": "Governance Token",
+      "Symbol": "GEAR",
+      "TokenType": "Governance",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/GearboxProtocol",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://gearbox.fi"
     },
     "CATEGORY#Token|PROTOCOL#gfi": {
       "ArbitrumPortalMetadata": {
@@ -20204,6 +20653,49 @@
       "UpdatedAt": "2026-06-25T17:59:56Z",
       "Website": "https://kamino.finance"
     },
+    "CATEGORY#Token|PROTOCOL#meth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Mantle"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/mantle-staked-ether",
+      "ContractAddress": "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "mETH is the liquid staking token of Mantle's LSP, a non-rebasing receipt for ETH staked through Mantle that appreciates against ETH as rewards accrue.",
+      "Discord": null,
+      "EntitySlug": "mantle-meth",
+      "GitHub": "https://github.com/mantlenetworkio",
+      "Name": "Mantle Staked ETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#meth",
+      "Slug": "meth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "mETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/0xMantle",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.mantle.xyz/meth"
+    },
     "CATEGORY#Token|PROTOCOL#mkr": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": "https://portal-data.arbitrum.io/images/projects/sky-banner.webp",
@@ -20350,6 +20842,49 @@
       "UpdatedAt": "2026-06-25T17:59:59Z",
       "Website": "https://morpho.org"
     },
+    "CATEGORY#Token|PROTOCOL#note": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Arbitrum One"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "Governance Token"
+      },
+      "AssetSubtype": "governance",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/notional-finance",
+      "ContractAddress": "0xcfeaead4947f0705a14ec42ac3d44129e1ef3ed5",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "Governance token of Notional Finance, a fixed-rate, fixed-term lending protocol that uses fCash and an on-chain AMM to price term debt.",
+      "Discord": null,
+      "EntitySlug": "notional",
+      "GitHub": "https://github.com/notional-finance",
+      "Name": "Notional Finance",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#note",
+      "Slug": "note",
+      "Status": "APPROVED",
+      "SubCategory": "Governance Token",
+      "Symbol": "NOTE",
+      "TokenType": "Governance",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/NotionalFinance",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://notional.finance"
+    },
     "CATEGORY#Token|PROTOCOL#ondo-gov": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": null,
@@ -20413,6 +20948,135 @@
       "UpdatedAt": "2026-06-25T18:00:00Z",
       "Website": "https://ondo.finance"
     },
+    "CATEGORY#Token|PROTOCOL#oseth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/stakewise-v3-oseth",
+      "ContractAddress": "0xf1c9acdc66974dfb6decb12aa385b9cd01190e38",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "osETH is StakeWise V3's liquid staking token, minted against ETH staked in permissionless vaults and over-collateralized to protect holders from operator under-performance.",
+      "Discord": null,
+      "EntitySlug": "stakewise",
+      "GitHub": "https://github.com/stakewise",
+      "Name": "StakeWise osETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#oseth",
+      "Slug": "oseth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "osETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/stakewise_io",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.stakewise.io"
+    },
+    "CATEGORY#Token|PROTOCOL#pendle": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Arbitrum One",
+          "Optimism",
+          "BNB Chain"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "Governance Token"
+      },
+      "AssetSubtype": "governance",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/pendle",
+      "ContractAddress": "0x808507121b80c02388fad14726482e061b8da827",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "Token of Pendle, a yield-tokenization protocol that splits yield-bearing assets into Principal (PT) and Yield (YT) tokens for fixed-rate and yield-trading markets. vePENDLE directs incentives and earns fees.",
+      "Discord": null,
+      "EntitySlug": "pendle",
+      "GitHub": "https://github.com/pendle-finance",
+      "Name": "Pendle",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#pendle",
+      "Slug": "pendle",
+      "Status": "APPROVED",
+      "SubCategory": "Governance Token",
+      "Symbol": "PENDLE",
+      "TokenType": "Governance",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/pendle_fi",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.pendle.finance"
+    },
+    "CATEGORY#Token|PROTOCOL#pufeth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/pufeth",
+      "ContractAddress": "0xd9a442856c234a39a81a089c06451ebaa4306a72",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "pufETH is Puffer Finance's native liquid restaking token, secured by anti-slashing (Secure-Signer) technology and EigenLayer restaking rewards.",
+      "Discord": null,
+      "EntitySlug": "puffer",
+      "GitHub": "https://github.com/PufferFinance",
+      "Name": "Puffer pufETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#pufeth",
+      "Slug": "pufeth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "pufETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/puffer_finance",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.puffer.fi"
+    },
     "CATEGORY#Token|PROTOCOL#ray": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": null,
@@ -20454,6 +21118,50 @@
       "Twitter": "https://x.com/RaydiumProtocol",
       "UpdatedAt": "2026-06-25T17:57:47Z",
       "Website": "https://raydium.io"
+    },
+    "CATEGORY#Token|PROTOCOL#rdnt": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Arbitrum One",
+          "BNB Chain",
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "Governance Token"
+      },
+      "AssetSubtype": "governance",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/radiant-capital",
+      "ContractAddress": "0x3082cc23568ea640225c2467653db90e9250aaa0",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "Governance token of Radiant Capital, an omnichain lending and borrowing market built on LayerZero. RDNT holders lock for dLP to earn protocol fees and direct emissions.",
+      "Discord": null,
+      "EntitySlug": "radiant",
+      "GitHub": "https://github.com/radiant-capital",
+      "Name": "Radiant Capital",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#rdnt",
+      "Slug": "rdnt",
+      "Status": "APPROVED",
+      "SubCategory": "Governance Token",
+      "Symbol": "RDNT",
+      "TokenType": "Governance",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/RDNTCapital",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://radiant.capital"
     },
     "CATEGORY#Token|PROTOCOL#reg": {
       "ArbitrumPortalMetadata": {
@@ -20497,6 +21205,96 @@
       "Twitter": "https://x.com/RealTPlatform",
       "UpdatedAt": "2026-06-25T17:57:47Z",
       "Website": "https://realt.co"
+    },
+    "CATEGORY#Token|PROTOCOL#reth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Arbitrum One",
+          "Optimism",
+          "Base"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/rocket-pool-eth",
+      "ContractAddress": "0xae78736cd615f374d3085123a210448e74fc6393",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "rETH is Rocket Pool's non-rebasing liquid staking token; its ETH exchange rate appreciates as staking rewards accrue across a permissionless operator set.",
+      "Discord": null,
+      "EntitySlug": "rocket-pool",
+      "GitHub": "https://github.com/rocket-pool",
+      "Name": "Rocket Pool ETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#reth",
+      "Slug": "reth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "rETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/Rocket_Pool",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://rocketpool.net"
+    },
+    "CATEGORY#Token|PROTOCOL#rseth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Arbitrum One",
+          "Optimism",
+          "Base"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/kelp-dao-restaked-eth",
+      "ContractAddress": "0xa1290d69c65a6fe4df752f95823fae25cb99e5a7",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "rsETH is Kelp DAO's liquid restaking token, backed by a basket of accepted LSTs deposited into EigenLayer to earn combined staking and restaking yield.",
+      "Discord": null,
+      "EntitySlug": "kelp-dao",
+      "GitHub": "https://github.com/Kelp-DAO",
+      "Name": "Kelp rsETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#rseth",
+      "Slug": "rseth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "rsETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/KelpDAO",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://kelpdao.xyz"
     },
     "CATEGORY#Token|PROTOCOL#rune": {
       "ArbitrumPortalMetadata": {
@@ -20658,6 +21456,50 @@
       "UpdatedAt": "2026-06-25T18:00:22Z",
       "Website": "https://ethena.fi/"
     },
+    "CATEGORY#Token|PROTOCOL#sfrxeth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Arbitrum One",
+          "Fraxtal"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/staked-frax-ether",
+      "ContractAddress": "0xac3e018457b222d93114458476f3e3416abbe38f",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "sfrxETH is the yield-bearing vault token of Frax Ether: staked frxETH whose exchange rate accrues the ETH staking yield routed to frxETH stakers.",
+      "Discord": null,
+      "EntitySlug": "frax",
+      "GitHub": "https://github.com/FraxFinance",
+      "Name": "Staked Frax ETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#sfrxeth",
+      "Slug": "sfrxeth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "sfrxETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/fraxfinance",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://frax.finance"
+    },
     "CATEGORY#Token|PROTOCOL#sky-gov": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": "https://portal-data.arbitrum.io/images/projects/sky-banner.webp",
@@ -20738,7 +21580,7 @@
       "AssetSubtype": "governance",
       "AuditURL": null,
       "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/spark",
+      "CoinGecko": "https://www.coingecko.com/en/coins/spark-2",
       "ContractAddress": "0xc20059e0317de91738d13af027dfc4a50781b066",
       "CreatedAt": "2026-06-17T19:33:57Z",
       "Description": "Governance token of Spark, the Sky/Maker-aligned stablecoin lending stack (SparkLend + Spark Savings). Governs risk parameters and USDS/DAI liquidity.",
@@ -20762,6 +21604,48 @@
       "Twitter": "https://x.com/sparkdotfi",
       "UpdatedAt": "2026-06-25T18:00:10Z",
       "Website": "https://spark.fi"
+    },
+    "CATEGORY#Token|PROTOCOL#steth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/staked-ether",
+      "ContractAddress": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "stETH is Lido's rebasing liquid staking token representing ETH staked across Lido's node-operator set, accruing Ethereum consensus and execution rewards daily.",
+      "Discord": null,
+      "EntitySlug": "lido",
+      "GitHub": "https://github.com/lidofinance",
+      "Name": "Lido Staked ETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#steth",
+      "Slug": "steth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "stETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/LidoFinance",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://lido.fi"
     },
     "CATEGORY#Token|PROTOCOL#stkaave": {
       "ArbitrumPortalMetadata": {
@@ -20976,6 +21860,48 @@
       "Twitter": "https://x.com/SushiSwap",
       "UpdatedAt": "2026-06-25T18:00:11Z",
       "Website": "https://www.sushi.com"
+    },
+    "CATEGORY#Token|PROTOCOL#sweth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/sweth",
+      "ContractAddress": "0xf951e335afb289353dc249e82926178eac7ded78",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "swETH is Swell Network's non-rebasing liquid staking token for ETH, accruing consensus and execution-layer rewards through its rising ETH exchange rate.",
+      "Discord": null,
+      "EntitySlug": "swell",
+      "GitHub": "https://github.com/SwellNetwork",
+      "Name": "Swell ETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#sweth",
+      "Slug": "sweth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "swETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/swellnetworkio",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.swellnetwork.io"
     },
     "CATEGORY#Token|PROTOCOL#syrup": {
       "ArbitrumPortalMetadata": {
@@ -21243,6 +22169,50 @@
       "UpdatedAt": "2026-06-25T18:00:17Z",
       "Website": "https://uniswap.org"
     },
+    "CATEGORY#Token|PROTOCOL#unieth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Arbitrum One",
+          "BNB Chain"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/universal-eth",
+      "ContractAddress": "0xf1376bcef0f78459c0ed0ba5ddce976f1ddf51f4",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "uniETH is Bedrock's multi-asset liquid restaking token, backed by staked ETH routed into EigenLayer to earn staking plus restaking rewards.",
+      "Discord": null,
+      "EntitySlug": "bedrock",
+      "GitHub": "https://github.com/Bedrock-Technology",
+      "Name": "Bedrock uniETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#unieth",
+      "Slug": "unieth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "uniETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/Bedrock_DeFi",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.bedrock.technology"
+    },
     "CATEGORY#Token|PROTOCOL#usdy": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": null,
@@ -21309,6 +22279,94 @@
         "yieldSource": "Short-term US Treasuries & bank deposits backing USDY (Reg S note)"
       }
     },
+    "CATEGORY#Token|PROTOCOL#wbeth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "BNB Chain"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/wrapped-beacon-eth",
+      "ContractAddress": "0xa2e3356610840701bdf5611a53974510ae27e2e1",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "wBETH is Binance's wrapped Beacon ETH, a value-accruing liquid staking token for ETH staked through Binance's exchange-native staking service.",
+      "Discord": null,
+      "EntitySlug": "binance-wbeth",
+      "GitHub": null,
+      "Name": "Wrapped Beacon ETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#wbeth",
+      "Slug": "wbeth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "wBETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/binance",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.binance.com/en/wbeth"
+    },
+    "CATEGORY#Token|PROTOCOL#weeth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Arbitrum One",
+          "Base",
+          "Blast"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/wrapped-eeth",
+      "ContractAddress": "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "weETH is the non-rebasing wrapper of ether.fi's eETH, a liquid restaking token that earns Ethereum staking yield plus EigenLayer restaking rewards.",
+      "Discord": null,
+      "EntitySlug": "ether-fi",
+      "GitHub": "https://github.com/etherfi-protocol",
+      "Name": "Wrapped eETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#weeth",
+      "Slug": "weeth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "weETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/ether_fi",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.ether.fi"
+    },
     "CATEGORY#Token|PROTOCOL#xvs": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": null,
@@ -21354,6 +22412,48 @@
       "Twitter": "https://x.com/VenusProtocol",
       "UpdatedAt": "2026-06-25T18:00:19Z",
       "Website": "https://venus.io"
+    },
+    "CATEGORY#Token|PROTOCOL#yneth": {
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false,
+        "logoUrl": null,
+        "portalUrl": null,
+        "subCategory": "LST"
+      },
+      "AssetSubtype": "lst",
+      "AuditURL": null,
+      "Category": "Token",
+      "CoinGecko": "https://www.coingecko.com/en/coins/yieldnest-restaked-eth",
+      "ContractAddress": "0x09db87a538bd693e9d08544577d5ccfaa6373d48",
+      "CreatedAt": "2026-06-25T18:30:00Z",
+      "Description": "ynETH is YieldNest's liquid restaking token, an LRT designed to optimize AVS selection on EigenLayer for risk-adjusted restaking yield.",
+      "Discord": null,
+      "EntitySlug": "yieldnest",
+      "GitHub": "https://github.com/yieldnest",
+      "Name": "YieldNest Restaked ETH",
+      "PK": "CATEGORY#Token",
+      "PegMechanism": "none",
+      "SK": "PROTOCOL#yneth",
+      "Slug": "yneth",
+      "Status": "APPROVED",
+      "SubCategory": "LST",
+      "Symbol": "ynETH",
+      "TokenType": "LST",
+      "TotalSupply": {
+        "source": "alchemy",
+        "updatedAt": null,
+        "value": null
+      },
+      "Twitter": "https://x.com/yieldnest",
+      "UpdatedAt": "2026-06-25T18:30:00Z",
+      "Website": "https://www.yieldnest.finance"
     }
   }
 }

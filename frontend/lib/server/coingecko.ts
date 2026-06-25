@@ -116,7 +116,7 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   // relying on live price/supply (the cron fails soft to null otherwise).
   morpho: "morpho",
   comp: "compound-governance-token",
-  spk: "spark",
+  spk: "spark-2", // Spark Protocol SPK (CoinGecko id is spark-2; "spark" is unrelated)
   fluid: "instadapp", // Fluid governance (ex-INST; fluid id has no CG market feed)
   xvs: "venus",
   jst: "just",
@@ -163,6 +163,29 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   usdz: "anzen-usdz",
   susdz: "anzen-staked-usdz",
   usdm: "mountain-protocol-usdm",
+  // Credit sector member coins (Leveraged Yield + Fixed Income gov tokens; verified 2026-06-25).
+  rdnt: "radiant-capital",
+  gear: "gearbox",
+  pendle: "pendle",
+  note: "notional-finance",
+  // Staking sector member coins — LST/LRT tokens (verified 2026-06-25).
+  steth: "staked-ether",
+  reth: "rocket-pool-eth",
+  wbeth: "wrapped-beacon-eth",
+  cbeth: "coinbase-wrapped-staked-eth",
+  meth: "mantle-staked-ether",
+  sfrxeth: "staked-frax-ether", // distinct from the `sfrax` stablecoin (staked-frax)
+  sweth: "sweth",
+  ethx: "stader-ethx",
+  oseth: "stakewise-v3-oseth",
+  ankreth: "ankreth",
+  eigen: "eigenlayer", // EigenCloud (prev. EigenLayer); CoinGecko id remains "eigenlayer"
+  weeth: "wrapped-eeth",
+  ezeth: "renzo-restaked-eth",
+  rseth: "kelp-dao-restaked-eth",
+  pufeth: "pufeth",
+  unieth: "universal-eth", // Bedrock uniETH (CoinGecko id is universal-eth)
+  yneth: "yieldnest-restaked-eth",
 };
 
 /**
@@ -195,7 +218,7 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   pancakeswap: "pancakeswap-token",
   raydium: "raydium",
   sky: "sky",
-  spark: "spark",
+  spark: "spark-2",
   sushiswap: "sushi",
   thorchain: "thorchain",
   "trader-joe": "joe",
@@ -220,7 +243,7 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   "binance-wbeth": "wrapped-beacon-eth",
   "coinbase-cbeth": "coinbase-wrapped-staked-eth",
   "mantle-meth": "mantle-staked-ether",
-  swell: "swell-ethereum",
+  swell: "sweth",
   stader: "stader-ethx",
   stakewise: "stakewise-v3-oseth",
   ankr: "ankreth",
@@ -231,7 +254,7 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   renzo: "renzo-restaked-eth",
   "kelp-dao": "kelp-dao-restaked-eth",
   puffer: "pufeth",
-  bedrock: "bedrock-unieth",
+  bedrock: "universal-eth",
   yieldnest: "yieldnest-restaked-eth",
   // Stablecoin issuers / TradFi — no meaningful governance token for universals.
   tether: null,

@@ -12,12 +12,14 @@ export interface CreditSeed {
   notes?: string;
 }
 
+/** Canonical Credit → Lending tag set (network tab filter). */
+export const CANONICAL_LENDING_SLUGS = ["aave", "compound", "morpho", "spark"] as const;
+
 export const CREDIT_SEED: CreditSeed[] = [
   // ---------- LENDING ----------
   { name: "Aave",     slug: "aave",     token: "AAVE", tag: "Lending", llamaSlug: "aave-v3",     coingeckoId: "aave",                        seedMode: "extend-existing", notes: "V3 multichain; aave.ts live fetch already wired" },
   { name: "Compound", slug: "compound", token: "COMP", tag: "Lending", llamaSlug: "compound-v3", feesSlug: "compound-v3", coingeckoId: "compound-governance-token", seedMode: "extend-existing", notes: "V3 base-asset model; V2 = compound-v2" },
   { name: "Morpho",   slug: "morpho",   token: "MORPHO", tag: "Lending", llamaSlug: "morpho-blue", coingeckoId: "morpho",                    seedMode: "extend-existing", notes: "Morpho Blue isolated markets" },
-  { name: "Radiant Capital", slug: "radiant", token: "RDNT", tag: "Lending", llamaSlug: "radiant-v2", coingeckoId: "radiant-capital",        seedMode: "new", notes: "Omnichain via LayerZero" },
   { name: "Spark Protocol", slug: "spark", token: null,   tag: "Lending", llamaSlug: "sparklend",   coingeckoId: null,                        seedMode: "extend-existing", notes: "Sky/MakerDAO-powered; no standalone tradable token" },
 
   // ---------- LEVERAGED YIELD ----------
@@ -26,8 +28,8 @@ export const CREDIT_SEED: CreditSeed[] = [
   { name: "Extra Finance", slug: "extra-finance", token: "EXTRA", tag: "Leveraged Yield", llamaSlug: "extra-finance-leverage-farming", coingeckoId: null, seedMode: "new", notes: "Optimism/Base; up to 7x LP leverage" },
 
   // ---------- FIXED INCOME ----------
-  { name: "Pendle",    slug: "pendle",    token: "PENDLE", tag: "Fixed Income", llamaSlug: "pendle",       coingeckoId: "pendle",            seedMode: "new", notes: "PT/YT yield split; category 'Yield' on Llama" },
-  { name: "Notional",  slug: "notional",  token: "NOTE",   tag: "Fixed Income", llamaSlug: "notional-v3",  coingeckoId: "notional-finance",  seedMode: "new", notes: "fCash fixed-rate AMM; v2=notional-v2" },
+  { name: "Pendle Finance",    slug: "pendle",    token: "PENDLE", tag: "Fixed Income", llamaSlug: "pendle",       coingeckoId: "pendle",            seedMode: "new", notes: "PT/YT yield split; category 'Yield' on Llama" },
+  { name: "Notional Finance",  slug: "notional",  token: "NOTE",   tag: "Fixed Income", llamaSlug: "notional-v3",  coingeckoId: "notional-finance",  seedMode: "new", notes: "fCash fixed-rate AMM; v2=notional-v2" },
   { name: "Spectra",   slug: "spectra",   token: null,     tag: "Fixed Income", llamaSlug: "spectra-v2",   coingeckoId: null,                seedMode: "new", notes: "ex-APWine yield tokenization; verify token availability" },
   { name: "Sense Finance", slug: "sense", token: null,     tag: "Fixed Income", llamaSlug: "sense",        coingeckoId: null,                seedMode: "new", notes: "zero-coupon / stripped-yield; verify activity before relying" },
 ];

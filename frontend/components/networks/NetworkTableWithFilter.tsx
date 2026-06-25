@@ -5,6 +5,11 @@ import { Search } from "lucide-react";
 
 import { NetworkTable } from "@/components/networks/NetworkTable";
 import type { NetworkProfile, MemberCoinCategory } from "@/lib/types";
+import {
+  filterTagsForSector,
+  sectorFilterTagOptions,
+  tagsForSector,
+} from "@/lib/networkTaxonomy";
 import { cn } from "@/lib/utils";
 
 const CATEGORY_FILTERS: { label: string; value: MemberCoinCategory | "all" }[] = [
@@ -42,10 +47,12 @@ export function NetworkTableWithFilter({
     return [...set].sort();
   }, [profiles]);
 
-  // Sub-sector / tags available for the selected sector. Sector-aware so DEX
-  // and RWA surface their own sub-sector + secondary tags, not just credit tags.
+  // Sub-sector / tags available for the selected sector. Credit and Staking use
+  // fixed primary-tag vocabularies; DEX/RWA/Stablecoin derive from profile data.
   const sectorTags = useMemo(() => {
     if (sector === "all") return [];
+    const fixed = sectorFilterTagOptions(sector);
+    if (fixed) return fixed;
     const set = new Set<string>();
     for (const p of profiles) {
       if (!matchesSectorTag(p, sector)) continue;
@@ -53,26 +60,6 @@ export function NetworkTableWithFilter({
     }
     return [...set].sort();
   }, [profiles, sector]);
-
-  // The sub-sector + secondary-tag vocabulary for a profile under a given sector.
-  function tagsForSector(p: NetworkProfile, s: string): string[] {
-    if (s === "DEX") {
-      return [p.dexSubSector, ...(p.dexSecondaryTags ?? [])].filter(Boolean) as string[];
-    }
-    if (s === "RWA") {
-      return [p.rwaSubSector, ...(p.rwaSecondaryTags ?? [])].filter(Boolean) as string[];
-    }
-    if (s === "Stablecoin") {
-      return [p.stablecoinSubSector, ...(p.stablecoinSecondaryTags ?? [])].filter(
-        Boolean,
-      ) as string[];
-    }
-    if (s === "Staking") {
-      return [p.stakingSubSector, ...(p.stakingSecondaryTags ?? [])].filter(Boolean) as string[];
-    }
-    // Credit + default: multi-tag vocabulary, falling back to subSector.
-    return p.tags ?? (p.subSector ? [p.subSector] : []);
-  }
 
   // Primary OR secondary sector match (additive cross-tagging).
   function matchesSectorTag(p: NetworkProfile, s: string): boolean {
@@ -96,7 +83,7 @@ export function NetworkTableWithFilter({
       const matchesSector = sector === "all" || matchesSectorTag(p, sector);
       const matchesTag =
         tagFilter === "all" ||
-        (sector !== "all" && tagsForSector(p, sector).includes(tagFilter));
+        (sector !== "all" && filterTagsForSector(p, sector).includes(tagFilter));
       return matchesQuery && matchesCategory && matchesSector && matchesTag;
     });
   }, [profiles, query, category, sector, tagFilter]);

@@ -49,7 +49,7 @@ def _migrate_credit_tags(tags: List[str]) -> List[str]:
         mapped = _CREDIT_TAG_MIGRATION.get(tag, tag)
         if mapped not in out:
             out.append(mapped)
-    return out or ["Lending"]
+    return out
 
 
 def _empty_scale() -> Dict[str, Any]:
@@ -112,8 +112,12 @@ def _net(
     moneyMarkets) have no home in the new CreditTagMetrics shape and are dropped;
     re-authoring curated tag metrics for the new Credit tags is deferred.
     """
-    raw_tags = tags if tags is not None else [sub_sector]
-    tag_list = _migrate_credit_tags(raw_tags)
+    if tags is not None:
+        tag_list = _migrate_credit_tags(tags)
+    else:
+        tag_list = _migrate_credit_tags([sub_sector])
+        if not tag_list:
+            tag_list = ["Lending"]
 
     # Auto-derive curated `creditTagMetrics.lending` from the existing `lending`
     # block for Lending-tag entities when not explicitly supplied, so the
@@ -157,7 +161,7 @@ def _net(
         # Taxonomy hierarchy.
         "sub_category": "Protocol",
         "sector": "Credit",
-        "sub_sector": tag_list[0],
+        "sub_sector": tag_list[0] if tag_list else None,
         "tags": tag_list,
         "competitors": competitors or [],
         "lending": lending,
@@ -208,7 +212,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         competitors=[
             _AAVE_COMPETITOR,
             {
-                "name": "Spark / SparkLend",
+                "name": "Spark Protocol",
                 "slug": "spark",
                 "rank": 2,
                 "positioning": "Stablecoin-native lending stack.",
@@ -283,7 +287,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         ],
     ),
     "spark": _net(
-        name="Spark",
+        name="Spark Protocol",
         symbol="SPK",
         tagline="Stablecoin-native credit stack tied to the Sky/Maker ecosystem.",
         description=(
@@ -296,6 +300,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "it creates, routes, lends and manages stablecoin liquidity."
         ),
         sub_sector="Stablecoin-Native Credit Stack",
+        tags=["Lending"],
         official_docs="https://docs.spark.fi",
         website="https://spark.fi",
         twitter="https://x.com/sparkdotfi",
@@ -366,7 +371,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             # SPK governance + cross-refs to Sky parent (sky-gov, USDS have EntitySlug=sky).
             {
                 "slug": "spk",
-                "name": "Spark",
+                "name": "Spark Protocol",
                 "symbol": "SPK",
                 "category": "Token",
                 "role": "Governance token",
@@ -564,6 +569,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "pooled model to JustLend but BNB-centric."
         ),
         sub_sector="Money Markets",
+        tags=[],
         official_docs="https://docs.venus.io",
         website="https://venus.io",
         twitter="https://x.com/VenusProtocol",
@@ -641,6 +647,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "its data pipeline is Tron/TVM rather than EVM."
         ),
         sub_sector="Money Markets",
+        tags=[],
         official_docs="https://docs.justlend.org",
         website="https://justlend.org",
         twitter="https://x.com/DeFi_JUST",
@@ -719,6 +726,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "metrics come from Solana programs/accounts rather than EVM contracts."
         ),
         sub_sector="Isolated / Curated Lending",
+        tags=[],
         official_docs="https://docs.kamino.finance",
         website="https://kamino.finance",
         twitter="https://x.com/KaminoFinance",
@@ -802,6 +810,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "collateral ratios, defaults, pool managers and loan terms matter most."
         ),
         sub_sector="Institutional / Private Credit",
+        tags=[],
         official_docs="https://docs.maple.finance",
         website="https://maple.finance",
         twitter="https://x.com/maplefinance",
@@ -927,7 +936,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "LayerZero rather than confined to a single network's liquidity."
         ),
         sub_sector="Money Markets",
-        tags=["Lending"],
+        tags=[],
         chains=["Arbitrum", "Ethereum", "BSC", "Base"],
         official_docs="https://docs.radiant.capital",
         website="https://radiant.capital",
@@ -1007,7 +1016,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "leveragedYield": {
                 "maxLeverageX": 5,
                 "borrowModel": "Pay-as-you-earn (0% borrow APR; lender profit share)",
-                "supportedStrategies": ["Curve", "Velodrome", "Pendle"],
+                "supportedStrategies": ["Curve", "Velodrome", "Pendle Finance"],
                 "integratedProtocols": ["Curve", "Velodrome"],
             },
         },
@@ -1041,7 +1050,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
     ),
     # ------------------------------- FIXED INCOME ------------------------------
     "pendle": _net(
-        name="Pendle",
+        name="Pendle Finance",
         symbol="PENDLE",
         tagline="Tokenized yield — split principal and yield (PT/YT).",
         description=(
@@ -1067,7 +1076,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         },
     ),
     "notional": _net(
-        name="Notional",
+        name="Notional Finance",
         symbol="NOTE",
         tagline="Fixed-rate, fixed-term lending and borrowing.",
         description=(

@@ -626,8 +626,6 @@ ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         # Primary Credit per ontology §6.1 / §7; stablecoin sub-sector is secondary.
         "sub_category": "Protocol",
         "sector": "Credit",
-        "sub_sector": "Lending",
-        "tags": ["Lending"],
         "secondary_sectors": ["Stablecoin", "RWA"],
         "stablecoin_sub_sector": "RWA-Backed Stable",
         "stablecoin_secondary_tags": ["RWA-Backed"],

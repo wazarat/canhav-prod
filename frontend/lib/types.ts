@@ -1481,6 +1481,14 @@ export interface UniversalIdentity {
   contracts: Sourced<TokenDeployment[]>;
   /** DeFiLlama protocol category (cross-check vs sector). */
   llamaCategory: Sourced<string | null>;
+  /** Protocol website — DeFiLlama url. */
+  url?: Sourced<string | null>;
+  /** Protocol Twitter handle — DeFiLlama twitter. */
+  twitter?: Sourced<string | null>;
+  /** Audit links — DeFiLlama audit_links. */
+  auditLinks?: Sourced<string[]>;
+  /** Protocol logo URL — DeFiLlama logo. */
+  logo?: Sourced<string | null>;
   /** Curated regulatory facts (no reliable API). */
   jurisdiction?: Sourced<string | null>;
   hq?: Sourced<string | null>;

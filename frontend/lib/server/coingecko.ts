@@ -165,6 +165,93 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   usdm: "mountain-protocol-usdm",
 };
 
+/**
+ * Network (umbrella entity) slug → governance / protocol token on CoinGecko.
+ * Separate from `COINGECKO_IDS` (member products). `null` = no suitable token;
+ * universal pass then relies on Llama `gecko_id` only.
+ */
+export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
+  aave: "aave",
+  aerodrome: "aerodrome-finance",
+  balancer: "balancer",
+  centrifuge: "centrifuge",
+  clearpool: "clearpool",
+  compound: "compound-governance-token",
+  "curve-finance": "curve-dao-token",
+  "drift-protocol": "drift-protocol",
+  dydx: "dydx-chain",
+  ethena: "ethena",
+  fluid: "instadapp",
+  "gains-network": "gains-network",
+  gmx: "gmx",
+  goldfinch: "goldfinch",
+  hyperliquid: "hyperliquid",
+  justlend: "just",
+  jupiter: "jupiter-exchange-solana",
+  kamino: "kamino",
+  maple: "syrup",
+  morpho: "morpho",
+  "ondo-finance": "ondo-finance",
+  pancakeswap: "pancakeswap-token",
+  raydium: "raydium",
+  sky: "sky",
+  spark: "spark",
+  sushiswap: "sushi",
+  thorchain: "thorchain",
+  "trader-joe": "joe",
+  uniswap: "uniswap",
+  venus: "venus",
+  frax: "frax",
+  liquity: "liquity",
+  "lista-dao": "lista",
+  realt: "realtoken-ecosystem-governance",
+  // Stablecoin issuers / TradFi — no meaningful governance token for universals.
+  tether: null,
+  circle: null,
+  monerium: null,
+  paxos: null,
+  "first-digital": null,
+  bitget: null,
+  stably: null,
+  "gmo-trust": null,
+  agora: null,
+  cap: null,
+  anzen: null,
+  falcon: null,
+  elixir: null,
+  "mountain-protocol": null,
+  resolv: null,
+  reserve: null,
+  "m-zero": null,
+  "usd-ai": null,
+  usdt0: null,
+  "trueusd": null,
+  "inverse-finance": null,
+  "curve-stablecoin": null,
+  // RWAs / early-stage — defer to Llama gecko_id when present.
+  arcton: null,
+  aryze: null,
+  atmosphera: null,
+  "chateau-capital": null,
+  dinari: null,
+  dualmint: null,
+  "estate-protocol": null,
+  "florence-finance": null,
+  "franklin-templeton": null,
+  "lofty-ai": null,
+  "pleasing-market": null,
+  securitize: null,
+  "toucan-protocol": null,
+};
+
+/** Governance-token join key for a network slug (not member-product slugs). */
+export function coinIdForNetworkSlug(slug: string): string | null {
+  if (slug in NETWORK_COINGECKO_IDS) {
+    return NETWORK_COINGECKO_IDS[slug] ?? null;
+  }
+  return null;
+}
+
 export interface TokenResolution {
   coinId: string;
   address: string | null;
@@ -308,6 +395,133 @@ export async function resolveForSlug(
 /** The curated CoinGecko coin id for a slug, or null if unmapped. */
 export function coinIdForSlug(slug: string): string | null {
   return COINGECKO_IDS[slug] ?? null;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Cron batch cache (/coins/markets + throttled /coins/{id} for platforms)    */
+/* -------------------------------------------------------------------------- */
+
+const MARKETS_BATCH_SIZE = 200;
+export const COINGECKO_BATCH_DELAY_MS = 2_000;
+export const COINGECKO_PLATFORM_DELAY_MS = 1_500;
+
+function marketRowToPartial(row: Record<string, unknown>, coinId: string): TokenResolution {
+  const n = (v: unknown): number | null =>
+    typeof v === "number" && Number.isFinite(v) ? v : null;
+  return {
+    coinId,
+    address: null,
+    decimals: null,
+    priceUsd: n(row.current_price),
+    marketCapUsd: n(row.market_cap),
+    volume24hUsd: n(row.total_volume),
+    change24hPct: n(row.price_change_percentage_24h),
+    fdvUsd: n(row.fully_diluted_valuation),
+    circulatingSupply: n(row.circulating_supply),
+    totalSupplyUnits: n(row.total_supply),
+    maxSupply: n(row.max_supply),
+    priceChange7dPct: n(row.price_change_percentage_7d_in_currency),
+    priceChange30dPct: n(row.price_change_percentage_30d_in_currency),
+    marketCapRank: n(row.market_cap_rank),
+    platforms: {},
+    source: "coingecko",
+  };
+}
+
+function mergeTokenResolution(
+  base: TokenResolution | null | undefined,
+  overlay: TokenResolution,
+): TokenResolution {
+  if (!base) return overlay;
+  return {
+    ...base,
+    ...overlay,
+    address: overlay.address ?? base.address,
+    decimals: overlay.decimals ?? base.decimals,
+    platforms:
+      Object.keys(overlay.platforms).length > 0 ? overlay.platforms : base.platforms,
+  };
+}
+
+/** Batch market snapshot via `/coins/markets` (≤250 ids per request on free tier). */
+export async function resolveCoinsBatch(
+  coinIds: string[],
+  revalidate?: number,
+): Promise<Map<string, TokenResolution>> {
+  const out = new Map<string, TokenResolution>();
+  const unique = [...new Set(coinIds.filter(Boolean))];
+  for (let i = 0; i < unique.length; i += MARKETS_BATCH_SIZE) {
+    const chunk = unique.slice(i, i + MARKETS_BATCH_SIZE);
+    const params = new URLSearchParams({
+      vs_currency: "usd",
+      ids: chunk.join(","),
+      order: "market_cap_desc",
+      price_change_percentage: "24h,7d,30d",
+      sparkline: "false",
+    });
+    const data = await getJson(`${COINGECKO_BASE}/coins/markets?${params}`, revalidate);
+    if (Array.isArray(data)) {
+      for (const row of data) {
+        if (!row || typeof row !== "object") continue;
+        const id = typeof (row as any).id === "string" ? (row as any).id : null;
+        if (!id) continue;
+        out.set(id, marketRowToPartial(row as Record<string, unknown>, id));
+      }
+    }
+    if (i + MARKETS_BATCH_SIZE < unique.length) {
+      await sleep(COINGECKO_BATCH_DELAY_MS);
+    }
+  }
+  return out;
+}
+
+/** In-run cache: batch markets first, then throttled `/coins/{id}` only for platforms. */
+export class CoinGeckoCronCache {
+  private readonly cache = new Map<string, TokenResolution | null>();
+
+  /** Seed cache from `/coins/markets` batches (dedupes ids). */
+  async prefetchMarkets(coinIds: string[]): Promise<void> {
+    const missing = [...new Set(coinIds.filter(Boolean))].filter((id) => !this.cache.has(id));
+    if (missing.length === 0) return;
+    const batch = await resolveCoinsBatch(missing);
+    for (const id of missing) {
+      const partial = batch.get(id) ?? null;
+      const existing = this.cache.get(id);
+      this.cache.set(id, partial ? mergeTokenResolution(existing, partial) : existing ?? null);
+    }
+  }
+
+  get(coinId: string): TokenResolution | null | undefined {
+    return this.cache.get(coinId);
+  }
+
+  /** Market fields from cache; optional `/coins/{id}` for platforms + Arbitrum address. */
+  async resolve(coinId: string, opts: { platforms?: boolean } = {}): Promise<TokenResolution | null> {
+    const cached = this.cache.get(coinId);
+    const hasPlatforms =
+      cached != null && (Object.keys(cached.platforms).length > 0 || cached.address != null);
+
+    if (cached && (!opts.platforms || hasPlatforms)) {
+      return cached;
+    }
+
+    const full = await resolveCoin(coinId);
+    if (full) {
+      this.cache.set(coinId, mergeTokenResolution(cached, full));
+      await sleep(COINGECKO_PLATFORM_DELAY_MS);
+      return this.cache.get(coinId) ?? full;
+    }
+
+    if (cached) return cached;
+    this.cache.set(coinId, null);
+    return null;
+  }
+
+  async resolveForProductSlug(slug: string, platforms = true): Promise<TokenResolution | null> {
+    const coinId = COINGECKO_IDS[slug];
+    if (!coinId) return null;
+    return this.resolve(coinId, { platforms });
+  }
 }
 
 /* -------------------------------------------------------------------------- */

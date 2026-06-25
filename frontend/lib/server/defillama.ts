@@ -488,8 +488,7 @@ export async function fetchLlamaProtocolTvl(
   const chains = data.chainTvls;
   if (chains && typeof chains === "object") {
     for (const [chain, entry] of Object.entries(chains as Record<string, any>)) {
-      // Skip synthetic slices like "Arbitrum-borrowed" / "staking".
-      if (/[-_]/.test(chain) || /borrowed|staking|pool2|treasury|vesting/i.test(chain)) continue;
+      if (isSyntheticChainKey(chain)) continue;
       const series = parseSeries(entry?.tvl);
       if (series.length === 0) continue;
       const latest = series[series.length - 1].value;
@@ -543,9 +542,16 @@ export interface LlamaProtocolMeta {
   tvlChangePct: { d1: number | null; d7: number | null };
 }
 
-/** True for synthetic `currentChainTvls` keys (e.g. "Ethereum-borrowed"). */
-function isSyntheticChainKey(chain: string): boolean {
-  return /[-_]/.test(chain) || /borrowed|staking|pool2|treasury|vesting/i.test(chain);
+/** True for synthetic `currentChainTvls` / `chainTvls` keys (e.g. "Ethereum-borrowed"). */
+export function isSyntheticChainKey(chain: string): boolean {
+  if (
+    /-(?:borrowed|staking|pool2|treasury|vesting|doublecounted|excludeParent|vesting-excluded)$/i.test(
+      chain,
+    )
+  ) {
+    return true;
+  }
+  return /^(?:borrowed|staking|pool2|treasury|vesting|doublecounted|excludeParent)$/i.test(chain);
 }
 
 /** Identity, links, and TVL universals for a network slug (single call). */

@@ -4,11 +4,11 @@ import { revalidatePath } from "next/cache";
 import { fetchReserveRatesForSlug, hasAave, isAaveReserveSlug, aTokenAddressForSlug } from "@/lib/server/aave";
 import { fetchTotalSupply, fetchTotalValueLocked } from "@/lib/server/alchemy";
 import {
-  resolveForSlug,
-  resolveCoin,
   coinIdForSlug,
+  coinIdForNetworkSlug,
   fetchMarketChart,
   COINGECKO_IDS,
+  CoinGeckoCronCache,
   type TokenResolution,
 } from "@/lib/server/coingecko";
 import {
@@ -30,6 +30,7 @@ import {
   llamaLendingProjectForSlug,
   llamaProtocolForSlug,
   type LlamaPool,
+  type LlamaProtocolMeta,
   resolveLlamaYieldPool,
 } from "@/lib/server/defillama";
 import { fetchHeliusTokenSupply, hasHelius, KMNO_MINT } from "@/lib/server/helius";
@@ -128,6 +129,55 @@ function authorized(req: Request): boolean {
 // lights up; GHO (a stablecoin) surfaces rates via its LendingMarket card.
 const AAVE_ATOKEN_SLUGS = new Set(["ausdc", "ausdt", "aweth"]);
 
+function isNullishNumber(v: number | null | undefined): boolean {
+  return v == null;
+}
+
+function isEmptyArray<T>(v: T[] | null | undefined): boolean {
+  return !v || v.length === 0;
+}
+
+/** Keep prior live value when a refresh fetch returns empty/null. */
+function mergeSourced<T>(
+  fresh: Sourced<T>,
+  prior: Sourced<T> | undefined,
+  isEmpty: (v: T) => boolean,
+): Sourced<T> {
+  if (prior && isEmpty(fresh.value) && !isEmpty(prior.value)) {
+    return { ...prior, updatedAt: fresh.updatedAt };
+  }
+  return fresh;
+}
+
+/** Sync universal TVL from an authoritative CurrentScale write (integration / supply pass). */
+function syncUniversalTvlFromCurrentScale(
+  item: Record<string, any>,
+  sourceLabel: string,
+): boolean {
+  const scaleTvl = item.CurrentScale?.tvlUsd;
+  if (scaleTvl == null || typeof scaleTvl !== "number") return false;
+  const u = item.UniversalMetrics as UniversalMetrics | undefined;
+  if (!u?.tvl) return false;
+  if (u.tvl.tvlUsd.value === scaleTvl) return false;
+  const now = nowIso();
+  u.tvl = {
+    ...u.tvl,
+    tvlUsd: {
+      value: scaleTvl,
+      dataSource: "live",
+      sourceLabel,
+      updatedAt: now,
+    },
+  };
+  item.UniversalMetrics = u;
+  return true;
+}
+
+interface UniversalRefreshContext {
+  meta: LlamaProtocolMeta | null;
+  cgCache: CoinGeckoCronCache;
+}
+
 /** Build a live TokenMarket block from a CoinGecko resolution (no extra call). */
 function buildTokenMarket(r: TokenResolution) {
   const sourced = (value: number | null) => ({
@@ -150,18 +200,14 @@ function buildTokenMarket(r: TokenResolution) {
 
 /**
  * Tier-1 universal metrics pass — runs for EVERY network so the cross-network
- * data block is consistent regardless of sector. One DeFi Llama
- * `/protocol/{slug}` call fills identity/links/TVL (§A/§B/§C1) and yields the
- * `gecko_id` join key; a single CoinGecko `/coins/{id}` call (resolved via that
- * id, falling back to the curated map) fills market data (§C2) + contracts.
- * Fees/revenue are reused from `item.ProtocolFeesRevenue` (written earlier in
- * the run) — not re-fetched. Everything fails soft to null; `syncedAt` is always
- * stamped (§C7). `CurrentScale` TVL/mcap are back-filled only when null.
+ * data block is consistent regardless of sector. Llama meta is pre-fetched;
+ * CoinGecko market data comes from the cron cache (batch markets + platforms).
  */
 async function refreshUniversalMetrics(
   item: Record<string, any>,
   slug: string,
-): Promise<{ tvlUsd: number | null; priceUsd: number | null; note: string }> {
+  ctx: UniversalRefreshContext,
+): Promise<{ tvlUsd: number | null; priceUsd: number | null; note: string; wrote: boolean }> {
   const now = nowIso();
   const notes: string[] = [];
   const sourced = <T,>(
@@ -170,20 +216,17 @@ async function refreshUniversalMetrics(
     dataSource: "live" | "derived" = "live",
   ): Sourced<T> => ({ value, dataSource, sourceLabel, updatedAt: now });
 
-  const llamaSlug = llamaProtocolForSlug(slug);
-  const meta = await fetchLlamaProtocolMeta(slug);
+  const { meta, cgCache } = ctx;
   if (meta) notes.push("llama meta");
 
-  // Resolve the CoinGecko join key: Llama's gecko_id first, then curated map.
-  const geckoId = meta?.geckoId ?? coinIdForSlug(slug);
+  const llamaSlug = llamaProtocolForSlug(slug);
+  const geckoId = meta?.geckoId ?? coinIdForNetworkSlug(slug);
   let resolution: TokenResolution | null = null;
   if (geckoId) {
-    resolution = await resolveCoin(geckoId);
-    await sleep(COINGECKO_DELAY_MS);
+    resolution = await cgCache.resolve(geckoId, { platforms: true });
     if (resolution) notes.push("cg market");
   }
 
-  // Per-chain token contracts from the CoinGecko platforms map.
   const contracts: TokenDeployment[] = resolution
     ? Object.entries(resolution.platforms)
         .filter(([, address]) => address)
@@ -192,73 +235,186 @@ async function refreshUniversalMetrics(
 
   const portalMeta = (item.ArbitrumPortalMetadata ?? {}) as Record<string, any>;
   const prior = (item.UniversalMetrics ?? {}) as Partial<UniversalMetrics>;
+  const priorIdentity = prior.identity;
+
+  const llamaLive = meta != null;
+  const llamaLabel = llamaLive ? "DeFi Llama" : "Unavailable";
+  const cgLive = resolution != null;
+
+  const foundedFresh = sourced(
+    meta?.listedAtIso ?? (portalMeta.foundedDate ?? null),
+    meta?.listedAtIso ? "DeFi Llama" : "Curated",
+    meta?.listedAtIso ? "live" : "derived",
+  );
+  const chainsFresh = sourced(
+    meta?.chains?.length ? meta.chains : ((portalMeta.chains as string[] | undefined) ?? []),
+    meta?.chains?.length ? "DeFi Llama" : "Curated",
+    meta?.chains?.length ? "live" : "derived",
+  );
+  const contractsFresh = sourced(
+    contracts.length > 0 ? contracts : [],
+    cgLive ? "CoinGecko" : "Unavailable",
+    cgLive ? "live" : "derived",
+  );
+  const llamaCategoryFresh = sourced(
+    meta?.category ?? null,
+    llamaLabel,
+    llamaLive ? "live" : "derived",
+  );
 
   const identity: UniversalIdentity = {
-    foundedDate: sourced(
-      meta?.listedAtIso ?? (portalMeta.foundedDate ?? null),
-      meta?.listedAtIso ? "DeFi Llama" : "Curated",
-      meta?.listedAtIso ? "live" : "derived",
-    ),
-    chains: sourced(
-      meta?.chains?.length ? meta.chains : ((portalMeta.chains as string[] | undefined) ?? []),
-      meta?.chains?.length ? "DeFi Llama" : "Curated",
-      meta?.chains?.length ? "live" : "derived",
-    ),
-    contracts: sourced(contracts, "CoinGecko"),
-    llamaCategory: sourced(meta?.category ?? null, "DeFi Llama"),
-    // Curated identity facts are preserved across refreshes when present.
-    ...(prior.identity?.tokenStandard ? { tokenStandard: prior.identity.tokenStandard } : {}),
-    ...(prior.identity?.jurisdiction ? { jurisdiction: prior.identity.jurisdiction } : {}),
-    ...(prior.identity?.hq ? { hq: prior.identity.hq } : {}),
-    ...(prior.identity?.entityType ? { entityType: prior.identity.entityType } : {}),
+    foundedDate: mergeSourced(foundedFresh, priorIdentity?.foundedDate, (v) => v == null),
+    chains: mergeSourced(chainsFresh, priorIdentity?.chains, isEmptyArray),
+    contracts: mergeSourced(contractsFresh, priorIdentity?.contracts, isEmptyArray),
+    llamaCategory: mergeSourced(llamaCategoryFresh, priorIdentity?.llamaCategory, (v) => v == null),
+    ...(llamaLive && meta?.url != null
+      ? { url: sourced(meta.url, "DeFi Llama") }
+      : priorIdentity?.url
+        ? { url: priorIdentity.url }
+        : {}),
+    ...(llamaLive && meta?.twitter != null
+      ? { twitter: sourced(meta.twitter, "DeFi Llama") }
+      : priorIdentity?.twitter
+        ? { twitter: priorIdentity.twitter }
+        : {}),
+    ...(llamaLive && meta?.auditLinks?.length
+      ? { auditLinks: sourced(meta.auditLinks, "DeFi Llama") }
+      : priorIdentity?.auditLinks
+        ? { auditLinks: priorIdentity.auditLinks }
+        : {}),
+    ...(llamaLive && meta?.logo != null
+      ? { logo: sourced(meta.logo, "DeFi Llama") }
+      : priorIdentity?.logo
+        ? { logo: priorIdentity.logo }
+        : {}),
+    ...(priorIdentity?.tokenStandard ? { tokenStandard: priorIdentity.tokenStandard } : {}),
+    ...(priorIdentity?.jurisdiction ? { jurisdiction: priorIdentity.jurisdiction } : {}),
+    ...(priorIdentity?.hq ? { hq: priorIdentity.hq } : {}),
+    ...(priorIdentity?.entityType ? { entityType: priorIdentity.entityType } : {}),
   };
 
   const marketCapUsd = resolution?.marketCapUsd ?? meta?.mcapUsd ?? null;
-  const market: UniversalMarket = {
-    priceUsd: sourced(resolution?.priceUsd ?? null, "CoinGecko"),
+  const marketCapSource =
+    resolution?.marketCapUsd != null ? "CoinGecko" : llamaLive ? "DeFi Llama" : "Unavailable";
+
+  const marketFresh: UniversalMarket = {
+    priceUsd: sourced(
+      resolution?.priceUsd ?? null,
+      cgLive ? "CoinGecko" : "Unavailable",
+      cgLive ? "live" : "derived",
+    ),
     marketCapUsd: sourced(
       marketCapUsd,
-      resolution?.marketCapUsd != null ? "CoinGecko" : "DeFi Llama",
+      marketCapSource,
+      marketCapUsd != null ? "live" : "derived",
     ),
-    fdvUsd: sourced(resolution?.fdvUsd ?? null, "CoinGecko"),
-    circulatingSupply: sourced(resolution?.circulatingSupply ?? null, "CoinGecko"),
-    totalSupply: sourced(resolution?.totalSupplyUnits ?? null, "CoinGecko"),
+    fdvUsd: sourced(
+      resolution?.fdvUsd ?? null,
+      cgLive ? "CoinGecko" : "Unavailable",
+      cgLive ? "live" : "derived",
+    ),
+    circulatingSupply: sourced(
+      resolution?.circulatingSupply ?? null,
+      cgLive ? "CoinGecko" : "Unavailable",
+      cgLive ? "live" : "derived",
+    ),
+    totalSupply: sourced(
+      resolution?.totalSupplyUnits ?? null,
+      cgLive ? "CoinGecko" : "Unavailable",
+      cgLive ? "live" : "derived",
+    ),
     priceChangePct: {
-      d1: sourced(resolution?.change24hPct ?? null, "CoinGecko"),
-      d7: sourced(resolution?.priceChange7dPct ?? null, "CoinGecko"),
-      d30: sourced(resolution?.priceChange30dPct ?? null, "CoinGecko"),
+      d1: sourced(
+        resolution?.change24hPct ?? null,
+        cgLive ? "CoinGecko" : "Unavailable",
+        cgLive ? "live" : "derived",
+      ),
+      d7: sourced(
+        resolution?.priceChange7dPct ?? null,
+        cgLive ? "CoinGecko" : "Unavailable",
+        cgLive ? "live" : "derived",
+      ),
+      d30: sourced(
+        resolution?.priceChange30dPct ?? null,
+        cgLive ? "CoinGecko" : "Unavailable",
+        cgLive ? "live" : "derived",
+      ),
     },
-    marketCapRank: sourced(resolution?.marketCapRank ?? null, "CoinGecko"),
+    marketCapRank: sourced(
+      resolution?.marketCapRank ?? null,
+      cgLive ? "CoinGecko" : "Unavailable",
+      cgLive ? "live" : "derived",
+    ),
   };
 
-  const tvl: UniversalTvl = {
-    tvlUsd: sourced(meta?.tvlUsdLatest ?? null, "DeFi Llama"),
+  const priorMarket = prior.market;
+  const market: UniversalMarket = {
+    priceUsd: mergeSourced(marketFresh.priceUsd, priorMarket?.priceUsd, isNullishNumber),
+    marketCapUsd: mergeSourced(marketFresh.marketCapUsd, priorMarket?.marketCapUsd, isNullishNumber),
+    fdvUsd: mergeSourced(marketFresh.fdvUsd, priorMarket?.fdvUsd, isNullishNumber),
+    circulatingSupply: mergeSourced(
+      marketFresh.circulatingSupply,
+      priorMarket?.circulatingSupply,
+      isNullishNumber,
+    ),
+    totalSupply: mergeSourced(marketFresh.totalSupply, priorMarket?.totalSupply, isNullishNumber),
+    priceChangePct: {
+      d1: mergeSourced(marketFresh.priceChangePct.d1, priorMarket?.priceChangePct?.d1, isNullishNumber),
+      d7: mergeSourced(marketFresh.priceChangePct.d7, priorMarket?.priceChangePct?.d7, isNullishNumber),
+      d30: mergeSourced(
+        marketFresh.priceChangePct.d30,
+        priorMarket?.priceChangePct?.d30,
+        isNullishNumber,
+      ),
+    },
+    marketCapRank: mergeSourced(
+      marketFresh.marketCapRank,
+      priorMarket?.marketCapRank,
+      isNullishNumber,
+    ),
+  };
+
+  const tvlFresh: UniversalTvl = {
+    tvlUsd: sourced(meta?.tvlUsdLatest ?? null, llamaLabel, llamaLive ? "live" : "derived"),
     tvlChangePct: {
-      d1: sourced(meta?.tvlChangePct.d1 ?? null, "DeFi Llama", "derived"),
-      d7: sourced(meta?.tvlChangePct.d7 ?? null, "DeFi Llama", "derived"),
+      d1: sourced(meta?.tvlChangePct.d1 ?? null, llamaLabel, "derived"),
+      d7: sourced(meta?.tvlChangePct.d7 ?? null, llamaLabel, "derived"),
     },
-    perChain: sourced(meta?.currentChainTvls ?? [], "DeFi Llama"),
+    perChain: sourced(meta?.currentChainTvls ?? [], llamaLabel, llamaLive ? "live" : "derived"),
   };
 
-  // Holder count has no turnkey free API (§C6): preserve any curated value,
-  // otherwise stamp a deferred placeholder so the field is present + honest.
+  const priorTvl = prior.tvl;
+  const tvl: UniversalTvl = {
+    tvlUsd: mergeSourced(tvlFresh.tvlUsd, priorTvl?.tvlUsd, isNullishNumber),
+    tvlChangePct: {
+      d1: mergeSourced(tvlFresh.tvlChangePct.d1, priorTvl?.tvlChangePct?.d1, isNullishNumber),
+      d7: mergeSourced(tvlFresh.tvlChangePct.d7, priorTvl?.tvlChangePct?.d7, isNullishNumber),
+    },
+    perChain: mergeSourced(tvlFresh.perChain, priorTvl?.perChain, isEmptyArray),
+  };
+
   const holderCount: Sourced<number | null> =
     prior.holderCount && prior.holderCount.value != null
       ? prior.holderCount
       : sourced<number | null>(null, "Deferred — no turnkey API", "derived");
+
+  const hasLiveData =
+    llamaLive ||
+    cgLive ||
+    (prior.tvl?.tvlUsd?.value ?? null) != null ||
+    (prior.market?.priceUsd?.value ?? null) != null;
 
   const universal: UniversalMetrics = {
     identity,
     market,
     tvl,
     holderCount,
-    coingeckoId: geckoId ?? null,
-    llamaSlug: llamaSlug ?? null,
+    coingeckoId: resolution ? geckoId ?? null : prior.coingeckoId ?? null,
+    llamaSlug: llamaSlug ?? prior.llamaSlug ?? null,
     syncedAt: now,
   };
   item.UniversalMetrics = universal;
 
-  // Back-fill CurrentScale only when null (never overwrite curated values).
   if ((item.CurrentScale?.tvlUsd ?? null) == null && meta?.tvlUsdLatest != null) {
     item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd: meta.tvlUsdLatest };
   }
@@ -267,9 +423,10 @@ async function refreshUniversalMetrics(
   }
 
   return {
-    tvlUsd: meta?.tvlUsdLatest ?? null,
-    priceUsd: resolution?.priceUsd ?? null,
+    tvlUsd: tvl.tvlUsd.value,
+    priceUsd: market.priceUsd.value,
     note: notes.join("; ") || "no provider mapping",
+    wrote: hasLiveData || priorIdentity != null || priorMarket != null || priorTvl != null,
   };
 }
 
@@ -588,6 +745,21 @@ export async function GET(req: Request): Promise<NextResponse> {
   // snapshot for every slug's pool resolution. Fails soft to an empty list.
   const llamaPools = await fetchLlamaPools();
 
+  const cgCache = new CoinGeckoCronCache();
+  const productCoinIds = [
+    ...new Set(
+      items
+        .filter((it) => {
+          const slug = String(it.Slug ?? "");
+          const category = String(it.Category ?? "");
+          return COINGECKO_IDS[slug] && !isNetworkCategory(category);
+        })
+        .map((it) => COINGECKO_IDS[String(it.Slug ?? "")])
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ];
+  await cgCache.prefetchMarkets(productCoinIds);
+
   let updated = 0;
   const touchedSlugs: { category: string; slug: string }[] = [];
   const results: { slug: string; address: string | null; metric: number | null; note: string }[] =
@@ -603,10 +775,9 @@ export async function GET(req: Request): Promise<NextResponse> {
     let priceUsd: number | null = null;
     let resolution: TokenResolution | null = null;
 
-    // 1. CoinGecko resolution (only when a coin id is mapped — saves the round-trip).
-    if (COINGECKO_IDS[slug]) {
-      resolution = await resolveForSlug(slug);
-      await sleep(COINGECKO_DELAY_MS);
+    // 1. CoinGecko resolution for member coins only (networks use the universal pass).
+    if (COINGECKO_IDS[slug] && !isNetworkCategory(category)) {
+      resolution = await cgCache.resolveForProductSlug(slug, true);
       if (resolution) {
         address = resolution.address;
         decimals = resolution.decimals;
@@ -920,23 +1091,39 @@ export async function GET(req: Request): Promise<NextResponse> {
   }
 
   // --- Universal metrics: consistent Tier-1 block for EVERY network ----------
-  // One DeFi Llama /protocol/{slug} + one CoinGecko /coins/{id} per network,
-  // written to `item.UniversalMetrics` so cross-network data is uniform across
-  // sectors. Runs after the sector passes so ProtocolFeesRevenue is in place.
+  const networkItems = items.filter((it) => isNetworkCategory(String(it.Category ?? "")));
+  const llamaMetaBySlug = new Map<string, LlamaProtocolMeta | null>();
+  const networkGeckoIds: string[] = [];
+
+  for (const item of networkItems) {
+    const slug = String(item.Slug ?? "");
+    if (!slug) continue;
+    const meta = await fetchLlamaProtocolMeta(slug);
+    llamaMetaBySlug.set(slug, meta);
+    const geckoId = meta?.geckoId ?? coinIdForNetworkSlug(slug);
+    if (geckoId) networkGeckoIds.push(geckoId);
+  }
+
+  await cgCache.prefetchMarkets(networkGeckoIds);
+
   const universalResults: {
     slug: string;
     tvlUsd: number | null;
     priceUsd: number | null;
     note: string;
   }[] = [];
-  for (const item of items) {
-    if (!isNetworkCategory(String(item.Category ?? ""))) continue;
+  for (const item of networkItems) {
     const slug = String(item.Slug ?? "");
     if (!slug) continue;
-    const res = await refreshUniversalMetrics(item, slug);
-    item.UpdatedAt = nowIso();
-    await putItem(item);
-    updated += 1;
+    const res = await refreshUniversalMetrics(item, slug, {
+      meta: llamaMetaBySlug.get(slug) ?? null,
+      cgCache,
+    });
+    if (res.wrote) {
+      item.UpdatedAt = nowIso();
+      await putItem(item);
+      updated += 1;
+    }
     universalResults.push({ slug, tvlUsd: res.tvlUsd, priceUsd: res.priceUsd, note: res.note });
   }
 
@@ -967,6 +1154,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         ...(morphoItem.CurrentScale ?? {}),
         tvlUsd: morphoMetrics.tvlUsd,
       };
+      syncUniversalTvlFromCurrentScale(morphoItem, "Morpho API");
       morphoItem.UpdatedAt = nowIso();
       await putItem(morphoItem);
       updated += 1;
@@ -990,6 +1178,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         ...(kaminoItem.CurrentScale ?? {}),
         tvlUsd: kaminoMetrics.tvlUsd,
       };
+      syncUniversalTvlFromCurrentScale(kaminoItem, "Kamino API");
       kaminoItem.UpdatedAt = nowIso();
       await putItem(kaminoItem);
       updated += 1;
@@ -1017,6 +1206,7 @@ export async function GET(req: Request): Promise<NextResponse> {
             ...(justItem.CurrentScale ?? {}),
             tvlUsd: lendingTvl,
           };
+          syncUniversalTvlFromCurrentScale(justItem, "TronGrid / JustLend");
         }
         justItem.UpdatedAt = nowIso();
         await putItem(justItem);
@@ -1079,6 +1269,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
     if (!found) continue;
     item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd: total };
+    syncUniversalTvlFromCurrentScale(item, "Member supply sum");
     if (String(item.Sector ?? "") === "Stablecoin") {
       const sourced = {
         value: total,
@@ -1092,6 +1283,28 @@ export async function GET(req: Request): Promise<NextResponse> {
     item.UpdatedAt = nowIso();
     await putItem(item);
     updated += 1;
+  }
+
+  // Reconcile universal TVL with headline CurrentScale when sector passes ran before universal.
+  for (const item of networkItems) {
+    const scaleTvl = item.CurrentScale?.tvlUsd;
+    if (scaleTvl == null || typeof scaleTvl !== "number") continue;
+    const uTvl = (item.UniversalMetrics as UniversalMetrics | undefined)?.tvl?.tvlUsd?.value;
+    if (uTvl === scaleTvl) continue;
+    const slug = String(item.Slug ?? "");
+    let label = "Headline TVL";
+    if (slug === "morpho") label = "Morpho API";
+    else if (slug === "kamino") label = "Kamino API";
+    else if (slug === "justlend") label = "TronGrid / JustLend";
+    else if (String(item.Sector ?? "") === "Stablecoin") label = "Member supply sum";
+    else if (String(item.Sector ?? "") === "DEX") label = "DeFi Llama DEX TVL";
+    else if (String(item.Sector ?? "") === "Lending") label = "DeFi Llama lending TVL";
+    else if (String(item.Sector ?? "") === "RWA") label = "DeFi Llama RWA AUM";
+    if (syncUniversalTvlFromCurrentScale(item, label)) {
+      item.UpdatedAt = nowIso();
+      await putItem(item);
+      updated += 1;
+    }
   }
 
   // Refresh public surfaces + each touched detail page.

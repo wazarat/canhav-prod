@@ -107,9 +107,16 @@ function buildFacts(profile: NetworkProfile): AgentSkillFact[] {
   const mcapUsd = universal?.market.marketCapUsd.value ?? scale.marketCapUsd;
   const priceUsd = universal?.market.priceUsd.value ?? null;
   const change24h = universal?.market.priceChangePct.d1.value ?? null;
+  const change7d = universal?.market.priceChangePct.d7.value ?? null;
+  const change30d = universal?.market.priceChangePct.d30.value ?? null;
+  const fdvUsd = universal?.market.fdvUsd.value ?? null;
+  const rank = universal?.market.marketCapRank.value ?? null;
+  const tvlChange1d = universal?.tvl.tvlChangePct.d1.value ?? null;
+  const tvlChange7d = universal?.tvl.tvlChangePct.d7.value ?? null;
+  const syncedAt = universal?.syncedAt ?? null;
 
   const facts: AgentSkillFact[] = [
-    { key: "category", value: "Umbrella Entity" },
+    { key: "category", value: "Network" },
     { key: "symbol", value: profile.symbol || "—" },
     { key: "tagline", value: profile.tagline || profile.description.slice(0, 120) },
     {
@@ -141,6 +148,14 @@ function buildFacts(profile: NetworkProfile): AgentSkillFact[] {
     facts.push({ key: "price", value: `$${priceUsd < 1 ? priceUsd.toFixed(4) : priceUsd.toFixed(2)}` });
   }
   if (change24h != null) facts.push({ key: "priceChange24h", value: `${change24h.toFixed(1)}%` });
+  if (change7d != null) facts.push({ key: "priceChange7d", value: `${change7d.toFixed(1)}%` });
+  if (change30d != null) facts.push({ key: "priceChange30d", value: `${change30d.toFixed(1)}%` });
+  const fdv = compactUsd(fdvUsd);
+  if (fdv) facts.push({ key: "fdv", value: fdv });
+  if (rank != null) facts.push({ key: "marketCapRank", value: `#${rank}` });
+  if (tvlChange1d != null) facts.push({ key: "tvlChange1d", value: `${tvlChange1d.toFixed(1)}%` });
+  if (tvlChange7d != null) facts.push({ key: "tvlChange7d", value: `${tvlChange7d.toFixed(1)}%` });
+  if (syncedAt) facts.push({ key: "universalMetricsSyncedAt", value: syncedAt });
   const users = compactNumber(scale.users);
   if (users) facts.push({ key: "users", value: users });
   if (scale.aprPct !== null) facts.push({ key: "apr", value: `${scale.aprPct}%` });

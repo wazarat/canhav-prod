@@ -513,6 +513,107 @@ export async function fetchLlamaProtocolTvl(
 }
 
 /* -------------------------------------------------------------------------- */
+/* Protocol metadata (Tier 1 universal) — one /protocol/{slug} call           */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Identity + links + TVL universals parsed from a single `/protocol/{slug}`
+ * payload (spec §A/§B/§C1). `gecko_id` here auto-resolves the CoinGecko join
+ * key, so the cron need not hand-map every network slug.
+ */
+export interface LlamaProtocolMeta {
+  geckoId: string | null;
+  cmcId: string | null;
+  name: string | null;
+  symbol: string | null;
+  category: string | null;
+  /** Launch/listed date (ISO YYYY-MM-DD) from `listedAt` (unix seconds). */
+  listedAtIso: string | null;
+  chains: string[];
+  url: string | null;
+  twitter: string | null;
+  auditLinks: string[];
+  logo: string | null;
+  mcapUsd: number | null;
+  /** Latest total TVL (USD) — last point of `tvl[]`. */
+  tvlUsdLatest: number | null;
+  /** Latest TVL per chain (USD), largest first — `currentChainTvls` filtered. */
+  currentChainTvls: LlamaChainTvl[];
+  /** TVL change vs −1 / −7 daily points, in %. */
+  tvlChangePct: { d1: number | null; d7: number | null };
+}
+
+/** True for synthetic `currentChainTvls` keys (e.g. "Ethereum-borrowed"). */
+function isSyntheticChainKey(chain: string): boolean {
+  return /[-_]/.test(chain) || /borrowed|staking|pool2|treasury|vesting/i.test(chain);
+}
+
+/** Identity, links, and TVL universals for a network slug (single call). */
+export async function fetchLlamaProtocolMeta(
+  slug: string,
+  revalidate?: number,
+): Promise<LlamaProtocolMeta | null> {
+  const protocol = llamaProtocolForSlug(slug);
+  if (!protocol) return null;
+  const data = await getJson(
+    `${PROTOCOLS_BASE}/protocol/${encodeURIComponent(protocol)}`,
+    revalidate,
+  );
+  if (!data || typeof data !== "object") return null;
+
+  // Daily total-TVL series for latest value + 1d/7d change.
+  const tvlSeries: number[] = [];
+  if (Array.isArray(data.tvl)) {
+    for (const row of data.tvl) {
+      const v = num((row as any)?.totalLiquidityUSD);
+      if (v !== null) tvlSeries.push(v);
+    }
+  }
+  const tvlUsdLatest = tvlSeries.length > 0 ? tvlSeries[tvlSeries.length - 1] : null;
+  const changePct = (lagDays: number): number | null => {
+    const i = tvlSeries.length - 1 - lagDays;
+    if (i < 0 || tvlUsdLatest === null) return null;
+    const prev = tvlSeries[i];
+    if (prev === undefined || prev <= 0) return null;
+    return ((tvlUsdLatest - prev) / prev) * 100;
+  };
+
+  // currentChainTvls: { chain: latestUsd } — drop synthetic suffixed keys.
+  const currentChainTvls: LlamaChainTvl[] = [];
+  if (data.currentChainTvls && typeof data.currentChainTvls === "object") {
+    for (const [chain, value] of Object.entries(data.currentChainTvls as Record<string, unknown>)) {
+      if (isSyntheticChainKey(chain)) continue;
+      const v = num(value);
+      if (v !== null && v > 0) currentChainTvls.push({ chain, tvlUsd: v });
+    }
+    currentChainTvls.sort((a, b) => b.tvlUsd - a.tvlUsd);
+  }
+
+  const str = (v: unknown): string | null =>
+    typeof v === "string" && v.trim() ? v.trim() : null;
+  const strArray = (v: unknown): string[] =>
+    Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && x.trim() !== "") : [];
+
+  return {
+    geckoId: str(data.gecko_id),
+    cmcId: str(data.cmcId),
+    name: str(data.name),
+    symbol: str(data.symbol),
+    category: str(data.category),
+    listedAtIso: isoDate(data.listedAt),
+    chains: strArray(data.chains),
+    url: str(data.url),
+    twitter: str(data.twitter),
+    auditLinks: strArray(data.audit_links),
+    logo: str(data.logo),
+    mcapUsd: num(data.mcap),
+    tvlUsdLatest,
+    currentChainTvls,
+    tvlChangePct: { d1: changePct(1), d7: changePct(7) },
+  };
+}
+
+/* -------------------------------------------------------------------------- */
 /* Shared helpers for the dimension/coin endpoints                            */
 /* -------------------------------------------------------------------------- */
 

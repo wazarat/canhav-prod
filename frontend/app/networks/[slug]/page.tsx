@@ -18,6 +18,7 @@ import {
   buildNetworkSectionNav,
 } from "@/components/networks/NetworkSections";
 import { NetworkMarketCard } from "@/components/networks/NetworkMarketCard";
+import { NetworkUniversalCard } from "@/components/networks/NetworkUniversalCard";
 import { MemberCoinsLauncher } from "@/components/networks/MemberCoinsLauncher";
 import { NetworkPulsePanel } from "@/components/networks/NetworkPulsePanel";
 import { NetworkResearchHub } from "@/components/networks/NetworkResearchHub";
@@ -147,6 +148,12 @@ export default async function NetworkProfilePage({ params }: PageProps) {
   const taxonomy = getNetworkTaxonomyBadges(profile);
   const entitySkill = profile.agentSkill ?? buildSkillFromEntity(profile);
   const scale = profile.currentScale;
+  const universal = profile.universalMetrics ?? null;
+  const foundedDate =
+    universal?.identity.foundedDate.value ?? profile.arbitrumPortalMetadata?.foundedDate ?? null;
+  const deployedChains: string[] = universal?.identity.chains.value?.length
+    ? universal.identity.chains.value
+    : (profile.arbitrumPortalMetadata?.chains ?? []);
   const labels = profile.scaleLabels ?? {};
   const tvlLabel = labels.tvl ?? "Total deposits / TVL";
   const usersLabel = labels.users ?? "Users";
@@ -286,6 +293,10 @@ export default async function NetworkProfilePage({ params }: PageProps) {
             <NetworkDashboard network={profile} />
           </Suspense>
 
+          {profile.universalMetrics && (
+            <NetworkUniversalCard universal={profile.universalMetrics} />
+          )}
+
           {profile.market && (
             <NetworkMarketCard market={profile.market} symbol={profile.symbol} />
           )}
@@ -354,6 +365,10 @@ export default async function NetworkProfilePage({ params }: PageProps) {
           </div>
 
           <DataPanel title="At a glance">
+            {foundedDate && <DataRow label="Founded" value={foundedDate} />}
+            {deployedChains.length > 0 && (
+              <DataRow label="Chains" value={deployedChains.join(", ")} />
+            )}
             {scale.loanPipelineUsd != null && (
               <DataRow label={pipelineLabel} value={formatUsdCompact(scale.loanPipelineUsd)} />
             )}

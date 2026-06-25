@@ -179,6 +179,13 @@ export interface TokenResolution {
   /** Total supply in token units (named to avoid clashing with the store's TotalSupply). */
   totalSupplyUnits: number | null;
   maxSupply: number | null;
+  /** Trailing 7d/30d price change (%) — same payload, promoted for universals. */
+  priceChange7dPct: number | null;
+  priceChange30dPct: number | null;
+  /** CoinGecko market-cap rank (top-level `market_cap_rank`). */
+  marketCapRank: number | null;
+  /** Full chain→contract-address map (`platforms`) for universal contracts[]. */
+  platforms: Record<string, string>;
   source: "coingecko";
 }
 
@@ -234,10 +241,17 @@ export async function resolveCoin(
     const dp = arb.decimal_place;
     decimals = typeof dp === "number" ? dp : null;
   }
-  if (address === null) {
-    const platforms = data.platforms;
-    if (platforms && typeof platforms === "object") {
-      address = (platforms[ARBITRUM_PLATFORM] || "").trim().toLowerCase() || null;
+  // Full chain→address map (universal contracts[]); also the Arbitrum fallback.
+  const platforms: Record<string, string> = {};
+  const rawPlatforms = data.platforms;
+  if (rawPlatforms && typeof rawPlatforms === "object") {
+    for (const [chain, addr] of Object.entries(rawPlatforms as Record<string, unknown>)) {
+      if (typeof addr === "string" && addr.trim()) {
+        platforms[chain] = addr.trim().toLowerCase();
+      }
+    }
+    if (address === null) {
+      address = platforms[ARBITRUM_PLATFORM] ?? null;
     }
   }
 
@@ -252,10 +266,9 @@ export async function resolveCoin(
   const marketCapUsd = m ? usd(m.market_cap) : null;
   const volume24hUsd = m ? usd(m.total_volume) : null;
   const fdvUsd = m ? usd(m.fully_diluted_valuation) : null;
-  const change24hPct =
-    m && typeof m.price_change_percentage_24h === "number"
-      ? m.price_change_percentage_24h
-      : null;
+  const pct = (value: unknown): number | null =>
+    typeof value === "number" && Number.isFinite(value) ? value : null;
+  const change24hPct = m ? pct(m.price_change_percentage_24h) : null;
   const supply = (value: unknown): number | null =>
     typeof value === "number" && Number.isFinite(value) ? value : null;
 
@@ -271,6 +284,13 @@ export async function resolveCoin(
     circulatingSupply: m ? supply(m.circulating_supply) : null,
     totalSupplyUnits: m ? supply(m.total_supply) : null,
     maxSupply: m ? supply(m.max_supply) : null,
+    priceChange7dPct: m ? pct(m.price_change_percentage_7d) : null,
+    priceChange30dPct: m ? pct(m.price_change_percentage_30d) : null,
+    marketCapRank:
+      typeof data.market_cap_rank === "number" && Number.isFinite(data.market_cap_rank)
+        ? data.market_cap_rank
+        : null,
+    platforms,
     source: "coingecko",
   };
 }

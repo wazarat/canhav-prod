@@ -1443,6 +1443,87 @@ export interface LendingMetrics {
   deployment?: ChainDeployment | null;
 }
 
+/* -------------------------------------------------------------------------- */
+/* Universal network metrics (Tier 1) — collected consistently for EVERY       */
+/* network from DeFiLlama /protocol/{slug} + a single CoinGecko /coins/{id}.    */
+/* Additive: layered alongside currentScale + sector blocks, never replacing    */
+/* them. Each field is Sourced<> so the UI/agent show honest provenance.        */
+/* -------------------------------------------------------------------------- */
+
+/** Trailing price-change percentages (CoinGecko market_data). */
+export interface PriceChangePct {
+  d1: Sourced<number | null>;
+  d7: Sourced<number | null>;
+  d30: Sourced<number | null>;
+}
+
+/** Trailing TVL-change percentages (derived from DeFiLlama tvl[] series). */
+export interface TvlChangePct {
+  d1: Sourced<number | null>;
+  d7: Sourced<number | null>;
+}
+
+/** Latest TVL on a single chain (USD) — DeFiLlama currentChainTvls. */
+export interface UniversalChainTvl {
+  chain: string;
+  tvlUsd: number;
+}
+
+/** Identity & classification universals (spec §A). */
+export interface UniversalIdentity {
+  /** Launch / listed date (ISO YYYY-MM-DD) — DeFiLlama listedAt. */
+  foundedDate: Sourced<string | null>;
+  /** Deployed chains — DeFiLlama chains[]. */
+  chains: Sourced<string[]>;
+  /** Token standard (ERC-20/SPL/…); curated/deferred until probed on-chain. */
+  tokenStandard?: Sourced<string | null>;
+  /** Per-chain token contract deployments — CoinGecko platforms map. */
+  contracts: Sourced<TokenDeployment[]>;
+  /** DeFiLlama protocol category (cross-check vs sector). */
+  llamaCategory: Sourced<string | null>;
+  /** Curated regulatory facts (no reliable API). */
+  jurisdiction?: Sourced<string | null>;
+  hq?: Sourced<string | null>;
+  entityType?: Sourced<string | null>;
+}
+
+/** Live market universals from a single CoinGecko /coins/{id} payload (spec §C2). */
+export interface UniversalMarket {
+  priceUsd: Sourced<number | null>;
+  marketCapUsd: Sourced<number | null>;
+  fdvUsd: Sourced<number | null>;
+  circulatingSupply: Sourced<number | null>;
+  totalSupply: Sourced<number | null>;
+  priceChangePct: PriceChangePct;
+  marketCapRank: Sourced<number | null>;
+}
+
+/** TVL universals from DeFiLlama /protocol/{slug} (spec §C1). */
+export interface UniversalTvl {
+  tvlUsd: Sourced<number | null>;
+  tvlChangePct: TvlChangePct;
+  perChain: Sourced<UniversalChainTvl[]>;
+}
+
+/**
+ * Tier-1 universal metrics — the consistent, cross-network data block populated
+ * for EVERY network by the cron's universal pass. Sector-specific enrichments
+ * (lending/dex/rwa/stablecoin) and curated copy live in their own blocks.
+ * Fees/revenue are NOT duplicated here — reuse `NetworkProfile.protocolFeesRevenue`.
+ */
+export interface UniversalMetrics {
+  identity: UniversalIdentity;
+  market: UniversalMarket;
+  tvl: UniversalTvl;
+  /** Holder count — no turnkey free API; curated/deferred (spec §C6). */
+  holderCount: Sourced<number | null>;
+  /** Resolved join keys (reused across refreshes). */
+  coingeckoId: string | null;
+  llamaSlug: string | null;
+  /** ISO timestamp this block was last synced (spec §C7). */
+  syncedAt: string;
+}
+
 export interface NetworkProfile {
   category: "Network";
   slug: string;
@@ -1513,6 +1594,8 @@ export interface NetworkProfile {
   arbitrumPortalMetadata: ArbitrumPortalMetadata;
   /** Protocol fees/revenue when this entity maps to a Llama protocol (DeFi Llama). */
   protocolFeesRevenue?: ProtocolFeesRevenue | null;
+  /** Tier-1 universal metrics — consistent cross-network block (cron-written). */
+  universalMetrics?: UniversalMetrics | null;
   /** DEX trading volume when this entity is a DEX (DeFi Llama). */
   dexVolume?: DexVolume | null;
   /** Options dex volume (DeFi Llama) — populated once `options` category is live. */

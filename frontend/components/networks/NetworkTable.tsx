@@ -12,7 +12,7 @@ import {
   subSectorBadgeTone,
 } from "@/lib/networkTaxonomy";
 import type { NetworkProfile, MemberCoinCategory } from "@/lib/types";
-import { formatUsdCompact } from "@/lib/utils";
+import { formatPct, formatUsdCompact } from "@/lib/utils";
 
 interface NetworkTableProps {
   profiles: NetworkProfile[];
@@ -44,6 +44,8 @@ export function NetworkTable({
             <TH>Network</TH>
             <TH>Coins</TH>
             <TH className="text-right">TVL</TH>
+            <TH className="text-right">Mkt cap</TH>
+            <TH className="text-right">24h</TH>
             {showStatus && <TH>Status</TH>}
             <TH className="text-right">Links</TH>
           </tr>
@@ -51,6 +53,10 @@ export function NetworkTable({
         <TBody>
           {profiles.map((p) => {
             const taxonomy = getNetworkTaxonomyBadges(p);
+            const u = p.universalMetrics;
+            const tvlUsd = u?.tvl.tvlUsd.value ?? p.currentScale.tvlUsd;
+            const mcapUsd = u?.market.marketCapUsd.value ?? p.currentScale.marketCapUsd;
+            const change24h = u?.market.priceChangePct.d1.value ?? null;
             return (
             <TR
               key={p.slug}
@@ -107,7 +113,21 @@ export function NetworkTable({
                 </div>
               </TD>
               <TD className="text-right font-mono text-ink-50">
-                {formatUsdCompact(p.currentScale.tvlUsd)}
+                {formatUsdCompact(tvlUsd)}
+              </TD>
+              <TD className="text-right font-mono text-ink-200">
+                {formatUsdCompact(mcapUsd)}
+              </TD>
+              <TD
+                className={
+                  change24h == null
+                    ? "text-right font-mono text-ink-500"
+                    : change24h >= 0
+                      ? "text-right font-mono text-emerald-400"
+                      : "text-right font-mono text-rose-400"
+                }
+              >
+                {change24h == null ? "—" : formatPct(change24h)}
               </TD>
               {showStatus && (
                 <TD>

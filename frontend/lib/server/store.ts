@@ -273,6 +273,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         // DeFi Llama overlays (written by the cron). Options/OI are scaffolded
         // for the coming-soon options/perpetuals categories.
         protocolFeesRevenue: item.ProtocolFeesRevenue ?? undefined,
+        universalMetrics: item.UniversalMetrics ?? undefined,
         dexVolume: item.DexVolume ?? undefined,
         optionsVolume: item.OptionsVolume ?? undefined,
         openInterest: item.OpenInterest ?? undefined,

@@ -97,6 +97,16 @@ function buildFacts(profile: NetworkProfile): AgentSkillFact[] {
     audits: profile.audits?.map((a) => ({ url: a.url })) ?? null,
   });
   const scale = profile.currentScale;
+  // Tier-1 universal metrics take precedence over curated/portal fallbacks.
+  const universal = profile.universalMetrics ?? null;
+  const chains = universal?.identity.chains.value?.length
+    ? universal.identity.chains.value
+    : meta.chains;
+  const founded = universal?.identity.foundedDate.value ?? meta.foundedDate ?? null;
+  const tvlUsd = universal?.tvl.tvlUsd.value ?? scale.tvlUsd;
+  const mcapUsd = universal?.market.marketCapUsd.value ?? scale.marketCapUsd;
+  const priceUsd = universal?.market.priceUsd.value ?? null;
+  const change24h = universal?.market.priceChangePct.d1.value ?? null;
 
   const facts: AgentSkillFact[] = [
     { key: "category", value: "Umbrella Entity" },
@@ -108,7 +118,7 @@ function buildFacts(profile: NetworkProfile): AgentSkillFact[] {
     },
     {
       key: "chains",
-      value: meta.chains.length ? meta.chains.join(", ") : "unspecified",
+      value: chains.length ? chains.join(", ") : "unspecified",
     },
     { key: "security", value: `${security.status} (${security.source})` },
     {
@@ -121,12 +131,16 @@ function buildFacts(profile: NetworkProfile): AgentSkillFact[] {
     },
   ];
 
-  if (meta.foundedDate) facts.push({ key: "founded", value: meta.foundedDate });
+  if (founded) facts.push({ key: "founded", value: founded });
 
-  const tvl = compactUsd(scale.tvlUsd);
+  const tvl = compactUsd(tvlUsd);
   if (tvl) facts.push({ key: "tvl", value: tvl });
-  const mcap = compactUsd(scale.marketCapUsd);
+  const mcap = compactUsd(mcapUsd);
   if (mcap) facts.push({ key: "marketCap", value: mcap });
+  if (priceUsd != null) {
+    facts.push({ key: "price", value: `$${priceUsd < 1 ? priceUsd.toFixed(4) : priceUsd.toFixed(2)}` });
+  }
+  if (change24h != null) facts.push({ key: "priceChange24h", value: `${change24h.toFixed(1)}%` });
   const users = compactNumber(scale.users);
   if (users) facts.push({ key: "users", value: users });
   if (scale.aprPct !== null) facts.push({ key: "apr", value: `${scale.aprPct}%` });

@@ -833,11 +833,11 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         "scale_labels": {
             "tvl": "Protocol TVL",
         },
-        # --- Lending taxonomy (Network -> Protocol -> Lending -> Money Markets) ---
+        # --- Credit taxonomy (Network -> Protocol -> Credit -> Lending) ---
         "sub_category": "Protocol",
-        "sector": "Lending",
-        "sub_sector": "Money Markets",
-        "tags": ["Money Markets"],
+        "sector": "Credit",
+        "sub_sector": "Lending",
+        "tags": ["Lending"],
         "competitors": [
             {
                 "name": "Morpho",
@@ -969,14 +969,9 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "notes": "Active Aave DAO — risk updates, listings, Aavenomics buybacks, Aave V4.",
             },
         },
-        "lending_tag_metrics": {
-            "moneyMarkets": {
-                "emissionsPerAsset": "AAVE/stkAAVE incentives vary by market; stablecoin markets receive significant emissions.",
-                "reserveFactorSummary": "Reserve factors 10–30% per asset; isolation mode and e-mode tiers available.",
-                "eModeUsage": "e-Mode enabled for correlated assets (stablecoins, ETH LSTs) across major chains.",
-                "notes": "Broadest multi-chain money market by TVL and asset coverage.",
-            },
-        },
+        # Legacy moneyMarkets tag-metric block dropped during the Credit
+        # migration (Option A); re-authoring curated Credit-tag metrics is deferred.
+        "credit_tag_metrics": {},
         "member_coins": [
             {
                 "slug": "gho",

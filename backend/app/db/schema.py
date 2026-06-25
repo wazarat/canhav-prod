@@ -58,25 +58,26 @@ NETWORK_SUBCATEGORIES = (
 )
 
 NETWORK_SECTORS = (
-    "Lending",
+    "Credit",
     "Perpetuals",
     "Yield",
     "DEX",
     "Options",
     "Stablecoin",
     "RWA",
+    "Staking",
 )
 
-# Lending sub-sectors (PDF "Further sub categories within lending").
-# Also used as lending tags — networks may carry multiple tags from this set.
-LENDING_SUBSECTORS = (
-    "Money Markets",
-    "Isolated / Curated Lending",
-    "Stablecoin-Native Credit Stack",
-    "Liquidity Hybrid",
-    "Institutional / Private Credit",
+# Credit-sector tags (replaces the legacy 5-value lending taxonomy).
+# Networks may carry multiple tags from this set.
+CREDIT_TAGS = (
+    "Lending",          # Aave V3, Compound, Morpho, Radiant, Spark
+    "Leveraged Yield",  # Gearbox, Stella, Extra Finance
+    "Fixed Income",     # Pendle, Notional, Spectra, Sense
 )
-LENDING_TAGS = LENDING_SUBSECTORS
+# Backward-compat aliases used across validation/ingest during the migration.
+LENDING_SUBSECTORS = CREDIT_TAGS
+LENDING_TAGS = CREDIT_TAGS
 
 # Legacy primary sectors — prefer DEX sub-sector "Perpetuals" + secondarySectors.
 LEGACY_NETWORK_SECTORS = ("Perpetuals", "Yield", "Options")
@@ -161,6 +162,26 @@ RWA_SECONDARY_TAGS = (
     "Wound-Down",
 )
 
+# Staking sub-sectors — the three staking tags (canhav-staking spec §2.2).
+STAKING_SUBSECTORS = (
+    "Liquid Staking",
+    "Restaking",
+    "Liquid Restaking",
+)
+
+STAKING_SECONDARY_TAGS = (
+    "Exchange-Native",
+    "Non-Custodial",
+    "Permissionless-Operators",
+    "Native-Restaking",
+    "Multi-Asset",
+    "Multi-Chain",
+    "LST-Backed-Basket",
+    "EigenLayer-Strategy-Manager",
+    "CDP-Integrated",
+    "L2-Ecosystem",
+)
+
 ASSET_SUBTYPES = (
     "fiat-stablecoin",
     "synthetic-dollar",
@@ -192,7 +213,7 @@ PEG_MECHANISMS = (
 # Cross-sector matrix (ontology §7): slug -> required secondary sectors.
 CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
     "aave": ("Stablecoin",),
-    "sky": ("Lending",),
+    "sky": ("Credit",),
     "spark": ("Stablecoin",),
     "curve-finance": ("Stablecoin",),
     "jupiter": ("Stablecoin", "Perpetuals"),
@@ -204,10 +225,10 @@ CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
     "ethena": ("RWA", "Yield"),
     "anzen": ("RWA",),
     "usd-ai": ("Stablecoin", "RWA"),
-    "frax": ("RWA",),
-    "centrifuge": ("Lending",),
-    "goldfinch": ("Lending",),
-    "clearpool": ("Lending",),
+    "frax": ("RWA", "Staking"),
+    "centrifuge": ("Credit",),
+    "goldfinch": ("Credit",),
+    "clearpool": ("Credit",),
     "maple": ("RWA",),
 }
 

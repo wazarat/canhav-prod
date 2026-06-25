@@ -310,8 +310,8 @@ export const CATEGORIES: CategoryDef[] = [
   },
   {
     slug: "lending",
-    label: "Lending / Borrowing",
-    description: "Money markets, rates, and collateral risk.",
+    label: "Credit",
+    description: "Lending money markets, leveraged yield, and fixed income.",
     status: "coming_soon",
   },
   {

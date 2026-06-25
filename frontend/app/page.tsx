@@ -64,7 +64,7 @@ export default async function DashboardPage() {
           <span className="text-gradient-brand">DeFi ecosystem</span>.
         </h1>
         <p className="text-lg text-ink-300">
-          Research-grade taxonomy and datasets across stablecoins, RWAs, networks, tokens, lending,
+          Research-grade taxonomy and datasets across stablecoins, RWAs, networks, tokens, credit,
           perpetuals and more — published as soon as data is ingested and synced.
         </p>
         <div className="flex flex-wrap gap-3">

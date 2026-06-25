@@ -104,16 +104,21 @@ export function morphoMetricsToLendingOverlay(metrics: MorphoLiveMetrics) {
 }
 
 export function morphoMetricsToTagOverlay(metrics: MorphoLiveMetrics) {
+  const sourced = (value: number | null, label = "Morpho API") => ({
+    value,
+    dataSource: "live" as const,
+    sourceLabel: label,
+    updatedAt: nowIso(),
+  });
+
+  // Credit-sector re-key (Option A): Morpho carries the "Lending" tag, so live
+  // vault aggregates overlay the CreditTagMetrics.lending (LendingMarketMetrics)
+  // block. vaultCount is used as the isolated-market proxy.
   return {
-    isolatedCurated: {
-      vaultCount: metrics.vaultCount,
-      curatorCount: metrics.curatorCount,
-      topCurators: metrics.topCurators.map((c) => ({
-        name: c.name,
-        aumUsd: c.aumUsd,
-        feeTakeRatePct: null,
-      })),
-      notes: "Live vault aggregates from api.morpho.org/graphql.",
+    lending: {
+      ...(metrics.tvlUsd != null ? { totalSuppliedUsd: sourced(metrics.tvlUsd) } : {}),
+      ...(metrics.supplyApyPct != null ? { supplyApyPct: sourced(metrics.supplyApyPct) } : {}),
+      ...(metrics.vaultCount != null ? { isolatedMarketCount: metrics.vaultCount } : {}),
     },
   };
 }

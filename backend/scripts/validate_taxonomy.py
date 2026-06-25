@@ -55,7 +55,7 @@ def _entity_member_coin_keys(item: Dict[str, Any]) -> Set[Tuple[str, str]]:
 def _is_lending_entity(item: Dict[str, Any]) -> bool:
     sector = item.get("Sector")
     secondary = item.get("SecondarySectors") or []
-    return sector == "Lending" or "Lending" in secondary
+    return sector == "Credit" or "Credit" in secondary
 
 
 def _is_audited_entity(item: Dict[str, Any], audit_slugs: Set[str]) -> bool:
@@ -64,9 +64,9 @@ def _is_audited_entity(item: Dict[str, Any], audit_slugs: Set[str]) -> bool:
         return False
     sector = item.get("Sector")
     secondary = item.get("SecondarySectors") or []
-    if sector in ("Lending", "Stablecoin", "RWA"):
+    if sector in ("Credit", "Stablecoin", "RWA"):
         return True
-    if any(s in ("Lending", "Stablecoin", "RWA") for s in secondary):
+    if any(s in ("Credit", "Stablecoin", "RWA") for s in secondary):
         return True
     return slug in audit_slugs
 
@@ -79,14 +79,16 @@ def _find_store_item(items: Dict[str, Any], category: str, slug: str) -> Optiona
 
 
 def _sector_subsector_sets(sector: Optional[str]) -> Tuple[Optional[Tuple[str, ...]], Optional[Tuple[str, ...]]]:
-    if sector == "Lending":
-        return schema.LENDING_SUBSECTORS, schema.LENDING_TAGS
+    if sector == "Credit":
+        return schema.CREDIT_TAGS, schema.CREDIT_TAGS
     if sector == "Stablecoin":
         return schema.STABLECOIN_SUBSECTORS, schema.STABLECOIN_SECONDARY_TAGS
     if sector == "DEX":
         return schema.DEX_SUBSECTORS, schema.DEX_SECONDARY_TAGS
     if sector == "RWA":
         return schema.RWA_SUBSECTORS, schema.RWA_SECONDARY_TAGS
+    if sector == "Staking":
+        return schema.STAKING_SUBSECTORS, schema.STAKING_SECONDARY_TAGS
     return None, None
 
 
@@ -108,13 +110,14 @@ def validate_entity_spec(slug: str, spec: Dict[str, Any], errors: List[str]) -> 
             errors.append(f"{slug}: invalid secondary sector {s!r}")
 
     for tag in spec.get("tags") or []:
-        if tag not in schema.LENDING_TAGS:
-            errors.append(f"{slug}: invalid lending tag {tag!r}")
+        if tag not in schema.CREDIT_TAGS:
+            errors.append(f"{slug}: invalid credit tag {tag!r}")
 
     for field, allowed in (
         ("stablecoin_sub_sector", schema.STABLECOIN_SUBSECTORS),
         ("dex_sub_sector", schema.DEX_SUBSECTORS),
         ("rwa_sub_sector", schema.RWA_SUBSECTORS),
+        ("staking_sub_sector", schema.STAKING_SUBSECTORS),
     ):
         val = spec.get(field)
         if val and val not in allowed:
@@ -124,6 +127,7 @@ def validate_entity_spec(slug: str, spec: Dict[str, Any], errors: List[str]) -> 
         ("stablecoin_secondary_tags", schema.STABLECOIN_SECONDARY_TAGS),
         ("dex_secondary_tags", schema.DEX_SECONDARY_TAGS),
         ("rwa_secondary_tags", schema.RWA_SECONDARY_TAGS),
+        ("staking_secondary_tags", schema.STAKING_SECONDARY_TAGS),
     ):
         for tag in spec.get(field) or []:
             if tag not in allowed:
@@ -176,6 +180,8 @@ def validate_store_items(items: Dict[str, Any]) -> Tuple[List[str], List[str]]:
                 "dex_secondary_tags": item.get("DexSecondaryTags"),
                 "rwa_sub_sector": item.get("RwaSubSector"),
                 "rwa_secondary_tags": item.get("RwaSecondaryTags"),
+                "staking_sub_sector": item.get("StakingSubSector"),
+                "staking_secondary_tags": item.get("StakingSecondaryTags"),
             }
             validate_entity_spec(slug, spec_like, errors)
 
@@ -425,7 +431,7 @@ def _tvl_source_hint(item: Dict[str, Any], items: Dict[str, Any]) -> str:
     scale = item.get("CurrentScale") or {}
     if scale.get("tvlUsd") is not None:
         return "CurrentScale.tvlUsd"
-    if sector == "Lending":
+    if sector == "Credit":
         lending = item.get("Lending") or {}
         tvl = lending.get("tvlUsd") or {}
         if tvl.get("value") is not None:
@@ -465,7 +471,7 @@ def report_missing_tvl(items: Dict[str, Any]) -> List[Dict[str, Any]]:
             continue
         slug = item.get("Slug", "")
         sector = item.get("Sector")
-        if sector not in ("Lending", "Stablecoin", "RWA", "DEX") and slug not in ALL_MEMBER_COIN_AUDIT:
+        if sector not in ("Credit", "Stablecoin", "RWA", "DEX") and slug not in ALL_MEMBER_COIN_AUDIT:
             continue
 
         scale = item.get("CurrentScale") or {}
@@ -551,7 +557,7 @@ def _matches_sector_cohort(item: Dict[str, Any], sector: str) -> bool:
 
 
 def _is_lending_cohort_entity(item: Dict[str, Any]) -> bool:
-    return _matches_sector_cohort(item, "Lending")
+    return _matches_sector_cohort(item, "Credit")
 
 
 def _is_stablecoin_cohort_entity(item: Dict[str, Any]) -> bool:
@@ -673,10 +679,10 @@ def _gaps_for_cohort(
 
 
 def report_member_coin_data_gaps(items: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Flag member coins missing any live-data path across Lending/Stablecoin/RWA/DEX."""
+    """Flag member coins missing any live-data path across Credit/Stablecoin/RWA/DEX."""
     gaps: List[Dict[str, Any]] = []
     for cohort_name, predicate in [
-        ("Lending", _is_lending_cohort_entity),
+        ("Credit", _is_lending_cohort_entity),
         ("Stablecoin", _is_stablecoin_cohort_entity),
         ("RWA", _is_rwa_cohort_entity),
         ("DEX", _is_dex_cohort_entity),
@@ -687,7 +693,7 @@ def report_member_coin_data_gaps(items: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 def print_member_coin_data_gap_report(gaps: List[Dict[str, Any]]) -> None:
     if not gaps:
-        print("\nMember-coin data gaps: none across Lending/Stablecoin/RWA/DEX cohorts.")
+        print("\nMember-coin data gaps: none across Credit/Stablecoin/RWA/DEX cohorts.")
         return
 
     by_cohort: Dict[str, List[Dict[str, Any]]] = {}
@@ -695,7 +701,7 @@ def print_member_coin_data_gap_report(gaps: List[Dict[str, Any]]) -> None:
         by_cohort.setdefault(row["cohort"], []).append(row)
 
     print(f"\nMember-coin data gaps ({len(gaps)} total):\n")
-    for cohort_name in ("Lending", "Stablecoin", "RWA", "DEX"):
+    for cohort_name in ("Credit", "Stablecoin", "RWA", "DEX"):
         cohort_gaps = by_cohort.get(cohort_name, [])
         if not cohort_gaps:
             print(f"  {cohort_name}: none")

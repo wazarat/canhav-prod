@@ -6,11 +6,11 @@ import { DataPanel } from "@/components/ui/DataPanel";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import type {
   Competitor,
+  CreditTag,
+  CreditTagMetrics,
   DexMetrics,
   DexSubSectorMetrics,
   LendingMetrics,
-  LendingTag,
-  LendingTagMetrics,
   MemberCoinRef,
   NetworkComponent,
   NetworkEvent,
@@ -645,12 +645,10 @@ export function LendingMetricsSection({ lending }: { lending?: LendingMetrics | 
   );
 }
 
-const TAG_TO_METRICS_KEY: Record<LendingTag, keyof LendingTagMetrics> = {
-  "Isolated / Curated Lending": "isolatedCurated",
-  "Stablecoin-Native Credit Stack": "stablecoinNative",
-  "Liquidity Hybrid": "liquidityHybrid",
-  "Institutional / Private Credit": "institutionalCredit",
-  "Money Markets": "moneyMarkets",
+const TAG_TO_METRICS_KEY: Record<CreditTag, keyof CreditTagMetrics> = {
+  Lending: "lending",
+  "Leveraged Yield": "leveragedYield",
+  "Fixed Income": "fixedIncome",
 };
 
 function TagMetricRow({ label, value }: { label: string; value: string | number | null | undefined }) {
@@ -664,12 +662,12 @@ function TagMetricRow({ label, value }: { label: string; value: string | number 
   );
 }
 
-export function LendingTagMetricsSection({
+export function CreditTagMetricsSection({
   tags,
   metrics,
 }: {
-  tags?: LendingTag[];
-  metrics?: LendingTagMetrics | null;
+  tags?: CreditTag[];
+  metrics?: CreditTagMetrics | null;
 }) {
   if (!metrics || !tags?.length) return null;
 
@@ -679,104 +677,57 @@ export function LendingTagMetricsSection({
       const block = metrics[key];
       if (!block) return null;
 
-      if (key === "isolatedCurated" && block && "isolatedMarketCount" in block) {
-        const m = block;
+      if (key === "lending") {
+        const m = block as NonNullable<CreditTagMetrics["lending"]>;
         return (
           <DataPanel key={tag} title={tag}>
-            <div className="divide-y divide-ink-800/60">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              <MetricTile label="Total supplied" sourced={m.totalSuppliedUsd} kind="usd" />
+              <MetricTile label="Total borrows" sourced={m.totalBorrowsUsd} kind="usd" />
+              <MetricTile label="Utilization" sourced={m.utilizationPct} kind="pct" />
+              <MetricTile label="Supply APY" sourced={m.supplyApyPct} kind="pct" />
+              <MetricTile label="Borrow APY" sourced={m.borrowApyPct} kind="pct" />
+            </div>
+            <div className="mt-3 divide-y divide-ink-800/60">
               <TagMetricRow label="Isolated markets" value={m.isolatedMarketCount} />
-              <TagMetricRow label="Vaults" value={m.vaultCount} />
-              <TagMetricRow label="Curators" value={m.curatorCount} />
-              <TagMetricRow label="Vault TVL share" value={m.vaultTvlSharePct != null ? `${m.vaultTvlSharePct}%` : null} />
-              <TagMetricRow label="Curator fee take-rate" value={m.curatorFeeTakeRatePct != null ? `${m.curatorFeeTakeRatePct}%` : null} />
-              <TagMetricRow label="LLTV distribution" value={m.lltvDistribution} />
-              {m.topCurators && m.topCurators.length > 0 && (
-                <CuratedRow
-                  label="Top curators (AUM)"
-                  text={m.topCurators
-                    .map((c) => `${c.name}${c.aumUsd != null ? ` · ${fmtUsd(c.aumUsd)}` : ""}`)
-                    .join(" · ")}
-                />
-              )}
-              <TagMetricRow label="Notes" value={m.notes} />
+              <CuratedRow label="Collateral assets" chips={m.collateralAssets} />
+              <CuratedRow label="Oracles" chips={m.oracles} />
             </div>
           </DataPanel>
         );
       }
 
-      if (key === "stablecoinNative" && block && "ssrPct" in block) {
-        const m = block;
+      if (key === "leveragedYield") {
+        const m = block as NonNullable<CreditTagMetrics["leveragedYield"]>;
         return (
           <DataPanel key={tag} title={tag}>
-            <div className="divide-y divide-ink-800/60">
-              <TagMetricRow label="USDS minted" value={m.usdsMintedUsd != null ? fmtUsd(m.usdsMintedUsd) : null} />
-              <TagMetricRow label="DAI routed" value={m.daiRoutedUsd != null ? fmtUsd(m.daiRoutedUsd) : null} />
-              <TagMetricRow label="Sky Savings Rate" value={m.ssrPct != null ? `${m.ssrPct}%` : null} />
-              <TagMetricRow label="SSR balance" value={m.ssrBalanceUsd != null ? fmtUsd(m.ssrBalanceUsd) : null} />
-              <CuratedRow label="SLL venues" chips={m.sllVenues} />
-              <TagMetricRow label="SSR-linked TVL" value={m.ssrLinkedTvlUsd != null ? fmtUsd(m.ssrLinkedTvlUsd) : null} />
-              <TagMetricRow label="Notes" value={m.notes} />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              <MetricTile label="TVL" sourced={m.tvlUsd} kind="usd" />
+              <MetricTile label="Borrow APY" sourced={m.borrowApyPct} kind="pct" />
+            </div>
+            <div className="mt-3 divide-y divide-ink-800/60">
+              <TagMetricRow label="Max leverage" value={m.maxLeverageX != null ? `${m.maxLeverageX}x` : null} />
+              <TagMetricRow label="Borrow model" value={m.borrowModel} />
+              <CuratedRow label="Supported strategies" chips={m.supportedStrategies} />
+              <CuratedRow label="Integrated protocols" chips={m.integratedProtocols} />
             </div>
           </DataPanel>
         );
       }
 
-      if (key === "liquidityHybrid" && block && "capitalEfficiencyMultiplier" in block) {
-        const m = block;
+      if (key === "fixedIncome") {
+        const m = block as NonNullable<CreditTagMetrics["fixedIncome"]>;
         return (
           <DataPanel key={tag} title={tag}>
-            <div className="divide-y divide-ink-800/60">
-              <TagMetricRow label="Capital-efficiency multiplier" value={m.capitalEfficiencyMultiplier != null ? `${m.capitalEfficiencyMultiplier}x` : null} />
-              <TagMetricRow label="Smart-collateral TVL" value={m.smartCollateralTvlUsd != null ? fmtUsd(m.smartCollateralTvlUsd) : null} />
-              <TagMetricRow label="Smart-debt TVL" value={m.smartDebtTvlUsd != null ? fmtUsd(m.smartDebtTvlUsd) : null} />
-              <TagMetricRow label="DEX volume tied to lending" value={m.dexVolumeTiedUsd != null ? fmtUsd(m.dexVolumeTiedUsd) : null} />
-              <TagMetricRow label="Shared-liquidity utilization" value={m.sharedLiquidityUtilizationPct != null ? `${m.sharedLiquidityUtilizationPct}%` : null} />
-              <TagMetricRow label="Notes" value={m.notes} />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              <MetricTile label="TVL" sourced={m.tvlUsd} kind="usd" />
+              <MetricTile label="Fixed APY" sourced={m.fixedApyPct} kind="pct" />
+              <MetricTile label="Implied yield" sourced={m.impliedYieldPct} kind="pct" />
             </div>
-          </DataPanel>
-        );
-      }
-
-      if (key === "institutionalCredit" && block && "activeBorrowerCount" in block) {
-        const m = block;
-        return (
-          <DataPanel key={tag} title={tag}>
-            <div className="divide-y divide-ink-800/60">
-              <TagMetricRow label="Active borrowers" value={m.activeBorrowerCount} />
-              <TagMetricRow label="Default rate (lifetime)" value={m.defaultRateLifetimePct != null ? `${m.defaultRateLifetimePct}%` : null} />
-              <TagMetricRow label="Default rate (12m)" value={m.defaultRate12mPct != null ? `${m.defaultRate12mPct}%` : null} />
-              <TagMetricRow label="Weighted avg maturity" value={m.weightedAvgMaturityDays != null ? `${m.weightedAvgMaturityDays} days` : null} />
-              <TagMetricRow label="KYC pool TVL" value={m.kycPoolTvlUsd != null ? fmtUsd(m.kycPoolTvlUsd) : null} />
-              <TagMetricRow label="Permissionless pool TVL" value={m.permissionlessPoolTvlUsd != null ? fmtUsd(m.permissionlessPoolTvlUsd) : null} />
-              <TagMetricRow label="Over-collateralized split" value={m.overCollateralizedPct != null ? `${m.overCollateralizedPct}%` : null} />
-              <TagMetricRow label="Under-collateralized split" value={m.underCollateralizedPct != null ? `${m.underCollateralizedPct}%` : null} />
-              <TagMetricRow label="Cumulative originations" value={m.cumulativeOriginationsUsd != null ? fmtUsd(m.cumulativeOriginationsUsd) : null} />
-              <TagMetricRow label="syrupUSDC pool" value={m.syrupUsdcPoolUsd != null ? fmtUsd(m.syrupUsdcPoolUsd) : null} />
-              <TagMetricRow label="syrupUSDT pool" value={m.syrupUsdtPoolUsd != null ? fmtUsd(m.syrupUsdtPoolUsd) : null} />
-              <TagMetricRow label="stSYRUP staked supply" value={m.stSyrupStakedSupply} />
-              {m.poolDelegates && m.poolDelegates.length > 0 && (
-                <CuratedRow
-                  label="Pool delegates"
-                  text={m.poolDelegates
-                    .map((d) => `${d.name}${d.aumUsd != null ? ` · ${fmtUsd(d.aumUsd)}` : ""}`)
-                    .join(" · ")}
-                />
-              )}
-              <TagMetricRow label="Notes" value={m.notes} />
-            </div>
-          </DataPanel>
-        );
-      }
-
-      if (key === "moneyMarkets" && block && "emissionsPerAsset" in block) {
-        const m = block;
-        return (
-          <DataPanel key={tag} title={tag}>
-            <div className="divide-y divide-ink-800/60">
-              <TagMetricRow label="Token emissions per asset" value={m.emissionsPerAsset} />
-              <TagMetricRow label="Reserve factor" value={m.reserveFactorSummary} />
-              <TagMetricRow label="E-mode / efficiency mode" value={m.eModeUsage} />
-              <TagMetricRow label="Notes" value={m.notes} />
+            <div className="mt-3 divide-y divide-ink-800/60">
+              <TagMetricRow label="Active markets" value={m.markets} />
+              <TagMetricRow label="Mechanism" value={m.mechanism} />
+              <CuratedRow label="Maturities" chips={m.maturities} />
             </div>
           </DataPanel>
         );
@@ -789,10 +740,10 @@ export function LendingTagMetricsSection({
   if (panels.length === 0) return null;
 
   return (
-    <section id="lending-tags" className="scroll-mt-24 space-y-4">
+    <section id="credit-tags" className="scroll-mt-24 space-y-4">
       <SectionHeading
         title="Tag-specific metrics"
-        subtitle="Curated metrics for each lending tag on this network."
+        subtitle="Curated metrics for each credit tag on this network."
       />
       <div className="space-y-4">{panels}</div>
     </section>

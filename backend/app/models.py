@@ -522,10 +522,15 @@ class EntityProfile(BaseModel):
     dexSecondaryTags: List[str] = Field(default_factory=list)
     rwaSubSector: Optional[str] = None
     rwaSecondaryTags: List[str] = Field(default_factory=list)
+    stakingSubSector: Optional[str] = None
+    stakingSecondaryTags: List[str] = Field(default_factory=list)
     childEntities: List[str] = Field(default_factory=list)
     # Ranked competitors (top->bottom) + sector metrics; passthrough dicts.
     competitors: List[dict] = Field(default_factory=list)
     lending: Optional[dict] = None
+    # Credit tag-specific metric blocks (CreditTagMetrics). Field `lending`
+    # above retains its name per the Lending→Credit migration naming note.
+    creditTagMetrics: Optional[dict] = None
     stablecoin: Optional[dict] = None
     dex: Optional[dict] = None
     rwa: Optional[dict] = None
@@ -578,12 +583,16 @@ class EntityProfile(BaseModel):
             "DexSecondaryTags": self.dexSecondaryTags or None,
             "RwaSubSector": self.rwaSubSector,
             "RwaSecondaryTags": self.rwaSecondaryTags or None,
+            "StakingSubSector": self.stakingSubSector,
+            "StakingSecondaryTags": self.stakingSecondaryTags or None,
             "ChildEntities": self.childEntities or None,
             "Competitors": self.competitors,
             "Lending": self.lending,
+            "CreditTagMetrics": self.creditTagMetrics,
             "Stablecoin": self.stablecoin,
             "Dex": self.dex,
             "Rwa": self.rwa,
+            "Staking": self.staking,
             "Partnerships": [p.model_dump() for p in self.partnerships],
             "CurrentScale": self.currentScale.model_dump(),
             "MemberCoins": [m.model_dump() for m in self.memberCoins],
@@ -636,12 +645,16 @@ class EntityProfile(BaseModel):
             dexSecondaryTags=item.get("DexSecondaryTags") or [],
             rwaSubSector=item.get("RwaSubSector"),
             rwaSecondaryTags=item.get("RwaSecondaryTags") or [],
+            stakingSubSector=item.get("StakingSubSector"),
+            stakingSecondaryTags=item.get("StakingSecondaryTags") or [],
             childEntities=item.get("ChildEntities") or [],
             competitors=item.get("Competitors") or [],
             lending=item.get("Lending"),
+            creditTagMetrics=item.get("CreditTagMetrics") or item.get("LendingTagMetrics"),
             stablecoin=item.get("Stablecoin"),
             dex=item.get("Dex"),
             rwa=item.get("Rwa"),
+            staking=item.get("Staking"),
             memberCoins=[MemberCoinRef(**m) for m in (item.get("MemberCoins") or [])],
             protocolFeesRevenue=item.get("ProtocolFeesRevenue"),
             dexVolume=item.get("DexVolume"),

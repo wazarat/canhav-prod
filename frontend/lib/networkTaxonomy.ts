@@ -10,7 +10,7 @@ export interface NetworkTaxonomyBadges {
 /** Sector chip tone per ontology §9. */
 export function sectorBadgeTone(sector: string | null | undefined): BadgeTone {
   switch (sector) {
-    case "Lending":
+    case "Credit":
       return "electric";
     case "DEX":
       return "neon";
@@ -18,6 +18,8 @@ export function sectorBadgeTone(sector: string | null | undefined): BadgeTone {
       return "signal";
     case "RWA":
       return "warning";
+    case "Staking":
+      return "positive";
     default:
       return "neutral";
   }
@@ -43,6 +45,11 @@ export function tagsForSector(profile: NetworkProfile, sector: string): string[]
   }
   if (sector === "Stablecoin") {
     return [profile.stablecoinSubSector, ...(profile.stablecoinSecondaryTags ?? [])].filter(
+      Boolean,
+    ) as string[];
+  }
+  if (sector === "Staking") {
+    return [profile.stakingSubSector, ...(profile.stakingSecondaryTags ?? [])].filter(
       Boolean,
     ) as string[];
   }

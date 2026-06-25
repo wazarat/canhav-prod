@@ -27,6 +27,30 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+# Lending→Credit migration: collapse the legacy 5-value lending taxonomy into
+# the new 3-value Credit tags (see canhav-credit-implementation-spec §5).
+_CREDIT_TAG_MIGRATION: Dict[str, str] = {
+    "Money Markets": "Lending",
+    "Isolated / Curated Lending": "Lending",
+    "Stablecoin-Native Credit Stack": "Lending",
+    "Institutional / Private Credit": "Lending",
+    "Liquidity Hybrid": "Leveraged Yield",
+    # New tags pass through unchanged.
+    "Lending": "Lending",
+    "Leveraged Yield": "Leveraged Yield",
+    "Fixed Income": "Fixed Income",
+}
+
+
+def _migrate_credit_tags(tags: List[str]) -> List[str]:
+    """Map legacy lending tags to Credit tags, de-duplicating while preserving order."""
+    out: List[str] = []
+    for tag in tags:
+        mapped = _CREDIT_TAG_MIGRATION.get(tag, tag)
+        if mapped not in out:
+            out.append(mapped)
+    return out or ["Lending"]
+
 
 def _empty_scale() -> Dict[str, Any]:
     return {
@@ -78,8 +102,17 @@ def _net(
     scale_labels: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     """Build a lending-network spec, filling the editorial defaults that
-    `build_entity_item` expects so each entry stays focused on real content."""
-    tag_list = tags if tags is not None else [sub_sector]
+    `build_entity_item` expects so each entry stays focused on real content.
+
+    Lending→Credit migration: the legacy 5-value lending taxonomy is collapsed
+    into the new 3-value Credit tags via `_CREDIT_TAG_MIGRATION`, and the sector
+    string becomes "Credit". The legacy `lending_tag_metrics` blocks
+    (isolatedCurated / stablecoinNative / liquidityHybrid / institutionalCredit /
+    moneyMarkets) have no home in the new CreditTagMetrics shape and are dropped;
+    re-authoring curated tag metrics for the new Credit tags is deferred.
+    """
+    raw_tags = tags if tags is not None else [sub_sector]
+    tag_list = _migrate_credit_tags(raw_tags)
     return {
         "name": name,
         "symbol": symbol,
@@ -104,12 +137,13 @@ def _net(
         "scale_labels": scale_labels or {"tvl": "Protocol TVL"},
         # Taxonomy hierarchy.
         "sub_category": "Protocol",
-        "sector": "Lending",
+        "sector": "Credit",
         "sub_sector": tag_list[0],
         "tags": tag_list,
         "competitors": competitors,
         "lending": lending,
-        "lending_tag_metrics": lending_tag_metrics or {},
+        # Legacy tag-metric blocks dropped during the Credit migration (Option A).
+        "credit_tag_metrics": {},
         "member_coins": member_coins,
         "portal_defaults": _portal_defaults(chains),
     }

@@ -30,7 +30,7 @@ export function NetworkTableWithFilter({
   const [sector, setSector] = useState<string | "all">("all");
   const [tagFilter, setTagFilter] = useState<string | "all">("all");
 
-  // Sectors present in the data (e.g. "Lending"), for the taxonomy filter row.
+  // Sectors present in the data (e.g. "Credit"), for the taxonomy filter row.
   // Includes secondary (cross-tagged) sectors so multi-sector entities surface
   // under every sector they belong to.
   const sectors = useMemo(() => {
@@ -43,7 +43,7 @@ export function NetworkTableWithFilter({
   }, [profiles]);
 
   // Sub-sector / tags available for the selected sector. Sector-aware so DEX
-  // and RWA surface their own sub-sector + secondary tags, not just lending tags.
+  // and RWA surface their own sub-sector + secondary tags, not just credit tags.
   const sectorTags = useMemo(() => {
     if (sector === "all") return [];
     const set = new Set<string>();
@@ -67,7 +67,7 @@ export function NetworkTableWithFilter({
         Boolean,
       ) as string[];
     }
-    // Lending + default: multi-tag vocabulary, falling back to subSector.
+    // Credit + default: multi-tag vocabulary, falling back to subSector.
     return p.tags ?? (p.subSector ? [p.subSector] : []);
   }
 

@@ -237,7 +237,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         tags: item.Tags ?? (item.SubSector ? [item.SubSector] : []),
         competitors: item.Competitors ?? [],
         lending: item.Lending ?? null,
-        lendingTagMetrics: item.LendingTagMetrics ?? null,
+        creditTagMetrics: item.CreditTagMetrics ?? item.LendingTagMetrics ?? null,
         stablecoinSubSector: item.StablecoinSubSector ?? null,
         stablecoinSecondaryTags: item.StablecoinSecondaryTags ?? undefined,
         stablecoin: item.Stablecoin ?? null,
@@ -247,6 +247,9 @@ export async function readLiveStore(): Promise<LiveStore> {
         rwaSubSector: item.RwaSubSector ?? null,
         rwaSecondaryTags: item.RwaSecondaryTags ?? undefined,
         rwa: item.Rwa ?? null,
+        stakingSubSector: item.StakingSubSector ?? null,
+        stakingSecondaryTags: item.StakingSecondaryTags ?? undefined,
+        staking: item.Staking ?? null,
         childEntities: item.ChildEntities ?? undefined,
         currentScale: {
           tvlUsd: null,

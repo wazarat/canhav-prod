@@ -415,13 +415,13 @@ def main(argv: List[str]) -> int:
     if llama_price_updated:
         print(f"Llama price: refreshed {llama_price_updated} token(s) (contract price fallback).")
 
-    # --- Lending networks: DeFi Llama live protocol TVL --------------------
-    # Run before DEX/RWA so a slow DEX volume fetch cannot block lending TVL.
+    # --- Credit networks: DeFi Llama live protocol TVL ---------------------
+    # Run before DEX/RWA so a slow DEX volume fetch cannot block credit TVL.
     lending_updated = 0
     for item in items:
         if item.get("Category") != schema.CATEGORY_ENTITY:
             continue
-        if item.get("Sector") != "Lending":
+        if item.get("Sector") != "Credit":
             continue
         slug = _slug_of(item)
         if defillama.llama_lending_project_for_slug(slug) is None:

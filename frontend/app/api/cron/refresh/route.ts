@@ -938,15 +938,15 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
   }
 
-  // --- Lending networks: DeFi Llama live metrics ---------------------------
-  // For each network tagged sector "Lending", overlay live supply/borrow/APY/
+  // --- Credit networks: DeFi Llama live metrics ----------------------------
+  // For each network tagged sector "Credit", overlay live supply/borrow/APY/
   // utilization (yields /poolsBorrow), protocol TVL, and fees/revenue onto the
-  // curated `Lending` block. Curated string/array fields (risk params, oracles,
-  // bad debt, audit history) are preserved.
+  // curated `Lending` block (field name retained per migration). Curated
+  // string/array fields (risk params, oracles, bad debt, audit) are preserved.
   const lendingItems = items.filter(
     (it) =>
       isNetworkCategory(String(it.Category ?? "")) &&
-      String(it.Sector ?? "") === "Lending" &&
+      String(it.Sector ?? "") === "Credit" &&
       llamaLendingProjectForSlug(String(it.Slug ?? "")) !== null,
   );
   const lendingResults: { slug: string; tvlUsd: number | null; utilizationPct: number | null }[] =
@@ -1146,8 +1146,8 @@ export async function GET(req: Request): Promise<NextResponse> {
         ...(morphoItem.Lending ?? {}),
         ...morphoMetricsToLendingOverlay(morphoMetrics),
       };
-      morphoItem.LendingTagMetrics = {
-        ...(morphoItem.LendingTagMetrics ?? {}),
+      morphoItem.CreditTagMetrics = {
+        ...(morphoItem.CreditTagMetrics ?? morphoItem.LendingTagMetrics ?? {}),
         ...morphoMetricsToTagOverlay(morphoMetrics),
       };
       morphoItem.CurrentScale = {
@@ -1298,7 +1298,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     else if (slug === "justlend") label = "TronGrid / JustLend";
     else if (String(item.Sector ?? "") === "Stablecoin") label = "Member supply sum";
     else if (String(item.Sector ?? "") === "DEX") label = "DeFi Llama DEX TVL";
-    else if (String(item.Sector ?? "") === "Lending") label = "DeFi Llama lending TVL";
+    else if (String(item.Sector ?? "") === "Credit") label = "DeFi Llama lending TVL";
     else if (String(item.Sector ?? "") === "RWA") label = "DeFi Llama RWA AUM";
     if (syncUniversalTvlFromCurrentScale(item, label)) {
       item.UpdatedAt = nowIso();

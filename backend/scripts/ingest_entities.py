@@ -622,11 +622,11 @@ ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "bannerUrl": None,
             "portalUrl": None,
         },
-        # Primary Lending per ontology §6.1 / §7; stablecoin sub-sector is secondary.
+        # Primary Credit per ontology §6.1 / §7; stablecoin sub-sector is secondary.
         "sub_category": "Protocol",
-        "sector": "Lending",
-        "sub_sector": "Institutional / Private Credit",
-        "tags": ["Institutional / Private Credit"],
+        "sector": "Credit",
+        "sub_sector": "Lending",
+        "tags": ["Lending"],
         "secondary_sectors": ["Stablecoin", "RWA"],
         "stablecoin_sub_sector": "RWA-Backed Stable",
         "stablecoin_secondary_tags": ["RWA-Backed"],
@@ -1099,11 +1099,13 @@ for _slug, (_subsector, _tags) in _STABLECOIN_SECONDARY_BACKFILL.items():
 # are secondary *tags* not sectors, so Mountain and Bitget get none here.
 _SECONDARY_SECTORS: Dict[str, List[str]] = {
     # Primary Stablecoin issuers that also operate in other sectors.
-    "sky": ["Lending"],
+    "sky": ["Credit"],
     "spark": ["Stablecoin"],
     "ethena": ["RWA", "Yield"],
     "anzen": ["RWA"],
-    "frax": ["RWA"],
+    # Frax extend-existing: primary Stablecoin, cross-tagged RWA + Staking
+    # (sfrxETH liquid staking) — see canhav-staking spec §5.
+    "frax": ["RWA", "Staking"],
     "mountain-protocol": ["RWA"],
     # Primary Lending with stablecoin / RWA cross-tags.
     "usd-ai": ["Stablecoin", "RWA"],
@@ -1119,6 +1121,22 @@ for _slug, _sectors in _SECONDARY_SECTORS.items():
     _spec = ENTITY_SPECS.get(_slug)
     if _spec is not None:
         _spec["secondary_sectors"] = _sectors
+
+# Staking extend-existing (canhav-staking spec §5): issuers that already exist
+# on-platform get "Staking" added as a secondary sector + staking tags in place
+# rather than creating duplicate entities. Lido/Ankr are NOT yet in the store,
+# so only Frax (Stablecoin primary) is extended here; the rest are deferred.
+_STAKING_EXTEND_EXISTING: Dict[str, Dict[str, Any]] = {
+    "frax": {
+        "staking_sub_sector": "Liquid Staking",
+        "staking_secondary_tags": ["CDP-Integrated", "Non-Custodial"],
+    },
+}
+for _slug, _staking in _STAKING_EXTEND_EXISTING.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["staking_sub_sector"] = _staking["staking_sub_sector"]
+        _spec["staking_secondary_tags"] = _staking["staking_secondary_tags"]
 
 # --- DEX + RWA Sector Expansion (PDF §6) ----------------------------------
 # Retro-tag the existing Jupiter umbrella as a primary DEX (Aggregator); its
@@ -1150,9 +1168,9 @@ if _jupiter is not None:
 # Clearpool, and Goldfinch are private-credit RWA shops that also function as
 # lending venues; PancakeSwap and Hyperliquid run perps alongside their DEX.
 _EXPANSION_SECONDARY_SECTORS: Dict[str, List[str]] = {
-    "centrifuge": ["Lending"],
-    "clearpool": ["Lending"],
-    "goldfinch": ["Lending"],
+    "centrifuge": ["Credit"],
+    "clearpool": ["Credit"],
+    "goldfinch": ["Credit"],
     "pancakeswap": ["Perpetuals"],
     "hyperliquid": ["Perpetuals"],
     "gmx": ["Perpetuals"],
@@ -1272,7 +1290,8 @@ def build_entity_item(
         # Ranked competitors (top->bottom) + lending-specific metrics block.
         "Competitors": spec.get("competitors", []),
         "Lending": spec.get("lending"),
-        "LendingTagMetrics": spec.get("lending_tag_metrics") or None,
+        # Credit migration (Option A): store key renamed; field `Lending` retained.
+        "CreditTagMetrics": spec.get("credit_tag_metrics") or spec.get("lending_tag_metrics") or None,
         # Stablecoin-issuer taxonomy + metrics (PDF "Stablecoin Sector Expansion").
         "StablecoinSubSector": spec.get("stablecoin_sub_sector"),
         "StablecoinSecondaryTags": spec.get("stablecoin_secondary_tags"),
@@ -1285,6 +1304,10 @@ def build_entity_item(
         "RwaSubSector": spec.get("rwa_sub_sector"),
         "RwaSecondaryTags": spec.get("rwa_secondary_tags"),
         "Rwa": spec.get("rwa"),
+        # Staking taxonomy + metrics (canhav-staking spec §2).
+        "StakingSubSector": spec.get("staking_sub_sector"),
+        "StakingSecondaryTags": spec.get("staking_secondary_tags"),
+        "Staking": spec.get("staking"),
         "MemberCoins": spec["member_coins"],
         "ChildEntities": spec.get("child_entities"),
         "ArbitrumPortalMetadata": {

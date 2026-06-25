@@ -11,6 +11,7 @@ import {
   StablecoinMetricsSection,
   DexMetricsSection,
   RwaMetricsSection,
+  StakingMetricsSection,
   OrgStructureSection,
   PartnershipsSection,
   RisksSection,
@@ -323,6 +324,7 @@ export default async function NetworkProfilePage({ params }: PageProps) {
             />
             <DexMetricsSection dex={profile.dex} />
             <RwaMetricsSection rwa={profile.rwa} />
+            <StakingMetricsSection staking={profile.staking} />
             <CompetitorsSection
               competitors={profile.competitors}
               networkName={profile.name}

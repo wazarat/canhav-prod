@@ -24,6 +24,7 @@ import type {
   Sourced,
   StablecoinMetrics,
   StablecoinSubSectorMetrics,
+  StakingMetrics,
   TimelineEntry,
   TimelineStatus,
   TradFiRow,
@@ -1245,6 +1246,144 @@ export function RwaMetricsSection({ rwa }: { rwa?: RwaMetrics | null }) {
   );
 }
 
+/** A plain (non-Sourced) metric tile for derived/curated scalars. */
+function PlainTile({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+}) {
+  return (
+    <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+      <p className="text-xs uppercase tracking-wide text-ink-500">{label}</p>
+      <p className="mt-1 font-mono text-lg text-ink-50">{value}</p>
+      {hint && <p className="mt-1 text-[10px] text-ink-500">{hint}</p>}
+    </div>
+  );
+}
+
+export function StakingMetricsSection({ staking }: { staking?: StakingMetrics | null }) {
+  if (!staking) return null;
+  const dep = staking.deployment;
+  const tvlChange = staking.tvlChangePct;
+  const exchangeRate = staking.baseAssetExchangeRate?.value ?? null;
+  const marketShare = staking.marketSharePct ?? null;
+  const gov = staking.governanceDetail;
+  const hasLive =
+    staking.totalStakedUsd ||
+    staking.tokenPriceUsd ||
+    staking.marketCapUsd ||
+    staking.stakingAprPct ||
+    exchangeRate != null ||
+    marketShare != null;
+  return (
+    <section id="staking" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Staking metrics"
+        subtitle="Live total-staked, token, and yield data (DeFi Llama + CoinGecko) plus curated operator and restaking facts."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <MetricTile label="Total staked" sourced={staking.totalStakedUsd} kind="usd" />
+        <MetricTile label="Token price" sourced={staking.tokenPriceUsd} kind="usd" />
+        <MetricTile label="Market cap" sourced={staking.marketCapUsd} kind="usd" />
+        <MetricTile label="Staking APR" sourced={staking.stakingAprPct} kind="pct" />
+        <PlainTile
+          label="Exchange rate"
+          value={exchangeRate != null ? `${exchangeRate.toFixed(4)} ${staking.underlyingAsset ?? "ETH"}` : "—"}
+          hint={staking.baseAssetExchangeRate?.sourceLabel ?? "Pending live refresh"}
+        />
+        <PlainTile
+          label="Peg deviation"
+          value={staking.pegDeviationPct?.value != null ? fmtPct(staking.pegDeviationPct.value) : "—"}
+          hint="Curated (needs redemption oracle)"
+        />
+        <PlainTile
+          label="Market share"
+          value={marketShare != null ? fmtPct(marketShare) : "—"}
+          hint="Derived (within sub-sector)"
+        />
+        <PlainTile
+          label="TVL change (1d / 7d)"
+          value={
+            tvlChange && (tvlChange.d1 != null || tvlChange.d7 != null)
+              ? `${fmtPct(tvlChange.d1)} / ${fmtPct(tvlChange.d7)}`
+              : "—"
+          }
+          hint="DeFi Llama"
+        />
+      </div>
+      {!hasLive && (
+        <p className="text-xs text-ink-500">
+          Live staking metrics populate on the next DeFi Llama + CoinGecko refresh.
+        </p>
+      )}
+
+      <DataPanel title="Operators, restaking & deployment">
+        <div className="divide-y divide-ink-800/60">
+          <CuratedRow label="Underlying asset" text={staking.underlyingAsset} />
+          <CuratedRow label="Operator model" text={staking.operatorModel} />
+          {staking.validatorCount?.value != null && (
+            <CuratedRow label="Validators" text={staking.validatorCount.value.toLocaleString()} />
+          )}
+          {staking.nodeOperatorCount?.value != null && (
+            <CuratedRow
+              label="Node operators"
+              text={staking.nodeOperatorCount.value.toLocaleString()}
+            />
+          )}
+          <CuratedRow label="Withdrawal queue" text={staking.withdrawalQueue} />
+          {staking.collateralBasket && staking.collateralBasket.length > 0 && (
+            <CuratedRow
+              label="Collateral basket"
+              chips={staking.collateralBasket.map((c) => `${c.asset} ${c.pct}%`)}
+            />
+          )}
+          {staking.avsData && staking.avsData.length > 0 && (
+            <CuratedRow
+              label="AVS exposure"
+              chips={staking.avsData.map((a) =>
+                a.delegatedStakeUsd != null
+                  ? `${a.name} · ${fmtUsd(a.delegatedStakeUsd)}`
+                  : a.name,
+              )}
+            />
+          )}
+          {staking.slashingEvents && staking.slashingEvents.length > 0 && (
+            <CuratedRow
+              label="Slashing history"
+              text={staking.slashingEvents
+                .map((s) => `${s.date}: ${s.description}`)
+                .join(" · ")}
+            />
+          )}
+          {gov && (
+            <>
+              {gov.proposals != null && (
+                <CuratedRow label="Governance proposals" text={String(gov.proposals)} />
+              )}
+              {gov.treasuryUsd != null && (
+                <CuratedRow label="Treasury" text={fmtUsd(gov.treasuryUsd)} />
+              )}
+              {gov.notes && <CuratedRow label="Governance notes" text={gov.notes} />}
+            </>
+          )}
+          <CuratedRow label="Audit / exploit history" text={staking.auditHistory} />
+          {dep && (
+            <CuratedRow
+              label={`Chains${dep.evmCompatible ? ` · EVM: ${dep.evmCompatible}` : ""}`}
+              chips={dep.chains}
+            />
+          )}
+          {dep?.notes && <CuratedRow label="Deployment notes" text={dep.notes} />}
+        </div>
+      </DataPanel>
+    </section>
+  );
+}
+
 export function CompetitorsSection({
   competitors,
   networkName,
@@ -1325,6 +1464,7 @@ export function buildNetworkSectionNav(profile: {
   stablecoin?: unknown;
   dex?: unknown;
   rwa?: unknown;
+  staking?: unknown;
   competitors?: unknown[];
 }) {
   const items: { id: string; label: string; researchTab?: string }[] = [];
@@ -1342,6 +1482,7 @@ export function buildNetworkSectionNav(profile: {
   if (profile.stablecoin) items.push({ id: "stablecoin", label: "Stablecoin" });
   if (profile.dex) items.push({ id: "dex", label: "DEX" });
   if (profile.rwa) items.push({ id: "rwa", label: "RWA" });
+  if (profile.staking) items.push({ id: "staking", label: "Staking" });
   if (profile.competitors?.length) items.push({ id: "competitors", label: "Competitors" });
   if (hasResearch) items.push({ id: "research-hub", label: "Research" });
   if (profile.market) items.push({ id: "market", label: "Market" });

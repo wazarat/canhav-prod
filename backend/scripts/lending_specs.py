@@ -86,11 +86,12 @@ def _net(
     description: str,
     differentiator: str,
     sub_sector: str,
-    competitors: List[Dict[str, Any]],
-    lending: Dict[str, Any],
-    member_coins: List[Dict[str, Any]],
     chains: List[str],
+    competitors: Optional[List[Dict[str, Any]]] = None,
+    lending: Optional[Dict[str, Any]] = None,
+    member_coins: Optional[List[Dict[str, Any]]] = None,
     tags: Optional[List[str]] = None,
+    credit_tag_metrics: Optional[Dict[str, Any]] = None,
     lending_tag_metrics: Optional[Dict[str, Any]] = None,
     official_docs: Optional[str] = None,
     website: Optional[str] = None,
@@ -113,6 +114,24 @@ def _net(
     """
     raw_tags = tags if tags is not None else [sub_sector]
     tag_list = _migrate_credit_tags(raw_tags)
+
+    # Auto-derive curated `creditTagMetrics.lending` from the existing `lending`
+    # block for Lending-tag entities when not explicitly supplied, so the
+    # tag-specific panel shows curated collateral/oracles immediately (live
+    # tvl/supply/borrow/util/APY are overlaid by the cron). Explicit
+    # `credit_tag_metrics` always wins.
+    ctm = credit_tag_metrics
+    if ctm is None:
+        ctm = {}
+        if lending and "Lending" in tag_list:
+            lb: Dict[str, Any] = {}
+            if lending.get("collateralAssets"):
+                lb["collateralAssets"] = lending["collateralAssets"]
+            if lending.get("oracles"):
+                lb["oracles"] = lending["oracles"]
+            if lb:
+                ctm["lending"] = lb
+
     return {
         "name": name,
         "symbol": symbol,
@@ -140,11 +159,13 @@ def _net(
         "sector": "Credit",
         "sub_sector": tag_list[0],
         "tags": tag_list,
-        "competitors": competitors,
+        "competitors": competitors or [],
         "lending": lending,
-        # Legacy tag-metric blocks dropped during the Credit migration (Option A).
-        "credit_tag_metrics": {},
-        "member_coins": member_coins,
+        # Per-tag curated metrics (Lending / Leveraged Yield / Fixed Income).
+        # Live Tier-1 fields (tvl/supply/borrow/util/APY) are overlaid by the
+        # cron Credit tag-metrics pass; these curated fields are authored here.
+        "credit_tag_metrics": ctm or {},
+        "member_coins": member_coins or [],
         "portal_defaults": _portal_defaults(chains),
     }
 
@@ -892,6 +913,234 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "subCategory": "Yield-generating Token",
             },
         ],
+    ),
+    "radiant": _net(
+        name="Radiant Capital",
+        symbol="RDNT",
+        tagline="Omnichain money market via LayerZero.",
+        description=(
+            "Radiant Capital is a cross-chain money market that lets users deposit on one "
+            "chain and borrow on another, unifying fragmented liquidity through LayerZero."
+        ),
+        differentiator=(
+            "Omnichain lending — deposits and borrows are bridged across chains via "
+            "LayerZero rather than confined to a single network's liquidity."
+        ),
+        sub_sector="Money Markets",
+        tags=["Lending"],
+        chains=["Arbitrum", "Ethereum", "BSC", "Base"],
+        official_docs="https://docs.radiant.capital",
+        website="https://radiant.capital",
+        twitter="https://x.com/RDNTCapital",
+        lending={
+            "collateralAssets": ["ETH", "WBTC", "USDC", "USDT", "ARB"],
+            "loanAssets": ["USDC", "USDT", "ETH", "WBTC"],
+            "stablecoinExposure": ["USDC", "USDT"],
+            "oracles": ["Chainlink"],
+            "riskParameters": (
+                "Aave-style LTV / liquidation thresholds per reserve, applied across the "
+                "omnichain deployment."
+            ),
+            "auditHistory": "Audited; suffered a 2024 exploit — review post-incident hardening before relying.",
+            "deployment": {
+                "chains": ["Arbitrum", "Ethereum", "BSC", "Base"],
+                "evmCompatible": "yes",
+                "notes": "Omnichain via LayerZero.",
+            },
+        },
+        credit_tag_metrics={
+            "lending": {
+                "collateralAssets": ["ETH", "WBTC", "USDC", "USDT", "ARB"],
+                "oracles": ["Chainlink"],
+            },
+        },
+    ),
+    # ----------------------------- LEVERAGED YIELD -----------------------------
+    "gearbox": _net(
+        name="Gearbox",
+        symbol="GEAR",
+        tagline="Composable leverage via Credit Accounts.",
+        description=(
+            "Gearbox is a generalized leverage protocol: users open Credit Accounts to "
+            "borrow against collateral and deploy leveraged positions into integrated "
+            "DeFi strategies (Curve, Convex, Lido, Yearn)."
+        ),
+        differentiator=(
+            "Credit Accounts compose leverage across protocols rather than a single "
+            "isolated farm — up to ~10x with a unified margin position."
+        ),
+        sub_sector="Leveraged Yield",
+        tags=["Leveraged Yield"],
+        chains=["Ethereum", "Arbitrum", "Optimism"],
+        official_docs="https://docs.gearbox.fi",
+        website="https://gearbox.fi",
+        twitter="https://x.com/GearboxProtocol",
+        credit_tag_metrics={
+            "leveragedYield": {
+                "maxLeverageX": 10,
+                "borrowModel": "Credit Accounts (composable cross-protocol leverage)",
+                "supportedStrategies": ["Curve", "Convex", "Lido", "Yearn", "Balancer"],
+                "integratedProtocols": ["Curve", "Convex", "Lido", "Yearn"],
+            },
+        },
+    ),
+    "stella": _net(
+        name="Stella",
+        symbol="ALPHA",
+        tagline="Pay-as-you-earn leveraged strategies (ex-Alpha Homora).",
+        description=(
+            "Stella (formerly Alpha Homora) offers leveraged yield strategies with a "
+            "pay-as-you-earn borrowing model: borrowers pay 0% interest and instead "
+            "share a portion of realized profit with lenders."
+        ),
+        differentiator=(
+            "0% borrow APR — lenders are compensated from strategy profit share rather "
+            "than interest, aligning incentives between borrowers and lenders."
+        ),
+        sub_sector="Leveraged Yield",
+        tags=["Leveraged Yield"],
+        chains=["Arbitrum", "Optimism", "Manta"],
+        official_docs="https://docs.stellaxyz.io",
+        website="https://stellaxyz.io",
+        twitter="https://x.com/Stella_xyz_",
+        credit_tag_metrics={
+            "leveragedYield": {
+                "maxLeverageX": 5,
+                "borrowModel": "Pay-as-you-earn (0% borrow APR; lender profit share)",
+                "supportedStrategies": ["Curve", "Velodrome", "Pendle"],
+                "integratedProtocols": ["Curve", "Velodrome"],
+            },
+        },
+    ),
+    "extra-finance": _net(
+        name="Extra Finance",
+        symbol="EXTRA",
+        tagline="Lending + leveraged LP farming on the Superchain.",
+        description=(
+            "Extra Finance combines a lending market with leveraged LP farming, letting "
+            "users lever up liquidity positions on Optimism and Base DEXes."
+        ),
+        differentiator=(
+            "Tightly integrated lend + leverage-farm design focused on the Optimism/Base "
+            "(Superchain) DEX ecosystem, with up to ~7x LP leverage."
+        ),
+        sub_sector="Leveraged Yield",
+        tags=["Leveraged Yield"],
+        chains=["Optimism", "Base"],
+        official_docs="https://docs.extrafi.io",
+        website="https://extrafi.io",
+        twitter="https://x.com/extrafi_io",
+        credit_tag_metrics={
+            "leveragedYield": {
+                "maxLeverageX": 7,
+                "borrowModel": "Lending pool + leveraged LP farming",
+                "supportedStrategies": ["Velodrome", "Aerodrome"],
+                "integratedProtocols": ["Velodrome", "Aerodrome"],
+            },
+        },
+    ),
+    # ------------------------------- FIXED INCOME ------------------------------
+    "pendle": _net(
+        name="Pendle",
+        symbol="PENDLE",
+        tagline="Tokenized yield — split principal and yield (PT/YT).",
+        description=(
+            "Pendle tokenizes yield-bearing assets into Principal Tokens (PT) and Yield "
+            "Tokens (YT), creating an on-chain market for fixed-rate yield and yield "
+            "speculation/hedging."
+        ),
+        differentiator=(
+            "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT "
+            "buyers go long yield — a true fixed-income primitive for DeFi."
+        ),
+        sub_sector="Fixed Income",
+        tags=["Fixed Income"],
+        chains=["Ethereum", "Arbitrum", "Base", "Mantle", "BSC"],
+        official_docs="https://docs.pendle.finance",
+        website="https://www.pendle.finance",
+        twitter="https://x.com/pendle_fi",
+        credit_tag_metrics={
+            "fixedIncome": {
+                "mechanism": "PT/YT yield split (tokenized yield markets)",
+                "maturities": ["Varies per market (1–12 months)"],
+            },
+        },
+    ),
+    "notional": _net(
+        name="Notional",
+        symbol="NOTE",
+        tagline="Fixed-rate, fixed-term lending and borrowing.",
+        description=(
+            "Notional provides fixed-rate, fixed-term lending and borrowing via fCash — "
+            "tokenized claims on a fixed amount of an asset at a future maturity, traded "
+            "on an on-chain AMM."
+        ),
+        differentiator=(
+            "True fixed-rate/fixed-term loans through fCash, rather than variable money-"
+            "market rates — predictable cost of capital for borrowers and lenders."
+        ),
+        sub_sector="Fixed Income",
+        tags=["Fixed Income"],
+        chains=["Ethereum", "Arbitrum"],
+        official_docs="https://docs.notional.finance",
+        website="https://notional.finance",
+        twitter="https://x.com/NotionalFinance",
+        credit_tag_metrics={
+            "fixedIncome": {
+                "mechanism": "fCash fixed-rate / fixed-term lending (AMM)",
+                "maturities": ["3 months", "6 months", "1 year"],
+            },
+        },
+    ),
+    "spectra": _net(
+        name="Spectra",
+        symbol="SPECTRA",
+        tagline="Permissionless yield tokenization (ex-APWine).",
+        description=(
+            "Spectra (formerly APWine) is a permissionless interest-rate derivatives "
+            "protocol: any yield-bearing asset can be split into principal and yield "
+            "tokens to trade fixed and variable rates."
+        ),
+        differentiator=(
+            "Permissionless market creation for yield tokenization — anyone can list a "
+            "new PT/YT market for an interest-bearing asset."
+        ),
+        sub_sector="Fixed Income",
+        tags=["Fixed Income"],
+        chains=["Ethereum", "Base", "Arbitrum"],
+        official_docs="https://docs.spectra.finance",
+        website="https://www.spectra.finance",
+        twitter="https://x.com/spectra_finance",
+        credit_tag_metrics={
+            "fixedIncome": {
+                "mechanism": "Permissionless yield tokenization (PT/YT)",
+            },
+        },
+    ),
+    "sense": _net(
+        name="Sense Finance",
+        symbol="SENSE",
+        tagline="Yield stripping into zero-coupon and yield tokens.",
+        description=(
+            "Sense Finance is a yield-stripping protocol that decomposes yield-bearing "
+            "assets into zero-coupon Principal Tokens and Yield Tokens for fixed-rate "
+            "and yield-trading use cases. Verify on-chain activity before relying on it."
+        ),
+        differentiator=(
+            "Early yield-tokenization design (Sense Space AMM); confirm current activity "
+            "levels before treating its markets as live."
+        ),
+        sub_sector="Fixed Income",
+        tags=["Fixed Income"],
+        chains=["Ethereum"],
+        official_docs="https://docs.sense.finance",
+        website="https://sense.finance",
+        twitter="https://x.com/senseprotocol",
+        credit_tag_metrics={
+            "fixedIncome": {
+                "mechanism": "Zero-coupon / yield stripping (PT/YT)",
+            },
+        },
     ),
 }
 

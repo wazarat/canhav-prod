@@ -205,6 +205,34 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   liquity: "liquity",
   "lista-dao": "lista",
   realt: "realtoken-ecosystem-governance",
+  // Credit sector expansion — Leveraged Yield + Fixed Income gov tokens (verified 2026-06-25).
+  gearbox: "gearbox",
+  stella: "alpha-finance", // ex-Alpha Homora (ALPHA token)
+  "extra-finance": null, // EXTRA not listed on CoinGecko
+  pendle: "pendle",
+  notional: "notional-finance",
+  spectra: null, // no standalone tradable token
+  sense: null,
+  radiant: "radiant-capital",
+  // Staking sector — LST/LRT or governance token for the universal pass (verified 2026-06-25).
+  lido: "staked-ether",
+  "rocket-pool": "rocket-pool-eth",
+  "binance-wbeth": "wrapped-beacon-eth",
+  "coinbase-cbeth": "coinbase-wrapped-staked-eth",
+  "mantle-meth": "mantle-staked-ether",
+  swell: "swell-ethereum",
+  stader: "stader-ethx",
+  stakewise: "stakewise-v3-oseth",
+  ankr: "ankreth",
+  eigenlayer: "eigenlayer",
+  symbiotic: null, // TVL-only (no liquid token)
+  karak: null,
+  "ether-fi": "wrapped-eeth",
+  renzo: "renzo-restaked-eth",
+  "kelp-dao": "kelp-dao-restaked-eth",
+  puffer: "pufeth",
+  bedrock: "bedrock-unieth",
+  yieldnest: "yieldnest-restaked-eth",
   // Stablecoin issuers / TradFi — no meaningful governance token for universals.
   tether: null,
   circle: null,

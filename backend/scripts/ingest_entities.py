@@ -40,6 +40,7 @@ from lending_specs import LENDING_ENTITY_SPECS  # noqa: E402
 from stablecoin_specs import STABLECOIN_ENTITY_SPECS  # noqa: E402
 from dex_specs import DEX_ENTITY_SPECS  # noqa: E402
 from rwa_specs import RWA_ENTITY_SPECS  # noqa: E402
+from staking_specs import STAKING_ENTITY_SPECS  # noqa: E402
 
 DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
 DOWNLOADS_CSV = Path.home() / "Downloads" / "Arbitrum Ecosystem - scrape v2.csv"
@@ -1062,6 +1063,11 @@ ENTITY_SPECS.update(DEX_ENTITY_SPECS)
 # RWA cohort (PDF "DEX + RWA Sector Expansion" §4): Securitize, Centrifuge,
 # Goldfinch, RealT, Clearpool, Toucan, Lofty.ai, Franklin Templeton.
 ENTITY_SPECS.update(RWA_ENTITY_SPECS)
+# Staking cohort (canhav-staking spec §5/§6): Lido, Rocket Pool, Binance wBETH,
+# Coinbase cbETH, Mantle, Swell, Stader, StakeWise, Ankr (Liquid Staking);
+# EigenLayer, Symbiotic, Karak (Restaking); ether.fi, Renzo, Kelp, Puffer,
+# Bedrock, YieldNest (Liquid Restaking). Frax is extend-existing (below).
+ENTITY_SPECS.update(STAKING_ENTITY_SPECS)
 
 # Stablecoin sub-sector backfill for the pre-existing issuers (PDF §2). Primary
 # stablecoin issuers also get sector="Stablecoin"; cross-tagged protocols keep

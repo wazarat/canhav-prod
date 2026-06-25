@@ -67,6 +67,9 @@ export function NetworkTableWithFilter({
         Boolean,
       ) as string[];
     }
+    if (s === "Staking") {
+      return [p.stakingSubSector, ...(p.stakingSecondaryTags ?? [])].filter(Boolean) as string[];
+    }
     // Credit + default: multi-tag vocabulary, falling back to subSector.
     return p.tags ?? (p.subSector ? [p.subSector] : []);
   }

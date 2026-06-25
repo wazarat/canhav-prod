@@ -116,6 +116,35 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
   justlend: "justlend",
   kamino: "kamino-lend",
   maple: "maple",
+  // Credit sector expansion — Leveraged Yield + Fixed Income (verified 2026-06-25).
+  gearbox: "gearbox",
+  stella: "stella",
+  "extra-finance": "extra-finance-leverage-farming",
+  pendle: "pendle",
+  notional: "notional-v3",
+  spectra: "spectra-v2",
+  sense: "sense",
+  radiant: "radiant-v2",
+  // Staking sector (Liquid Staking / Restaking / Liquid Restaking; verified 2026-06-25).
+  lido: "lido",
+  "rocket-pool": "rocket-pool",
+  "binance-wbeth": "binance-staked-eth",
+  "coinbase-cbeth": "coinbase-wrapped-staked-eth",
+  "mantle-meth": "mantle-restaking",
+  // frax already mapped to "frax-ether" via the stablecoin/staking cross-tag below if absent.
+  swell: "swell-liquid-staking",
+  stader: "stader",
+  stakewise: "stakewise-v2",
+  ankr: "ankr",
+  eigenlayer: "eigencloud",
+  symbiotic: "symbiotic",
+  karak: null, // no DeFiLlama adapter as of 2026-06-25 — curated-only
+  "ether-fi": "ether.fi-stake",
+  renzo: "renzo",
+  "kelp-dao": "kelp",
+  puffer: "puffer-stake",
+  bedrock: "bedrock-unieth",
+  yieldnest: "yieldnest",
   centrifuge: "centrifuge-protocol",
   dinari: "dinari",
   "estate-protocol": "estate-protocol",
@@ -840,6 +869,7 @@ export const LLAMA_LENDING_PROJECTS: Record<string, string | null> = {
   justlend: "justlend",
   kamino: "kamino-lend",
   maple: "maple",
+  radiant: "radiant-v2",
 };
 
 export function llamaLendingProjectForSlug(slug: string): string | null {

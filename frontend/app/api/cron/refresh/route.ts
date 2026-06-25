@@ -45,6 +45,8 @@ import {
 } from "@/lib/server/morpho";
 import { hasUpstash, putItem, readAllItemsFromRedis } from "@/lib/server/redis";
 import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
+import { collectAllStakingMetrics } from "@/lib/server/staking";
+import { STAKING_SEED } from "@/data/staking-seed";
 import { pegVsCurrency } from "@/lib/server/series";
 import {
   fetchJustLendLiveMetrics,
@@ -1009,6 +1011,76 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
   }
 
+  // --- Credit tag-metrics overlay: per-tag live blocks (creditTagMetrics) ---
+  // For every Credit network (primary or secondary), populate the tag-keyed
+  // `CreditTagMetrics` block from its `Tags`: Lending (supply/borrow/util/APY via
+  // /poolsBorrow + protocol TVL), Leveraged Yield (TVL), Fixed Income (TVL).
+  // Curated fields are preserved; the Morpho-specific overlay below spreads
+  // richer tag data on top (this pass runs first).
+  const creditItems = items.filter(
+    (it) =>
+      isNetworkCategory(String(it.Category ?? "")) &&
+      (String(it.Sector ?? "") === "Credit" ||
+        (Array.isArray(it.SecondarySectors) && it.SecondarySectors.includes("Credit"))),
+  );
+  const creditTagResults: { slug: string; tags: string[] }[] = [];
+  if (creditItems.length > 0) {
+    const sourced = (value: number | null) => ({
+      value,
+      dataSource: "live" as const,
+      sourceLabel: "DeFi Llama",
+      updatedAt: nowIso(),
+    });
+    const borrowPools = await fetchLlamaBorrowPools();
+    for (const item of creditItems) {
+      const slug = String(item.Slug ?? "");
+      const tags: string[] = Array.isArray(item.Tags) ? item.Tags : [];
+      if (tags.length === 0) continue;
+
+      const tvl = await fetchLlamaProtocolTvl(slug, 1);
+      const tvlUsd = tvl && tvl.points.length > 0 ? tvl.points[tvl.points.length - 1].value : null;
+      const ctm: Record<string, any> = {
+        ...(item.CreditTagMetrics ?? item.LendingTagMetrics ?? {}),
+      };
+      let wrote = false;
+
+      if (tags.includes("Lending")) {
+        const borrow = aggregateLendingBorrow(slug, borrowPools);
+        const lendingBlock: Record<string, unknown> = { ...(ctm.lending ?? {}) };
+        if (tvlUsd != null) lendingBlock.totalSuppliedUsd = sourced(tvlUsd);
+        if (borrow?.totalBorrowUsd != null)
+          lendingBlock.totalBorrowsUsd = sourced(borrow.totalBorrowUsd);
+        if (borrow?.utilizationPct != null)
+          lendingBlock.utilizationPct = sourced(borrow.utilizationPct);
+        if (borrow?.supplyApyPct != null) lendingBlock.supplyApyPct = sourced(borrow.supplyApyPct);
+        if (borrow?.borrowApyPct != null) lendingBlock.borrowApyPct = sourced(borrow.borrowApyPct);
+        if (Object.keys(lendingBlock).length > 0) {
+          ctm.lending = lendingBlock;
+          wrote = true;
+        }
+      }
+      if (tags.includes("Leveraged Yield") && tvlUsd != null) {
+        ctm.leveragedYield = { ...(ctm.leveragedYield ?? {}), tvlUsd: sourced(tvlUsd) };
+        wrote = true;
+      }
+      if (tags.includes("Fixed Income") && tvlUsd != null) {
+        ctm.fixedIncome = { ...(ctm.fixedIncome ?? {}), tvlUsd: sourced(tvlUsd) };
+        wrote = true;
+      }
+
+      if (wrote) {
+        item.CreditTagMetrics = ctm;
+        if (tvlUsd != null && (item.CurrentScale?.tvlUsd ?? null) == null) {
+          item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
+        }
+        item.UpdatedAt = nowIso();
+        await putItem(item);
+        updated += 1;
+        creditTagResults.push({ slug, tags });
+      }
+    }
+  }
+
   // --- DEX networks: DeFi Llama live TVL + volume --------------------------
   // For each network tagged sector "DEX", overlay live protocol TVL and 30d
   // trading volume onto the curated `Dex` block. Curated fields (governance
@@ -1087,6 +1159,40 @@ export async function GET(req: Request): Promise<NextResponse> {
       } else {
         rwaMissingAum.push(slug);
       }
+    }
+  }
+
+  // --- Staking networks: DeFi Llama + CoinGecko Tier-1 metrics --------------
+  // For each network tagged sector "Staking" (primary or secondary, e.g. Frax),
+  // overlay live Tier-1 staking metrics (totalStakedUsd, tvlChangePct, token
+  // price/mcap, base-asset exchange rate, fees, derived marketSharePct) onto the
+  // curated `Staking` block. Tier-2 fields (validators, AVS, slashing,
+  // governance) stay curated/null. Metrics are derived across the full seed set
+  // so market-share is accurate even when a protocol isn't in the store yet.
+  const stakingResults: { slug: string; totalStakedUsd: number | null }[] = [];
+  const stakingItems = items.filter(
+    (it) =>
+      isNetworkCategory(String(it.Category ?? "")) &&
+      (String(it.Sector ?? "") === "Staking" ||
+        (Array.isArray(it.SecondarySectors) && it.SecondarySectors.includes("Staking"))),
+  );
+  if (stakingItems.length > 0) {
+    const metricsBySlug = await collectAllStakingMetrics(STAKING_SEED);
+    for (const item of stakingItems) {
+      const slug = String(item.Slug ?? "");
+      const live = metricsBySlug.get(slug);
+      if (!live || Object.keys(live).length === 0) continue;
+      // Preserve curated Tier-2 fields; overlay live Tier-1 fields.
+      item.Staking = { ...(item.Staking ?? {}), ...live };
+      const totalStakedUsd = live.totalStakedUsd?.value ?? null;
+      if (totalStakedUsd != null) {
+        item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd: totalStakedUsd };
+        syncUniversalTvlFromCurrentScale(item, "DeFi Llama staking TVL");
+      }
+      item.UpdatedAt = nowIso();
+      await putItem(item);
+      updated += 1;
+      stakingResults.push({ slug, totalStakedUsd });
     }
   }
 
@@ -1300,6 +1406,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     else if (String(item.Sector ?? "") === "DEX") label = "DeFi Llama DEX TVL";
     else if (String(item.Sector ?? "") === "Credit") label = "DeFi Llama lending TVL";
     else if (String(item.Sector ?? "") === "RWA") label = "DeFi Llama RWA AUM";
+    else if (String(item.Sector ?? "") === "Staking") label = "DeFi Llama staking TVL";
     if (syncUniversalTvlFromCurrentScale(item, label)) {
       item.UpdatedAt = nowIso();
       await putItem(item);
@@ -1334,6 +1441,8 @@ export async function GET(req: Request): Promise<NextResponse> {
     results,
     aave: aaveResults,
     lending: lendingResults,
+    creditTags: creditTagResults,
+    staking: stakingResults,
     dex: dexResults,
     rwa: rwaResults,
     universal: universalResults,

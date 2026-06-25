@@ -27,8 +27,9 @@ export const STAKING_SEED: StakingSeed[] = [
   // ---------- 2) RESTAKING ----------
   { name: "EigenLayer",     slug: "eigenlayer",  token: null,      subSector: "Restaking",      secondaryTags: ["Multi-Asset", "Non-Custodial"],        llamaSlug: "eigencloud",                  coingeckoId: "eigenlayer",                  seedMode: "new" },
   { name: "Symbiotic",      slug: "symbiotic",   token: null,      subSector: "Restaking",      secondaryTags: ["Multi-Asset", "Non-Custodial"],        llamaSlug: "symbiotic",                   coingeckoId: null,                          seedMode: "new" },
-  // Karak: no clean DefiLlama slug / no token resolved on 2026-06-25 — resolve
-  // manually from https://api.llama.fi/protocols before relying; metrics curated.
+  // Karak: confirmed ABSENT from https://api.llama.fi/protocols on 2026-06-25
+  // (no DeFiLlama adapter, no liquid token) — stays curated-only. Re-check
+  // periodically; if an adapter lands, set llamaSlug here + in LLAMA_PROTOCOL_SLUGS.
   { name: "Karak",          slug: "karak",       token: null,      subSector: "Restaking",      secondaryTags: ["Multi-Asset", "Multi-Chain"],          llamaSlug: null,                          coingeckoId: null,                          seedMode: "new" },
 
   // ---------- 3) LIQUID RESTAKING ----------

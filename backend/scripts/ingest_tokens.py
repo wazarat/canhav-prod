@@ -940,7 +940,7 @@ TOKENS: Dict[str, Dict[str, Any]] = {
     # The new primary-Liquidity entities' tokens. The five extend-existing DEX
     # venues (CRV/UNI/BAL/AERO/CAKE) already have token records above. Arrakis is
     # tokenless (TVL sourced from DeFi Llama instead of token mcap aggregation).
-    "gamma": {
+    "gamma-gov": {
         "name": "Gamma Strategies",
         "symbol": "GAMMA",
         "tokenType": "Governance",
@@ -1017,7 +1017,7 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         "discord": None,
         "github": "https://github.com/beefyfinance",
     },
-    "aura": {
+    "aura-gov": {
         "name": "Aura Finance",
         "symbol": "AURA",
         "tokenType": "Governance",

@@ -160,7 +160,7 @@ LIQUIDITY_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         twitter="https://x.com/GammaStrategies",
         github="https://github.com/GammaStrategies",
         member_coins=[
-            _coin("gamma", "Gamma Strategies", "GAMMA", "Governance + fee-share token (xGAMMA staking)"),
+            _coin("gamma-gov", "Gamma Strategies", "GAMMA", "Governance + fee-share token (xGAMMA staking)"),
         ],
     ),
     # ------------------------------- VAULTS ---------------------------------
@@ -261,7 +261,7 @@ LIQUIDITY_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         twitter="https://x.com/aurafinance",
         github="https://github.com/aurafinance",
         member_coins=[
-            _coin("aura", "Aura Finance", "AURA", "Governance token (vlAURA vote-locked)"),
+            _coin("aura-gov", "Aura Finance", "AURA", "Governance token (vlAURA vote-locked)"),
         ],
     ),
     "arrakis": _net(

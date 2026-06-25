@@ -8,6 +8,7 @@ import type {
   NetworkRisk,
   RiskCategory,
   RwaProfile,
+  RwaSecondaryTag,
   StablecoinProfile,
   TokenProfile,
 } from "@/lib/types";
@@ -90,6 +91,37 @@ function parseRisks(raw: unknown): NetworkRisk[] {
       description: r.description ?? "",
     };
   });
+}
+
+/**
+ * Map any legacy RWA secondary tag to the narrowed 5-tag set on ingest, so stale
+ * store/seed data can't reintroduce a dropped tag. Mirrors the migration in the
+ * RWA sector revamp: Compliance-Heavy + Permissioned -> Institutional-Gated;
+ * Hybrid-Chain -> Multi-Chain; Multi-Currency / Non-EVM / Wound-Down dropped.
+ */
+const RWA_TAG_MIGRATION: Record<string, RwaSecondaryTag | null> = {
+  "Compliance-Heavy": "Institutional-Gated",
+  Permissioned: "Institutional-Gated",
+  "Hybrid-Chain": "Multi-Chain",
+  "Multi-Currency": null,
+  "Non-EVM": null,
+  "Wound-Down": null,
+  // Pass-through for the 5 kept tags.
+  "Institutional-Gated": "Institutional-Gated",
+  "Yield-Bearing": "Yield-Bearing",
+  "Real-World-Custody": "Real-World-Custody",
+  "DAO-Governed": "DAO-Governed",
+  "Multi-Chain": "Multi-Chain",
+};
+
+function normalizeRwaTags(raw: unknown): RwaSecondaryTag[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const out = new Set<RwaSecondaryTag>();
+  for (const tag of raw) {
+    const mapped = RWA_TAG_MIGRATION[String(tag)];
+    if (mapped) out.add(mapped);
+  }
+  return out.size ? [...out] : undefined;
 }
 
 function common(item: Record<string, any>) {
@@ -245,7 +277,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         dexSecondaryTags: item.DexSecondaryTags ?? undefined,
         dex: item.Dex ?? null,
         rwaSubSector: item.RwaSubSector ?? null,
-        rwaSecondaryTags: item.RwaSecondaryTags ?? undefined,
+        rwaSecondaryTags: normalizeRwaTags(item.RwaSecondaryTags),
         rwa: item.Rwa ?? null,
         stakingSubSector: item.StakingSubSector ?? null,
         stakingSecondaryTags: item.StakingSecondaryTags ?? undefined,

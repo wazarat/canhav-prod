@@ -148,18 +148,18 @@ RWA_SUBSECTORS = (
     "Stablecoins & FX",
 )
 
+# RWA attribute tags — deliberately narrowed to 5 to avoid overwhelming users.
+# Collapses the legacy 11-tag set (Compliance-Heavy + Permissioned ->
+# Institutional-Gated; Hybrid-Chain -> Multi-Chain; Multi-Currency / Non-EVM /
+# Wound-Down dropped and represented structurally elsewhere). Keep
+# STABLECOIN_SECONDARY_TAGS / DEX_SECONDARY_TAGS untouched — they legitimately
+# reuse some of these strings.
 RWA_SECONDARY_TAGS = (
-    "Institutional-Gated",
-    "Permissioned",
-    "Compliance-Heavy",
-    "Multi-Chain",
-    "Multi-Currency",
-    "Non-EVM",
-    "Hybrid-Chain",
-    "Yield-Bearing",
-    "Real-World-Custody",
-    "DAO-Governed",
-    "Wound-Down",
+    "Institutional-Gated",  # absorbs Compliance-Heavy + Permissioned (KYC/AML or accredited-only)
+    "Yield-Bearing",        # passes TradFi yield (T-Bill interest, rent) to the holder's wallet
+    "Real-World-Custody",   # underlying held in an off-chain legal entity (LLC / SPV / vault)
+    "DAO-Governed",         # token holders vote on risk params, pool deployment, treasury
+    "Multi-Chain",          # absorbs Hybrid-Chain (natively bridges across EVM / EVM<->non-EVM)
 )
 
 # Staking sub-sectors — the three staking tags (canhav-staking spec §2.2).
@@ -222,10 +222,13 @@ CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
     "ondo-finance": ("Stablecoin",),
     "pleasing-market": ("Stablecoin",),
     "mountain-protocol": ("RWA",),
-    "ethena": ("RWA", "Yield"),
+    # Ethena & Frax are stablecoin issuers whose backing touches RWAs; they are
+    # NOT RWA tokenization protocols. Keep them out of the RWA sector (the
+    # RWA-Backed flavour is captured via StablecoinSecondaryTag instead).
+    "ethena": ("Yield",),
     "anzen": ("RWA",),
     "usd-ai": ("Stablecoin", "RWA"),
-    "frax": ("RWA", "Staking"),
+    "frax": ("Staking",),
     "centrifuge": ("Credit",),
     "goldfinch": ("Credit",),
     "clearpool": ("Credit",),

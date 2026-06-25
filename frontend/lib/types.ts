@@ -995,19 +995,19 @@ export type RwaSubSector =
   | "Event Finance" // Atmosphera (weather/climate-linked notes)
   | "Stablecoins & FX"; // Aryze, currency-only RWA shops
 
-/** Secondary cross-cutting tags for an RWA entity (0+ apply). */
+/**
+ * RWA attribute tags — deliberately narrowed to 5 to avoid overwhelming users.
+ * Collapses the legacy 11-tag set (Compliance-Heavy + Permissioned ->
+ * Institutional-Gated; Hybrid-Chain -> Multi-Chain; Multi-Currency / Non-EVM /
+ * Wound-Down dropped and represented structurally elsewhere). Mirrors the
+ * backend `RWA_SECONDARY_TAGS` enum in `backend/app/db/schema.py`.
+ */
 export type RwaSecondaryTag =
-  | "Institutional-Gated" // Reg D 506(c), 3(c)(7), KYC-only mint
-  | "Permissioned" // whitelist required for transfers
-  | "Compliance-Heavy" // SEC-registered transfer agent, MiFID, similar
-  | "Multi-Chain"
-  | "Multi-Currency"
-  | "Non-EVM"
-  | "Hybrid-Chain"
-  | "Yield-Bearing"
-  | "Real-World-Custody" // physical asset custody (gold vault, real estate deeds)
-  | "DAO-Governed"
-  | "Wound-Down";
+  | "Institutional-Gated" // absorbs Compliance-Heavy + Permissioned: KYC/AML or accredited-only access
+  | "Yield-Bearing" // passes TradFi yield (T-Bill interest, rent) to the holder's wallet
+  | "Real-World-Custody" // underlying held in an off-chain legal entity (Delaware LLC / SPV / vault)
+  | "DAO-Governed" // token holders vote on risk params, pool deployment, treasury
+  | "Multi-Chain"; // absorbs Hybrid-Chain: natively bridges across EVM (and EVM<->non-EVM) networks
 
 /** Staking primary sub-sector — the three staking tags. */
 export type StakingSubSector =
@@ -1657,7 +1657,7 @@ export interface NetworkProfile {
   dex?: DexMetrics | null;
   /** RWA primary sub-sector (when sector === "RWA", or as a secondary marker). */
   rwaSubSector?: RwaSubSector | null;
-  /** RWA secondary tags (0+): Institutional-Gated, Permissioned, etc. */
+  /** RWA secondary tags (0+): Institutional-Gated, Yield-Bearing, etc. */
   rwaSecondaryTags?: RwaSecondaryTag[];
   /** RWA-entity metrics block (live + curated) — `sector === "RWA"`. */
   rwa?: RwaMetrics | null;

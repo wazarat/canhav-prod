@@ -197,7 +197,7 @@ RWA_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "largest institutional tokenized funds; filed for an NYSE listing (SECZ)."
         ),
         sub_sector="Tokenization Infrastructure",
-        secondary_tags=["Compliance-Heavy", "Institutional-Gated", "Permissioned", "Multi-Chain"],
+        secondary_tags=["Institutional-Gated", "Multi-Chain"],
         regulatory_status=(
             "SEC-registered transfer agent; broker-dealer (Securitize Markets); ATS "
             "operator; FINRA member."
@@ -243,7 +243,7 @@ RWA_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "tranches connect legal collateral to on-chain lenders."
         ),
         sub_sector="Private Credit",
-        secondary_tags=["Hybrid-Chain", "Multi-Chain", "Compliance-Heavy", "Institutional-Gated", "DAO-Governed"],
+        secondary_tags=["DAO-Governed", "Institutional-Gated", "Yield-Bearing"],
         regulatory_status=(
             "Per-pool SPV legal structures (Delaware, BVI, Cayman); KYC via Securitize ID."
         ),
@@ -292,7 +292,7 @@ RWA_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "Prime brings institutional private-credit funds on-chain."
         ),
         sub_sector="Private Credit",
-        secondary_tags=["Institutional-Gated", "Compliance-Heavy", "DAO-Governed"],
+        secondary_tags=["DAO-Governed", "Institutional-Gated", "Yield-Bearing"],
         regulatory_status="Reg D / Reg S exempt offerings; KYC required for backers.",
         official_docs="https://docs.goldfinch.finance",
         website="https://goldfinch.finance",
@@ -338,7 +338,7 @@ RWA_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "utilization-driven rates and single-borrower Credit Vaults."
         ),
         sub_sector="Private Credit",
-        secondary_tags=["Institutional-Gated", "Multi-Chain", "Permissioned"],
+        secondary_tags=["Institutional-Gated", "Multi-Chain", "Yield-Bearing"],
         regulatory_status="KYC-only borrowers; lender side permissionless (some Credit Vaults gated).",
         official_docs="https://docs.clearpool.finance",
         website="https://clearpool.finance",
@@ -384,7 +384,7 @@ RWA_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "holder's wallet; hundreds of individual property tokens."
         ),
         sub_sector="Real Estate",
-        secondary_tags=["Yield-Bearing", "Multi-Chain", "Real-World-Custody", "Compliance-Heavy"],
+        secondary_tags=["Yield-Bearing", "Real-World-Custody", "Multi-Chain"],
         regulatory_status="Reg D 506(c) per property; Delaware LLC per asset; KYC required.",
         official_docs="https://realt.co",
         website="https://realt.co",
@@ -428,7 +428,7 @@ RWA_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "per-property ASA governance; daily USDC rental yield."
         ),
         sub_sector="Real Estate",
-        secondary_tags=["Yield-Bearing", "Non-EVM", "Real-World-Custody", "Compliance-Heavy"],
+        secondary_tags=["Yield-Bearing", "Real-World-Custody"],
         regulatory_status="Each property is a Reg D 506(c) US LLC; Lofty Inc. as manager.",
         official_docs="https://www.lofty.ai",
         website="https://www.lofty.ai",
@@ -523,7 +523,7 @@ RWA_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "via Benji; Franklin Templeton is its own transfer agent."
         ),
         sub_sector="Tokenized Treasuries",
-        secondary_tags=["Institutional-Gated", "Multi-Chain", "Compliance-Heavy", "Yield-Bearing", "Real-World-Custody"],
+        secondary_tags=["Institutional-Gated", "Yield-Bearing", "Real-World-Custody", "Multi-Chain"],
         regulatory_status="SEC-registered '40 Act mutual fund; Franklin Templeton transfer agent.",
         official_docs="https://benjiinvestments.franklintempleton.com",
         website="https://www.franklintempleton.com",
@@ -606,7 +606,7 @@ RWA_ENTITY_SPECS.update({
         symbol="ARYZE",
         tagline="Multi-currency RWA stablecoins and FX tokens.",
         sub_sector="Stablecoins & FX",
-        secondary_tags=["Multi-Currency", "Compliance-Heavy"],
+        secondary_tags=["Institutional-Gated"],
         website="https://aryze.io",
     ),
     "atmosphera": _seed(
@@ -633,7 +633,7 @@ RWA_ENTITY_SPECS.update({
         symbol="DINARI",
         tagline="Tokenized US equities as dShares.",
         sub_sector="Tokenized Equities",
-        secondary_tags=["Compliance-Heavy", "Multi-Chain"],
+        secondary_tags=["Institutional-Gated", "Multi-Chain"],
         website="https://dinari.com",
     ),
     "dualmint": _seed(
@@ -642,7 +642,7 @@ RWA_ENTITY_SPECS.update({
         symbol="DUAL",
         tagline="Tokenization infrastructure for real-world assets.",
         sub_sector="Tokenization Infrastructure",
-        secondary_tags=["Permissioned"],
+        secondary_tags=["Institutional-Gated"],
         website="https://dualmint.com",
     ),
     "estate-protocol": _seed(
@@ -651,7 +651,7 @@ RWA_ENTITY_SPECS.update({
         symbol="ESTATE",
         tagline="Fractional commercial real estate on-chain.",
         sub_sector="Real Estate",
-        secondary_tags=["Real-World-Custody", "Permissioned"],
+        secondary_tags=["Real-World-Custody", "Institutional-Gated"],
         website="https://estateprotocol.com",
     ),
     "florence-finance": _seed(
@@ -660,7 +660,7 @@ RWA_ENTITY_SPECS.update({
         symbol="FF",
         tagline="SME invoice financing on-chain.",
         sub_sector="Private Credit",
-        secondary_tags=["Permissioned"],
+        secondary_tags=["Institutional-Gated"],
         website="https://florence.finance",
     ),
 })

@@ -1105,11 +1105,14 @@ _SECONDARY_SECTORS: Dict[str, List[str]] = {
     # Primary Stablecoin issuers that also operate in other sectors.
     "sky": ["Credit"],
     "spark": ["Stablecoin"],
-    "ethena": ["RWA", "Yield"],
+    # Ethena & Frax are stablecoin issuers whose backing touches RWAs; they are
+    # NOT RWA tokenization protocols, so they carry no RWA association (the
+    # RWA-Backed flavour is captured via StablecoinSecondaryTag instead).
+    "ethena": ["Yield"],
     "anzen": ["RWA"],
-    # Frax extend-existing: primary Stablecoin, cross-tagged RWA + Staking
+    # Frax extend-existing: primary Stablecoin, cross-tagged Staking
     # (sfrxETH liquid staking) — see canhav-staking spec §5.
-    "frax": ["RWA", "Staking"],
+    "frax": ["Staking"],
     "mountain-protocol": ["RWA"],
     # Primary Lending with stablecoin / RWA cross-tags.
     "usd-ai": ["Stablecoin", "RWA"],
@@ -1204,8 +1207,10 @@ for _slug, (_subsector, _tags) in _RWA_PRIMARY_BACKFILL.items():
         _existing.add("Stablecoin")
         _spec["secondary_sectors"] = sorted(_existing)
 
+# Wound-Down is a lifecycle state, not an RWA attribute tag — it is dropped from
+# the 5-tag set and tracked via status / OffchainFact instead.
 _RWA_SECONDARY_BACKFILL: Dict[str, Any] = {
-    "mountain-protocol": ("Tokenized Treasuries", ["Wound-Down"]),
+    "mountain-protocol": ("Tokenized Treasuries", []),
 }
 for _slug, (_subsector, _tags) in _RWA_SECONDARY_BACKFILL.items():
     _spec = ENTITY_SPECS.get(_slug)

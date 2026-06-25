@@ -111,6 +111,15 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   gns: "gains-network",
   joe: "joe",
   rune: "thorchain",
+  // Derivatives sector member coins (canhav-derivatives spec §3/§4/§5; verified 2026-06-25).
+  // ENA (ena -> "ethena") is already mapped above. DPX (Dopex) has no clean
+  // CoinGecko markets entry; Rage Trade / Neutra are tokenless.
+  snx: "havven", // Synthetix SNX (legacy CoinGecko id "havven")
+  "aevo-gov": "aevo-exchange", // member-coin slug distinct from the "aevo" entity slug
+  rbn: "ribbon-finance",
+  drv: "derive", // Derive (ex-Lyra)
+  jones: "jones-dao",
+  dpx: null, // Dopex — no reliable CoinGecko markets entry (TVL via DeFi Llama)
   // Lending-network governance tokens (PDF Week 7+8). Ids verified via the
   // CoinGecko /search endpoint; `// verify` ones should be confirmed before
   // relying on live price/supply (the cron fails soft to null otherwise).
@@ -266,6 +275,17 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   aura: "aura-finance",
   arrakis: null, // tokenless — TVL sourced from DeFi Llama only
   maverick: "maverick-protocol",
+  // Derivatives sector — governance token for the universal pass (verified 2026-06-25).
+  // The extend-existing perp venues (gmx/gains-network/hyperliquid) + ethena are
+  // already mapped above. dYdX/Drift excluded (non-EVM).
+  synthetix: "havven", // SNX (legacy CoinGecko id "havven")
+  aevo: "aevo-exchange",
+  "ribbon-finance": "ribbon-finance",
+  dopex: null, // DPX — no reliable CoinGecko markets entry (TVL via DeFi Llama)
+  derive: "derive",
+  "jones-dao": "jones-dao",
+  "rage-trade": null, // tokenless — TVL sourced from DeFi Llama only
+  "neutra-finance": null, // tokenless — TVL sourced from DeFi Llama only
   // Stablecoin issuers / TradFi — no meaningful governance token for universals.
   tether: null,
   circle: null,

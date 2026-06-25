@@ -52,6 +52,8 @@ import { collectAllStakingMetrics } from "@/lib/server/staking";
 import { STAKING_SEED } from "@/data/staking-seed";
 import { collectAllLiquidityMetrics } from "@/lib/server/liquidity";
 import { LIQUIDITY_SEED } from "@/data/liquidity-seed";
+import { collectAllDerivativesMetrics } from "@/lib/server/derivatives";
+import { DERIVATIVES_SEED } from "@/data/derivatives-seed";
 import { pegVsCurrency } from "@/lib/server/series";
 import {
   fetchJustLendLiveMetrics,
@@ -1350,6 +1352,42 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
   }
 
+  // --- Derivatives networks: DeFi Llama + CoinGecko Tier-1 metrics -----------
+  // For each network tagged sector "Derivatives" (primary, e.g. Synthetix/Aevo,
+  // or secondary, e.g. the cross-tagged perp venues GMX/Gains/Hyperliquid and the
+  // delta-neutral Ethena), overlay live Tier-1 Derivatives metrics (tvlUsd,
+  // tvlChangePct, fees, token price/mcap, derived marketSharePct) onto the curated
+  // `Derivatives` block. Tier-2 fields (maxLeverageX, vaultStrategies, hedgeVenue,
+  // fundingRatePct, governance) stay curated/null. The headline CurrentScale.tvlUsd
+  // is only written for PRIMARY-Derivatives entities, so the cross-tagged DEX /
+  // Stablecoin venues keep their own (DEX / stablecoin-supply) headline.
+  const derivativesResults: { slug: string; tvlUsd: number | null }[] = [];
+  const derivativesItems = items.filter(
+    (it) =>
+      isNetworkCategory(String(it.Category ?? "")) &&
+      (String(it.Sector ?? "") === "Derivatives" ||
+        (Array.isArray(it.SecondarySectors) && it.SecondarySectors.includes("Derivatives"))),
+  );
+  if (derivativesItems.length > 0) {
+    const metricsBySlug = await collectAllDerivativesMetrics(DERIVATIVES_SEED);
+    for (const item of derivativesItems) {
+      const slug = String(item.Slug ?? "");
+      const live = metricsBySlug.get(slug);
+      if (!live || Object.keys(live).length === 0) continue;
+      // Preserve curated Tier-2 fields; overlay live Tier-1 fields.
+      item.Derivatives = { ...(item.Derivatives ?? {}), ...live };
+      const tvlUsd = live.tvlUsd?.value ?? null;
+      if (tvlUsd != null && String(item.Sector ?? "") === "Derivatives") {
+        item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
+        syncUniversalTvlFromCurrentScale(item, "DeFi Llama derivatives TVL");
+      }
+      item.UpdatedAt = nowIso();
+      await putItem(item);
+      updated += 1;
+      derivativesResults.push({ slug, tvlUsd });
+    }
+  }
+
   // --- Universal metrics: consistent Tier-1 block for EVERY network ----------
   const networkItems = items.filter((it) => isNetworkCategory(String(it.Category ?? "")));
   const llamaMetaBySlug = new Map<string, LlamaProtocolMeta | null>();
@@ -1645,6 +1683,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     creditTags: creditTagResults,
     staking: stakingResults,
     liquidity: liquidityResults,
+    derivatives: derivativesResults,
     dex: dexResults,
     rwa: rwaResults,
     universal: universalResults,

@@ -1055,6 +1055,106 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         "discord": None,
         "github": "https://github.com/maverickprotocol",
     },
+    # ---- Derivatives governance tokens (canhav-derivatives spec §3/§4/§5) ----
+    # New primary-Derivatives entities' tokens. The extend-existing perp venues
+    # (GMX/GNS/HYPE) and Ethena's ENA already have token records above.
+    # Tokenless protocols (Dopex w/o clean CG markets, Rage Trade, Neutra) carry
+    # no token record — their network TVL is sourced from DeFi Llama (path c).
+    "snx": {
+        "name": "Synthetix Network Token",
+        "symbol": "SNX",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance + staking collateral token of Synthetix; stakers back the "
+            "synthetic-asset / perps debt pool and earn protocol fees."
+        ),
+        "entitySlug": "synthetix",
+        "coingecko": "https://www.coingecko.com/en/coins/synthetix-network-token",
+        "contractAddress": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Optimism", "Base", "Arbitrum One"],
+        "website": "https://synthetix.io",
+        "twitter": "https://x.com/synthetix_io",
+        "discord": None,
+        "github": "https://github.com/Synthetixio",
+    },
+    "aevo-gov": {
+        "name": "Aevo",
+        "symbol": "AEVO",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Aevo, a high-performance options + perpetuals "
+            "exchange built on a custom EVM rollup (formerly Ribbon Finance)."
+        ),
+        "entitySlug": "aevo",
+        "coingecko": "https://www.coingecko.com/en/coins/aevo-exchange",
+        "contractAddress": "0xB528edBef013aff855ac3c50b381f253aF13b997",
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
+        "website": "https://www.aevo.xyz",
+        "twitter": "https://x.com/aevoxyz",
+        "discord": None,
+        "github": None,
+    },
+    "rbn": {
+        "name": "Ribbon Finance",
+        "symbol": "RBN",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Ribbon Finance, the pioneering DeFi Option Vault "
+            "(DOV) protocol. Ribbon merged into Aevo; RBN remains as a legacy token."
+        ),
+        "entitySlug": "ribbon-finance",
+        "coingecko": "https://www.coingecko.com/en/coins/ribbon-finance",
+        "contractAddress": "0x6123B0049F904d730dB3C36a31167D9d4121fA6B",
+        "csvParentSlug": None,
+        "chains": ["Ethereum"],
+        "website": "https://www.ribbon.finance",
+        "twitter": "https://x.com/ribbonfinance",
+        "discord": None,
+        "github": "https://github.com/ribbon-finance",
+    },
+    "drv": {
+        "name": "Derive",
+        "symbol": "DRV",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Derive (formerly Lyra), an on-chain options + "
+            "structured-products protocol with automated option vaults."
+        ),
+        "entitySlug": "derive",
+        "coingecko": "https://www.coingecko.com/en/coins/derive",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Optimism", "Arbitrum One", "Base"],
+        "website": "https://www.derive.xyz",
+        "twitter": "https://x.com/derivexyz",
+        "discord": None,
+        "github": "https://github.com/derivexyz",
+    },
+    "jones": {
+        "name": "Jones DAO",
+        "symbol": "JONES",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Jones DAO, an Arbitrum-native yield + options "
+            "strategy vault protocol that automates structured derivatives positions."
+        ),
+        "entitySlug": "jones-dao",
+        "coingecko": "https://www.coingecko.com/en/coins/jones-dao",
+        "contractAddress": "0x10393c20975cF177a3513071bC110f7962CD67da",
+        "csvParentSlug": None,
+        "chains": ["Arbitrum One"],
+        "website": "https://www.jonesdao.io",
+        "twitter": "https://x.com/DAOJonesOptions",
+        "discord": None,
+        "github": None,
+    },
     # ---- RWA governance tokens (PDF "DEX + RWA Sector Expansion" §4) -----
     "cfg": {
         "name": "Centrifuge",

@@ -896,6 +896,7 @@ export type NetworkSubCategory = "Protocol" | "Chain" | "Rollup" | "Appchain";
  */
 export type NetworkSector =
   | "Credit"
+  /** @deprecated Legacy umbrella — perp venues now route through "Derivatives" + "Perp DEX". Kept for back-compat; slated for removal in a later cleanup. */
   | "Perpetuals"
   | "Yield"
   | "DEX"
@@ -903,7 +904,8 @@ export type NetworkSector =
   | "Stablecoin"
   | "RWA"
   | "Staking"
-  | "Liquidity";
+  | "Liquidity"
+  | "Derivatives";
 
 /** Credit-sector tags (replaces the legacy 5-value lending taxonomy). */
 export type CreditTag =
@@ -1036,6 +1038,21 @@ export type LiquiditySecondaryTag =
   | "LP-Strategy-Manager" // manages/optimizes LP positions (Gamma, Arrakis)
   | "Multi-Chain"
   | "ve-Tokenomics"; // vote-escrow boosted (Curve, Convex, Aura)
+
+/** Derivatives primary sub-sector — the three Derivatives tags. */
+export type DerivativesSubSector =
+  | "Perp DEX" // on-chain perpetual futures (GMX, Synthetix, Gains, Aevo, Hyperliquid)
+  | "Option Vaults" // automated options strategy vaults / DOVs (Ribbon, Dopex, Derive, Jones DAO)
+  | "Delta-Neutral"; // hedged zero-delta yield strategies (Ethena, Rage Trade, Neutra)
+
+/** Derivatives cross-cutting secondary tags (0+, multi-select). */
+export type DerivativesSecondaryTag =
+  | "Oracle-Based" // GMX, Gains (oracle pricing vs orderbook)
+  | "Orderbook" // Aevo, Hyperliquid
+  | "Synthetic-Assets" // Synthetix synths
+  | "Auto-Strategy" // DOVs / managed vaults (Ribbon, Jones)
+  | "Funding-Rate-Yield" // delta-neutral funding capture (Ethena)
+  | "Multi-Chain";
 
 /** Fiat-Backed Regulated sub-sector metrics (Circle, Paxos, First Digital). */
 export interface StablecoinFiatBackedMetrics {
@@ -1368,6 +1385,53 @@ export interface LiquidityMetrics {
   performanceFeePct?: number | null;
   /** Impermanent-loss exposure note (curated). */
   ileImpermanentLossNote?: string | null;
+  /** Structured governance metrics (reuse existing type). */
+  governanceDetail?: GovernanceActivityDetail | null;
+  /** Audit / exploit history (curated). */
+  auditHistory?: string | null;
+  /** Chain / ecosystem deployment (reuse existing type). */
+  deployment?: ChainDeployment | null;
+}
+
+/**
+ * Derivatives-entity metrics block (sector === "Derivatives"). Mirrors the
+ * `LiquidityMetrics` pattern: Tier-1 fields are filled live by the DeFi Llama +
+ * CoinGecko cron; Tier-2 fields are schema-reserved and stay curated/null until
+ * indexers are wired. Everything optional so partial data renders honestly.
+ */
+export interface DerivativesMetrics {
+  /* --- Tier 1: LIVE (DeFi Llama + CoinGecko, reuse existing clients) --- */
+  /** Protocol TVL (USD) — DeFi Llama /protocol/{slug}. */
+  tvlUsd?: Sourced<number | null>;
+  /** TVL change over 1d / 7d (%). */
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  /** Open interest (USD) — DeFi Llama (Perp DEX). */
+  openInterestUsd?: Sourced<number | null>;
+  /** 24h trading volume (USD) — DeFi Llama /summary/derivatives/{slug}. */
+  volume24hUsd?: Sourced<number | null>;
+  /** Protocol fees / revenue — DeFi Llama /summary/fees/{slug}. */
+  feesRevenue?: ProtocolFeesRevenue | null;
+  /** Governance token price (USD) — CoinGecko. */
+  tokenPriceUsd?: Sourced<number | null>;
+  /** Governance token market cap (USD) — CoinGecko. */
+  marketCapUsd?: Sourced<number | null>;
+  /** Market share within sub-sector (%) — derived across the tag set. */
+  marketSharePct?: number | null;
+  /* --- Tier 2: SCHEMA RESERVED (curated/theoretical until indexed) --- */
+  /** Max leverage offered (x) — curated (Perp DEX). */
+  maxLeverageX?: number | null;
+  /** Supported markets (crypto / forex / commodities) — curated (Gains). */
+  supportedMarkets?: string[];
+  /** Pricing model ("oracle" | "orderbook" | "vAMM") — curated. */
+  pricingModel?: string | null;
+  /** Vault strategies (covered call, CSP…) — curated (Option Vaults). */
+  vaultStrategies?: string[];
+  /** Vault APY (%) — Option Vaults / Delta-Neutral. */
+  vaultApyPct?: Sourced<number | null>;
+  /** Hedge venues where shorts are placed (GMX, Aave…) — Delta-Neutral. */
+  hedgeVenue?: string[];
+  /** Funding rate (%) — Delta-Neutral. */
+  fundingRatePct?: Sourced<number | null>;
   /** Structured governance metrics (reuse existing type). */
   governanceDetail?: GovernanceActivityDetail | null;
   /** Audit / exploit history (curated). */
@@ -1728,6 +1792,12 @@ export interface NetworkProfile {
   liquiditySecondaryTags?: LiquiditySecondaryTag[];
   /** Liquidity-entity metrics block (live + curated) — `sector === "Liquidity"`. */
   liquidity?: LiquidityMetrics | null;
+  /** Derivatives primary sub-sector (when sector === "Derivatives", or as a secondary marker). */
+  derivativesSubSector?: DerivativesSubSector | null;
+  /** Derivatives secondary tags (0+): Oracle-Based, Orderbook, Funding-Rate-Yield, etc. */
+  derivativesSecondaryTags?: DerivativesSecondaryTag[];
+  /** Derivatives-entity metrics block (live + curated) — `sector === "Derivatives"`. */
+  derivatives?: DerivativesMetrics | null;
   /** High-cardinality child entity slugs (RealT properties, Centrifuge pools, …). */
   childEntities?: string[];
   memberCoins: MemberCoinRef[];

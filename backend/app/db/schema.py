@@ -67,6 +67,7 @@ NETWORK_SECTORS = (
     "RWA",
     "Staking",
     "Liquidity",
+    "Derivatives",
 )
 
 # Credit-sector tags (replaces the legacy 5-value lending taxonomy).
@@ -198,6 +199,22 @@ LIQUIDITY_SECONDARY_TAGS = (
     "ve-Tokenomics",           # vote-escrow boosted (Curve, Convex, Aura)
 )
 
+# Derivatives sub-sectors — the three Derivatives tags (canhav-derivatives spec §1.2).
+DERIVATIVES_SUBSECTORS = (
+    "Perp DEX",       # on-chain perpetual futures (GMX, Synthetix, Gains, Aevo, Hyperliquid)
+    "Option Vaults",  # automated options strategy vaults / DOVs (Ribbon, Dopex, Derive, Jones)
+    "Delta-Neutral",  # hedged zero-delta yield strategies (Ethena, Rage Trade, Neutra)
+)
+
+DERIVATIVES_SECONDARY_TAGS = (
+    "Oracle-Based",        # GMX, Gains (oracle pricing vs orderbook)
+    "Orderbook",           # Aevo, Hyperliquid
+    "Synthetic-Assets",    # Synthetix synths
+    "Auto-Strategy",       # DOVs / managed vaults (Ribbon, Jones)
+    "Funding-Rate-Yield",  # delta-neutral funding capture (Ethena)
+    "Multi-Chain",
+)
+
 ASSET_SUBTYPES = (
     "fiat-stablecoin",
     "synthetic-dollar",
@@ -234,7 +251,12 @@ CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
     "curve-finance": ("Stablecoin", "Liquidity"),
     "jupiter": ("Stablecoin", "Perpetuals"),
     "pancakeswap": ("Perpetuals", "Liquidity"),
-    "hyperliquid": ("Perpetuals",),
+    # Perp DEX venues cross-tagged into the new Derivatives sector (Perp DEX) —
+    # canhav-derivatives spec §3 (extend the existing DEX entity, do not duplicate).
+    # Legacy "Perpetuals" kept for back-compat (removed in a later cleanup).
+    "hyperliquid": ("Perpetuals", "Derivatives"),
+    "gmx": ("Perpetuals", "Derivatives"),
+    "gains-network": ("Perpetuals", "Derivatives"),
     # DEX venues cross-tagged into the Liquidity sector (Pools) — canhav-liquidity
     # spec §1.3 (extend the existing DEX entity, do not duplicate).
     "uniswap": ("Liquidity",),
@@ -245,8 +267,9 @@ CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
     "mountain-protocol": ("RWA",),
     # Ethena & Frax are stablecoin issuers whose backing touches RWAs; they are
     # NOT RWA tokenization protocols. Keep them out of the RWA sector (the
-    # RWA-Backed flavour is captured via StablecoinSecondaryTag instead).
-    "ethena": ("Yield",),
+    # RWA-Backed flavour is captured via StablecoinSecondaryTag instead). Ethena is
+    # DeFi Llama-classified "Basis Trading" (delta-neutral) → Derivatives cross-tag.
+    "ethena": ("Yield", "Derivatives"),
     "anzen": ("RWA",),
     "usd-ai": ("Stablecoin", "RWA"),
     "frax": ("Staking",),

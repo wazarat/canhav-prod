@@ -55,6 +55,16 @@ LLAMA_PROTOCOL_SLUGS: dict[str, Optional[str]] = {
     "gmx": "gmx",
     "drift-protocol": "drift-trade",
     "gains-network": "gains-network",
+    # Derivatives networks (canhav-derivatives spec §3/§4/§5) — protocol TVL.
+    # gmx/gains-network/hyperliquid mapped above. Keyed by canhav entity slug.
+    "synthetix": "synthetix-v3",
+    "aevo": "aevo-perps",
+    "ribbon-finance": "ribbon",
+    "dopex": "dopex",
+    "derive": "derive-v2",
+    "jones-dao": "jones-dao",
+    "rage-trade": "rage-trade-v1",
+    "neutra-finance": "neutral-trade",
     # RWA networks — issuer/protocol TVL.
     "ondo-finance": "ondo-finance",
     "pleasing-market": "pleasing-gold",

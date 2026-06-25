@@ -91,6 +91,8 @@ def _sector_subsector_sets(sector: Optional[str]) -> Tuple[Optional[Tuple[str, .
         return schema.STAKING_SUBSECTORS, schema.STAKING_SECONDARY_TAGS
     if sector == "Liquidity":
         return schema.LIQUIDITY_SUBSECTORS, schema.LIQUIDITY_SECONDARY_TAGS
+    if sector == "Derivatives":
+        return schema.DERIVATIVES_SUBSECTORS, schema.DERIVATIVES_SECONDARY_TAGS
     return None, None
 
 
@@ -121,6 +123,7 @@ def validate_entity_spec(slug: str, spec: Dict[str, Any], errors: List[str]) -> 
         ("rwa_sub_sector", schema.RWA_SUBSECTORS),
         ("staking_sub_sector", schema.STAKING_SUBSECTORS),
         ("liquidity_sub_sector", schema.LIQUIDITY_SUBSECTORS),
+        ("derivatives_sub_sector", schema.DERIVATIVES_SUBSECTORS),
     ):
         val = spec.get(field)
         if val and val not in allowed:
@@ -132,6 +135,7 @@ def validate_entity_spec(slug: str, spec: Dict[str, Any], errors: List[str]) -> 
         ("rwa_secondary_tags", schema.RWA_SECONDARY_TAGS),
         ("staking_secondary_tags", schema.STAKING_SECONDARY_TAGS),
         ("liquidity_secondary_tags", schema.LIQUIDITY_SECONDARY_TAGS),
+        ("derivatives_secondary_tags", schema.DERIVATIVES_SECONDARY_TAGS),
     ):
         for tag in spec.get(field) or []:
             if tag not in allowed:
@@ -188,6 +192,8 @@ def validate_store_items(items: Dict[str, Any]) -> Tuple[List[str], List[str]]:
                 "staking_secondary_tags": item.get("StakingSecondaryTags"),
                 "liquidity_sub_sector": item.get("LiquiditySubSector"),
                 "liquidity_secondary_tags": item.get("LiquiditySecondaryTags"),
+                "derivatives_sub_sector": item.get("DerivativesSubSector"),
+                "derivatives_secondary_tags": item.get("DerivativesSecondaryTags"),
             }
             validate_entity_spec(slug, spec_like, errors)
 

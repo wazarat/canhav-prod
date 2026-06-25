@@ -42,6 +42,7 @@ from dex_specs import DEX_ENTITY_SPECS  # noqa: E402
 from rwa_specs import RWA_ENTITY_SPECS  # noqa: E402
 from staking_specs import STAKING_ENTITY_SPECS  # noqa: E402
 from liquidity_specs import LIQUIDITY_ENTITY_SPECS  # noqa: E402
+from derivatives_specs import DERIVATIVES_ENTITY_SPECS  # noqa: E402
 
 DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
 DOWNLOADS_CSV = Path.home() / "Downloads" / "Arbitrum Ecosystem - scrape v2.csv"
@@ -1071,6 +1072,11 @@ ENTITY_SPECS.update(STAKING_ENTITY_SPECS)
 # Beefy, Aura, Arrakis, Maverick (Vaults). The five in-platform DEX venues
 # (Curve, Uniswap, Balancer, Aerodrome, PancakeSwap) are extend-existing (below).
 ENTITY_SPECS.update(LIQUIDITY_ENTITY_SPECS)
+# Derivatives cohort (canhav-derivatives spec §3/§4/§5): Synthetix, Aevo (Perp DEX);
+# Ribbon, Dopex, Derive, Jones DAO (Option Vaults); Rage Trade, Neutra (Delta-Neutral).
+# The in-platform perp venues (GMX, Gains, Hyperliquid) + Ethena are extend-existing
+# (below); dYdX (Cosmos) and Drift (Solana) are excluded as non-EVM.
+ENTITY_SPECS.update(DERIVATIVES_ENTITY_SPECS)
 
 # Stablecoin sub-sector backfill for the pre-existing issuers (PDF §2). Primary
 # stablecoin issuers also get sector="Stablecoin"; cross-tagged protocols keep
@@ -1314,6 +1320,43 @@ for _slug, _liq in _LIQUIDITY_EXTEND_EXISTING.items():
             _existing.append("Liquidity")
         _spec["secondary_sectors"] = _existing
 
+# Derivatives extend-existing (canhav-derivatives spec §3/§5): in-platform perp
+# venues + Ethena keep their primary sector (DEX / Stablecoin) and gain
+# "Derivatives" as a secondary sector + the relevant sub-sector tag, rather than
+# creating duplicate entities. Their token member coins (GMX/GNS/HYPE/ENA) already
+# exist, so the Derivatives-tagged view aggregates them automatically. Only
+# EVM-compatible venues are extended (dYdX/Cosmos and Drift/Solana are excluded).
+# Runs after all other secondary-sector assignments so "Derivatives" is merged in.
+_DERIVATIVES_EXTEND_EXISTING: Dict[str, Dict[str, Any]] = {
+    "gmx": {
+        "derivatives_sub_sector": "Perp DEX",
+        "derivatives_secondary_tags": ["Oracle-Based", "Multi-Chain"],
+    },
+    "gains-network": {
+        "derivatives_sub_sector": "Perp DEX",
+        "derivatives_secondary_tags": ["Oracle-Based", "Multi-Chain"],
+    },
+    "hyperliquid": {
+        "derivatives_sub_sector": "Perp DEX",
+        "derivatives_secondary_tags": ["Orderbook"],
+    },
+    # Ethena keeps primary Stablecoin; DeFi Llama classifies it as "Basis Trading"
+    # (the canonical delta-neutral protocol), so it gains a secondary Derivatives tag.
+    "ethena": {
+        "derivatives_sub_sector": "Delta-Neutral",
+        "derivatives_secondary_tags": ["Funding-Rate-Yield"],
+    },
+}
+for _slug, _deriv in _DERIVATIVES_EXTEND_EXISTING.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["derivatives_sub_sector"] = _deriv["derivatives_sub_sector"]
+        _spec["derivatives_secondary_tags"] = _deriv["derivatives_secondary_tags"]
+        _existing = list(_spec.get("secondary_sectors") or [])
+        if "Derivatives" not in _existing:
+            _existing.append("Derivatives")
+        _spec["secondary_sectors"] = _existing
+
 
 def build_entity_item(
     slug: str, spec: Dict[str, Any], parent_row: Optional[Dict[str, str]], created_at: str
@@ -1402,6 +1445,10 @@ def build_entity_item(
         "LiquiditySubSector": spec.get("liquidity_sub_sector"),
         "LiquiditySecondaryTags": spec.get("liquidity_secondary_tags"),
         "Liquidity": spec.get("liquidity"),
+        # Derivatives taxonomy + metrics (canhav-derivatives spec §1).
+        "DerivativesSubSector": spec.get("derivatives_sub_sector"),
+        "DerivativesSecondaryTags": spec.get("derivatives_secondary_tags"),
+        "Derivatives": spec.get("derivatives"),
         "MemberCoins": spec["member_coins"],
         "ChildEntities": spec.get("child_entities"),
         "ArbitrumPortalMetadata": {

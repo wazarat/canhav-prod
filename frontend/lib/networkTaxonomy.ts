@@ -1,6 +1,7 @@
 import type { BadgeTone } from "@/components/ui/Badge";
 import type {
   CreditTag,
+  DerivativesSubSector,
   LiquiditySubSector,
   NetworkProfile,
   RwaSecondaryTag,
@@ -26,6 +27,13 @@ export const STAKING_PRIMARY_TAGS: StakingSubSector[] = [
 /** Primary Liquidity tag vocabulary for the network-tab filter row. */
 export const LIQUIDITY_PRIMARY_TAGS: LiquiditySubSector[] = ["Pools", "Vaults"];
 
+/** Primary Derivatives tag vocabulary for the network-tab filter row. */
+export const DERIVATIVES_PRIMARY_TAGS: DerivativesSubSector[] = [
+  "Perp DEX",
+  "Option Vaults",
+  "Delta-Neutral",
+];
+
 /** RWA attribute-tag vocabulary for the network-tab filter row (5-tag revamp). */
 export const RWA_SECONDARY_TAGS: RwaSecondaryTag[] = [
   "Institutional-Gated",
@@ -50,6 +58,8 @@ export function sectorBadgeTone(sector: string | null | undefined): BadgeTone {
       return "positive";
     case "Liquidity":
       return "electric";
+    case "Derivatives":
+      return "warning";
     default:
       return "neutral";
   }
@@ -93,6 +103,11 @@ export function tagsForSector(profile: NetworkProfile, sector: string): string[]
       Boolean,
     ) as string[];
   }
+  if (sector === "Derivatives") {
+    return [profile.derivativesSubSector, ...(profile.derivativesSecondaryTags ?? [])].filter(
+      Boolean,
+    ) as string[];
+  }
   return profile.tags ?? (profile.subSector ? [profile.subSector] : []);
 }
 
@@ -103,6 +118,9 @@ export function filterTagsForSector(profile: NetworkProfile, sector: string): st
   }
   if (sector === "Liquidity") {
     return profile.liquiditySubSector ? [profile.liquiditySubSector] : [];
+  }
+  if (sector === "Derivatives") {
+    return profile.derivativesSubSector ? [profile.derivativesSubSector] : [];
   }
   if (sector === "Credit") {
     return profile.tags ?? (profile.subSector ? [profile.subSector] : []);
@@ -127,6 +145,7 @@ export function sectorFilterTagOptions(sector: string): string[] | null {
   if (sector === "Credit") return [...CREDIT_PRIMARY_TAGS];
   if (sector === "Staking") return [...STAKING_PRIMARY_TAGS];
   if (sector === "Liquidity") return [...LIQUIDITY_PRIMARY_TAGS];
+  if (sector === "Derivatives") return [...DERIVATIVES_PRIMARY_TAGS];
   if (sector === "RWA") return [...RWA_SECONDARY_TAGS];
   return null;
 }

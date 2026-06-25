@@ -245,6 +245,14 @@ function enrichNetworksWithTvl(
       return { ...network, currentScale: { ...network.currentScale, tvlUsd: liquidityTvl } };
     }
 
+    // Derivatives entities (e.g. tokenless Rage Trade / Neutra / Dopex) source
+    // their headline number from protocol TVL (DeFi Llama). Extend-existing perp
+    // venues keep their own headline (already set above), so they never reach here.
+    const derivativesTvl = network.derivatives?.tvlUsd?.value;
+    if (derivativesTvl != null && derivativesTvl > 0) {
+      return { ...network, currentScale: { ...network.currentScale, tvlUsd: derivativesTvl } };
+    }
+
     let total = 0;
     let found = false;
     for (const ref of network.memberCoins) {

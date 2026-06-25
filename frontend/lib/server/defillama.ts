@@ -176,6 +176,18 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
   gmx: "gmx",
   "drift-protocol": "drift-trade",
   "gains-network": "gains-network",
+  // Derivatives sector (canhav-derivatives spec §3/§4/§5). The in-platform perp
+  // venues (gmx/gains-network/hyperliquid) are mapped above. These are the new
+  // primary-Derivatives entities; tokenless ones (dopex/rage-trade/neutra-finance)
+  // still source TVL here (path c). Keyed by canhav entity slug.
+  synthetix: "synthetix-v3",
+  aevo: "aevo-perps",
+  "ribbon-finance": "ribbon",
+  dopex: "dopex",
+  derive: "derive-v2",
+  "jones-dao": "jones-dao",
+  "rage-trade": "rage-trade-v1",
+  "neutra-finance": "neutral-trade",
   // RWA networks (sector expansion) — issuer/protocol TVL (verified 2026-06-18).
   "ondo-finance": "ondo-finance",
   "pleasing-market": "pleasing-gold",

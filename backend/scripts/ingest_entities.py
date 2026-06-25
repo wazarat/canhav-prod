@@ -41,6 +41,7 @@ from stablecoin_specs import STABLECOIN_ENTITY_SPECS  # noqa: E402
 from dex_specs import DEX_ENTITY_SPECS  # noqa: E402
 from rwa_specs import RWA_ENTITY_SPECS  # noqa: E402
 from staking_specs import STAKING_ENTITY_SPECS  # noqa: E402
+from liquidity_specs import LIQUIDITY_ENTITY_SPECS  # noqa: E402
 
 DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
 DOWNLOADS_CSV = Path.home() / "Downloads" / "Arbitrum Ecosystem - scrape v2.csv"
@@ -1066,6 +1067,10 @@ ENTITY_SPECS.update(RWA_ENTITY_SPECS)
 # EigenLayer, Symbiotic, Karak (Restaking); ether.fi, Renzo, Kelp, Puffer,
 # Bedrock, YieldNest (Liquid Restaking). Frax is extend-existing (below).
 ENTITY_SPECS.update(STAKING_ENTITY_SPECS)
+# Liquidity cohort (canhav-liquidity spec §3/§4): Gamma (Pools); Yearn, Convex,
+# Beefy, Aura, Arrakis, Maverick (Vaults). The five in-platform DEX venues
+# (Curve, Uniswap, Balancer, Aerodrome, PancakeSwap) are extend-existing (below).
+ENTITY_SPECS.update(LIQUIDITY_ENTITY_SPECS)
 
 # Stablecoin sub-sector backfill for the pre-existing issuers (PDF §2). Primary
 # stablecoin issuers also get sector="Stablecoin"; cross-tagged protocols keep
@@ -1271,6 +1276,45 @@ if _ONDO_SPEC is not None:
     )
     _ONDO_SPEC["offchain_facts"] = _existing_facts
 
+# Liquidity extend-existing (canhav-liquidity spec §1.3): the in-platform DEX
+# venues that also enable LPing keep their primary DEX sector and gain "Liquidity"
+# as a secondary sector + the "Pools" sub-sector tag, rather than creating
+# duplicate entities. Their token member coins (CRV/UNI/BAL/AERO/CAKE) already
+# exist on these specs, so the Liquidity-tagged view aggregates them automatically.
+# Runs after all other secondary-sector assignments so "Liquidity" is merged in.
+_LIQUIDITY_EXTEND_EXISTING: Dict[str, Dict[str, Any]] = {
+    "curve-finance": {
+        "liquidity_sub_sector": "Pools",
+        "liquidity_secondary_tags": ["Stable-Pools", "ve-Tokenomics", "Multi-Chain"],
+    },
+    "uniswap": {
+        "liquidity_sub_sector": "Pools",
+        "liquidity_secondary_tags": ["Concentrated-Liquidity", "Multi-Chain"],
+    },
+    "balancer": {
+        "liquidity_sub_sector": "Pools",
+        "liquidity_secondary_tags": ["Stable-Pools", "ve-Tokenomics"],
+    },
+    "aerodrome": {
+        "liquidity_sub_sector": "Pools",
+        "liquidity_secondary_tags": ["Concentrated-Liquidity", "ve-Tokenomics"],
+    },
+    "pancakeswap": {
+        "liquidity_sub_sector": "Pools",
+        "liquidity_secondary_tags": ["Concentrated-Liquidity", "Multi-Chain"],
+    },
+}
+for _slug, _liq in _LIQUIDITY_EXTEND_EXISTING.items():
+    _spec = ENTITY_SPECS.get(_slug)
+    if _spec is not None:
+        _spec["liquidity_sub_sector"] = _liq["liquidity_sub_sector"]
+        _spec["liquidity_secondary_tags"] = _liq["liquidity_secondary_tags"]
+        _existing = list(_spec.get("secondary_sectors") or [])
+        if "Liquidity" not in _existing:
+            _existing.append("Liquidity")
+        _spec["secondary_sectors"] = _existing
+
+
 def build_entity_item(
     slug: str, spec: Dict[str, Any], parent_row: Optional[Dict[str, str]], created_at: str
 ) -> dict:
@@ -1354,6 +1398,10 @@ def build_entity_item(
         "StakingSubSector": spec.get("staking_sub_sector"),
         "StakingSecondaryTags": spec.get("staking_secondary_tags"),
         "Staking": spec.get("staking"),
+        # Liquidity taxonomy + metrics (canhav-liquidity spec §1).
+        "LiquiditySubSector": spec.get("liquidity_sub_sector"),
+        "LiquiditySecondaryTags": spec.get("liquidity_secondary_tags"),
+        "Liquidity": spec.get("liquidity"),
         "MemberCoins": spec["member_coins"],
         "ChildEntities": spec.get("child_entities"),
         "ArbitrumPortalMetadata": {

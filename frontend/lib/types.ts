@@ -902,7 +902,8 @@ export type NetworkSector =
   | "Options"
   | "Stablecoin"
   | "RWA"
-  | "Staking";
+  | "Staking"
+  | "Liquidity";
 
 /** Credit-sector tags (replaces the legacy 5-value lending taxonomy). */
 export type CreditTag =
@@ -1021,6 +1022,20 @@ export type StakingSecondaryTag =
   | "EigenLayer-Strategy-Manager" // Renzo
   | "CDP-Integrated" // Frax sfrxETH
   | "L2-Ecosystem"; // Mantle mETH
+
+/** Liquidity primary sub-sector — the two Liquidity tags. */
+export type LiquiditySubSector =
+  | "Pools" // LPing / stable pools: deposit asset pairs to enable swaps & earn fees (Curve, Uniswap V3)
+  | "Vaults"; // yield farming / auto-compounding vaults over LP strategies (Yearn, Convex, Beefy)
+
+/** Liquidity cross-cutting secondary tags (0+, multi-select). */
+export type LiquiditySecondaryTag =
+  | "Stable-Pools" // pools of like-priced assets (Curve 3pool)
+  | "Concentrated-Liquidity" // Uniswap V3 / Maverick style
+  | "Auto-Compounding" // vaults that harvest + reinvest
+  | "LP-Strategy-Manager" // manages/optimizes LP positions (Gamma, Arrakis)
+  | "Multi-Chain"
+  | "ve-Tokenomics"; // vote-escrow boosted (Curve, Convex, Aura)
 
 /** Fiat-Backed Regulated sub-sector metrics (Circle, Paxos, First Digital). */
 export interface StablecoinFiatBackedMetrics {
@@ -1308,6 +1323,51 @@ export interface StakingMetrics {
   withdrawalQueue?: string | null;
   /** Underlying LST composition for basket LRTs (e.g. rsETH). */
   collateralBasket?: { asset: string; pct: number }[] | null;
+  /** Structured governance metrics (reuse existing type). */
+  governanceDetail?: GovernanceActivityDetail | null;
+  /** Audit / exploit history (curated). */
+  auditHistory?: string | null;
+  /** Chain / ecosystem deployment (reuse existing type). */
+  deployment?: ChainDeployment | null;
+}
+
+/**
+ * Liquidity-entity metrics block (sector === "Liquidity"). Mirrors the
+ * `StakingMetrics` pattern: Tier-1 fields are filled live by the DeFiLlama +
+ * CoinGecko cron; Tier-2 fields are schema-reserved and stay curated/null until
+ * indexers are wired. Everything optional so partial data renders honestly.
+ */
+export interface LiquidityMetrics {
+  /* --- Tier 1: LIVE (DeFi Llama + CoinGecko, reuse existing clients) --- */
+  /** Protocol TVL (USD) — DeFi Llama /protocol/{slug}. */
+  tvlUsd?: Sourced<number | null>;
+  /** TVL change over 1d / 7d (%). */
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  /** 24h swap volume (USD) — DeFi Llama /summary/dexs/{slug} (Pools). */
+  volume24hUsd?: Sourced<number | null>;
+  /** Protocol fees / revenue — DeFi Llama /summary/fees/{slug}. */
+  feesRevenue?: ProtocolFeesRevenue | null;
+  /** Governance token price (USD) — CoinGecko. */
+  tokenPriceUsd?: Sourced<number | null>;
+  /** Governance token market cap (USD) — CoinGecko. */
+  marketCapUsd?: Sourced<number | null>;
+  /** Market share within sub-sector (%) — derived across the tag set. */
+  marketSharePct?: number | null;
+  /* --- Tier 2: SCHEMA RESERVED (curated/theoretical until indexed) --- */
+  /** Number of active pools (Pools). */
+  poolCount?: Sourced<number | null>;
+  /** Top pools by TVL (Pools). */
+  topPools?: { name: string; tvlUsd: number; apyPct: number | null }[] | null;
+  /** Number of vaults (Vaults). */
+  vaultCount?: Sourced<number | null>;
+  /** Weighted average vault APY (%) (Vaults). */
+  avgVaultApyPct?: Sourced<number | null>;
+  /** Strategies / protocols deployed into (Curve, Convex…). */
+  underlyingProtocols?: string[];
+  /** Vault performance fee (%) (curated). */
+  performanceFeePct?: number | null;
+  /** Impermanent-loss exposure note (curated). */
+  ileImpermanentLossNote?: string | null;
   /** Structured governance metrics (reuse existing type). */
   governanceDetail?: GovernanceActivityDetail | null;
   /** Audit / exploit history (curated). */
@@ -1662,6 +1722,12 @@ export interface NetworkProfile {
   stakingSecondaryTags?: StakingSecondaryTag[];
   /** Staking-entity metrics block (live + curated) — `sector === "Staking"`. */
   staking?: StakingMetrics | null;
+  /** Liquidity primary sub-sector (when sector === "Liquidity", or as a secondary marker). */
+  liquiditySubSector?: LiquiditySubSector | null;
+  /** Liquidity secondary tags (0+): Stable-Pools, Auto-Compounding, etc. */
+  liquiditySecondaryTags?: LiquiditySecondaryTag[];
+  /** Liquidity-entity metrics block (live + curated) — `sector === "Liquidity"`. */
+  liquidity?: LiquidityMetrics | null;
   /** High-cardinality child entity slugs (RealT properties, Centrifuge pools, …). */
   childEntities?: string[];
   memberCoins: MemberCoinRef[];

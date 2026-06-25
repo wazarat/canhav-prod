@@ -50,6 +50,8 @@ import { hasUpstash, putItem, readAllItemsFromRedis } from "@/lib/server/redis";
 import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
 import { collectAllStakingMetrics } from "@/lib/server/staking";
 import { STAKING_SEED } from "@/data/staking-seed";
+import { collectAllLiquidityMetrics } from "@/lib/server/liquidity";
+import { LIQUIDITY_SEED } from "@/data/liquidity-seed";
 import { pegVsCurrency } from "@/lib/server/series";
 import {
   fetchJustLendLiveMetrics,
@@ -1313,6 +1315,41 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
   }
 
+  // --- Liquidity networks: DeFi Llama + CoinGecko Tier-1 metrics -------------
+  // For each network tagged sector "Liquidity" (primary, e.g. Yearn/Convex, or
+  // secondary, e.g. the cross-tagged DEX venues Curve/Uniswap/...), overlay live
+  // Tier-1 Liquidity metrics (tvlUsd, tvlChangePct, fees, token price/mcap,
+  // derived marketSharePct) onto the curated `Liquidity` block. Tier-2 fields
+  // (poolCount, vaultCount, avgVaultApyPct, governance) stay curated/null. The
+  // headline CurrentScale.tvlUsd is only written for PRIMARY-Liquidity entities,
+  // so the cross-tagged DEX venues keep their DEX-pass headline TVL.
+  const liquidityResults: { slug: string; tvlUsd: number | null }[] = [];
+  const liquidityItems = items.filter(
+    (it) =>
+      isNetworkCategory(String(it.Category ?? "")) &&
+      (String(it.Sector ?? "") === "Liquidity" ||
+        (Array.isArray(it.SecondarySectors) && it.SecondarySectors.includes("Liquidity"))),
+  );
+  if (liquidityItems.length > 0) {
+    const metricsBySlug = await collectAllLiquidityMetrics(LIQUIDITY_SEED);
+    for (const item of liquidityItems) {
+      const slug = String(item.Slug ?? "");
+      const live = metricsBySlug.get(slug);
+      if (!live || Object.keys(live).length === 0) continue;
+      // Preserve curated Tier-2 fields; overlay live Tier-1 fields.
+      item.Liquidity = { ...(item.Liquidity ?? {}), ...live };
+      const tvlUsd = live.tvlUsd?.value ?? null;
+      if (tvlUsd != null && String(item.Sector ?? "") === "Liquidity") {
+        item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
+        syncUniversalTvlFromCurrentScale(item, "DeFi Llama liquidity TVL");
+      }
+      item.UpdatedAt = nowIso();
+      await putItem(item);
+      updated += 1;
+      liquidityResults.push({ slug, tvlUsd });
+    }
+  }
+
   // --- Universal metrics: consistent Tier-1 block for EVERY network ----------
   const networkItems = items.filter((it) => isNetworkCategory(String(it.Category ?? "")));
   const llamaMetaBySlug = new Map<string, LlamaProtocolMeta | null>();
@@ -1570,6 +1607,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     else if (String(item.Sector ?? "") === "Credit") label = "DeFi Llama lending TVL";
     else if (String(item.Sector ?? "") === "RWA") label = "DeFi Llama RWA AUM";
     else if (String(item.Sector ?? "") === "Staking") label = "DeFi Llama staking TVL";
+    else if (String(item.Sector ?? "") === "Liquidity") label = "DeFi Llama liquidity TVL";
     if (syncUniversalTvlFromCurrentScale(item, label)) {
       item.UpdatedAt = nowIso();
       await putItem(item);
@@ -1606,6 +1644,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     lending: lendingResults,
     creditTags: creditTagResults,
     staking: stakingResults,
+    liquidity: liquidityResults,
     dex: dexResults,
     rwa: rwaResults,
     universal: universalResults,

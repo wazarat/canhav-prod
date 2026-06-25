@@ -282,6 +282,9 @@ export async function readLiveStore(): Promise<LiveStore> {
         stakingSubSector: item.StakingSubSector ?? null,
         stakingSecondaryTags: item.StakingSecondaryTags ?? undefined,
         staking: item.Staking ?? null,
+        liquiditySubSector: item.LiquiditySubSector ?? null,
+        liquiditySecondaryTags: item.LiquiditySecondaryTags ?? undefined,
+        liquidity: item.Liquidity ?? null,
         childEntities: item.ChildEntities ?? undefined,
         currentScale: {
           tvlUsd: null,

@@ -66,6 +66,7 @@ NETWORK_SECTORS = (
     "Stablecoin",
     "RWA",
     "Staking",
+    "Liquidity",
 )
 
 # Credit-sector tags (replaces the legacy 5-value lending taxonomy).
@@ -182,6 +183,21 @@ STAKING_SECONDARY_TAGS = (
     "L2-Ecosystem",
 )
 
+# Liquidity sub-sectors — the two Liquidity tags (canhav-liquidity spec §1.2).
+LIQUIDITY_SUBSECTORS = (
+    "Pools",   # LPing / stable pools (Curve, Uniswap V3, Balancer)
+    "Vaults",  # yield farming / auto-compounding vaults (Yearn, Convex, Beefy)
+)
+
+LIQUIDITY_SECONDARY_TAGS = (
+    "Stable-Pools",            # pools of like-priced assets (Curve 3pool)
+    "Concentrated-Liquidity",  # Uniswap V3 / Maverick style
+    "Auto-Compounding",        # vaults that harvest + reinvest
+    "LP-Strategy-Manager",     # manages/optimizes LP positions (Gamma, Arrakis)
+    "Multi-Chain",
+    "ve-Tokenomics",           # vote-escrow boosted (Curve, Convex, Aura)
+)
+
 ASSET_SUBTYPES = (
     "fiat-stablecoin",
     "synthetic-dollar",
@@ -215,10 +231,15 @@ CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
     "aave": ("Stablecoin",),
     "sky": ("Credit",),
     "spark": ("Stablecoin",),
-    "curve-finance": ("Stablecoin",),
+    "curve-finance": ("Stablecoin", "Liquidity"),
     "jupiter": ("Stablecoin", "Perpetuals"),
-    "pancakeswap": ("Perpetuals",),
+    "pancakeswap": ("Perpetuals", "Liquidity"),
     "hyperliquid": ("Perpetuals",),
+    # DEX venues cross-tagged into the Liquidity sector (Pools) — canhav-liquidity
+    # spec §1.3 (extend the existing DEX entity, do not duplicate).
+    "uniswap": ("Liquidity",),
+    "balancer": ("Liquidity",),
+    "aerodrome": ("Liquidity",),
     "ondo-finance": ("Stablecoin",),
     "pleasing-market": ("Stablecoin",),
     "mountain-protocol": ("RWA",),

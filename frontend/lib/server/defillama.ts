@@ -145,6 +145,16 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
   puffer: "puffer-stake",
   bedrock: "bedrock-unieth",
   yieldnest: "yieldnest",
+  // Liquidity sector (Pools / Vaults; verified 2026-06-25). The five in-platform
+  // DEX venues (curve-finance/uniswap/balancer/aerodrome/pancakeswap) are mapped
+  // in the DEX section above; these are the new primary-Liquidity entities.
+  gamma: "gamma",
+  "yearn-finance": "yearn-finance",
+  "convex-finance": "convex-finance",
+  beefy: "beefy",
+  aura: "aura",
+  arrakis: "arrakis-modular",
+  maverick: "maverick-protocol",
   centrifuge: "centrifuge-protocol",
   dinari: "dinari",
   "estate-protocol": "estate-protocol",

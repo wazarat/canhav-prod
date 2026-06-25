@@ -256,6 +256,16 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   puffer: "pufeth",
   bedrock: "universal-eth",
   yieldnest: "yieldnest-restaked-eth",
+  // Liquidity sector — governance token for the universal pass (verified 2026-06-25).
+  // The five extend-existing DEX venues (curve-finance/uniswap/balancer/aerodrome/
+  // pancakeswap) are already mapped above.
+  gamma: "gamma-strategies",
+  "yearn-finance": "yearn-finance",
+  "convex-finance": "convex-finance",
+  beefy: "beefy-finance",
+  aura: "aura-finance",
+  arrakis: null, // tokenless — TVL sourced from DeFi Llama only
+  maverick: "maverick-protocol",
   // Stablecoin issuers / TradFi — no meaningful governance token for universals.
   tether: null,
   circle: null,

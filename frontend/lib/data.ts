@@ -238,6 +238,13 @@ function enrichNetworksWithTvl(
       return { ...network, currentScale: { ...network.currentScale, tvlUsd: stakingTvl } };
     }
 
+    // Liquidity entities (e.g. tokenless Arrakis) source their headline number
+    // from protocol TVL (DeFi Llama) rather than aggregated member-coin mcap.
+    const liquidityTvl = network.liquidity?.tvlUsd?.value;
+    if (liquidityTvl != null && liquidityTvl > 0) {
+      return { ...network, currentScale: { ...network.currentScale, tvlUsd: liquidityTvl } };
+    }
+
     let total = 0;
     let found = false;
     for (const ref of network.memberCoins) {

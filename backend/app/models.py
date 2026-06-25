@@ -524,6 +524,8 @@ class EntityProfile(BaseModel):
     rwaSecondaryTags: List[str] = Field(default_factory=list)
     stakingSubSector: Optional[str] = None
     stakingSecondaryTags: List[str] = Field(default_factory=list)
+    liquiditySubSector: Optional[str] = None
+    liquiditySecondaryTags: List[str] = Field(default_factory=list)
     childEntities: List[str] = Field(default_factory=list)
     # Ranked competitors (top->bottom) + sector metrics; passthrough dicts.
     competitors: List[dict] = Field(default_factory=list)
@@ -534,6 +536,7 @@ class EntityProfile(BaseModel):
     stablecoin: Optional[dict] = None
     dex: Optional[dict] = None
     rwa: Optional[dict] = None
+    liquidity: Optional[dict] = None
     memberCoins: List[MemberCoinRef] = Field(default_factory=list)
     # DeFi Llama overlays (written by the cron); passthrough dicts. Options /
     # open-interest are scaffolded for the coming-soon options/perpetuals categories.
@@ -585,6 +588,8 @@ class EntityProfile(BaseModel):
             "RwaSecondaryTags": self.rwaSecondaryTags or None,
             "StakingSubSector": self.stakingSubSector,
             "StakingSecondaryTags": self.stakingSecondaryTags or None,
+            "LiquiditySubSector": self.liquiditySubSector,
+            "LiquiditySecondaryTags": self.liquiditySecondaryTags or None,
             "ChildEntities": self.childEntities or None,
             "Competitors": self.competitors,
             "Lending": self.lending,
@@ -593,6 +598,7 @@ class EntityProfile(BaseModel):
             "Dex": self.dex,
             "Rwa": self.rwa,
             "Staking": self.staking,
+            "Liquidity": self.liquidity,
             "Partnerships": [p.model_dump() for p in self.partnerships],
             "CurrentScale": self.currentScale.model_dump(),
             "MemberCoins": [m.model_dump() for m in self.memberCoins],
@@ -647,6 +653,8 @@ class EntityProfile(BaseModel):
             rwaSecondaryTags=item.get("RwaSecondaryTags") or [],
             stakingSubSector=item.get("StakingSubSector"),
             stakingSecondaryTags=item.get("StakingSecondaryTags") or [],
+            liquiditySubSector=item.get("LiquiditySubSector"),
+            liquiditySecondaryTags=item.get("LiquiditySecondaryTags") or [],
             childEntities=item.get("ChildEntities") or [],
             competitors=item.get("Competitors") or [],
             lending=item.get("Lending"),
@@ -655,6 +663,7 @@ class EntityProfile(BaseModel):
             dex=item.get("Dex"),
             rwa=item.get("Rwa"),
             staking=item.get("Staking"),
+            liquidity=item.get("Liquidity"),
             memberCoins=[MemberCoinRef(**m) for m in (item.get("MemberCoins") or [])],
             protocolFeesRevenue=item.get("ProtocolFeesRevenue"),
             dexVolume=item.get("DexVolume"),

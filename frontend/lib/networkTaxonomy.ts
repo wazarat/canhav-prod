@@ -1,5 +1,11 @@
 import type { BadgeTone } from "@/components/ui/Badge";
-import type { CreditTag, NetworkProfile, RwaSecondaryTag, StakingSubSector } from "@/lib/types";
+import type {
+  CreditTag,
+  LiquiditySubSector,
+  NetworkProfile,
+  RwaSecondaryTag,
+  StakingSubSector,
+} from "@/lib/types";
 
 export interface NetworkTaxonomyBadges {
   primarySector: string | null;
@@ -16,6 +22,9 @@ export const STAKING_PRIMARY_TAGS: StakingSubSector[] = [
   "Restaking",
   "Liquid Restaking",
 ];
+
+/** Primary Liquidity tag vocabulary for the network-tab filter row. */
+export const LIQUIDITY_PRIMARY_TAGS: LiquiditySubSector[] = ["Pools", "Vaults"];
 
 /** RWA attribute-tag vocabulary for the network-tab filter row (5-tag revamp). */
 export const RWA_SECONDARY_TAGS: RwaSecondaryTag[] = [
@@ -39,6 +48,8 @@ export function sectorBadgeTone(sector: string | null | undefined): BadgeTone {
       return "warning";
     case "Staking":
       return "positive";
+    case "Liquidity":
+      return "electric";
     default:
       return "neutral";
   }
@@ -77,6 +88,11 @@ export function tagsForSector(profile: NetworkProfile, sector: string): string[]
       Boolean,
     ) as string[];
   }
+  if (sector === "Liquidity") {
+    return [profile.liquiditySubSector, ...(profile.liquiditySecondaryTags ?? [])].filter(
+      Boolean,
+    ) as string[];
+  }
   return profile.tags ?? (profile.subSector ? [profile.subSector] : []);
 }
 
@@ -84,6 +100,9 @@ export function tagsForSector(profile: NetworkProfile, sector: string): string[]
 export function filterTagsForSector(profile: NetworkProfile, sector: string): string[] {
   if (sector === "Staking") {
     return profile.stakingSubSector ? [profile.stakingSubSector] : [];
+  }
+  if (sector === "Liquidity") {
+    return profile.liquiditySubSector ? [profile.liquiditySubSector] : [];
   }
   if (sector === "Credit") {
     return profile.tags ?? (profile.subSector ? [profile.subSector] : []);
@@ -107,6 +126,7 @@ export function filterTagsForSector(profile: NetworkProfile, sector: string): st
 export function sectorFilterTagOptions(sector: string): string[] | null {
   if (sector === "Credit") return [...CREDIT_PRIMARY_TAGS];
   if (sector === "Staking") return [...STAKING_PRIMARY_TAGS];
+  if (sector === "Liquidity") return [...LIQUIDITY_PRIMARY_TAGS];
   if (sector === "RWA") return [...RWA_SECONDARY_TAGS];
   return null;
 }

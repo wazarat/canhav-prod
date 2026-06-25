@@ -936,6 +936,125 @@ TOKENS: Dict[str, Dict[str, Any]] = {
         "discord": None,
         "github": None,
     },
+    # ---- Liquidity governance tokens (canhav-liquidity spec §3/§4) -------
+    # The new primary-Liquidity entities' tokens. The five extend-existing DEX
+    # venues (CRV/UNI/BAL/AERO/CAKE) already have token records above. Arrakis is
+    # tokenless (TVL sourced from DeFi Llama instead of token mcap aggregation).
+    "gamma": {
+        "name": "Gamma Strategies",
+        "symbol": "GAMMA",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance + fee-share token of Gamma Strategies; stake as xGAMMA to "
+            "earn a share of management/performance fees from its concentrated-"
+            "liquidity Hypervisor vaults."
+        ),
+        "entitySlug": "gamma",
+        "coingecko": "https://www.coingecko.com/en/coins/gamma-strategies",
+        "contractAddress": "0x6beA7CFEF803D1e3d5f7C0103f7ded065644e197",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Polygon", "Optimism", "Base"],
+        "website": "https://app.gamma.xyz",
+        "twitter": "https://x.com/GammaStrategies",
+        "discord": None,
+        "github": "https://github.com/GammaStrategies",
+    },
+    "yfi": {
+        "name": "yearn.finance",
+        "symbol": "YFI",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Yearn Finance; lock into veYFI to direct gauge "
+            "rewards and govern vault strategies and treasury."
+        ),
+        "entitySlug": "yearn-finance",
+        "coingecko": "https://www.coingecko.com/en/coins/yearn-finance",
+        "contractAddress": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Optimism", "Base", "Polygon"],
+        "website": "https://yearn.fi",
+        "twitter": "https://x.com/yearnfi",
+        "discord": None,
+        "github": "https://github.com/yearn",
+    },
+    "cvx": {
+        "name": "Convex Finance",
+        "symbol": "CVX",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Convex Finance; vote-lock as vlCVX to steer Curve "
+            "gauge emissions and earn the Curve bribe/fee economy."
+        ),
+        "entitySlug": "convex-finance",
+        "coingecko": "https://www.coingecko.com/en/coins/convex-finance",
+        "contractAddress": "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Polygon"],
+        "website": "https://www.convexfinance.com",
+        "twitter": "https://x.com/ConvexFinance",
+        "discord": None,
+        "github": "https://github.com/convex-eth",
+    },
+    "bifi": {
+        "name": "Beefy",
+        "symbol": "BIFI",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance + revenue-share token of Beefy; stake BIFI to earn a share "
+            "of the multi-chain vault platform's harvested fees."
+        ),
+        "entitySlug": "beefy",
+        "coingecko": "https://www.coingecko.com/en/coins/beefy-finance",
+        "contractAddress": "0xB1F1ee126e9c96231Cc3d3fAD7C08b4cf873b1f1",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Optimism", "Base", "Polygon", "BNB Chain"],
+        "website": "https://beefy.com",
+        "twitter": "https://x.com/beefyfinance",
+        "discord": None,
+        "github": "https://github.com/beefyfinance",
+    },
+    "aura": {
+        "name": "Aura Finance",
+        "symbol": "AURA",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Aura Finance; vote-lock as vlAURA to steer "
+            "Balancer gauge emissions and earn the Balancer bribe/fee economy."
+        ),
+        "entitySlug": "aura",
+        "coingecko": "https://www.coingecko.com/en/coins/aura-finance",
+        "contractAddress": "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One", "Optimism", "Base", "Polygon", "Gnosis"],
+        "website": "https://aura.finance",
+        "twitter": "https://x.com/aurafinance",
+        "discord": None,
+        "github": "https://github.com/aurafinance",
+    },
+    "mav": {
+        "name": "Maverick Protocol",
+        "symbol": "MAV",
+        "tokenType": "Governance",
+        "subCategory": "Governance Token",
+        "description": (
+            "Governance token of Maverick Protocol; lock into veMAV to direct "
+            "Boosted Position incentives across its dynamic-distribution AMM."
+        ),
+        "entitySlug": "maverick",
+        "coingecko": "https://www.coingecko.com/en/coins/maverick-protocol",
+        "contractAddress": "0x7448c7456a97769F6cD04F1E83A4a23cCdC46aBD",
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Base", "BNB Chain", "Arbitrum One", "ZKsync"],
+        "website": "https://www.mav.xyz",
+        "twitter": "https://x.com/mavprotocol",
+        "discord": None,
+        "github": "https://github.com/maverickprotocol",
+    },
     # ---- RWA governance tokens (PDF "DEX + RWA Sector Expansion" §4) -----
     "cfg": {
         "name": "Centrifuge",

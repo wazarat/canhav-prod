@@ -1,7 +1,7 @@
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { DataSourceDot } from "@/components/ui/DataSourceDot";
 import type { Sourced, UniversalMetrics } from "@/lib/types";
-import { formatPct, formatUsdCompact, timeAgo } from "@/lib/utils";
+import { formatNumberCompact, formatPct, formatUsdCompact, timeAgo } from "@/lib/utils";
 
 interface NetworkUniversalCardProps {
   universal: UniversalMetrics;
@@ -57,9 +57,10 @@ function ChangeRow({ label, field }: { label: string; field: Sourced<number | nu
  * for every network regardless of sector; fields degrade to "—" when null.
  */
 export function NetworkUniversalCard({ universal, id = "universal" }: NetworkUniversalCardProps) {
-  const { market, tvl } = universal;
+  const { identity, market, tvl } = universal;
   const price = market.priceUsd.value;
   const change24h = market.priceChangePct.d1.value;
+  const perChain = tvl.perChain.value ?? [];
 
   return (
     <section id={id} className="scroll-mt-24 space-y-4">
@@ -105,6 +106,16 @@ export function NetworkUniversalCard({ universal, id = "universal" }: NetworkUni
             display={formatUsdCompact(market.fdvUsd.value)}
             field={market.fdvUsd}
           />
+          <MetricRow
+            label="Circulating supply"
+            display={formatNumberCompact(market.circulatingSupply.value)}
+            field={market.circulatingSupply}
+          />
+          <MetricRow
+            label="Total supply"
+            display={formatNumberCompact(market.totalSupply.value)}
+            field={market.totalSupply}
+          />
           {market.marketCapRank.value != null && (
             <MetricRow
               label="Market-cap rank"
@@ -112,11 +123,58 @@ export function NetworkUniversalCard({ universal, id = "universal" }: NetworkUni
               field={market.marketCapRank}
             />
           )}
+          {universal.cmcId && (
+            <div className="flex items-center justify-between gap-4 py-2">
+              <span className="text-sm text-ink-300">CMC id</span>
+              <span className="font-mono text-sm text-ink-100">{universal.cmcId}</span>
+            </div>
+          )}
+          {universal.holderCount.value != null && (
+            <MetricRow
+              label="Holders"
+              display={formatNumberCompact(universal.holderCount.value)}
+              field={universal.holderCount}
+            />
+          )}
           <ChangeRow label="Price 7d" field={market.priceChangePct.d7} />
           <ChangeRow label="Price 30d" field={market.priceChangePct.d30} />
           <ChangeRow label="TVL 1d" field={tvl.tvlChangePct.d1} />
           <ChangeRow label="TVL 7d" field={tvl.tvlChangePct.d7} />
         </div>
+        {perChain.length > 0 && (
+          <div className="pt-4">
+            <p className="text-xs uppercase tracking-wide text-ink-500">TVL by chain</p>
+            <div className="mt-2 space-y-1">
+              {perChain.slice(0, 5).map((row) => (
+                <div
+                  key={row.chain}
+                  className="flex items-center justify-between gap-4 text-sm"
+                >
+                  <span className="text-ink-300">{row.chain}</span>
+                  <span className="font-mono text-ink-100">{formatUsdCompact(row.tvlUsd)}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2">
+              <DataSourceDot
+                dataSource={tvl.perChain.dataSource}
+                sourceLabel={tvl.perChain.sourceLabel}
+              />
+            </div>
+          </div>
+        )}
+        {identity.tokenStandard?.value && (
+          <div className="flex items-center justify-between gap-4 py-2 pt-4">
+            <span className="flex items-center gap-2 text-sm text-ink-300">
+              Token standard
+              <DataSourceDot
+                dataSource={identity.tokenStandard.dataSource}
+                sourceLabel={identity.tokenStandard.sourceLabel}
+              />
+            </span>
+            <span className="text-sm font-medium text-ink-100">{identity.tokenStandard.value}</span>
+          </div>
+        )}
       </Card>
     </section>
   );

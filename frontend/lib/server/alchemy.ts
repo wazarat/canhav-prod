@@ -117,6 +117,20 @@ export async function fetchTotalSupply(
 }
 
 /**
+ * Best-effort ERC-20 classification: a successful `decimals()` read implies a
+ * standard fungible token on Arbitrum (Tier 1 §A tokenStandard).
+ */
+export async function probeErc20Standard(
+  tokenAddress: string,
+  revalidate?: number,
+): Promise<string | null> {
+  if (!rpcUrl() || !tokenAddress) return null;
+  const decRaw = hexToBigInt(await ethCall(tokenAddress, SELECTOR_DECIMALS, "latest", revalidate));
+  if (decRaw === null) return null;
+  return "ERC-20";
+}
+
+/**
  * Live total value locked (USD) for an RWA protocol: sum(supply_i * priceUsd_i)
  * over the protocol's token/vault contracts. value=null if nothing could be priced.
  */

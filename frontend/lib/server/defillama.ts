@@ -282,6 +282,11 @@ export function llamaDexProtocolForSlug(slug: string): string | null {
   return LLAMA_DEX_SLUGS[slug] ?? null;
 }
 
+/** Llama protocol slug for options volume (falls back to TVL protocol map). */
+export function llamaOptionsProtocolForSlug(slug: string): string | null {
+  return llamaProtocolForSlug(slug);
+}
+
 export function llamaYieldHintForSlug(slug: string): LlamaYieldHint | null {
   return LLAMA_YIELD_POOLS[slug] ?? null;
 }
@@ -705,6 +710,7 @@ export interface LlamaFeesRevenue {
   methodology: string | null;
   methodologyUrl: string | null;
   category: string | null;
+  githubUrls: string[];
 }
 
 async function fetchFeesSummary(
@@ -746,6 +752,14 @@ export async function fetchLlamaFeesRevenue(
   const rev = revenue && typeof revenue === "object" ? revenue : null;
   const hold = holders && typeof holders === "object" ? holders : null;
 
+  const githubUrls: string[] = [];
+  const rawGithub = fees.github;
+  if (Array.isArray(rawGithub)) {
+    for (const entry of rawGithub) {
+      if (typeof entry === "string" && entry.trim()) githubUrls.push(entry.trim());
+    }
+  }
+
   return {
     fees24hUsd: fees24h,
     fees7dUsd: fees7d,
@@ -759,6 +773,7 @@ export async function fetchLlamaFeesRevenue(
     methodology: methodologyText(fees.methodology),
     methodologyUrl: typeof fees.methodologyURL === "string" ? fees.methodologyURL : null,
     category: typeof fees.category === "string" ? fees.category : null,
+    githubUrls,
   };
 }
 
@@ -1206,7 +1221,7 @@ export async function fetchLlamaStablecoinPrices(
 }
 
 /* -------------------------------------------------------------------------- */
-/* Options & Open Interest (deferred — implemented, not yet called by cron)   */
+/* Options & Open Interest                                                    */
 /* -------------------------------------------------------------------------- */
 
 export interface LlamaOptionsVolume {

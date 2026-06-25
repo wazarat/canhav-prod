@@ -15,6 +15,8 @@ import type {
   NetworkComponent,
   NetworkEvent,
   NetworkRisk,
+  OpenInterest,
+  OptionsVolume,
   FaqItem,
   InvestmentRound,
   OrgUnit,
@@ -1103,6 +1105,102 @@ export function DexMetricsSection({ dex }: { dex?: DexMetrics | null }) {
   );
 }
 
+export function OptionsVolumeSection({
+  optionsVolume,
+}: {
+  optionsVolume?: OptionsVolume | null;
+}) {
+  if (!optionsVolume) return null;
+  return (
+    <section id="options-volume" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Options volume"
+        subtitle="Notional and premium volume from DeFi Llama options adapters."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+          <p className="text-xs uppercase tracking-wide text-ink-500">Notional 24h</p>
+          <p className="mt-1 font-mono text-lg text-ink-50">
+            {optionsVolume.notionalVolume24hUsd != null
+              ? fmtUsd(optionsVolume.notionalVolume24hUsd)
+              : "—"}
+          </p>
+        </div>
+        <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+          <p className="text-xs uppercase tracking-wide text-ink-500">Notional 30d</p>
+          <p className="mt-1 font-mono text-lg text-ink-50">
+            {optionsVolume.notionalVolume30dUsd != null
+              ? fmtUsd(optionsVolume.notionalVolume30dUsd)
+              : "—"}
+          </p>
+        </div>
+        <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+          <p className="text-xs uppercase tracking-wide text-ink-500">Premium 24h</p>
+          <p className="mt-1 font-mono text-lg text-ink-50">
+            {optionsVolume.premiumVolume24hUsd != null
+              ? fmtUsd(optionsVolume.premiumVolume24hUsd)
+              : "—"}
+          </p>
+        </div>
+        <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+          <p className="text-xs uppercase tracking-wide text-ink-500">Premium 30d</p>
+          <p className="mt-1 font-mono text-lg text-ink-50">
+            {optionsVolume.premiumVolume30dUsd != null
+              ? fmtUsd(optionsVolume.premiumVolume30dUsd)
+              : "—"}
+          </p>
+        </div>
+      </div>
+      <p className="text-xs text-ink-500">
+        Source: DeFi Llama · updated {optionsVolume.updatedAt ?? "—"}
+      </p>
+    </section>
+  );
+}
+
+export function OpenInterestSection({
+  openInterest,
+}: {
+  openInterest?: OpenInterest | null;
+}) {
+  if (!openInterest || openInterest.openInterestUsd == null) return null;
+  return (
+    <section id="open-interest" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Open interest"
+        subtitle="Perpetuals open interest from DeFi Llama overview."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+          <p className="text-xs uppercase tracking-wide text-ink-500">Total OI</p>
+          <p className="mt-1 font-mono text-lg text-ink-50">
+            {fmtUsd(openInterest.openInterestUsd)}
+          </p>
+        </div>
+        {openInterest.longOpenInterestUsd != null && (
+          <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+            <p className="text-xs uppercase tracking-wide text-ink-500">Long OI</p>
+            <p className="mt-1 font-mono text-lg text-ink-50">
+              {fmtUsd(openInterest.longOpenInterestUsd)}
+            </p>
+          </div>
+        )}
+        {openInterest.shortOpenInterestUsd != null && (
+          <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
+            <p className="text-xs uppercase tracking-wide text-ink-500">Short OI</p>
+            <p className="mt-1 font-mono text-lg text-ink-50">
+              {fmtUsd(openInterest.shortOpenInterestUsd)}
+            </p>
+          </div>
+        )}
+      </div>
+      <p className="text-xs text-ink-500">
+        Source: DeFi Llama · updated {openInterest.updatedAt ?? "—"}
+      </p>
+    </section>
+  );
+}
+
 /* -------------------------------------------------------------------------- */
 /* RWA sector — entity metrics + sub-sector panel                             */
 /* -------------------------------------------------------------------------- */
@@ -1465,6 +1563,8 @@ export function buildNetworkSectionNav(profile: {
   dex?: unknown;
   rwa?: unknown;
   staking?: unknown;
+  optionsVolume?: unknown;
+  openInterest?: unknown;
   competitors?: unknown[];
 }) {
   const items: { id: string; label: string; researchTab?: string }[] = [];
@@ -1481,6 +1581,8 @@ export function buildNetworkSectionNav(profile: {
   if (profile.lending) items.push({ id: "lending", label: "Lending" });
   if (profile.stablecoin) items.push({ id: "stablecoin", label: "Stablecoin" });
   if (profile.dex) items.push({ id: "dex", label: "DEX" });
+  if (profile.optionsVolume) items.push({ id: "options-volume", label: "Options" });
+  if (profile.openInterest) items.push({ id: "open-interest", label: "Open interest" });
   if (profile.rwa) items.push({ id: "rwa", label: "RWA" });
   if (profile.staking) items.push({ id: "staking", label: "Staking" });
   if (profile.competitors?.length) items.push({ id: "competitors", label: "Competitors" });

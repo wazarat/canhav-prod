@@ -1541,6 +1541,8 @@ export interface UniversalIdentity {
   auditLinks?: Sourced<string[]>;
   /** Protocol logo URL — DeFiLlama logo. */
   logo?: Sourced<string | null>;
+  /** Protocol GitHub repo(s) — DeFiLlama fees summary `github[]`. */
+  github?: Sourced<string | null>;
   /** Curated regulatory facts (no reliable API). */
   jurisdiction?: Sourced<string | null>;
   hq?: Sourced<string | null>;
@@ -1580,6 +1582,8 @@ export interface UniversalMetrics {
   /** Resolved join keys (reused across refreshes). */
   coingeckoId: string | null;
   llamaSlug: string | null;
+  /** CoinMarketCap id from DeFiLlama protocol meta (`cmcId`). */
+  cmcId?: string | null;
   /** ISO timestamp this block was last synced (spec §C7). */
   syncedAt: string;
 }

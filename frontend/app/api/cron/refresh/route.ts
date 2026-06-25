@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { fetchReserveRatesForSlug, hasAave, isAaveReserveSlug, aTokenAddressForSlug } from "@/lib/server/aave";
-import { fetchTotalSupply, fetchTotalValueLocked } from "@/lib/server/alchemy";
+import { fetchTotalSupply, fetchTotalValueLocked, hasAlchemy, probeErc20Standard } from "@/lib/server/alchemy";
 import {
   coinIdForSlug,
   coinIdForNetworkSlug,
@@ -20,6 +20,8 @@ import {
   llamaCoinKeysForAddress,
   fetchLlamaDexVolume,
   fetchLlamaFeesRevenue,
+  fetchLlamaOpenInterest,
+  fetchLlamaOptionsVolume,
   fetchLlamaPools,
   fetchLlamaProtocolMeta,
   fetchLlamaProtocolTvl,
@@ -28,6 +30,7 @@ import {
   fetchLlamaStablecoinPrices,
   fetchLlamaYieldChart,
   llamaLendingProjectForSlug,
+  llamaOptionsProtocolForSlug,
   llamaProtocolForSlug,
   type LlamaPool,
   type LlamaProtocolMeta,
@@ -178,6 +181,77 @@ function syncUniversalTvlFromCurrentScale(
 interface UniversalRefreshContext {
   meta: LlamaProtocolMeta | null;
   cgCache: CoinGeckoCronCache;
+  feesGithub?: string | null;
+}
+
+/** Normalize Llama / CoinGecko twitter handles to profile link URLs. */
+function normalizeTwitterUrl(handle: string): string {
+  const trimmed = handle.trim();
+  if (!trimmed) return trimmed;
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+  return `https://x.com/${trimmed.replace(/^@/, "")}`;
+}
+
+/** Promote universal identity links to top-level profile fields when curated copy is empty. */
+function promoteIdentityToProfileFields(
+  item: Record<string, any>,
+  identity: UniversalIdentity,
+  feesGithub?: string | null,
+): void {
+  if (!item.Website && identity.url?.value) {
+    item.Website = identity.url.value;
+  }
+  if (!item.Twitter && identity.twitter?.value) {
+    item.Twitter = normalizeTwitterUrl(identity.twitter.value);
+  }
+  const github =
+    identity.github?.value ??
+    feesGithub ??
+    (item.GitHub && String(item.GitHub).trim() ? String(item.GitHub) : null);
+  if (!item.GitHub && github) {
+    item.GitHub = github;
+  }
+
+  const portal = (item.ArbitrumPortalMetadata ?? {}) as Record<string, any>;
+  if (!portal.logoUrl && identity.logo?.value) {
+    item.ArbitrumPortalMetadata = { ...portal, logoUrl: identity.logo.value };
+  }
+
+  const auditUrls = identity.auditLinks?.value ?? [];
+  if (!item.Audits?.length && auditUrls.length > 0) {
+    item.Audits = auditUrls.map((url: string) => ({
+      firm: "DeFi Llama",
+      date: "",
+      url,
+    }));
+  }
+  if (!item.AuditURL && auditUrls[0]) {
+    item.AuditURL = auditUrls[0];
+  }
+}
+
+function arbDeploymentFromContracts(contracts: TokenDeployment[]): TokenDeployment | null {
+  const arb =
+    contracts.find((c) => c.chain === "arbitrum-one") ??
+    contracts.find((c) => c.chain.toLowerCase() === "arbitrum");
+  return arb ?? (contracts[0] ?? null);
+}
+
+function isPerpetualsNetwork(item: Record<string, any>): boolean {
+  const sector = String(item.Sector ?? "");
+  const subSector = String(item.SubSector ?? "");
+  const secondary = (item.SecondarySectors as string[] | undefined) ?? [];
+  return (
+    sector === "Perpetuals" ||
+    subSector === "Perpetuals" ||
+    secondary.includes("Perpetuals")
+  );
+}
+
+function isOptionsNetwork(item: Record<string, any>): boolean {
+  const sector = String(item.Sector ?? "");
+  const subSector = String(item.SubSector ?? "");
+  return sector === "Options" || subSector === "Options";
 }
 
 /** Build a live TokenMarket block from a CoinGecko resolution (no extra call). */
@@ -218,7 +292,7 @@ async function refreshUniversalMetrics(
     dataSource: "live" | "derived" = "live",
   ): Sourced<T> => ({ value, dataSource, sourceLabel, updatedAt: now });
 
-  const { meta, cgCache } = ctx;
+  const { meta, cgCache, feesGithub } = ctx;
   if (meta) notes.push("llama meta");
 
   const llamaSlug = llamaProtocolForSlug(slug);
@@ -288,6 +362,11 @@ async function refreshUniversalMetrics(
       ? { logo: sourced(meta.logo, "DeFi Llama") }
       : priorIdentity?.logo
         ? { logo: priorIdentity.logo }
+        : {}),
+    ...(feesGithub
+      ? { github: sourced(feesGithub, "DeFi Llama") }
+      : priorIdentity?.github
+        ? { github: priorIdentity.github }
         : {}),
     ...(priorIdentity?.tokenStandard ? { tokenStandard: priorIdentity.tokenStandard } : {}),
     ...(priorIdentity?.jurisdiction ? { jurisdiction: priorIdentity.jurisdiction } : {}),
@@ -376,6 +455,35 @@ async function refreshUniversalMetrics(
     ),
   };
 
+  // Alchemy supply + ERC-20 probe when CoinGecko market data is unavailable.
+  if (hasAlchemy()) {
+    const arbDeploy = arbDeploymentFromContracts(contracts);
+    if (arbDeploy?.address) {
+      if (market.totalSupply.value == null || market.circulatingSupply.value == null) {
+        const supply = await fetchTotalSupply(
+          arbDeploy.address,
+          resolution?.decimals ?? null,
+        );
+        if (supply.value != null) {
+          if (market.totalSupply.value == null) {
+            market.totalSupply = sourced(supply.value, "Alchemy", "live");
+          }
+          if (market.circulatingSupply.value == null) {
+            market.circulatingSupply = sourced(supply.value, "Alchemy", "live");
+          }
+          notes.push("alchemy supply");
+        }
+      }
+      if (!identity.tokenStandard) {
+        const std = await probeErc20Standard(arbDeploy.address);
+        if (std) {
+          identity.tokenStandard = sourced(std, "Alchemy", "live");
+          notes.push("token standard");
+        }
+      }
+    }
+  }
+
   const tvlFresh: UniversalTvl = {
     tvlUsd: sourced(meta?.tvlUsdLatest ?? null, llamaLabel, llamaLive ? "live" : "derived"),
     tvlChangePct: {
@@ -413,9 +521,14 @@ async function refreshUniversalMetrics(
     holderCount,
     coingeckoId: resolution ? geckoId ?? null : prior.coingeckoId ?? null,
     llamaSlug: llamaSlug ?? prior.llamaSlug ?? null,
+    cmcId: meta?.cmcId ?? prior.cmcId ?? null,
     syncedAt: now,
   };
   item.UniversalMetrics = universal;
+
+  if (isNetworkCategory(String(item.Category ?? ""))) {
+    promoteIdentityToProfileFields(item, identity, feesGithub);
+  }
 
   if ((item.CurrentScale?.tvlUsd ?? null) == null && meta?.tvlUsdLatest != null) {
     item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd: meta.tvlUsdLatest };
@@ -634,6 +747,10 @@ async function refreshLlamaDimensions(
       source: "defillama",
       updatedAt: nowIso(),
     };
+    if (!item.GitHub && feesRev.githubUrls.length > 0) {
+      item.GitHub = feesRev.githubUrls[0];
+      notes.push("github");
+    }
     mutated = true;
     notes.push("fees/rev");
   }
@@ -1224,6 +1341,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const res = await refreshUniversalMetrics(item, slug, {
       meta: llamaMetaBySlug.get(slug) ?? null,
       cgCache,
+      feesGithub: item.GitHub ? String(item.GitHub) : null,
     });
     if (res.wrote) {
       item.UpdatedAt = nowIso();
@@ -1231,6 +1349,51 @@ export async function GET(req: Request): Promise<NextResponse> {
       updated += 1;
     }
     universalResults.push({ slug, tvlUsd: res.tvlUsd, priceUsd: res.priceUsd, note: res.note });
+  }
+
+  // --- Options volume (sector === Options) ------------------------------------
+  const optionsResults: { slug: string; notional24hUsd: number | null }[] = [];
+  for (const item of networkItems) {
+    if (!isOptionsNetwork(item)) continue;
+    const slug = String(item.Slug ?? "");
+    const protocol = llamaOptionsProtocolForSlug(slug);
+    if (!protocol) continue;
+    const opts = await fetchLlamaOptionsVolume(protocol);
+    if (!opts) continue;
+    item.OptionsVolume = {
+      notionalVolume24hUsd: opts.notionalVolume24hUsd,
+      notionalVolume30dUsd: opts.notionalVolume30dUsd,
+      premiumVolume24hUsd: opts.premiumVolume24hUsd,
+      premiumVolume30dUsd: opts.premiumVolume30dUsd,
+      source: "defillama",
+      updatedAt: nowIso(),
+    };
+    item.UpdatedAt = nowIso();
+    await putItem(item);
+    updated += 1;
+    optionsResults.push({ slug, notional24hUsd: opts.notionalVolume24hUsd });
+  }
+
+  // --- Perp open interest (Perpetuals sector / sub-sector) --------------------
+  const perpOiResults: { slug: string; openInterestUsd: number | null }[] = [];
+  for (const item of networkItems) {
+    if (!isPerpetualsNetwork(item)) continue;
+    const slug = String(item.Slug ?? "");
+    const protocol = llamaProtocolForSlug(slug);
+    if (!protocol) continue;
+    const oi = await fetchLlamaOpenInterest(protocol);
+    if (!oi || oi.openInterestUsd == null) continue;
+    item.OpenInterest = {
+      openInterestUsd: oi.openInterestUsd,
+      longOpenInterestUsd: oi.longOpenInterestUsd,
+      shortOpenInterestUsd: oi.shortOpenInterestUsd,
+      source: "defillama",
+      updatedAt: nowIso(),
+    };
+    item.UpdatedAt = nowIso();
+    await putItem(item);
+    updated += 1;
+    perpOiResults.push({ slug, openInterestUsd: oi.openInterestUsd });
   }
 
   // --- Chain-native lending overlays (Morpho, Kamino, TronGrid, Helius) --------
@@ -1446,6 +1609,8 @@ export async function GET(req: Request): Promise<NextResponse> {
     dex: dexResults,
     rwa: rwaResults,
     universal: universalResults,
+    optionsVolume: optionsResults,
+    perpOpenInterest: perpOiResults,
     rwaMissingAum,
     stablecoinSupplyUpdated,
     integrations: integrationStatus,

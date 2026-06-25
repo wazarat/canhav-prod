@@ -10,6 +10,8 @@ import {
   CreditTagMetricsSection,
   StablecoinMetricsSection,
   DexMetricsSection,
+  OpenInterestSection,
+  OptionsVolumeSection,
   RwaMetricsSection,
   StakingMetricsSection,
   OrgStructureSection,
@@ -325,6 +327,8 @@ export default async function NetworkProfilePage({ params }: PageProps) {
               memberCoins={profile.memberCoins}
             />
             <DexMetricsSection dex={profile.dex} />
+            <OptionsVolumeSection optionsVolume={profile.optionsVolume} />
+            <OpenInterestSection openInterest={profile.openInterest} />
             <RwaMetricsSection rwa={profile.rwa} />
             <StakingMetricsSection staking={profile.staking} />
             <CompetitorsSection

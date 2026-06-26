@@ -265,14 +265,13 @@ CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
     "aave": ("Stablecoin",),
     "sky": ("Credit",),
     "spark": ("Stablecoin",),
-    "curve-finance": ("Stablecoin", "Liquidity"),
+    "curve-finance": ("Stablecoin", "DEX"),
     "jupiter": ("Stablecoin", "Perpetuals"),
-    "pancakeswap": ("Perpetuals", "Liquidity"),
-    # DEX venues cross-tagged into the Liquidity sector (Pools) — canhav-liquidity
-    # spec §1.3 (extend the existing DEX entity, do not duplicate).
-    "uniswap": ("Liquidity",),
-    "balancer": ("Liquidity",),
-    "aerodrome": ("Liquidity",),
+    "pancakeswap": ("Perpetuals", "DEX"),
+    # DEX venues cross-tagged from primary Liquidity / Pools (canhav-liquidity spec §1.3).
+    "uniswap": ("DEX",),
+    "balancer": ("DEX",),
+    "aerodrome": ("DEX",),
     "ondo-finance": ("Stablecoin",),
     "pleasing-market": ("Stablecoin",),
     "mountain-protocol": ("RWA",),

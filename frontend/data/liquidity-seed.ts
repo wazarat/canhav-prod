@@ -11,18 +11,17 @@ export interface LiquiditySeed {
   seedMode: "new" | "extend-existing";
 }
 
-// Liquidity sector seed (canhav-liquidity spec §3/§4). The five in-platform DEX
-// venues are `extend-existing` — they keep their primary DEX sector and gain a
-// secondary Liquidity/Pools tag (wired in backend ingest_entities.py); the cron
-// uses these rows to overlay live Tier-1 Liquidity metrics on them too. Ids
-// verified against DeFi Llama /protocols + CoinGecko markets on 2026-06-25.
+// Liquidity sector seed (canhav-liquidity spec §3/§4). Curve, Uniswap, Balancer,
+// Aerodrome, and PancakeSwap are primary Liquidity / Pools (seedMode: new); DEX
+// cross-tags stay on the entity via secondarySectors (wired in ingest_entities.py).
+// Ids verified against DeFi Llama /protocols + CoinGecko markets on 2026-06-25.
 export const LIQUIDITY_SEED: LiquiditySeed[] = [
   // ---------------- POOLS (LPing / stable pools) ----------------
-  { name: "Curve Finance",     slug: "curve-finance", token: "CRV",  subSector: "Pools",  secondaryTags: ["Stable-Pools", "ve-Tokenomics", "Multi-Chain"],        llamaSlug: "curve-dex",            coingeckoId: "curve-dao-token",  seedMode: "extend-existing" },
-  { name: "Uniswap",           slug: "uniswap",       token: "UNI",  subSector: "Pools",  secondaryTags: ["Concentrated-Liquidity", "Multi-Chain"],               llamaSlug: "uniswap-v3",           coingeckoId: "uniswap",          seedMode: "extend-existing" },
-  { name: "Balancer",          slug: "balancer",      token: "BAL",  subSector: "Pools",  secondaryTags: ["Stable-Pools", "ve-Tokenomics"],                       llamaSlug: "balancer-v3",          coingeckoId: "balancer",         seedMode: "extend-existing" },
-  { name: "Aerodrome Finance", slug: "aerodrome",     token: "AERO", subSector: "Pools",  secondaryTags: ["Concentrated-Liquidity", "ve-Tokenomics"],             llamaSlug: "aerodrome-slipstream", coingeckoId: "aerodrome-finance", seedMode: "extend-existing" },
-  { name: "PancakeSwap",       slug: "pancakeswap",   token: "CAKE", subSector: "Pools",  secondaryTags: ["Concentrated-Liquidity", "Multi-Chain"],               llamaSlug: "pancakeswap-amm-v3",   coingeckoId: "pancakeswap-token", seedMode: "extend-existing" },
+  { name: "Curve Finance",     slug: "curve-finance", token: "CRV",  subSector: "Pools",  secondaryTags: ["Stable-Pools", "ve-Tokenomics", "Multi-Chain"],        llamaSlug: "curve-dex",            coingeckoId: "curve-dao-token",  seedMode: "new" },
+  { name: "Uniswap",           slug: "uniswap",       token: "UNI",  subSector: "Pools",  secondaryTags: ["Concentrated-Liquidity", "Multi-Chain"],               llamaSlug: "uniswap-v3",           coingeckoId: "uniswap",          seedMode: "new" },
+  { name: "Balancer",          slug: "balancer",      token: "BAL",  subSector: "Pools",  secondaryTags: ["Stable-Pools", "ve-Tokenomics"],                       llamaSlug: "balancer-v3",          coingeckoId: "balancer",         seedMode: "new" },
+  { name: "Aerodrome Finance", slug: "aerodrome",     token: "AERO", subSector: "Pools",  secondaryTags: ["Concentrated-Liquidity", "ve-Tokenomics"],             llamaSlug: "aerodrome-slipstream", coingeckoId: "aerodrome-finance", seedMode: "new" },
+  { name: "PancakeSwap",       slug: "pancakeswap",   token: "CAKE", subSector: "Pools",  secondaryTags: ["Concentrated-Liquidity", "Multi-Chain"],               llamaSlug: "pancakeswap-amm-v3",   coingeckoId: "pancakeswap-token", seedMode: "new" },
   { name: "Gamma",             slug: "gamma",         token: "GAMMA", subSector: "Pools", secondaryTags: ["LP-Strategy-Manager", "Concentrated-Liquidity", "Multi-Chain"], llamaSlug: "gamma",          coingeckoId: "gamma-strategies", seedMode: "new" },
 
   // ---------------- VAULTS (yield farming / auto-compounding) ----------------

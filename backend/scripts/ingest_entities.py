@@ -1071,8 +1071,9 @@ ENTITY_SPECS.update(RWA_ENTITY_SPECS)
 # Bedrock, YieldNest (Liquid Restaking). Frax is extend-existing (below).
 ENTITY_SPECS.update(STAKING_ENTITY_SPECS)
 # Liquidity cohort (canhav-liquidity spec §3/§4): Gamma (Pools); Yearn, Convex,
-# Beefy, Aura, Arrakis, Maverick (Vaults). The five in-platform DEX venues
-# (Curve, Uniswap, Balancer, Aerodrome, PancakeSwap) are extend-existing (below).
+# Beefy, Aura, Arrakis, Maverick (Vaults). Curve, Uniswap, Balancer, Aerodrome,
+# and PancakeSwap are primary Liquidity / Pools via reclassify (below); DEX prose
+# stays in dex_specs.py.
 ENTITY_SPECS.update(LIQUIDITY_ENTITY_SPECS)
 # Derivatives cohort (canhav-derivatives spec §3/§4/§5): Synthetix, Aevo, GMX,
 # Gains, dYdX, Hyperliquid, Drift (Perp DEX); Ribbon, Dopex, Derive, Jones DAO
@@ -1285,13 +1286,12 @@ if _ONDO_SPEC is not None:
     )
     _ONDO_SPEC["offchain_facts"] = _existing_facts
 
-# Liquidity extend-existing (canhav-liquidity spec §1.3): the in-platform DEX
-# venues that also enable LPing keep their primary DEX sector and gain "Liquidity"
-# as a secondary sector + the "Pools" sub-sector tag, rather than creating
-# duplicate entities. Their token member coins (CRV/UNI/BAL/AERO/CAKE) already
-# exist on these specs, so the Liquidity-tagged view aggregates them automatically.
-# Runs after all other secondary-sector assignments so "Liquidity" is merged in.
-_LIQUIDITY_EXTEND_EXISTING: Dict[str, Dict[str, Any]] = {
+# Liquidity primary reclassify (canhav-liquidity spec §1.3): the in-platform DEX
+# venues that also enable LPing become primary Liquidity / Pools and gain "DEX"
+# as a secondary sector (DexSubSector + Dex block stay on the dex_specs entry).
+# Runs after all other secondary-sector assignments so Stablecoin / Perpetuals
+# cross-tags are preserved before DEX is merged in.
+_LIQUIDITY_PRIMARY_RECLASSIFY: Dict[str, Dict[str, Any]] = {
     "curve-finance": {
         "liquidity_sub_sector": "Pools",
         "liquidity_secondary_tags": ["Stable-Pools", "ve-Tokenomics", "Multi-Chain"],
@@ -1313,15 +1313,17 @@ _LIQUIDITY_EXTEND_EXISTING: Dict[str, Dict[str, Any]] = {
         "liquidity_secondary_tags": ["Concentrated-Liquidity", "Multi-Chain"],
     },
 }
-for _slug, _liq in _LIQUIDITY_EXTEND_EXISTING.items():
+for _slug, _liq in _LIQUIDITY_PRIMARY_RECLASSIFY.items():
     _spec = ENTITY_SPECS.get(_slug)
     if _spec is not None:
+        _spec["sector"] = "Liquidity"
+        _spec["sub_sector"] = "Pools"
         _spec["liquidity_sub_sector"] = _liq["liquidity_sub_sector"]
         _spec["liquidity_secondary_tags"] = _liq["liquidity_secondary_tags"]
-        _existing = list(_spec.get("secondary_sectors") or [])
-        if "Liquidity" not in _existing:
-            _existing.append("Liquidity")
-        _spec["secondary_sectors"] = _existing
+        _existing = [s for s in (_spec.get("secondary_sectors") or []) if s != "Liquidity"]
+        if "DEX" not in _existing:
+            _existing.append("DEX")
+        _spec["secondary_sectors"] = _existing or None
 
 # Derivatives extend-existing (canhav-derivatives spec §3/§5): Ethena keeps
 # primary Stablecoin and gains a secondary Derivatives tag (Delta-Neutral).

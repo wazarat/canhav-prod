@@ -1207,14 +1207,16 @@ export async function GET(req: Request): Promise<NextResponse> {
   }
 
   // --- DEX networks: DeFi Llama live TVL + volume --------------------------
-  // For each network tagged sector "DEX", overlay live protocol TVL and 30d
-  // trading volume onto the curated `Dex` block. Curated fields (governance
-  // token, audit history, deployment, subSectorMetrics) are preserved. Open
-  // interest / funding stay curated (no derivatives feed this phase).
+  // For each network tagged sector "DEX" (primary or secondary), overlay live
+  // protocol TVL and 30d trading volume onto the curated `Dex` block. Curated
+  // fields (governance token, audit history, deployment, subSectorMetrics) are
+  // preserved. Headline CurrentScale.tvlUsd is only written for PRIMARY-DEX
+  // entities so Liquidity-primary cross-tagged venues keep Liquidity-pass TVL.
   const dexItems = items.filter(
     (it) =>
       isNetworkCategory(String(it.Category ?? "")) &&
-      String(it.Sector ?? "") === "DEX" &&
+      (String(it.Sector ?? "") === "DEX" ||
+        (Array.isArray(it.SecondarySectors) && it.SecondarySectors.includes("DEX"))) &&
       llamaProtocolForSlug(String(it.Slug ?? "")) !== null,
   );
   const dexResults: { slug: string; tvlUsd: number | null; volume30dUsd: number | null }[] = [];
@@ -1240,7 +1242,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       if (Object.keys(live).length > 0) {
         // Preserve curated fields; overlay live (Sourced) fields.
         item.Dex = { ...(item.Dex ?? {}), ...live };
-        if (tvlUsd != null) {
+        if (tvlUsd != null && String(item.Sector ?? "") === "DEX") {
           item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
         }
         item.UpdatedAt = nowIso();

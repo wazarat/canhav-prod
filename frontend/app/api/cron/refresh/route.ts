@@ -246,11 +246,13 @@ function arbDeploymentFromContracts(contracts: TokenDeployment[]): TokenDeployme
 function isPerpetualsNetwork(item: Record<string, any>): boolean {
   const sector = String(item.Sector ?? "");
   const subSector = String(item.SubSector ?? "");
+  const derivSub = String(item.DerivativesSubSector ?? "");
   const secondary = (item.SecondarySectors as string[] | undefined) ?? [];
   return (
     sector === "Perpetuals" ||
     subSector === "Perpetuals" ||
-    secondary.includes("Perpetuals")
+    secondary.includes("Perpetuals") ||
+    (sector === "Derivatives" && derivSub === "Perp DEX")
   );
 }
 

@@ -268,12 +268,6 @@ CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
     "curve-finance": ("Stablecoin", "Liquidity"),
     "jupiter": ("Stablecoin", "Perpetuals"),
     "pancakeswap": ("Perpetuals", "Liquidity"),
-    # Perp DEX venues cross-tagged into the new Derivatives sector (Perp DEX) —
-    # canhav-derivatives spec §3 (extend the existing DEX entity, do not duplicate).
-    # Legacy "Perpetuals" kept for back-compat (removed in a later cleanup).
-    "hyperliquid": ("Perpetuals", "Derivatives"),
-    "gmx": ("Perpetuals", "Derivatives"),
-    "gains-network": ("Perpetuals", "Derivatives"),
     # DEX venues cross-tagged into the Liquidity sector (Pools) — canhav-liquidity
     # spec §1.3 (extend the existing DEX entity, do not duplicate).
     "uniswap": ("Liquidity",),

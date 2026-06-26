@@ -1058,8 +1058,9 @@ ENTITY_SPECS.update(LENDING_ENTITY_SPECS)
 # Frax, Resolv, Falcon, Cap, Elixir, Anzen, Mountain Protocol.
 ENTITY_SPECS.update(STABLECOIN_ENTITY_SPECS)
 # DEX cohort (PDF "DEX + RWA Sector Expansion" §3): Uniswap, Curve, Balancer,
-# Aerodrome, PancakeSwap, Trader Joe, SushiSwap, Raydium, THORChain, Hyperliquid,
-# dYdX, GMX, Drift, Gains Network — Jupiter is retro-tagged below.
+# Aerodrome, PancakeSwap, Trader Joe, SushiSwap, Raydium, THORChain — Jupiter is
+# retro-tagged below. Perp venues (GMX, Gains, dYdX, Hyperliquid, Drift) are
+# primary Derivatives in derivatives_specs.py.
 ENTITY_SPECS.update(DEX_ENTITY_SPECS)
 # RWA cohort (PDF "DEX + RWA Sector Expansion" §4): Securitize, Centrifuge,
 # Goldfinch, RealT, Clearpool, Toucan, Lofty.ai, Franklin Templeton.
@@ -1073,10 +1074,10 @@ ENTITY_SPECS.update(STAKING_ENTITY_SPECS)
 # Beefy, Aura, Arrakis, Maverick (Vaults). The five in-platform DEX venues
 # (Curve, Uniswap, Balancer, Aerodrome, PancakeSwap) are extend-existing (below).
 ENTITY_SPECS.update(LIQUIDITY_ENTITY_SPECS)
-# Derivatives cohort (canhav-derivatives spec §3/§4/§5): Synthetix, Aevo (Perp DEX);
-# Ribbon, Dopex, Derive, Jones DAO (Option Vaults); Rage Trade, Neutra (Delta-Neutral).
-# The in-platform perp venues (GMX, Gains, Hyperliquid) + Ethena are extend-existing
-# (below); dYdX (Cosmos) and Drift (Solana) are excluded as non-EVM.
+# Derivatives cohort (canhav-derivatives spec §3/§4/§5): Synthetix, Aevo, GMX,
+# Gains, dYdX, Hyperliquid, Drift (Perp DEX); Ribbon, Dopex, Derive, Jones DAO
+# (Option Vaults); Rage Trade, Neutra (Delta-Neutral). Ethena is extend-existing
+# (below) — primary Stablecoin with secondary Derivatives tag.
 ENTITY_SPECS.update(DERIVATIVES_ENTITY_SPECS)
 # Other cohort (canhav-other-spec §3/§4): Nexus, Sherlock, InsurAce, Neptune, Cozy,
 # Ease (Underwriting); Votium, Hidden Hand, Paladin, Stake DAO (Governance).
@@ -1189,15 +1190,12 @@ if _jupiter is not None:
 
 # Additive cross-sector tags for the new DEX/RWA entities (PDF §6). Centrifuge,
 # Clearpool, and Goldfinch are private-credit RWA shops that also function as
-# lending venues; PancakeSwap and Hyperliquid run perps alongside their DEX.
+# lending venues; PancakeSwap runs perps alongside its DEX.
 _EXPANSION_SECONDARY_SECTORS: Dict[str, List[str]] = {
     "centrifuge": ["Credit"],
     "clearpool": ["Credit"],
     "goldfinch": ["Credit"],
     "pancakeswap": ["Perpetuals"],
-    "hyperliquid": ["Perpetuals"],
-    "gmx": ["Perpetuals"],
-    "gains-network": ["Perpetuals"],
 }
 for _slug, _sectors in _EXPANSION_SECONDARY_SECTORS.items():
     _spec = ENTITY_SPECS.get(_slug)
@@ -1325,26 +1323,11 @@ for _slug, _liq in _LIQUIDITY_EXTEND_EXISTING.items():
             _existing.append("Liquidity")
         _spec["secondary_sectors"] = _existing
 
-# Derivatives extend-existing (canhav-derivatives spec §3/§5): in-platform perp
-# venues + Ethena keep their primary sector (DEX / Stablecoin) and gain
-# "Derivatives" as a secondary sector + the relevant sub-sector tag, rather than
-# creating duplicate entities. Their token member coins (GMX/GNS/HYPE/ENA) already
-# exist, so the Derivatives-tagged view aggregates them automatically. Only
-# EVM-compatible venues are extended (dYdX/Cosmos and Drift/Solana are excluded).
-# Runs after all other secondary-sector assignments so "Derivatives" is merged in.
+# Derivatives extend-existing (canhav-derivatives spec §3/§5): Ethena keeps
+# primary Stablecoin and gains a secondary Derivatives tag (Delta-Neutral).
+# Primary Perp DEX venues (GMX, Gains, Hyperliquid, dYdX, Drift) live in
+# derivatives_specs.py. Runs after all other secondary-sector assignments.
 _DERIVATIVES_EXTEND_EXISTING: Dict[str, Dict[str, Any]] = {
-    "gmx": {
-        "derivatives_sub_sector": "Perp DEX",
-        "derivatives_secondary_tags": ["Oracle-Based", "Multi-Chain"],
-    },
-    "gains-network": {
-        "derivatives_sub_sector": "Perp DEX",
-        "derivatives_secondary_tags": ["Oracle-Based", "Multi-Chain"],
-    },
-    "hyperliquid": {
-        "derivatives_sub_sector": "Perp DEX",
-        "derivatives_secondary_tags": ["Orderbook"],
-    },
     # Ethena keeps primary Stablecoin; DeFi Llama classifies it as "Basis Trading"
     # (the canonical delta-neutral protocol), so it gains a secondary Derivatives tag.
     "ethena": {

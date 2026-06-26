@@ -2,18 +2,18 @@
 """
 DEX-entity specs (PDF "DEX + RWA Sector Expansion" §1/§3).
 
-The 14 new DEX entities that join the existing Jupiter aggregator under the
-Network -> Protocol -> DEX taxonomy, each tagged with its DEX sub-sector
-(spec §1) and 0+ secondary tags:
+The 9 spot/cross-chain DEX entities that join the existing Jupiter aggregator
+under the Network -> Protocol -> DEX taxonomy, each tagged with its DEX
+sub-sector (spec §1) and 0+ secondary tags:
 
     Concentrated Liquidity .. Uniswap, PancakeSwap, Trader Joe
     Stableswap .............. Curve Finance
     AMM ..................... Balancer, SushiSwap
     ve(3,3) ................. Aerodrome
-    Hybrid AMM + Orderbook .. Raydium, Drift Protocol
+    Hybrid AMM + Orderbook .. Raydium
     Cross-Chain Native ...... THORChain
-    Orderbook ............... Hyperliquid, dYdX
-    Perpetuals .............. GMX, Gains Network
+
+Perp venues (GMX, Gains, dYdX, Hyperliquid, Drift) live in derivatives_specs.py.
 
 These dicts are merged into ENTITY_SPECS by ingest_entities.py and flattened to
 store items by `build_entity_item`. Live TVL / 30d volume is filled by the
@@ -174,16 +174,6 @@ _UNISWAP_COMPETITOR = {
         "and customizable pools via hooks (V4)."
     ),
 }
-
-_HYPERLIQUID_COMPETITOR = {
-    "name": "Hyperliquid",
-    "slug": "hyperliquid",
-    "rank": 1,
-    "positioning": "Deepest on-chain perp liquidity (purpose-built L1 CLOB).",
-    "similarities": "Both offer on-chain leveraged perpetual trading.",
-    "differences": "Hyperliquid runs a fully on-chain central limit order book on its own L1 with sub-second finality.",
-}
-
 
 DEX_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
     # ---- Spot / AMM / Aggregator ----------------------------------------
@@ -580,233 +570,6 @@ DEX_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             _coin("rune", "THORChain", "RUNE", "Settlement + governance asset"),
         ],
     ),
-    # ---- Perpetuals / Derivatives ---------------------------------------
-    "hyperliquid": _net(
-        name="Hyperliquid",
-        symbol="HYPE",
-        tagline="Purpose-built L1 with a fully on-chain order book.",
-        description=(
-            "Hyperliquid is a purpose-built L1 with a fully on-chain CLOB — ~200k "
-            "orders/sec throughput, sub-second finality, and the deepest on-chain "
-            "perp liquidity in 2026 (typically >70% of on-chain perp volume). "
-            "HyperEVM extends programmability."
-        ),
-        differentiator=(
-            "Fully on-chain central limit order book on a bespoke L1; HyperEVM adds "
-            "EVM execution without sacrificing CLOB performance."
-        ),
-        sub_sector="Orderbook",
-        secondary_tags=["Perps", "Spot", "Derivatives", "Appchain"],
-        official_docs="https://hyperliquid.gitbook.io",
-        website="https://hyperliquid.xyz",
-        twitter="https://x.com/HyperliquidX",
-        audit_firms="Zellic, multiple independent rounds.",
-        chains=["Hyperliquid L1", "Arbitrum"],
-        tvl_usd=6_030_000_000,
-        competitors=[_UNISWAP_COMPETITOR],
-        dex={
-            "tvlUsd": _sourced(6_030_000_000),
-            "volume30dUsd": _sourced(245_000_000_000),
-            "governanceToken": "HYPE",
-            "auditHistory": "Zellic, multiple independent rounds.",
-            "deployment": {
-                "chains": ["Hyperliquid L1", "Arbitrum"],
-                "evmCompatible": "mixed",
-                "notes": "Native L1 CLOB; Arbitrum for bridge deposits; HyperEVM execution layer.",
-            },
-            "subSectorMetrics": {
-                "kind": "orderbook",
-                "markets": _sourced(None),
-                "makerRebatePct": _sourced(None),
-                "takerFeePct": _sourced(0.025),
-                "openInterestUsd": _sourced(None),
-            },
-        },
-        member_coins=[
-            _coin("hype", "Hyperliquid", "HYPE", "Governance token"),
-        ],
-    ),
-    "dydx": _net(
-        name="dYdX",
-        symbol="DYDX",
-        tagline="The original decentralized perps pioneer.",
-        description=(
-            "dYdX is the original decentralized perps pioneer. V4 runs on its own "
-            "Cosmos appchain with decentralized, validator-driven order matching and "
-            "strong BTC/ETH perp liquidity targeted at professional traders."
-        ),
-        differentiator=(
-            "Permissionless perpetual markets on a dedicated Cosmos appchain with "
-            "off-chain orderbook and on-chain settlement; Megavault LP product."
-        ),
-        sub_sector="Orderbook",
-        secondary_tags=["Perps", "Derivatives", "Appchain", "Non-EVM"],
-        official_docs="https://docs.dydx.exchange",
-        website="https://dydx.exchange",
-        twitter="https://x.com/dYdX",
-        github="https://github.com/dydxprotocol",
-        audit_firms="Informal Systems, Sigma Prime, Trail of Bits.",
-        chains=["dYdX Chain", "Ethereum"],
-        tvl_usd=135_000_000,
-        competitors=[_HYPERLIQUID_COMPETITOR],
-        dex={
-            "tvlUsd": _sourced(135_000_000),
-            "volume30dUsd": _sourced(None),
-            "governanceToken": "DYDX",
-            "auditHistory": "Informal Systems, Sigma Prime, Trail of Bits.",
-            "deployment": {
-                "chains": ["dYdX Chain", "Ethereum"],
-                "evmCompatible": "no",
-                "notes": "Cosmos appchain (V4) primary; Ethereum V3 legacy still operational.",
-            },
-            "subSectorMetrics": {
-                "kind": "orderbook",
-                "markets": _sourced(None),
-                "makerRebatePct": _sourced(0.02),
-                "takerFeePct": _sourced(0.05),
-                "openInterestUsd": _sourced(None),
-            },
-        },
-        member_coins=[
-            _coin("dydx-gov", "dYdX", "DYDX", "Governance + staking token"),
-        ],
-    ),
-    "gmx": _net(
-        name="GMX",
-        symbol="GMX",
-        tagline="Multi-asset pool-backed perpetuals with zero price impact.",
-        description=(
-            "GMX uses multi-asset liquidity pools (GLP V1, GM V2) where LPs are the "
-            "counterparty to traders; oracle-based pricing means zero price-impact "
-            "trades up to pool depth. V2 added isolated-market GM pools."
-        ),
-        differentiator=(
-            "Oracle-priced, pool-backed perps with zero price impact within pool "
-            "depth; GLP composability across DeFi."
-        ),
-        sub_sector="Perpetuals",
-        secondary_tags=["Perps", "Spot", "Multi-Chain", "L2-Native"],
-        official_docs="https://docs.gmx.io",
-        website="https://gmx.io",
-        twitter="https://x.com/GMX_IO",
-        github="https://github.com/gmx-io",
-        audit_firms="ABDK Consulting, Quantstamp.",
-        chains=["Arbitrum", "Avalanche"],
-        tvl_usd=177_000_000,
-        competitors=[_HYPERLIQUID_COMPETITOR],
-        dex={
-            "tvlUsd": _sourced(177_000_000),
-            "volume30dUsd": _sourced(None),
-            "governanceToken": "GMX",
-            "auditHistory": "ABDK Consulting, Quantstamp.",
-            "deployment": {
-                "chains": ["Arbitrum", "Avalanche"],
-                "evmCompatible": "yes",
-                "notes": "Arbitrum-primary; V2 isolated GM markets per asset.",
-            },
-            "subSectorMetrics": {
-                "kind": "perps",
-                "markets": _sourced(None),
-                "openInterestUsd": _sourced(None),
-                "fundingRateModel": "Borrow fees per market; oracle-priced fills.",
-                "maxLeverage": _sourced(None),
-                "liquidationsVolume30dUsd": _sourced(None),
-            },
-        },
-        member_coins=[
-            _coin("gmx-gov", "GMX", "GMX", "Governance + fee-share token (esGMX vesting)"),
-        ],
-    ),
-    "drift-protocol": _net(
-        name="Drift Protocol",
-        symbol="DRIFT",
-        tagline="Leading Solana-native perps DEX.",
-        description=(
-            "Drift is the leading Solana-native perps DEX. It combines an on-chain "
-            "orderbook (DLOB) with an AMM (vAMM) fallback so liquidity providers and "
-            "just-in-time market makers can both serve fills."
-        ),
-        differentiator=(
-            "DLOB + vAMM hybrid with JIT auctions; Drift Vaults offer passive "
-            "strategies, with spot routed via Jupiter."
-        ),
-        sub_sector="Hybrid AMM + Orderbook",
-        secondary_tags=["Perps", "Spot", "Solana-Native", "Non-EVM"],
-        official_docs="https://docs.drift.trade",
-        website="https://drift.trade",
-        twitter="https://x.com/DriftProtocol",
-        audit_firms="OtterSec, Zellic.",
-        chains=["Solana"],
-        tvl_usd=205_000_000,
-        competitors=[_HYPERLIQUID_COMPETITOR],
-        dex={
-            "tvlUsd": _sourced(205_000_000),
-            "volume30dUsd": _sourced(None),
-            "governanceToken": "DRIFT",
-            "auditHistory": "OtterSec, Zellic.",
-            "deployment": {
-                "chains": ["Solana"],
-                "evmCompatible": "no",
-                "notes": "DLOB + vAMM hybrid; Drift Vaults passive strategies.",
-            },
-            "subSectorMetrics": {
-                "kind": "perps",
-                "markets": _sourced(None),
-                "openInterestUsd": _sourced(None),
-                "fundingRateModel": "Hourly funding on DLOB/vAMM hybrid.",
-                "maxLeverage": _sourced(None),
-                "liquidationsVolume30dUsd": _sourced(None),
-            },
-        },
-        member_coins=[
-            _coin("drift", "Drift", "DRIFT", "Governance token (sDRIFT staking)"),
-        ],
-    ),
-    "gains-network": _net(
-        name="Gains Network",
-        symbol="GNS",
-        tagline="Synthetic leveraged trading (gTrade).",
-        description=(
-            "Gains Network (gTrade) offers synthetic leveraged trading backed by "
-            "gToken LP vaults; it supports very high leverage (up to 150x) across "
-            "crypto, forex, and equities/indices, accessible to retail with low minimums."
-        ),
-        differentiator=(
-            "Synthetic markets (no spot leg) collateralized by gToken vaults; "
-            "up-to-150x leverage on majors plus forex and equities."
-        ),
-        sub_sector="Perpetuals",
-        secondary_tags=["Perps", "Multi-Chain", "L2-Native"],
-        official_docs="https://docs.gains.trade",
-        website="https://gains.trade",
-        twitter="https://x.com/GainsNetwork_io",
-        audit_firms="Halborn, Code4rena contests.",
-        chains=["Arbitrum", "Polygon", "Base"],
-        tvl_usd=13_300_000,
-        competitors=[_HYPERLIQUID_COMPETITOR],
-        dex={
-            "tvlUsd": _sourced(13_300_000),
-            "volume30dUsd": _sourced(None),
-            "governanceToken": "GNS",
-            "auditHistory": "Halborn, Code4rena contests.",
-            "deployment": {
-                "chains": ["Arbitrum", "Polygon", "Base"],
-                "evmCompatible": "yes",
-                "notes": "Arbitrum-primary; gToken LP model (gUSDC, gGNS).",
-            },
-            "subSectorMetrics": {
-                "kind": "perps",
-                "markets": _sourced(None),
-                "openInterestUsd": _sourced(None),
-                "fundingRateModel": "Open/close 0.04-0.08% per side + rollover funding.",
-                "maxLeverage": _sourced(150),
-                "liquidationsVolume30dUsd": _sourced(None),
-            },
-        },
-        member_coins=[
-            _coin("gns", "Gains Network", "GNS", "Governance token (gGNS vault collateral)"),
-        ],
-    ),
 }
 
 # Per-network MemberCoin audit registry (expected count + rationale).
@@ -821,11 +584,6 @@ DEX_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
     "sushiswap": {"expected": 1, "rationale": "SUSHI governance"},
     "raydium": {"expected": 1, "rationale": "RAY governance"},
     "thorchain": {"expected": 1, "rationale": "RUNE settlement asset"},
-    "hyperliquid": {"expected": 1, "rationale": "HYPE governance"},
-    "dydx": {"expected": 1, "rationale": "DYDX governance"},
-    "gmx": {"expected": 1, "rationale": "GMX governance"},
-    "drift-protocol": {"expected": 1, "rationale": "DRIFT governance"},
-    "gains-network": {"expected": 1, "rationale": "GNS governance"},
     "jupiter": {
         "expected": "multi",
         "rationale": "JUP + JLP + JupUSD + JLP-USD + JupSOL",

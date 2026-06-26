@@ -274,6 +274,12 @@ function enrichNetworksWithTvl(
   });
 }
 
+/** Headline TVL for a network row — mirrors NetworkTable column resolution. */
+export function networkHeadlineTvlUsd(network: NetworkProfile): number | null {
+  const u = network.universalMetrics;
+  return u?.tvl.tvlUsd.value ?? network.currentScale.tvlUsd ?? null;
+}
+
 export async function getNetworkBySlug(slug: string): Promise<NetworkProfile | null> {
   return getApprovedNetworkBySlug(slug);
 }

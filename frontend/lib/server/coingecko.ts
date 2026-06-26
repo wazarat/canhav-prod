@@ -61,6 +61,7 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   stkaave: "staked-aave",
   pgold: "pleasing-gold",
   ousg: "ousg",
+  benji: "franklin-templeton-benji",
   usdc: "usd-coin",
   usdt0: "usdt0",
   // RWAs (most have no CoinGecko-listed Arbitrum token yet). Verified via the

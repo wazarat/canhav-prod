@@ -33,10 +33,17 @@ export interface RwaTokenEntry {
 export const RWA_ADDRESSES: Record<string, RwaTokenEntry> = {
   // Franklin OnChain U.S. Government Money Fund (BENJI) — Arbitrum One, $1.00 NAV.
   // Verified: CoinGecko detail_platforms["arbitrum-one"] for franklin-templeton-benji.
-  "franklin-templeton": {
+  benji: {
     address: "0xb9e4765bce2609bc1949592059b17ea72fee6c6a",
     pegged: true,
     note: "BENJI money-market fund token on Arbitrum One; TVL = on-chain supply x $1.00.",
+  },
+  // OUSG — tokenized short-term US Treasury fund (Ondo). Ethereum mainnet; used when
+  // CoinGecko platform resolution misses the contract. Verified: ingest_rwas.py + Ondo docs.
+  ousg: {
+    address: "0x1b19c19393e2d034d8ff31ff34c81252fcbbee92",
+    pegged: true,
+    note: "OUSG on Ethereum; TVL proxy = on-chain supply x ~$1 NAV.",
   },
   // Pleasing Gold (PGOLD) — Arbitrum One. Verified: CoinGecko
   // platforms["arbitrum-one"] for pleasing-gold. No fixed price (tracks gold

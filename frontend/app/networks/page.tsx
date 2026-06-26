@@ -2,7 +2,7 @@ import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { NetworkTableWithFilter } from "@/components/networks/NetworkTableWithFilter";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
-import { getApprovedNetworks } from "@/lib/data";
+import { getApprovedNetworks, networkHeadlineTvlUsd } from "@/lib/data";
 import { formatUsdCompact } from "@/lib/utils";
 
 export const metadata = {
@@ -13,7 +13,10 @@ export const revalidate = 300;
 
 export default async function NetworksPage() {
   const profiles = await getApprovedNetworks();
-  const aggregateTvl = profiles.reduce((sum, p) => sum + (p.currentScale.tvlUsd ?? 0), 0);
+  const aggregateTvl = profiles.reduce(
+    (sum, p) => sum + (networkHeadlineTvlUsd(p) ?? 0),
+    0,
+  );
   const totalCoins = profiles.reduce((sum, p) => sum + p.memberCoins.length, 0);
   const totalFees24h = profiles.reduce(
     (sum, p) => sum + (p.protocolFeesRevenue?.fees24hUsd ?? 0),

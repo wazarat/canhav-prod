@@ -449,11 +449,36 @@ def _tvl_source_hint(item: Dict[str, Any], items: Dict[str, Any]) -> str:
     scale = item.get("CurrentScale") or {}
     if scale.get("tvlUsd") is not None:
         return "CurrentScale.tvlUsd"
-    if sector == "Credit":
+    if sector == "Credit" or "Credit" in (item.get("SecondarySectors") or []):
         lending = item.get("Lending") or {}
         tvl = lending.get("tvlUsd") or {}
         if tvl.get("value") is not None:
             return "Lending.tvlUsd"
+    if sector == "Staking" or "Staking" in (item.get("SecondarySectors") or []):
+        staking = item.get("Staking") or {}
+        staked = staking.get("totalStakedUsd") or {}
+        if staked.get("value") is not None:
+            return "Staking.totalStakedUsd"
+    if sector == "Liquidity" or "Liquidity" in (item.get("SecondarySectors") or []):
+        liquidity = item.get("Liquidity") or {}
+        liq_tvl = liquidity.get("tvlUsd") or {}
+        if liq_tvl.get("value") is not None:
+            return "Liquidity.tvlUsd"
+    if sector == "Derivatives" or "Derivatives" in (item.get("SecondarySectors") or []):
+        deriv = item.get("Derivatives") or {}
+        d_tvl = deriv.get("tvlUsd") or {}
+        if d_tvl.get("value") is not None:
+            return "Derivatives.tvlUsd"
+    if sector == "Other" or "Other" in (item.get("SecondarySectors") or []):
+        other = item.get("Other") or {}
+        o_tvl = other.get("tvlUsd") or {}
+        if o_tvl.get("value") is not None:
+            return "Other.tvlUsd"
+    if sector == "DEX":
+        dex = item.get("Dex") or {}
+        dex_tvl = dex.get("tvlUsd") or {}
+        if dex_tvl.get("value") is not None:
+            return "Dex.tvlUsd"
     if sector == "RWA":
         rwa = item.get("Rwa") or {}
         aum = rwa.get("aumUsd") or {}
@@ -479,17 +504,34 @@ def _tvl_source_hint(item: Dict[str, Any], items: Dict[str, Any]) -> str:
     return "none"
 
 
-def report_missing_tvl(items: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """List entities with no resolvable headline TVL after refresh paths."""
+# Sectors audited by --report-missing-tvl (primary or secondary match).
+_TVL_AUDIT_SECTORS = frozenset(
+    {"Credit", "Stablecoin", "RWA", "DEX", "Staking", "Liquidity", "Derivatives", "Other"}
+)
+
+
+def _in_tvl_audit_cohort(item: Dict[str, Any]) -> bool:
+    slug = item.get("Slug", "")
     from lending_specs import ALL_MEMBER_COIN_AUDIT  # noqa: E402
 
+    if slug in ALL_MEMBER_COIN_AUDIT:
+        return True
+    primary = item.get("Sector")
+    if primary in _TVL_AUDIT_SECTORS:
+        return True
+    secondary = item.get("SecondarySectors") or []
+    return any(s in _TVL_AUDIT_SECTORS for s in secondary)
+
+
+def report_missing_tvl(items: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """List entities with no resolvable headline TVL after refresh paths."""
     reports: List[Dict[str, Any]] = []
     for item in items.values():
         if item.get("Category") not in ("Entity", "Network"):
             continue
         slug = item.get("Slug", "")
         sector = item.get("Sector")
-        if sector not in ("Credit", "Stablecoin", "RWA", "DEX") and slug not in ALL_MEMBER_COIN_AUDIT:
+        if not _in_tvl_audit_cohort(item):
             continue
 
         scale = item.get("CurrentScale") or {}

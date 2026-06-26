@@ -99,6 +99,19 @@ ENTITY_RWA_COINS: Dict[str, Dict[str, Dict[str, Optional[str]]]] = {
             ),
         },
     },
+    "franklin-templeton": {
+        "benji": {
+            "name": "BENJI",
+            "symbol": "BENJI",
+            "assetClass": "Treasuries & Funds",
+            "coingecko": "https://www.coingecko.com/en/coins/franklin-templeton-benji",
+            "contractAddress": "0xb9e4765bce2609bc1949592059b17ea72fee6c6a",
+            "description": (
+                "On-chain share of FOBXX (Franklin OnChain U.S. Government Money Fund). "
+                "SEC-registered '40 Act mutual fund; $1.00 NAV on Arbitrum One."
+            ),
+        },
+    },
     "stably": {
         "stably-gold": {
             "name": "Stably Gold",
@@ -313,6 +326,11 @@ def main(argv: List[str]) -> int:
         "stably": {
             "website": "https://stably.io",
             "twitter": "https://x.com/StablyHQ",
+        },
+        "franklin-templeton": {
+            "website": "https://www.franklintempleton.com",
+            "twitter": "https://x.com/FTI_US",
+            "chains": ["Arbitrum One", "Ethereum", "Polygon", "Base"],
         },
     }
 

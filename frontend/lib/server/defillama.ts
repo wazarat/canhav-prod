@@ -131,7 +131,7 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
   "binance-wbeth": "binance-staked-eth",
   "coinbase-cbeth": "coinbase-wrapped-staked-eth",
   "mantle-meth": "mantle-restaking",
-  // frax already mapped to "frax-ether" via the stablecoin/staking cross-tag below if absent.
+  frax: "frax-ether",
   swell: "swell-liquid-staking",
   stader: "stader",
   stakewise: "stakewise-v2",
@@ -188,6 +188,7 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
   "jones-dao": "jones-dao",
   "rage-trade": "rage-trade-v1",
   "neutra-finance": "neutral-trade",
+  ethena: "ethena-usde",
   // Other sector (canhav-other-spec §3/§4). Convex & Aura mapped above (Liquidity);
   // extend-existing here for secondary Other/Governance cron overlay.
   "nexus-mutual": "nexus-mutual",

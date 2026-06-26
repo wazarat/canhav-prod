@@ -96,6 +96,17 @@ def _coin(
     }
 
 
+def _rwa_coin(
+    slug: str,
+    name: str,
+    symbol: str,
+    role: str,
+    sub_category: str = "Treasuries & Funds",
+) -> Dict[str, Any]:
+    """Member-coin ref to a CATEGORY#RWA partition row (ingest_rwas.py)."""
+    return _coin(slug, name, symbol, role, sub_category=sub_category, category="RWA")
+
+
 def _net(
     *,
     name: str,
@@ -550,7 +561,15 @@ RWA_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "custodian": "Franklin Templeton (transfer agent + custodian).",
             },
         },
-        member_coins=[],
+        member_coins=[
+            _rwa_coin(
+                "benji",
+                "BENJI",
+                "BENJI",
+                "On-chain share of FOBXX ('40 Act US Government Money Fund)",
+                sub_category="Treasuries & Funds",
+            ),
+        ],
     ),
 }
 
@@ -690,8 +709,8 @@ RWA_MEMBER_COIN_AUDIT: Dict[str, Dict[str, Any]] = {
     "lofty-ai": {"expected": 0, "rationale": "Algorand properties; no on-chain member coins"},
     "toucan-protocol": {"expected": 0, "rationale": "BCT/NCT pools; no MemberCoins in scope"},
     "franklin-templeton": {
-        "expected": 0,
-        "rationale": "BENJI tracked on-chain via registry, not MemberCoin",
+        "expected": 1,
+        "rationale": "BENJI RWA coin (benji slug; on-chain via registry + CoinGecko)",
     },
     "arcton": {"expected": 0, "rationale": "Long-tail seed"},
     "aryze": {"expected": 0, "rationale": "Long-tail seed"},

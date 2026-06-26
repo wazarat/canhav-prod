@@ -16,8 +16,8 @@ import type { LiquidityMetrics, ProtocolFeesRevenue, Sourced } from "@/lib/types
  * wired.
  *
  * Per seed:
- *   1. llama = fetchLlamaProtocolMeta(llamaSlug) -> tvlUsd, tvlChangePct, chains
- *   2. fees  = fetchLlamaFeesRevenue(llamaSlug)  -> feesRevenue
+ *   1. llama = fetchLlamaProtocolMeta(slug) -> tvlUsd, tvlChangePct, chains
+ *   2. fees  = fetchLlamaFeesRevenue(slug)  -> feesRevenue
  *   3. cg    = coingeckoId ? fetchMarketData(id) -> tokenPriceUsd, marketCapUsd
  *   4. marketSharePct derived across the same sub-sector after all seeds fetched
  *
@@ -61,8 +61,9 @@ export async function collectLiquidityMetrics(seed: LiquiditySeed): Promise<Liqu
   const metrics: LiquidityMetrics = {};
 
   // 1 + 2. DeFiLlama TVL + change + chains + fees (skip when no slug).
+  // Resolution goes through LLAMA_PROTOCOL_SLUGS keyed by canhav slug — not raw llama slug.
   if (seed.llamaSlug) {
-    const meta = await fetchLlamaProtocolMeta(seed.llamaSlug);
+    const meta = await fetchLlamaProtocolMeta(seed.slug);
     if (meta) {
       if (meta.tvlUsdLatest != null) {
         metrics.tvlUsd = sourced(meta.tvlUsdLatest, "DeFi Llama");
@@ -75,7 +76,7 @@ export async function collectLiquidityMetrics(seed: LiquiditySeed): Promise<Liqu
         };
       }
     }
-    const fees = await fetchLlamaFeesRevenue(seed.llamaSlug);
+    const fees = await fetchLlamaFeesRevenue(seed.slug);
     if (fees) metrics.feesRevenue = mapFeesRevenue(fees);
   }
 

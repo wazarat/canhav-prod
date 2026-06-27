@@ -1,60 +1,27 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArrowUpRight, BookOpen } from "lucide-react";
 
-import {
-  CompetitorsSection,
-  InvestmentRoundsSection,
-  LendingMetricsSection,
-  CreditTagMetricsSection,
-  StablecoinMetricsSection,
-  DexMetricsSection,
-  OpenInterestSection,
-  OptionsVolumeSection,
-  RwaMetricsSection,
-  StakingMetricsSection,
-  OrgStructureSection,
-  PartnershipsSection,
-  RisksSection,
-  TradFiComparisonSection,
-  buildNetworkSectionNav,
-} from "@/components/networks/NetworkSections";
-import { NetworkMarketCard } from "@/components/networks/NetworkMarketCard";
-import { NetworkUniversalCard } from "@/components/networks/NetworkUniversalCard";
-import { MemberCoinsLauncher } from "@/components/networks/MemberCoinsLauncher";
-import { NetworkPulsePanel } from "@/components/networks/NetworkPulsePanel";
-import { NetworkResearchHub } from "@/components/networks/NetworkResearchHub";
-import { TvlFlowWidget } from "@/components/networks/dashboard/TvlFlowWidget";
-import { FeesWidget } from "@/components/networks/dashboard/FeesWidget";
-import { CombinedVerdictCard } from "@/components/agent/CombinedVerdictCard";
-import { AgentSkillCard } from "@/components/agent/AgentSkillCard";
+import { NetworkEntityHeader } from "@/components/networks/NetworkEntityHeader";
+import { NetworkTabBar } from "@/components/networks/NetworkTabBar";
+import { NetworkAgentSkillsTab } from "@/components/networks/tabs/NetworkAgentSkillsTab";
+import { NetworkAssetCoverageTab } from "@/components/networks/tabs/NetworkAssetCoverageTab";
+import { NetworkCompetitorsTab } from "@/components/networks/tabs/NetworkCompetitorsTab";
+import { NetworkMetricsTab } from "@/components/networks/tabs/NetworkMetricsTab";
+import { NetworkOverviewTab } from "@/components/networks/tabs/NetworkOverviewTab";
+import { NetworkPartnershipsTab } from "@/components/networks/tabs/NetworkPartnershipsTab";
+import { NetworkResearchTab } from "@/components/networks/tabs/NetworkResearchTab";
+import { NetworkRisksTab } from "@/components/networks/tabs/NetworkRisksTab";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
-import { SecurityBadge } from "@/components/shared/SecurityBadge";
-import { SourcesFooter } from "@/components/shared/SourcesFooter";
-import { TypedRiskList } from "@/components/shared/TypedRiskList";
-import { Badge } from "@/components/ui/Badge";
-import { DataPanel, DataRow, LinkRow } from "@/components/ui/DataPanel";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { SectionNav } from "@/components/ui/SectionNav";
-import { StatCard } from "@/components/ui/StatCard";
-import { Card } from "@/components/ui/Card";
-import { getApprovedNetworks, getApprovedNetworkBySlug } from "@/lib/data";
 import { buildSkillFromEntity } from "@/lib/agent/skills";
-import {
-  getNetworkTaxonomyBadges,
-  isNonEvmRwa,
-  secondarySectorBadgeTone,
-  sectorBadgeTone,
-  subSectorBadgeTone,
-} from "@/lib/networkTaxonomy";
-import { deriveSecurityStatus } from "@/lib/security";
+import { getApprovedNetworks, getApprovedNetworkBySlug } from "@/lib/data";
 import { loadNetworkDashboardData } from "@/lib/networks/dashboard-data";
-import type { NetworkProfile } from "@/lib/types";
+import { buildNetworkTabs, resolveNetworkTab } from "@/lib/networks/tabs";
+import type { NetworkStatCard } from "@/components/networks/tabs/NetworkOverviewTab";
 import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
 
 interface PageProps {
   params: { slug: string };
+  searchParams: { tab?: string };
 }
 
 export const revalidate = 300;
@@ -69,101 +36,29 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return { title: profile.name, description: profile.description };
 }
 
-function DashboardSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="h-36 animate-pulse rounded-2xl bg-ink-800/50" />
-      <div className="h-48 animate-pulse rounded-2xl bg-ink-800/50" />
-      <div className="h-64 animate-pulse rounded-2xl bg-ink-800/50" />
-    </div>
-  );
-}
-
-async function NetworkDashboard({ network }: { network: NetworkProfile }) {
-  const data = await loadNetworkDashboardData(network);
-  const labels = network.scaleLabels ?? {};
-  const tvlLabel = labels.tvl ?? "Protocol TVL";
-
-  return (
-    <>
-      <NetworkPulsePanel
-        snapshot={data.snapshot}
-        tvlLabel={tvlLabel}
-        tvlSeries={data.tvlSeries}
-        tvlSeriesSource={data.tvlSeriesSource}
-      />
-      <MemberCoinsLauncher coins={data.coins} networkName={network.name} />
-      <NetworkResearchHub
-        components={network.components}
-        differentiator={network.differentiator}
-        offchainFacts={network.offchainFacts}
-        faq={network.faq}
-        timeline={network.timeline ?? network.events}
-        tokenomics={network.tokenomics}
-      />
-      <div className="space-y-4 lg:hidden">
-        <TvlFlowWidget flow={data.flow} tvlSeries={data.tvlValues} />
-        <FeesWidget fees={data.fees} />
-      </div>
-    </>
-  );
-}
-
-async function NetworkDashboardRail({ network }: { network: NetworkProfile }) {
-  const data = await loadNetworkDashboardData(network);
-
-  return (
-    <div className="hidden space-y-4 lg:block">
-      <TvlFlowWidget flow={data.flow} tvlSeries={data.tvlValues} />
-      <FeesWidget fees={data.fees} />
-    </div>
-  );
-}
-
-function NetworkAvatar({ profile }: { profile: NetworkProfile }) {
-  const logoUrl = profile.arbitrumPortalMetadata?.logoUrl;
-  const initial = profile.name.charAt(0).toUpperCase();
-
-  if (logoUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={logoUrl}
-        alt=""
-        className="h-12 w-12 rounded-xl border border-ink-700/60 object-cover"
-      />
-    );
-  }
-
-  return (
-    <span className="grid h-12 w-12 place-items-center rounded-xl border border-neon-500/30 bg-neon-500/10 font-display text-lg font-semibold text-neon-400">
-      {initial}
-    </span>
-  );
-}
-
-export default async function NetworkProfilePage({ params }: PageProps) {
+export default async function NetworkProfilePage({ params, searchParams }: PageProps) {
   const profile = await getApprovedNetworkBySlug(params.slug);
   if (!profile) notFound();
 
   const dashboardPreview = await loadNetworkDashboardData(profile);
   const resolvedCoinCount = dashboardPreview.coins.length;
-
-  const taxonomy = getNetworkTaxonomyBadges(profile);
+  const tabs = buildNetworkTabs(profile);
+  const activeTab = resolveNetworkTab(searchParams.tab, profile);
   const entitySkill = profile.agentSkill ?? buildSkillFromEntity(profile);
-  const scale = profile.currentScale;
+
   const universal = profile.universalMetrics ?? null;
+  const scale = profile.currentScale;
   const foundedDate =
     universal?.identity.foundedDate.value ?? profile.arbitrumPortalMetadata?.foundedDate ?? null;
   const deployedChains: string[] = universal?.identity.chains.value?.length
     ? universal.identity.chains.value
     : (profile.arbitrumPortalMetadata?.chains ?? []);
   const labels = profile.scaleLabels ?? {};
+  const pipelineLabel = labels.pipeline ?? "Loan pipeline";
+  const partnershipsLabel = labels.partnerships ?? "Partnerships";
   const tvlLabel = labels.tvl ?? "Total deposits / TVL";
   const usersLabel = labels.users ?? "Users";
   const aprLabel = labels.apr ?? "APR";
-  const pipelineLabel = labels.pipeline ?? "Loan pipeline";
-  const partnershipsLabel = labels.partnerships ?? "Partnerships";
   const coinsLabel = labels.coins ?? `Coins under ${profile.name}`;
 
   const aprValue =
@@ -172,7 +67,8 @@ export default async function NetworkProfilePage({ params }: PageProps) {
       : scale.aprPct != null
         ? `${scale.aprPct.toFixed(2)}%`
         : null;
-  const statCards: { label: string; value: string; hint?: string }[] = [];
+
+  const statCards: NetworkStatCard[] = [];
   if (scale.tvlUsd != null) {
     statCards.push({ label: tvlLabel, value: formatUsdCompact(scale.tvlUsd), hint: "Latest data" });
   }
@@ -202,217 +98,36 @@ export default async function NetworkProfilePage({ params }: PageProps) {
         : "Member products",
   });
 
-  const sectionNavItems = buildNetworkSectionNav(profile);
-
-  const ctaClass =
-    "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors";
-  const ctaPrimary = `${ctaClass} border-electric-500/40 bg-electric-500/10 text-electric-300 hover:bg-electric-500/20`;
-  const ctaSecondary = `${ctaClass} border-ink-700 bg-ink-900/60 text-ink-200 hover:text-ink-50`;
-
   return (
-    <div className="container space-y-8 pb-24 py-12">
-      <PageHeader
-        breadcrumbs={[
-          { label: "Dashboard", href: "/" },
-          { label: "Networks", href: "/networks" },
-          { label: profile.name },
-        ]}
-        title={profile.name}
-        badges={
-          <>
-            <Badge tone="neon">Network</Badge>
-            {taxonomy.primarySector && (
-              <Badge tone={sectorBadgeTone(taxonomy.primarySector)}>{taxonomy.primarySector}</Badge>
-            )}
-            {taxonomy.secondarySectors.map((sector) => (
-              <Badge key={sector} tone={secondarySectorBadgeTone()}>
-                {sector}
-              </Badge>
-            ))}
-            {taxonomy.subSectorTags.map((tag) => (
-              <Badge key={tag} tone={subSectorBadgeTone()}>
-                {tag}
-              </Badge>
-            ))}
-            {isNonEvmRwa(profile) && <Badge tone="warning">Non-EVM</Badge>}
-            <Badge tone="neutral">{resolvedCoinCount} coins</Badge>
-            <SecurityBadge
-              info={deriveSecurityStatus({
-                isPubliclyAudited: profile.arbitrumPortalMetadata?.isPubliclyAudited,
-                audits: profile.audits,
-              })}
-            />
-          </>
-        }
-        description={
-          <>
-            <p>{profile.description}</p>
-            {profile.tagline && (
-              <p className="mt-2 text-xs italic text-ink-400">{profile.tagline}</p>
-            )}
-          </>
-        }
-        actions={
-          <>
-            {profile.officialDocs && (
-              <a href={profile.officialDocs} target="_blank" rel="noreferrer" className={ctaPrimary}>
-                <BookOpen className="h-4 w-4" />
-                Official Docs
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </a>
-            )}
-            {profile.website && (
-              <a href={profile.website} target="_blank" rel="noreferrer" className={ctaSecondary}>
-                Website
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </a>
-            )}
-            {profile.twitter && (
-              <a href={profile.twitter} target="_blank" rel="noreferrer" className={ctaSecondary}>
-                Twitter / X
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </a>
-            )}
-          </>
-        }
+    <div className="container space-y-6 pb-24 py-12">
+      <NetworkEntityHeader
+        profile={profile}
+        snapshot={dashboardPreview.snapshot}
+        coinCount={resolvedCoinCount}
       />
 
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {statCards.map((s) => (
-          <StatCard key={s.label} label={s.label} value={s.value} hint={s.hint} />
-        ))}
-      </section>
+      <NetworkTabBar slug={profile.slug} activeTab={activeTab} tabs={tabs} />
 
-      {(profile.slug === "ethena" || profile.slug === "usd-ai") && (
-        <CombinedVerdictCard
-          entitySlug={profile.slug}
-          asset={profile.slug === "ethena" ? "sUSDe" : "sUSDai"}
+      {activeTab === "overview" && (
+        <NetworkOverviewTab
+          profile={profile}
+          statCards={statCards}
+          foundedDate={foundedDate}
+          deployedChains={deployedChains}
+          pipelineLabel={pipelineLabel}
+          partnershipsLabel={partnershipsLabel}
+          resolvedCoinCount={resolvedCoinCount}
         />
       )}
-
-      <SectionNav items={sectionNavItems} className="lg:hidden" />
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          <Suspense fallback={<DashboardSkeleton />}>
-            <NetworkDashboard network={profile} />
-          </Suspense>
-
-          {profile.universalMetrics && (
-            <NetworkUniversalCard universal={profile.universalMetrics} />
-          )}
-
-          {profile.market && (
-            <NetworkMarketCard market={profile.market} symbol={profile.symbol} />
-          )}
-
-          {profile.longDescription && (
-            <section className="space-y-2">
-              <div className="border-b border-ink-800/60 pb-2">
-                <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
-                  About
-                </h2>
-              </div>
-              <Card className="text-sm leading-relaxed text-ink-300">
-                {profile.longDescription}
-              </Card>
-            </section>
-          )}
-
-          <div className="space-y-8">
-            <LendingMetricsSection lending={profile.lending} />
-            <CreditTagMetricsSection tags={profile.tags} metrics={profile.creditTagMetrics} />
-            <StablecoinMetricsSection
-              stablecoin={profile.stablecoin}
-              memberCoins={profile.memberCoins}
-            />
-            <DexMetricsSection dex={profile.dex} />
-            <OptionsVolumeSection optionsVolume={profile.optionsVolume} />
-            <OpenInterestSection openInterest={profile.openInterest} />
-            <RwaMetricsSection rwa={profile.rwa} />
-            <StakingMetricsSection staking={profile.staking} />
-            <CompetitorsSection
-              competitors={profile.competitors}
-              networkName={profile.name}
-            />
-            <OrgStructureSection org={profile.orgStructure} />
-            {profile.typedRisks ? (
-              <TypedRiskList risks={profile.typedRisks} />
-            ) : (
-              <RisksSection risks={profile.risks} />
-            )}
-            <InvestmentRoundsSection rounds={profile.investmentRounds} />
-            <PartnershipsSection partnerships={profile.partnerships} />
-            <TradFiComparisonSection
-              rows={profile.tradFiComparison}
-              networkName={profile.name}
-            />
-            <AgentSkillCard skill={entitySkill} />
-            {profile.sources && <SourcesFooter sources={profile.sources} />}
-          </div>
-        </div>
-
-        <aside className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto lg:space-y-4 space-y-4">
-          <Suspense
-            fallback={
-              <div className="hidden space-y-4 lg:block">
-                <div className="h-52 animate-pulse rounded-2xl bg-ink-800/50" />
-                <div className="h-40 animate-pulse rounded-2xl bg-ink-800/50" />
-              </div>
-            }
-          >
-            <NetworkDashboardRail network={profile} />
-          </Suspense>
-
-          <div className="flex items-center gap-3 px-1">
-            <NetworkAvatar profile={profile} />
-            <div>
-              <p className="text-sm font-medium text-ink-50">{profile.name}</p>
-              <p className="text-xs text-ink-400">{profile.symbol}</p>
-            </div>
-          </div>
-
-          <DataPanel title="At a glance">
-            {foundedDate && <DataRow label="Founded" value={foundedDate} />}
-            {deployedChains.length > 0 && (
-              <DataRow label="Chains" value={deployedChains.join(", ")} />
-            )}
-            {scale.loanPipelineUsd != null && (
-              <DataRow label={pipelineLabel} value={formatUsdCompact(scale.loanPipelineUsd)} />
-            )}
-            {scale.partnerships != null && (
-              <DataRow label={partnershipsLabel} value={`${scale.partnerships}+`} />
-            )}
-            {resolvedCoinCount > 0 && (
-              <DataRow
-                label="Member coins"
-                value={
-                  <a href="#member-coins" className="text-electric-400 hover:underline">
-                    {resolvedCoinCount} products →
-                  </a>
-                }
-              />
-            )}
-          </DataPanel>
-
-          <div className="hidden lg:block">
-            <SectionNav items={sectionNavItems} nested />
-          </div>
-
-          <DataPanel title="Links">
-            <div className="-mx-1">
-              <LinkRow label="Official docs" href={profile.officialDocs} />
-              <LinkRow label="Website" href={profile.website} />
-              <LinkRow label="Twitter / X" href={profile.twitter} />
-              <LinkRow label="Discord" href={profile.discord} />
-              <LinkRow label="GitHub" href={profile.github} />
-              {profile.arbitrumPortalMetadata?.portalUrl && (
-                <LinkRow label="Arbitrum Portal" href={profile.arbitrumPortalMetadata.portalUrl} />
-              )}
-            </div>
-          </DataPanel>
-        </aside>
-      </div>
+      {activeTab === "metrics" && <NetworkMetricsTab profile={profile} />}
+      {activeTab === "research" && <NetworkResearchTab profile={profile} />}
+      {activeTab === "asset-coverage" && <NetworkAssetCoverageTab profile={profile} />}
+      {activeTab === "risks" && <NetworkRisksTab profile={profile} />}
+      {activeTab === "competitors" && <NetworkCompetitorsTab profile={profile} />}
+      {activeTab === "partnerships" && <NetworkPartnershipsTab profile={profile} />}
+      {activeTab === "agent-skills" && (
+        <NetworkAgentSkillsTab profile={profile} skill={entitySkill} />
+      )}
 
       <ResearchChatScope entitySlug={profile.slug} entityName={profile.name} />
     </div>

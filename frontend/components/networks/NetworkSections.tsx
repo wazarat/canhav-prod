@@ -544,9 +544,7 @@ function CuratedRow({
   );
 }
 
-export function LendingMetricsSection({ lending }: { lending?: LendingMetrics | null }) {
-  if (!lending) return null;
-  const dep = lending.deployment;
+export function LendingMetricTiles({ lending }: { lending: LendingMetrics }) {
   const hasLive =
     lending.tvlUsd ||
     lending.totalBorrowsUsd ||
@@ -554,12 +552,9 @@ export function LendingMetricsSection({ lending }: { lending?: LendingMetrics | 
     lending.supplyApyPct ||
     lending.borrowApyPct ||
     lending.activeUsers;
+
   return (
-    <section id="lending" className="scroll-mt-24 space-y-4">
-      <SectionHeading
-        title="Lending metrics"
-        subtitle="Live supply/borrow data (DeFi Llama) plus curated risk and deployment facts."
-      />
+    <>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <MetricTile label="TVL / deposits" sourced={lending.tvlUsd} kind="usd" />
         <MetricTile label="Total borrows" sourced={lending.totalBorrowsUsd} kind="usd" />
@@ -579,71 +574,87 @@ export function LendingMetricsSection({ lending }: { lending?: LendingMetrics | 
           Live supply/borrow metrics populate on the next DeFi Llama refresh.
         </p>
       )}
+    </>
+  );
+}
 
-      <DataPanel title="Asset coverage & risk">
-        <div className="divide-y divide-ink-800/60">
-          <CuratedRow label="Collateral assets" chips={lending.collateralAssets} />
-          <CuratedRow label="Loan assets" chips={lending.loanAssets} />
-          <CuratedRow label="Stablecoin exposure" chips={lending.stablecoinExposure} />
-          {lending.stablecoinExposurePct != null && (
-            <CuratedRow
-              label="Stablecoin exposure (% TVL)"
-              text={`${lending.stablecoinExposurePct}% of TVL in stables (curated estimate).`}
-            />
-          )}
-          <CuratedRow label="Oracles" chips={lending.oracles} />
-          <CuratedRow label="Risk parameters" text={lending.riskParameters} />
-          <CuratedRow label="Liquidations" text={lending.liquidations} />
-          {lending.liquidations30d && (
-            <CuratedRow
-              label="Liquidations (30d)"
-              text={
-                lending.liquidations30d.volumeUsd != null ||
-                lending.liquidations30d.count != null
-                  ? `${lending.liquidations30d.count ?? "—"} events · ${fmtUsd(lending.liquidations30d.volumeUsd)} volume`
-                  : lending.liquidations30d.notes ?? null
-              }
-            />
-          )}
-          <CuratedRow label="Bad debt" text={lending.badDebt} />
-          <CuratedRow label="Governance activity" text={lending.governanceActivity} />
-          {lending.governanceDetail && (
-            <>
-              {lending.governanceDetail.proposals != null && (
-                <CuratedRow
-                  label="Governance proposals"
-                  text={String(lending.governanceDetail.proposals)}
-                />
-              )}
-              {lending.governanceDetail.voterTurnoutPct != null && (
-                <CuratedRow
-                  label="Voter turnout"
-                  text={`${lending.governanceDetail.voterTurnoutPct}%`}
-                />
-              )}
-              {lending.governanceDetail.treasuryUsd != null && (
-                <CuratedRow
-                  label="Treasury"
-                  text={fmtUsd(lending.governanceDetail.treasuryUsd)}
-                />
-              )}
-              {lending.governanceDetail.notes && (
-                <CuratedRow label="Governance notes" text={lending.governanceDetail.notes} />
-              )}
-            </>
-          )}
-          <CuratedRow label="Audit / exploit history" text={lending.auditHistory} />
-          {dep && (
-            <CuratedRow
-              label={`Chains${
-                dep.evmCompatible ? ` · EVM: ${dep.evmCompatible}` : ""
-              }`}
-              chips={dep.chains}
-            />
-          )}
-          {dep?.notes && <CuratedRow label="Deployment notes" text={dep.notes} />}
-        </div>
-      </DataPanel>
+export function LendingAssetCoveragePanel({ lending }: { lending: LendingMetrics }) {
+  const dep = lending.deployment;
+
+  return (
+    <DataPanel title="Asset coverage & risk">
+      <div className="divide-y divide-ink-800/60">
+        <CuratedRow label="Collateral assets" chips={lending.collateralAssets} />
+        <CuratedRow label="Loan assets" chips={lending.loanAssets} />
+        <CuratedRow label="Stablecoin exposure" chips={lending.stablecoinExposure} />
+        {lending.stablecoinExposurePct != null && (
+          <CuratedRow
+            label="Stablecoin exposure (% TVL)"
+            text={`${lending.stablecoinExposurePct}% of TVL in stables (curated estimate).`}
+          />
+        )}
+        <CuratedRow label="Oracles" chips={lending.oracles} />
+        <CuratedRow label="Risk parameters" text={lending.riskParameters} />
+        <CuratedRow label="Liquidations" text={lending.liquidations} />
+        {lending.liquidations30d && (
+          <CuratedRow
+            label="Liquidations (30d)"
+            text={
+              lending.liquidations30d.volumeUsd != null ||
+              lending.liquidations30d.count != null
+                ? `${lending.liquidations30d.count ?? "—"} events · ${fmtUsd(lending.liquidations30d.volumeUsd)} volume`
+                : lending.liquidations30d.notes ?? null
+            }
+          />
+        )}
+        <CuratedRow label="Bad debt" text={lending.badDebt} />
+        <CuratedRow label="Governance activity" text={lending.governanceActivity} />
+        {lending.governanceDetail && (
+          <>
+            {lending.governanceDetail.proposals != null && (
+              <CuratedRow
+                label="Governance proposals"
+                text={String(lending.governanceDetail.proposals)}
+              />
+            )}
+            {lending.governanceDetail.voterTurnoutPct != null && (
+              <CuratedRow
+                label="Voter turnout"
+                text={`${lending.governanceDetail.voterTurnoutPct}%`}
+              />
+            )}
+            {lending.governanceDetail.treasuryUsd != null && (
+              <CuratedRow label="Treasury" text={fmtUsd(lending.governanceDetail.treasuryUsd)} />
+            )}
+            {lending.governanceDetail.notes && (
+              <CuratedRow label="Governance notes" text={lending.governanceDetail.notes} />
+            )}
+          </>
+        )}
+        <CuratedRow label="Audit / exploit history" text={lending.auditHistory} />
+        {dep && (
+          <CuratedRow
+            label={`Chains${dep.evmCompatible ? ` · EVM: ${dep.evmCompatible}` : ""}`}
+            chips={dep.chains}
+          />
+        )}
+        {dep?.notes && <CuratedRow label="Deployment notes" text={dep.notes} />}
+      </div>
+    </DataPanel>
+  );
+}
+
+export function LendingMetricsSection({ lending }: { lending?: LendingMetrics | null }) {
+  if (!lending) return null;
+
+  return (
+    <section id="lending" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Lending metrics"
+        subtitle="Live supply/borrow data (DeFi Llama) plus curated risk and deployment facts."
+      />
+      <LendingMetricTiles lending={lending} />
+      <LendingAssetCoveragePanel lending={lending} />
     </section>
   );
 }

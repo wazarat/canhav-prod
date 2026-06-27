@@ -1,4 +1,4 @@
-import { coinIdForNetworkSlug } from "@/lib/server/coingecko";
+import { coinIdForNetworkSlug } from "@/lib/coingeckoIds";
 import type { NetworkProfile } from "@/lib/types";
 
 /**

@@ -34,8 +34,8 @@ FIRST_CLASS_COIN_CATEGORIES = frozenset({"Stablecoin", "Token", "RWA"})
 STABLECOIN_UMBRELLA_SLUGS = frozenset({"ethena", "sky", "monerium", "stably", "trueusd"})
 
 # Canonical Credit → Lending (matches frontend/data/credit-seed.ts).
-CANONICAL_LENDING_SLUGS = frozenset({"aave", "compound", "morpho", "spark"})
-NON_CANONICAL_LENDING_STRIP = frozenset({"justlend", "venus", "kamino", "maple", "radiant"})
+CANONICAL_LENDING_SLUGS = frozenset({"aave", "compound", "morpho", "spark", "radiant"})
+NON_CANONICAL_LENDING_STRIP = frozenset({"justlend", "venus", "kamino", "maple"})
 
 SUGGESTED_ACTIONS = (
     "ok",
@@ -168,7 +168,7 @@ def validate_entity_specs(specs: Dict[str, Dict[str, Any]]) -> List[str]:
 
 
 def validate_canonical_lending_tags(items: Dict[str, Any]) -> List[str]:
-    """Assert exactly the canonical four carry Credit tag Lending; no Stablecoin cross-sector."""
+    """Assert exactly the canonical lending set carries Credit tag Lending; no Stablecoin cross-sector."""
     errors: List[str] = []
     lending_slugs: Set[str] = set()
 

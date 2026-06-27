@@ -36,7 +36,7 @@ const localStorePath = path.join(repoRoot, "backend", "data", "store.json");
 const STORE_KEY = process.env.REDIS_STORE_KEY || "canhav:store";
 
 /** Canonical Credit → Lending entities — taxonomy fields are patched on every deploy. */
-const CANONICAL_LENDING_SLUGS = new Set(["aave", "compound", "morpho", "spark"]);
+const CANONICAL_LENDING_SLUGS = new Set(["aave", "compound", "morpho", "spark", "radiant"]);
 const TAXONOMY_PATCH_FIELDS = [
   "Sector",
   "SubSector",

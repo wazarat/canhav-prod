@@ -1383,7 +1383,7 @@ for _slug, _other in _OTHER_EXTEND_EXISTING.items():
         _spec["secondary_sectors"] = _existing
 
 # Canonical Credit → Lending (matches frontend/data/credit-seed.ts CANONICAL_LENDING_SLUGS).
-_CANONICAL_LENDING_SLUGS = frozenset({"aave", "compound", "morpho", "spark"})
+_CANONICAL_LENDING_SLUGS = frozenset({"aave", "compound", "morpho", "spark", "radiant"})
 
 
 def _spec_credit_tags(spec: Dict[str, Any]) -> List[str]:

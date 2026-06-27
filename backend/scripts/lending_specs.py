@@ -942,8 +942,8 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "Omnichain lending — deposits and borrows are bridged across chains via "
             "LayerZero rather than confined to a single network's liquidity."
         ),
-        sub_sector="Money Markets",
-        tags=[],
+        sub_sector="Lending",
+        tags=["Lending"],
         chains=["Arbitrum", "Ethereum", "BSC", "Base"],
         official_docs="https://docs.radiant.capital",
         website="https://radiant.capital",

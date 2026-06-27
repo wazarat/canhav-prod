@@ -13,7 +13,7 @@ export interface CreditSeed {
 }
 
 /** Canonical Credit → Lending tag set (network tab filter). */
-export const CANONICAL_LENDING_SLUGS = ["aave", "compound", "morpho", "spark"] as const;
+export const CANONICAL_LENDING_SLUGS = ["aave", "compound", "morpho", "spark", "radiant"] as const;
 
 export const CREDIT_SEED: CreditSeed[] = [
   // ---------- LENDING ----------
@@ -21,6 +21,7 @@ export const CREDIT_SEED: CreditSeed[] = [
   { name: "Compound", slug: "compound", token: "COMP", tag: "Lending", llamaSlug: "compound-v3", feesSlug: "compound-v3", coingeckoId: "compound-governance-token", seedMode: "extend-existing", notes: "V3 base-asset model; V2 = compound-v2" },
   { name: "Morpho",   slug: "morpho",   token: "MORPHO", tag: "Lending", llamaSlug: "morpho-blue", coingeckoId: "morpho",                    seedMode: "extend-existing", notes: "Morpho Blue isolated markets" },
   { name: "Spark Protocol", slug: "spark", token: null,   tag: "Lending", llamaSlug: "sparklend",   coingeckoId: null,                        seedMode: "extend-existing", notes: "Sky/MakerDAO-powered; no standalone tradable token" },
+  { name: "Radiant Capital", slug: "radiant", token: "RDNT", tag: "Lending", llamaSlug: "radiant-v2", coingeckoId: "radiant-capital", seedMode: "extend-existing", notes: "Omnichain money market via LayerZero" },
 
   // ---------- LEVERAGED YIELD ----------
   { name: "Gearbox", slug: "gearbox", token: "GEAR", tag: "Leveraged Yield", llamaSlug: "gearbox",                       coingeckoId: "gearbox",     seedMode: "new", notes: "Credit Accounts, up to 10x" },

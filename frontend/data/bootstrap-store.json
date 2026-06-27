@@ -3,7 +3,7 @@
     "backend": "local",
     "count": 278,
     "table": "canhav-research",
-    "updatedAt": "2026-06-27T13:32:54Z"
+    "updatedAt": "2026-06-27T14:04:50Z"
   },
   "items": {
     "CATEGORY#Entity|PROTOCOL#aave": {
@@ -496,7 +496,7 @@
       ],
       "Twitter": "https://twitter.com/aaveaave",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Entity|PROTOCOL#aerodrome": {
@@ -661,7 +661,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/aerodromefi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://aerodrome.finance"
     },
     "CATEGORY#Entity|PROTOCOL#aevo": {
@@ -773,7 +773,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/aevoxyz",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.aevo.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#agora": {
@@ -947,7 +947,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/withAUSD",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.agora.finance"
     },
     "CATEGORY#Entity|PROTOCOL#ankr": {
@@ -1052,7 +1052,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ankr",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.ankr.com"
     },
     "CATEGORY#Entity|PROTOCOL#anzen": {
@@ -1225,7 +1225,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/AnzenFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.anzen.finance"
     },
     "CATEGORY#Entity|PROTOCOL#arcton": {
@@ -1344,7 +1344,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://arcton.com"
     },
     "CATEGORY#Entity|PROTOCOL#arrakis": {
@@ -1458,7 +1458,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ArrakisFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://arrakis.finance"
     },
     "CATEGORY#Entity|PROTOCOL#aryze": {
@@ -1577,7 +1577,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://aryze.io"
     },
     "CATEGORY#Entity|PROTOCOL#atmosphera": {
@@ -1694,7 +1694,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://atmosphera.com"
     },
     "CATEGORY#Entity|PROTOCOL#aura": {
@@ -1838,7 +1838,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/aurafinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://aura.finance"
     },
     "CATEGORY#Entity|PROTOCOL#balancer": {
@@ -2013,7 +2013,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Balancer",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://balancer.fi"
     },
     "CATEGORY#Entity|PROTOCOL#bedrock": {
@@ -2117,7 +2117,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Bedrock_DeFi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.bedrock.technology"
     },
     "CATEGORY#Entity|PROTOCOL#beefy": {
@@ -2247,7 +2247,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/beefyfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://beefy.com"
     },
     "CATEGORY#Entity|PROTOCOL#binance-wbeth": {
@@ -2353,7 +2353,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/binance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.binance.com/en/wbeth"
     },
     "CATEGORY#Entity|PROTOCOL#bitget": {
@@ -2512,7 +2512,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/bitgetglobal",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.bitget.com"
     },
     "CATEGORY#Entity|PROTOCOL#cap": {
@@ -2672,7 +2672,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/capmoney_",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://cap.app"
     },
     "CATEGORY#Entity|PROTOCOL#centrifuge": {
@@ -2853,7 +2853,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/centrifuge",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://centrifuge.io"
     },
     "CATEGORY#Entity|PROTOCOL#chateau-capital": {
@@ -2972,7 +2972,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://chateau.capital"
     },
     "CATEGORY#Entity|PROTOCOL#circle": {
@@ -3157,7 +3157,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/circle",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.circle.com"
     },
     "CATEGORY#Entity|PROTOCOL#clearpool": {
@@ -3342,7 +3342,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ClearpoolFin",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://clearpool.finance"
     },
     "CATEGORY#Entity|PROTOCOL#coinbase-cbeth": {
@@ -3448,7 +3448,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/coinbase",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.coinbase.com/cbeth"
     },
     "CATEGORY#Entity|PROTOCOL#compound": {
@@ -3640,7 +3640,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/compoundfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://compound.finance"
     },
     "CATEGORY#Entity|PROTOCOL#convex-finance": {
@@ -3779,7 +3779,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ConvexFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.convexfinance.com"
     },
     "CATEGORY#Entity|PROTOCOL#cozy-finance": {
@@ -3884,7 +3884,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/CozyFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://cozy.finance"
     },
     "CATEGORY#Entity|PROTOCOL#curve-finance": {
@@ -4065,7 +4065,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/CurveFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://curve.fi"
     },
     "CATEGORY#Entity|PROTOCOL#curve-stablecoin": {
@@ -4258,7 +4258,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/CurveFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://crvusd.curve.fi"
     },
     "CATEGORY#Entity|PROTOCOL#derive": {
@@ -4376,7 +4376,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/derivexyz",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.derive.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#dinari": {
@@ -4496,7 +4496,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://dinari.com"
     },
     "CATEGORY#Entity|PROTOCOL#dopex": {
@@ -4598,7 +4598,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/dopex_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.dopex.io"
     },
     "CATEGORY#Entity|PROTOCOL#drift-protocol": {
@@ -4719,7 +4719,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/DriftProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://drift.trade"
     },
     "CATEGORY#Entity|PROTOCOL#dualmint": {
@@ -4838,7 +4838,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://dualmint.com"
     },
     "CATEGORY#Entity|PROTOCOL#dydx": {
@@ -4962,7 +4962,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/dYdX",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://dydx.exchange"
     },
     "CATEGORY#Entity|PROTOCOL#ease-org": {
@@ -5074,7 +5074,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/EaseDeFi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://ease.org"
     },
     "CATEGORY#Entity|PROTOCOL#eigenlayer": {
@@ -5179,7 +5179,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/eigenlayer",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.eigencloud.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#elixir": {
@@ -5350,7 +5350,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/elixir",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.elixir.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#estate-protocol": {
@@ -5470,7 +5470,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://estateprotocol.com"
     },
     "CATEGORY#Entity|PROTOCOL#ethena": {
@@ -5846,7 +5846,7 @@
       ],
       "Twitter": "https://x.com/ethena_labs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Entity|PROTOCOL#ether-fi": {
@@ -5950,7 +5950,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ether_fi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.ether.fi"
     },
     "CATEGORY#Entity|PROTOCOL#extra-finance": {
@@ -6059,7 +6059,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/extrafi_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://extrafi.io"
     },
     "CATEGORY#Entity|PROTOCOL#falcon": {
@@ -6232,7 +6232,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/FalconStable",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://falcon.finance"
     },
     "CATEGORY#Entity|PROTOCOL#first-digital": {
@@ -6406,7 +6406,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/FDLabsHQ",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://firstdigitallabs.com"
     },
     "CATEGORY#Entity|PROTOCOL#florence-finance": {
@@ -6525,7 +6525,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://florence.finance"
     },
     "CATEGORY#Entity|PROTOCOL#fluid": {
@@ -6699,7 +6699,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/0xfluid",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://fluid.io"
     },
     "CATEGORY#Entity|PROTOCOL#franklin-templeton": {
@@ -6871,7 +6871,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/FTI_US",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.franklintempleton.com"
     },
     "CATEGORY#Entity|PROTOCOL#frax": {
@@ -7064,7 +7064,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/fraxfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://frax.finance"
     },
     "CATEGORY#Entity|PROTOCOL#gains-network": {
@@ -7190,7 +7190,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/GainsNetwork_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://gains.trade"
     },
     "CATEGORY#Entity|PROTOCOL#gamma": {
@@ -7313,7 +7313,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/GammaStrategies",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://app.gamma.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#gearbox": {
@@ -7428,7 +7428,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/GearboxProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://gearbox.fi"
     },
     "CATEGORY#Entity|PROTOCOL#gmo-trust": {
@@ -7606,7 +7606,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/gmotrust",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://stablecoin.z.com"
     },
     "CATEGORY#Entity|PROTOCOL#gmx": {
@@ -7730,7 +7730,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/GMX_IO",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://gmx.io"
     },
     "CATEGORY#Entity|PROTOCOL#goldfinch": {
@@ -7902,7 +7902,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/goldfinch_fi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://goldfinch.finance"
     },
     "CATEGORY#Entity|PROTOCOL#hidden-hand": {
@@ -8018,7 +8018,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/redactedcartel",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://redacted.finance"
     },
     "CATEGORY#Entity|PROTOCOL#hyperliquid": {
@@ -8141,7 +8141,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/HyperliquidX",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://hyperliquid.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#insurace": {
@@ -8263,7 +8263,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/InsurAce_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.insurace.io"
     },
     "CATEGORY#Entity|PROTOCOL#inverse-finance": {
@@ -8416,7 +8416,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/InverseFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://inverse.finance"
     },
     "CATEGORY#Entity|PROTOCOL#jones-dao": {
@@ -8527,7 +8527,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/DAOJonesOptions",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.jonesdao.io"
     },
     "CATEGORY#Entity|PROTOCOL#jupiter": {
@@ -8937,7 +8937,7 @@
       ],
       "Twitter": "https://x.com/JupiterExchange",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Entity|PROTOCOL#justlend": {
@@ -9099,7 +9099,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/DeFi_JUST",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://justlend.org"
     },
     "CATEGORY#Entity|PROTOCOL#kamino": {
@@ -9281,7 +9281,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/KaminoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://kamino.finance"
     },
     "CATEGORY#Entity|PROTOCOL#karak": {
@@ -9388,7 +9388,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Karak_Network",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://karak.network"
     },
     "CATEGORY#Entity|PROTOCOL#kelp-dao": {
@@ -9492,7 +9492,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/KelpDAO",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.kelpdao.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#lido": {
@@ -9596,7 +9596,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/LidoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://lido.fi"
     },
     "CATEGORY#Entity|PROTOCOL#liquity": {
@@ -9785,7 +9785,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/LiquityProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.liquity.org"
     },
     "CATEGORY#Entity|PROTOCOL#lista-dao": {
@@ -9957,7 +9957,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/lista_dao",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://lista.org"
     },
     "CATEGORY#Entity|PROTOCOL#lofty-ai": {
@@ -10107,7 +10107,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/lofty_ai",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.lofty.ai"
     },
     "CATEGORY#Entity|PROTOCOL#m-zero": {
@@ -10276,7 +10276,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/m0foundation",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://m0.org"
     },
     "CATEGORY#Entity|PROTOCOL#mantle-meth": {
@@ -10383,7 +10383,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/0xMantle",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.mantle.xyz/meth"
     },
     "CATEGORY#Entity|PROTOCOL#maple": {
@@ -10584,7 +10584,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/maplefinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Entity|PROTOCOL#maverick": {
@@ -10704,7 +10704,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/mavprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.mav.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#monerium": {
@@ -10997,7 +10997,7 @@
       ],
       "Twitter": "https://x.com/monerium",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Entity|PROTOCOL#morpho": {
@@ -11195,7 +11195,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/MorphoLabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://morpho.org"
     },
     "CATEGORY#Entity|PROTOCOL#mountain-protocol": {
@@ -11372,7 +11372,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/MountainUSDM",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://mountainprotocol.com"
     },
     "CATEGORY#Entity|PROTOCOL#neptune-mutual": {
@@ -11488,7 +11488,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/neptune_mutual",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://neptune-mutual.com"
     },
     "CATEGORY#Entity|PROTOCOL#neutra-finance": {
@@ -11593,7 +11593,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/NeutraFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://neutra.finance"
     },
     "CATEGORY#Entity|PROTOCOL#nexus-mutual": {
@@ -11711,7 +11711,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/NexusMutual",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://nexusmutual.io"
     },
     "CATEGORY#Entity|PROTOCOL#notional": {
@@ -11816,7 +11816,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/NotionalFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://notional.finance"
     },
     "CATEGORY#Entity|PROTOCOL#ondo-finance": {
@@ -12184,7 +12184,7 @@
       ],
       "Twitter": "https://x.com/OndoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#Entity|PROTOCOL#paladin": {
@@ -12306,7 +12306,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/PaladinVote",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://paladin.vote"
     },
     "CATEGORY#Entity|PROTOCOL#pancakeswap": {
@@ -12484,7 +12484,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/PancakeSwap",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://pancakeswap.finance"
     },
     "CATEGORY#Entity|PROTOCOL#paxos": {
@@ -12679,7 +12679,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/paxos",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Entity|PROTOCOL#pendle": {
@@ -12785,7 +12785,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/pendle_fi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.pendle.finance"
     },
     "CATEGORY#Entity|PROTOCOL#pleasing-market": {
@@ -13042,7 +13042,7 @@
       ],
       "Twitter": "https://x.com/PleasingMarket",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://www.pleasingmarket.com/"
     },
     "CATEGORY#Entity|PROTOCOL#puffer": {
@@ -13147,7 +13147,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/puffer_finance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.puffer.fi"
     },
     "CATEGORY#Entity|PROTOCOL#radiant": {
@@ -13280,16 +13280,18 @@
       "StakingSubSector": null,
       "Status": "APPROVED",
       "SubCategory": "Protocol",
-      "SubSector": null,
+      "SubSector": "Lending",
       "Symbol": "RDNT",
       "Tagline": "Omnichain money market via LayerZero.",
-      "Tags": [],
+      "Tags": [
+        "Lending"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
       "Twitter": "https://x.com/RDNTCapital",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://radiant.capital"
     },
     "CATEGORY#Entity|PROTOCOL#rage-trade": {
@@ -13394,7 +13396,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/rage_trade",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.rage.trade"
     },
     "CATEGORY#Entity|PROTOCOL#raydium": {
@@ -13552,7 +13554,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/RaydiumProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://raydium.io"
     },
     "CATEGORY#Entity|PROTOCOL#realt": {
@@ -13714,7 +13716,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/RealTPlatform",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://realt.co"
     },
     "CATEGORY#Entity|PROTOCOL#renzo": {
@@ -13818,7 +13820,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/RenzoProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.renzoprotocol.com"
     },
     "CATEGORY#Entity|PROTOCOL#reserve": {
@@ -14011,7 +14013,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/reserveprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://reserve.org"
     },
     "CATEGORY#Entity|PROTOCOL#resolv": {
@@ -14204,7 +14206,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ResolvLabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://resolv.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#ribbon-finance": {
@@ -14315,7 +14317,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ribbonfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.ribbon.finance"
     },
     "CATEGORY#Entity|PROTOCOL#rocket-pool": {
@@ -14420,7 +14422,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Rocket_Pool",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://rocketpool.net"
     },
     "CATEGORY#Entity|PROTOCOL#securitize": {
@@ -14590,7 +14592,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Securitize",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://securitize.io"
     },
     "CATEGORY#Entity|PROTOCOL#sense": {
@@ -14692,7 +14694,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/senseprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://sense.finance"
     },
     "CATEGORY#Entity|PROTOCOL#sherlock": {
@@ -14801,7 +14803,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/sherlockdefi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://sherlock.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#sky": {
@@ -15170,7 +15172,7 @@
       ],
       "Twitter": "https://x.com/SkyEcosystem",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Entity|PROTOCOL#spark": {
@@ -15380,7 +15382,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/sparkdotfi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://spark.fi"
     },
     "CATEGORY#Entity|PROTOCOL#spectra": {
@@ -15484,7 +15486,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/spectra_finance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.spectra.finance"
     },
     "CATEGORY#Entity|PROTOCOL#stably": {
@@ -15758,7 +15760,7 @@
       ],
       "Twitter": "https://twitter.com/Stably_Official",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Entity|PROTOCOL#stader": {
@@ -15863,7 +15865,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/staderlabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.staderlabs.com"
     },
     "CATEGORY#Entity|PROTOCOL#stake-dao": {
@@ -15986,7 +15988,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/StakeDAOHQ",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://stakedao.org"
     },
     "CATEGORY#Entity|PROTOCOL#stakewise": {
@@ -16090,7 +16092,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/stakewise_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.stakewise.io"
     },
     "CATEGORY#Entity|PROTOCOL#stella": {
@@ -16201,7 +16203,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Stella_xyz_",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://stellaxyz.io"
     },
     "CATEGORY#Entity|PROTOCOL#sushiswap": {
@@ -16375,7 +16377,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/SushiSwap",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://www.sushi.com"
     },
     "CATEGORY#Entity|PROTOCOL#swell": {
@@ -16479,7 +16481,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/swellnetworkio",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.swellnetwork.io"
     },
     "CATEGORY#Entity|PROTOCOL#symbiotic": {
@@ -16584,7 +16586,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/symbioticfi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://symbiotic.fi"
     },
     "CATEGORY#Entity|PROTOCOL#synthetix": {
@@ -16703,7 +16705,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/synthetix_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://synthetix.io"
     },
     "CATEGORY#Entity|PROTOCOL#tether": {
@@ -16866,7 +16868,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Tether_to",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://tether.to"
     },
     "CATEGORY#Entity|PROTOCOL#thorchain": {
@@ -17053,7 +17055,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/THORChain",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://thorchain.org"
     },
     "CATEGORY#Entity|PROTOCOL#toucan-protocol": {
@@ -17208,7 +17210,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/toucanprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://toucan.earth"
     },
     "CATEGORY#Entity|PROTOCOL#trader-joe": {
@@ -17370,7 +17372,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/LFJ_gg",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://lfj.gg"
     },
     "CATEGORY#Entity|PROTOCOL#trueusd": {
@@ -17637,7 +17639,7 @@
       ],
       "Twitter": "https://twitter.com/tusdio",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Entity|PROTOCOL#uniswap": {
@@ -17819,7 +17821,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Uniswap",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://uniswap.org"
     },
     "CATEGORY#Entity|PROTOCOL#usd-ai": {
@@ -18277,7 +18279,7 @@
       ],
       "Twitter": "https://x.com/USDai_Official",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Entity|PROTOCOL#usdt0": {
@@ -18433,7 +18435,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Tether_to",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:12Z",
+      "UpdatedAt": "2026-06-27T14:02:08Z",
       "Website": "https://tether.to"
     },
     "CATEGORY#Entity|PROTOCOL#venus": {
@@ -18610,7 +18612,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/VenusProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:11Z",
+      "UpdatedAt": "2026-06-27T14:02:07Z",
       "Website": "https://venus.io"
     },
     "CATEGORY#Entity|PROTOCOL#votium": {
@@ -18716,7 +18718,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Votium",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://votium.app"
     },
     "CATEGORY#Entity|PROTOCOL#yearn-finance": {
@@ -18842,7 +18844,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/yearnfi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://yearn.fi"
     },
     "CATEGORY#Entity|PROTOCOL#yieldnest": {
@@ -18946,7 +18948,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/YieldNestFi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.yieldnest.finance"
     },
     "CATEGORY#RWA|PROTOCOL#benji": {
@@ -18993,7 +18995,7 @@
         "value": null
       },
       "Twitter": "https://x.com/FTI_US",
-      "UpdatedAt": "2026-06-27T13:30:36Z",
+      "UpdatedAt": "2026-06-27T14:02:32Z",
       "VaultAddresses": [
         "0xb9e4765bce2609bc1949592059b17ea72fee6c6a"
       ],
@@ -19043,7 +19045,7 @@
         "value": null
       },
       "Twitter": "https://x.com/OndoFinance",
-      "UpdatedAt": "2026-06-27T13:30:16Z",
+      "UpdatedAt": "2026-06-27T14:02:12Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#RWA|PROTOCOL#ousg": {
@@ -19090,7 +19092,7 @@
         "value": null
       },
       "Twitter": "https://x.com/OndoFinance",
-      "UpdatedAt": "2026-06-27T13:30:37Z",
+      "UpdatedAt": "2026-06-27T14:02:33Z",
       "VaultAddresses": [
         "0x1b19c19393e2d034d8ff31ff34c81252fcbbee92"
       ],
@@ -19139,7 +19141,7 @@
         "value": null
       },
       "Twitter": "https://x.com/PleasingMarket",
-      "UpdatedAt": "2026-06-27T13:30:39Z",
+      "UpdatedAt": "2026-06-27T14:02:35Z",
       "VaultAddresses": [
         "0x3e76bb02286bfeaa89dd35f11253f2cbce634f91"
       ],
@@ -19188,7 +19190,7 @@
         "value": null
       },
       "Twitter": "https://x.com/StablyHQ",
-      "UpdatedAt": "2026-06-27T13:30:16Z",
+      "UpdatedAt": "2026-06-27T14:02:12Z",
       "Website": "https://stably.io"
     },
     "CATEGORY#Stablecoin|PROTOCOL#ausd": {
@@ -19233,7 +19235,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:40Z",
+      "UpdatedAt": "2026-06-27T14:02:36Z",
       "Website": "https://www.agora.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#bgusd": {
@@ -19280,7 +19282,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/bitgetglobal",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://www.bitget.com/en/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#bold": {
@@ -19327,7 +19329,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/LiquityProtocol",
-      "UpdatedAt": "2026-06-27T13:30:43Z",
+      "UpdatedAt": "2026-06-27T14:02:39Z",
       "Website": "https://liquity.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#crvusd": {
@@ -19372,7 +19374,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:46Z",
+      "UpdatedAt": "2026-06-27T14:03:42Z",
       "Website": "https://crvusd.curve.fi"
     },
     "CATEGORY#Stablecoin|PROTOCOL#cusd": {
@@ -19417,7 +19419,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://cap.app"
     },
     "CATEGORY#Stablecoin|PROTOCOL#dai": {
@@ -19464,7 +19466,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#deusd": {
@@ -19521,7 +19523,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:48Z",
+      "UpdatedAt": "2026-06-27T14:03:44Z",
       "Website": "https://www.elixir.xyz"
     },
     "CATEGORY#Stablecoin|PROTOCOL#ethena": {
@@ -19580,7 +19582,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#eurc": {
@@ -19625,7 +19627,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:51Z",
+      "UpdatedAt": "2026-06-27T14:02:47Z",
       "Website": "https://www.circle.com/eurc"
     },
     "CATEGORY#Stablecoin|PROTOCOL#eusd": {
@@ -19670,7 +19672,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:49Z",
+      "UpdatedAt": "2026-06-27T14:02:45Z",
       "Website": "https://reserve.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#fdusd": {
@@ -19727,7 +19729,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:52Z",
+      "UpdatedAt": "2026-06-27T14:02:49Z",
       "Website": "https://firstdigitallabs.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#frax": {
@@ -19774,7 +19776,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/fraxfinance",
-      "UpdatedAt": "2026-06-27T13:30:54Z",
+      "UpdatedAt": "2026-06-27T14:02:50Z",
       "Website": "https://app.frax.finance/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#frxusd": {
@@ -19833,7 +19835,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/fraxfinance",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://app.frax.finance/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#gbpe": {
@@ -19892,7 +19894,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#gho": {
@@ -19939,7 +19941,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Stablecoin|PROTOCOL#gyen": {
@@ -19984,7 +19986,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:00Z",
+      "UpdatedAt": "2026-06-27T14:02:56Z",
       "Website": "https://stablecoin.z.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#inverse-finance": {
@@ -20031,7 +20033,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/InverseFinance",
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://inverse.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#iske": {
@@ -20078,7 +20080,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#jljupusd": {
@@ -20125,7 +20127,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Stablecoin|PROTOCOL#jupusd": {
@@ -20172,7 +20174,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-27T13:31:05Z",
+      "UpdatedAt": "2026-06-27T14:03:01Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Stablecoin|PROTOCOL#lisusd": {
@@ -20217,7 +20219,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:09Z",
+      "UpdatedAt": "2026-06-27T14:03:05Z",
       "Website": "https://lista.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#lusd": {
@@ -20264,7 +20266,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/LiquityProtocol",
-      "UpdatedAt": "2026-06-27T13:31:08Z",
+      "UpdatedAt": "2026-06-27T14:03:04Z",
       "Website": "https://liquity.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#m0": {
@@ -20309,7 +20311,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:11Z",
+      "UpdatedAt": "2026-06-27T14:03:07Z",
       "Website": "https://m0.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#monerium": {
@@ -20368,7 +20370,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#monerium-usde": {
@@ -20415,7 +20417,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#pyusd": {
@@ -20472,7 +20474,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:15Z",
+      "UpdatedAt": "2026-06-27T14:03:12Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#rgusd": {
@@ -20517,7 +20519,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:22Z",
+      "UpdatedAt": "2026-06-27T14:03:18Z",
       "Website": "https://reserve.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#rlp": {
@@ -20562,7 +20564,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:19Z",
+      "UpdatedAt": "2026-06-27T14:03:15Z",
       "Website": "https://resolv.xyz"
     },
     "CATEGORY#Stablecoin|PROTOCOL#rsv": {
@@ -20607,7 +20609,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:17Z",
+      "UpdatedAt": "2026-06-27T14:03:13Z",
       "Website": "https://reserve.org"
     },
     "CATEGORY#Stablecoin|PROTOCOL#rusdy": {
@@ -20652,7 +20654,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://ondo.finance/usdy"
     },
     "CATEGORY#Stablecoin|PROTOCOL#scrvusd": {
@@ -20697,7 +20699,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:23Z",
+      "UpdatedAt": "2026-06-27T14:03:19Z",
       "Website": "https://crvusd.curve.fi"
     },
     "CATEGORY#Stablecoin|PROTOCOL#sdeusd": {
@@ -20742,7 +20744,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://www.elixir.xyz"
     },
     "CATEGORY#Stablecoin|PROTOCOL#sfrax": {
@@ -20789,7 +20791,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/fraxfinance",
-      "UpdatedAt": "2026-06-27T13:31:26Z",
+      "UpdatedAt": "2026-06-27T14:03:22Z",
       "Website": "https://app.frax.finance/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#sgho": {
@@ -20848,7 +20850,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Stablecoin|PROTOCOL#sky": {
@@ -20907,7 +20909,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-27T13:31:34Z",
+      "UpdatedAt": "2026-06-27T14:03:30Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stably": {
@@ -20954,7 +20956,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Stably_Official",
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:09Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stkgho": {
@@ -21013,7 +21015,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stusds": {
@@ -21060,7 +21062,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#stusr": {
@@ -21105,7 +21107,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:26Z",
+      "UpdatedAt": "2026-06-27T14:03:22Z",
       "Website": "https://resolv.xyz"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susdai": {
@@ -21164,7 +21166,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-27T13:31:52Z",
+      "UpdatedAt": "2026-06-27T14:03:48Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susde": {
@@ -21223,7 +21225,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-27T13:31:54Z",
+      "UpdatedAt": "2026-06-27T14:03:50Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susdf": {
@@ -21268,7 +21270,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:26Z",
+      "UpdatedAt": "2026-06-27T14:03:22Z",
       "Website": "https://falcon.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susds": {
@@ -21327,7 +21329,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Stablecoin|PROTOCOL#susdz": {
@@ -21372,7 +21374,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://www.anzen.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#taud": {
@@ -21419,7 +21421,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#tcad": {
@@ -21466,7 +21468,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#tether": {
@@ -21513,7 +21515,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Tether_to/",
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://tether.to/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#tgbp": {
@@ -21560,7 +21562,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#thkd": {
@@ -21607,7 +21609,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#trueusd": {
@@ -21666,7 +21668,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/tusdio",
-      "UpdatedAt": "2026-06-27T13:31:29Z",
+      "UpdatedAt": "2026-06-27T14:03:25Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdai": {
@@ -21725,7 +21727,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-27T13:31:37Z",
+      "UpdatedAt": "2026-06-27T14:03:33Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdc": {
@@ -21773,7 +21775,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/circle",
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://www.circle.com/en/usdc"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdf": {
@@ -21818,7 +21820,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:51Z",
+      "UpdatedAt": "2026-06-27T14:02:47Z",
       "Website": "https://falcon.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdg": {
@@ -21863,7 +21865,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:02Z",
+      "UpdatedAt": "2026-06-27T14:02:58Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdl": {
@@ -21908,7 +21910,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdm": {
@@ -21965,7 +21967,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:12Z",
+      "UpdatedAt": "2026-06-27T14:03:08Z",
       "Website": "https://mountainprotocol.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdp": {
@@ -22010,7 +22012,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:14Z",
+      "UpdatedAt": "2026-06-27T14:03:10Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdpm": {
@@ -22057,7 +22059,7 @@
         "value": null
       },
       "Twitter": "https://x.com/PleasingMarket",
-      "UpdatedAt": "2026-06-27T13:31:40Z",
+      "UpdatedAt": "2026-06-27T14:03:36Z",
       "Website": "https://www.pleasingmarket.com/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdsc": {
@@ -22104,7 +22106,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Stably_Official",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdt0": {
@@ -22151,7 +22153,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDT0_to",
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://usdt0.to/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdtb": {
@@ -22198,7 +22200,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-27T13:30:13Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usdz": {
@@ -22243,7 +22245,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:30:42Z",
+      "UpdatedAt": "2026-06-27T14:02:38Z",
       "Website": "https://www.anzen.finance"
     },
     "CATEGORY#Stablecoin|PROTOCOL#usr": {
@@ -22300,7 +22302,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:20Z",
+      "UpdatedAt": "2026-06-27T14:03:16Z",
       "Website": "https://resolv.xyz"
     },
     "CATEGORY#Stablecoin|PROTOCOL#veusd": {
@@ -22347,7 +22349,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/Stably_Official",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:10Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Stablecoin|PROTOCOL#zusd": {
@@ -22392,7 +22394,7 @@
         "value": null
       },
       "Twitter": null,
-      "UpdatedAt": "2026-06-27T13:31:45Z",
+      "UpdatedAt": "2026-06-27T14:03:41Z",
       "Website": "https://stablecoin.z.com"
     },
     "CATEGORY#Token|PROTOCOL#aave-gov": {
@@ -22475,7 +22477,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-27T13:31:55Z",
+      "UpdatedAt": "2026-06-27T14:03:51Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Token|PROTOCOL#aero": {
@@ -22517,7 +22519,7 @@
         "value": null
       },
       "Twitter": "https://x.com/aerodromefi",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://aerodrome.finance"
     },
     "CATEGORY#Token|PROTOCOL#aevo-gov": {
@@ -22557,7 +22559,7 @@
         "value": null
       },
       "Twitter": "https://x.com/aevoxyz",
-      "UpdatedAt": "2026-06-27T13:31:57Z",
+      "UpdatedAt": "2026-06-27T14:03:53Z",
       "Website": "https://www.aevo.xyz"
     },
     "CATEGORY#Token|PROTOCOL#ankreth": {
@@ -22609,7 +22611,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ankr",
-      "UpdatedAt": "2026-06-27T13:31:57Z",
+      "UpdatedAt": "2026-06-27T14:03:53Z",
       "Website": "https://www.ankr.com/staking"
     },
     "CATEGORY#Token|PROTOCOL#aura-gov": {
@@ -22654,7 +22656,7 @@
         "value": null
       },
       "Twitter": "https://x.com/aurafinance",
-      "UpdatedAt": "2026-06-27T13:31:57Z",
+      "UpdatedAt": "2026-06-27T14:03:53Z",
       "Website": "https://aura.finance"
     },
     "CATEGORY#Token|PROTOCOL#ausdc": {
@@ -22697,7 +22699,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-27T13:31:55Z",
+      "UpdatedAt": "2026-06-27T14:03:51Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Token|PROTOCOL#ausdt": {
@@ -22740,7 +22742,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-27T13:31:55Z",
+      "UpdatedAt": "2026-06-27T14:03:52Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Token|PROTOCOL#aweth": {
@@ -22783,7 +22785,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-27T13:31:55Z",
+      "UpdatedAt": "2026-06-27T14:03:52Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Token|PROTOCOL#bal": {
@@ -22829,7 +22831,7 @@
         "value": null
       },
       "Twitter": "https://x.com/Balancer",
-      "UpdatedAt": "2026-06-27T13:31:59Z",
+      "UpdatedAt": "2026-06-27T14:03:55Z",
       "Website": "https://balancer.fi"
     },
     "CATEGORY#Token|PROTOCOL#bifi": {
@@ -22874,7 +22876,7 @@
         "value": null
       },
       "Twitter": "https://x.com/beefyfinance",
-      "UpdatedAt": "2026-06-27T13:31:59Z",
+      "UpdatedAt": "2026-06-27T14:03:55Z",
       "Website": "https://beefy.com"
     },
     "CATEGORY#Token|PROTOCOL#btrfly": {
@@ -22914,7 +22916,7 @@
         "value": null
       },
       "Twitter": "https://x.com/redactedcartel",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:12Z",
       "Website": "https://redacted.finance"
     },
     "CATEGORY#Token|PROTOCOL#cake": {
@@ -22959,7 +22961,7 @@
         "value": null
       },
       "Twitter": "https://x.com/PancakeSwap",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://pancakeswap.finance"
     },
     "CATEGORY#Token|PROTOCOL#cbeth": {
@@ -23011,7 +23013,7 @@
         "value": null
       },
       "Twitter": "https://x.com/coinbase",
-      "UpdatedAt": "2026-06-27T13:32:02Z",
+      "UpdatedAt": "2026-06-27T14:03:58Z",
       "Website": "https://www.coinbase.com/cbeth"
     },
     "CATEGORY#Token|PROTOCOL#cfg": {
@@ -23054,7 +23056,7 @@
         "value": null
       },
       "Twitter": "https://x.com/centrifuge",
-      "UpdatedAt": "2026-06-27T13:32:00Z",
+      "UpdatedAt": "2026-06-27T14:03:56Z",
       "Website": "https://centrifuge.io"
     },
     "CATEGORY#Token|PROTOCOL#chip": {
@@ -23127,7 +23129,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-27T13:30:14Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Token|PROTOCOL#comp": {
@@ -23173,7 +23175,7 @@
         "value": null
       },
       "Twitter": "https://x.com/compoundfinance",
-      "UpdatedAt": "2026-06-27T13:32:03Z",
+      "UpdatedAt": "2026-06-27T14:03:59Z",
       "Website": "https://compound.finance"
     },
     "CATEGORY#Token|PROTOCOL#cpool": {
@@ -23219,7 +23221,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ClearpoolFin",
-      "UpdatedAt": "2026-06-27T13:32:02Z",
+      "UpdatedAt": "2026-06-27T14:03:58Z",
       "Website": "https://clearpool.finance"
     },
     "CATEGORY#Token|PROTOCOL#crv": {
@@ -23265,7 +23267,7 @@
         "value": null
       },
       "Twitter": "https://x.com/CurveFinance",
-      "UpdatedAt": "2026-06-27T13:32:05Z",
+      "UpdatedAt": "2026-06-27T14:04:01Z",
       "Website": "https://curve.fi"
     },
     "CATEGORY#Token|PROTOCOL#cvx": {
@@ -23307,7 +23309,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ConvexFinance",
-      "UpdatedAt": "2026-06-27T13:32:03Z",
+      "UpdatedAt": "2026-06-27T14:03:59Z",
       "Website": "https://www.convexfinance.com"
     },
     "CATEGORY#Token|PROTOCOL#drift": {
@@ -23349,7 +23351,7 @@
         "value": null
       },
       "Twitter": "https://x.com/DriftProtocol",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://drift.trade"
     },
     "CATEGORY#Token|PROTOCOL#drv": {
@@ -23392,7 +23394,7 @@
         "value": null
       },
       "Twitter": "https://x.com/derivexyz",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://www.derive.xyz"
     },
     "CATEGORY#Token|PROTOCOL#dydx-gov": {
@@ -23435,7 +23437,7 @@
         "value": null
       },
       "Twitter": "https://x.com/dYdX",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://dydx.exchange"
     },
     "CATEGORY#Token|PROTOCOL#ease": {
@@ -23475,7 +23477,7 @@
         "value": null
       },
       "Twitter": "https://x.com/EaseDeFi",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:12Z",
       "Website": "https://ease.org"
     },
     "CATEGORY#Token|PROTOCOL#eigen": {
@@ -23525,7 +23527,7 @@
         "value": null
       },
       "Twitter": "https://x.com/eigenlayer",
-      "UpdatedAt": "2026-06-27T13:32:08Z",
+      "UpdatedAt": "2026-06-27T14:04:04Z",
       "Website": "https://www.eigenlayer.xyz"
     },
     "CATEGORY#Token|PROTOCOL#ena": {
@@ -23607,7 +23609,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-27T13:32:08Z",
+      "UpdatedAt": "2026-06-27T14:04:04Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Token|PROTOCOL#ethx": {
@@ -23657,7 +23659,7 @@
         "value": null
       },
       "Twitter": "https://x.com/staderlabs",
-      "UpdatedAt": "2026-06-27T13:32:39Z",
+      "UpdatedAt": "2026-06-27T14:04:35Z",
       "Website": "https://www.staderlabs.com"
     },
     "CATEGORY#Token|PROTOCOL#ezeth": {
@@ -23710,7 +23712,7 @@
         "value": null
       },
       "Twitter": "https://x.com/RenzoProtocol",
-      "UpdatedAt": "2026-06-27T13:32:34Z",
+      "UpdatedAt": "2026-06-27T14:04:30Z",
       "Website": "https://www.renzoprotocol.com"
     },
     "CATEGORY#Token|PROTOCOL#fluid": {
@@ -23805,7 +23807,7 @@
         "value": 537027.696203252
       },
       "Twitter": "https://x.com/0xfluid",
-      "UpdatedAt": "2026-06-27T13:32:09Z",
+      "UpdatedAt": "2026-06-27T14:04:06Z",
       "Website": "https://fluid.io"
     },
     "CATEGORY#Token|PROTOCOL#gamma-gov": {
@@ -23849,7 +23851,7 @@
         "value": null
       },
       "Twitter": "https://x.com/GammaStrategies",
-      "UpdatedAt": "2026-06-27T13:32:13Z",
+      "UpdatedAt": "2026-06-27T14:04:09Z",
       "Website": "https://app.gamma.xyz"
     },
     "CATEGORY#Token|PROTOCOL#gear": {
@@ -23901,7 +23903,7 @@
         "value": null
       },
       "Twitter": "https://x.com/GearboxProtocol",
-      "UpdatedAt": "2026-06-27T13:32:13Z",
+      "UpdatedAt": "2026-06-27T14:04:09Z",
       "Website": "https://gearbox.fi"
     },
     "CATEGORY#Token|PROTOCOL#gfi": {
@@ -23943,7 +23945,7 @@
         "value": null
       },
       "Twitter": "https://x.com/goldfinch_fi",
-      "UpdatedAt": "2026-06-27T13:32:14Z",
+      "UpdatedAt": "2026-06-27T14:04:10Z",
       "Website": "https://goldfinch.finance"
     },
     "CATEGORY#Token|PROTOCOL#gmx-gov": {
@@ -23986,7 +23988,7 @@
         "value": null
       },
       "Twitter": "https://x.com/GMX_IO",
-      "UpdatedAt": "2026-06-27T13:32:11Z",
+      "UpdatedAt": "2026-06-27T14:04:07Z",
       "Website": "https://gmx.io"
     },
     "CATEGORY#Token|PROTOCOL#gns": {
@@ -24030,7 +24032,7 @@
         "value": null
       },
       "Twitter": "https://x.com/GainsNetwork_io",
-      "UpdatedAt": "2026-06-27T13:32:13Z",
+      "UpdatedAt": "2026-06-27T14:04:09Z",
       "Website": "https://gains.trade"
     },
     "CATEGORY#Token|PROTOCOL#hype": {
@@ -24072,7 +24074,7 @@
         "value": null
       },
       "Twitter": "https://x.com/HyperliquidX",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://hyperliquid.xyz"
     },
     "CATEGORY#Token|PROTOCOL#insur": {
@@ -24115,7 +24117,7 @@
         "value": null
       },
       "Twitter": "https://x.com/InsurAce_io",
-      "UpdatedAt": "2026-06-27T13:32:16Z",
+      "UpdatedAt": "2026-06-27T14:04:12Z",
       "Website": "https://www.insurace.io"
     },
     "CATEGORY#Token|PROTOCOL#iusde": {
@@ -24169,7 +24171,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Token|PROTOCOL#jlp": {
@@ -24263,7 +24265,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-27T13:32:17Z",
+      "UpdatedAt": "2026-06-27T14:04:13Z",
       "Website": "https://jup.ag/perps",
       "YieldMechanics": {
         "currentApyPct": 20.0,
@@ -24316,7 +24318,7 @@
         "value": null
       },
       "Twitter": "https://x.com/LFJ_gg",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://lfj.gg"
     },
     "CATEGORY#Token|PROTOCOL#jones": {
@@ -24356,7 +24358,7 @@
         "value": null
       },
       "Twitter": "https://x.com/DAOJonesOptions",
-      "UpdatedAt": "2026-06-27T13:32:22Z",
+      "UpdatedAt": "2026-06-27T14:04:18Z",
       "Website": "https://www.jonesdao.io"
     },
     "CATEGORY#Token|PROTOCOL#jst": {
@@ -24398,7 +24400,7 @@
         "value": null
       },
       "Twitter": "https://x.com/DeFi_JUST",
-      "UpdatedAt": "2026-06-27T13:32:22Z",
+      "UpdatedAt": "2026-06-27T14:04:18Z",
       "Website": "https://justlend.org"
     },
     "CATEGORY#Token|PROTOCOL#jup": {
@@ -24471,7 +24473,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-27T13:32:20Z",
+      "UpdatedAt": "2026-06-27T14:04:16Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Token|PROTOCOL#jupsol": {
@@ -24513,7 +24515,7 @@
         "value": null
       },
       "Twitter": "https://x.com/JupiterExchange",
-      "UpdatedAt": "2026-06-27T13:32:23Z",
+      "UpdatedAt": "2026-06-27T14:04:20Z",
       "Website": "https://jup.ag/stake"
     },
     "CATEGORY#Token|PROTOCOL#kmno": {
@@ -24555,7 +24557,7 @@
         "value": null
       },
       "Twitter": "https://x.com/KaminoFinance",
-      "UpdatedAt": "2026-06-27T13:32:25Z",
+      "UpdatedAt": "2026-06-27T14:04:21Z",
       "Website": "https://kamino.finance"
     },
     "CATEGORY#Token|PROTOCOL#mav": {
@@ -24599,7 +24601,7 @@
         "value": null
       },
       "Twitter": "https://x.com/mavprotocol",
-      "UpdatedAt": "2026-06-27T13:32:28Z",
+      "UpdatedAt": "2026-06-27T14:04:24Z",
       "Website": "https://www.mav.xyz"
     },
     "CATEGORY#Token|PROTOCOL#meth": {
@@ -24650,7 +24652,7 @@
         "value": null
       },
       "Twitter": "https://x.com/0xMantle",
-      "UpdatedAt": "2026-06-27T13:32:28Z",
+      "UpdatedAt": "2026-06-27T14:04:24Z",
       "Website": "https://www.mantle.xyz/meth"
     },
     "CATEGORY#Token|PROTOCOL#mkr": {
@@ -24692,7 +24694,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-27T13:32:27Z",
+      "UpdatedAt": "2026-06-27T14:04:23Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Token|PROTOCOL#morpho": {
@@ -24796,7 +24798,7 @@
         "value": 311163.639845
       },
       "Twitter": "https://x.com/MorphoLabs",
-      "UpdatedAt": "2026-06-27T13:32:28Z",
+      "UpdatedAt": "2026-06-27T14:04:24Z",
       "Website": "https://morpho.org"
     },
     "CATEGORY#Token|PROTOCOL#note": {
@@ -24847,7 +24849,7 @@
         "value": null
       },
       "Twitter": "https://x.com/NotionalFinance",
-      "UpdatedAt": "2026-06-27T13:32:28Z",
+      "UpdatedAt": "2026-06-27T14:04:24Z",
       "Website": "https://notional.finance"
     },
     "CATEGORY#Token|PROTOCOL#npm": {
@@ -24889,7 +24891,7 @@
         "value": null
       },
       "Twitter": "https://x.com/neptune_mutual",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:12Z",
       "Website": "https://neptune-mutual.com"
     },
     "CATEGORY#Token|PROTOCOL#ondo-gov": {
@@ -24952,7 +24954,7 @@
         "value": null
       },
       "Twitter": "https://x.com/OndoFinance",
-      "UpdatedAt": "2026-06-27T13:32:30Z",
+      "UpdatedAt": "2026-06-27T14:04:26Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#Token|PROTOCOL#oseth": {
@@ -25002,7 +25004,7 @@
         "value": null
       },
       "Twitter": "https://x.com/stakewise_io",
-      "UpdatedAt": "2026-06-27T13:32:39Z",
+      "UpdatedAt": "2026-06-27T14:04:35Z",
       "Website": "https://www.stakewise.io"
     },
     "CATEGORY#Token|PROTOCOL#pal": {
@@ -25045,7 +25047,7 @@
         "value": null
       },
       "Twitter": "https://x.com/PaladinVote",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:12Z",
       "Website": "https://paladin.vote"
     },
     "CATEGORY#Token|PROTOCOL#pendle": {
@@ -25098,7 +25100,7 @@
         "value": null
       },
       "Twitter": "https://x.com/pendle_fi",
-      "UpdatedAt": "2026-06-27T13:32:31Z",
+      "UpdatedAt": "2026-06-27T14:04:27Z",
       "Website": "https://www.pendle.finance"
     },
     "CATEGORY#Token|PROTOCOL#pufeth": {
@@ -25148,7 +25150,7 @@
         "value": null
       },
       "Twitter": "https://x.com/puffer_finance",
-      "UpdatedAt": "2026-06-27T13:32:31Z",
+      "UpdatedAt": "2026-06-27T14:04:27Z",
       "Website": "https://www.puffer.fi"
     },
     "CATEGORY#Token|PROTOCOL#ray": {
@@ -25190,7 +25192,7 @@
         "value": null
       },
       "Twitter": "https://x.com/RaydiumProtocol",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://raydium.io"
     },
     "CATEGORY#Token|PROTOCOL#rbn": {
@@ -25230,7 +25232,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ribbonfinance",
-      "UpdatedAt": "2026-06-27T13:32:34Z",
+      "UpdatedAt": "2026-06-27T14:04:30Z",
       "Website": "https://www.ribbon.finance"
     },
     "CATEGORY#Token|PROTOCOL#rdnt": {
@@ -25282,7 +25284,7 @@
         "value": 977208799.4082681
       },
       "Twitter": "https://x.com/RDNTCapital",
-      "UpdatedAt": "2026-06-27T13:32:31Z",
+      "UpdatedAt": "2026-06-27T14:04:27Z",
       "Website": "https://radiant.capital"
     },
     "CATEGORY#Token|PROTOCOL#reg": {
@@ -25325,7 +25327,7 @@
         "value": null
       },
       "Twitter": "https://x.com/RealTPlatform",
-      "UpdatedAt": "2026-06-27T13:30:16Z",
+      "UpdatedAt": "2026-06-27T14:02:12Z",
       "Website": "https://realt.co"
     },
     "CATEGORY#Token|PROTOCOL#reth": {
@@ -25378,7 +25380,7 @@
         "value": null
       },
       "Twitter": "https://x.com/Rocket_Pool",
-      "UpdatedAt": "2026-06-27T13:32:34Z",
+      "UpdatedAt": "2026-06-27T14:04:31Z",
       "Website": "https://rocketpool.net"
     },
     "CATEGORY#Token|PROTOCOL#rseth": {
@@ -25431,7 +25433,7 @@
         "value": null
       },
       "Twitter": "https://x.com/KelpDAO",
-      "UpdatedAt": "2026-06-27T13:32:25Z",
+      "UpdatedAt": "2026-06-27T14:04:21Z",
       "Website": "https://kelpdao.xyz"
     },
     "CATEGORY#Token|PROTOCOL#rune": {
@@ -25473,7 +25475,7 @@
         "value": null
       },
       "Twitter": "https://x.com/THORChain",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://thorchain.org"
     },
     "CATEGORY#Token|PROTOCOL#schip": {
@@ -25527,7 +25529,7 @@
         "value": null
       },
       "Twitter": "https://x.com/USDai_Official",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://usd.ai",
       "YieldMechanics": {
         "currentApyPct": 10.0,
@@ -25579,7 +25581,7 @@
         "value": null
       },
       "Twitter": "https://x.com/StakeDAOHQ",
-      "UpdatedAt": "2026-06-27T13:32:39Z",
+      "UpdatedAt": "2026-06-27T14:04:35Z",
       "Website": "https://stakedao.org"
     },
     "CATEGORY#Token|PROTOCOL#sena": {
@@ -25634,7 +25636,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ethena_labs",
-      "UpdatedAt": "2026-06-27T13:32:52Z",
+      "UpdatedAt": "2026-06-27T14:04:48Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Token|PROTOCOL#sfrxeth": {
@@ -25686,7 +25688,7 @@
         "value": null
       },
       "Twitter": "https://x.com/fraxfinance",
-      "UpdatedAt": "2026-06-27T13:32:39Z",
+      "UpdatedAt": "2026-06-27T14:04:35Z",
       "Website": "https://frax.finance"
     },
     "CATEGORY#Token|PROTOCOL#sky-gov": {
@@ -25749,7 +25751,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SkyEcosystem",
-      "UpdatedAt": "2026-06-27T13:32:36Z",
+      "UpdatedAt": "2026-06-27T14:04:32Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Token|PROTOCOL#snx": {
@@ -25792,7 +25794,7 @@
         "value": null
       },
       "Twitter": "https://x.com/synthetix_io",
-      "UpdatedAt": "2026-06-27T13:32:41Z",
+      "UpdatedAt": "2026-06-27T14:04:37Z",
       "Website": "https://synthetix.io"
     },
     "CATEGORY#Token|PROTOCOL#spk": {
@@ -25834,7 +25836,7 @@
         "value": null
       },
       "Twitter": "https://x.com/sparkdotfi",
-      "UpdatedAt": "2026-06-27T13:32:39Z",
+      "UpdatedAt": "2026-06-27T14:04:35Z",
       "Website": "https://spark.fi"
     },
     "CATEGORY#Token|PROTOCOL#steth": {
@@ -25884,7 +25886,7 @@
         "value": null
       },
       "Twitter": "https://x.com/LidoFinance",
-      "UpdatedAt": "2026-06-27T13:32:25Z",
+      "UpdatedAt": "2026-06-27T14:04:21Z",
       "Website": "https://lido.fi"
     },
     "CATEGORY#Token|PROTOCOL#stkaave": {
@@ -25938,7 +25940,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-27T13:32:53Z",
+      "UpdatedAt": "2026-06-27T14:04:49Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
       "YieldMechanics": {
         "currentApyPct": 5.0,
@@ -26001,7 +26003,7 @@
         "value": null
       },
       "Twitter": "https://twitter.com/aaveaave",
-      "UpdatedAt": "2026-06-27T13:32:53Z",
+      "UpdatedAt": "2026-06-27T14:04:49Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
       "YieldMechanics": {
         "currentApyPct": 5.0,
@@ -26052,7 +26054,7 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-27T13:32:52Z",
+      "UpdatedAt": "2026-06-27T14:04:48Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#sushi": {
@@ -26098,7 +26100,7 @@
         "value": null
       },
       "Twitter": "https://x.com/SushiSwap",
-      "UpdatedAt": "2026-06-27T13:32:41Z",
+      "UpdatedAt": "2026-06-27T14:04:37Z",
       "Website": "https://www.sushi.com"
     },
     "CATEGORY#Token|PROTOCOL#sweth": {
@@ -26148,7 +26150,7 @@
         "value": null
       },
       "Twitter": "https://x.com/swellnetworkio",
-      "UpdatedAt": "2026-06-27T13:32:41Z",
+      "UpdatedAt": "2026-06-27T14:04:37Z",
       "Website": "https://www.swellnetwork.io"
     },
     "CATEGORY#Token|PROTOCOL#syrup": {
@@ -26200,7 +26202,7 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-27T13:32:42Z",
+      "UpdatedAt": "2026-06-27T14:04:38Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#syrup-oft": {
@@ -26242,7 +26244,7 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-27T13:32:38Z",
+      "UpdatedAt": "2026-06-27T14:04:34Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#syrup-usdc-pool": {
@@ -26284,7 +26286,7 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-27T13:32:53Z",
+      "UpdatedAt": "2026-06-27T14:04:49Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#syrup-usdt-pool": {
@@ -26326,7 +26328,7 @@
         "value": null
       },
       "Twitter": "https://x.com/maplefinance",
-      "UpdatedAt": "2026-06-27T13:32:53Z",
+      "UpdatedAt": "2026-06-27T14:04:49Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Token|PROTOCOL#true": {
@@ -26368,7 +26370,7 @@
         "value": null
       },
       "Twitter": "https://x.com/monerium",
-      "UpdatedAt": "2026-06-27T13:30:15Z",
+      "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://monerium.com"
     },
     "CATEGORY#Token|PROTOCOL#uni": {
@@ -26414,7 +26416,7 @@
         "value": null
       },
       "Twitter": "https://x.com/Uniswap",
-      "UpdatedAt": "2026-06-27T13:32:47Z",
+      "UpdatedAt": "2026-06-27T14:04:43Z",
       "Website": "https://uniswap.org"
     },
     "CATEGORY#Token|PROTOCOL#unieth": {
@@ -26466,7 +26468,7 @@
         "value": null
       },
       "Twitter": "https://x.com/Bedrock_DeFi",
-      "UpdatedAt": "2026-06-27T13:31:59Z",
+      "UpdatedAt": "2026-06-27T14:03:55Z",
       "Website": "https://www.bedrock.technology"
     },
     "CATEGORY#Token|PROTOCOL#usdy": {
@@ -26523,7 +26525,7 @@
         "value": null
       },
       "Twitter": "https://x.com/OndoFinance",
-      "UpdatedAt": "2026-06-27T13:32:45Z",
+      "UpdatedAt": "2026-06-27T14:04:41Z",
       "Website": "https://ondo.finance/usdy",
       "YieldMechanics": {
         "currentApyPct": 5.0,
@@ -26583,7 +26585,7 @@
         "value": null
       },
       "Twitter": "https://x.com/binance",
-      "UpdatedAt": "2026-06-27T13:32:48Z",
+      "UpdatedAt": "2026-06-27T14:04:45Z",
       "Website": "https://www.binance.com/en/wbeth"
     },
     "CATEGORY#Token|PROTOCOL#weeth": {
@@ -26636,7 +26638,7 @@
         "value": null
       },
       "Twitter": "https://x.com/ether_fi",
-      "UpdatedAt": "2026-06-27T13:32:49Z",
+      "UpdatedAt": "2026-06-27T14:04:45Z",
       "Website": "https://www.ether.fi"
     },
     "CATEGORY#Token|PROTOCOL#wnxm": {
@@ -26676,7 +26678,7 @@
         "value": null
       },
       "Twitter": "https://x.com/NexusMutual",
-      "UpdatedAt": "2026-06-27T13:32:49Z",
+      "UpdatedAt": "2026-06-27T14:04:45Z",
       "Website": "https://nexusmutual.io"
     },
     "CATEGORY#Token|PROTOCOL#xvs": {
@@ -26722,7 +26724,7 @@
         "value": null
       },
       "Twitter": "https://x.com/VenusProtocol",
-      "UpdatedAt": "2026-06-27T13:32:48Z",
+      "UpdatedAt": "2026-06-27T14:04:44Z",
       "Website": "https://venus.io"
     },
     "CATEGORY#Token|PROTOCOL#yfi": {
@@ -26766,7 +26768,7 @@
         "value": null
       },
       "Twitter": "https://x.com/yearnfi",
-      "UpdatedAt": "2026-06-27T13:32:53Z",
+      "UpdatedAt": "2026-06-27T14:04:49Z",
       "Website": "https://yearn.fi"
     },
     "CATEGORY#Token|PROTOCOL#yneth": {
@@ -26808,7 +26810,7 @@
         "value": null
       },
       "Twitter": "https://x.com/yieldnest",
-      "UpdatedAt": "2026-06-27T13:32:49Z",
+      "UpdatedAt": "2026-06-27T14:04:45Z",
       "Website": "https://www.yieldnest.finance"
     }
   }

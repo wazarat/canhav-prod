@@ -35,6 +35,44 @@ const bootstrapPath = path.join(frontendRoot, "data", "bootstrap-store.json");
 const localStorePath = path.join(repoRoot, "backend", "data", "store.json");
 const STORE_KEY = process.env.REDIS_STORE_KEY || "canhav:store";
 
+/** Canonical Credit → Lending entities — taxonomy fields are patched on every deploy. */
+const CANONICAL_LENDING_SLUGS = new Set(["aave", "compound", "morpho", "spark"]);
+const TAXONOMY_PATCH_FIELDS = [
+  "Sector",
+  "SubSector",
+  "Tags",
+  "SecondarySectors",
+  "StablecoinSubSector",
+  "StablecoinSecondaryTags",
+];
+
+function parseStoreItem(raw) {
+  if (raw == null) return null;
+  if (typeof raw === "string") {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+  return typeof raw === "object" ? raw : null;
+}
+
+function taxonomyPatchNeeded(existing, bootstrap) {
+  for (const key of TAXONOMY_PATCH_FIELDS) {
+    if (JSON.stringify(existing[key]) !== JSON.stringify(bootstrap[key])) return true;
+  }
+  return false;
+}
+
+function applyTaxonomyPatch(existing, bootstrap) {
+  const next = { ...existing };
+  for (const key of TAXONOMY_PATCH_FIELDS) {
+    next[key] = bootstrap[key];
+  }
+  return next;
+}
+
 /** Load `frontend/.env.local` when running outside Next (e.g. local sync). */
 function loadEnvLocal() {
   const envPath = path.join(frontendRoot, ".env.local");
@@ -73,10 +111,11 @@ const force = process.env.SEED_FORCE === "1";
 
 const redis = new Redis({ url, token });
 
+let existingRaw = {};
 let existingKeys = new Set();
 try {
-  const raw = await redis.hgetall(STORE_KEY);
-  existingKeys = new Set(raw ? Object.keys(raw) : []);
+  existingRaw = (await redis.hgetall(STORE_KEY)) ?? {};
+  existingKeys = new Set(Object.keys(existingRaw));
 } catch (err) {
   log(`Could not read Redis hash: ${err instanceof Error ? err.message : err}`);
   process.exit(1);
@@ -155,18 +194,33 @@ if (existingCount === 0) {
   log("SEED_FORCE=1 — cleared hash; full re-seed from bootstrap bundle.");
   toWrite = payload;
 } else {
-  // Non-destructive merge: add only bootstrap keys missing from Redis so new
-  // entities propagate on every deploy without clobbering live cron metrics.
+  // Non-destructive merge: add missing bootstrap keys and patch canonical lending taxonomy.
   toWrite = {};
   for (const [field, value] of Object.entries(payload)) {
-    if (!existingKeys.has(field)) toWrite[field] = value;
+    if (!existingKeys.has(field)) {
+      toWrite[field] = value;
+      continue;
+    }
+
+    const bootstrapItem = JSON.parse(value);
+    if (!CANONICAL_LENDING_SLUGS.has(bootstrapItem?.Slug)) continue;
+
+    const existingItem = parseStoreItem(existingRaw[field]);
+    if (!existingItem) continue;
+    if (!taxonomyPatchNeeded(existingItem, bootstrapItem)) continue;
+
+    toWrite[field] = JSON.stringify(applyTaxonomyPatch(existingItem, bootstrapItem));
   }
-  const addedCount = Object.keys(toWrite).length;
-  if (addedCount === 0) {
-    log(`Store has ${existingCount} items; no new bootstrap keys — nothing to add.`);
+
+  const addedCount = Object.keys(toWrite).filter((field) => !existingKeys.has(field)).length;
+  const patchedCount = Object.keys(toWrite).length - addedCount;
+  if (Object.keys(toWrite).length === 0) {
+    log(`Store has ${existingCount} items; no new keys or taxonomy patches needed.`);
     process.exit(0);
   }
-  log(`Store has ${existingCount} items; adding ${addedCount} new key(s) (non-destructive merge).`);
+  log(
+    `Store has ${existingCount} items; adding ${addedCount} new key(s), patching ${patchedCount} canonical lending record(s).`,
+  );
 }
 
 await redis.hset(STORE_KEY, toWrite);

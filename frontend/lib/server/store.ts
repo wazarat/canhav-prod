@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
 import { repoRoot } from "@/lib/server/env";
 import { hasUpstash, readAllItemsFromRedis } from "@/lib/server/redis";
 import type {
@@ -113,6 +114,48 @@ const RWA_TAG_MIGRATION: Record<string, RwaSecondaryTag | null> = {
   "DAO-Governed": "DAO-Governed",
   "Multi-Chain": "Multi-Chain",
 };
+
+const CANONICAL_LENDING_SLUG_SET = new Set<string>(CANONICAL_LENDING_SLUGS);
+
+/** Normalize Credit → Lending taxonomy at read time (handles stale Redis records). */
+function normalizeNetworkTaxonomy(item: Record<string, unknown>): {
+  sector: NetworkProfile["sector"];
+  secondarySectors: string[] | undefined;
+  subSector: string | null;
+  tags: string[];
+} {
+  const slug = String(item.Slug ?? "");
+  const rawSecondary = Array.isArray(item.SecondarySectors)
+    ? (item.SecondarySectors as string[])
+    : undefined;
+
+  if (CANONICAL_LENDING_SLUG_SET.has(slug)) {
+    const secondarySectors = rawSecondary?.filter(
+      (s) => s !== "Stablecoin" && s !== "Lending",
+    );
+    return {
+      sector: "Credit",
+      secondarySectors: secondarySectors?.length ? secondarySectors : undefined,
+      subSector: "Lending",
+      tags: ["Lending"],
+    };
+  }
+
+  const sector = (item.Sector as NetworkProfile["sector"] | null | undefined) ?? null;
+  let tags = Array.isArray(item.Tags)
+    ? [...(item.Tags as string[])]
+    : item.SubSector
+      ? [String(item.SubSector)]
+      : [];
+  tags = tags.filter((t) => t !== "Lending");
+
+  return {
+    sector,
+    secondarySectors: rawSecondary,
+    subSector: (item.SubSector as string | null) ?? null,
+    tags,
+  };
+}
 
 function normalizeRwaTags(raw: unknown): RwaSecondaryTag[] | undefined {
   if (!Array.isArray(raw)) return undefined;
@@ -238,6 +281,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         agentSkill: item.AgentSkill ?? undefined,
       } as TokenProfile);
     } else if (item.Category === "Network" || item.Category === "Entity") {
+      const taxonomy = normalizeNetworkTaxonomy(item);
       // Accept legacy "Entity" records until the prod store is re-seeded.
       networks.push({
         category: "Network",
@@ -263,10 +307,10 @@ export async function readLiveStore(): Promise<LiveStore> {
         partnerships: item.Partnerships ?? [],
         scaleLabels: item.ScaleLabels ?? undefined,
         subCategory: item.SubCategory ?? null,
-        sector: item.Sector ?? null,
-        secondarySectors: item.SecondarySectors ?? undefined,
-        subSector: item.SubSector ?? null,
-        tags: item.Tags ?? (item.SubSector ? [item.SubSector] : []),
+        sector: taxonomy.sector,
+        secondarySectors: taxonomy.secondarySectors,
+        subSector: taxonomy.subSector,
+        tags: taxonomy.tags,
         competitors: item.Competitors ?? [],
         lending: item.Lending ?? null,
         creditTagMetrics: item.CreditTagMetrics ?? null,

@@ -8,6 +8,7 @@ import type { NetworkProfile, MemberCoinCategory } from "@/lib/types";
 import {
   filterTagsForSector,
   isNonEvmRwa,
+  matchesSectorFilter,
   sectorFilterTagOptions,
   tagsForSector,
 } from "@/lib/networkTaxonomy";
@@ -59,16 +60,11 @@ export function NetworkTableWithFilter({
     if (fixed) return fixed;
     const set = new Set<string>();
     for (const p of profiles) {
-      if (!matchesSectorTag(p, sector)) continue;
+      if (!matchesSectorFilter(p, sector)) continue;
       for (const t of tagsForSector(p, sector)) set.add(t);
     }
     return [...set].sort();
   }, [profiles, sector]);
-
-  // Primary OR secondary sector match (additive cross-tagging).
-  function matchesSectorTag(p: NetworkProfile, s: string): boolean {
-    return p.sector === s || (p.secondarySectors as string[] | undefined)?.includes(s) === true;
-  }
 
   // Structural EVM-compatibility flag (replaces the dropped "Non-EVM" tag).
   function matchesNonEvmRwa(p: NetworkProfile): boolean {
@@ -77,7 +73,7 @@ export function NetworkTableWithFilter({
 
   // Whether any RWA entity in scope is non-EVM (controls toggle visibility).
   const hasNonEvmRwa = useMemo(
-    () => profiles.some((p) => matchesSectorTag(p, "RWA") && matchesNonEvmRwa(p)),
+    () => profiles.some((p) => matchesSectorFilter(p, "RWA") && matchesNonEvmRwa(p)),
     [profiles],
   );
 
@@ -95,7 +91,7 @@ export function NetworkTableWithFilter({
         );
       const matchesCategory =
         category === "all" || p.memberCoins.some((c) => c.category === category);
-      const matchesSector = sector === "all" || matchesSectorTag(p, sector);
+      const matchesSector = sector === "all" || matchesSectorFilter(p, sector);
       const matchesTag =
         tagFilter === "all" ||
         (sector !== "all" && filterTagsForSector(p, sector).includes(tagFilter));

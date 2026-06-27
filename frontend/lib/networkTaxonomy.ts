@@ -125,6 +125,14 @@ export function tagsForSector(profile: NetworkProfile, sector: string): string[]
   return profile.tags ?? (profile.subSector ? [profile.subSector] : []);
 }
 
+/** Primary OR secondary sector match, with canonical lenders always under Credit. */
+export function matchesSectorFilter(profile: NetworkProfile, sector: string): boolean {
+  if (profile.sector === sector) return true;
+  if ((profile.secondarySectors as string[] | undefined)?.includes(sector)) return true;
+  if (sector === "Credit" && CANONICAL_LENDING_SLUG_SET.has(profile.slug)) return true;
+  return false;
+}
+
 /** Primary tags used for sector filter chips and tag-based row filtering. */
 export function filterTagsForSector(profile: NetworkProfile, sector: string): string[] {
   if (sector === "Staking") {

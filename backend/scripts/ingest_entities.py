@@ -44,6 +44,7 @@ from staking_specs import STAKING_ENTITY_SPECS  # noqa: E402
 from liquidity_specs import LIQUIDITY_ENTITY_SPECS  # noqa: E402
 from derivatives_specs import DERIVATIVES_ENTITY_SPECS  # noqa: E402
 from other_specs import OTHER_ENTITY_SPECS  # noqa: E402
+from bulk_research_defaults import apply_minimal_research  # noqa: E402
 
 DEFAULT_CSV = BACKEND_ROOT / "data" / "Arbitrum Ecosystem - scrape v2.csv"
 DOWNLOADS_CSV = Path.home() / "Downloads" / "Arbitrum Ecosystem - scrape v2.csv"
@@ -1551,8 +1552,9 @@ def main(argv: List[str]) -> int:
         parent_row = csv_rows.get(csv_slug) if csv_slug else None
         existing = repo.get_item(pk, schema.protocol_sk(slug))
         created_at = (existing or {}).get("CreatedAt") or _now_iso()
-        repo.put_item(build_entity_item(slug, spec, parent_row, created_at))
-        print(f"{schema.STATUS_APPROVED:<18}{spec['symbol']:<10}{spec['name']}")
+        enriched = apply_minimal_research(spec, slug)
+        repo.put_item(build_entity_item(slug, enriched, parent_row, created_at))
+        print(f"{schema.STATUS_APPROVED:<18}{enriched['symbol']:<10}{enriched['name']}")
 
     print("-" * 64)
     total_coins = sum(len(s["member_coins"]) for s in ENTITY_SPECS.values())

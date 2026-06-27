@@ -82,6 +82,7 @@ def _net(
     *,
     name: str,
     symbol: str,
+    csv_slug: Optional[str] = None,
     tagline: str,
     description: str,
     differentiator: str,
@@ -99,8 +100,19 @@ def _net(
     discord: Optional[str] = None,
     github: Optional[str] = None,
     risks: Optional[List[Dict[str, str]]] = None,
+    typed_risks: Optional[List[Dict[str, str]]] = None,
     events: Optional[List[Dict[str, Any]]] = None,
+    components: Optional[List[Dict[str, str]]] = None,
+    faq: Optional[List[Dict[str, Any]]] = None,
+    timeline: Optional[List[Dict[str, Any]]] = None,
+    tokenomics: Optional[Dict[str, Any]] = None,
+    offchain_facts: Optional[List[Dict[str, Any]]] = None,
+    partnerships: Optional[List[Dict[str, Any]]] = None,
+    org_structure: Optional[List[Dict[str, str]]] = None,
+    tradfi_comparison: Optional[List[Dict[str, str]]] = None,
+    investment_rounds: Optional[List[Dict[str, Any]]] = None,
     scale_labels: Optional[Dict[str, str]] = None,
+    current_scale: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Build a lending-network spec, filling the editorial defaults that
     `build_entity_item` expects so each entry stays focused on real content.
@@ -139,7 +151,7 @@ def _net(
     return {
         "name": name,
         "symbol": symbol,
-        "csv_slug": None,
+        "csv_slug": csv_slug,
         "tagline": tagline,
         "description": description,
         "differentiator": differentiator,
@@ -148,15 +160,19 @@ def _net(
         "twitter": twitter,
         "discord": discord,
         "github": github,
-        "components": [],
-        "faq": [],
-        "org_structure": [],
-        "tradfi_comparison": [],
+        "components": components or [],
+        "faq": faq or [],
+        "org_structure": org_structure or [],
+        "tradfi_comparison": tradfi_comparison or [],
         "risks": risks or [],
+        "typed_risks": typed_risks,
         "events": events or [],
-        "investment_rounds": [],
-        "partnerships": [],
-        "current_scale": _empty_scale(),
+        "timeline": timeline,
+        "tokenomics": tokenomics,
+        "offchain_facts": offchain_facts,
+        "investment_rounds": investment_rounds or [],
+        "partnerships": partnerships or [],
+        "current_scale": current_scale or _empty_scale(),
         "scale_labels": scale_labels or {"tvl": "Protocol TVL"},
         # Taxonomy hierarchy.
         "sub_category": "Protocol",
@@ -188,10 +204,132 @@ _AAVE_COMPETITOR = {
 }
 
 
+def _lending_risks(*extra: Dict[str, str]) -> List[Dict[str, str]]:
+    base = [
+        {
+            "category": "Smart Contract",
+            "description": "Upgradeable or complex lending logic can fail under edge-case liquidations or parameter misconfiguration.",
+        },
+        {
+            "category": "Oracle",
+            "description": "Stale or manipulated price feeds impair collateral valuation and liquidations.",
+        },
+        {
+            "category": "Collateral",
+            "description": "Correlated collateral drawdowns or listing errors can create bad debt in money markets.",
+        },
+        {
+            "category": "Liquidity",
+            "description": "Thin borrow/supply depth impairs exits and liquidations during market stress.",
+        },
+        {
+            "category": "Governance",
+            "description": "Parameter changes, listings, and emissions are controlled by token holders or delegates.",
+        },
+    ]
+    return base + list(extra)
+
+
+_MORPHO_COMPONENTS = [
+    {
+        "name": "Morpho Blue",
+        "description": "Minimal immutable lending primitive — each market fixes collateral, loan asset, oracle, and LLTV.",
+    },
+    {
+        "name": "MetaMorpho vaults",
+        "description": "Curated vaults that allocate supplier liquidity across Morpho Blue markets with supply caps.",
+    },
+    {
+        "name": "MORPHO token",
+        "description": "Governance token for the Morpho DAO and protocol fee routing.",
+    },
+]
+
+_MORPHO_FAQ = [
+    {
+        "question": "How is Morpho different from Aave?",
+        "answer": "Morpho uses isolated markets with fixed parameters per market; curators build vaults on top. Aave uses broader pooled markets with shared risk parameters.",
+        "pinned": True,
+    },
+    {
+        "question": "Who sets risk on Morpho vaults?",
+        "answer": "Independent risk curators configure MetaMorpho vault allocations and supply caps; suppliers choose which curator vault to deposit into.",
+        "pinned": True,
+    },
+]
+
+_COMPOUND_COMPONENTS = [
+    {
+        "name": "Compound III markets",
+        "description": "Single base borrowable asset per market with separate collateral assets posted as collateral only.",
+    },
+    {
+        "name": "COMP governance",
+        "description": "Token holders propose and vote on new markets, collateral factors, and protocol upgrades.",
+    },
+]
+
+_COMPOUND_FAQ = [
+    {
+        "question": "What changed in Compound III?",
+        "answer": "Each market has one borrowable base asset (e.g. USDC); other assets are collateral-only, simplifying risk versus multi-asset pools.",
+        "pinned": True,
+    },
+    {
+        "question": "Is Compound custodial?",
+        "answer": "No — users interact with non-custodial smart contracts; assets remain in protocol-controlled pools until withdrawn.",
+        "pinned": True,
+    },
+]
+
+_SPARK_COMPONENTS = [
+    {
+        "name": "SparkLend",
+        "description": "Lending market forked from Aave V3 architecture, optimized for Sky/Maker stablecoin liquidity.",
+    },
+    {
+        "name": "Spark Savings",
+        "description": "Yield product routing USDS/DAI liquidity from the Sky ecosystem at scale.",
+    },
+    {
+        "name": "USDS / DAI liquidity",
+        "description": "Primary stablecoin rails connecting Spark to the broader Sky/Maker credit stack.",
+    },
+]
+
+_SPARK_FAQ = [
+    {
+        "question": "How is Spark related to Sky/Maker?",
+        "answer": "Spark routes and lends stablecoin liquidity from the Sky (formerly Maker) ecosystem — USDS/DAI are the core rails.",
+        "pinned": True,
+    },
+]
+
+_RADIANT_COMPONENTS = [
+    {
+        "name": "Radiant v2 markets",
+        "description": "Cross-chain money markets with unified liquidity via LayerZero messaging.",
+    },
+    {
+        "name": "RDNT emissions",
+        "description": "Liquidity mining token incentivizing cross-chain supply and borrow.",
+    },
+]
+
+_RADIANT_FAQ = [
+    {
+        "question": "What does omnichain mean for Radiant?",
+        "answer": "Users can deposit on one chain and borrow on another; LayerZero bridges messaging between Radiant deployments.",
+        "pinned": True,
+    },
+]
+
+
 LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
     "morpho": _net(
         name="Morpho",
         symbol="MORPHO",
+        csv_slug="morpho",
         tagline="Customizable lending infrastructure — isolated markets + curated vaults.",
         description=(
             "Morpho is a lending protocol built around Morpho Blue, a minimal primitive "
@@ -209,6 +347,51 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         twitter="https://x.com/MorphoLabs",
         github="https://github.com/morpho-org",
         chains=["Ethereum", "Base"],
+        components=_MORPHO_COMPONENTS,
+        faq=_MORPHO_FAQ,
+        timeline=[
+            {
+                "date": "2023-01",
+                "title": "Morpho Optimizer era",
+                "description": "Peer-to-peer matching layer on top of Aave/Compound before Morpho Blue.",
+                "status": "executed",
+            },
+            {
+                "date": "2024-01",
+                "title": "Morpho Blue launch",
+                "description": "Immutable isolated-market primitive with curator vaults (MetaMorpho).",
+                "status": "executed",
+            },
+        ],
+        events=[
+            {
+                "date": "2024-01",
+                "title": "Morpho Blue mainnet",
+                "description": "Isolated markets and MetaMorpho vaults go live on Ethereum.",
+            },
+        ],
+        offchain_facts=[
+            {
+                "key": "curatorModel",
+                "value": "Risk curators operate MetaMorpho vaults — suppliers pick curators rather than a single pooled risk committee.",
+                "freshness": "static",
+                "capturedAt": "2026-06-27",
+                "source": {"label": "Morpho docs", "url": "https://docs.morpho.org"},
+            },
+        ],
+        partnerships=[
+            {
+                "name": "Coinbase / Base",
+                "date": "2024",
+                "description": "Morpho Blue and vaults deployed on Base alongside Ethereum mainnet.",
+            },
+        ],
+        risks=_lending_risks(
+            {
+                "category": "Curator",
+                "description": "MetaMorpho curators choose market allocations; poor curator decisions isolate bad outcomes to vault depositors.",
+            },
+        ),
         competitors=[
             _AAVE_COMPETITOR,
             {
@@ -289,6 +472,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
     "spark": _net(
         name="Spark Protocol",
         symbol="SPK",
+        csv_slug="spark",
         tagline="Stablecoin-native credit stack tied to the Sky/Maker ecosystem.",
         description=(
             "Spark is a lending system built mainly around stablecoin liquidity, borrowing "
@@ -306,6 +490,45 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         twitter="https://x.com/sparkdotfi",
         github="https://github.com/marsfoundation",
         chains=["Ethereum"],
+        components=_SPARK_COMPONENTS,
+        faq=_SPARK_FAQ,
+        timeline=[
+            {
+                "date": "2023-05",
+                "title": "Spark Protocol launch",
+                "description": "SparkLend goes live as the Sky/Maker lending front-end.",
+                "status": "executed",
+            },
+        ],
+        events=[
+            {
+                "date": "2025-03",
+                "title": "Spark on Arbitrum",
+                "description": "Spark expands USDS lending to Arbitrum One.",
+            },
+        ],
+        offchain_facts=[
+            {
+                "key": "skyLink",
+                "value": "Spark is the primary lending outlet for Sky/Maker stablecoin liquidity (USDS/DAI).",
+                "freshness": "static",
+                "capturedAt": "2026-06-27",
+                "source": {"label": "Spark", "url": "https://spark.fi"},
+            },
+        ],
+        partnerships=[
+            {
+                "name": "Sky (MakerDAO)",
+                "date": "2023",
+                "description": "Spark routes Sky ecosystem stablecoin liquidity through SparkLend and Spark Savings.",
+            },
+        ],
+        risks=_lending_risks(
+            {
+                "category": "Stablecoin",
+                "description": "Heavy reliance on USDS/DAI peg and Sky governance for core liquidity rails.",
+            },
+        ),
         competitors=[
             _AAVE_COMPETITOR,
             {
@@ -398,6 +621,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
     "compound": _net(
         name="Compound",
         symbol="COMP",
+        csv_slug="compound",
         tagline="Simple, battle-tested money markets (Compound III).",
         description=(
             "Compound is one of the original DeFi lending protocols. Compound III simplifies "
@@ -414,6 +638,55 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         twitter="https://x.com/compoundfinance",
         github="https://github.com/compound-finance",
         chains=["Ethereum", "Base", "Arbitrum One", "Optimism", "Polygon", "Mantle"],
+        components=_COMPOUND_COMPONENTS,
+        faq=_COMPOUND_FAQ,
+        timeline=[
+            {
+                "date": "2020-06",
+                "title": "Compound v2 mainnet",
+                "description": "Classic pooled money markets with COMP liquidity mining.",
+                "status": "executed",
+            },
+            {
+                "date": "2022-08",
+                "title": "Compound III",
+                "description": "Single base-asset markets simplify collateral and borrow logic.",
+                "status": "executed",
+            },
+        ],
+        events=[
+            {
+                "date": "2023-09",
+                "title": "Compound III on Arbitrum",
+                "description": "USDC base market live on Arbitrum One.",
+            },
+        ],
+        tokenomics={
+            "summary": "COMP governs the protocol; emissions directed by governance to markets and contributors.",
+            "maxSupply": "10,000,000 COMP",
+        },
+        offchain_facts=[
+            {
+                "key": "compoundIII",
+                "value": "Compound III uses one borrowable base asset per market — collateral assets do not earn supply yield.",
+                "freshness": "static",
+                "capturedAt": "2026-06-27",
+                "source": {"label": "Compound docs", "url": "https://docs.compound.finance"},
+            },
+        ],
+        partnerships=[
+            {
+                "name": "Chainlink",
+                "date": "ongoing",
+                "description": "Price oracles for collateral and base assets across Compound III markets.",
+            },
+        ],
+        risks=_lending_risks(
+            {
+                "category": "Market design",
+                "description": "Single base-asset markets concentrate borrow demand on one asset per deployment.",
+            },
+        ),
         competitors=[
             _AAVE_COMPETITOR,
             {
@@ -933,6 +1206,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
     "radiant": _net(
         name="Radiant Capital",
         symbol="RDNT",
+        csv_slug="radiant-capital",
         tagline="Omnichain money market via LayerZero.",
         description=(
             "Radiant Capital is a cross-chain money market that lets users deposit on one "
@@ -948,6 +1222,49 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         official_docs="https://docs.radiant.capital",
         website="https://radiant.capital",
         twitter="https://x.com/RDNTCapital",
+        components=_RADIANT_COMPONENTS,
+        faq=_RADIANT_FAQ,
+        timeline=[
+            {
+                "date": "2022-07",
+                "title": "Radiant v1 on Arbitrum",
+                "description": "Initial omnichain lending launch on Arbitrum.",
+                "status": "executed",
+            },
+        ],
+        events=[
+            {
+                "date": "2024-06",
+                "title": "Security incident",
+                "description": "Radiant reported a security exploit; governance and markets paused for remediation.",
+            },
+        ],
+        offchain_facts=[
+            {
+                "key": "omnichain",
+                "value": "LayerZero messaging connects Radiant deployments — cross-chain borrow relies on bridge/oracle integrity.",
+                "freshness": "static",
+                "capturedAt": "2026-06-27",
+                "source": {"label": "Radiant docs", "url": "https://docs.radiant.capital"},
+            },
+        ],
+        partnerships=[
+            {
+                "name": "LayerZero",
+                "date": "2022",
+                "description": "Cross-chain messaging layer enabling omnichain deposit/borrow.",
+            },
+        ],
+        risks=_lending_risks(
+            {
+                "category": "Bridge",
+                "description": "Omnichain design adds cross-chain messaging and bridge dependency beyond single-chain lenders.",
+            },
+            {
+                "category": "Security history",
+                "description": "Prior exploit history raises operational and smart-contract risk awareness.",
+            },
+        ),
         lending={
             "collateralAssets": ["ETH", "WBTC", "USDC", "USDT", "ARB"],
             "loanAssets": ["USDC", "USDT", "ETH", "WBTC"],

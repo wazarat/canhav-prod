@@ -1,5 +1,6 @@
 import { coinIdForNetworkSlug, resolveCoinsBatch, type TokenResolution } from "@/lib/server/coingecko";
 import { fetchLlamaProtocolMeta, llamaProtocolForSlug } from "@/lib/server/defillama";
+import { enrichNetworksWithCompetitors } from "@/lib/networks/competitors";
 import {
   networkHeadlineMarketCapUsd,
   networkHeadlineTvlUsd,
@@ -177,20 +178,21 @@ export async function getAllNetworks(): Promise<NetworkProfile[]> {
   return [...networks].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function getApprovedNetworks(): Promise<NetworkProfile[]> {
+async function loadEnrichedNetworks(): Promise<NetworkProfile[]> {
   const store = await readLiveStore();
   const networks = [...store.networks].sort((a, b) => a.name.localeCompare(b.name));
   const withTvl = enrichNetworksWithTvl(networks, store);
-  return enrichNetworksWithMarketMetrics(withTvl, store);
+  const withMarket = await enrichNetworksWithMarketMetrics(withTvl, store);
+  return enrichNetworksWithCompetitors(withMarket);
+}
+
+export async function getApprovedNetworks(): Promise<NetworkProfile[]> {
+  return loadEnrichedNetworks();
 }
 
 export async function getApprovedNetworkBySlug(slug: string): Promise<NetworkProfile | null> {
-  const store = await readLiveStore();
-  const network = store.networks.find((p) => p.slug === slug) ?? null;
-  if (!network) return null;
-  const withTvl = enrichNetworksWithTvl([network], store);
-  const enriched = await enrichNetworksWithMarketMetrics(withTvl, store);
-  return enriched[0] ?? network;
+  const networks = await loadEnrichedNetworks();
+  return networks.find((p) => p.slug === slug) ?? null;
 }
 
 /**

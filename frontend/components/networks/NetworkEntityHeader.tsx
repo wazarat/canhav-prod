@@ -12,12 +12,20 @@ import {
   subSectorBadgeTone,
 } from "@/lib/networkTaxonomy";
 import { deriveSecurityStatus } from "@/lib/security";
+import { networkLogoInitial, resolveNetworkLogoUrl } from "@/lib/networks/entityLogo";
 import type { NetworkProfile } from "@/lib/types";
 import { formatPct, formatUsdCompact } from "@/lib/utils";
 
-export function NetworkAvatar({ profile }: { profile: NetworkProfile }) {
-  const logoUrl = profile.arbitrumPortalMetadata?.logoUrl;
-  const initial = profile.name.charAt(0).toUpperCase();
+export function NetworkAvatar({
+  profile,
+  size = "lg",
+}: {
+  profile: NetworkProfile;
+  size?: "sm" | "lg";
+}) {
+  const logoUrl = resolveNetworkLogoUrl(profile);
+  const initial = networkLogoInitial(profile.name);
+  const sizeClass = size === "sm" ? "h-8 w-8 rounded-lg text-sm" : "h-14 w-14 rounded-xl text-xl";
 
   if (logoUrl) {
     return (
@@ -25,13 +33,15 @@ export function NetworkAvatar({ profile }: { profile: NetworkProfile }) {
       <img
         src={logoUrl}
         alt=""
-        className="h-14 w-14 rounded-xl border border-ink-700/60 object-cover"
+        className={`${sizeClass} border border-ink-700/60 object-cover`}
       />
     );
   }
 
   return (
-    <span className="grid h-14 w-14 place-items-center rounded-xl border border-neon-500/30 bg-neon-500/10 font-display text-xl font-semibold text-neon-400">
+    <span
+      className={`grid ${sizeClass} place-items-center border border-neon-500/30 bg-neon-500/10 font-display font-semibold text-neon-400`}
+    >
       {initial}
     </span>
   );

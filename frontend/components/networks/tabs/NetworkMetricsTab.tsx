@@ -47,6 +47,12 @@ export function NetworkMetricsTab({ profile }: { profile: NetworkProfile }) {
       profile.market,
   );
 
+  // When the full Lending block is present, live tiles render there — skip duplicate
+  // Lending tag panel (curated collateral/oracles remain on Asset coverage tab).
+  const creditTags = profile.lending
+    ? (profile.tags ?? []).filter((tag) => tag !== "Lending")
+    : profile.tags;
+
   return (
     <div className="space-y-8 pt-6">
       {!hasAnySectorBlock && (
@@ -61,11 +67,14 @@ export function NetworkMetricsTab({ profile }: { profile: NetworkProfile }) {
           title="Lending metrics"
           subtitle="Live supply/borrow data (DeFi Llama)."
         >
-          <LendingMetricTiles lending={profile.lending} />
+          <LendingMetricTiles
+            lending={profile.lending}
+            syncedAt={profile.universalMetrics?.syncedAt}
+          />
         </SectionShell>
       )}
 
-      <CreditTagMetricsSection tags={profile.tags} metrics={profile.creditTagMetrics} />
+      <CreditTagMetricsSection tags={creditTags} metrics={profile.creditTagMetrics} />
       <StablecoinMetricsSection stablecoin={profile.stablecoin} memberCoins={profile.memberCoins} />
       <DexMetricsSection dex={profile.dex} />
       <OptionsVolumeSection optionsVolume={profile.optionsVolume} />

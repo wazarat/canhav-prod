@@ -1142,6 +1142,11 @@ export async function GET(req: Request): Promise<NextResponse> {
         if (tvlUsd != null) {
           item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
         }
+        // Promote headline supply APY to overview (except Aave — GHO supply APY handled above).
+        if (slug !== "aave" && supplyApy != null) {
+          item.CurrentScale = { ...(item.CurrentScale ?? {}), aprPct: supplyApy };
+          item.ScaleLabels = { ...(item.ScaleLabels ?? {}), apr: "Supply APY" };
+        }
         item.UpdatedAt = nowIso();
         await putItem(item);
         updated += 1;

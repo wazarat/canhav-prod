@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BookOpen, Globe } from "lucide-react";
 
+import { NetworkAvatar } from "@/components/networks/NetworkEntityHeader";
 import { Badge } from "@/components/ui/Badge";
 import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
@@ -68,17 +69,20 @@ export function NetworkTable({
                 className="border-l-2 border-l-transparent hover:border-l-electric-500/60"
               >
                 <TD>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/networks/${p.slug}`}
-                      className="font-medium text-ink-50 transition-colors hover:text-electric-400"
-                    >
-                      {p.name}
-                    </Link>
+                  <div className="flex items-center gap-2.5">
+                    <NetworkAvatar profile={p} size="sm" />
+                    <div className="min-w-0">
+                      <Link
+                        href={`/networks/${p.slug}`}
+                        className="font-medium text-ink-50 transition-colors hover:text-electric-400"
+                      >
+                        {p.name}
+                      </Link>
+                      <p className="mt-0.5 line-clamp-1 max-w-[280px] text-xs text-ink-300">
+                        {p.description}
+                      </p>
+                    </div>
                   </div>
-                  <p className="mt-0.5 line-clamp-1 max-w-[320px] text-xs text-ink-300">
-                    {p.description}
-                  </p>
                   {taxonomy.primarySector && (
                     <div className="mt-1.5 flex flex-wrap items-center gap-1">
                       <Badge tone={sectorBadgeTone(taxonomy.primarySector)}>

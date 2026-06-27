@@ -26,6 +26,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
+import { mergeCuratedContent } from "./patch-store-content.mjs";
+
 import { Redis } from "@upstash/redis";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -203,23 +205,31 @@ if (existingCount === 0) {
     }
 
     const bootstrapItem = JSON.parse(value);
-    if (!CANONICAL_LENDING_SLUGS.has(bootstrapItem?.Slug)) continue;
-
     const existingItem = parseStoreItem(existingRaw[field]);
     if (!existingItem) continue;
-    if (!taxonomyPatchNeeded(existingItem, bootstrapItem)) continue;
 
-    toWrite[field] = JSON.stringify(applyTaxonomyPatch(existingItem, bootstrapItem));
+    let mergedItem = existingItem;
+    if (
+      CANONICAL_LENDING_SLUGS.has(bootstrapItem?.Slug) &&
+      taxonomyPatchNeeded(existingItem, bootstrapItem)
+    ) {
+      mergedItem = applyTaxonomyPatch(existingItem, bootstrapItem);
+    }
+
+    const contentMerged = mergeCuratedContent(mergedItem, bootstrapItem);
+    if (contentMerged) {
+      toWrite[field] = JSON.stringify(contentMerged);
+    }
   }
 
   const addedCount = Object.keys(toWrite).filter((field) => !existingKeys.has(field)).length;
   const patchedCount = Object.keys(toWrite).length - addedCount;
   if (Object.keys(toWrite).length === 0) {
-    log(`Store has ${existingCount} items; no new keys or taxonomy patches needed.`);
+    log(`Store has ${existingCount} items; no new keys, taxonomy, or content patches needed.`);
     process.exit(0);
   }
   log(
-    `Store has ${existingCount} items; adding ${addedCount} new key(s), patching ${patchedCount} canonical lending record(s).`,
+    `Store has ${existingCount} items; adding ${addedCount} new key(s), patching ${patchedCount} existing record(s).`,
   );
 }
 

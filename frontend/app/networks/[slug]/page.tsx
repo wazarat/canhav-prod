@@ -15,6 +15,10 @@ import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { buildSkillFromEntity } from "@/lib/agent/skills";
 import { getApprovedNetworks, getApprovedNetworkBySlug } from "@/lib/data";
 import { loadNetworkDashboardData } from "@/lib/networks/dashboard-data";
+import {
+  networkHeadlineMarketCapUsd,
+  networkHeadlineTvlUsd,
+} from "@/lib/networks/marketHeadlines";
 import { buildNetworkTabs, resolveNetworkTab } from "@/lib/networks/tabs";
 import type { NetworkStatCard } from "@/components/networks/tabs/NetworkOverviewTab";
 import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
@@ -48,6 +52,8 @@ export default async function NetworkProfilePage({ params, searchParams }: PageP
 
   const universal = profile.universalMetrics ?? null;
   const scale = profile.currentScale;
+  const headlineTvl = networkHeadlineTvlUsd(profile);
+  const headlineMcap = networkHeadlineMarketCapUsd(profile);
   const foundedDate =
     universal?.identity.foundedDate.value ?? profile.arbitrumPortalMetadata?.foundedDate ?? null;
   const deployedChains: string[] = universal?.identity.chains.value?.length
@@ -59,18 +65,12 @@ export default async function NetworkProfilePage({ params, searchParams }: PageP
   const tvlLabel = labels.tvl ?? "Total deposits / TVL";
   const usersLabel = labels.users ?? "Users";
   const aprLabel = labels.apr ?? "APR";
+  const mcapLabel = labels.apr === "Market Cap" ? "Market Cap" : "Market cap";
   const coinsLabel = labels.coins ?? `Coins under ${profile.name}`;
 
-  const aprValue =
-    scale.marketCapUsd != null
-      ? formatUsdCompact(scale.marketCapUsd)
-      : scale.aprPct != null
-        ? `${scale.aprPct.toFixed(2)}%`
-        : null;
-
   const statCards: NetworkStatCard[] = [];
-  if (scale.tvlUsd != null) {
-    statCards.push({ label: tvlLabel, value: formatUsdCompact(scale.tvlUsd), hint: "Latest data" });
+  if (headlineTvl != null) {
+    statCards.push({ label: tvlLabel, value: formatUsdCompact(headlineTvl), hint: "Latest data" });
   }
   if (scale.users != null) {
     statCards.push({
@@ -79,14 +79,24 @@ export default async function NetworkProfilePage({ params, searchParams }: PageP
       hint: labels.users ? undefined : "Depositors",
     });
   }
-  if (aprValue != null) {
+  if (scale.aprPct != null) {
     statCards.push({
       label: aprLabel,
-      value: aprValue,
-      hint:
-        scale.marketCapUsd == null && scale.targetAprPct != null
-          ? `Target ${scale.targetAprPct.toFixed(2)}%`
-          : undefined,
+      value: `${scale.aprPct.toFixed(2)}%`,
+      hint: scale.targetAprPct != null ? `Target ${scale.targetAprPct.toFixed(2)}%` : undefined,
+    });
+  }
+  if (headlineMcap != null && scale.aprPct == null) {
+    statCards.push({
+      label: mcapLabel,
+      value: formatUsdCompact(headlineMcap),
+      hint: "Latest data",
+    });
+  } else if (headlineMcap != null && labels.apr === "Market Cap") {
+    statCards.push({
+      label: mcapLabel,
+      value: formatUsdCompact(headlineMcap),
+      hint: "Latest data",
     });
   }
   statCards.push({

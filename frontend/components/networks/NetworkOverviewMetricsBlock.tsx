@@ -1,5 +1,9 @@
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { NetworkUniversalCard } from "@/components/networks/NetworkUniversalCard";
+import {
+  networkHeadlineMarketCapUsd,
+  networkHeadlineTvlUsd,
+} from "@/lib/networks/marketHeadlines";
 import type { NetworkProfile } from "@/lib/types";
 import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
 
@@ -14,6 +18,8 @@ export function NetworkOverviewMetricsBlock({ profile }: { profile: NetworkProfi
   }
 
   const scale = profile.currentScale;
+  const headlineTvl = networkHeadlineTvlUsd(profile);
+  const headlineMcap = networkHeadlineMarketCapUsd(profile);
   const founded =
     profile.arbitrumPortalMetadata?.foundedDate ?? null;
   const chains = profile.arbitrumPortalMetadata?.chains ?? [];
@@ -32,15 +38,15 @@ export function NetworkOverviewMetricsBlock({ profile }: { profile: NetworkProfi
         <div className="pb-4">
           <CardDescription>Headline scale</CardDescription>
           <CardTitle className="text-2xl">
-            {scale.tvlUsd != null ? formatUsdCompact(scale.tvlUsd) : "—"}
+            {headlineTvl != null ? formatUsdCompact(headlineTvl) : "—"}
           </CardTitle>
-          <p className="mt-1 text-xs text-ink-500">Total deposits / TVL (curated snapshot)</p>
+          <p className="mt-1 text-xs text-ink-500">Total deposits / TVL</p>
         </div>
         <div className="grid gap-0 pt-2 sm:grid-cols-2">
           <OverviewRow label="Users / depositors" value={scale.users != null ? formatUsersCompact(scale.users) : "—"} />
           <OverviewRow
             label="Market cap"
-            value={scale.marketCapUsd != null ? formatUsdCompact(scale.marketCapUsd) : "—"}
+            value={headlineMcap != null ? formatUsdCompact(headlineMcap) : "—"}
           />
           <OverviewRow
             label="APR"

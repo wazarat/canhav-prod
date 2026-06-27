@@ -544,7 +544,13 @@ function CuratedRow({
   );
 }
 
-export function LendingMetricTiles({ lending }: { lending: LendingMetrics }) {
+export function LendingMetricTiles({
+  lending,
+  syncedAt,
+}: {
+  lending: LendingMetrics;
+  syncedAt?: string | null;
+}) {
   const hasLive =
     lending.tvlUsd ||
     lending.totalBorrowsUsd ||
@@ -571,7 +577,8 @@ export function LendingMetricTiles({ lending }: { lending: LendingMetrics }) {
       </div>
       {!hasLive && (
         <p className="text-xs text-ink-500">
-          Live supply/borrow metrics populate on the next DeFi Llama refresh.
+          Live supply/borrow metrics populate on the next DeFi Llama refresh
+          {syncedAt ? ` (last sync ${new Date(syncedAt).toLocaleString()})` : ""}.
         </p>
       )}
     </>

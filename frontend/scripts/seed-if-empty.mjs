@@ -39,6 +39,13 @@ const STORE_KEY = process.env.REDIS_STORE_KEY || "canhav:store";
 
 /** Canonical Credit → Lending entities — taxonomy fields are patched on every deploy. */
 const CANONICAL_LENDING_SLUGS = new Set(["aave", "compound", "morpho", "spark", "radiant"]);
+const CANONICAL_PERP_DEX_SLUGS = new Set([
+  "gmx",
+  "gains-network",
+  "dydx",
+  "hyperliquid",
+  "drift-protocol",
+]);
 const TAXONOMY_PATCH_FIELDS = [
   "Sector",
   "SubSector",
@@ -46,6 +53,7 @@ const TAXONOMY_PATCH_FIELDS = [
   "SecondarySectors",
   "StablecoinSubSector",
   "StablecoinSecondaryTags",
+  "DerivativesSecondaryTags",
 ];
 
 function parseStoreItem(raw) {
@@ -210,7 +218,8 @@ if (existingCount === 0) {
 
     let mergedItem = existingItem;
     if (
-      CANONICAL_LENDING_SLUGS.has(bootstrapItem?.Slug) &&
+      (CANONICAL_LENDING_SLUGS.has(bootstrapItem?.Slug) ||
+        CANONICAL_PERP_DEX_SLUGS.has(bootstrapItem?.Slug)) &&
       taxonomyPatchNeeded(existingItem, bootstrapItem)
     ) {
       mergedItem = applyTaxonomyPatch(existingItem, bootstrapItem);

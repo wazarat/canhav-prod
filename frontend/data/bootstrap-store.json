@@ -3,7 +3,7 @@
     "backend": "local",
     "count": 278,
     "table": "canhav-research",
-    "updatedAt": "2026-06-27T17:09:14Z"
+    "updatedAt": "2026-06-27T17:56:30.515Z"
   },
   "items": {
     "CATEGORY#Entity|PROTOCOL#aave": {
@@ -511,7 +511,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/aerodrome",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -699,7 +699,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/aevo-perps",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -843,7 +843,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/39259/small/agUSD.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1041,7 +1041,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/ankr",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1175,7 +1175,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/38039/small/usdz-image-200x200.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1373,7 +1373,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/arcton-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1526,7 +1526,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/arrakis-modular",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1658,7 +1658,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/aryze-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1805,7 +1805,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/atmosphera-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1957,7 +1957,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/aura",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2127,7 +2127,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/balancer",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2319,7 +2319,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/bedrock-unieth",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2457,7 +2457,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/beefy",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2606,7 +2606,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/binance-staked-eth",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2739,7 +2739,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/bitget-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2926,7 +2926,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/68272/small/cUSD_ab_500%C3%97500.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -3119,7 +3119,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/centrifuge-protocol",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -3321,7 +3321,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/chateau",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -3474,7 +3474,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/6319/small/USDC.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -3692,7 +3692,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/clearpool",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -3897,7 +3897,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/coinbase-wrapped-staked-eth",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -4303,7 +4303,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/convex-finance",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -4465,7 +4465,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/cozy-earn",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -4604,7 +4604,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/curve",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -4801,7 +4801,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/9638/small/CRVUSD.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5022,7 +5022,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/derive",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5163,7 +5163,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/dinari",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5313,7 +5313,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/stryke-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5443,7 +5443,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/drift-trade",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5486,9 +5486,7 @@
         },
         "pricingModel": "orderbook"
       },
-      "DerivativesSecondaryTags": [
-        "Orderbook"
-      ],
+      "DerivativesSecondaryTags": [],
       "DerivativesSubSector": "Perp DEX",
       "Description": "Drift is the leading Solana-native perps DEX. It combines an on-chain orderbook (DLOB) with an AMM (vAMM) fallback so liquidity providers and just-in-time market makers can both serve fills.",
       "Dex": null,
@@ -5590,7 +5588,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/dualmint-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5740,7 +5738,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/dydx",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5784,10 +5782,7 @@
         },
         "pricingModel": "orderbook"
       },
-      "DerivativesSecondaryTags": [
-        "Orderbook",
-        "Multi-Chain"
-      ],
+      "DerivativesSecondaryTags": [],
       "DerivativesSubSector": "Perp DEX",
       "Description": "dYdX is the original decentralized perps pioneer. V4 runs on its own Cosmos appchain with decentralized, validator-driven order matching and strong BTC/ETH perp liquidity targeted at professional traders.",
       "Dex": null,
@@ -5891,7 +5886,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/easedefi.org",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -6027,7 +6022,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/eigencloud",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -6160,7 +6155,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/31099/small/deUSD.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -6357,7 +6352,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/estate-protocol",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -6883,7 +6878,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/ether.fi",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7016,7 +7011,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/extra-finance",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7153,7 +7148,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/102173313/small/Falcon_Token_fUSD_Primary_200px.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7358,7 +7353,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/33062/small/FDUSD.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7553,7 +7548,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/florence-finance",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7705,7 +7700,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/fluid",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7912,7 +7907,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/franklin-templeton-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8108,7 +8103,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/frax-ether",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8327,7 +8322,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/gains-network",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8372,10 +8367,7 @@
         },
         "pricingModel": "oracle"
       },
-      "DerivativesSecondaryTags": [
-        "Oracle-Based",
-        "Multi-Chain"
-      ],
+      "DerivativesSecondaryTags": [],
       "DerivativesSubSector": "Perp DEX",
       "Description": "Gains Network (gTrade) offers synthetic leveraged trading backed by gToken LP vaults; it supports very high leverage (up to 150x) across crypto, forex, and equities/indices, accessible to retail with low minimums.",
       "Dex": null,
@@ -8484,7 +8476,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/gamma",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8628,7 +8620,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/gearbox",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8773,7 +8765,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/1026/small/GYEN.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8976,7 +8968,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/gmx",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9020,10 +9012,7 @@
         },
         "pricingModel": "oracle"
       },
-      "DerivativesSecondaryTags": [
-        "Oracle-Based",
-        "Multi-Chain"
-      ],
+      "DerivativesSecondaryTags": [],
       "DerivativesSubSector": "Perp DEX",
       "Description": "GMX uses multi-asset liquidity pools (GLP V1, GM V2) where LPs are the counterparty to traders; oracle-based pricing means zero price-impact trades up to pool depth. V2 added isolated-market GM pools.",
       "Dex": null,
@@ -9127,7 +9116,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/goldfinch",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9327,7 +9316,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/hidden-hand",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9468,7 +9457,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/hyperliquid",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9512,9 +9501,7 @@
         },
         "pricingModel": "orderbook"
       },
-      "DerivativesSecondaryTags": [
-        "Orderbook"
-      ],
+      "DerivativesSecondaryTags": [],
       "DerivativesSubSector": "Perp DEX",
       "Description": "Hyperliquid is a purpose-built L1 with a fully on-chain CLOB — ~200k orders/sec throughput, sub-second finality, and the deepest on-chain perp liquidity in 2026 (typically >70% of on-chain perp volume). HyperEVM extends programmability.",
       "Dex": null,
@@ -9623,7 +9610,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/insurace",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9764,7 +9751,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/inverse-finance-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9945,7 +9932,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/jones-dao",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -10494,7 +10481,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/justlend",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -10684,7 +10671,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/kamino-lend",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -10895,7 +10882,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/52182/small/karak.jpg",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11029,7 +11016,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/kelp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11161,7 +11148,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/lido",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11296,7 +11283,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/liquity-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11510,7 +11497,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/35477/small/lista.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11710,7 +11697,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/lofty",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11892,7 +11879,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/39104/small/M0.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -12086,7 +12073,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/mantle-restaking",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -12223,7 +12210,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/maple",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -12453,7 +12440,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/maverick-protocol",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -13173,7 +13160,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/31719/small/usdm.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -13376,7 +13363,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/neptune-mutual",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -13514,7 +13501,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/neutral-trade",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -13647,7 +13634,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/nexus-mutual",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -13790,7 +13777,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/notional-v3",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -14293,7 +14280,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/paladin-vote",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -14444,7 +14431,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/pancakeswap",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -14641,7 +14628,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/6013/small/Pax_Dollar.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -14865,7 +14852,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/pendle",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -15252,7 +15239,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/puffer-stake",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -15600,7 +15587,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/rage-trade-v1",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -15733,7 +15720,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/raydium",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -15920,7 +15907,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/realt",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16109,7 +16096,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/renzo",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16243,7 +16230,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/8365/small/Reserve.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16464,7 +16451,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/40008/small/USR_LOGO.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16683,7 +16670,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/ribbon-finance",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16822,7 +16809,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/rocket-pool",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16963,7 +16950,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/securitize",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -17153,7 +17140,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/sense",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -17286,7 +17273,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/sherlock",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -18071,7 +18058,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/spectra-v2",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -18475,7 +18462,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/stader",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -18611,7 +18598,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/stake-dao",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -18755,7 +18742,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/stakewise",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -18889,7 +18876,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/stella",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19037,7 +19024,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/sushiswap",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19228,7 +19215,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/swell",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19360,7 +19347,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/symbiotic",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19496,7 +19483,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/synthetix-v3",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19645,7 +19632,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/tether-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19840,7 +19827,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/thorchain-dex",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -20031,7 +20018,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/toucan-protocol",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -20197,7 +20184,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/trader-joe",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -20663,7 +20650,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/uniswap",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -21319,7 +21306,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://portal-data.arbitrum.io/images/projects/usdt0-logo.webp",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -21504,7 +21491,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/venus-core-pool",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -21705,7 +21692,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://coin-images.coingecko.com/coins/images/13404/small/CVX.png",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -21839,7 +21826,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/yearn-finance",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -21985,7 +21972,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": null,
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/yieldnest",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -27423,7 +27410,7 @@
       "UpdatedAt": "2026-06-27T14:04:13Z",
       "Website": "https://jup.ag/perps",
       "YieldMechanics": {
-        "currentApyPct": 20.0,
+        "currentApyPct": 20,
         "dataSource": "demo",
         "emissionsBased": false,
         "feeShareToHoldersPct": 75,
@@ -28687,7 +28674,7 @@
       "UpdatedAt": "2026-06-27T14:02:11Z",
       "Website": "https://usd.ai",
       "YieldMechanics": {
-        "currentApyPct": 10.0,
+        "currentApyPct": 10,
         "dataSource": "demo",
         "emissionsBased": true,
         "feeShareToHoldersPct": 0,
@@ -29098,7 +29085,7 @@
       "UpdatedAt": "2026-06-27T14:04:49Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
       "YieldMechanics": {
-        "currentApyPct": 5.0,
+        "currentApyPct": 5,
         "dataSource": "demo",
         "emissionsBased": true,
         "feeShareToHoldersPct": 0,
@@ -29161,7 +29148,7 @@
       "UpdatedAt": "2026-06-27T14:04:49Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
       "YieldMechanics": {
-        "currentApyPct": 5.0,
+        "currentApyPct": 5,
         "dataSource": "demo",
         "emissionsBased": true,
         "feeShareToHoldersPct": 0,
@@ -29683,7 +29670,7 @@
       "UpdatedAt": "2026-06-27T14:04:41Z",
       "Website": "https://ondo.finance/usdy",
       "YieldMechanics": {
-        "currentApyPct": 5.0,
+        "currentApyPct": 5,
         "dataSource": "demo",
         "emissionsBased": false,
         "feeShareToHoldersPct": 0,

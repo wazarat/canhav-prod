@@ -74,6 +74,15 @@ const MERGE_IF_NULL_FIELDS = [
   "CreditTagMetrics",
 ];
 
+/** Perp DEX venues whose secondary tags are canonical in bootstrap (cleared to []). */
+const CANONICAL_PERP_DEX_SLUGS = new Set([
+  "gmx",
+  "gains-network",
+  "dydx",
+  "hyperliquid",
+  "drift-protocol",
+]);
+
 function isEmptyArray(value) {
   return !Array.isArray(value) || value.length === 0;
 }
@@ -207,6 +216,15 @@ export function mergeCuratedContent(existing, bootstrap) {
   const ctm = mergeCreditTagMetricsCurated(existing.CreditTagMetrics, bootstrap.CreditTagMetrics);
   if (ctm) {
     next.CreditTagMetrics = ctm;
+    changed = true;
+  }
+
+  if (
+    CANONICAL_PERP_DEX_SLUGS.has(bootstrap.Slug) &&
+    JSON.stringify(existing.DerivativesSecondaryTags) !==
+      JSON.stringify(bootstrap.DerivativesSecondaryTags)
+  ) {
+    next.DerivativesSecondaryTags = bootstrap.DerivativesSecondaryTags;
     changed = true;
   }
 

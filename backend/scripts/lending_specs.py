@@ -64,7 +64,7 @@ def _empty_scale() -> Dict[str, Any]:
     }
 
 
-def _portal_defaults(chains: List[str]) -> Dict[str, Any]:
+def _portal_defaults(chains: List[str], logo_url: Optional[str] = None) -> Dict[str, Any]:
     return {
         "chains": chains,
         "subCategory": "Entity",
@@ -72,7 +72,7 @@ def _portal_defaults(chains: List[str]) -> Dict[str, Any]:
         "isArbitrumNative": False,
         "isPubliclyAudited": True,
         "foundedDate": None,
-        "logoUrl": None,
+        "logoUrl": logo_url,
         "bannerUrl": None,
         "portalUrl": None,
     }
@@ -113,6 +113,7 @@ def _net(
     investment_rounds: Optional[List[Dict[str, Any]]] = None,
     scale_labels: Optional[Dict[str, str]] = None,
     current_scale: Optional[Dict[str, Any]] = None,
+    logo_url: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Build a lending-network spec, filling the editorial defaults that
     `build_entity_item` expects so each entry stays focused on real content.
@@ -186,7 +187,7 @@ def _net(
         # cron Credit tag-metrics pass; these curated fields are authored here.
         "credit_tag_metrics": ctm or {},
         "member_coins": member_coins or [],
-        "portal_defaults": _portal_defaults(chains),
+        "portal_defaults": _portal_defaults(chains, logo_url),
     }
 
 
@@ -1293,6 +1294,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         name="Gearbox",
         symbol="GEAR",
         tagline="Composable leverage via Credit Accounts.",
+        logo_url="https://icons.llamao.fi/icons/protocols/gearbox",
         description=(
             "Gearbox is a generalized leverage protocol: users open Credit Accounts to "
             "borrow against collateral and deploy leveraged positions into integrated "
@@ -1321,6 +1323,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         name="Stella",
         symbol="ALPHA",
         tagline="Pay-as-you-earn leveraged strategies (ex-Alpha Homora).",
+        logo_url="https://icons.llamao.fi/icons/protocols/stella",
         description=(
             "Stella (formerly Alpha Homora) offers leveraged yield strategies with a "
             "pay-as-you-earn borrowing model: borrowers pay 0% interest and instead "
@@ -1349,6 +1352,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         name="Extra Finance",
         symbol="EXTRA",
         tagline="Lending + leveraged LP farming on the Superchain.",
+        logo_url="https://icons.llamao.fi/icons/protocols/extra-finance-leverage-farming",
         description=(
             "Extra Finance combines a lending market with leveraged LP farming, letting "
             "users lever up liquidity positions on Optimism and Base DEXes."
@@ -1377,6 +1381,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         name="Pendle Finance",
         symbol="PENDLE",
         tagline="Tokenized yield — split principal and yield (PT/YT).",
+        logo_url="https://icons.llamao.fi/icons/protocols/pendle",
         description=(
             "Pendle tokenizes yield-bearing assets into Principal Tokens (PT) and Yield "
             "Tokens (YT), creating an on-chain market for fixed-rate yield and yield "
@@ -1403,6 +1408,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         name="Notional Finance",
         symbol="NOTE",
         tagline="Fixed-rate, fixed-term lending and borrowing.",
+        logo_url="https://icons.llamao.fi/icons/protocols/notional-v3",
         description=(
             "Notional provides fixed-rate, fixed-term lending and borrowing via fCash — "
             "tokenized claims on a fixed amount of an asset at a future maturity, traded "
@@ -1429,6 +1435,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         name="Spectra",
         symbol="SPECTRA",
         tagline="Permissionless yield tokenization (ex-APWine).",
+        logo_url="https://icons.llamao.fi/icons/protocols/spectra-v2",
         description=(
             "Spectra (formerly APWine) is a permissionless interest-rate derivatives "
             "protocol: any yield-bearing asset can be split into principal and yield "
@@ -1455,6 +1462,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         name="Sense Finance",
         symbol="SENSE",
         tagline="Yield stripping into zero-coupon and yield tokens.",
+        logo_url="https://icons.llamao.fi/icons/protocols/sense",
         description=(
             "Sense Finance is a yield-stripping protocol that decomposes yield-bearing "
             "assets into zero-coupon Principal Tokens and Yield Tokens for fixed-rate "

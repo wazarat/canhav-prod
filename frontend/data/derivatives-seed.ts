@@ -20,11 +20,11 @@ export interface DerivativesSeed {
 // 2026-06-25; the collector fails soft to null when a slug/id is wrong.
 export const DERIVATIVES_SEED: DerivativesSeed[] = [
   // ---------------------------- PERP DEX ----------------------------------
-  { name: "GMX",           slug: "gmx",            token: "GMX",  subSector: "Perp DEX", secondaryTags: ["Oracle-Based", "Multi-Chain"],     llamaSlug: "gmx",           coingeckoId: "gmx",            tracksOpenInterest: true, seedMode: "new" },
-  { name: "Gains Network", slug: "gains-network",  token: "GNS",  subSector: "Perp DEX", secondaryTags: ["Oracle-Based", "Multi-Chain"],     llamaSlug: "gains-network", coingeckoId: "gains-network",  tracksOpenInterest: true, seedMode: "new" },
-  { name: "Hyperliquid",   slug: "hyperliquid",    token: "HYPE", subSector: "Perp DEX", secondaryTags: ["Orderbook"],                       llamaSlug: "hyperliquid",   coingeckoId: "hyperliquid",    tracksOpenInterest: true, seedMode: "new" },
-  { name: "dYdX",          slug: "dydx",           token: "DYDX", subSector: "Perp DEX", secondaryTags: ["Orderbook", "Multi-Chain"],        llamaSlug: "dydx",          coingeckoId: "dydx-chain",     tracksOpenInterest: true, seedMode: "new" },
-  { name: "Drift Protocol", slug: "drift-protocol", token: "DRIFT", subSector: "Perp DEX", secondaryTags: ["Orderbook"],                    llamaSlug: "drift-trade",   coingeckoId: "drift-protocol", tracksOpenInterest: true, seedMode: "new" },
+  { name: "GMX",           slug: "gmx",            token: "GMX",  subSector: "Perp DEX", secondaryTags: [], llamaSlug: "gmx",           coingeckoId: "gmx",            tracksOpenInterest: true, seedMode: "new" },
+  { name: "Gains Network", slug: "gains-network",  token: "GNS",  subSector: "Perp DEX", secondaryTags: [], llamaSlug: "gains-network", coingeckoId: "gains-network",  tracksOpenInterest: true, seedMode: "new" },
+  { name: "Hyperliquid",   slug: "hyperliquid",    token: "HYPE", subSector: "Perp DEX", secondaryTags: [], llamaSlug: "hyperliquid",   coingeckoId: "hyperliquid",    tracksOpenInterest: true, seedMode: "new" },
+  { name: "dYdX",          slug: "dydx",           token: "DYDX", subSector: "Perp DEX", secondaryTags: [], llamaSlug: "dydx",          coingeckoId: "dydx-chain",     tracksOpenInterest: true, seedMode: "new" },
+  { name: "Drift Protocol", slug: "drift-protocol", token: "DRIFT", subSector: "Perp DEX", secondaryTags: [], llamaSlug: "drift-trade",   coingeckoId: "drift-protocol", tracksOpenInterest: true, seedMode: "new" },
   { name: "Synthetix",     slug: "synthetix",      token: "SNX",  subSector: "Perp DEX", secondaryTags: ["Synthetic-Assets", "Multi-Chain"], llamaSlug: "synthetix-v3",  coingeckoId: "havven",         tracksOpenInterest: true, seedMode: "new" },
   { name: "Aevo",          slug: "aevo",           token: "AEVO", subSector: "Perp DEX", secondaryTags: ["Orderbook"],                       llamaSlug: "aevo-perps",    coingeckoId: "aevo-exchange",  tracksOpenInterest: true, seedMode: "new" },
 

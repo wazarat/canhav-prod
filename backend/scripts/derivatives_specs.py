@@ -232,7 +232,7 @@ DERIVATIVES_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "EVM execution without sacrificing CLOB performance."
         ),
         derivatives_sub_sector="Perp DEX",
-        derivatives_secondary_tags=["Orderbook"],
+        derivatives_secondary_tags=[],
         chains=["Hyperliquid L1", "Arbitrum"],
         pricing_model="orderbook",
         evm_compatible="mixed",
@@ -258,7 +258,7 @@ DERIVATIVES_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "off-chain orderbook and on-chain settlement; Megavault LP product."
         ),
         derivatives_sub_sector="Perp DEX",
-        derivatives_secondary_tags=["Orderbook", "Multi-Chain"],
+        derivatives_secondary_tags=[],
         chains=["dYdX Chain", "Ethereum"],
         pricing_model="orderbook",
         evm_compatible="no",
@@ -285,7 +285,7 @@ DERIVATIVES_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "depth; GLP composability across DeFi."
         ),
         derivatives_sub_sector="Perp DEX",
-        derivatives_secondary_tags=["Oracle-Based", "Multi-Chain"],
+        derivatives_secondary_tags=[],
         chains=["Arbitrum", "Avalanche"],
         pricing_model="oracle",
         official_docs="https://docs.gmx.io",
@@ -311,7 +311,7 @@ DERIVATIVES_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "strategies, with spot routed via Jupiter."
         ),
         derivatives_sub_sector="Perp DEX",
-        derivatives_secondary_tags=["Orderbook"],
+        derivatives_secondary_tags=[],
         chains=["Solana"],
         pricing_model="orderbook",
         evm_compatible="no",
@@ -337,7 +337,7 @@ DERIVATIVES_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "up-to-150x leverage on majors plus forex and equities."
         ),
         derivatives_sub_sector="Perp DEX",
-        derivatives_secondary_tags=["Oracle-Based", "Multi-Chain"],
+        derivatives_secondary_tags=[],
         chains=["Arbitrum", "Polygon", "Base"],
         pricing_model="oracle",
         official_docs="https://docs.gains.trade",

@@ -1,10 +1,15 @@
 import Link from "next/link";
-import { ArrowUpRight, BookOpen, Globe } from "lucide-react";
+import { BookOpen, Globe } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import { categoryBadgeTone } from "@/lib/categoryTone";
+import {
+  networkHeadlineMarketCapUsd,
+  networkHeadlineTvlUsd,
+  networkHeadlineVolume24hUsd,
+} from "@/lib/networks/marketHeadlines";
 import {
   getNetworkTaxonomyBadges,
   isNonEvmRwa,
@@ -12,8 +17,8 @@ import {
   sectorBadgeTone,
   subSectorBadgeTone,
 } from "@/lib/networkTaxonomy";
-import type { NetworkProfile, MemberCoinCategory } from "@/lib/types";
-import { formatPct, formatUsdCompact } from "@/lib/utils";
+import type { MemberCoinCategory, NetworkProfile } from "@/lib/types";
+import { formatUsdCompact } from "@/lib/utils";
 
 interface NetworkTableProps {
   profiles: NetworkProfile[];
@@ -46,7 +51,7 @@ export function NetworkTable({
             <TH>Coins</TH>
             <TH className="text-right">TVL</TH>
             <TH className="text-right">Mkt cap</TH>
-            <TH className="text-right">24h</TH>
+            <TH className="text-right">Vol 24h</TH>
             {showStatus && <TH>Status</TH>}
             <TH className="text-right">Links</TH>
           </tr>
@@ -54,122 +59,111 @@ export function NetworkTable({
         <TBody>
           {profiles.map((p) => {
             const taxonomy = getNetworkTaxonomyBadges(p);
-            const u = p.universalMetrics;
-            const tvlUsd = u?.tvl.tvlUsd.value ?? p.currentScale.tvlUsd;
-            const mcapUsd = u?.market.marketCapUsd.value ?? p.currentScale.marketCapUsd;
-            const change24h = u?.market.priceChangePct.d1.value ?? null;
+            const tvlUsd = networkHeadlineTvlUsd(p);
+            const mcapUsd = networkHeadlineMarketCapUsd(p);
+            const volume24hUsd = networkHeadlineVolume24hUsd(p);
             return (
-            <TR
-              key={p.slug}
-              className="border-l-2 border-l-transparent hover:border-l-electric-500/60"
-            >
-              <TD>
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={`/networks/${p.slug}`}
-                    className="font-medium text-ink-50 transition-colors hover:text-electric-400"
-                  >
-                    {p.name}
-                  </Link>
-                </div>
-                <p className="mt-0.5 line-clamp-1 max-w-[320px] text-xs text-ink-300">
-                  {p.description}
-                </p>
-                {taxonomy.primarySector && (
-                  <div className="mt-1.5 flex flex-wrap items-center gap-1">
-                    <Badge tone={sectorBadgeTone(taxonomy.primarySector)}>
-                      {taxonomy.primarySector}
-                    </Badge>
-                    {taxonomy.secondarySectors.map((sector) => (
-                      <Badge key={sector} tone={secondarySectorBadgeTone()}>
-                        {sector}
+              <TR
+                key={p.slug}
+                className="border-l-2 border-l-transparent hover:border-l-electric-500/60"
+              >
+                <TD>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/networks/${p.slug}`}
+                      className="font-medium text-ink-50 transition-colors hover:text-electric-400"
+                    >
+                      {p.name}
+                    </Link>
+                  </div>
+                  <p className="mt-0.5 line-clamp-1 max-w-[320px] text-xs text-ink-300">
+                    {p.description}
+                  </p>
+                  {taxonomy.primarySector && (
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                      <Badge tone={sectorBadgeTone(taxonomy.primarySector)}>
+                        {taxonomy.primarySector}
+                      </Badge>
+                      {taxonomy.secondarySectors.map((sector) => (
+                        <Badge key={sector} tone={secondarySectorBadgeTone()}>
+                          {sector}
+                        </Badge>
+                      ))}
+                      {taxonomy.subSectorTags.map((tag) => (
+                        <Badge key={tag} tone={subSectorBadgeTone()}>
+                          {tag}
+                        </Badge>
+                      ))}
+                      {isNonEvmRwa(p) && <Badge tone="warning">Non-EVM</Badge>}
+                    </div>
+                  )}
+                  <p className="mt-1 text-xs text-ink-400">
+                    {p.memberCoins.length} coin{p.memberCoins.length !== 1 ? "s" : ""}
+                  </p>
+                </TD>
+                <TD>
+                  <div className="flex flex-wrap gap-1">
+                    {p.memberCoins.map((c) => (
+                      <Badge
+                        key={c.slug}
+                        tone={categoryBadgeTone(c.category)}
+                        className={
+                          coinCategoryFilter !== "all" && c.category !== coinCategoryFilter
+                            ? "opacity-35"
+                            : undefined
+                        }
+                      >
+                        {c.symbol}
                       </Badge>
                     ))}
-                    {taxonomy.subSectorTags.map((tag) => (
-                      <Badge key={tag} tone={subSectorBadgeTone()}>
-                        {tag}
-                      </Badge>
-                    ))}
-                    {isNonEvmRwa(p) && (
-                      <Badge tone="warning">Non-EVM</Badge>
+                  </div>
+                </TD>
+                <TD className="text-right font-mono text-ink-50">
+                  {formatUsdCompact(tvlUsd)}
+                </TD>
+                <TD className="text-right font-mono text-ink-200">
+                  {formatUsdCompact(mcapUsd)}
+                </TD>
+                <TD className="text-right font-mono text-ink-200">
+                  {formatUsdCompact(volume24hUsd)}
+                </TD>
+                {showStatus && (
+                  <TD>
+                    <StatusPill status={p.status} />
+                  </TD>
+                )}
+                <TD>
+                  <div className="flex items-center justify-end gap-2">
+                    {p.website && (
+                      <a
+                        href={p.website}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Website"
+                        className="inline-flex items-center gap-1 rounded-lg border border-ink-700/60 bg-ink-900/40 px-2 py-1 text-xs text-ink-200 transition-colors hover:border-ink-600 hover:text-ink-50"
+                      >
+                        <Globe className="h-3 w-3" />
+                        Website
+                      </a>
+                    )}
+                    {p.officialDocs && (
+                      <a
+                        href={p.officialDocs}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Official docs"
+                        className="inline-flex items-center gap-1 rounded-lg border border-electric-500/30 bg-electric-500/10 px-2 py-1 text-xs text-electric-300 transition-colors hover:bg-electric-500/20"
+                      >
+                        <BookOpen className="h-3 w-3" />
+                        Docs
+                      </a>
+                    )}
+                    {!p.website && !p.officialDocs && (
+                      <span className="text-xs text-ink-500">—</span>
                     )}
                   </div>
-                )}
-                <p className="mt-1 text-xs text-ink-400">
-                  {p.memberCoins.length} coin{p.memberCoins.length !== 1 ? "s" : ""}
-                </p>
-              </TD>
-              <TD>
-                <div className="flex flex-wrap gap-1">
-                  {p.memberCoins.map((c) => (
-                    <Badge
-                      key={c.slug}
-                      tone={categoryBadgeTone(c.category)}
-                      className={
-                        coinCategoryFilter !== "all" && c.category !== coinCategoryFilter
-                          ? "opacity-35"
-                          : undefined
-                      }
-                    >
-                      {c.symbol}
-                    </Badge>
-                  ))}
-                </div>
-              </TD>
-              <TD className="text-right font-mono text-ink-50">
-                {formatUsdCompact(tvlUsd)}
-              </TD>
-              <TD className="text-right font-mono text-ink-200">
-                {formatUsdCompact(mcapUsd)}
-              </TD>
-              <TD
-                className={
-                  change24h == null
-                    ? "text-right font-mono text-ink-500"
-                    : change24h >= 0
-                      ? "text-right font-mono text-emerald-400"
-                      : "text-right font-mono text-rose-400"
-                }
-              >
-                {change24h == null ? "—" : formatPct(change24h)}
-              </TD>
-              {showStatus && (
-                <TD>
-                  <StatusPill status={p.status} />
                 </TD>
-              )}
-              <TD>
-                <div className="flex items-center justify-end gap-2">
-                  {p.website && (
-                    <a
-                      href={p.website}
-                      target="_blank"
-                      rel="noreferrer"
-                      title="Website"
-                      className="inline-flex items-center gap-1 rounded-lg border border-ink-700/60 bg-ink-900/40 px-2 py-1 text-xs text-ink-200 transition-colors hover:border-ink-600 hover:text-ink-50"
-                    >
-                      <Globe className="h-3 w-3" />
-                      Website
-                    </a>
-                  )}
-                  {p.officialDocs && (
-                    <a
-                      href={p.officialDocs}
-                      target="_blank"
-                      rel="noreferrer"
-                      title="Official docs"
-                      className="inline-flex items-center gap-1 rounded-lg border border-electric-500/30 bg-electric-500/10 px-2 py-1 text-xs text-electric-300 transition-colors hover:bg-electric-500/20"
-                    >
-                      <BookOpen className="h-3 w-3" />
-                      Docs
-                    </a>
-                  )}
-                  {!p.website && !p.officialDocs && (
-                    <span className="text-xs text-ink-500">—</span>
-                  )}
-                </div>
-              </TD>
-            </TR>
+              </TR>
             );
           })}
         </TBody>

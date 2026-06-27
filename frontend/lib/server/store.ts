@@ -342,6 +342,7 @@ export async function readLiveStore(): Promise<LiveStore> {
           aprPct: null,
           targetAprPct: null,
           marketCapUsd: null,
+          volume24hUsd: null,
           loanPipelineUsd: null,
           partnerships: null,
           ...((item.CurrentScale as Record<string, unknown> | undefined) ?? {}),

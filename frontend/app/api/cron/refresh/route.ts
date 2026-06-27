@@ -383,6 +383,7 @@ async function refreshUniversalMetrics(
   };
 
   const marketCapUsd = resolution?.marketCapUsd ?? meta?.mcapUsd ?? null;
+  const volume24hUsd = resolution?.volume24hUsd ?? null;
   const marketCapSource =
     resolution?.marketCapUsd != null ? "CoinGecko" : llamaLive ? "DeFi Llama" : "Unavailable";
 
@@ -396,6 +397,11 @@ async function refreshUniversalMetrics(
       marketCapUsd,
       marketCapSource,
       marketCapUsd != null ? "live" : "derived",
+    ),
+    volume24hUsd: sourced(
+      volume24hUsd,
+      cgLive ? "CoinGecko" : "Unavailable",
+      volume24hUsd != null ? "live" : "derived",
     ),
     fdvUsd: sourced(
       resolution?.fdvUsd ?? null,
@@ -440,6 +446,11 @@ async function refreshUniversalMetrics(
   const market: UniversalMarket = {
     priceUsd: mergeSourced(marketFresh.priceUsd, priorMarket?.priceUsd, isNullishNumber),
     marketCapUsd: mergeSourced(marketFresh.marketCapUsd, priorMarket?.marketCapUsd, isNullishNumber),
+    volume24hUsd: mergeSourced(
+      marketFresh.volume24hUsd,
+      priorMarket?.volume24hUsd,
+      isNullishNumber,
+    ),
     fdvUsd: mergeSourced(marketFresh.fdvUsd, priorMarket?.fdvUsd, isNullishNumber),
     circulatingSupply: mergeSourced(
       marketFresh.circulatingSupply,
@@ -543,6 +554,9 @@ async function refreshUniversalMetrics(
   }
   if ((item.CurrentScale?.marketCapUsd ?? null) == null && marketCapUsd != null) {
     item.CurrentScale = { ...(item.CurrentScale ?? {}), marketCapUsd };
+  }
+  if ((item.CurrentScale?.volume24hUsd ?? null) == null && volume24hUsd != null) {
+    item.CurrentScale = { ...(item.CurrentScale ?? {}), volume24hUsd };
   }
 
   return {

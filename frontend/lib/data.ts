@@ -1,3 +1,11 @@
+import { coinIdForNetworkSlug, resolveCoinsBatch, type TokenResolution } from "@/lib/server/coingecko";
+import { fetchLlamaProtocolMeta, llamaProtocolForSlug } from "@/lib/server/defillama";
+import {
+  networkHeadlineMarketCapUsd,
+  networkHeadlineTvlUsd,
+  networkHeadlineVolume24hUsd,
+  networkNeedsMarketEnrichment,
+} from "@/lib/networks/marketHeadlines";
 import { readLiveStore } from "@/lib/server/store";
 import type {
   CategoryDef,
@@ -172,14 +180,17 @@ export async function getAllNetworks(): Promise<NetworkProfile[]> {
 export async function getApprovedNetworks(): Promise<NetworkProfile[]> {
   const store = await readLiveStore();
   const networks = [...store.networks].sort((a, b) => a.name.localeCompare(b.name));
-  return enrichNetworksWithTvl(networks, store);
+  const withTvl = enrichNetworksWithTvl(networks, store);
+  return enrichNetworksWithMarketMetrics(withTvl, store);
 }
 
 export async function getApprovedNetworkBySlug(slug: string): Promise<NetworkProfile | null> {
   const store = await readLiveStore();
   const network = store.networks.find((p) => p.slug === slug) ?? null;
   if (!network) return null;
-  return enrichNetworksWithTvl([network], store)[0] ?? network;
+  const withTvl = enrichNetworksWithTvl([network], store);
+  const enriched = await enrichNetworksWithMarketMetrics(withTvl, store);
+  return enriched[0] ?? network;
 }
 
 /**
@@ -274,10 +285,161 @@ function enrichNetworksWithTvl(
   });
 }
 
-/** Headline TVL for a network row — mirrors NetworkTable column resolution. */
-export function networkHeadlineTvlUsd(network: NetworkProfile): number | null {
-  const u = network.universalMetrics;
-  return u?.tvl.tvlUsd.value ?? network.currentScale.tvlUsd ?? null;
+export {
+  networkHeadlineMarketCapUsd,
+  networkHeadlineTvlUsd,
+  networkHeadlineVolume24hUsd,
+} from "@/lib/networks/marketHeadlines";
+
+function pickGovernanceToken(
+  network: NetworkProfile,
+  tokenBySlug: Map<string, TokenProfile>,
+): TokenProfile | null {
+  const memberTokens = network.memberCoins.filter((c) => c.category === "Token");
+  const profiles = memberTokens
+    .map((c) => tokenBySlug.get(c.slug))
+    .filter((p): p is TokenProfile => p != null);
+  if (profiles.length === 0) return null;
+
+  const sym = network.symbol.toUpperCase();
+  const bySymbol = profiles.find((t) => t.symbol.toUpperCase() === sym);
+  if (bySymbol) return bySymbol;
+
+  const govSlug = memberTokens.find((m) => /governance/i.test(m.role))?.slug;
+  if (govSlug) {
+    const gov = tokenBySlug.get(govSlug);
+    if (gov) return gov;
+  }
+
+  return profiles.find((t) => t.market?.marketCapUsd?.value != null) ?? profiles[0] ?? null;
+}
+
+function dexSectorVolume24h(network: NetworkProfile): number | null {
+  return network.dexVolume?.volume24hUsd ?? null;
+}
+
+function patchNetworkMarketScale(
+  network: NetworkProfile,
+  patch: { marketCapUsd?: number | null; volume24hUsd?: number | null },
+): NetworkProfile {
+  const nextScale = { ...network.currentScale };
+  let changed = false;
+  if (
+    patch.marketCapUsd != null &&
+    network.universalMetrics?.market.marketCapUsd.value == null &&
+    nextScale.marketCapUsd == null
+  ) {
+    nextScale.marketCapUsd = patch.marketCapUsd;
+    changed = true;
+  }
+  if (
+    patch.volume24hUsd != null &&
+    network.universalMetrics?.market.volume24hUsd?.value == null &&
+    (nextScale.volume24hUsd == null || nextScale.volume24hUsd === undefined)
+  ) {
+    nextScale.volume24hUsd = patch.volume24hUsd;
+    changed = true;
+  }
+  return changed ? { ...network, currentScale: nextScale } : network;
+}
+
+function enrichFromStoreMembers(
+  networks: NetworkProfile[],
+  store: { tokens: TokenProfile[] },
+): NetworkProfile[] {
+  const tokenBySlug = new Map(store.tokens.map((p) => [p.slug, p]));
+
+  return networks.map((network) => {
+    if (!networkNeedsMarketEnrichment(network)) return network;
+
+    let marketCapUsd = networkHeadlineMarketCapUsd(network);
+    let volume24hUsd = networkHeadlineVolume24hUsd(network);
+
+    if (marketCapUsd == null || volume24hUsd == null) {
+      const gov = pickGovernanceToken(network, tokenBySlug);
+      if (marketCapUsd == null) {
+        marketCapUsd = gov?.market?.marketCapUsd?.value ?? null;
+      }
+      if (volume24hUsd == null) {
+        volume24hUsd = gov?.market?.volume24hUsd?.value ?? null;
+      }
+    }
+
+    if (volume24hUsd == null) {
+      volume24hUsd = dexSectorVolume24h(network);
+    }
+
+    if (marketCapUsd == null && volume24hUsd == null) return network;
+
+    return patchNetworkMarketScale(network, { marketCapUsd, volume24hUsd });
+  });
+}
+
+/**
+ * Backfill network list market cap + 24h volume from member tokens, CoinGecko
+ * batch markets, and DeFi Llama mcap — mirrors enrichNetworksWithTvl for offline
+ * bootstrap when UniversalMetrics is absent.
+ */
+async function enrichNetworksWithMarketMetrics(
+  networks: NetworkProfile[],
+  store: { stablecoins: StablecoinProfile[]; rwas: RwaProfile[]; tokens: TokenProfile[] },
+): Promise<NetworkProfile[]> {
+  let enriched = enrichFromStoreMembers(networks, store);
+  if (!enriched.some(networkNeedsMarketEnrichment)) return enriched;
+
+  const coinIds = new Set<string>();
+  for (const network of enriched) {
+    if (!networkNeedsMarketEnrichment(network)) continue;
+    const id = coinIdForNetworkSlug(network.slug);
+    if (id) coinIds.add(id);
+  }
+
+  let batch = new Map<string, TokenResolution>();
+  if (coinIds.size > 0) {
+    batch = await resolveCoinsBatch([...coinIds], 300);
+  }
+
+  enriched = enriched.map((network) => {
+    if (!networkNeedsMarketEnrichment(network)) return network;
+
+    const geckoId = coinIdForNetworkSlug(network.slug);
+    const resolution = geckoId ? batch.get(geckoId) : undefined;
+
+    let marketCapUsd = networkHeadlineMarketCapUsd(network);
+    let volume24hUsd = networkHeadlineVolume24hUsd(network);
+
+    if (marketCapUsd == null && resolution?.marketCapUsd != null) {
+      marketCapUsd = resolution.marketCapUsd;
+    }
+    if (volume24hUsd == null && resolution?.volume24hUsd != null) {
+      volume24hUsd = resolution.volume24hUsd;
+    }
+
+    if (marketCapUsd == null && volume24hUsd == null) return network;
+    return patchNetworkMarketScale(network, { marketCapUsd, volume24hUsd });
+  });
+
+  const llamaSlugs = enriched
+    .filter((n) => networkHeadlineMarketCapUsd(n) == null && llamaProtocolForSlug(n.slug))
+    .map((n) => n.slug);
+
+  if (llamaSlugs.length === 0) return enriched;
+
+  const llamaMeta = await Promise.all(
+    llamaSlugs.map(async (slug) => ({
+      slug,
+      meta: await fetchLlamaProtocolMeta(slug, 300),
+    })),
+  );
+
+  const llamaBySlug = new Map(llamaMeta.map(({ slug, meta }) => [slug, meta]));
+
+  return enriched.map((network) => {
+    if (networkHeadlineMarketCapUsd(network) != null) return network;
+    const mcap = llamaBySlug.get(network.slug)?.mcapUsd ?? null;
+    if (mcap == null) return network;
+    return patchNetworkMarketScale(network, { marketCapUsd: mcap });
+  });
 }
 
 export async function getNetworkBySlug(slug: string): Promise<NetworkProfile | null> {

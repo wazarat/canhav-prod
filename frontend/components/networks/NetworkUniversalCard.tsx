@@ -101,6 +101,13 @@ export function NetworkUniversalCard({ universal, id = "universal" }: NetworkUni
             display={formatUsdCompact(market.marketCapUsd.value)}
             field={market.marketCapUsd}
           />
+          {market.volume24hUsd != null && (
+            <MetricRow
+              label="Volume (24h)"
+              display={formatUsdCompact(market.volume24hUsd.value)}
+              field={market.volume24hUsd}
+            />
+          )}
           <MetricRow
             label="FDV"
             display={formatUsdCompact(market.fdvUsd.value)}

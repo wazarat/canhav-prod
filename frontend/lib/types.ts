@@ -812,6 +812,8 @@ export interface CurrentScale {
   aprPct: number | null;
   targetAprPct: number | null;
   marketCapUsd: number | null;
+  /** 24h trading volume (USD) — CoinGecko governance token or DEX sector fallback. */
+  volume24hUsd?: number | null;
   loanPipelineUsd: number | null;
   partnerships: number | null;
 }
@@ -1740,6 +1742,7 @@ export interface UniversalIdentity {
 export interface UniversalMarket {
   priceUsd: Sourced<number | null>;
   marketCapUsd: Sourced<number | null>;
+  volume24hUsd: Sourced<number | null>;
   fdvUsd: Sourced<number | null>;
   circulatingSupply: Sourced<number | null>;
   totalSupply: Sourced<number | null>;

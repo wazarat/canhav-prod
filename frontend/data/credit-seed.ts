@@ -20,7 +20,6 @@ export const CREDIT_SEED: CreditSeed[] = [
   { name: "Aave",     slug: "aave",     token: "AAVE", tag: "Lending", llamaSlug: "aave-v3",     coingeckoId: "aave",                        seedMode: "extend-existing", notes: "V3 multichain; aave.ts live fetch already wired" },
   { name: "Compound", slug: "compound", token: "COMP", tag: "Lending", llamaSlug: "compound-v3", feesSlug: "compound-v3", coingeckoId: "compound-governance-token", seedMode: "extend-existing", notes: "V3 base-asset model; V2 = compound-v2" },
   { name: "Morpho",   slug: "morpho",   token: "MORPHO", tag: "Lending", llamaSlug: "morpho-blue", coingeckoId: "morpho",                    seedMode: "extend-existing", notes: "Morpho Blue isolated markets" },
-  { name: "Radiant Capital", slug: "radiant", token: "RDNT", tag: "Lending", llamaSlug: "radiant-v2", coingeckoId: "radiant-capital",        seedMode: "extend-existing", notes: "Omnichain via LayerZero" },
   { name: "Spark Protocol", slug: "spark", token: null,   tag: "Lending", llamaSlug: "sparklend",   coingeckoId: null,                        seedMode: "extend-existing", notes: "Sky/MakerDAO-powered; no standalone tradable token" },
 
   // ---------- LEVERAGED YIELD ----------

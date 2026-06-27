@@ -33,6 +33,10 @@ FIRST_CLASS_COIN_CATEGORIES = frozenset({"Stablecoin", "Token", "RWA"})
 # Umbrella issuers that intentionally share slug with Stablecoin partition row.
 STABLECOIN_UMBRELLA_SLUGS = frozenset({"ethena", "sky", "monerium", "stably", "trueusd"})
 
+# Canonical Credit → Lending (matches frontend/data/credit-seed.ts).
+CANONICAL_LENDING_SLUGS = frozenset({"aave", "compound", "morpho", "spark"})
+NON_CANONICAL_LENDING_STRIP = frozenset({"justlend", "venus", "kamino", "maple", "radiant"})
+
 SUGGESTED_ACTIONS = (
     "ok",
     "missing_back_link",
@@ -163,6 +167,44 @@ def validate_entity_specs(specs: Dict[str, Dict[str, Any]]) -> List[str]:
     return errors
 
 
+def validate_canonical_lending_tags(items: Dict[str, Any]) -> List[str]:
+    """Assert exactly the canonical four carry Credit tag Lending; no Stablecoin cross-sector."""
+    errors: List[str] = []
+    lending_slugs: Set[str] = set()
+
+    for item in items.values():
+        if item.get("Category") not in ("Entity", "Network"):
+            continue
+        slug = str(item.get("Slug", ""))
+        tags = item.get("Tags") or []
+        if "Lending" in tags:
+            lending_slugs.add(slug)
+        if slug in CANONICAL_LENDING_SLUGS:
+            secondary = item.get("SecondarySectors") or []
+            if "Stablecoin" in secondary:
+                errors.append(
+                    f"{slug}: canonical Lending entity must not have Stablecoin in SecondarySectors"
+                )
+
+    if lending_slugs != CANONICAL_LENDING_SLUGS:
+        errors.append(
+            "Credit Lending tag mismatch: expected exactly "
+            f"{sorted(CANONICAL_LENDING_SLUGS)}, got {sorted(lending_slugs)}"
+        )
+
+    for slug in NON_CANONICAL_LENDING_STRIP:
+        for item in items.values():
+            if item.get("Category") not in ("Entity", "Network"):
+                continue
+            if item.get("Slug") != slug:
+                continue
+            if "Lending" in (item.get("Tags") or []):
+                errors.append(f"{slug}: non-canonical entity must not carry Lending tag")
+            break
+
+    return errors
+
+
 def validate_store_items(items: Dict[str, Any]) -> Tuple[List[str], List[str]]:
     """Validate store items; return (errors, gap_warnings)."""
     errors: List[str] = []
@@ -238,6 +280,8 @@ def validate_store_items(items: Dict[str, Any]) -> Tuple[List[str], List[str]]:
             entity_slug = item.get("EntitySlug")
             if entity_slug and entity_slug not in entity_slugs:
                 errors.append(f"{slug}: EntitySlug {entity_slug!r} not found")
+
+    errors.extend(validate_canonical_lending_tags(items))
 
     return errors, gaps
 

@@ -1,3 +1,4 @@
+import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
 import type { BadgeTone } from "@/components/ui/Badge";
 import type {
   CreditTag,
@@ -8,6 +9,8 @@ import type {
   RwaSecondaryTag,
   StakingSubSector,
 } from "@/lib/types";
+
+const CANONICAL_LENDING_SLUG_SET = new Set<string>(CANONICAL_LENDING_SLUGS);
 
 export interface NetworkTaxonomyBadges {
   primarySector: string | null;
@@ -137,7 +140,12 @@ export function filterTagsForSector(profile: NetworkProfile, sector: string): st
     return profile.otherSubSector ? [profile.otherSubSector] : [];
   }
   if (sector === "Credit") {
-    return profile.tags ?? (profile.subSector ? [profile.subSector] : []);
+    const slug = profile.slug;
+    if (CANONICAL_LENDING_SLUG_SET.has(slug)) {
+      return ["Lending"];
+    }
+    const tags = profile.tags ?? (profile.subSector ? [profile.subSector] : []);
+    return tags.filter((t) => t !== "Lending");
   }
   if (sector === "DEX") {
     return profile.dexSubSector ? [profile.dexSubSector] : [];

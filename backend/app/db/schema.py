@@ -262,9 +262,7 @@ PEG_MECHANISMS = (
 
 # Cross-sector matrix (ontology §7): slug -> required secondary sectors.
 CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
-    "aave": ("Stablecoin",),
     "sky": ("Credit",),
-    "spark": ("Stablecoin",),
     "curve-finance": ("Stablecoin", "DEX"),
     "jupiter": ("Stablecoin", "Perpetuals"),
     "pancakeswap": ("Perpetuals", "DEX"),

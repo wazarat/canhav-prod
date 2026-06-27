@@ -1122,7 +1122,6 @@ for _slug, (_subsector, _tags) in _STABLECOIN_SECONDARY_BACKFILL.items():
 _SECONDARY_SECTORS: Dict[str, List[str]] = {
     # Primary Stablecoin issuers that also operate in other sectors.
     "sky": ["Credit"],
-    "spark": ["Stablecoin"],
     # Ethena & Frax are stablecoin issuers whose backing touches RWAs; they are
     # NOT RWA tokenization protocols, so they carry no RWA association (the
     # RWA-Backed flavour is captured via StablecoinSecondaryTag instead).
@@ -1139,7 +1138,6 @@ _SECONDARY_SECTORS: Dict[str, List[str]] = {
     "jupiter": ["Stablecoin", "Perpetuals"],
     "curve-finance": ["Stablecoin"],
     "ondo-finance": ["Stablecoin"],
-    "aave": ["Stablecoin"],
     "pleasing-market": ["Stablecoin"],
 }
 for _slug, _sectors in _SECONDARY_SECTORS.items():
@@ -1383,6 +1381,34 @@ for _slug, _other in _OTHER_EXTEND_EXISTING.items():
         if "Other" not in _existing:
             _existing.append("Other")
         _spec["secondary_sectors"] = _existing
+
+# Canonical Credit → Lending (matches frontend/data/credit-seed.ts CANONICAL_LENDING_SLUGS).
+_CANONICAL_LENDING_SLUGS = frozenset({"aave", "compound", "morpho", "spark"})
+
+
+def _spec_credit_tags(spec: Dict[str, Any]) -> List[str]:
+    tags = spec.get("tags")
+    if tags is not None:
+        return list(tags)
+    sub = spec.get("sub_sector")
+    return [sub] if sub else []
+
+
+for _slug, _spec in ENTITY_SPECS.items():
+    if _slug in _CANONICAL_LENDING_SLUGS:
+        _spec["sector"] = "Credit"
+        _spec["sub_sector"] = "Lending"
+        _spec["tags"] = ["Lending"]
+        _sec = [s for s in (_spec.get("secondary_sectors") or []) if s != "Stablecoin"]
+        _spec["secondary_sectors"] = _sec or None
+        continue
+    if _spec.get("sector") != "Credit":
+        continue
+    _tags = _spec_credit_tags(_spec)
+    if "Lending" not in _tags and _spec.get("sub_sector") != "Lending":
+        continue
+    _spec["tags"] = []
+    _spec["sub_sector"] = None
 
 
 def build_entity_item(

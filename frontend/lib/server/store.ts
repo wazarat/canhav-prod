@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
+import { CANONICAL_PERP_DEX_SLUGS } from "@/data/derivatives-seed";
 import { repoRoot } from "@/lib/server/env";
 import { hasUpstash, readAllItemsFromRedis } from "@/lib/server/redis";
 import type {
@@ -116,6 +117,7 @@ const RWA_TAG_MIGRATION: Record<string, RwaSecondaryTag | null> = {
 };
 
 const CANONICAL_LENDING_SLUG_SET = new Set<string>(CANONICAL_LENDING_SLUGS);
+const CANONICAL_PERP_DEX_SLUG_SET = new Set<string>(CANONICAL_PERP_DEX_SLUGS);
 
 /** Normalize Credit → Lending taxonomy at read time (handles stale Redis records). */
 function normalizeNetworkTaxonomy(item: Record<string, unknown>): {
@@ -138,6 +140,15 @@ function normalizeNetworkTaxonomy(item: Record<string, unknown>): {
       secondarySectors: secondarySectors?.length ? secondarySectors : undefined,
       subSector: "Lending",
       tags: ["Lending"],
+    };
+  }
+
+  if (CANONICAL_PERP_DEX_SLUG_SET.has(slug)) {
+    return {
+      sector: "Derivatives",
+      secondarySectors: undefined,
+      subSector: "Perp DEX",
+      tags: [],
     };
   }
 
@@ -282,10 +293,12 @@ export async function readLiveStore(): Promise<LiveStore> {
       } as TokenProfile);
     } else if (item.Category === "Network" || item.Category === "Entity") {
       const taxonomy = normalizeNetworkTaxonomy(item);
+      const slug = String(item.Slug ?? "");
+      const isCanonicalPerpDex = CANONICAL_PERP_DEX_SLUG_SET.has(slug);
       // Accept legacy "Entity" records until the prod store is re-seeded.
       networks.push({
         category: "Network",
-        slug: String(item.Slug ?? ""),
+        slug: slug,
         name: String(item.Name ?? ""),
         symbol: String(item.Symbol ?? ""),
         status: (item.Status ?? "APPROVED") as NetworkProfile["status"],
@@ -317,8 +330,8 @@ export async function readLiveStore(): Promise<LiveStore> {
         stablecoinSubSector: item.StablecoinSubSector ?? null,
         stablecoinSecondaryTags: item.StablecoinSecondaryTags ?? undefined,
         stablecoin: item.Stablecoin ?? null,
-        dexSubSector: item.DexSubSector ?? null,
-        dexSecondaryTags: item.DexSecondaryTags ?? undefined,
+        dexSubSector: isCanonicalPerpDex ? null : (item.DexSubSector ?? null),
+        dexSecondaryTags: isCanonicalPerpDex ? undefined : (item.DexSecondaryTags ?? undefined),
         dex: item.Dex ?? null,
         rwaSubSector: item.RwaSubSector ?? null,
         rwaSecondaryTags: normalizeRwaTags(item.RwaSecondaryTags),
@@ -329,8 +342,15 @@ export async function readLiveStore(): Promise<LiveStore> {
         liquiditySubSector: item.LiquiditySubSector ?? null,
         liquiditySecondaryTags: item.LiquiditySecondaryTags ?? undefined,
         liquidity: item.Liquidity ?? null,
-        derivativesSubSector: item.DerivativesSubSector ?? null,
-        derivativesSecondaryTags: item.DerivativesSecondaryTags ?? undefined,
+        derivativesSubSector: isCanonicalPerpDex
+          ? "Perp DEX"
+          : ((item.DerivativesSubSector as NetworkProfile["derivativesSubSector"]) ??
+            (taxonomy.sector === "Derivatives" && taxonomy.subSector
+              ? (taxonomy.subSector as NetworkProfile["derivativesSubSector"])
+              : null)),
+        derivativesSecondaryTags: isCanonicalPerpDex
+          ? []
+          : (item.DerivativesSecondaryTags ?? undefined),
         derivatives: item.Derivatives ?? null,
         otherSubSector: item.OtherSubSector ?? null,
         otherSecondaryTags: item.OtherSecondaryTags ?? undefined,

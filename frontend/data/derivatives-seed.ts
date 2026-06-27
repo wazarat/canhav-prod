@@ -42,3 +42,12 @@ export const DERIVATIVES_SEED: DerivativesSeed[] = [
   { name: "Rage Trade",     slug: "rage-trade",     token: null,   subSector: "Delta-Neutral", secondaryTags: ["Auto-Strategy"],      llamaSlug: "rage-trade-v1", coingeckoId: null,     seedMode: "new" },
   { name: "Neutra Finance", slug: "neutra-finance", token: null,   subSector: "Delta-Neutral", secondaryTags: ["Auto-Strategy"],      llamaSlug: "neutral-trade", coingeckoId: null,     seedMode: "new" },
 ];
+
+/** Primary Perp DEX venues that must stay under Derivatives / Perp DEX only. */
+export const CANONICAL_PERP_DEX_SLUGS = [
+  "gmx",
+  "gains-network",
+  "dydx",
+  "hyperliquid",
+  "drift-protocol",
+] as const;

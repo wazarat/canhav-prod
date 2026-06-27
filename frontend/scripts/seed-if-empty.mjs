@@ -53,6 +53,7 @@ const TAXONOMY_PATCH_FIELDS = [
   "SecondarySectors",
   "StablecoinSubSector",
   "StablecoinSecondaryTags",
+  "DerivativesSubSector",
   "DerivativesSecondaryTags",
 ];
 

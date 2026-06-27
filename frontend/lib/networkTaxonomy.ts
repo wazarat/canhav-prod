@@ -1,4 +1,5 @@
 import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
+import { CANONICAL_PERP_DEX_SLUGS } from "@/data/derivatives-seed";
 import type { BadgeTone } from "@/components/ui/Badge";
 import type {
   CreditTag,
@@ -11,6 +12,7 @@ import type {
 } from "@/lib/types";
 
 const CANONICAL_LENDING_SLUG_SET = new Set<string>(CANONICAL_LENDING_SLUGS);
+const CANONICAL_PERP_DEX_SLUG_SET = new Set<string>(CANONICAL_PERP_DEX_SLUGS);
 
 export interface NetworkTaxonomyBadges {
   primarySector: string | null;
@@ -113,9 +115,10 @@ export function tagsForSector(profile: NetworkProfile, sector: string): string[]
     ) as string[];
   }
   if (sector === "Derivatives") {
-    return [profile.derivativesSubSector, ...(profile.derivativesSecondaryTags ?? [])].filter(
-      Boolean,
-    ) as string[];
+    const primary =
+      profile.derivativesSubSector ??
+      (profile.sector === "Derivatives" && profile.subSector ? profile.subSector : null);
+    return [primary, ...(profile.derivativesSecondaryTags ?? [])].filter(Boolean) as string[];
   }
   if (sector === "Other") {
     return [profile.otherSubSector, ...(profile.otherSecondaryTags ?? [])].filter(
@@ -130,6 +133,7 @@ export function matchesSectorFilter(profile: NetworkProfile, sector: string): bo
   if (profile.sector === sector) return true;
   if ((profile.secondarySectors as string[] | undefined)?.includes(sector)) return true;
   if (sector === "Credit" && CANONICAL_LENDING_SLUG_SET.has(profile.slug)) return true;
+  if (sector === "Derivatives" && CANONICAL_PERP_DEX_SLUG_SET.has(profile.slug)) return true;
   return false;
 }
 
@@ -142,7 +146,10 @@ export function filterTagsForSector(profile: NetworkProfile, sector: string): st
     return profile.liquiditySubSector ? [profile.liquiditySubSector] : [];
   }
   if (sector === "Derivatives") {
-    return profile.derivativesSubSector ? [profile.derivativesSubSector] : [];
+    const primary =
+      profile.derivativesSubSector ??
+      (profile.sector === "Derivatives" && profile.subSector ? profile.subSector : null);
+    return primary ? [primary] : [];
   }
   if (sector === "Other") {
     return profile.otherSubSector ? [profile.otherSubSector] : [];

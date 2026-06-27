@@ -74,7 +74,7 @@ const MERGE_IF_NULL_FIELDS = [
   "CreditTagMetrics",
 ];
 
-/** Perp DEX venues whose secondary tags are canonical in bootstrap (cleared to []). */
+/** Perp DEX venues whose taxonomy is canonical in bootstrap. */
 const CANONICAL_PERP_DEX_SLUGS = new Set([
   "gmx",
   "gains-network",
@@ -82,6 +82,33 @@ const CANONICAL_PERP_DEX_SLUGS = new Set([
   "hyperliquid",
   "drift-protocol",
 ]);
+
+/** Full derivatives taxonomy sync for canonical Perp DEX venues. */
+const PERP_DEX_TAXONOMY_FIELDS = [
+  "Sector",
+  "SubSector",
+  "Tags",
+  "SecondarySectors",
+  "DerivativesSubSector",
+  "DerivativesSecondaryTags",
+  "DexSubSector",
+  "DexSecondaryTags",
+  "LiquiditySubSector",
+  "LiquiditySecondaryTags",
+];
+
+function mergePerpDexTaxonomy(existing, bootstrap) {
+  if (!CANONICAL_PERP_DEX_SLUGS.has(bootstrap?.Slug)) return null;
+  const next = { ...existing };
+  let changed = false;
+  for (const key of PERP_DEX_TAXONOMY_FIELDS) {
+    if (JSON.stringify(existing[key]) !== JSON.stringify(bootstrap[key])) {
+      next[key] = bootstrap[key];
+      changed = true;
+    }
+  }
+  return changed ? next : null;
+}
 
 function isEmptyArray(value) {
   return !Array.isArray(value) || value.length === 0;
@@ -219,12 +246,9 @@ export function mergeCuratedContent(existing, bootstrap) {
     changed = true;
   }
 
-  if (
-    CANONICAL_PERP_DEX_SLUGS.has(bootstrap.Slug) &&
-    JSON.stringify(existing.DerivativesSecondaryTags) !==
-      JSON.stringify(bootstrap.DerivativesSecondaryTags)
-  ) {
-    next.DerivativesSecondaryTags = bootstrap.DerivativesSecondaryTags;
+  const perpDex = mergePerpDexTaxonomy(existing, bootstrap);
+  if (perpDex) {
+    Object.assign(next, perpDex);
     changed = true;
   }
 

@@ -10,6 +10,7 @@ import type {
   NetworkProfile,
   NetworkRisk,
   NetworkSector,
+  ReceiptProfile,
   RiskCategory,
   RwaProfile,
   RwaSecondaryTag,
@@ -249,10 +250,22 @@ function common(item: Record<string, any>) {
   };
 }
 
+function coinTaxonomyFields(item: Record<string, any>) {
+  return {
+    coinType: item.CoinType ?? null,
+    isStablecoin: item.IsStablecoin ?? undefined,
+    pegDeviation: item.PegDeviation ?? null,
+    stakingApr: item.StakingApr ?? null,
+    backing: item.Backing ?? null,
+    sector: item.Sector ?? null,
+  };
+}
+
 export interface LiveStore {
   stablecoins: StablecoinProfile[];
   rwas: RwaProfile[];
   tokens: TokenProfile[];
+  receipts: ReceiptProfile[];
   networks: NetworkProfile[];
 }
 
@@ -260,6 +273,7 @@ export async function readLiveStore(): Promise<LiveStore> {
   const stablecoins: StablecoinProfile[] = [];
   const rwas: RwaProfile[] = [];
   const tokens: TokenProfile[] = [];
+  const receipts: ReceiptProfile[] = [];
   const networks: NetworkProfile[] = [];
 
   for (const raw of await readItems()) {
@@ -281,7 +295,45 @@ export async function readLiveStore(): Promise<LiveStore> {
         lendingMarket: item.LendingMarket ?? undefined,
         market: item.Market ?? undefined,
         yieldMechanics: item.YieldMechanics ?? undefined,
+        ...coinTaxonomyFields(item),
       } as StablecoinProfile);
+    } else if (item.Category === "Receipt") {
+      receipts.push({
+        category: "Receipt",
+        ...common(item),
+        receiptType: item.ReceiptType ?? "YieldVault",
+        entitySlug: String(item.EntitySlug ?? ""),
+        baseAsset: item.BaseAsset ?? null,
+        tag: item.Tag ?? null,
+        notes: item.Notes ?? null,
+        priceUsd: item.PriceUsd ?? null,
+        exchangeRateVsBase: item.ExchangeRateVsBase ?? null,
+        pegDeviation: item.PegDeviation ?? null,
+        underlyingTvlUsd: item.UnderlyingTvlUsd ?? null,
+        apr: item.Apr ?? null,
+        navPerShare: item.NavPerShare ?? null,
+        maturityDate: item.MaturityDate ?? null,
+        impliedApy: item.ImpliedApy ?? null,
+        aumUsd: item.AumUsd ?? null,
+        underlyingYield: item.UnderlyingYield ?? null,
+        holders: item.Holders ?? null,
+        market: item.Market ?? undefined,
+        yieldMechanics: item.YieldMechanics ?? undefined,
+        lendingMarket: item.LendingMarket ?? undefined,
+        assetSubtype: item.AssetSubtype ?? null,
+        pegMechanism: item.PegMechanism ?? null,
+        arbitrumPortalMetadata: item.ArbitrumPortalMetadata ?? {
+          portalUrl: null,
+          logoUrl: null,
+          bannerUrl: null,
+          chains: [],
+          subCategory: null,
+          isLive: true,
+          isArbitrumNative: false,
+          isPubliclyAudited: false,
+          foundedDate: null,
+        },
+      } as ReceiptProfile);
     } else if (item.Category === "RWA") {
       rwas.push({
         category: "RWA",
@@ -322,6 +374,7 @@ export async function readLiveStore(): Promise<LiveStore> {
         sources: item.Sources ?? undefined,
         offchainFacts: item.OffchainFacts ?? undefined,
         agentSkill: item.AgentSkill ?? undefined,
+        ...coinTaxonomyFields(item),
       } as TokenProfile);
     } else if (item.Category === "Network" || item.Category === "Entity") {
       const taxonomy = normalizeNetworkTaxonomy(item);
@@ -454,8 +507,9 @@ export async function readLiveStore(): Promise<LiveStore> {
   stablecoins.sort((a, b) => a.name.localeCompare(b.name));
   rwas.sort((a, b) => a.name.localeCompare(b.name));
   tokens.sort((a, b) => a.name.localeCompare(b.name));
+  receipts.sort((a, b) => a.name.localeCompare(b.name));
   networks.sort((a, b) => a.name.localeCompare(b.name));
-  return { stablecoins, rwas, tokens, networks };
+  return { stablecoins, rwas, tokens, receipts, networks };
 }
 
 function mapSectorAggregateItem(item: Record<string, unknown>): SectorAggregate {

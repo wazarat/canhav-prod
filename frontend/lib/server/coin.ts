@@ -10,8 +10,11 @@ import { coinIdForSlug, fetchMarketData, type MarketData } from "@/lib/server/co
 import { resolveEntityToken } from "@/lib/server/resolve";
 import type {
   AssetSubtype,
+  CoinType,
   LendingMarket,
   PegMechanism,
+  ReceiptProfile,
+  ReceiptType,
   RwaProfile,
   StablecoinProfile,
   TokenDeployment,
@@ -83,10 +86,12 @@ export interface CoinLiveData {
   slug: string;
   name: string;
   symbol: string;
-  category: "Stablecoin" | "Token" | "RWA";
+  category: "Stablecoin" | "Token" | "RWA" | "Receipt";
   /** Member-coin role label (e.g. "Yield-bearing synthetic dollar"). */
   role: string;
   subCategory: string | null;
+  coinType?: CoinType | null;
+  receiptType?: ReceiptType | null;
   /** Fine-grained economic classification (additive; null on old records). */
   assetSubtype: AssetSubtype | null;
   pegMechanism: PegMechanism | null;
@@ -111,6 +116,11 @@ export interface CoinLiveData {
   circulatingSupplyUsd: number | null;
   /** RWA TVL / AUM proxy in USD from store or on-chain. */
   tvlUsd: number | null;
+  /** Receipt-specific Tier 1 fields. */
+  exchangeRateVsBase?: number | null;
+  underlyingTvlUsd?: number | null;
+  apr?: number | null;
+  pegDeviation?: number | null;
   links: {
     website: string | null;
     coingecko: string | null;
@@ -237,9 +247,13 @@ function mergeMarketData(
 }
 
 export async function getCoinLiveData(
-  profile: StablecoinProfile | TokenProfile | RwaProfile,
+  profile: StablecoinProfile | TokenProfile | RwaProfile | ReceiptProfile,
   role = "",
 ): Promise<CoinLiveData> {
+  if (profile.category === "Receipt") {
+    return getReceiptLiveData(profile, role);
+  }
+
   const token = await resolveEntityToken(profile);
   const storedAddress =
     (profile.contractAddress || "").trim().toLowerCase() || null;
@@ -336,6 +350,11 @@ export async function getCoinLiveData(
     symbol: profile.symbol,
     category: profile.category,
     role,
+    coinType:
+      profile.category === "Token" || profile.category === "Stablecoin"
+        ? (profile.coinType ?? null)
+        : null,
+    receiptType: null,
     subCategory:
       profile.category === "RWA"
         ? (profile.assetClass ?? null)
@@ -357,11 +376,79 @@ export async function getCoinLiveData(
     referencePriceLabel,
     circulatingSupplyUsd,
     tvlUsd,
+    exchangeRateVsBase: null,
+    underlyingTvlUsd: null,
+    apr: yieldMechanics?.currentApyPct ?? lendingMarket?.supplyApyPct ?? null,
+    pegDeviation:
+      profile.category === "Stablecoin" || profile.category === "Token"
+        ? (profile.pegDeviation ?? null)
+        : null,
     links: {
       website: profile.website,
       coingecko: profile.coingecko,
       explorer: explorer.url,
       explorerLabel: explorer.label,
+    },
+  };
+}
+
+async function getReceiptLiveData(
+  profile: ReceiptProfile,
+  role: string,
+): Promise<CoinLiveData> {
+  const coinId = coinIdForSlug(profile.slug);
+  const [liveMarket] = await Promise.all([
+    coinId ? fetchMarketData(coinId, LIVE_REVALIDATE) : Promise.resolve(null),
+  ]);
+  const storedMarket = profile.market;
+  const market = mergeMarketData(liveMarket, storedMarket, profile.priceUsd ?? null);
+  const meta = profile.arbitrumPortalMetadata ?? {
+    portalUrl: null,
+    logoUrl: null,
+    bannerUrl: null,
+    chains: [],
+    subCategory: null,
+    isLive: true,
+    isArbitrumNative: false,
+    isPubliclyAudited: false,
+    foundedDate: null,
+  };
+
+  return {
+    slug: profile.slug,
+    name: profile.name,
+    symbol: profile.symbol,
+    category: "Receipt",
+    role,
+    coinType: null,
+    receiptType: profile.receiptType,
+    subCategory: profile.receiptType,
+    assetSubtype: profile.assetSubtype ?? null,
+    pegMechanism: profile.pegMechanism ?? null,
+    description: profile.description,
+    contractAddress: profile.contractAddress ?? null,
+    chains: meta.chains ?? [],
+    deployments: [],
+    profilePath: `/receipts/${profile.slug}`,
+    isLive: meta.isLive ?? true,
+    hasAlchemy: hasAlchemy(),
+    market: profile.receiptType === "LendingReceipt" ? null : market,
+    onchain: null,
+    lendingMarket: profile.lendingMarket ?? null,
+    yieldMechanics: profile.yieldMechanics ?? null,
+    referencePrice: null,
+    referencePriceLabel: null,
+    circulatingSupplyUsd: null,
+    tvlUsd: profile.underlyingTvlUsd ?? profile.aumUsd ?? null,
+    exchangeRateVsBase: profile.exchangeRateVsBase ?? null,
+    underlyingTvlUsd: profile.underlyingTvlUsd ?? profile.aumUsd ?? null,
+    apr: profile.apr ?? profile.yieldMechanics?.currentApyPct ?? null,
+    pegDeviation: profile.pegDeviation ?? null,
+    links: {
+      website: profile.website,
+      coingecko: profile.coingecko,
+      explorer: null,
+      explorerLabel: "Explorer",
     },
   };
 }

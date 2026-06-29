@@ -11,6 +11,7 @@ import { readLiveStore } from "@/lib/server/store";
 import type {
   CategoryDef,
   NetworkProfile,
+  ReceiptProfile,
   RwaProfile,
   StablecoinProfile,
   TokenProfile,
@@ -154,7 +155,9 @@ export function tvlTrend(profile: RwaProfile): TvlTrend {
 
 export async function getAllTokens(): Promise<TokenProfile[]> {
   const { tokens } = await readLiveStore();
-  return [...tokens].sort((a, b) => a.name.localeCompare(b.name));
+  return [...tokens]
+    .filter((p) => p.coinType !== "NoToken")
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function getApprovedTokens(): Promise<TokenProfile[]> {
@@ -167,6 +170,23 @@ export async function getApprovedTokenBySlug(slug: string): Promise<TokenProfile
 
 export async function getTokenBySlug(slug: string): Promise<TokenProfile | null> {
   return getApprovedTokenBySlug(slug);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Receipt accessors                                                          */
+/* -------------------------------------------------------------------------- */
+
+export async function getAllReceipts(): Promise<ReceiptProfile[]> {
+  const { receipts } = await readLiveStore();
+  return [...receipts].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function getApprovedReceipts(): Promise<ReceiptProfile[]> {
+  return getAllReceipts();
+}
+
+export async function getReceiptBySlug(slug: string): Promise<ReceiptProfile | null> {
+  return (await getAllReceipts()).find((p) => p.slug === slug) ?? null;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -208,13 +228,19 @@ export async function getApprovedNetworkBySlug(slug: string): Promise<NetworkPro
  */
 function enrichNetworksWithTvl(
   networks: NetworkProfile[],
-  store: { stablecoins: StablecoinProfile[]; rwas: RwaProfile[]; tokens: TokenProfile[] },
+  store: {
+    stablecoins: StablecoinProfile[];
+    rwas: RwaProfile[];
+    tokens: TokenProfile[];
+    receipts?: import("@/lib/types").ReceiptProfile[];
+  },
 ): NetworkProfile[] {
   if (!networks.some((e) => e.currentScale.tvlUsd == null)) return networks;
 
   const stablecoinBySlug = new Map(store.stablecoins.map((p) => [p.slug, p]));
   const rwaBySlug = new Map(store.rwas.map((p) => [p.slug, p]));
   const tokenBySlug = new Map(store.tokens.map((p) => [p.slug, p]));
+  const receiptBySlug = new Map((store.receipts ?? []).map((p) => [p.slug, p]));
 
   const memberValueUsd = (ref: NetworkProfile["memberCoins"][number]): number | null => {
     if (ref.category === "Stablecoin") {
@@ -224,6 +250,11 @@ function enrichNetworksWithTvl(
       const profile = rwaBySlug.get(ref.slug);
       if (!profile) return null;
       return latestTvl(profile);
+    }
+    if (ref.category === "Receipt") {
+      const profile = receiptBySlug.get(ref.slug);
+      if (!profile) return null;
+      return profile.underlyingTvlUsd ?? profile.aumUsd ?? profile.priceUsd ?? null;
     }
     return tokenBySlug.get(ref.slug)?.market?.marketCapUsd?.value ?? null;
   };
@@ -456,13 +487,14 @@ export async function getNetworkMemberCoins(
 ): Promise<
   {
     ref: NetworkProfile["memberCoins"][number];
-    profile: StablecoinProfile | TokenProfile | RwaProfile | null;
+    profile: StablecoinProfile | TokenProfile | RwaProfile | ReceiptProfile | null;
   }[]
 > {
-  const [stablecoins, tokens, rwas] = await Promise.all([
+  const [stablecoins, tokens, rwas, receipts] = await Promise.all([
     getAllStablecoins(),
     getAllTokens(),
     getAllRwas(),
+    getAllReceipts(),
   ]);
   return network.memberCoins.map((ref) => {
     const profile =
@@ -470,7 +502,9 @@ export async function getNetworkMemberCoins(
         ? (stablecoins.find((p) => p.slug === ref.slug) ?? null)
         : ref.category === "RWA"
           ? (rwas.find((p) => p.slug === ref.slug) ?? null)
-          : (tokens.find((p) => p.slug === ref.slug) ?? null);
+          : ref.category === "Receipt"
+            ? (receipts.find((p) => p.slug === ref.slug) ?? null)
+            : (tokens.find((p) => p.slug === ref.slug) ?? null);
     return { ref, profile };
   });
 }
@@ -503,6 +537,12 @@ export const CATEGORIES: CategoryDef[] = [
     slug: "tokens",
     label: "Tokens",
     description: "Governance & utility tokens powering protocol ecosystems.",
+    status: "active",
+  },
+  {
+    slug: "receipts",
+    label: "Receipt Tokens",
+    description: "LSTs, lending receipts, yield vault shares, and staked wrappers.",
     status: "active",
   },
   {

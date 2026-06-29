@@ -58,6 +58,10 @@ import { DERIVATIVES_SEED } from "@/data/derivatives-seed";
 import { collectAllOtherMetrics } from "@/lib/server/other";
 import { OTHER_SEED } from "@/data/other-seed";
 import { refreshSectorAggregates } from "@/lib/server/sectorAggregates";
+import {
+  enrichCoinTaxonomyOnItem,
+  enrichReceiptOnItem,
+} from "@/lib/server/coinRefresh";
 import { pegVsCurrency } from "@/lib/server/series";
 import {
   fetchJustLendLiveMetrics,
@@ -102,6 +106,7 @@ export const maxDuration = 300;
 const CATEGORY_STABLECOIN = "Stablecoin";
 const CATEGORY_RWA = "RWA";
 const CATEGORY_TOKEN = "Token";
+const CATEGORY_RECEIPT = "Receipt";
 // Networks were renamed from "Entity"; accept the legacy value until the prod
 // store is re-seeded (mirrors lib/server/store.ts).
 const CATEGORY_NETWORK = "Network";
@@ -1005,12 +1010,32 @@ export async function GET(req: Request): Promise<NextResponse> {
     // Persist CoinGecko market block (agent-readable + bootstrap export).
     // Independent of address: Solana tokens and Ethereum-only stables have
     // market data but may lack an Arbitrum contract.
-    const marketCategories = new Set([CATEGORY_TOKEN, CATEGORY_STABLECOIN]);
+    const marketCategories = new Set([CATEGORY_TOKEN, CATEGORY_STABLECOIN, CATEGORY_RECEIPT]);
     if (marketCategories.has(category) && resolution && resolution.priceUsd !== null) {
       item.Market = buildTokenMarket(resolution);
       mutated = true;
       if (row.metric === null) row.metric = resolution.priceUsd;
       if (!row.note) row.note = "market block";
+    }
+
+    if (category === CATEGORY_TOKEN || category === CATEGORY_STABLECOIN) {
+      const taxMut = await enrichCoinTaxonomyOnItem(
+        item,
+        slug,
+        resolution?.priceUsd ?? null,
+        llamaPools,
+      );
+      if (taxMut) mutated = true;
+    }
+
+    if (category === CATEGORY_RECEIPT) {
+      const recMut = await enrichReceiptOnItem(
+        item,
+        slug,
+        resolution,
+        llamaPools,
+      );
+      if (recMut) mutated = true;
     }
 
     if (address) {
@@ -1738,6 +1763,9 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (!member) return null;
     if (ref.category === CATEGORY_STABLECOIN) return member.TotalSupply?.value ?? null;
     if (ref.category === CATEGORY_RWA) return rwaLatestTvlUsd(member);
+    if (ref.category === CATEGORY_RECEIPT) {
+      return member.UnderlyingTvlUsd ?? member.AumUsd ?? member.PriceUsd ?? null;
+    }
     if (ref.category === CATEGORY_TOKEN) return member.Market?.marketCapUsd?.value ?? null;
     return null;
   };

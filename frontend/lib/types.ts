@@ -34,6 +34,7 @@ export type CategorySlug =
   | "stablecoins"
   | "rwas"
   | "tokens"
+  | "receipts"
   | "lending"
   | "perpetuals"
   | "yield"
@@ -232,6 +233,17 @@ export interface StablecoinProfile {
   yieldMechanics?: YieldMechanics;
   /** Protocol fees/revenue when this coin maps to a Llama protocol (DeFi Llama). */
   protocolFeesRevenue?: ProtocolFeesRevenue | null;
+  /** Primary coin taxonomy (6-type enum). */
+  coinType?: CoinType | null;
+  isStablecoin?: boolean;
+  /** Peg deviation from $1 for stablecoin types (Tier 1, cron-written). */
+  pegDeviation?: number | null;
+  /** Staking APR where a yields pool maps (Tier 1/2). */
+  stakingApr?: number | null;
+  /** Tier 2 curated reserve composition. */
+  backing?: string | null;
+  /** Sector tag from compiled coin sheet (Credit, Staking, etc.). */
+  sector?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -761,6 +773,58 @@ export interface TokenProfile {
   /** Curated off-chain facts (reg status, rating, ICO terms) with provenance. */
   offchainFacts?: OffchainFact[];
   agentSkill?: AgentSkill;
+  /** Primary coin taxonomy (6-type enum). */
+  coinType?: CoinType | null;
+  isStablecoin?: boolean;
+  pegDeviation?: number | null;
+  stakingApr?: number | null;
+  backing?: string | null;
+  sector?: string | null;
+}
+
+/** Receipt token profile — CATEGORY#Receipt partition. */
+export interface ReceiptProfile {
+  category: "Receipt";
+  slug: string;
+  name: string;
+  symbol: string;
+  status: ApprovalStatus;
+  receiptType: ReceiptType;
+  entitySlug: string;
+  baseAsset?: string | null;
+  coingecko: string | null;
+  description: string;
+  website: string | null;
+  twitter: string | null;
+  discord: string | null;
+  github: string | null;
+  auditUrl: string | null;
+  contractAddress?: string | null;
+  deployments?: TokenDeployment[];
+  sector?: string | null;
+  tag?: string | null;
+  notes?: string | null;
+  assetSubtype?: AssetSubtype | null;
+  pegMechanism?: PegMechanism | null;
+  arbitrumPortalMetadata?: ArbitrumPortalMetadata;
+  /** Tier 1 metric fields (cron-written). */
+  priceUsd?: number | null;
+  exchangeRateVsBase?: number | null;
+  pegDeviation?: number | null;
+  underlyingTvlUsd?: number | null;
+  apr?: number | null;
+  navPerShare?: number | null;
+  /** Tier 2 / curated (schema-reserved). */
+  maturityDate?: string | null;
+  impliedApy?: number | null;
+  aumUsd?: number | null;
+  underlyingYield?: number | null;
+  holders?: number | null;
+  market?: TokenMarket;
+  yieldMechanics?: YieldMechanics;
+  lendingMarket?: LendingMarket | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -819,7 +883,7 @@ export interface CurrentScale {
 }
 
 /** Which category partition a member coin lives in. */
-export type MemberCoinCategory = "Stablecoin" | "Token" | "RWA";
+export type MemberCoinCategory = "Stablecoin" | "Token" | "RWA" | "Receipt";
 
 export interface MemberCoinRef {
   slug: string;
@@ -829,6 +893,10 @@ export interface MemberCoinRef {
   role: string;
   /** Optional sub-classification mirrored from the product profile. */
   subCategory?: string | null;
+  /** Receipt taxonomy when category === "Receipt". */
+  receiptType?: ReceiptType | null;
+  /** Primary coin taxonomy when category !== "Receipt". */
+  coinType?: CoinType | null;
 }
 
 export type RiskCategory =
@@ -909,6 +977,26 @@ export type NetworkSector =
   | "Liquidity"
   | "Derivatives"
   | "Other";
+
+/** Consolidated 6-type coin taxonomy (primary tokens only). */
+export type CoinType =
+  | "Governance"
+  | "GovernanceUtility"
+  | "NativeStablecoin"
+  | "SyntheticDollar"
+  | "LockedEscrow"
+  | "NoToken";
+
+/** Consolidated 8-type receipt taxonomy. */
+export type ReceiptType =
+  | "LiquidStaking"
+  | "LiquidRestaking"
+  | "LendingReceipt"
+  | "YieldVault"
+  | "StakedStablecoin"
+  | "FixedIncomeTranche"
+  | "TokenizedRWA"
+  | "LockedEscrowReceipt";
 
 /** Credit-sector tags (replaces the legacy 5-value lending taxonomy). */
 export type CreditTag =

@@ -9,6 +9,14 @@ const nextConfig = {
     return [
       { source: "/entities", destination: "/networks", permanent: true },
       { source: "/entities/:slug", destination: "/networks/:slug", permanent: true },
+      // Receipt migration — individual tokens moved to family receipt profiles.
+      { source: "/tokens/steth", destination: "/receipts/lido-steth", permanent: true },
+      { source: "/tokens/ausdc", destination: "/receipts/aave-atokens", permanent: true },
+      { source: "/tokens/ausdt", destination: "/receipts/aave-atokens", permanent: true },
+      { source: "/tokens/aweth", destination: "/receipts/aave-atokens", permanent: true },
+      { source: "/tokens/weeth", destination: "/receipts/ether-fi-weeth", permanent: true },
+      { source: "/stablecoins/susde", destination: "/receipts/ethena-susde", permanent: true },
+      { source: "/tokens/reth", destination: "/receipts/rocket-pool-reth", permanent: true },
     ];
   },
   images: {

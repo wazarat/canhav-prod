@@ -14,6 +14,7 @@ export interface AgentScope {
     stablecoins: string[];
     tokens: string[];
     rwas: string[];
+    receipts: string[];
   };
 }
 
@@ -41,6 +42,7 @@ export async function resolveEntityBinding(slug: string): Promise<EntityBinding 
       .map((c) => c.slug),
     tokens: entity.memberCoins.filter((c) => c.category === "Token").map((c) => c.slug),
     rwas: entity.memberCoins.filter((c) => c.category === "RWA").map((c) => c.slug),
+    receipts: entity.memberCoins.filter((c) => c.category === "Receipt").map((c) => c.slug),
   };
 
   return {

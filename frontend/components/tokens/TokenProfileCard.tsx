@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
+import { CoinTypeBadge } from "@/components/shared/CoinTypeBadge";
 import type { TokenProfile } from "@/lib/types";
 
 function LinkRow({ label, href }: { label: string; href: string | null }) {
@@ -37,6 +38,9 @@ export function TokenProfileCard({ profile }: { profile: TokenProfile }) {
         <CardTitle className="pb-3">Metadata</CardTitle>
         <div className="pt-1">
           <MetaRow label="Token type" value={<Badge tone="neon">{profile.tokenType}</Badge>} />
+          {profile.coinType && (
+            <MetaRow label="Coin type" value={<CoinTypeBadge coinType={profile.coinType} />} />
+          )}
           {profile.subCategory && (
             <MetaRow label="Sub-category" value={<Badge tone="neutral">{profile.subCategory}</Badge>} />
           )}

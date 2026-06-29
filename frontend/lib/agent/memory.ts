@@ -59,7 +59,7 @@ export interface AgentMemoryFact {
 export interface AgentProductRef {
   slug: string;
   symbol: string;
-  category: "Stablecoin" | "Token" | "RWA";
+  category: "Stablecoin" | "Token" | "RWA" | "Receipt";
 }
 
 /**

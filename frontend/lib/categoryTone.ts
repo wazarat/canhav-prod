@@ -8,6 +8,8 @@ export function categoryBadgeTone(category: MemberCoinCategory): BadgeTone {
       return "neon";
     case "RWA":
       return "signal";
+    case "Receipt":
+      return "signal";
     case "Stablecoin":
     default:
       return "electric";

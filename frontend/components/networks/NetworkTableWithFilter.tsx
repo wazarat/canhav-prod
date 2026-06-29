@@ -19,6 +19,7 @@ const CATEGORY_FILTERS: { label: string; value: MemberCoinCategory | "all" }[] =
   { label: "All", value: "all" },
   { label: "Stablecoins", value: "Stablecoin" },
   { label: "Tokens", value: "Token" },
+  { label: "Receipts", value: "Receipt" },
   { label: "RWAs", value: "RWA" },
 ];
 

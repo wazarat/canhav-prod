@@ -22,6 +22,7 @@ const ICONS: Record<CategorySlug, LucideIcon> = {
   stablecoins: Coins,
   rwas: Landmark,
   tokens: CircleDollarSign,
+  receipts: Layers,
   lending: Banknote,
   perpetuals: CandlestickChart,
   yield: Sparkles,

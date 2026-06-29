@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ArrowUpRight, Eye } from "lucide-react";
 
 import { CoinModal } from "@/components/networks/CoinModal";
+import { CoinTypeBadge } from "@/components/shared/CoinTypeBadge";
+import { ReceiptTypeBadge } from "@/components/shared/ReceiptTypeBadge";
 
 import { Badge } from "@/components/ui/Badge";
 import { ClassificationChips } from "@/components/shared/ClassificationChips";
@@ -15,22 +17,57 @@ import {
   formatUsdCompact,
 } from "@/lib/utils";
 
+function splitCoins(coins: CoinLiveData[]) {
+  const primary = coins.filter((c) => c.category !== "Receipt");
+  const receipts = coins.filter((c) => c.category === "Receipt");
+  return { primary, receipts };
+}
+
 /**
- * Member-coin cards for an Entity. Card click navigates to full profile;
- * "Quick view" opens modal with live CoinGecko + Alchemy data.
+ * Member-coin cards for an Entity — split into primary coins and receipt tokens.
  */
 export function MemberCoins({ coins }: { coins: CoinLiveData[] }) {
   const [active, setActive] = useState<CoinLiveData | null>(null);
+  const { primary, receipts } = splitCoins(coins);
 
   return (
-    <div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-        {coins.map((coin) => (
-          <MemberCoinCard key={coin.slug} coin={coin} onQuickView={() => setActive(coin)} />
-        ))}
-      </div>
-
+    <div className="space-y-8">
+      {primary.length > 0 && (
+        <section className="space-y-4">
+          <h3 className="font-display text-lg font-semibold text-ink-50">Coins</h3>
+          <CoinGrid coins={primary} onQuickView={setActive} variant="coin" />
+        </section>
+      )}
+      {receipts.length > 0 && (
+        <section className="space-y-4">
+          <h3 className="font-display text-lg font-semibold text-ink-50">Receipt Tokens</h3>
+          <CoinGrid coins={receipts} onQuickView={setActive} variant="receipt" />
+        </section>
+      )}
       {active && <CoinModal coin={active} onClose={() => setActive(null)} />}
+    </div>
+  );
+}
+
+function CoinGrid({
+  coins,
+  onQuickView,
+  variant,
+}: {
+  coins: CoinLiveData[];
+  onQuickView: (c: CoinLiveData) => void;
+  variant: "coin" | "receipt";
+}) {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+      {coins.map((coin) => (
+        <MemberCoinCard
+          key={coin.slug}
+          coin={coin}
+          onQuickView={() => onQuickView(coin)}
+          variant={variant}
+        />
+      ))}
     </div>
   );
 }
@@ -85,16 +122,25 @@ function missingDataLabel(coin: CoinLiveData): string {
 function MemberCoinCard({
   coin,
   onQuickView,
+  variant = "coin",
 }: {
   coin: CoinLiveData;
   onQuickView: () => void;
+  variant?: "coin" | "receipt";
 }) {
   const change24h = coin.market?.priceChange24h;
   const metricsPresent = hasCoinMetrics(coin);
   const apy = supplyApyPct(coin);
+  const isReceipt = variant === "receipt";
 
   return (
-    <div className="group glass flex h-full flex-col gap-3 rounded-2xl border border-ink-700/60 p-5 transition-all duration-200 hover:border-electric-500/50 hover:glow-ring">
+    <div
+      className={`group glass flex h-full flex-col gap-3 rounded-2xl border p-5 transition-all duration-200 hover:glow-ring ${
+        isReceipt
+          ? "border-dashed border-ink-600/70 hover:border-signal-500/50"
+          : "border-ink-700/60 hover:border-electric-500/50"
+      }`}
+    >
       <div className="flex items-start justify-between gap-2">
         <Link href={coin.profilePath} className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center gap-2">
@@ -107,7 +153,9 @@ function MemberCoinCard({
         </Link>
         <div className="flex flex-col items-end gap-1">
           <Badge tone={categoryBadgeTone(coin.category)}>{coin.category}</Badge>
-          {coin.subCategory && (
+          {coin.coinType && !isReceipt && <CoinTypeBadge coinType={coin.coinType} />}
+          {coin.receiptType && isReceipt && <ReceiptTypeBadge receiptType={coin.receiptType} />}
+          {coin.subCategory && !isReceipt && (
             <Badge tone="neutral" className="text-[10px]">
               {coin.subCategory}
             </Badge>
@@ -153,11 +201,11 @@ function MemberCoinCard({
                 Supply APY{" "}
                 <span className="font-mono text-ink-100">{apy.toFixed(2)}%</span>
               </span>
-            ) : hasTvlMetric(coin) ? (
+            ) : hasTvlMetric(coin) || coin.underlyingTvlUsd != null ? (
               <span>
-                TVL{" "}
+                {isReceipt ? "Underlying " : ""}TVL{" "}
                 <span className="font-mono text-ink-100">
-                  {formatUsdCompact(coin.tvlUsd)}
+                  {formatUsdCompact(coin.underlyingTvlUsd ?? coin.tvlUsd)}
                 </span>
               </span>
             ) : hasSupplyMetric(coin) ? (
@@ -168,6 +216,22 @@ function MemberCoinCard({
                 </span>
               </span>
             ) : null}
+            {coin.pegDeviation != null && (
+              <span>
+                Peg dev{" "}
+                <span className="font-mono text-ink-100">
+                  {(coin.pegDeviation * 100).toFixed(2)} bps
+                </span>
+              </span>
+            )}
+            {coin.exchangeRateVsBase != null && (
+              <span>
+                Rate{" "}
+                <span className="font-mono text-ink-100">
+                  {coin.exchangeRateVsBase.toFixed(4)}
+                </span>
+              </span>
+            )}
             {coin.referencePrice != null && coin.referencePriceLabel && (
               <span>
                 {coin.referencePriceLabel}{" "}

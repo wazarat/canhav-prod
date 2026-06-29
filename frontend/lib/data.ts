@@ -8,6 +8,7 @@ import {
   networkNeedsMarketEnrichment,
 } from "@/lib/networks/marketHeadlines";
 import { readLiveStore } from "@/lib/server/store";
+import { enrichNetworkWithLiveSectorMetrics } from "@/lib/server/liveNetworkMetrics";
 import type {
   CategoryDef,
   NetworkProfile,
@@ -212,7 +213,9 @@ export async function getApprovedNetworks(): Promise<NetworkProfile[]> {
 
 export async function getApprovedNetworkBySlug(slug: string): Promise<NetworkProfile | null> {
   const networks = await loadEnrichedNetworks();
-  return networks.find((p) => p.slug === slug) ?? null;
+  const profile = networks.find((p) => p.slug === slug) ?? null;
+  if (!profile) return null;
+  return enrichNetworkWithLiveSectorMetrics(profile);
 }
 
 /**

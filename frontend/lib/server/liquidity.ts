@@ -1,7 +1,7 @@
 import "server-only";
 
 import { fetchMarketData } from "@/lib/server/coingecko";
-import { fetchLlamaFeesRevenue, fetchLlamaProtocolMeta } from "@/lib/server/defillama";
+import { fetchLlamaDexVolume, fetchLlamaFeesRevenue, fetchLlamaProtocolMeta } from "@/lib/server/defillama";
 import { nowIso, sleep } from "@/lib/server/http";
 import type { LiquiditySeed } from "@/data/liquidity-seed";
 import type { LiquidityMetrics, ProtocolFeesRevenue, Sourced } from "@/lib/types";
@@ -78,6 +78,18 @@ export async function collectLiquidityMetrics(seed: LiquiditySeed): Promise<Liqu
     }
     const fees = await fetchLlamaFeesRevenue(seed.slug);
     if (fees) metrics.feesRevenue = mapFeesRevenue(fees);
+
+    if (seed.subSector === "Pools") {
+      const dexVol = await fetchLlamaDexVolume(seed.slug);
+      if (dexVol?.volume24hUsd != null) {
+        metrics.volume24hUsd = sourced(dexVol.volume24hUsd, "DeFi Llama");
+      }
+      const tvl = metrics.tvlUsd?.value;
+      const fees24h = fees?.fees24hUsd;
+      if (tvl != null && tvl > 0 && fees24h != null && fees24h > 0) {
+        metrics.feeAprPct = sourced((fees24h / tvl) * 365 * 100, "Derived", "derived");
+      }
+    }
   }
 
   // 3. CoinGecko token market (price + market cap). Tokenless seeds skip this.

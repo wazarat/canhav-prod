@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 
 import { NetworkTable } from "@/components/networks/NetworkTable";
-import type { NetworkProfile, MemberCoinCategory } from "@/lib/types";
+import { StatCard } from "@/components/ui/StatCard";
+import type { NetworkProfile, MemberCoinCategory, SectorAggregate } from "@/lib/types";
 import {
   filterTagsForSector,
   isNonEvmRwa,
@@ -12,7 +13,7 @@ import {
   sectorFilterTagOptions,
   tagsForSector,
 } from "@/lib/networkTaxonomy";
-import { cn } from "@/lib/utils";
+import { cn, formatUsdCompact } from "@/lib/utils";
 
 const CATEGORY_FILTERS: { label: string; value: MemberCoinCategory | "all" }[] = [
   { label: "All", value: "all" },
@@ -23,12 +24,14 @@ const CATEGORY_FILTERS: { label: string; value: MemberCoinCategory | "all" }[] =
 
 interface NetworkTableWithFilterProps {
   profiles: NetworkProfile[];
+  sectorAggregates?: SectorAggregate[];
   showStatus?: boolean;
   emptyHint?: string;
 }
 
 export function NetworkTableWithFilter({
   profiles,
+  sectorAggregates = [],
   showStatus = false,
   emptyHint,
 }: NetworkTableWithFilterProps) {
@@ -100,6 +103,11 @@ export function NetworkTableWithFilter({
       return matchesQuery && matchesCategory && matchesSector && matchesTag && matchesEvm;
     });
   }, [profiles, query, category, sector, tagFilter, includeNonEvm]);
+
+  const activeSectorAggregate = useMemo(() => {
+    if (sector === "all") return null;
+    return sectorAggregates.find((a) => a.sector === sector) ?? null;
+  }, [sector, sectorAggregates]);
 
   return (
     <div className="space-y-4">
@@ -209,6 +217,55 @@ export function NetworkTableWithFilter({
             </div>
           )}
         </div>
+      )}
+
+      {activeSectorAggregate && (
+        <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <StatCard
+            label="Sector TVL"
+            value={formatUsdCompact(activeSectorAggregate.totalTvlUsd.value)}
+            hint={`${activeSectorAggregate.protocolCount.value ?? "—"} protocols`}
+            source={activeSectorAggregate.totalTvlUsd.sourceLabel}
+          />
+          <StatCard
+            label="DeFi dominance"
+            value={
+              activeSectorAggregate.dominancePct.value != null
+                ? `${activeSectorAggregate.dominancePct.value.toFixed(1)}%`
+                : "—"
+            }
+            hint="Share of total DeFi TVL"
+            source={activeSectorAggregate.dominancePct.sourceLabel}
+          />
+          {activeSectorAggregate.sector === "Liquidity" && (
+            <StatCard
+              label="DEX volume (24h)"
+              value={formatUsdCompact(activeSectorAggregate.dexVolume24hUsd?.value ?? null)}
+              hint="Sector-wide"
+              source={activeSectorAggregate.dexVolume24hUsd?.sourceLabel ?? "DeFi Llama"}
+            />
+          )}
+          {activeSectorAggregate.sector === "Credit" && (
+            <StatCard
+              label="Utilization"
+              value={
+                activeSectorAggregate.utilizationPct?.value != null
+                  ? `${activeSectorAggregate.utilizationPct.value.toFixed(1)}%`
+                  : "—"
+              }
+              hint="Borrowed / supplied"
+              source={activeSectorAggregate.utilizationPct?.sourceLabel ?? "Derived"}
+            />
+          )}
+          {activeSectorAggregate.sector === "Derivatives" && (
+            <StatCard
+              label="Open interest"
+              value={formatUsdCompact(activeSectorAggregate.totalOpenInterestUsd?.value ?? null)}
+              hint="Perp OI aggregate"
+              source={activeSectorAggregate.totalOpenInterestUsd?.sourceLabel ?? "DeFi Llama"}
+            />
+          )}
+        </section>
       )}
 
       {hasNonEvmRwa && (sector === "all" || sector === "RWA") && (

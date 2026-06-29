@@ -12,10 +12,8 @@ underlyingProtocols, governance) stay curated/null until per-protocol indexers
 are wired.
 
 Resolver ids (llamaSlug / coingeckoId) live in frontend/data/liquidity-seed.ts
-and the cron maps (LLAMA_PROTOCOL_SLUGS / NETWORK_COINGECKO_IDS). The five
-in-platform DEX venues (Curve, Uniswap, Balancer, Aerodrome, PancakeSwap) are
-handled as `extend-existing` in ingest_entities.py (primary DEX + secondary
-Liquidity/Pools) and are intentionally NOT duplicated here.
+and the cron maps (LLAMA_PROTOCOL_SLUGS / NETWORK_COINGECKO_IDS). The five in-platform DEX venues (Curve, Uniswap, Balancer, Aerodrome, PancakeSwap)
+are exclusive Liquidity / Pools entities in liquidity_specs.py (no DEX cross-tag).
 
 Curated prose below is concise, factual protocol description; numeric / Tier-2
 curated fields are left null pending research authoring.
@@ -90,13 +88,21 @@ def _net(
     github: Optional[str] = None,
     competitors: Optional[List[Dict[str, Any]]] = None,
     scale_labels: Optional[Dict[str, str]] = None,
+    audit_history: Optional[str] = None,
+    deployment_notes: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Build a Liquidity-network spec with the editorial defaults
     `build_entity_item` expects. `liquidity` holds the curated Tier-2 block; the
     cron overlays Tier-1 live fields (tvlUsd, token price/mcap, fees, share)."""
     liquidity: Dict[str, Any] = {
-        "deployment": {"chains": chains, "evmCompatible": "yes"},
+        "deployment": {
+            "chains": chains,
+            "evmCompatible": "yes",
+            **({"notes": deployment_notes} if deployment_notes else {}),
+        },
     }
+    if audit_history:
+        liquidity["auditHistory"] = audit_history
     if underlying_protocols:
         liquidity["underlyingProtocols"] = underlying_protocols
 
@@ -138,7 +144,143 @@ def _net(
 
 
 LIQUIDITY_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
-    # ------------------------------- POOLS ----------------------------------
+    # ---------------- POOLS (major AMM venues — exclusive Liquidity / Pools) ---
+    "uniswap": _net(
+        name="Uniswap",
+        symbol="UNI",
+        tagline="The AMM pioneer and largest spot DEX by volume.",
+        description=(
+            "Uniswap is the leading automated market maker. V3 introduced "
+            "concentrated-liquidity ranges; V4 introduced 'hooks' that let pools "
+            "embed custom logic (TWAMM, dynamic fees, on-chain limit orders) "
+            "without forking the core contract."
+        ),
+        differentiator=(
+            "Largest spot DEX by volume; V4 hooks make pools programmable, and "
+            "UniswapX delivers intent-based, cross-chain routing. Runs its own L2 (Unichain)."
+        ),
+        liquidity_sub_sector="Pools",
+        liquidity_secondary_tags=["Concentrated-Liquidity", "Multi-Chain"],
+        chains=[
+            "Ethereum", "Base", "Arbitrum", "Optimism", "Polygon", "BNB Chain",
+            "Avalanche", "Blast", "Celo", "ZKsync", "Worldchain", "Unichain",
+        ],
+        official_docs="https://docs.uniswap.org",
+        website="https://uniswap.org",
+        twitter="https://x.com/Uniswap",
+        github="https://github.com/Uniswap",
+        audit_history="Trail of Bits, ABDK Consulting, ChainSecurity (V3 + V4).",
+        deployment_notes="Native on 12+ EVM chains; Unichain is Uniswap's own L2.",
+        member_coins=[
+            _coin("uni", "Uniswap", "UNI", "Governance token (UNI staking incoming)"),
+        ],
+    ),
+    "curve-finance": _net(
+        name="Curve Finance",
+        symbol="CRV",
+        tagline="Stableswap AMM optimized for like-pegged assets.",
+        description=(
+            "Curve's stableswap invariant is optimized for trades between "
+            "like-pegged assets (stablecoins, LSTs). It pioneered vote-escrow "
+            "tokenomics where governance power is bought with locked CRV (veCRV)."
+        ),
+        differentiator=(
+            "Stableswap invariant gives minimal slippage on like-pegged trades; "
+            "veCRV bribe markets (Convex/Votium) steer emissions."
+        ),
+        liquidity_sub_sector="Pools",
+        liquidity_secondary_tags=["Stable-Pools", "ve-Tokenomics", "Multi-Chain"],
+        chains=[
+            "Ethereum", "Arbitrum", "Optimism", "Polygon", "Base", "BNB Chain",
+            "Avalanche", "Fantom", "Gnosis", "ZKsync", "Fraxtal", "Sonic",
+        ],
+        official_docs="https://docs.curve.fi",
+        website="https://curve.fi",
+        twitter="https://x.com/CurveFinance",
+        github="https://github.com/curvefi",
+        audit_history="Trail of Bits, MixBytes, ChainSecurity (multi-round).",
+        deployment_notes="Multi-chain stableswap pools; crvUSD is a separate entity.",
+        member_coins=[
+            _coin("crv", "Curve DAO Token", "CRV", "Governance token (vote-escrow via veCRV)"),
+        ],
+    ),
+    "balancer": _net(
+        name="Balancer",
+        symbol="BAL",
+        tagline="Generalized weighted-pool AMM.",
+        description=(
+            "Balancer is a generalized AMM supporting up to 8 assets per pool with "
+            "arbitrary weights (not just 50/50), used for index-style pools and "
+            "structured liquidity. V3 (2024+) added hooks."
+        ),
+        differentiator=(
+            "Arbitrary-weight, multi-asset pools enable index-style and boosted "
+            "liquidity; Composable Stable Pools and V3 hooks extend programmability."
+        ),
+        liquidity_sub_sector="Pools",
+        liquidity_secondary_tags=["Stable-Pools", "ve-Tokenomics"],
+        chains=["Ethereum", "Arbitrum", "Polygon", "Optimism", "Base", "Avalanche", "Gnosis", "ZKsync"],
+        official_docs="https://docs.balancer.fi",
+        website="https://balancer.fi",
+        twitter="https://x.com/Balancer",
+        github="https://github.com/balancer",
+        audit_history="Trail of Bits, OpenZeppelin, Certora.",
+        deployment_notes="Weighted, Composable Stable, and Boosted pools; V3 with hooks.",
+        member_coins=[
+            _coin("bal", "Balancer", "BAL", "Governance token (veBAL: 80/20 BAL/WETH lock)"),
+        ],
+    ),
+    "aerodrome": _net(
+        name="Aerodrome Finance",
+        symbol="AERO",
+        tagline="The dominant ve(3,3) DEX on Base.",
+        description=(
+            "Aerodrome is a Solidly-fork ve(3,3) DEX on Base, the dominant venue on "
+            "the Coinbase L2 by volume. It captures emissions-driven sticky "
+            "liquidity and offers Slipstream concentrated liquidity."
+        ),
+        differentiator=(
+            "Vote-escrow emissions + bribe markets direct liquidity; Slipstream "
+            "adds a CLMM atop the ve(3,3) base. Dominant DEX on Base."
+        ),
+        liquidity_sub_sector="Pools",
+        liquidity_secondary_tags=["Concentrated-Liquidity", "ve-Tokenomics"],
+        chains=["Base", "Optimism"],
+        official_docs="https://docs.aerodrome.finance",
+        website="https://aerodrome.finance",
+        twitter="https://x.com/aerodromefi",
+        audit_history="Spearbit, code4rena contests.",
+        deployment_notes="Base-native; Optimism via Superchain merger with Velodrome.",
+        member_coins=[
+            _coin("aero", "Aerodrome", "AERO", "Governance token (veAERO lock NFT)"),
+        ],
+    ),
+    "pancakeswap": _net(
+        name="PancakeSwap",
+        symbol="CAKE",
+        tagline="The dominant DEX in the Binance ecosystem.",
+        description=(
+            "PancakeSwap is the dominant DEX in the BNB ecosystem — retail-focused "
+            "with gamification (lotteries, predictions, NFTs) plus its Infinity CLMM."
+        ),
+        differentiator=(
+            "Retail-first BNB DEX with v3 CLMM, Infinity (hook-like router), "
+            "and an IFO launchpad."
+        ),
+        liquidity_sub_sector="Pools",
+        liquidity_secondary_tags=["Concentrated-Liquidity", "Multi-Chain"],
+        chains=["BNB Chain", "Ethereum", "Arbitrum", "Base", "Polygon zkEVM", "Linea", "opBNB", "ZKsync", "Aptos"],
+        official_docs="https://docs.pancakeswap.finance",
+        website="https://pancakeswap.finance",
+        twitter="https://x.com/PancakeSwap",
+        github="https://github.com/pancakeswap",
+        audit_history="Certik, PeckShield (multi-round).",
+        deployment_notes="BNB-primary; v3 CLMM + Infinity router; Aptos (non-EVM).",
+        member_coins=[
+            _coin("cake", "PancakeSwap", "CAKE", "Governance + utility token"),
+        ],
+    ),
+    # ---------------- POOLS (LP strategy managers) -----------------------------
     "gamma": _net(
         name="Gamma",
         symbol="GAMMA",

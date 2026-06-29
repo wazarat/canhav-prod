@@ -96,6 +96,30 @@ export function NetworkUniversalCard({ universal, id = "universal" }: NetworkUni
             display={formatUsdCompact(tvl.tvlUsd.value)}
             field={tvl.tvlUsd}
           />
+          {universal.treasuryUsd && (
+            <MetricRow
+              label="Treasury"
+              display={formatUsdCompact(universal.treasuryUsd.value)}
+              field={universal.treasuryUsd}
+            />
+          )}
+          {identity.raises && identity.raises.value.length > 0 && (
+            <MetricRow
+              label="Funding rounds"
+              display={`${identity.raises.value.length}${
+                identity.raises.value[0]?.round ? ` · latest: ${identity.raises.value[0].round}` : ""
+              }`}
+              field={identity.raises}
+            />
+          )}
+          {identity.governanceIds && identity.governanceIds.value.length > 0 && (
+            <MetricRow
+              label="Governance IDs"
+              display={identity.governanceIds.value.slice(0, 2).join(", ")}
+              field={identity.governanceIds}
+            />
+          )}
+          <p className="py-2 text-xs uppercase tracking-wide text-ink-500">Token market (secondary)</p>
           <MetricRow
             label="Market cap"
             display={formatUsdCompact(market.marketCapUsd.value)}

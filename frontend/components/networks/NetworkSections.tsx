@@ -8,15 +8,18 @@ import type {
   Competitor,
   CreditTag,
   CreditTagMetrics,
+  DerivativesMetrics,
   DexMetrics,
   DexSubSectorMetrics,
   LendingMetrics,
+  LiquidityMetrics,
   MemberCoinRef,
   NetworkComponent,
   NetworkEvent,
   NetworkRisk,
   OpenInterest,
   OptionsVolume,
+  OtherMetrics,
   FaqItem,
   InvestmentRound,
   OrgUnit,
@@ -1494,6 +1497,212 @@ export function StakingMetricsSection({ staking }: { staking?: StakingMetrics | 
             />
           )}
           {dep?.notes && <CuratedRow label="Deployment notes" text={dep.notes} />}
+        </div>
+      </DataPanel>
+    </section>
+  );
+}
+
+export function LiquidityMetricsSection({ liquidity }: { liquidity?: LiquidityMetrics | null }) {
+  if (!liquidity) return null;
+  const tvlChange = liquidity.tvlChangePct;
+  const fees = liquidity.feesRevenue;
+  const dep = liquidity.deployment;
+  const hasLive =
+    liquidity.tvlUsd ||
+    liquidity.volume24hUsd ||
+    fees?.fees24hUsd != null ||
+    liquidity.tokenPriceUsd;
+  return (
+    <section id="liquidity" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Liquidity metrics"
+        subtitle="Live pool/vault TVL, DEX volume, and fees (DeFi Llama) plus curated pool facts."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <MetricTile label="Protocol TVL" sourced={liquidity.tvlUsd} kind="usd" />
+        <MetricTile label="24h volume" sourced={liquidity.volume24hUsd} kind="usd" />
+        <PlainTile
+          label="Fees (24h)"
+          value={fees?.fees24hUsd != null ? fmtUsd(fees.fees24hUsd) : "—"}
+          hint="DeFi Llama"
+        />
+        <PlainTile
+          label="Revenue (24h)"
+          value={fees?.revenue24hUsd != null ? fmtUsd(fees.revenue24hUsd) : "—"}
+          hint="DeFi Llama"
+        />
+        <MetricTile label="Fee APR" sourced={liquidity.feeAprPct} kind="pct" />
+        <MetricTile label="Token price" sourced={liquidity.tokenPriceUsd} kind="usd" />
+        <MetricTile label="Market cap" sourced={liquidity.marketCapUsd} kind="usd" />
+        <PlainTile
+          label="Market share"
+          value={liquidity.marketSharePct != null ? fmtPct(liquidity.marketSharePct) : "—"}
+          hint="Derived (within sub-sector)"
+        />
+        <PlainTile
+          label="TVL change (1d / 7d)"
+          value={
+            tvlChange && (tvlChange.d1 != null || tvlChange.d7 != null)
+              ? `${fmtPct(tvlChange.d1)} / ${fmtPct(tvlChange.d7)}`
+              : "—"
+          }
+          hint="DeFi Llama"
+        />
+        <MetricTile label="Pool count" sourced={liquidity.poolCount} kind="count" />
+        <MetricTile label="Vault count" sourced={liquidity.vaultCount} kind="count" />
+        <MetricTile label="Avg vault APY" sourced={liquidity.avgVaultApyPct} kind="pct" />
+      </div>
+      {!hasLive && (
+        <p className="text-xs text-ink-500">
+          Live liquidity metrics populate on the next DeFi Llama + CoinGecko refresh.
+        </p>
+      )}
+      <DataPanel title="Pools, deployment & governance">
+        <div className="divide-y divide-ink-800/60">
+          {liquidity.topPools && liquidity.topPools.length > 0 && (
+            <CuratedRow
+              label="Top pools"
+              chips={liquidity.topPools.map((p) =>
+                p.tvlUsd != null ? `${p.name} · ${fmtUsd(p.tvlUsd)}` : p.name,
+              )}
+            />
+          )}
+          {liquidity.underlyingProtocols && liquidity.underlyingProtocols.length > 0 && (
+            <CuratedRow label="Underlying protocols" chips={liquidity.underlyingProtocols} />
+          )}
+          <CuratedRow label="Audit / exploit history" text={liquidity.auditHistory} />
+          {dep && (
+            <CuratedRow
+              label={`Chains${dep.evmCompatible ? ` · EVM: ${dep.evmCompatible}` : ""}`}
+              chips={dep.chains}
+            />
+          )}
+          {dep?.notes && <CuratedRow label="Deployment notes" text={dep.notes} />}
+        </div>
+      </DataPanel>
+    </section>
+  );
+}
+
+export function DerivativesMetricsSection({
+  derivatives,
+}: {
+  derivatives?: DerivativesMetrics | null;
+}) {
+  if (!derivatives) return null;
+  const tvlChange = derivatives.tvlChangePct;
+  const fees = derivatives.feesRevenue;
+  const dep = derivatives.deployment;
+  return (
+    <section id="derivatives" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Derivatives metrics"
+        subtitle="Live open interest, volume, and fees (DeFi Llama) plus curated perp/vault facts."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <MetricTile label="Protocol TVL" sourced={derivatives.tvlUsd} kind="usd" />
+        <MetricTile label="Open interest" sourced={derivatives.openInterestUsd} kind="usd" />
+        <MetricTile label="24h volume" sourced={derivatives.volume24hUsd} kind="usd" />
+        <PlainTile
+          label="Fees (24h)"
+          value={fees?.fees24hUsd != null ? fmtUsd(fees.fees24hUsd) : "—"}
+          hint="DeFi Llama"
+        />
+        <MetricTile label="Token price" sourced={derivatives.tokenPriceUsd} kind="usd" />
+        <MetricTile label="Market cap" sourced={derivatives.marketCapUsd} kind="usd" />
+        <PlainTile
+          label="TVL change (1d / 7d)"
+          value={
+            tvlChange && (tvlChange.d1 != null || tvlChange.d7 != null)
+              ? `${fmtPct(tvlChange.d1)} / ${fmtPct(tvlChange.d7)}`
+              : "—"
+          }
+          hint="DeFi Llama"
+        />
+        {derivatives.maxLeverageX != null && (
+          <PlainTile label="Max leverage" value={`${derivatives.maxLeverageX}x`} hint="Curated" />
+        )}
+        <MetricTile label="Vault APY" sourced={derivatives.vaultApyPct} kind="pct" />
+        <MetricTile label="Funding rate" sourced={derivatives.fundingRatePct} kind="pct" />
+      </div>
+      <DataPanel title="Markets & deployment">
+        <div className="divide-y divide-ink-800/60">
+          {derivatives.supportedMarkets && derivatives.supportedMarkets.length > 0 && (
+            <CuratedRow label="Supported markets" chips={derivatives.supportedMarkets} />
+          )}
+          <CuratedRow label="Pricing model" text={derivatives.pricingModel} />
+          {derivatives.vaultStrategies && derivatives.vaultStrategies.length > 0 && (
+            <CuratedRow label="Vault strategies" chips={derivatives.vaultStrategies} />
+          )}
+          {derivatives.hedgeVenue && derivatives.hedgeVenue.length > 0 && (
+            <CuratedRow label="Hedge venues" chips={derivatives.hedgeVenue} />
+          )}
+          <CuratedRow label="Audit / exploit history" text={derivatives.auditHistory} />
+          {dep && (
+            <CuratedRow
+              label={`Chains${dep.evmCompatible ? ` · EVM: ${dep.evmCompatible}` : ""}`}
+              chips={dep.chains}
+            />
+          )}
+        </div>
+      </DataPanel>
+    </section>
+  );
+}
+
+export function OtherMetricsSection({ other }: { other?: OtherMetrics | null }) {
+  if (!other) return null;
+  const tvlChange = other.tvlChangePct;
+  const fees = other.feesRevenue;
+  const dep = other.deployment;
+  return (
+    <section id="other" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Other sector metrics"
+        subtitle="Live capital pool / treasury data (DeFi Llama) plus curated underwriting and governance facts."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <MetricTile label="Protocol TVL" sourced={other.tvlUsd} kind="usd" />
+        <MetricTile label="Treasury" sourced={other.treasuryUsd} kind="usd" />
+        <PlainTile
+          label="Fees (24h)"
+          value={fees?.fees24hUsd != null ? fmtUsd(fees.fees24hUsd) : "—"}
+          hint="DeFi Llama"
+        />
+        <MetricTile label="Token price" sourced={other.tokenPriceUsd} kind="usd" />
+        <MetricTile label="Market cap" sourced={other.marketCapUsd} kind="usd" />
+        <MetricTile label="Active cover" sourced={other.activeCoverUsd} kind="usd" />
+        <MetricTile label="Capital pool" sourced={other.capitalPoolUsd} kind="usd" />
+        <MetricTile label="Claims paid" sourced={other.claimsPaidUsd} kind="usd" />
+        <MetricTile label="Bribe volume" sourced={other.bribeVolumeUsd} kind="usd" />
+        <PlainTile
+          label="TVL change (1d / 7d)"
+          value={
+            tvlChange && (tvlChange.d1 != null || tvlChange.d7 != null)
+              ? `${fmtPct(tvlChange.d1)} / ${fmtPct(tvlChange.d7)}`
+              : "—"
+          }
+          hint="DeFi Llama"
+        />
+      </div>
+      <DataPanel title="Underwriting & governance">
+        <div className="divide-y divide-ink-800/60">
+          <CuratedRow label="Cover model" text={other.coverModel} />
+          {other.coveredProtocols && other.coveredProtocols.length > 0 && (
+            <CuratedRow label="Covered protocols" chips={other.coveredProtocols} />
+          )}
+          <CuratedRow label="Voting power controlled" text={other.votingPowerControlled} />
+          {other.targetProtocols && other.targetProtocols.length > 0 && (
+            <CuratedRow label="Target protocols" chips={other.targetProtocols} />
+          )}
+          <CuratedRow label="Audit / exploit history" text={other.auditHistory} />
+          {dep && (
+            <CuratedRow
+              label={`Chains${dep.evmCompatible ? ` · EVM: ${dep.evmCompatible}` : ""}`}
+              chips={dep.chains}
+            />
+          )}
         </div>
       </DataPanel>
     </section>

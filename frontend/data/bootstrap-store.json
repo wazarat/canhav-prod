@@ -3,7 +3,7 @@
     "backend": "local",
     "count": 278,
     "table": "canhav-research",
-    "updatedAt": "2026-06-27T17:56:30.515Z"
+    "updatedAt": "2026-06-29T15:30:59Z"
   },
   "items": {
     "CATEGORY#Entity|PROTOCOL#aave": {
@@ -496,7 +496,7 @@
       ],
       "Twitter": "https://twitter.com/aaveaave",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Entity|PROTOCOL#aerodrome": {
@@ -511,23 +511,14 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/aerodrome",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
       "Audits": null,
       "Category": "Entity",
       "ChildEntities": null,
-      "Competitors": [
-        {
-          "differences": "Uniswap is the deepest multi-chain AMM with concentrated liquidity (V3) and customizable pools via hooks (V4).",
-          "name": "Uniswap",
-          "positioning": "The largest spot DEX by volume.",
-          "rank": 1,
-          "similarities": "Both let users swap tokens against on-chain liquidity without an intermediary.",
-          "slug": "uniswap"
-        }
-      ],
+      "Competitors": [],
       "Components": [
         {
           "description": "Aerodrome is a Solidly-fork ve(3,3) DEX on Base, the dominant venue on the Coinbase L2 by volume. It captures emissions-driven sticky liquidity and offers Slipstream concentrated liquidity.",
@@ -542,53 +533,16 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 310000000,
+        "tvlUsd": null,
         "users": 290000
       },
       "Derivatives": null,
       "DerivativesSecondaryTags": null,
       "DerivativesSubSector": null,
       "Description": "Aerodrome is a Solidly-fork ve(3,3) DEX on Base, the dominant venue on the Coinbase L2 by volume. It captures emissions-driven sticky liquidity and offers Slipstream concentrated liquidity.",
-      "Dex": {
-        "auditHistory": "Spearbit, code4rena contests.",
-        "deployment": {
-          "chains": [
-            "Base",
-            "Optimism"
-          ],
-          "evmCompatible": "yes",
-          "notes": "Base-native; Optimism via Superchain merger with Velodrome."
-        },
-        "governanceToken": "AERO",
-        "subSectorMetrics": {
-          "feeTierStructure": "0.02% to 0.05% (variable per pool)",
-          "kind": "amm",
-          "pools": {
-            "dataSource": "derived",
-            "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-            "updatedAt": null,
-            "value": null
-          }
-        },
-        "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 310000000
-        },
-        "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": null
-        }
-      },
-      "DexSecondaryTags": [
-        "Spot",
-        "L2-Native",
-        "veTokenomics"
-      ],
-      "DexSubSector": "ve(3,3)",
+      "Dex": null,
+      "DexSecondaryTags": null,
+      "DexSubSector": null,
       "Differentiator": "Vote-escrow emissions + bribe markets direct liquidity; Slipstream adds a CLMM atop the ve(3,3) base. Dominant DEX on Base.",
       "Discord": null,
       "Events": [],
@@ -602,7 +556,17 @@
       "GitHub": null,
       "InvestmentRounds": [],
       "Lending": null,
-      "Liquidity": null,
+      "Liquidity": {
+        "auditHistory": "Spearbit, code4rena contests.",
+        "deployment": {
+          "chains": [
+            "Base",
+            "Optimism"
+          ],
+          "evmCompatible": "yes",
+          "notes": "Base-native; Optimism via Superchain merger with Velodrome."
+        }
+      },
       "LiquiditySecondaryTags": [
         "Concentrated-Liquidity",
         "ve-Tokenomics"
@@ -621,18 +585,7 @@
         }
       ],
       "Name": "Aerodrome Finance",
-      "OffchainFacts": [
-        {
-          "capturedAt": "2026-06-18",
-          "freshness": "static",
-          "key": "auditFirms",
-          "source": {
-            "label": "Aerodrome Finance",
-            "url": "https://docs.aerodrome.finance"
-          },
-          "value": "Spearbit, code4rena contests."
-        }
-      ],
+      "OffchainFacts": null,
       "OfficialDocs": "https://docs.aerodrome.finance",
       "OrgStructure": [],
       "Other": null,
@@ -662,9 +615,7 @@
       "ScaleLabels": {
         "tvl": "Protocol TVL"
       },
-      "SecondarySectors": [
-        "DEX"
-      ],
+      "SecondarySectors": null,
       "Sector": "Liquidity",
       "Slug": "aerodrome",
       "Sources": null,
@@ -685,7 +636,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/aerodromefi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://aerodrome.finance"
     },
     "CATEGORY#Entity|PROTOCOL#aevo": {
@@ -699,7 +650,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/aevo-perps",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -825,7 +776,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/aevoxyz",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.aevo.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#agora": {
@@ -843,7 +794,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/39259/small/agUSD.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1027,7 +978,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/withAUSD",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://www.agora.finance"
     },
     "CATEGORY#Entity|PROTOCOL#ankr": {
@@ -1041,7 +992,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/ankr",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1160,7 +1111,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ankr",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.ankr.com"
     },
     "CATEGORY#Entity|PROTOCOL#anzen": {
@@ -1175,7 +1126,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/38039/small/usdz-image-200x200.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1361,7 +1312,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/AnzenFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://www.anzen.finance"
     },
     "CATEGORY#Entity|PROTOCOL#arcton": {
@@ -1373,7 +1324,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/arcton-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1508,7 +1459,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://arcton.com"
     },
     "CATEGORY#Entity|PROTOCOL#arrakis": {
@@ -1526,7 +1477,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/arrakis-modular",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1646,7 +1597,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ArrakisFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://arrakis.finance"
     },
     "CATEGORY#Entity|PROTOCOL#aryze": {
@@ -1658,7 +1609,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/aryze-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1793,7 +1744,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://aryze.io"
     },
     "CATEGORY#Entity|PROTOCOL#atmosphera": {
@@ -1805,7 +1756,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/atmosphera-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -1938,7 +1889,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://atmosphera.com"
     },
     "CATEGORY#Entity|PROTOCOL#aura": {
@@ -1957,7 +1908,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/aura",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2106,7 +2057,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/aurafinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://aura.finance"
     },
     "CATEGORY#Entity|PROTOCOL#balancer": {
@@ -2127,23 +2078,14 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/balancer",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
       "Audits": null,
       "Category": "Entity",
       "ChildEntities": null,
-      "Competitors": [
-        {
-          "differences": "Uniswap is the deepest multi-chain AMM with concentrated liquidity (V3) and customizable pools via hooks (V4).",
-          "name": "Uniswap",
-          "positioning": "The largest spot DEX by volume.",
-          "rank": 1,
-          "similarities": "Both let users swap tokens against on-chain liquidity without an intermediary.",
-          "slug": "uniswap"
-        }
-      ],
+      "Competitors": [],
       "Components": [
         {
           "description": "Balancer is a generalized AMM supporting up to 8 assets per pool with arbitrary weights (not just 50/50), used for index-style pools and structured liquidity. V3 (2024+) added hooks.",
@@ -2158,57 +2100,16 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 136000000,
+        "tvlUsd": null,
         "users": 380000
       },
       "Derivatives": null,
       "DerivativesSecondaryTags": null,
       "DerivativesSubSector": null,
       "Description": "Balancer is a generalized AMM supporting up to 8 assets per pool with arbitrary weights (not just 50/50), used for index-style pools and structured liquidity. V3 (2024+) added hooks.",
-      "Dex": {
-        "auditHistory": "Trail of Bits, OpenZeppelin, Certora.",
-        "deployment": {
-          "chains": [
-            "Ethereum",
-            "Arbitrum",
-            "Polygon",
-            "Optimism",
-            "Base",
-            "+3 more"
-          ],
-          "evmCompatible": "yes",
-          "notes": "Weighted, Composable Stable, and Boosted pools; V3 with hooks."
-        },
-        "governanceToken": "BAL",
-        "subSectorMetrics": {
-          "feeTierStructure": "0.01% to 10% (pool-creator set)",
-          "kind": "amm",
-          "pools": {
-            "dataSource": "derived",
-            "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-            "updatedAt": null,
-            "value": null
-          }
-        },
-        "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 136000000
-        },
-        "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": null
-        }
-      },
-      "DexSecondaryTags": [
-        "Spot",
-        "Multi-Chain",
-        "veTokenomics"
-      ],
-      "DexSubSector": "AMM",
+      "Dex": null,
+      "DexSecondaryTags": null,
+      "DexSubSector": null,
       "Differentiator": "Arbitrary-weight, multi-asset pools enable index-style and boosted liquidity; Composable Stable Pools and V3 hooks extend programmability.",
       "Discord": null,
       "Events": [],
@@ -2222,7 +2123,23 @@
       "GitHub": "https://github.com/balancer",
       "InvestmentRounds": [],
       "Lending": null,
-      "Liquidity": null,
+      "Liquidity": {
+        "auditHistory": "Trail of Bits, OpenZeppelin, Certora.",
+        "deployment": {
+          "chains": [
+            "Ethereum",
+            "Arbitrum",
+            "Polygon",
+            "Optimism",
+            "Base",
+            "Avalanche",
+            "Gnosis",
+            "ZKsync"
+          ],
+          "evmCompatible": "yes",
+          "notes": "Weighted, Composable Stable, and Boosted pools; V3 with hooks."
+        }
+      },
       "LiquiditySecondaryTags": [
         "Stable-Pools",
         "ve-Tokenomics"
@@ -2241,18 +2158,7 @@
         }
       ],
       "Name": "Balancer",
-      "OffchainFacts": [
-        {
-          "capturedAt": "2026-06-18",
-          "freshness": "static",
-          "key": "auditFirms",
-          "source": {
-            "label": "Balancer",
-            "url": "https://docs.balancer.fi"
-          },
-          "value": "Trail of Bits, OpenZeppelin, Certora."
-        }
-      ],
+      "OffchainFacts": null,
       "OfficialDocs": "https://docs.balancer.fi",
       "OrgStructure": [],
       "Other": null,
@@ -2282,9 +2188,7 @@
       "ScaleLabels": {
         "tvl": "Protocol TVL"
       },
-      "SecondarySectors": [
-        "DEX"
-      ],
+      "SecondarySectors": null,
       "Sector": "Liquidity",
       "Slug": "balancer",
       "Sources": null,
@@ -2305,7 +2209,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Balancer",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://balancer.fi"
     },
     "CATEGORY#Entity|PROTOCOL#bedrock": {
@@ -2319,7 +2223,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/bedrock-unieth",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2437,7 +2341,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Bedrock_DeFi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.bedrock.technology"
     },
     "CATEGORY#Entity|PROTOCOL#beefy": {
@@ -2457,7 +2361,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/beefy",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2591,7 +2495,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/beefyfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://beefy.com"
     },
     "CATEGORY#Entity|PROTOCOL#binance-wbeth": {
@@ -2606,7 +2510,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/binance-staked-eth",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2725,7 +2629,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/binance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://www.binance.com/en/wbeth"
     },
     "CATEGORY#Entity|PROTOCOL#bitget": {
@@ -2739,7 +2643,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/bitget-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -2912,7 +2816,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/bitgetglobal",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://www.bitget.com"
     },
     "CATEGORY#Entity|PROTOCOL#cap": {
@@ -2926,7 +2830,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/68272/small/cUSD_ab_500%C3%97500.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -3100,7 +3004,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/capmoney_",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://cap.app"
     },
     "CATEGORY#Entity|PROTOCOL#centrifuge": {
@@ -3119,7 +3023,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/centrifuge-protocol",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -3309,7 +3213,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/centrifuge",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://centrifuge.io"
     },
     "CATEGORY#Entity|PROTOCOL#chateau-capital": {
@@ -3321,7 +3225,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/chateau",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -3456,7 +3360,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://chateau.capital"
     },
     "CATEGORY#Entity|PROTOCOL#circle": {
@@ -3474,7 +3378,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/6319/small/USDC.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -3669,7 +3573,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/circle",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://www.circle.com"
     },
     "CATEGORY#Entity|PROTOCOL#clearpool": {
@@ -3692,7 +3596,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/clearpool",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -3882,7 +3786,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ClearpoolFin",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://clearpool.finance"
     },
     "CATEGORY#Entity|PROTOCOL#coinbase-cbeth": {
@@ -3897,7 +3801,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/coinbase-wrapped-staked-eth",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -4016,7 +3920,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/coinbase",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.coinbase.com/cbeth"
     },
     "CATEGORY#Entity|PROTOCOL#compound": {
@@ -4287,7 +4191,7 @@
       "TradFiComparison": [],
       "Twitter": "https://twitter.com/compoundfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://compound.finance"
     },
     "CATEGORY#Entity|PROTOCOL#convex-finance": {
@@ -4303,7 +4207,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/convex-finance",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -4450,7 +4354,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ConvexFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.convexfinance.com"
     },
     "CATEGORY#Entity|PROTOCOL#cozy-finance": {
@@ -4465,7 +4369,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/cozy-earn",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -4579,7 +4483,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/CozyFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://cozy.finance"
     },
     "CATEGORY#Entity|PROTOCOL#curve-finance": {
@@ -4604,26 +4508,17 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/curve",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
       "Audits": null,
       "Category": "Entity",
       "ChildEntities": null,
-      "Competitors": [
-        {
-          "differences": "Uniswap is the deepest multi-chain AMM with concentrated liquidity (V3) and customizable pools via hooks (V4).",
-          "name": "Uniswap",
-          "positioning": "The largest spot DEX by volume.",
-          "rank": 1,
-          "similarities": "Both let users swap tokens against on-chain liquidity without an intermediary.",
-          "slug": "uniswap"
-        }
-      ],
+      "Competitors": [],
       "Components": [
         {
-          "description": "Curve's stableswap invariant is optimized for trades between like-pegged assets (stablecoins, LSTs). It pioneered vote-escrow tokenomics where governance power is bought with locked CRV (veCRV) and runs its own crvUSD CDP stablecoin.",
+          "description": "Curve's stableswap invariant is optimized for trades between like-pegged assets (stablecoins, LSTs). It pioneered vote-escrow tokenomics where governance power is bought with locked CRV (veCRV).",
           "name": "Curve Finance core product"
         }
       ],
@@ -4635,14 +4530,30 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 1440000000,
+        "tvlUsd": null,
         "users": 850000
       },
       "Derivatives": null,
       "DerivativesSecondaryTags": null,
       "DerivativesSubSector": null,
-      "Description": "Curve's stableswap invariant is optimized for trades between like-pegged assets (stablecoins, LSTs). It pioneered vote-escrow tokenomics where governance power is bought with locked CRV (veCRV) and runs its own crvUSD CDP stablecoin.",
-      "Dex": {
+      "Description": "Curve's stableswap invariant is optimized for trades between like-pegged assets (stablecoins, LSTs). It pioneered vote-escrow tokenomics where governance power is bought with locked CRV (veCRV).",
+      "Dex": null,
+      "DexSecondaryTags": null,
+      "DexSubSector": null,
+      "Differentiator": "Stableswap invariant gives minimal slippage on like-pegged trades; veCRV bribe markets (Convex/Votium) steer emissions.",
+      "Discord": null,
+      "Events": [],
+      "Faq": [
+        {
+          "answer": "Curve's stableswap invariant is optimized for trades between like-pegged assets (stablecoins, LSTs). It pioneered vote-escrow tokenomics where governance power is bought with locked CRV (veCRV).",
+          "pinned": true,
+          "question": "What is Curve Finance?"
+        }
+      ],
+      "GitHub": "https://github.com/curvefi",
+      "InvestmentRounds": [],
+      "Lending": null,
+      "Liquidity": {
         "auditHistory": "Trail of Bits, MixBytes, ChainSecurity (multi-round).",
         "deployment": {
           "chains": [
@@ -4651,55 +4562,18 @@
             "Optimism",
             "Polygon",
             "Base",
-            "+7 more"
+            "BNB Chain",
+            "Avalanche",
+            "Fantom",
+            "Gnosis",
+            "ZKsync",
+            "Fraxtal",
+            "Sonic"
           ],
           "evmCompatible": "yes",
-          "notes": "crvUSD multi-chain; LLAMMA soft-liquidation CDP."
-        },
-        "governanceToken": "CRV",
-        "subSectorMetrics": {
-          "feeTierStructure": "0.04% (stableswap) to 0.40% (crypto pools)",
-          "kind": "amm",
-          "pools": {
-            "dataSource": "derived",
-            "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-            "updatedAt": null,
-            "value": null
-          }
-        },
-        "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 1440000000
-        },
-        "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": null
+          "notes": "Multi-chain stableswap pools; crvUSD is a separate entity."
         }
       },
-      "DexSecondaryTags": [
-        "Spot",
-        "Multi-Chain",
-        "veTokenomics"
-      ],
-      "DexSubSector": "Stableswap",
-      "Differentiator": "Stableswap invariant gives minimal slippage on like-pegged trades; veCRV bribe markets (Convex/Votium) steer emissions.",
-      "Discord": null,
-      "Events": [],
-      "Faq": [
-        {
-          "answer": "Curve's stableswap invariant is optimized for trades between like-pegged assets (stablecoins, LSTs). It pioneered vote-escrow tokenomics where governance power is bought with locked CRV (veCRV) and runs its own crvUSD CDP stablecoin.",
-          "pinned": true,
-          "question": "What is Curve Finance?"
-        }
-      ],
-      "GitHub": "https://github.com/curvefi",
-      "InvestmentRounds": [],
-      "Lending": null,
-      "Liquidity": null,
       "LiquiditySecondaryTags": [
         "Stable-Pools",
         "ve-Tokenomics",
@@ -4719,18 +4593,7 @@
         }
       ],
       "Name": "Curve Finance",
-      "OffchainFacts": [
-        {
-          "capturedAt": "2026-06-18",
-          "freshness": "static",
-          "key": "auditFirms",
-          "source": {
-            "label": "Curve Finance",
-            "url": "https://docs.curve.fi"
-          },
-          "value": "Trail of Bits, MixBytes, ChainSecurity (multi-round)."
-        }
-      ],
+      "OffchainFacts": null,
       "OfficialDocs": "https://docs.curve.fi",
       "OrgStructure": [],
       "Other": null,
@@ -4760,16 +4623,13 @@
       "ScaleLabels": {
         "tvl": "Protocol TVL"
       },
-      "SecondarySectors": [
-        "Stablecoin",
-        "DEX"
-      ],
+      "SecondarySectors": null,
       "Sector": "Liquidity",
       "Slug": "curve-finance",
       "Sources": null,
       "Stablecoin": null,
-      "StablecoinSecondaryTags": [],
-      "StablecoinSubSector": "Decentralized CDP",
+      "StablecoinSecondaryTags": null,
+      "StablecoinSubSector": null,
       "Staking": null,
       "StakingSecondaryTags": null,
       "StakingSubSector": null,
@@ -4784,7 +4644,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/CurveFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://curve.fi"
     },
     "CATEGORY#Entity|PROTOCOL#curve-stablecoin": {
@@ -4801,7 +4661,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/9638/small/CRVUSD.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5005,7 +4865,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/CurveFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://crvusd.curve.fi"
     },
     "CATEGORY#Entity|PROTOCOL#derive": {
@@ -5022,7 +4882,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/derive",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5151,7 +5011,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/derivexyz",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.derive.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#dinari": {
@@ -5163,7 +5023,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/dinari",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5299,7 +5159,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://dinari.com"
     },
     "CATEGORY#Entity|PROTOCOL#dopex": {
@@ -5313,7 +5173,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/stryke-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5429,7 +5289,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/dopex_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.dopex.io"
     },
     "CATEGORY#Entity|PROTOCOL#drift-protocol": {
@@ -5443,7 +5303,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/drift-trade",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5576,7 +5436,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/DriftProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://drift.trade"
     },
     "CATEGORY#Entity|PROTOCOL#dualmint": {
@@ -5588,7 +5448,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/dualmint-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5723,7 +5583,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://dualmint.com"
     },
     "CATEGORY#Entity|PROTOCOL#dydx": {
@@ -5738,7 +5598,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/dydx",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -5872,7 +5732,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/dYdX",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://dydx.exchange"
     },
     "CATEGORY#Entity|PROTOCOL#ease-org": {
@@ -5886,7 +5746,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/easedefi.org",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -6008,7 +5868,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/EaseDeFi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://ease.org"
     },
     "CATEGORY#Entity|PROTOCOL#eigenlayer": {
@@ -6022,7 +5882,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/eigencloud",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -6141,7 +6001,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/eigenlayer",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.eigencloud.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#elixir": {
@@ -6155,7 +6015,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/31099/small/deUSD.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -6340,7 +6200,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/elixir",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://www.elixir.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#estate-protocol": {
@@ -6352,7 +6212,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/estate-protocol",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -6488,7 +6348,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://estateprotocol.com"
     },
     "CATEGORY#Entity|PROTOCOL#ethena": {
@@ -6864,7 +6724,7 @@
       ],
       "Twitter": "https://x.com/ethena_labs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Entity|PROTOCOL#ether-fi": {
@@ -6878,7 +6738,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/ether.fi",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -6996,7 +6856,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ether_fi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.ether.fi"
     },
     "CATEGORY#Entity|PROTOCOL#extra-finance": {
@@ -7011,7 +6871,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/extra-finance",
+        "logoUrl": "https://icons.llamao.fi/icons/protocols/extra-finance-leverage-farming",
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7133,7 +6993,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/extrafi_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://extrafi.io"
     },
     "CATEGORY#Entity|PROTOCOL#falcon": {
@@ -7148,7 +7008,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/102173313/small/Falcon_Token_fUSD_Primary_200px.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7334,7 +7194,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/FalconStable",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://falcon.finance"
     },
     "CATEGORY#Entity|PROTOCOL#first-digital": {
@@ -7353,7 +7213,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/33062/small/FDUSD.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7536,7 +7396,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/FDLabsHQ",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://firstdigitallabs.com"
     },
     "CATEGORY#Entity|PROTOCOL#florence-finance": {
@@ -7548,7 +7408,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/florence-finance",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7683,7 +7543,7 @@
       "TradFiComparison": [],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://florence.finance"
     },
     "CATEGORY#Entity|PROTOCOL#fluid": {
@@ -7700,7 +7560,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/fluid",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -7885,7 +7745,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/0xfluid",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://fluid.io"
     },
     "CATEGORY#Entity|PROTOCOL#franklin-templeton": {
@@ -7907,7 +7767,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/franklin-templeton-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8085,7 +7945,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/FTI_US",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://www.franklintempleton.com"
     },
     "CATEGORY#Entity|PROTOCOL#frax": {
@@ -8103,7 +7963,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/frax-ether",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8306,7 +8166,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/fraxfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://frax.finance"
     },
     "CATEGORY#Entity|PROTOCOL#gains-network": {
@@ -8322,7 +8182,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/gains-network",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8457,7 +8317,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/GainsNetwork_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://gains.trade"
     },
     "CATEGORY#Entity|PROTOCOL#gamma": {
@@ -8476,7 +8336,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/gamma",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8604,7 +8464,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/GammaStrategies",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://app.gamma.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#gearbox": {
@@ -8747,7 +8607,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/GearboxProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://gearbox.fi"
     },
     "CATEGORY#Entity|PROTOCOL#gmo-trust": {
@@ -8765,7 +8625,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/1026/small/GYEN.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -8953,7 +8813,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/gmotrust",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://stablecoin.z.com"
     },
     "CATEGORY#Entity|PROTOCOL#gmx": {
@@ -8968,7 +8828,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/gmx",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9102,7 +8962,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/GMX_IO",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://gmx.io"
     },
     "CATEGORY#Entity|PROTOCOL#goldfinch": {
@@ -9116,7 +8976,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/goldfinch",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9302,7 +9162,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/goldfinch_fi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://goldfinch.finance"
     },
     "CATEGORY#Entity|PROTOCOL#hidden-hand": {
@@ -9316,7 +9176,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/hidden-hand",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9442,7 +9302,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/redactedcartel",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:58Z",
       "Website": "https://redacted.finance"
     },
     "CATEGORY#Entity|PROTOCOL#hyperliquid": {
@@ -9457,7 +9317,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/hyperliquid",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9591,7 +9451,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/HyperliquidX",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://hyperliquid.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#insurace": {
@@ -9610,7 +9470,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/insurace",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9737,7 +9597,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/InsurAce_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.insurace.io"
     },
     "CATEGORY#Entity|PROTOCOL#inverse-finance": {
@@ -9751,7 +9611,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/inverse-finance-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -9918,7 +9778,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/InverseFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://inverse.finance"
     },
     "CATEGORY#Entity|PROTOCOL#jones-dao": {
@@ -9932,7 +9792,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/jones-dao",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -10057,7 +9917,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/DAOJonesOptions",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.jonesdao.io"
     },
     "CATEGORY#Entity|PROTOCOL#jupiter": {
@@ -10467,7 +10327,7 @@
       ],
       "Twitter": "https://x.com/JupiterExchange",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://jup.ag"
     },
     "CATEGORY#Entity|PROTOCOL#justlend": {
@@ -10481,7 +10341,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/justlend",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -10657,7 +10517,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/DeFi_JUST",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://justlend.org"
     },
     "CATEGORY#Entity|PROTOCOL#kamino": {
@@ -10671,7 +10531,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/kamino-lend",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -10867,7 +10727,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/KaminoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://kamino.finance"
     },
     "CATEGORY#Entity|PROTOCOL#karak": {
@@ -10882,7 +10742,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/52182/small/karak.jpg",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11002,7 +10862,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Karak_Network",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://karak.network"
     },
     "CATEGORY#Entity|PROTOCOL#kelp-dao": {
@@ -11016,7 +10876,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/kelp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11134,7 +10994,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/KelpDAO",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.kelpdao.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#lido": {
@@ -11148,7 +11008,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/lido",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11266,7 +11126,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/LidoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://lido.fi"
     },
     "CATEGORY#Entity|PROTOCOL#liquity": {
@@ -11283,7 +11143,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/liquity-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11483,7 +11343,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/LiquityProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://www.liquity.org"
     },
     "CATEGORY#Entity|PROTOCOL#lista-dao": {
@@ -11497,7 +11357,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/35477/small/lista.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11683,7 +11543,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/lista_dao",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://lista.org"
     },
     "CATEGORY#Entity|PROTOCOL#lofty-ai": {
@@ -11697,7 +11557,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/lofty",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -11861,7 +11721,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/lofty_ai",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://www.lofty.ai"
     },
     "CATEGORY#Entity|PROTOCOL#m-zero": {
@@ -11879,7 +11739,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/39104/small/M0.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -12058,7 +11918,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/m0foundation",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://m0.org"
     },
     "CATEGORY#Entity|PROTOCOL#mantle-meth": {
@@ -12073,7 +11933,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/mantle-restaking",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -12193,7 +12053,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/0xMantle",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.mantle.xyz/meth"
     },
     "CATEGORY#Entity|PROTOCOL#maple": {
@@ -12210,7 +12070,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/maple",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -12422,7 +12282,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/maplefinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Entity|PROTOCOL#maverick": {
@@ -12440,7 +12300,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/maverick-protocol",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -12566,7 +12426,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/mavprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.mav.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#monerium": {
@@ -12859,7 +12719,7 @@
       ],
       "Twitter": "https://x.com/monerium",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://monerium.com/"
     },
     "CATEGORY#Entity|PROTOCOL#morpho": {
@@ -13142,7 +13002,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/MorphoLabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://app.morpho.org/arbitrum/earn"
     },
     "CATEGORY#Entity|PROTOCOL#mountain-protocol": {
@@ -13160,7 +13020,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/31719/small/usdm.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -13347,7 +13207,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/MountainUSDM",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://mountainprotocol.com"
     },
     "CATEGORY#Entity|PROTOCOL#neptune-mutual": {
@@ -13363,7 +13223,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/neptune-mutual",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -13487,7 +13347,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/neptune_mutual",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://neptune-mutual.com"
     },
     "CATEGORY#Entity|PROTOCOL#neutra-finance": {
@@ -13501,7 +13361,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/neutral-trade",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -13620,7 +13480,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/NeutraFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://neutra.finance"
     },
     "CATEGORY#Entity|PROTOCOL#nexus-mutual": {
@@ -13634,7 +13494,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/nexus-mutual",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -13762,7 +13622,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/NexusMutual",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://nexusmutual.io"
     },
     "CATEGORY#Entity|PROTOCOL#notional": {
@@ -13895,7 +13755,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/NotionalFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://notional.finance"
     },
     "CATEGORY#Entity|PROTOCOL#ondo-finance": {
@@ -14263,7 +14123,7 @@
       ],
       "Twitter": "https://x.com/OndoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#Entity|PROTOCOL#paladin": {
@@ -14280,7 +14140,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/paladin-vote",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -14409,7 +14269,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/PaladinVote",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:58Z",
       "Website": "https://paladin.vote"
     },
     "CATEGORY#Entity|PROTOCOL#pancakeswap": {
@@ -14431,26 +14291,17 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/pancakeswap",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
       "Audits": null,
       "Category": "Entity",
       "ChildEntities": null,
-      "Competitors": [
-        {
-          "differences": "Uniswap is the deepest multi-chain AMM with concentrated liquidity (V3) and customizable pools via hooks (V4).",
-          "name": "Uniswap",
-          "positioning": "The largest spot DEX by volume.",
-          "rank": 1,
-          "similarities": "Both let users swap tokens against on-chain liquidity without an intermediary.",
-          "slug": "uniswap"
-        }
-      ],
+      "Competitors": [],
       "Components": [
         {
-          "description": "PancakeSwap is the dominant DEX in the BNB ecosystem — retail-focused with gamification (lotteries, predictions, NFTs) plus its Infinity CLMM and a perps DEX.",
+          "description": "PancakeSwap is the dominant DEX in the BNB ecosystem — retail-focused with gamification (lotteries, predictions, NFTs) plus its Infinity CLMM.",
           "name": "PancakeSwap core product"
         }
       ],
@@ -14462,64 +14313,22 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 2130000000,
+        "tvlUsd": null,
         "users": 1800000
       },
       "Derivatives": null,
       "DerivativesSecondaryTags": null,
       "DerivativesSubSector": null,
-      "Description": "PancakeSwap is the dominant DEX in the BNB ecosystem — retail-focused with gamification (lotteries, predictions, NFTs) plus its Infinity CLMM and a perps DEX.",
-      "Dex": {
-        "auditHistory": "Certik, PeckShield (multi-round).",
-        "deployment": {
-          "chains": [
-            "BNB Chain",
-            "Ethereum",
-            "Arbitrum",
-            "Base",
-            "+5 more"
-          ],
-          "evmCompatible": "mixed",
-          "notes": "BNB-primary; v3 CLMM + Infinity router; Aptos (non-EVM)."
-        },
-        "governanceToken": "CAKE",
-        "subSectorMetrics": {
-          "feeTierStructure": "0.01% / 0.05% / 0.25% / 1.00%",
-          "kind": "amm",
-          "pools": {
-            "dataSource": "derived",
-            "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-            "updatedAt": null,
-            "value": null
-          }
-        },
-        "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 2130000000
-        },
-        "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 25100000000
-        }
-      },
-      "DexSecondaryTags": [
-        "Spot",
-        "Perps",
-        "Multi-Chain",
-        "CLMM",
-        "veTokenomics"
-      ],
-      "DexSubSector": "Concentrated Liquidity",
-      "Differentiator": "Retail-first BNB DEX with v3 CLMM, Infinity (hook-like router), perps, and an IFO launchpad.",
+      "Description": "PancakeSwap is the dominant DEX in the BNB ecosystem — retail-focused with gamification (lotteries, predictions, NFTs) plus its Infinity CLMM.",
+      "Dex": null,
+      "DexSecondaryTags": null,
+      "DexSubSector": null,
+      "Differentiator": "Retail-first BNB DEX with v3 CLMM, Infinity (hook-like router), and an IFO launchpad.",
       "Discord": null,
       "Events": [],
       "Faq": [
         {
-          "answer": "PancakeSwap is the dominant DEX in the BNB ecosystem — retail-focused with gamification (lotteries, predictions, NFTs) plus its Infinity CLMM and a perps DEX.",
+          "answer": "PancakeSwap is the dominant DEX in the BNB ecosystem — retail-focused with gamification (lotteries, predictions, NFTs) plus its Infinity CLMM.",
           "pinned": true,
           "question": "What is PancakeSwap?"
         }
@@ -14527,7 +14336,24 @@
       "GitHub": "https://github.com/pancakeswap",
       "InvestmentRounds": [],
       "Lending": null,
-      "Liquidity": null,
+      "Liquidity": {
+        "auditHistory": "Certik, PeckShield (multi-round).",
+        "deployment": {
+          "chains": [
+            "BNB Chain",
+            "Ethereum",
+            "Arbitrum",
+            "Base",
+            "Polygon zkEVM",
+            "Linea",
+            "opBNB",
+            "ZKsync",
+            "Aptos"
+          ],
+          "evmCompatible": "yes",
+          "notes": "BNB-primary; v3 CLMM + Infinity router; Aptos (non-EVM)."
+        }
+      },
       "LiquiditySecondaryTags": [
         "Concentrated-Liquidity",
         "Multi-Chain"
@@ -14546,18 +14372,7 @@
         }
       ],
       "Name": "PancakeSwap",
-      "OffchainFacts": [
-        {
-          "capturedAt": "2026-06-18",
-          "freshness": "static",
-          "key": "auditFirms",
-          "source": {
-            "label": "PancakeSwap",
-            "url": "https://docs.pancakeswap.finance"
-          },
-          "value": "Certik, PeckShield (multi-round)."
-        }
-      ],
+      "OffchainFacts": null,
       "OfficialDocs": "https://docs.pancakeswap.finance",
       "OrgStructure": [],
       "Other": null,
@@ -14587,10 +14402,7 @@
       "ScaleLabels": {
         "tvl": "Protocol TVL"
       },
-      "SecondarySectors": [
-        "Perpetuals",
-        "DEX"
-      ],
+      "SecondarySectors": null,
       "Sector": "Liquidity",
       "Slug": "pancakeswap",
       "Sources": null,
@@ -14611,7 +14423,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/PancakeSwap",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://pancakeswap.finance"
     },
     "CATEGORY#Entity|PROTOCOL#paxos": {
@@ -14628,7 +14440,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/6013/small/Pax_Dollar.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -14834,7 +14646,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/paxos",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://paxos.com"
     },
     "CATEGORY#Entity|PROTOCOL#pendle": {
@@ -14968,7 +14780,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/pendle_fi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://www.pendle.finance"
     },
     "CATEGORY#Entity|PROTOCOL#pleasing-market": {
@@ -15225,7 +15037,7 @@
       ],
       "Twitter": "https://x.com/PleasingMarket",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://www.pleasingmarket.com/"
     },
     "CATEGORY#Entity|PROTOCOL#puffer": {
@@ -15239,7 +15051,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/puffer-stake",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -15358,7 +15170,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/puffer_finance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.puffer.fi"
     },
     "CATEGORY#Entity|PROTOCOL#radiant": {
@@ -15573,7 +15385,7 @@
       "TradFiComparison": [],
       "Twitter": "https://twitter.com/RDNTCapital",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://radiant.capital/"
     },
     "CATEGORY#Entity|PROTOCOL#rage-trade": {
@@ -15587,7 +15399,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/rage-trade-v1",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -15706,7 +15518,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/rage_trade",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.rage.trade"
     },
     "CATEGORY#Entity|PROTOCOL#raydium": {
@@ -15720,7 +15532,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/raydium",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -15892,7 +15704,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/RaydiumProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://raydium.io"
     },
     "CATEGORY#Entity|PROTOCOL#realt": {
@@ -15907,7 +15719,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/realt",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16082,7 +15894,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/RealTPlatform",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://realt.co"
     },
     "CATEGORY#Entity|PROTOCOL#renzo": {
@@ -16096,7 +15908,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/renzo",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16214,7 +16026,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/RenzoProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.renzoprotocol.com"
     },
     "CATEGORY#Entity|PROTOCOL#reserve": {
@@ -16230,7 +16042,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/8365/small/Reserve.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16435,7 +16247,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/reserveprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://reserve.org"
     },
     "CATEGORY#Entity|PROTOCOL#resolv": {
@@ -16451,7 +16263,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/40008/small/USR_LOGO.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16656,7 +16468,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ResolvLabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://resolv.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#ribbon-finance": {
@@ -16670,7 +16482,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/ribbon-finance",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16795,7 +16607,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/ribbonfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.ribbon.finance"
     },
     "CATEGORY#Entity|PROTOCOL#rocket-pool": {
@@ -16809,7 +16621,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/rocket-pool",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -16928,7 +16740,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Rocket_Pool",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://rocketpool.net"
     },
     "CATEGORY#Entity|PROTOCOL#securitize": {
@@ -16950,7 +16762,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/securitize",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -17126,7 +16938,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Securitize",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://securitize.io"
     },
     "CATEGORY#Entity|PROTOCOL#sense": {
@@ -17256,7 +17068,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/senseprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://sense.finance"
     },
     "CATEGORY#Entity|PROTOCOL#sherlock": {
@@ -17273,7 +17085,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/sherlock",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -17389,7 +17201,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/sherlockdefi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://sherlock.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#sky": {
@@ -17758,7 +17570,7 @@
       ],
       "Twitter": "https://x.com/SkyEcosystem",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Entity|PROTOCOL#spark": {
@@ -18042,7 +17854,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/sparkdotfi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://spark.fi"
     },
     "CATEGORY#Entity|PROTOCOL#spectra": {
@@ -18174,7 +17986,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/spectra_finance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://www.spectra.finance"
     },
     "CATEGORY#Entity|PROTOCOL#stably": {
@@ -18448,7 +18260,7 @@
       ],
       "Twitter": "https://twitter.com/Stably_Official",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://www.stablecamel.com/ethereum"
     },
     "CATEGORY#Entity|PROTOCOL#stader": {
@@ -18462,7 +18274,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/stader",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -18581,7 +18393,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/staderlabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.staderlabs.com"
     },
     "CATEGORY#Entity|PROTOCOL#stake-dao": {
@@ -18598,7 +18410,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/stake-dao",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -18728,7 +18540,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/StakeDAOHQ",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:58Z",
       "Website": "https://stakedao.org"
     },
     "CATEGORY#Entity|PROTOCOL#stakewise": {
@@ -18742,7 +18554,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/stakewise",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -18860,7 +18672,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/stakewise_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.stakewise.io"
     },
     "CATEGORY#Entity|PROTOCOL#stella": {
@@ -18999,7 +18811,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Stella_xyz_",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://stellaxyz.io"
     },
     "CATEGORY#Entity|PROTOCOL#sushiswap": {
@@ -19024,7 +18836,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/sushiswap",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19201,7 +19013,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/SushiSwap",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://www.sushi.com"
     },
     "CATEGORY#Entity|PROTOCOL#swell": {
@@ -19215,7 +19027,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/swell",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19333,7 +19145,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/swellnetworkio",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.swellnetwork.io"
     },
     "CATEGORY#Entity|PROTOCOL#symbiotic": {
@@ -19347,7 +19159,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/symbiotic",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19466,7 +19278,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/symbioticfi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://symbiotic.fi"
     },
     "CATEGORY#Entity|PROTOCOL#synthetix": {
@@ -19483,7 +19295,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/synthetix-v3",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19613,7 +19425,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/synthetix_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://synthetix.io"
     },
     "CATEGORY#Entity|PROTOCOL#tether": {
@@ -19632,7 +19444,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/tether-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -19804,7 +19616,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Tether_to",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://tether.to"
     },
     "CATEGORY#Entity|PROTOCOL#thorchain": {
@@ -19827,7 +19639,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/thorchain-dex",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -20002,7 +19814,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/THORChain",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://thorchain.org"
     },
     "CATEGORY#Entity|PROTOCOL#toucan-protocol": {
@@ -20018,7 +19830,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/toucan-protocol",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -20168,7 +19980,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/toucanprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://toucan.earth"
     },
     "CATEGORY#Entity|PROTOCOL#trader-joe": {
@@ -20184,7 +19996,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/trader-joe",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -20358,7 +20170,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/LFJ_gg",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://lfj.gg"
     },
     "CATEGORY#Entity|PROTOCOL#trueusd": {
@@ -20625,7 +20437,7 @@
       ],
       "Twitter": "https://twitter.com/tusdio",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://trueusd.com/"
     },
     "CATEGORY#Entity|PROTOCOL#uniswap": {
@@ -20650,23 +20462,14 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/uniswap",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
       "Audits": null,
       "Category": "Entity",
       "ChildEntities": null,
-      "Competitors": [
-        {
-          "differences": "Uniswap is the deepest multi-chain AMM with concentrated liquidity (V3) and customizable pools via hooks (V4).",
-          "name": "Uniswap",
-          "positioning": "The largest spot DEX by volume.",
-          "rank": 1,
-          "similarities": "Both let users swap tokens against on-chain liquidity without an intermediary.",
-          "slug": "uniswap"
-        }
-      ],
+      "Competitors": [],
       "Components": [
         {
           "description": "Uniswap is the leading automated market maker. V3 introduced concentrated-liquidity ranges; V4 introduced 'hooks' that let pools embed custom logic (TWAMM, dynamic fees, on-chain limit orders) without forking the core contract.",
@@ -20681,60 +20484,16 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 3120000000,
+        "tvlUsd": null,
         "users": 4500000
       },
       "Derivatives": null,
       "DerivativesSecondaryTags": null,
       "DerivativesSubSector": null,
       "Description": "Uniswap is the leading automated market maker. V3 introduced concentrated-liquidity ranges; V4 introduced 'hooks' that let pools embed custom logic (TWAMM, dynamic fees, on-chain limit orders) without forking the core contract.",
-      "Dex": {
-        "auditHistory": "Trail of Bits, ABDK Consulting, ChainSecurity (V3 + V4).",
-        "deployment": {
-          "chains": [
-            "Ethereum",
-            "Base",
-            "Arbitrum",
-            "Optimism",
-            "Polygon",
-            "+7 more"
-          ],
-          "evmCompatible": "yes",
-          "notes": "Native on 12+ EVM chains; Unichain is Uniswap's own L2."
-        },
-        "governanceToken": "UNI",
-        "subSectorMetrics": {
-          "feeTierStructure": "0.01% / 0.05% / 0.30% / 1.00% (V3) + dynamic via hooks (V4)",
-          "kind": "amm",
-          "pools": {
-            "dataSource": "derived",
-            "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-            "updatedAt": null,
-            "value": null
-          }
-        },
-        "tvlUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 3120000000
-        },
-        "volume30dUsd": {
-          "dataSource": "derived",
-          "sourceLabel": "DefiLlama / protocol docs (2026-06-18)",
-          "updatedAt": null,
-          "value": 42600000000
-        }
-      },
-      "DexSecondaryTags": [
-        "Spot",
-        "Multi-Chain",
-        "L2-Native",
-        "Hooks",
-        "CLMM",
-        "veTokenomics"
-      ],
-      "DexSubSector": "Concentrated Liquidity",
+      "Dex": null,
+      "DexSecondaryTags": null,
+      "DexSubSector": null,
       "Differentiator": "Largest spot DEX by volume; V4 hooks make pools programmable, and UniswapX delivers intent-based, cross-chain routing. Runs its own L2 (Unichain).",
       "Discord": null,
       "Events": [],
@@ -20748,7 +20507,27 @@
       "GitHub": "https://github.com/Uniswap",
       "InvestmentRounds": [],
       "Lending": null,
-      "Liquidity": null,
+      "Liquidity": {
+        "auditHistory": "Trail of Bits, ABDK Consulting, ChainSecurity (V3 + V4).",
+        "deployment": {
+          "chains": [
+            "Ethereum",
+            "Base",
+            "Arbitrum",
+            "Optimism",
+            "Polygon",
+            "BNB Chain",
+            "Avalanche",
+            "Blast",
+            "Celo",
+            "ZKsync",
+            "Worldchain",
+            "Unichain"
+          ],
+          "evmCompatible": "yes",
+          "notes": "Native on 12+ EVM chains; Unichain is Uniswap's own L2."
+        }
+      },
       "LiquiditySecondaryTags": [
         "Concentrated-Liquidity",
         "Multi-Chain"
@@ -20767,18 +20546,7 @@
         }
       ],
       "Name": "Uniswap",
-      "OffchainFacts": [
-        {
-          "capturedAt": "2026-06-18",
-          "freshness": "static",
-          "key": "auditFirms",
-          "source": {
-            "label": "Uniswap",
-            "url": "https://docs.uniswap.org"
-          },
-          "value": "Trail of Bits, ABDK Consulting, ChainSecurity (V3 + V4)."
-        }
-      ],
+      "OffchainFacts": null,
       "OfficialDocs": "https://docs.uniswap.org",
       "OrgStructure": [],
       "Other": null,
@@ -20808,9 +20576,7 @@
       "ScaleLabels": {
         "tvl": "Protocol TVL"
       },
-      "SecondarySectors": [
-        "DEX"
-      ],
+      "SecondarySectors": null,
       "Sector": "Liquidity",
       "Slug": "uniswap",
       "Sources": null,
@@ -20831,7 +20597,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Uniswap",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://uniswap.org"
     },
     "CATEGORY#Entity|PROTOCOL#usd-ai": {
@@ -21289,7 +21055,7 @@
       ],
       "Twitter": "https://x.com/USDai_Official",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:11Z",
+      "UpdatedAt": "2026-06-29T15:30:54Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Entity|PROTOCOL#usdt0": {
@@ -21306,7 +21072,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://portal-data.arbitrum.io/images/projects/usdt0-logo.webp",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -21473,7 +21239,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Tether_to",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:56Z",
       "Website": "https://tether.to"
     },
     "CATEGORY#Entity|PROTOCOL#venus": {
@@ -21491,7 +21257,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/venus-core-pool",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -21678,7 +21444,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/VenusProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:12Z",
+      "UpdatedAt": "2026-06-29T15:30:55Z",
       "Website": "https://venus.io"
     },
     "CATEGORY#Entity|PROTOCOL#votium": {
@@ -21692,7 +21458,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://coin-images.coingecko.com/coins/images/13404/small/CVX.png",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -21808,7 +21574,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/Votium",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://votium.app"
     },
     "CATEGORY#Entity|PROTOCOL#yearn-finance": {
@@ -21826,7 +21592,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/yearn-finance",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -21958,7 +21724,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/yearnfi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://yearn.fi"
     },
     "CATEGORY#Entity|PROTOCOL#yieldnest": {
@@ -21972,7 +21738,7 @@
         "isArbitrumNative": false,
         "isLive": true,
         "isPubliclyAudited": true,
-        "logoUrl": "https://icons.llamao.fi/icons/protocols/yieldnest",
+        "logoUrl": null,
         "portalUrl": null,
         "subCategory": "Entity"
       },
@@ -22090,7 +21856,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/YieldNestFi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-06-27T17:09:13Z",
+      "UpdatedAt": "2026-06-29T15:30:57Z",
       "Website": "https://www.yieldnest.finance"
     },
     "CATEGORY#RWA|PROTOCOL#benji": {

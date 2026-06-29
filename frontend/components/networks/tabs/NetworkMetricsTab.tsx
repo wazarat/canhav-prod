@@ -2,10 +2,13 @@ import type { ReactNode } from "react";
 
 import {
   CreditTagMetricsSection,
+  DerivativesMetricsSection,
   DexMetricsSection,
   LendingMetricTiles,
+  LiquidityMetricsSection,
   OpenInterestSection,
   OptionsVolumeSection,
+  OtherMetricsSection,
   RwaMetricsSection,
   StablecoinMetricsSection,
   StakingMetricsSection,
@@ -41,6 +44,9 @@ export function NetworkMetricsTab({ profile }: { profile: NetworkProfile }) {
       profile.dex ||
       profile.rwa ||
       profile.staking ||
+      profile.liquidity ||
+      profile.derivatives ||
+      profile.other ||
       profile.optionsVolume ||
       profile.openInterest ||
       profile.creditTagMetrics ||
@@ -77,6 +83,9 @@ export function NetworkMetricsTab({ profile }: { profile: NetworkProfile }) {
       <CreditTagMetricsSection tags={creditTags} metrics={profile.creditTagMetrics} />
       <StablecoinMetricsSection stablecoin={profile.stablecoin} memberCoins={profile.memberCoins} />
       <DexMetricsSection dex={profile.dex} />
+      <LiquidityMetricsSection liquidity={profile.liquidity} />
+      <DerivativesMetricsSection derivatives={profile.derivatives} />
+      <OtherMetricsSection other={profile.other} />
       <OptionsVolumeSection optionsVolume={profile.optionsVolume} />
       <OpenInterestSection openInterest={profile.openInterest} />
       <RwaMetricsSection rwa={profile.rwa} />

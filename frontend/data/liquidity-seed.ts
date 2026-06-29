@@ -12,8 +12,8 @@ export interface LiquiditySeed {
 }
 
 // Liquidity sector seed (canhav-liquidity spec §3/§4). Curve, Uniswap, Balancer,
-// Aerodrome, and PancakeSwap are primary Liquidity / Pools (seedMode: new); DEX
-// cross-tags stay on the entity via secondarySectors (wired in ingest_entities.py).
+// Aerodrome, and PancakeSwap are exclusive primary Liquidity / Pools venues
+// (defined in liquidity_specs.py; no DEX secondary sector).
 // Ids verified against DeFi Llama /protocols + CoinGecko markets on 2026-06-25.
 export const LIQUIDITY_SEED: LiquiditySeed[] = [
   // ---------------- POOLS (LPing / stable pools) ----------------

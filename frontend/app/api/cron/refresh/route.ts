@@ -28,6 +28,7 @@ import {
   fetchLlamaStablecoin,
   fetchLlamaStablecoinCharts,
   fetchLlamaStablecoinPrices,
+  fetchLlamaTreasury,
   fetchLlamaYieldChart,
   llamaLendingProjectForSlug,
   llamaOptionsProtocolForSlug,
@@ -56,6 +57,7 @@ import { collectAllDerivativesMetrics } from "@/lib/server/derivatives";
 import { DERIVATIVES_SEED } from "@/data/derivatives-seed";
 import { collectAllOtherMetrics } from "@/lib/server/other";
 import { OTHER_SEED } from "@/data/other-seed";
+import { refreshSectorAggregates } from "@/lib/server/sectorAggregates";
 import { pegVsCurrency } from "@/lib/server/series";
 import {
   fetchJustLendLiveMetrics,
@@ -63,6 +65,7 @@ import {
   justLendMetricsToLendingOverlay,
 } from "@/lib/server/trongrid";
 import type {
+  InvestmentRound,
   Sourced,
   StablecoinProfile,
   TokenDeployment,
@@ -146,6 +149,20 @@ function isNullishNumber(v: number | null | undefined): boolean {
 
 function isEmptyArray<T>(v: T[] | null | undefined): boolean {
   return !v || v.length === 0;
+}
+
+function mapMetaRaisesToInvestmentRounds(
+  raises: NonNullable<LlamaProtocolMeta["raises"]>,
+): InvestmentRound[] {
+  return raises.map((r) => ({
+    date: r.date ?? "",
+    round: r.round ?? "",
+    amountUsd: r.amountUsd,
+    amountLabel:
+      r.amountUsd != null ? `$${(r.amountUsd / 1_000_000).toFixed(1)}M` : null,
+    investors: r.investors,
+    link: r.link,
+  }));
 }
 
 /** Keep prior live value when a refresh fetch returns empty/null. */
@@ -380,6 +397,28 @@ async function refreshUniversalMetrics(
     ...(priorIdentity?.jurisdiction ? { jurisdiction: priorIdentity.jurisdiction } : {}),
     ...(priorIdentity?.hq ? { hq: priorIdentity.hq } : {}),
     ...(priorIdentity?.entityType ? { entityType: priorIdentity.entityType } : {}),
+    ...(meta?.raises?.length
+      ? {
+          raises: mergeSourced(
+            sourced(mapMetaRaisesToInvestmentRounds(meta.raises), "DeFi Llama"),
+            priorIdentity?.raises,
+            isEmptyArray,
+          ),
+        }
+      : priorIdentity?.raises
+        ? { raises: priorIdentity.raises }
+        : {}),
+    ...(meta?.governanceIds?.length
+      ? {
+          governanceIds: mergeSourced(
+            sourced(meta.governanceIds, "DeFi Llama"),
+            priorIdentity?.governanceIds,
+            isEmptyArray,
+          ),
+        }
+      : priorIdentity?.governanceIds
+        ? { governanceIds: priorIdentity.governanceIds }
+        : {}),
   };
 
   const marketCapUsd = resolution?.marketCapUsd ?? meta?.mcapUsd ?? null;
@@ -533,6 +572,25 @@ async function refreshUniversalMetrics(
     (prior.tvl?.tvlUsd?.value ?? null) != null ||
     (prior.market?.priceUsd?.value ?? null) != null;
 
+  let treasuryUsd: Sourced<number | null> | undefined = prior.treasuryUsd;
+  let treasuryExOwnTokensUsd: Sourced<number | null> | undefined = prior.treasuryExOwnTokensUsd;
+  if (llamaSlug) {
+    const treasury = await fetchLlamaTreasury(slug);
+    if (treasury) {
+      treasuryUsd = mergeSourced(
+        sourced(treasury.treasuryUsd, "DeFi Llama"),
+        prior.treasuryUsd,
+        isNullishNumber,
+      );
+      treasuryExOwnTokensUsd = mergeSourced(
+        sourced(treasury.treasuryExOwnTokensUsd, "DeFi Llama"),
+        prior.treasuryExOwnTokensUsd,
+        isNullishNumber,
+      );
+      notes.push("treasury");
+    }
+  }
+
   const universal: UniversalMetrics = {
     identity,
     market,
@@ -541,6 +599,8 @@ async function refreshUniversalMetrics(
     coingeckoId: resolution ? geckoId ?? null : prior.coingeckoId ?? null,
     llamaSlug: llamaSlug ?? prior.llamaSlug ?? null,
     cmcId: meta?.cmcId ?? prior.cmcId ?? null,
+    ...(treasuryUsd ? { treasuryUsd } : {}),
+    ...(treasuryExOwnTokensUsd ? { treasuryExOwnTokensUsd } : {}),
     syncedAt: now,
   };
   item.UniversalMetrics = universal;
@@ -1120,6 +1180,16 @@ export async function GET(req: Request): Promise<NextResponse> {
         ...(borrow?.utilizationPct != null
           ? { utilizationPct: sourced(borrow.utilizationPct) }
           : {}),
+        ...(tvlUsd != null && borrow?.totalBorrowUsd != null
+          ? {
+              availableLiquidityUsd: {
+                value: Math.max(0, tvlUsd - borrow.totalBorrowUsd),
+                dataSource: "derived" as const,
+                sourceLabel: "Derived",
+                updatedAt: nowIso(),
+              },
+            }
+          : {}),
         ...(supplyApy != null ? { supplyApyPct: sourced(supplyApy) } : {}),
         ...(borrowApy != null ? { borrowApyPct: sourced(borrowApy) } : {}),
         ...(nim != null ? { netInterestMarginPct: sourced(nim) } : {}),
@@ -1435,6 +1505,20 @@ export async function GET(req: Request): Promise<NextResponse> {
       if (!live || Object.keys(live).length === 0) continue;
       item.Other = { ...(item.Other ?? {}), ...live };
       const tvlUsd = live.tvlUsd?.value ?? null;
+      if (String(item.OtherSubSector ?? "") === "Governance" && llamaProtocolForSlug(slug)) {
+        const treasury = await fetchLlamaTreasury(slug);
+        if (treasury?.treasuryUsd != null) {
+          item.Other = {
+            ...item.Other,
+            treasuryUsd: {
+              value: treasury.treasuryUsd,
+              dataSource: "live",
+              sourceLabel: "DeFi Llama",
+              updatedAt: nowIso(),
+            },
+          };
+        }
+      }
       if (tvlUsd != null && String(item.Sector ?? "") === "Other") {
         item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
         syncUniversalTvlFromCurrentScale(item, "DeFi Llama other TVL");
@@ -1483,6 +1567,8 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
     universalResults.push({ slug, tvlUsd: res.tvlUsd, priceUsd: res.priceUsd, note: res.note });
   }
+
+  const sectorAggregateResults = await refreshSectorAggregates(items, putItem);
 
   // --- Options volume (sector === Options) ------------------------------------
   const optionsResults: { slug: string; notional24hUsd: number | null }[] = [];
@@ -1746,6 +1832,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     dex: dexResults,
     rwa: rwaResults,
     universal: universalResults,
+    sectorAggregates: sectorAggregateResults,
     optionsVolume: optionsResults,
     perpOpenInterest: perpOiResults,
     rwaMissingAum,

@@ -3,6 +3,7 @@ import { NetworkTableWithFilter } from "@/components/networks/NetworkTableWithFi
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { getApprovedNetworks, networkHeadlineTvlUsd } from "@/lib/data";
+import { getSectorAggregates } from "@/lib/server/store";
 import { formatUsdCompact } from "@/lib/utils";
 
 export const metadata = {
@@ -12,7 +13,10 @@ export const metadata = {
 export const revalidate = 300;
 
 export default async function NetworksPage() {
-  const profiles = await getApprovedNetworks();
+  const [profiles, sectorAggregates] = await Promise.all([
+    getApprovedNetworks(),
+    getSectorAggregates(),
+  ]);
   const aggregateTvl = profiles.reduce(
     (sum, p) => sum + (networkHeadlineTvlUsd(p) ?? 0),
     0,
@@ -66,7 +70,11 @@ export default async function NetworksPage() {
         />
       </section>
 
-      <NetworkTableWithFilter profiles={profiles} emptyHint="No networks in the store yet." />
+      <NetworkTableWithFilter
+        profiles={profiles}
+        sectorAggregates={sectorAggregates}
+        emptyHint="No networks in the store yet."
+      />
 
       <ResearchChatScope />
     </div>

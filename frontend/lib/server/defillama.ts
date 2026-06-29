@@ -609,6 +609,45 @@ export interface LlamaProtocolMeta {
   currentChainTvls: LlamaChainTvl[];
   /** TVL change vs −1 / −7 daily points, in %. */
   tvlChangePct: { d1: number | null; d7: number | null };
+  /** Funding rounds from `raises[]`. */
+  raises: LlamaRaise[];
+  /** Governance IDs from `governanceID[]`. */
+  governanceIds: string[];
+}
+
+export interface LlamaRaise {
+  date: string | null;
+  amountUsd: number | null;
+  round: string | null;
+  valuationUsd: number | null;
+  investors: string[];
+  link: string | null;
+}
+
+export interface LlamaOffchain {
+  raises: LlamaRaise[];
+  governanceIds: string[];
+}
+
+function parseLlamaRaises(rawRaises: unknown): LlamaRaise[] {
+  if (!Array.isArray(rawRaises)) return [];
+  return rawRaises.map((r: any) => ({
+    date: isoDate(r?.date),
+    amountUsd: num(r?.amount) != null ? (num(r.amount) as number) * 1e6 : null,
+    round: typeof r?.round === "string" ? r.round : null,
+    valuationUsd: num(r?.valuation),
+    investors: [
+      ...(Array.isArray(r?.leadInvestors) ? r.leadInvestors : []),
+      ...(Array.isArray(r?.otherInvestors) ? r.otherInvestors : []),
+    ].filter((x: unknown): x is string => typeof x === "string"),
+    link: typeof r?.source === "string" && r.source ? r.source : null,
+  }));
+}
+
+function parseLlamaGovernanceIds(raw: unknown): string[] {
+  return Array.isArray(raw)
+    ? raw.filter((x: unknown): x is string => typeof x === "string")
+    : [];
 }
 
 /** True for synthetic `currentChainTvls` / `chainTvls` keys (e.g. "Ethereum-borrowed"). */
@@ -685,6 +724,93 @@ export async function fetchLlamaProtocolMeta(
     tvlUsdLatest,
     currentChainTvls,
     tvlChangePct: { d1: changePct(1), d7: changePct(7) },
+    raises: parseLlamaRaises(data.raises),
+    governanceIds: parseLlamaGovernanceIds(data.governanceID),
+  };
+}
+
+/** Parse raises[] + governanceID[] from one /protocol/{slug} payload (Tier 1). */
+export async function fetchLlamaOffchain(
+  slug: string,
+  revalidate?: number,
+): Promise<LlamaOffchain | null> {
+  const protocol = llamaProtocolForSlug(slug);
+  if (!protocol) return null;
+  const data = await getJson(
+    `${PROTOCOLS_BASE}/protocol/${encodeURIComponent(protocol)}`,
+    revalidate,
+  );
+  if (!data || typeof data !== "object") return null;
+  return {
+    raises: parseLlamaRaises(data.raises),
+    governanceIds: parseLlamaGovernanceIds(data.governanceID),
+  };
+}
+
+/** Treasury USD totals from /treasury/{slug} (Σ currentChainTvls). Tier 1. */
+export async function fetchLlamaTreasury(
+  slug: string,
+  revalidate?: number,
+): Promise<{ treasuryUsd: number | null; treasuryExOwnTokensUsd: number | null } | null> {
+  const protocol = llamaProtocolForSlug(slug);
+  if (!protocol) return null;
+  const data = await getJson(
+    `${PROTOCOLS_BASE}/treasury/${encodeURIComponent(protocol)}`,
+    revalidate,
+  );
+  const cc = data?.currentChainTvls;
+  if (!cc || typeof cc !== "object") return null;
+  let total = 0;
+  let exOwn = 0;
+  for (const [k, v] of Object.entries(cc as Record<string, unknown>)) {
+    const n = num(v);
+    if (n === null) continue;
+    total += n;
+    if (!/-OwnTokens$/i.test(k)) exOwn += n;
+  }
+  return { treasuryUsd: total, treasuryExOwnTokensUsd: exOwn };
+}
+
+export interface LlamaProtocolRow {
+  slug: string;
+  name: string;
+  category: string | null;
+  tvl: number | null;
+  change_1d: number | null;
+  change_7d: number | null;
+  chains: string[];
+}
+
+/** Full /protocols roster (Tier 1). Cache hard — one call powers all sectors. */
+export async function fetchAllProtocols(revalidate?: number): Promise<LlamaProtocolRow[]> {
+  const data = await getJson(`${PROTOCOLS_BASE}/protocols`, revalidate);
+  if (!Array.isArray(data)) return [];
+  return data.map((p: any) => ({
+    slug: String(p?.slug ?? ""),
+    name: String(p?.name ?? ""),
+    category: typeof p?.category === "string" ? p.category : null,
+    tvl: num(p?.tvl),
+    change_1d: num(p?.change_1d),
+    change_7d: num(p?.change_7d),
+    chains: Array.isArray(p?.chains)
+      ? p.chains.filter((c: unknown): c is string => typeof c === "string")
+      : [],
+  }));
+}
+
+/** Sector volume/fees totals (Tier 1). dataType: "dailyFees" | "dailyRevenue". */
+export async function fetchLlamaOverview(
+  dimension: "dexs" | "options" | "fees",
+  dataType?: "dailyFees" | "dailyRevenue",
+  revalidate?: number,
+): Promise<{ total24h: number | null; total7d: number | null; total30d: number | null } | null> {
+  const qs = dataType ? `?dataType=${dataType}` : "";
+  const data = await getJson(`${PROTOCOLS_BASE}/overview/${dimension}${qs}`, revalidate);
+  if (!data || typeof data !== "object") return null;
+  return {
+    total24h: num(data.total24h),
+    total7d: num(data.total7d),
+    total30d: num(data.total30d),
   };
 }
 
@@ -1298,6 +1424,19 @@ export interface LlamaOpenInterest {
  * Perp open interest for a protocol, read from the `/overview/open-interest`
  * roster (there is no per-protocol summary endpoint on the free tier).
  */
+export async function fetchLlamaOpenInterestOverview(
+  revalidate?: number,
+): Promise<Array<{ slug: string; name: string; openInterestUsd: number | null }>> {
+  const data = await getJson(`${PROTOCOLS_BASE}/overview/open-interest`, revalidate);
+  const protocols = data && Array.isArray(data.protocols) ? data.protocols : [];
+  return protocols.map((p: any) => ({
+    slug: typeof p?.slug === "string" ? p.slug : "",
+    name: typeof p?.name === "string" ? p.name : "",
+    openInterestUsd:
+      num(p.openInterestAtEnd) ?? num(p.total24h) ?? num(p.totalOpenInterest),
+  }));
+}
+
 export async function fetchLlamaOpenInterest(
   protocol: string,
   revalidate?: number,

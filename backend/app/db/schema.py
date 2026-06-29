@@ -263,13 +263,7 @@ PEG_MECHANISMS = (
 # Cross-sector matrix (ontology §7): slug -> required secondary sectors.
 CROSS_SECTOR_MATRIX: dict[str, tuple[str, ...]] = {
     "sky": ("Credit",),
-    "curve-finance": ("Stablecoin", "DEX"),
     "jupiter": ("Stablecoin", "Perpetuals"),
-    "pancakeswap": ("Perpetuals", "DEX"),
-    # DEX venues cross-tagged from primary Liquidity / Pools (canhav-liquidity spec §1.3).
-    "uniswap": ("DEX",),
-    "balancer": ("DEX",),
-    "aerodrome": ("DEX",),
     "ondo-finance": ("Stablecoin",),
     "pleasing-market": ("Stablecoin",),
     "mountain-protocol": ("RWA",),

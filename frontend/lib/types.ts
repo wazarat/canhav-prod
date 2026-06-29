@@ -1389,6 +1389,8 @@ export interface LiquidityMetrics {
   /** Market share within sub-sector (%) — derived across the tag set. */
   marketSharePct?: number | null;
   /* --- Tier 2: SCHEMA RESERVED (curated/theoretical until indexed) --- */
+  /** Fee APR (%) — derived fees24h / TVL × 365 × 100. */
+  feeAprPct?: Sourced<number | null>;
   /** Number of active pools (Pools). */
   poolCount?: Sourced<number | null>;
   /** Top pools by TVL (Pools). */
@@ -1478,6 +1480,8 @@ export interface OtherMetrics {
   marketCapUsd?: Sourced<number | null>;
   /** Market share within sub-sector (%) — derived across the tag set. */
   marketSharePct?: number | null;
+  /** Protocol treasury size (USD) — DeFi Llama /treasury/{slug} (Governance). */
+  treasuryUsd?: Sourced<number | null>;
   /* --- Tier 2: SCHEMA RESERVED (curated/theoretical) --- */
   /** Total active coverage (USD) — Underwriting. */
   activeCoverUsd?: Sourced<number | null>;
@@ -1638,6 +1642,8 @@ export interface LendingMetrics {
   totalBorrowsUsd?: Sourced<number | null>;
   /** Borrowed / supplied (0–100). */
   utilizationPct?: Sourced<number | null>;
+  /** Supplied minus borrowed (USD) — derived. */
+  availableLiquidityUsd?: Sourced<number | null>;
   /** Blended supply APY (%). */
   supplyApyPct?: Sourced<number | null>;
   /** Blended variable borrow APY (%). */
@@ -1736,6 +1742,10 @@ export interface UniversalIdentity {
   jurisdiction?: Sourced<string | null>;
   hq?: Sourced<string | null>;
   entityType?: Sourced<string | null>;
+  /** Funding rounds — DefiLlama /protocol/{slug} `raises[]` (Tier 1, live). */
+  raises?: Sourced<InvestmentRound[]>;
+  /** Governance IDs (e.g. "snapshot:aave.eth") — /protocol/{slug} `governanceID[]` (Tier 1). */
+  governanceIds?: Sourced<string[]>;
 }
 
 /** Live market universals from a single CoinGecko /coins/{id} payload (spec §C2). */
@@ -1774,7 +1784,56 @@ export interface UniversalMetrics {
   llamaSlug: string | null;
   /** CoinMarketCap id from DeFiLlama protocol meta (`cmcId`). */
   cmcId?: string | null;
+  /** Protocol treasury size (USD) — DefiLlama /treasury/{slug}, Σ currentChainTvls (Tier 1). */
+  treasuryUsd?: Sourced<number | null>;
+  /** Treasury excluding own-token holdings (USD) — keys not ending "-OwnTokens" (Tier 1). */
+  treasuryExOwnTokensUsd?: Sourced<number | null>;
   /** ISO timestamp this block was last synced (spec §C7). */
+  syncedAt: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Sector-level aggregates (Layer A) — computed by grouping DefiLlama          */
+/* /protocols by category + /overview/* totals. NOT coin data. Cron-written    */
+/* to a dedicated store item (Category="SectorAggregate", SK=PROTOCOL#<sector>)*/
+/* -------------------------------------------------------------------------- */
+
+export interface SectorTopProtocol {
+  name: string;
+  slug: string;
+  tvlUsd: number;
+}
+
+/** One sector's aggregate snapshot. All Tier 1 unless a field notes otherwise. */
+export interface SectorAggregate {
+  sector: NetworkSector;
+  /** Σ protocol TVL over the sector's seed slugs (DefiLlama /protocols tvl). */
+  totalTvlUsd: Sourced<number | null>;
+  /** TVL-weighted mean of change_1d / change_7d. */
+  tvlChangePct: { d1: number | null; d7: number | null } | null;
+  /** Count of seed protocols present in /protocols. */
+  protocolCount: Sourced<number | null>;
+  /** sectorTvl / total-DeFi-tvl × 100 (derived). */
+  dominancePct: Sourced<number | null>;
+  /** Top 5 protocols by TVL within the sector. */
+  topProtocols: SectorTopProtocol[];
+  /** Union of chains across the sector. */
+  chainsCovered: string[];
+  /** Sector fees / revenue 24h/7d/30d (DefiLlama /overview/fees). */
+  feesRevenue?: ProtocolFeesRevenue | null;
+  /** Sector-specific aggregates (only the relevant keys are set per sector). */
+  totalSuppliedUsd?: Sourced<number | null>;
+  totalBorrowedUsd?: Sourced<number | null>;
+  utilizationPct?: Sourced<number | null>;
+  totalOpenInterestUsd?: Sourced<number | null>;
+  perpVolume24hUsd?: Sourced<number | null>;
+  optionsNotional24hUsd?: Sourced<number | null>;
+  dexVolume24hUsd?: Sourced<number | null>;
+  totalStakedUsd?: Sourced<number | null>;
+  restakingTvlUsd?: Sourced<number | null>;
+  totalAumUsd?: Sourced<number | null>;
+  coverageCapacityUsd?: Sourced<number | null>;
+  treasuryUsd?: Sourced<number | null>;
   syncedAt: string;
 }
 

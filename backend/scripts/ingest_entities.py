@@ -1101,7 +1101,6 @@ _STABLECOIN_SECONDARY_BACKFILL: Dict[str, Any] = {
     "ondo-finance": ("RWA-Backed Stable", []),
     "aave": ("Decentralized CDP", []),
     "pleasing-market": ("Fiat-Backed Regulated", []),
-    "curve-finance": ("Decentralized CDP", []),
     "spark": ("Decentralized CDP", ["Yield-Bearing"]),
 }
 for _slug, (_subsector, _tags) in _STABLECOIN_PRIMARY_BACKFILL.items():
@@ -1137,7 +1136,6 @@ _SECONDARY_SECTORS: Dict[str, List[str]] = {
     "maple": ["RWA"],
     # Protocols whose primary sector stays put but also issue a stablecoin.
     "jupiter": ["Stablecoin", "Perpetuals"],
-    "curve-finance": ["Stablecoin"],
     "ondo-finance": ["Stablecoin"],
     "pleasing-market": ["Stablecoin"],
 }
@@ -1195,7 +1193,6 @@ _EXPANSION_SECONDARY_SECTORS: Dict[str, List[str]] = {
     "centrifuge": ["Credit"],
     "clearpool": ["Credit"],
     "goldfinch": ["Credit"],
-    "pancakeswap": ["Perpetuals"],
 }
 for _slug, _sectors in _EXPANSION_SECONDARY_SECTORS.items():
     _spec = ENTITY_SPECS.get(_slug)
@@ -1285,44 +1282,32 @@ if _ONDO_SPEC is not None:
     )
     _ONDO_SPEC["offchain_facts"] = _existing_facts
 
-# Liquidity primary reclassify (canhav-liquidity spec §1.3): the in-platform DEX
-# venues that also enable LPing become primary Liquidity / Pools and gain "DEX"
-# as a secondary sector (DexSubSector + Dex block stay on the dex_specs entry).
-# Runs after all other secondary-sector assignments so Stablecoin / Perpetuals
-# cross-tags are preserved before DEX is merged in.
-_LIQUIDITY_PRIMARY_RECLASSIFY: Dict[str, Dict[str, Any]] = {
-    "curve-finance": {
-        "liquidity_sub_sector": "Pools",
-        "liquidity_secondary_tags": ["Stable-Pools", "ve-Tokenomics", "Multi-Chain"],
-    },
-    "uniswap": {
-        "liquidity_sub_sector": "Pools",
-        "liquidity_secondary_tags": ["Concentrated-Liquidity", "Multi-Chain"],
-    },
-    "balancer": {
-        "liquidity_sub_sector": "Pools",
-        "liquidity_secondary_tags": ["Stable-Pools", "ve-Tokenomics"],
-    },
-    "aerodrome": {
-        "liquidity_sub_sector": "Pools",
-        "liquidity_secondary_tags": ["Concentrated-Liquidity", "ve-Tokenomics"],
-    },
-    "pancakeswap": {
-        "liquidity_sub_sector": "Pools",
-        "liquidity_secondary_tags": ["Concentrated-Liquidity", "Multi-Chain"],
-    },
-}
-for _slug, _liq in _LIQUIDITY_PRIMARY_RECLASSIFY.items():
+# Liquidity-exclusive pool venues (canhav-network-data spec): primary Liquidity /
+# Pools only — strip any legacy DEX / Stablecoin / Perpetuals cross-tags.
+_LIQUIDITY_EXCLUSIVE_POOL_SLUGS = (
+    "curve-finance",
+    "uniswap",
+    "balancer",
+    "aerodrome",
+    "pancakeswap",
+)
+for _slug in _LIQUIDITY_EXCLUSIVE_POOL_SLUGS:
     _spec = ENTITY_SPECS.get(_slug)
     if _spec is not None:
         _spec["sector"] = "Liquidity"
         _spec["sub_sector"] = "Pools"
-        _spec["liquidity_sub_sector"] = _liq["liquidity_sub_sector"]
-        _spec["liquidity_secondary_tags"] = _liq["liquidity_secondary_tags"]
-        _existing = [s for s in (_spec.get("secondary_sectors") or []) if s != "Liquidity"]
-        if "DEX" not in _existing:
-            _existing.append("DEX")
-        _spec["secondary_sectors"] = _existing or None
+        _spec["liquidity_sub_sector"] = "Pools"
+        _spec["secondary_sectors"] = None
+        for _field in (
+            "dex_sub_sector",
+            "dex_secondary_tags",
+            "dex",
+            "stablecoin_sub_sector",
+            "stablecoin_secondary_tags",
+            "derivatives_sub_sector",
+            "derivatives_secondary_tags",
+        ):
+            _spec.pop(_field, None)
 
 # Derivatives extend-existing (canhav-derivatives spec §3/§5): Ethena keeps
 # primary Stablecoin and gains a secondary Derivatives tag (Delta-Neutral).

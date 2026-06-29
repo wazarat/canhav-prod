@@ -8,9 +8,11 @@ import { hasUpstash, readAllItemsFromRedis } from "@/lib/server/redis";
 import type {
   NetworkProfile,
   NetworkRisk,
+  NetworkSector,
   RiskCategory,
   RwaProfile,
   RwaSecondaryTag,
+  SectorAggregate,
   StablecoinProfile,
   TokenProfile,
 } from "@/lib/types";
@@ -408,4 +410,39 @@ export async function readLiveStore(): Promise<LiveStore> {
   tokens.sort((a, b) => a.name.localeCompare(b.name));
   networks.sort((a, b) => a.name.localeCompare(b.name));
   return { stablecoins, rwas, tokens, networks };
+}
+
+function mapSectorAggregateItem(item: Record<string, unknown>): SectorAggregate {
+  return {
+    sector: String(item.Sector ?? item.Slug ?? "") as NetworkSector,
+    totalTvlUsd: item.TotalTvlUsd as SectorAggregate["totalTvlUsd"],
+    tvlChangePct: (item.TvlChangePct as SectorAggregate["tvlChangePct"]) ?? null,
+    protocolCount: item.ProtocolCount as SectorAggregate["protocolCount"],
+    dominancePct: item.DominancePct as SectorAggregate["dominancePct"],
+    topProtocols: (item.TopProtocols as SectorAggregate["topProtocols"]) ?? [],
+    chainsCovered: (item.ChainsCovered as string[]) ?? [],
+    feesRevenue: (item.FeesRevenue as SectorAggregate["feesRevenue"]) ?? null,
+    totalSuppliedUsd: item.TotalSuppliedUsd as SectorAggregate["totalSuppliedUsd"],
+    totalBorrowedUsd: item.TotalBorrowedUsd as SectorAggregate["totalBorrowedUsd"],
+    utilizationPct: item.UtilizationPct as SectorAggregate["utilizationPct"],
+    totalOpenInterestUsd: item.TotalOpenInterestUsd as SectorAggregate["totalOpenInterestUsd"],
+    perpVolume24hUsd: item.PerpVolume24hUsd as SectorAggregate["perpVolume24hUsd"],
+    optionsNotional24hUsd: item.OptionsNotional24hUsd as SectorAggregate["optionsNotional24hUsd"],
+    dexVolume24hUsd: item.DexVolume24hUsd as SectorAggregate["dexVolume24hUsd"],
+    totalStakedUsd: item.TotalStakedUsd as SectorAggregate["totalStakedUsd"],
+    restakingTvlUsd: item.RestakingTvlUsd as SectorAggregate["restakingTvlUsd"],
+    totalAumUsd: item.TotalAumUsd as SectorAggregate["totalAumUsd"],
+    coverageCapacityUsd: item.CoverageCapacityUsd as SectorAggregate["coverageCapacityUsd"],
+    treasuryUsd: item.TreasuryUsd as SectorAggregate["treasuryUsd"],
+    syncedAt: String(item.SyncedAt ?? item.UpdatedAt ?? ""),
+  };
+}
+
+/** Read sector-level aggregate snapshots written by the cron sector pass. */
+export async function getSectorAggregates(): Promise<SectorAggregate[]> {
+  const items = await readItems();
+  return items
+    .filter((it) => String(it.Category ?? "") === "SectorAggregate")
+    .map((it) => mapSectorAggregateItem(it as Record<string, unknown>))
+    .sort((a, b) => a.sector.localeCompare(b.sector));
 }

@@ -14,6 +14,10 @@ export function networkHeadlineMarketCapUsd(network: NetworkProfile): number | n
 
 /** Headline 24h trading volume for a network row. */
 export function networkHeadlineVolume24hUsd(network: NetworkProfile): number | null {
+  if (network.sector === "Liquidity") {
+    const liqVol = network.liquidity?.volume24hUsd?.value;
+    if (liqVol != null) return liqVol;
+  }
   const u = network.universalMetrics;
   return (
     u?.market.volume24hUsd?.value ??

@@ -1,5 +1,6 @@
 import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
 import { CANONICAL_PERP_DEX_SLUGS } from "@/data/derivatives-seed";
+import { CANONICAL_LIQUIDITY_POOL_SLUGS } from "@/data/liquidity-seed";
 import type { BadgeTone } from "@/components/ui/Badge";
 import type {
   CreditTag,
@@ -13,6 +14,7 @@ import type {
 
 const CANONICAL_LENDING_SLUG_SET = new Set<string>(CANONICAL_LENDING_SLUGS);
 const CANONICAL_PERP_DEX_SLUG_SET = new Set<string>(CANONICAL_PERP_DEX_SLUGS);
+const CANONICAL_LIQUIDITY_POOL_SLUG_SET = new Set<string>(CANONICAL_LIQUIDITY_POOL_SLUGS);
 
 export interface NetworkTaxonomyBadges {
   primarySector: string | null;
@@ -134,6 +136,7 @@ export function matchesSectorFilter(profile: NetworkProfile, sector: string): bo
   if ((profile.secondarySectors as string[] | undefined)?.includes(sector)) return true;
   if (sector === "Credit" && CANONICAL_LENDING_SLUG_SET.has(profile.slug)) return true;
   if (sector === "Derivatives" && CANONICAL_PERP_DEX_SLUG_SET.has(profile.slug)) return true;
+  if (sector === "Liquidity" && CANONICAL_LIQUIDITY_POOL_SLUG_SET.has(profile.slug)) return true;
   return false;
 }
 
@@ -143,7 +146,11 @@ export function filterTagsForSector(profile: NetworkProfile, sector: string): st
     return profile.stakingSubSector ? [profile.stakingSubSector] : [];
   }
   if (sector === "Liquidity") {
-    return profile.liquiditySubSector ? [profile.liquiditySubSector] : [];
+    const primary =
+      profile.liquiditySubSector ??
+      (profile.sector === "Liquidity" && profile.subSector ? profile.subSector : null) ??
+      (CANONICAL_LIQUIDITY_POOL_SLUG_SET.has(profile.slug) ? "Pools" : null);
+    return primary ? [primary] : [];
   }
   if (sector === "Derivatives") {
     const primary =

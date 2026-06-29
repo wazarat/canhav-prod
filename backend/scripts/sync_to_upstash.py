@@ -58,6 +58,7 @@ from typing import Dict, List, Optional, Tuple
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = BACKEND_ROOT.parent
 DEFAULT_STORE = BACKEND_ROOT / "data" / "store.json"
+DEFAULT_BOOTSTRAP = REPO_ROOT / "frontend" / "data" / "bootstrap-store.json"
 DEFAULT_KEY = "canhav:store"
 DEFAULT_ENV_FILES = (
     REPO_ROOT / "frontend" / ".env.local",
@@ -172,6 +173,11 @@ def main(argv: List[str]) -> int:
     parser = argparse.ArgumentParser(description="Seed Upstash Redis from the local store.")
     parser.add_argument("store", nargs="?", default=str(DEFAULT_STORE), help="Path to store.json")
     parser.add_argument(
+        "--bootstrap",
+        action="store_true",
+        help=f"Seed from committed bootstrap bundle ({DEFAULT_BOOTSTRAP.name}) instead of local store.json.",
+    )
+    parser.add_argument(
         "--replace",
         action="store_true",
         help="DEL the hash first so production mirrors local exactly.",
@@ -182,6 +188,8 @@ def main(argv: List[str]) -> int:
         help="Print what would be written; change nothing.",
     )
     args = parser.parse_args(argv[1:])
+
+    store_path = Path(DEFAULT_BOOTSTRAP if args.bootstrap else args.store).expanduser()
 
     for env_path in DEFAULT_ENV_FILES:
         load_env_file(env_path)
@@ -204,7 +212,7 @@ def main(argv: List[str]) -> int:
             msg += f"\nDetected empty vars: {cred_state.split(':', 1)[1]}\n"
         raise SystemExit(msg)
 
-    items = load_items(Path(args.store).expanduser())
+    items = load_items(store_path)
     key = store_key()
 
     # Build a single HSET with every field/value pair (Upstash accepts multi-field).
@@ -216,7 +224,7 @@ def main(argv: List[str]) -> int:
         cat = item.get("Category", "?")
         by_category[cat] = by_category.get(cat, 0) + 1
 
-    print(f"Store      : {args.store}")
+    print(f"Store      : {store_path}")
     print(f"Hash key   : {key}")
     print(f"Endpoint   : {url or '(dry-run, no endpoint)'}")
     print(f"Items      : {len(items)}  " + ", ".join(f"{c}={n}" for c, n in sorted(by_category.items())))

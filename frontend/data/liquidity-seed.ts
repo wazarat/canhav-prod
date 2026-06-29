@@ -34,3 +34,12 @@ export const LIQUIDITY_SEED: LiquiditySeed[] = [
   { name: "Arrakis Finance",   slug: "arrakis",        token: null,   subSector: "Vaults", secondaryTags: ["LP-Strategy-Manager", "Concentrated-Liquidity"],      llamaSlug: "arrakis-modular", coingeckoId: null,               seedMode: "new" },
   { name: "Maverick Protocol", slug: "maverick",       token: "MAV",  subSector: "Vaults", secondaryTags: ["LP-Strategy-Manager", "Concentrated-Liquidity"],      llamaSlug: "maverick-protocol", coingeckoId: "maverick-protocol", seedMode: "new" },
 ];
+
+/** Pool venues reclassified from DEX → exclusive Liquidity / Pools (read-time + store backfill). */
+export const CANONICAL_LIQUIDITY_POOL_SLUGS = [
+  "curve-finance",
+  "uniswap",
+  "balancer",
+  "aerodrome",
+  "pancakeswap",
+] as const;

@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
 import { CANONICAL_PERP_DEX_SLUGS } from "@/data/derivatives-seed";
+import { CANONICAL_LIQUIDITY_POOL_SLUGS, LIQUIDITY_SEED } from "@/data/liquidity-seed";
 import { repoRoot } from "@/lib/server/env";
 import { hasUpstash, readAllItemsFromRedis } from "@/lib/server/redis";
 import type {
@@ -120,6 +121,25 @@ const RWA_TAG_MIGRATION: Record<string, RwaSecondaryTag | null> = {
 
 const CANONICAL_LENDING_SLUG_SET = new Set<string>(CANONICAL_LENDING_SLUGS);
 const CANONICAL_PERP_DEX_SLUG_SET = new Set<string>(CANONICAL_PERP_DEX_SLUGS);
+const CANONICAL_LIQUIDITY_POOL_SLUG_SET = new Set<string>(CANONICAL_LIQUIDITY_POOL_SLUGS);
+const LIQUIDITY_SEED_BY_SLUG = new Map(LIQUIDITY_SEED.map((s) => [s.slug, s]));
+
+/** Map legacy Dex block onto Liquidity metrics when Redis still has pre-migration rows. */
+function liquidityBlockFromItem(item: Record<string, unknown>, slug: string): Record<string, unknown> | null {
+  const liquidity = item.Liquidity as Record<string, unknown> | null | undefined;
+  if (liquidity && typeof liquidity === "object") return liquidity;
+
+  if (!CANONICAL_LIQUIDITY_POOL_SLUG_SET.has(slug)) return null;
+  const dex = item.Dex as Record<string, unknown> | null | undefined;
+  if (!dex || typeof dex !== "object") return null;
+
+  const mapped: Record<string, unknown> = {};
+  if (dex.auditHistory) mapped.auditHistory = dex.auditHistory;
+  if (dex.deployment) mapped.deployment = dex.deployment;
+  if (dex.tvlUsd) mapped.tvlUsd = dex.tvlUsd;
+  if (dex.volume30dUsd) mapped.volume24hUsd = dex.volume30dUsd;
+  return Object.keys(mapped).length > 0 ? mapped : null;
+}
 
 /** Normalize Credit → Lending taxonomy at read time (handles stale Redis records). */
 function normalizeNetworkTaxonomy(item: Record<string, unknown>): {
@@ -150,6 +170,16 @@ function normalizeNetworkTaxonomy(item: Record<string, unknown>): {
       sector: "Derivatives",
       secondarySectors: undefined,
       subSector: "Perp DEX",
+      tags: [],
+    };
+  }
+
+  if (CANONICAL_LIQUIDITY_POOL_SLUG_SET.has(slug)) {
+    const seed = LIQUIDITY_SEED_BY_SLUG.get(slug);
+    return {
+      sector: "Liquidity",
+      secondarySectors: undefined,
+      subSector: "Pools",
       tags: [],
     };
   }
@@ -297,6 +327,19 @@ export async function readLiveStore(): Promise<LiveStore> {
       const taxonomy = normalizeNetworkTaxonomy(item);
       const slug = String(item.Slug ?? "");
       const isCanonicalPerpDex = CANONICAL_PERP_DEX_SLUG_SET.has(slug);
+      const isCanonicalLiquidityPool = CANONICAL_LIQUIDITY_POOL_SLUG_SET.has(slug);
+      const seed = LIQUIDITY_SEED_BY_SLUG.get(slug);
+      const liquidityBlock = liquidityBlockFromItem(item, slug);
+      const liquiditySubSector =
+        (item.LiquiditySubSector as NetworkProfile["liquiditySubSector"]) ??
+        (taxonomy.sector === "Liquidity" && item.SubSector
+          ? (item.SubSector as NetworkProfile["liquiditySubSector"])
+          : isCanonicalLiquidityPool
+            ? "Pools"
+            : null);
+      const liquiditySecondaryTags =
+        (item.LiquiditySecondaryTags as NetworkProfile["liquiditySecondaryTags"]) ??
+        (isCanonicalLiquidityPool && seed ? seed.secondaryTags : undefined);
       // Accept legacy "Entity" records until the prod store is re-seeded.
       networks.push({
         category: "Network",
@@ -332,18 +375,21 @@ export async function readLiveStore(): Promise<LiveStore> {
         stablecoinSubSector: item.StablecoinSubSector ?? null,
         stablecoinSecondaryTags: item.StablecoinSecondaryTags ?? undefined,
         stablecoin: item.Stablecoin ?? null,
-        dexSubSector: isCanonicalPerpDex ? null : (item.DexSubSector ?? null),
-        dexSecondaryTags: isCanonicalPerpDex ? undefined : (item.DexSecondaryTags ?? undefined),
-        dex: item.Dex ?? null,
+        dexSubSector: isCanonicalPerpDex || isCanonicalLiquidityPool ? null : (item.DexSubSector ?? null),
+        dexSecondaryTags:
+          isCanonicalPerpDex || isCanonicalLiquidityPool
+            ? undefined
+            : (item.DexSecondaryTags ?? undefined),
+        dex: isCanonicalLiquidityPool ? null : (item.Dex ?? null),
         rwaSubSector: item.RwaSubSector ?? null,
         rwaSecondaryTags: normalizeRwaTags(item.RwaSecondaryTags),
         rwa: item.Rwa ?? null,
         stakingSubSector: item.StakingSubSector ?? null,
         stakingSecondaryTags: item.StakingSecondaryTags ?? undefined,
         staking: item.Staking ?? null,
-        liquiditySubSector: item.LiquiditySubSector ?? null,
-        liquiditySecondaryTags: item.LiquiditySecondaryTags ?? undefined,
-        liquidity: item.Liquidity ?? null,
+        liquiditySubSector,
+        liquiditySecondaryTags,
+        liquidity: liquidityBlock,
         derivativesSubSector: isCanonicalPerpDex
           ? "Perp DEX"
           : ((item.DerivativesSubSector as NetworkProfile["derivativesSubSector"]) ??

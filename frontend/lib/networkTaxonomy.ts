@@ -54,6 +54,117 @@ export const RWA_SECONDARY_TAGS: RwaSecondaryTag[] = [
   "Multi-Chain",
 ];
 
+/** Staking tag label → StakingTagMetrics object key. */
+export const STAKING_TAG_METRICS_KEY: Record<
+  StakingSubSector,
+  "liquidStaking" | "restaking" | "liquidRestaking"
+> = {
+  "Liquid Staking": "liquidStaking",
+  Restaking: "restaking",
+  "Liquid Restaking": "liquidRestaking",
+};
+
+/** Liquidity tag label → LiquidityTagMetrics object key. */
+export const LIQUIDITY_TAG_METRICS_KEY: Record<
+  LiquiditySubSector,
+  "pools" | "vaults"
+> = {
+  Pools: "pools",
+  Vaults: "vaults",
+};
+
+/** Derivatives tag label → DerivativesTagMetrics object key. */
+export const DERIVATIVES_TAG_METRICS_KEY: Record<
+  DerivativesSubSector,
+  "perpDex" | "optionVaults" | "deltaNeutral"
+> = {
+  "Perp DEX": "perpDex",
+  "Option Vaults": "optionVaults",
+  "Delta-Neutral": "deltaNeutral",
+};
+
+/** Other tag label → OtherTagMetrics object key. */
+export const OTHER_TAG_METRICS_KEY: Record<
+  OtherSubSector,
+  "underwriting" | "governance"
+> = {
+  Underwriting: "underwriting",
+  Governance: "governance",
+};
+
+/** RWA sub-sector label → RwaTagMetrics object key. */
+export const RWA_TAG_METRICS_KEY: Record<
+  import("@/lib/types").RwaSubSector,
+  keyof import("@/lib/types").RwaTagMetrics
+> = {
+  "Tokenized Treasuries": "treasuries",
+  "Tokenized Equities": "tokenizedEquities",
+  "Tokenized Commodities": "commodities",
+  "Real Estate": "realEstate",
+  "Private Credit": "privateCredit",
+  "Carbon / ESG": "carbon",
+  "Tokenization Infrastructure": "tokenizationInfra",
+  "Structured Products": "structuredProducts",
+  "Event Finance": "eventFinance",
+  "Stablecoins & FX": "stablecoinsFx",
+};
+
+/** Sectors with tag-keyed metric panels on the Metrics tab. */
+export const TAG_METRICS_SECTORS = [
+  "Credit",
+  "Staking",
+  "Liquidity",
+  "Derivatives",
+  "Other",
+  "RWA",
+] as const;
+
+/** Primary metric-bearing tags for a sector (for Metrics tab panels). */
+export function primaryMetricTagsForSector(profile: NetworkProfile, sector: string): string[] {
+  if (sector === "Credit") {
+    if (CANONICAL_LENDING_SLUG_SET.has(profile.slug)) {
+      const tags = profile.tags?.length ? profile.tags : (["Lending"] as CreditTag[]);
+      return [...tags];
+    }
+    return profile.tags ?? (profile.subSector ? [profile.subSector] : []);
+  }
+  if (sector === "Staking" && profile.stakingSubSector) return [profile.stakingSubSector];
+  if (sector === "Liquidity") {
+    const primary =
+      profile.liquiditySubSector ??
+      (profile.sector === "Liquidity" && profile.subSector ? profile.subSector : null) ??
+      (CANONICAL_LIQUIDITY_POOL_SLUG_SET.has(profile.slug) ? "Pools" : null);
+    return primary ? [primary] : [];
+  }
+  if (sector === "Derivatives") {
+    const primary =
+      profile.derivativesSubSector ??
+      (profile.sector === "Derivatives" && profile.subSector ? profile.subSector : null) ??
+      (CANONICAL_PERP_DEX_SLUG_SET.has(profile.slug) ? "Perp DEX" : null);
+    return primary ? [primary] : [];
+  }
+  if (sector === "Other" && profile.otherSubSector) return [profile.otherSubSector];
+  if (sector === "RWA" && profile.rwaSubSector) return [profile.rwaSubSector];
+  return [];
+}
+
+/** All sectors this entity belongs to within the tag-metrics set. */
+export function affiliatedTagMetricSectors(profile: NetworkProfile): string[] {
+  const sectors = new Set<string>();
+  if (profile.sector && TAG_METRICS_SECTORS.includes(profile.sector as (typeof TAG_METRICS_SECTORS)[number])) {
+    sectors.add(profile.sector);
+  }
+  for (const s of profile.secondarySectors ?? []) {
+    if (TAG_METRICS_SECTORS.includes(s as (typeof TAG_METRICS_SECTORS)[number])) {
+      sectors.add(s);
+    }
+  }
+  if (CANONICAL_LENDING_SLUG_SET.has(profile.slug)) sectors.add("Credit");
+  if (CANONICAL_PERP_DEX_SLUG_SET.has(profile.slug)) sectors.add("Derivatives");
+  if (CANONICAL_LIQUIDITY_POOL_SLUG_SET.has(profile.slug)) sectors.add("Liquidity");
+  return [...sectors];
+}
+
 /** Sector chip tone per ontology §9. */
 export function sectorBadgeTone(sector: string | null | undefined): BadgeTone {
   switch (sector) {

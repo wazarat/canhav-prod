@@ -2,20 +2,22 @@ import type { ReactNode } from "react";
 
 import {
   CreditTagMetricsSection,
-  DerivativesMetricsSection,
-  DexMetricsSection,
+  DerivativesTagMetricsSection,
+  EntityOffchainSection,
   LendingMetricTiles,
-  LiquidityMetricsSection,
-  OpenInterestSection,
-  OptionsVolumeSection,
-  OtherMetricsSection,
-  RwaMetricsSection,
+  LiquidityTagMetricsSection,
+  OtherTagMetricsSection,
+  RwaTagMetricsSection,
+  StakingTagMetricsSection,
   StablecoinMetricsSection,
-  StakingMetricsSection,
 } from "@/components/networks/NetworkSections";
 import { NetworkMarketCard } from "@/components/networks/NetworkMarketCard";
 import { Card } from "@/components/ui/Card";
-import type { NetworkProfile } from "@/lib/types";
+import {
+  affiliatedTagMetricSectors,
+  primaryMetricTagsForSector,
+} from "@/lib/networkTaxonomy";
+import type { CreditTag, NetworkProfile } from "@/lib/types";
 
 function SectionShell({
   title,
@@ -37,7 +39,63 @@ function SectionShell({
   );
 }
 
+function hasTagMetricsForSector(profile: NetworkProfile, sector: string): boolean {
+  switch (sector) {
+    case "Credit":
+      return Boolean(profile.creditTagMetrics);
+    case "Staking":
+      return Boolean(profile.stakingTagMetrics);
+    case "Liquidity":
+      return Boolean(profile.liquidityTagMetrics);
+    case "Derivatives":
+      return Boolean(profile.derivativesTagMetrics);
+    case "Other":
+      return Boolean(profile.otherTagMetrics);
+    case "RWA":
+      return Boolean(profile.rwaTagMetrics);
+    default:
+      return false;
+  }
+}
+
+function SectorTagMetricsBlock({
+  profile,
+  sector,
+}: {
+  profile: NetworkProfile;
+  sector: string;
+}) {
+  const tags = primaryMetricTagsForSector(profile, sector);
+
+  switch (sector) {
+    case "Credit": {
+      const creditTags = (
+        profile.lending ? tags.filter((tag) => tag !== "Lending") : tags
+      ) as CreditTag[];
+      return (
+        <CreditTagMetricsSection tags={creditTags} metrics={profile.creditTagMetrics} />
+      );
+    }
+    case "Staking":
+      return <StakingTagMetricsSection tags={tags} metrics={profile.stakingTagMetrics} />;
+    case "Liquidity":
+      return <LiquidityTagMetricsSection tags={tags} metrics={profile.liquidityTagMetrics} />;
+    case "Derivatives":
+      return (
+        <DerivativesTagMetricsSection tags={tags} metrics={profile.derivativesTagMetrics} />
+      );
+    case "Other":
+      return <OtherTagMetricsSection tags={tags} metrics={profile.otherTagMetrics} />;
+    case "RWA":
+      return <RwaTagMetricsSection tags={tags} metrics={profile.rwaTagMetrics} />;
+    default:
+      return null;
+  }
+}
+
 export function NetworkMetricsTab({ profile }: { profile: NetworkProfile }) {
+  const sectors = affiliatedTagMetricSectors(profile);
+
   const hasAnySectorBlock = Boolean(
     profile.lending ||
       profile.stablecoin ||
@@ -50,14 +108,16 @@ export function NetworkMetricsTab({ profile }: { profile: NetworkProfile }) {
       profile.optionsVolume ||
       profile.openInterest ||
       profile.creditTagMetrics ||
-      profile.market,
+      profile.stakingTagMetrics ||
+      profile.liquidityTagMetrics ||
+      profile.derivativesTagMetrics ||
+      profile.otherTagMetrics ||
+      profile.rwaTagMetrics ||
+      profile.market ||
+      profile.universalMetrics?.identity.raises?.value.length ||
+      profile.universalMetrics?.identity.governanceIds?.value.length ||
+      profile.universalMetrics?.treasuryUsd?.value != null,
   );
-
-  // When the full Lending block is present, live tiles render there — skip duplicate
-  // Lending tag panel (curated collateral/oracles remain on Asset coverage tab).
-  const creditTags = profile.lending
-    ? (profile.tags ?? []).filter((tag) => tag !== "Lending")
-    : profile.tags;
 
   return (
     <div className="space-y-8 pt-6">
@@ -80,16 +140,15 @@ export function NetworkMetricsTab({ profile }: { profile: NetworkProfile }) {
         </SectionShell>
       )}
 
-      <CreditTagMetricsSection tags={creditTags} metrics={profile.creditTagMetrics} />
+      {sectors.map((sector) =>
+        hasTagMetricsForSector(profile, sector) ? (
+          <SectorTagMetricsBlock key={sector} profile={profile} sector={sector} />
+        ) : null,
+      )}
+
       <StablecoinMetricsSection stablecoin={profile.stablecoin} memberCoins={profile.memberCoins} />
-      <DexMetricsSection dex={profile.dex} />
-      <LiquidityMetricsSection liquidity={profile.liquidity} />
-      <DerivativesMetricsSection derivatives={profile.derivatives} />
-      <OtherMetricsSection other={profile.other} />
-      <OptionsVolumeSection optionsVolume={profile.optionsVolume} />
-      <OpenInterestSection openInterest={profile.openInterest} />
-      <RwaMetricsSection rwa={profile.rwa} />
-      <StakingMetricsSection staking={profile.staking} />
+
+      <EntityOffchainSection universal={profile.universalMetrics} />
 
       {profile.market && (
         <NetworkMarketCard market={profile.market} symbol={profile.symbol} />

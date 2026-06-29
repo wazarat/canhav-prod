@@ -72,6 +72,11 @@ const MERGE_IF_NULL_FIELDS = [
   "Sources",
   "Lending",
   "CreditTagMetrics",
+  "StakingTagMetrics",
+  "LiquidityTagMetrics",
+  "DerivativesTagMetrics",
+  "OtherTagMetrics",
+  "RwaTagMetrics",
 ];
 
 /** Perp DEX venues whose taxonomy is canonical in bootstrap. */

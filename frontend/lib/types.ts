@@ -1540,6 +1540,8 @@ export interface DerivativesMetrics {
   hedgeVenue?: string[];
   /** Funding rate (%) — Delta-Neutral. */
   fundingRatePct?: Sourced<number | null>;
+  /** Insurance fund size (USD) — curated Perp DEX. */
+  insuranceFundUsd?: Sourced<number | null>;
   /** Structured governance metrics (reuse existing type). */
   governanceDetail?: GovernanceActivityDetail | null;
   /** Audit / exploit history (curated). */
@@ -1689,6 +1691,8 @@ export interface LendingMarketMetrics {
   totalSuppliedUsd?: Sourced<number | null>; // DefiLlama TVL
   totalBorrowsUsd?: Sourced<number | null>;
   utilizationPct?: Sourced<number | null>;
+  /** Supplied minus borrowed (USD) — derived. */
+  availableLiquidityUsd?: Sourced<number | null>;
   supplyApyPct?: Sourced<number | null>;
   borrowApyPct?: Sourced<number | null>;
   collateralAssets?: string[]; // curated
@@ -1714,6 +1718,223 @@ export interface FixedIncomeMetrics {
   maturities?: string[]; // curated (3m, 6m, …)
   mechanism?: string | null; // curated ("PT/YT split", "fCash", "zero-coupon")
   markets?: number | null; // curated count of active markets
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tag-specific metric blocks — Staking / Liquidity / Derivatives / Other / RWA */
+/* -------------------------------------------------------------------------- */
+
+/** "Liquid Staking" tag metrics. */
+export interface StakingLiquidStakingTagMetrics {
+  totalStakedUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  baseAssetExchangeRate?: Sourced<number | null>;
+  pegDeviationPct?: Sourced<number | null>;
+  stakingAprPct?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  underlyingAsset?: string | null;
+  validatorCount?: Sourced<number | null>;
+  nodeOperatorCount?: Sourced<number | null>;
+  operatorModel?: string | null;
+  slashingEvents?: SlashingEvent[] | null;
+  withdrawalQueue?: string | null;
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
+/** "Restaking" tag metrics. */
+export interface StakingRestakingTagMetrics {
+  totalStakedUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  stakingAprPct?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  avsData?: AvsExposure[] | null;
+  validatorCount?: Sourced<number | null>;
+  nodeOperatorCount?: Sourced<number | null>;
+  operatorModel?: string | null;
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
+/** "Liquid Restaking" tag metrics. */
+export interface StakingLiquidRestakingTagMetrics {
+  totalStakedUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  baseAssetExchangeRate?: Sourced<number | null>;
+  pegDeviationPct?: Sourced<number | null>;
+  stakingAprPct?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  avsData?: AvsExposure[] | null;
+  collateralBasket?: { asset: string; pct: number }[] | null;
+  withdrawalQueue?: string | null;
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
+/** Tag-specific metric blocks keyed by the Staking tag vocabulary. */
+export interface StakingTagMetrics {
+  liquidStaking?: StakingLiquidStakingTagMetrics | null;
+  restaking?: StakingRestakingTagMetrics | null;
+  liquidRestaking?: StakingLiquidRestakingTagMetrics | null;
+}
+
+/** "Pools" tag metrics. */
+export interface LiquidityPoolsTagMetrics {
+  tvlUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  volume24hUsd?: Sourced<number | null>;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  feeAprPct?: Sourced<number | null>;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  poolCount?: Sourced<number | null>;
+  topPools?: { name: string; tvlUsd: number; apyPct: number | null }[] | null;
+  ileImpermanentLossNote?: string | null;
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
+/** "Vaults" tag metrics. */
+export interface LiquidityVaultsTagMetrics {
+  tvlUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  vaultCount?: Sourced<number | null>;
+  avgVaultApyPct?: Sourced<number | null>;
+  underlyingProtocols?: string[];
+  performanceFeePct?: number | null;
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
+/** Tag-specific metric blocks keyed by the Liquidity tag vocabulary. */
+export interface LiquidityTagMetrics {
+  pools?: LiquidityPoolsTagMetrics | null;
+  vaults?: LiquidityVaultsTagMetrics | null;
+}
+
+/** "Perp DEX" tag metrics. */
+export interface DerivativesPerpDexTagMetrics {
+  tvlUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  openInterestUsd?: Sourced<number | null>;
+  longOpenInterestUsd?: Sourced<number | null>;
+  shortOpenInterestUsd?: Sourced<number | null>;
+  volume24hUsd?: Sourced<number | null>;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  maxLeverageX?: number | null;
+  supportedMarkets?: string[];
+  pricingModel?: string | null;
+  insuranceFundUsd?: Sourced<number | null>;
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
+/** "Option Vaults" tag metrics. */
+export interface DerivativesOptionVaultsTagMetrics {
+  tvlUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  vaultStrategies?: string[];
+  vaultApyPct?: Sourced<number | null>;
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
+/** "Delta-Neutral" tag metrics. */
+export interface DerivativesDeltaNeutralTagMetrics {
+  tvlUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  hedgeVenue?: string[];
+  fundingRatePct?: Sourced<number | null>;
+  vaultApyPct?: Sourced<number | null>;
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
+/** Tag-specific metric blocks keyed by the Derivatives tag vocabulary. */
+export interface DerivativesTagMetrics {
+  perpDex?: DerivativesPerpDexTagMetrics | null;
+  optionVaults?: DerivativesOptionVaultsTagMetrics | null;
+  deltaNeutral?: DerivativesDeltaNeutralTagMetrics | null;
+}
+
+/** "Underwriting" tag metrics. */
+export interface OtherUnderwritingTagMetrics {
+  tvlUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  activeCoverUsd?: Sourced<number | null>;
+  capitalPoolUsd?: Sourced<number | null>;
+  claimsPaidUsd?: Sourced<number | null>;
+  coverModel?: string | null;
+  coveredProtocols?: string[];
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
+/** "Governance" tag metrics. */
+export interface OtherGovernanceTagMetrics {
+  tvlUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  treasuryUsd?: Sourced<number | null>;
+  votingPowerControlled?: string | null;
+  targetProtocols?: string[];
+  bribeVolumeUsd?: Sourced<number | null>;
+  lockedTokenValueUsd?: Sourced<number | null>;
+  governanceDetail?: GovernanceActivityDetail | null;
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
+/** Tag-specific metric blocks keyed by the Other tag vocabulary. */
+export interface OtherTagMetrics {
+  underwriting?: OtherUnderwritingTagMetrics | null;
+  governance?: OtherGovernanceTagMetrics | null;
+}
+
+/** Tag-specific metric blocks keyed by RWA sub-sector (camelCase keys). */
+export interface RwaTagMetrics {
+  treasuries?: RwaTreasuryMetrics | null;
+  tokenizedEquities?: { aumUsd?: Sourced<number | null> } | null;
+  commodities?: RwaCommoditiesMetrics | null;
+  realEstate?: RwaRealEstateMetrics | null;
+  privateCredit?: RwaPrivateCreditMetrics | null;
+  carbon?: RwaCarbonMetrics | null;
+  tokenizationInfra?: RwaTokenizationInfraMetrics | null;
+  structuredProducts?: { aumUsd?: Sourced<number | null> } | null;
+  eventFinance?: { aumUsd?: Sourced<number | null> } | null;
+  stablecoinsFx?: { aumUsd?: Sourced<number | null> } | null;
 }
 
 /**
@@ -1975,6 +2196,16 @@ export interface NetworkProfile {
   lending?: LendingMetrics | null;
   /** Tag-specific curated metric blocks (Lending / Leveraged Yield / Fixed Income). */
   creditTagMetrics?: CreditTagMetrics | null;
+  /** Tag-specific metric blocks (Liquid Staking / Restaking / Liquid Restaking). */
+  stakingTagMetrics?: StakingTagMetrics | null;
+  /** Tag-specific metric blocks (Pools / Vaults). */
+  liquidityTagMetrics?: LiquidityTagMetrics | null;
+  /** Tag-specific metric blocks (Perp DEX / Option Vaults / Delta-Neutral). */
+  derivativesTagMetrics?: DerivativesTagMetrics | null;
+  /** Tag-specific metric blocks (Underwriting / Governance). */
+  otherTagMetrics?: OtherTagMetrics | null;
+  /** Tag-specific metric blocks keyed by RWA sub-sector. */
+  rwaTagMetrics?: RwaTagMetrics | null;
   /** Stablecoin primary sub-sector (when sector === "Stablecoin", or as a secondary marker). */
   stablecoinSubSector?: StablecoinSubSector | null;
   /** Stablecoin secondary tags (0–2): Yield-Bearing, Multi-Currency, Wound-Down, etc. */

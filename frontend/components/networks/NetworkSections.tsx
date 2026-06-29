@@ -1,4 +1,5 @@
 import { ArrowUpRight, ChevronDown } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
@@ -9,10 +10,14 @@ import type {
   CreditTag,
   CreditTagMetrics,
   DerivativesMetrics,
+  DerivativesSubSector,
+  DerivativesTagMetrics,
   DexMetrics,
   DexSubSectorMetrics,
   LendingMetrics,
   LiquidityMetrics,
+  LiquiditySubSector,
+  LiquidityTagMetrics,
   MemberCoinRef,
   NetworkComponent,
   NetworkEvent,
@@ -20,20 +25,34 @@ import type {
   OpenInterest,
   OptionsVolume,
   OtherMetrics,
+  OtherSubSector,
+  OtherTagMetrics,
   FaqItem,
   InvestmentRound,
   OrgUnit,
   Partnership,
   RwaMetrics,
+  RwaSubSector,
   RwaSubSectorMetrics,
+  RwaTagMetrics,
   Sourced,
   StablecoinMetrics,
   StablecoinSubSectorMetrics,
   StakingMetrics,
+  StakingSubSector,
+  StakingTagMetrics,
   TimelineEntry,
   TimelineStatus,
   TradFiRow,
+  UniversalMetrics,
 } from "@/lib/types";
+import {
+  DERIVATIVES_TAG_METRICS_KEY,
+  LIQUIDITY_TAG_METRICS_KEY,
+  OTHER_TAG_METRICS_KEY,
+  RWA_TAG_METRICS_KEY,
+  STAKING_TAG_METRICS_KEY,
+} from "@/lib/networkTaxonomy";
 import type { BadgeTone } from "@/components/ui/Badge";
 import { cn, formatUsdCompact } from "@/lib/utils";
 
@@ -568,6 +587,7 @@ export function LendingMetricTiles({
         <MetricTile label="TVL / deposits" sourced={lending.tvlUsd} kind="usd" />
         <MetricTile label="Total borrows" sourced={lending.totalBorrowsUsd} kind="usd" />
         <MetricTile label="Utilization" sourced={lending.utilizationPct} kind="pct" />
+        <MetricTile label="Available liquidity" sourced={lending.availableLiquidityUsd} kind="usd" />
         <MetricTile label="Supply APY" sourced={lending.supplyApyPct} kind="pct" />
         <MetricTile label="Borrow APY" sourced={lending.borrowApyPct} kind="pct" />
         <MetricTile label="Net interest margin" sourced={lending.netInterestMarginPct} kind="pct" />
@@ -709,6 +729,7 @@ export function CreditTagMetricsSection({
               <MetricTile label="Total supplied" sourced={m.totalSuppliedUsd} kind="usd" />
               <MetricTile label="Total borrows" sourced={m.totalBorrowsUsd} kind="usd" />
               <MetricTile label="Utilization" sourced={m.utilizationPct} kind="pct" />
+              <MetricTile label="Available liquidity" sourced={m.availableLiquidityUsd} kind="usd" />
               <MetricTile label="Supply APY" sourced={m.supplyApyPct} kind="pct" />
               <MetricTile label="Borrow APY" sourced={m.borrowApyPct} kind="pct" />
             </div>
@@ -770,6 +791,404 @@ export function CreditTagMetricsSection({
         subtitle="Curated metrics for each credit tag on this network."
       />
       <div className="space-y-4">{panels}</div>
+    </section>
+  );
+}
+
+function TagMetricsSectionShell({
+  id,
+  sector,
+  children,
+}: {
+  id: string;
+  sector: string;
+  children: ReactNode;
+}) {
+  return (
+    <section id={id} className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title={`${sector} tag metrics`}
+        subtitle={`Metrics for each ${sector.toLowerCase()} tag on this network.`}
+      />
+      <div className="space-y-4">{children}</div>
+    </section>
+  );
+}
+
+function TvlChangeTile({
+  tvlChange,
+}: {
+  tvlChange?: { d1: number | null; d7: number | null } | null;
+}) {
+  return (
+    <PlainTile
+      label="TVL change (1d / 7d)"
+      value={
+        tvlChange && (tvlChange.d1 != null || tvlChange.d7 != null)
+          ? `${fmtPct(tvlChange.d1)} / ${fmtPct(tvlChange.d7)}`
+          : "—"
+      }
+      hint="DeFi Llama"
+    />
+  );
+}
+
+export function StakingTagMetricsSection({
+  tags,
+  metrics,
+}: {
+  tags?: string[];
+  metrics?: StakingTagMetrics | null;
+}) {
+  if (!metrics || !tags?.length) return null;
+
+  const panels = tags
+    .map((tag) => {
+      const key = STAKING_TAG_METRICS_KEY[tag as StakingSubSector];
+      if (!key) return null;
+      const block = metrics[key];
+      if (!block) return null;
+
+      return (
+        <DataPanel key={tag} title={tag}>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <MetricTile label="Total staked" sourced={block.totalStakedUsd} kind="usd" />
+            <MetricTile label="Token price" sourced={block.tokenPriceUsd} kind="usd" />
+            <MetricTile label="Market cap" sourced={block.marketCapUsd} kind="usd" />
+            <MetricTile label="Staking APR" sourced={block.stakingAprPct} kind="pct" />
+            {"baseAssetExchangeRate" in block && (
+              <PlainTile
+                label="Exchange rate"
+                value={
+                  block.baseAssetExchangeRate?.value != null
+                    ? block.baseAssetExchangeRate.value.toFixed(4)
+                    : "—"
+                }
+                hint={block.baseAssetExchangeRate?.sourceLabel ?? "Pending"}
+              />
+            )}
+            {"pegDeviationPct" in block && (
+              <MetricTile label="Peg deviation" sourced={block.pegDeviationPct} kind="pct" />
+            )}
+            <TvlChangeTile tvlChange={block.tvlChangePct} />
+          </div>
+          <div className="mt-3 divide-y divide-ink-800/60">
+            {"validatorCount" in block && (
+              <MetricTile label="Validators" sourced={block.validatorCount} kind="count" />
+            )}
+            {"avsData" in block && block.avsData && block.avsData.length > 0 && (
+              <CuratedRow
+                label="AVS exposure"
+                chips={block.avsData.map((a) => a.name)}
+              />
+            )}
+            {"collateralBasket" in block && block.collateralBasket && block.collateralBasket.length > 0 && (
+              <CuratedRow
+                label="Collateral basket"
+                chips={block.collateralBasket.map((c) => `${c.asset} ${c.pct}%`)}
+              />
+            )}
+            {"operatorModel" in block && (
+              <CuratedRow label="Operator model" text={block.operatorModel ?? null} />
+            )}
+            {"withdrawalQueue" in block && (
+              <CuratedRow label="Withdrawal queue" text={block.withdrawalQueue ?? null} />
+            )}
+          </div>
+        </DataPanel>
+      );
+    })
+    .filter(Boolean);
+
+  if (panels.length === 0) return null;
+  return <TagMetricsSectionShell id="staking-tags" sector="Staking">{panels}</TagMetricsSectionShell>;
+}
+
+export function LiquidityTagMetricsSection({
+  tags,
+  metrics,
+}: {
+  tags?: string[];
+  metrics?: LiquidityTagMetrics | null;
+}) {
+  if (!metrics || !tags?.length) return null;
+
+  const panels = tags
+    .map((tag) => {
+      const key = LIQUIDITY_TAG_METRICS_KEY[tag as LiquiditySubSector];
+      if (!key) return null;
+      const block = metrics[key];
+      if (!block) return null;
+      const fees = block.feesRevenue;
+
+      return (
+        <DataPanel key={tag} title={tag}>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <MetricTile label="Protocol TVL" sourced={block.tvlUsd} kind="usd" />
+            {"volume24hUsd" in block && (
+              <MetricTile label="24h volume" sourced={block.volume24hUsd} kind="usd" />
+            )}
+            {"feeAprPct" in block && (
+              <MetricTile label="Fee APR" sourced={block.feeAprPct} kind="pct" />
+            )}
+            <PlainTile
+              label="Fees (24h)"
+              value={fees?.fees24hUsd != null ? fmtUsd(fees.fees24hUsd) : "—"}
+              hint="DeFi Llama"
+            />
+            {"poolCount" in block && (
+              <MetricTile label="Pool count" sourced={block.poolCount} kind="count" />
+            )}
+            {"vaultCount" in block && (
+              <MetricTile label="Vault count" sourced={block.vaultCount} kind="count" />
+            )}
+            {"avgVaultApyPct" in block && (
+              <MetricTile label="Avg vault APY" sourced={block.avgVaultApyPct} kind="pct" />
+            )}
+            <TvlChangeTile tvlChange={block.tvlChangePct} />
+          </div>
+          {"underlyingProtocols" in block && block.underlyingProtocols && block.underlyingProtocols.length > 0 && (
+            <div className="mt-3">
+              <CuratedRow label="Underlying protocols" chips={block.underlyingProtocols} />
+            </div>
+          )}
+        </DataPanel>
+      );
+    })
+    .filter(Boolean);
+
+  if (panels.length === 0) return null;
+  return <TagMetricsSectionShell id="liquidity-tags" sector="Liquidity">{panels}</TagMetricsSectionShell>;
+}
+
+export function DerivativesTagMetricsSection({
+  tags,
+  metrics,
+}: {
+  tags?: string[];
+  metrics?: DerivativesTagMetrics | null;
+}) {
+  if (!metrics || !tags?.length) return null;
+
+  const panels = tags
+    .map((tag) => {
+      const key = DERIVATIVES_TAG_METRICS_KEY[tag as DerivativesSubSector];
+      if (!key) return null;
+      const block = metrics[key];
+      if (!block) return null;
+      const fees = block.feesRevenue;
+
+      return (
+        <DataPanel key={tag} title={tag}>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <MetricTile label="Protocol TVL" sourced={block.tvlUsd} kind="usd" />
+            {"openInterestUsd" in block && (
+              <MetricTile label="Open interest" sourced={block.openInterestUsd} kind="usd" />
+            )}
+            {"longOpenInterestUsd" in block && (
+              <MetricTile label="Long OI" sourced={block.longOpenInterestUsd} kind="usd" />
+            )}
+            {"shortOpenInterestUsd" in block && (
+              <MetricTile label="Short OI" sourced={block.shortOpenInterestUsd} kind="usd" />
+            )}
+            {"volume24hUsd" in block && (
+              <MetricTile label="24h volume" sourced={block.volume24hUsd} kind="usd" />
+            )}
+            <PlainTile
+              label="Fees (24h)"
+              value={fees?.fees24hUsd != null ? fmtUsd(fees.fees24hUsd) : "—"}
+              hint="DeFi Llama"
+            />
+            {"maxLeverageX" in block && block.maxLeverageX != null && (
+              <PlainTile label="Max leverage" value={`${block.maxLeverageX}x`} hint="Curated" />
+            )}
+            {"insuranceFundUsd" in block && (
+              <MetricTile label="Insurance fund" sourced={block.insuranceFundUsd} kind="usd" />
+            )}
+            {"vaultApyPct" in block && (
+              <MetricTile label="Vault APY" sourced={block.vaultApyPct} kind="pct" />
+            )}
+            {"fundingRatePct" in block && (
+              <MetricTile label="Funding rate" sourced={block.fundingRatePct} kind="pct" />
+            )}
+            <TvlChangeTile tvlChange={block.tvlChangePct} />
+          </div>
+          {"supportedMarkets" in block && block.supportedMarkets && block.supportedMarkets.length > 0 && (
+            <div className="mt-3">
+              <CuratedRow label="Supported markets" chips={block.supportedMarkets} />
+            </div>
+          )}
+          {"vaultStrategies" in block && block.vaultStrategies && block.vaultStrategies.length > 0 && (
+            <div className="mt-3">
+              <CuratedRow label="Vault strategies" chips={block.vaultStrategies} />
+            </div>
+          )}
+          {"hedgeVenue" in block && block.hedgeVenue && block.hedgeVenue.length > 0 && (
+            <div className="mt-3">
+              <CuratedRow label="Hedge venues" chips={block.hedgeVenue} />
+            </div>
+          )}
+        </DataPanel>
+      );
+    })
+    .filter(Boolean);
+
+  if (panels.length === 0) return null;
+  return <TagMetricsSectionShell id="derivatives-tags" sector="Derivatives">{panels}</TagMetricsSectionShell>;
+}
+
+export function OtherTagMetricsSection({
+  tags,
+  metrics,
+}: {
+  tags?: string[];
+  metrics?: OtherTagMetrics | null;
+}) {
+  if (!metrics || !tags?.length) return null;
+
+  const panels = tags
+    .map((tag) => {
+      const key = OTHER_TAG_METRICS_KEY[tag as OtherSubSector];
+      if (!key) return null;
+      const block = metrics[key];
+      if (!block) return null;
+      const fees = block.feesRevenue;
+
+      return (
+        <DataPanel key={tag} title={tag}>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <MetricTile label="Protocol TVL" sourced={block.tvlUsd} kind="usd" />
+            {"treasuryUsd" in block && (
+              <MetricTile label="Treasury" sourced={block.treasuryUsd} kind="usd" />
+            )}
+            {"activeCoverUsd" in block && (
+              <MetricTile label="Active cover" sourced={block.activeCoverUsd} kind="usd" />
+            )}
+            {"capitalPoolUsd" in block && (
+              <MetricTile label="Capital pool" sourced={block.capitalPoolUsd} kind="usd" />
+            )}
+            {"claimsPaidUsd" in block && (
+              <MetricTile label="Claims paid" sourced={block.claimsPaidUsd} kind="usd" />
+            )}
+            {"bribeVolumeUsd" in block && (
+              <MetricTile label="Bribe volume" sourced={block.bribeVolumeUsd} kind="usd" />
+            )}
+            <PlainTile
+              label="Fees (24h)"
+              value={fees?.fees24hUsd != null ? fmtUsd(fees.fees24hUsd) : "—"}
+              hint="DeFi Llama"
+            />
+            <TvlChangeTile tvlChange={block.tvlChangePct} />
+          </div>
+          <div className="mt-3 divide-y divide-ink-800/60">
+            {"coverModel" in block && <CuratedRow label="Cover model" text={block.coverModel ?? null} />}
+            {"coveredProtocols" in block && block.coveredProtocols && block.coveredProtocols.length > 0 && (
+              <CuratedRow label="Covered protocols" chips={block.coveredProtocols} />
+            )}
+            {"votingPowerControlled" in block && (
+              <CuratedRow label="Voting power" text={block.votingPowerControlled ?? null} />
+            )}
+            {"targetProtocols" in block && block.targetProtocols && block.targetProtocols.length > 0 && (
+              <CuratedRow label="Target protocols" chips={block.targetProtocols} />
+            )}
+          </div>
+        </DataPanel>
+      );
+    })
+    .filter(Boolean);
+
+  if (panels.length === 0) return null;
+  return <TagMetricsSectionShell id="other-tags" sector="Other">{panels}</TagMetricsSectionShell>;
+}
+
+export function RwaTagMetricsSection({
+  tags,
+  metrics,
+}: {
+  tags?: string[];
+  metrics?: RwaTagMetrics | null;
+}) {
+  if (!metrics || !tags?.length) return null;
+
+  const panels = tags
+    .map((tag) => {
+      const key = RWA_TAG_METRICS_KEY[tag as RwaSubSector];
+      if (!key) return null;
+      const block = metrics[key];
+      if (!block) return null;
+
+      const aumUsd =
+        "aumUsd" in block
+          ? block.aumUsd
+          : "navUsd" in block
+            ? block.navUsd
+            : "totalAumUsd" in block
+              ? block.totalAumUsd
+              : undefined;
+
+      return (
+        <DataPanel key={tag} title={tag}>
+          {aumUsd && <MetricTile label="AUM / TVL" sourced={aumUsd} kind="usd" />}
+          {"kind" in block && block.kind ? (
+            <div className="mt-3">
+              <RwaSubSectorPanel m={block as RwaSubSectorMetrics} />
+            </div>
+          ) : null}
+        </DataPanel>
+      );
+    })
+    .filter(Boolean);
+
+  if (panels.length === 0) return null;
+  return <TagMetricsSectionShell id="rwa-tags" sector="RWA">{panels}</TagMetricsSectionShell>;
+}
+
+export function EntityOffchainSection({ universal }: { universal?: UniversalMetrics | null }) {
+  if (!universal) return null;
+  const { identity } = universal;
+  const hasRaises = (identity.raises?.value.length ?? 0) > 0;
+  const hasGovIds = (identity.governanceIds?.value.length ?? 0) > 0;
+  const hasTreasury =
+    universal.treasuryUsd?.value != null || universal.treasuryExOwnTokensUsd?.value != null;
+  if (!hasRaises && !hasGovIds && !hasTreasury) return null;
+
+  return (
+    <section id="offchain" className="scroll-mt-24 space-y-4">
+      <SectionHeading
+        title="Off-chain metrics"
+        subtitle="Funding, governance, and treasury data (DeFi Llama + curated)."
+      />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {hasTreasury && universal.treasuryUsd && (
+          <MetricTile label="Treasury" sourced={universal.treasuryUsd} kind="usd" />
+        )}
+        {universal.treasuryExOwnTokensUsd?.value != null && (
+          <MetricTile label="Treasury (ex own tokens)" sourced={universal.treasuryExOwnTokensUsd} kind="usd" />
+        )}
+      </div>
+      {hasRaises && identity.raises && (
+        <DataPanel title="Funding rounds">
+          <div className="divide-y divide-ink-800/60">
+            {identity.raises.value.map((r, i) => (
+              <div key={i} className="py-3 first:pt-0 last:pb-0">
+                <p className="text-sm font-medium text-ink-100">{r.round ?? "Round"}</p>
+                <p className="mt-1 text-sm text-ink-300">
+                  {r.amountUsd != null ? fmtUsd(r.amountUsd) : "—"}
+                  {r.date ? ` · ${r.date}` : ""}
+                </p>
+                {r.investors.length > 0 && (
+                  <CuratedRow label="Investors" chips={r.investors.slice(0, 8)} />
+                )}
+              </div>
+            ))}
+          </div>
+        </DataPanel>
+      )}
+      {hasGovIds && identity.governanceIds && (
+        <DataPanel title="Governance">
+          <CuratedRow label="Governance IDs" chips={identity.governanceIds.value} />
+        </DataPanel>
+      )}
     </section>
   );
 }

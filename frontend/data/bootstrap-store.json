@@ -113,7 +113,24 @@
         }
       ],
       "CreatedAt": "2026-06-05T19:46:53Z",
-      "CreditTagMetrics": null,
+      "CreditTagMetrics": {
+        "lending": {
+          "collateralAssets": [
+            "ETH",
+            "wstETH",
+            "weETH",
+            "WBTC",
+            "USDC",
+            "USDT",
+            "DAI",
+            "GHO",
+            "LINK"
+          ],
+          "oracles": [
+            "Chainlink"
+          ]
+        }
+      },
       "CurrentScale": {
         "aprPct": null,
         "loanPipelineUsd": null,
@@ -614,7 +631,20 @@
       "Twitter": "https://x.com/aerodromefi",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://aerodrome.finance"
+      "Website": "https://aerodrome.finance",
+      "LiquidityTagMetrics": {
+        "pools": {
+          "auditHistory": "Spearbit, code4rena contests.",
+          "deployment": {
+            "chains": [
+              "Base",
+              "Optimism"
+            ],
+            "evmCompatible": "yes",
+            "notes": "Base-native; Optimism via Superchain merger with Velodrome."
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#aevo": {
       "AgentSkill": null,
@@ -763,7 +793,18 @@
       "Twitter": "https://x.com/aevoxyz",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.aevo.xyz"
+      "Website": "https://www.aevo.xyz",
+      "DerivativesTagMetrics": {
+        "perpDex": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "pricingModel": "orderbook"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#agora": {
       "AgentSkill": null,
@@ -1124,7 +1165,19 @@
       "Twitter": "https://x.com/ankr",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.ankr.com"
+      "Website": "https://www.ankr.com",
+      "StakingTagMetrics": {
+        "liquidStaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Ankr-operated validators across multiple chains.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#anzen": {
       "AgentSkill": null,
@@ -1481,7 +1534,18 @@
       "Twitter": null,
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://arcton.com"
+      "Website": "https://arcton.com",
+      "RwaTagMetrics": {
+        "tokenizedEquities": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "tokenized-equities"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#arrakis": {
       "AgentSkill": null,
@@ -1629,7 +1693,24 @@
       "Twitter": "https://x.com/ArrakisFinance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://arrakis.finance"
+      "Website": "https://arrakis.finance",
+      "LiquidityTagMetrics": {
+        "vaults": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Optimism",
+              "Base",
+              "Polygon"
+            ],
+            "evmCompatible": "yes"
+          },
+          "underlyingProtocols": [
+            "Uniswap"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#aryze": {
       "AgentSkill": null,
@@ -1776,7 +1857,18 @@
       "Twitter": null,
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://aryze.io"
+      "Website": "https://aryze.io",
+      "RwaTagMetrics": {
+        "stablecoinsFx": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "stablecoins-&-fx"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#atmosphera": {
       "AgentSkill": null,
@@ -1921,7 +2013,18 @@
       "Twitter": null,
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://atmosphera.com"
+      "Website": "https://atmosphera.com",
+      "RwaTagMetrics": {
+        "eventFinance": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "event-finance"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#aura": {
       "AgentSkill": null,
@@ -2106,7 +2209,43 @@
       "Twitter": "https://x.com/aurafinance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://aura.finance"
+      "Website": "https://aura.finance",
+      "LiquidityTagMetrics": {
+        "vaults": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Optimism",
+              "Base",
+              "Polygon",
+              "Gnosis"
+            ],
+            "evmCompatible": "yes"
+          },
+          "underlyingProtocols": [
+            "Balancer"
+          ]
+        }
+      },
+      "OtherTagMetrics": {
+        "governance": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Optimism",
+              "Base",
+              "Polygon",
+              "Gnosis"
+            ],
+            "evmCompatible": "yes"
+          },
+          "targetProtocols": [
+            "Balancer"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#balancer": {
       "AgentSkill": null,
@@ -2258,7 +2397,26 @@
       "Twitter": "https://x.com/Balancer",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://balancer.fi"
+      "Website": "https://balancer.fi",
+      "LiquidityTagMetrics": {
+        "pools": {
+          "auditHistory": "Trail of Bits, OpenZeppelin, Certora.",
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Polygon",
+              "Optimism",
+              "Base",
+              "Avalanche",
+              "Gnosis",
+              "ZKsync"
+            ],
+            "evmCompatible": "yes",
+            "notes": "Weighted, Composable Stable, and Boosted pools; V3 with hooks."
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#bedrock": {
       "AgentSkill": null,
@@ -2408,7 +2566,19 @@
       "Twitter": "https://x.com/Bedrock_DeFi",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.bedrock.technology"
+      "Website": "https://www.bedrock.technology",
+      "StakingTagMetrics": {
+        "liquidRestaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Restakes via EigenLayer through curated operators.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#beefy": {
       "AgentSkill": null,
@@ -2570,7 +2740,29 @@
       "Twitter": "https://x.com/beefyfinance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://beefy.com"
+      "Website": "https://beefy.com",
+      "LiquidityTagMetrics": {
+        "vaults": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Optimism",
+              "Base",
+              "Polygon",
+              "BNB Chain",
+              "Avalanche"
+            ],
+            "evmCompatible": "yes"
+          },
+          "underlyingProtocols": [
+            "Curve",
+            "Aerodrome",
+            "Balancer",
+            "Uniswap"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#binance-wbeth": {
       "AgentSkill": null,
@@ -2722,7 +2914,20 @@
       "Twitter": "https://x.com/binance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://www.binance.com/en/wbeth"
+      "Website": "https://www.binance.com/en/wbeth",
+      "StakingTagMetrics": {
+        "liquidStaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Binance"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Centralized exchange-operated validators (custodial issuance).",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#bitget": {
       "AgentSkill": null,
@@ -3314,7 +3519,43 @@
       "Twitter": "https://x.com/centrifuge",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://centrifuge.io"
+      "Website": "https://centrifuge.io",
+      "RwaTagMetrics": {
+        "privateCredit": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": 1790000000
+          },
+          "activeBorrowers": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "averageMaturityDays": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "cumulativeOriginationsUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "defaultRatePct": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "private-credit",
+          "trancheStructure": "Per-pool DROP (senior) / TIN (junior); JAAA CLO + JTRSY Treasury funds."
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#chateau-capital": {
       "AgentSkill": null,
@@ -3461,7 +3702,18 @@
       "Twitter": null,
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://chateau.capital"
+      "Website": "https://chateau.capital",
+      "RwaTagMetrics": {
+        "structuredProducts": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "structured-products"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#circle": {
       "AgentSkill": null,
@@ -3895,7 +4147,43 @@
       "Twitter": "https://x.com/ClearpoolFin",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://clearpool.finance"
+      "Website": "https://clearpool.finance",
+      "RwaTagMetrics": {
+        "privateCredit": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": 60000000
+          },
+          "activeBorrowers": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "averageMaturityDays": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "cumulativeOriginationsUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": 924000000
+          },
+          "defaultRatePct": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "private-credit",
+          "trancheStructure": "Per-pool cpToken LP receipts; single-borrower Credit Vaults."
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#coinbase-cbeth": {
       "AgentSkill": null,
@@ -4047,7 +4335,20 @@
       "Twitter": "https://x.com/coinbase",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.coinbase.com/cbeth"
+      "Website": "https://www.coinbase.com/cbeth",
+      "StakingTagMetrics": {
+        "liquidStaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Base"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Centralized exchange-operated validators (custodial issuance).",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#compound": {
       "AgentSkill": null,
@@ -4505,7 +4806,41 @@
       "Twitter": "https://x.com/ConvexFinance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.convexfinance.com"
+      "Website": "https://www.convexfinance.com",
+      "LiquidityTagMetrics": {
+        "vaults": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Polygon"
+            ],
+            "evmCompatible": "yes"
+          },
+          "underlyingProtocols": [
+            "Curve",
+            "Frax",
+            "Prisma"
+          ]
+        }
+      },
+      "OtherTagMetrics": {
+        "governance": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Polygon"
+            ],
+            "evmCompatible": "yes"
+          },
+          "targetProtocols": [
+            "Curve",
+            "Frax",
+            "Prisma"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#cozy-finance": {
       "AgentSkill": null,
@@ -4644,7 +4979,19 @@
       "Twitter": "https://x.com/CozyFinance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://cozy.finance"
+      "Website": "https://cozy.finance",
+      "OtherTagMetrics": {
+        "underwriting": {
+          "coverModel": "parametric",
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Optimism"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#curve-finance": {
       "AgentSkill": null,
@@ -4814,7 +5161,30 @@
       "Twitter": "https://x.com/CurveFinance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://curve.fi"
+      "Website": "https://curve.fi",
+      "LiquidityTagMetrics": {
+        "pools": {
+          "auditHistory": "Trail of Bits, MixBytes, ChainSecurity (multi-round).",
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Optimism",
+              "Polygon",
+              "Base",
+              "BNB Chain",
+              "Avalanche",
+              "Fantom",
+              "Gnosis",
+              "ZKsync",
+              "Fraxtal",
+              "Sonic"
+            ],
+            "evmCompatible": "yes",
+            "notes": "Multi-chain stableswap pools; crvUSD is a separate entity."
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#curve-stablecoin": {
       "AgentSkill": null,
@@ -5181,7 +5551,20 @@
       "Twitter": "https://x.com/derivexyz",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.derive.xyz"
+      "Website": "https://www.derive.xyz",
+      "DerivativesTagMetrics": {
+        "optionVaults": {
+          "deployment": {
+            "chains": [
+              "Optimism",
+              "Arbitrum One",
+              "Base",
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#dinari": {
       "AgentSkill": null,
@@ -5347,7 +5730,18 @@
       "Twitter": null,
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://dinari.com"
+      "Website": "https://dinari.com",
+      "RwaTagMetrics": {
+        "tokenizedEquities": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "tokenized-equities"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#dopex": {
       "AgentSkill": null,
@@ -5495,7 +5889,17 @@
       "Twitter": "https://x.com/dopex_io",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.dopex.io"
+      "Website": "https://www.dopex.io",
+      "DerivativesTagMetrics": {
+        "optionVaults": {
+          "deployment": {
+            "chains": [
+              "Arbitrum One"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#drift-protocol": {
       "AgentSkill": null,
@@ -5642,7 +6046,18 @@
       "Twitter": "https://x.com/DriftProtocol",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://drift.trade"
+      "Website": "https://drift.trade",
+      "DerivativesTagMetrics": {
+        "perpDex": {
+          "deployment": {
+            "chains": [
+              "Solana"
+            ],
+            "evmCompatible": "no"
+          },
+          "pricingModel": "orderbook"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#dualmint": {
       "AgentSkill": null,
@@ -5789,7 +6204,18 @@
       "Twitter": null,
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://dualmint.com"
+      "Website": "https://dualmint.com",
+      "RwaTagMetrics": {
+        "tokenizationInfra": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "tokenization-infrastructure"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#dydx": {
       "AgentSkill": null,
@@ -5947,7 +6373,19 @@
       "Twitter": "https://x.com/dYdX",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://dydx.exchange"
+      "Website": "https://dydx.exchange",
+      "DerivativesTagMetrics": {
+        "perpDex": {
+          "deployment": {
+            "chains": [
+              "dYdX Chain",
+              "Ethereum"
+            ],
+            "evmCompatible": "no"
+          },
+          "pricingModel": "orderbook"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#ease-org": {
       "AgentSkill": null,
@@ -6092,7 +6530,18 @@
       "Twitter": "https://x.com/EaseDeFi",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://ease.org"
+      "Website": "https://ease.org",
+      "OtherTagMetrics": {
+        "underwriting": {
+          "coverModel": "reciprocal",
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#eigenlayer": {
       "AgentSkill": null,
@@ -6235,7 +6684,19 @@
       "Twitter": "https://x.com/eigenlayer",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.eigencloud.xyz"
+      "Website": "https://www.eigencloud.xyz",
+      "StakingTagMetrics": {
+        "restaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Permissionless operators register to run AVSs; stakers delegate to operators.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#elixir": {
       "AgentSkill": null,
@@ -6582,7 +7043,18 @@
       "Twitter": null,
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://estateprotocol.com"
+      "Website": "https://estateprotocol.com",
+      "RwaTagMetrics": {
+        "realEstate": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "real-estate"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#ethena": {
       "AgentSkill": null,
@@ -7134,7 +7606,19 @@
       "Twitter": "https://x.com/ether_fi",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.ether.fi"
+      "Website": "https://www.ether.fi",
+      "StakingTagMetrics": {
+        "liquidRestaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Non-custodial — stakers retain key control; restakes via EigenLayer.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#extra-finance": {
       "AgentSkill": null,
@@ -7841,7 +8325,18 @@
       "Twitter": null,
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://florence.finance"
+      "Website": "https://florence.finance",
+      "RwaTagMetrics": {
+        "privateCredit": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "private-credit"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#fluid": {
       "AgentSkill": null,
@@ -8277,7 +8772,32 @@
       "Twitter": "https://x.com/FTI_US",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://www.franklintempleton.com"
+      "Website": "https://www.franklintempleton.com",
+      "RwaTagMetrics": {
+        "treasuries": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": 1980000000
+          },
+          "custodian": "Franklin Templeton (transfer agent + custodian).",
+          "duration": "Short-duration (money market)",
+          "fundStructure": "FOBXX ('40 Act US Government Money Fund); 1 BENJI = 1 share.",
+          "kind": "treasuries",
+          "navUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "underlyingAssets": [
+            "Short-duration US Treasuries",
+            "Repo"
+          ],
+          "yieldDistribution": "exchange-rate"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#frax": {
       "AgentSkill": null,
@@ -8675,7 +9195,20 @@
       "Twitter": "https://x.com/GainsNetwork_io",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://gains.trade"
+      "Website": "https://gains.trade",
+      "DerivativesTagMetrics": {
+        "perpDex": {
+          "deployment": {
+            "chains": [
+              "Arbitrum",
+              "Polygon",
+              "Base"
+            ],
+            "evmCompatible": "yes"
+          },
+          "pricingModel": "oracle"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#gamma": {
       "AgentSkill": null,
@@ -8831,7 +9364,22 @@
       "Twitter": "https://x.com/GammaStrategies",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://app.gamma.xyz"
+      "Website": "https://app.gamma.xyz",
+      "LiquidityTagMetrics": {
+        "pools": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Polygon",
+              "Optimism",
+              "Base",
+              "BNB Chain"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#gearbox": {
       "AgentSkill": null,
@@ -9364,7 +9912,19 @@
       "Twitter": "https://x.com/GMX_IO",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://gmx.io"
+      "Website": "https://gmx.io",
+      "DerivativesTagMetrics": {
+        "perpDex": {
+          "deployment": {
+            "chains": [
+              "Arbitrum",
+              "Avalanche"
+            ],
+            "evmCompatible": "yes"
+          },
+          "pricingModel": "oracle"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#goldfinch": {
       "AgentSkill": null,
@@ -9572,7 +10132,43 @@
       "Twitter": "https://x.com/goldfinch_fi",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://goldfinch.finance"
+      "Website": "https://goldfinch.finance",
+      "RwaTagMetrics": {
+        "privateCredit": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": 57000000
+          },
+          "activeBorrowers": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "averageMaturityDays": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "cumulativeOriginationsUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "defaultRatePct": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "private-credit",
+          "trancheStructure": "FIDU senior pool (price drifts up with interest) + borrower-pool tranche tokens."
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#hidden-hand": {
       "AgentSkill": null,
@@ -9736,7 +10332,22 @@
       "Twitter": "https://x.com/redactedcartel",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:58Z",
-      "Website": "https://redacted.finance"
+      "Website": "https://redacted.finance",
+      "OtherTagMetrics": {
+        "governance": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "targetProtocols": [
+            "Curve",
+            "Balancer",
+            "Frax"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#hyperliquid": {
       "AgentSkill": null,
@@ -9885,7 +10496,19 @@
       "Twitter": "https://x.com/HyperliquidX",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://hyperliquid.xyz"
+      "Website": "https://hyperliquid.xyz",
+      "DerivativesTagMetrics": {
+        "perpDex": {
+          "deployment": {
+            "chains": [
+              "Hyperliquid L1",
+              "Arbitrum"
+            ],
+            "evmCompatible": "mixed"
+          },
+          "pricingModel": "orderbook"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#insurace": {
       "AgentSkill": null,
@@ -10031,7 +10654,23 @@
       "Twitter": "https://x.com/InsurAce_io",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.insurace.io"
+      "Website": "https://www.insurace.io",
+      "OtherTagMetrics": {
+        "underwriting": {
+          "coverModel": "claims-assessed",
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "BSC",
+              "Polygon",
+              "Arbitrum",
+              "Optimism",
+              "Avalanche"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#inverse-finance": {
       "AgentSkill": null,
@@ -10351,7 +10990,17 @@
       "Twitter": "https://x.com/DAOJonesOptions",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.jonesdao.io"
+      "Website": "https://www.jonesdao.io",
+      "DerivativesTagMetrics": {
+        "optionVaults": {
+          "deployment": {
+            "chains": [
+              "Arbitrum One"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#jupiter": {
       "AgentSkill": null,
@@ -11306,7 +11955,20 @@
       "Twitter": "https://x.com/Karak_Network",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://karak.network"
+      "Website": "https://karak.network",
+      "StakingTagMetrics": {
+        "restaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Operators secure DSS; multi-chain collateral deposits.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#kelp-dao": {
       "AgentSkill": null,
@@ -11456,7 +12118,19 @@
       "Twitter": "https://x.com/KelpDAO",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.kelpdao.xyz"
+      "Website": "https://www.kelpdao.xyz",
+      "StakingTagMetrics": {
+        "liquidRestaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Restakes deposited LSTs via EigenLayer through curated operators.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#lido": {
       "AgentSkill": null,
@@ -11614,7 +12288,19 @@
       "Twitter": "https://x.com/LidoFinance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://lido.fi"
+      "Website": "https://lido.fi",
+      "StakingTagMetrics": {
+        "liquidStaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "DAO-curated professional node operator set; moving toward DVT (SimpleDVT).",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#liquity": {
       "AgentSkill": null,
@@ -12209,7 +12895,33 @@
       "Twitter": "https://x.com/lofty_ai",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://www.lofty.ai"
+      "Website": "https://www.lofty.ai",
+      "RwaTagMetrics": {
+        "realEstate": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": 99600000
+          },
+          "averagePropertyValueUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "custodyStructure": "Per-property US LLC; Lofty Inc. as manager.",
+          "geographicScope": "US residential",
+          "kind": "real-estate",
+          "propertiesCount": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "rentalYieldRangePct": "Daily rental yield distributed in USDC"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#m-zero": {
       "AgentSkill": null,
@@ -12568,7 +13280,20 @@
       "Twitter": "https://x.com/0xMantle",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.mantle.xyz/meth"
+      "Website": "https://www.mantle.xyz/meth",
+      "StakingTagMetrics": {
+        "liquidStaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Mantle"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Curated node operators under the mETH Protocol governance.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#maple": {
       "AgentSkill": null,
@@ -12616,7 +13341,23 @@
         }
       ],
       "CreatedAt": "2026-06-17T19:33:57Z",
-      "CreditTagMetrics": null,
+      "CreditTagMetrics": {
+        "lending": {
+          "collateralAssets": [
+            "BTC",
+            "ETH",
+            "Tokenized T-bills",
+            "Undercollateralized (vetted)"
+          ],
+          "oracles": [
+            "Off-chain underwriting + Chainlink for onchain collateral"
+          ]
+        },
+        "fixedIncome": {
+          "mechanism": "Pool-based private credit",
+          "markets": 3
+        }
+      },
       "CurrentScale": {
         "aprPct": null,
         "loanPipelineUsd": null,
@@ -12807,7 +13548,10 @@
       "SubSector": null,
       "Symbol": "SYRUP",
       "Tagline": "Onchain institutional / private credit.",
-      "Tags": [],
+      "Tags": [
+        "Lending",
+        "Fixed Income"
+      ],
       "Timeline": null,
       "Tokenomics": null,
       "TradFiComparison": [],
@@ -12958,7 +13702,21 @@
       "Twitter": "https://x.com/mavprotocol",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.mav.xyz"
+      "Website": "https://www.mav.xyz",
+      "LiquidityTagMetrics": {
+        "vaults": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Base",
+              "BNB Chain",
+              "Arbitrum",
+              "ZKsync"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#monerium": {
       "AgentSkill": null,
@@ -13905,7 +14663,20 @@
       "Twitter": "https://x.com/neptune_mutual",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://neptune-mutual.com"
+      "Website": "https://neptune-mutual.com",
+      "OtherTagMetrics": {
+        "underwriting": {
+          "coverModel": "parametric",
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "BSC"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#neutra-finance": {
       "AgentSkill": null,
@@ -14048,7 +14819,20 @@
       "Twitter": "https://x.com/NeutraFinance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://neutra.finance"
+      "Website": "https://neutra.finance",
+      "DerivativesTagMetrics": {
+        "deltaNeutral": {
+          "deployment": {
+            "chains": [
+              "Arbitrum One"
+            ],
+            "evmCompatible": "yes"
+          },
+          "hedgeVenue": [
+            "GMX"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#nexus-mutual": {
       "AgentSkill": null,
@@ -14198,7 +14982,24 @@
       "Twitter": "https://x.com/NexusMutual",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://nexusmutual.io"
+      "Website": "https://nexusmutual.io",
+      "OtherTagMetrics": {
+        "underwriting": {
+          "coverModel": "claims-assessed",
+          "coveredProtocols": [
+            "Aave",
+            "Compound",
+            "Curve",
+            "Balancer"
+          ],
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#notional": {
       "AgentSkill": null,
@@ -14905,7 +15706,25 @@
       "Twitter": "https://x.com/PaladinVote",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:58Z",
-      "Website": "https://paladin.vote"
+      "Website": "https://paladin.vote",
+      "OtherTagMetrics": {
+        "governance": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Optimism",
+              "Polygon"
+            ],
+            "evmCompatible": "yes"
+          },
+          "targetProtocols": [
+            "Curve",
+            "Balancer",
+            "Frax"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#pancakeswap": {
       "AgentSkill": null,
@@ -15059,7 +15878,27 @@
       "Twitter": "https://x.com/PancakeSwap",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://pancakeswap.finance"
+      "Website": "https://pancakeswap.finance",
+      "LiquidityTagMetrics": {
+        "pools": {
+          "auditHistory": "Certik, PeckShield (multi-round).",
+          "deployment": {
+            "chains": [
+              "BNB Chain",
+              "Ethereum",
+              "Arbitrum",
+              "Base",
+              "Polygon zkEVM",
+              "Linea",
+              "opBNB",
+              "ZKsync",
+              "Aptos"
+            ],
+            "evmCompatible": "yes",
+            "notes": "BNB-primary; v3 CLMM + Infinity router; Aptos (non-EVM)."
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#paxos": {
       "AgentSkill": null,
@@ -15850,7 +16689,19 @@
       "Twitter": "https://x.com/puffer_finance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.puffer.fi"
+      "Website": "https://www.puffer.fi",
+      "StakingTagMetrics": {
+        "liquidRestaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Permissionless operators with Secure-Signer anti-slashing; native restaking.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#radiant": {
       "AgentSkill": null,
@@ -16235,7 +17086,20 @@
       "Twitter": "https://x.com/rage_trade",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.rage.trade"
+      "Website": "https://www.rage.trade",
+      "DerivativesTagMetrics": {
+        "deltaNeutral": {
+          "deployment": {
+            "chains": [
+              "Arbitrum One"
+            ],
+            "evmCompatible": "yes"
+          },
+          "hedgeVenue": [
+            "GMX"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#raydium": {
       "AgentSkill": null,
@@ -16628,7 +17492,33 @@
       "Twitter": "https://x.com/RealTPlatform",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://realt.co"
+      "Website": "https://realt.co",
+      "RwaTagMetrics": {
+        "realEstate": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": 156900000
+          },
+          "averagePropertyValueUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "custodyStructure": "Delaware LLC per property; deeds custodied off-chain.",
+          "geographicScope": "US residential & commercial (Detroit, Chicago, others)",
+          "kind": "real-estate",
+          "propertiesCount": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "rentalYieldRangePct": "Daily rental yield paid in xDai / USDC"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#renzo": {
       "AgentSkill": null,
@@ -16778,7 +17668,19 @@
       "Twitter": "https://x.com/RenzoProtocol",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.renzoprotocol.com"
+      "Website": "https://www.renzoprotocol.com",
+      "StakingTagMetrics": {
+        "liquidRestaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Curated EigenLayer operator set selected by Renzo strategy management.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#reserve": {
       "AgentSkill": null,
@@ -17376,7 +18278,17 @@
       "Twitter": "https://x.com/ribbonfinance",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.ribbon.finance"
+      "Website": "https://www.ribbon.finance",
+      "DerivativesTagMetrics": {
+        "optionVaults": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#rocket-pool": {
       "AgentSkill": null,
@@ -17527,7 +18439,19 @@
       "Twitter": "https://x.com/Rocket_Pool",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://rocketpool.net"
+      "Website": "https://rocketpool.net",
+      "StakingTagMetrics": {
+        "liquidStaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Permissionless node operators (8/16 ETH minipools + RPL bond).",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#securitize": {
       "AgentSkill": null,
@@ -17743,7 +18667,41 @@
       "Twitter": "https://x.com/Securitize",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://securitize.io"
+      "Website": "https://securitize.io",
+      "RwaTagMetrics": {
+        "tokenizationInfra": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": 4000000000
+          },
+          "fundsHosted": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "tokenization-infra",
+          "registeredJurisdictions": [
+            "United States (SEC/FINRA)"
+          ],
+          "topClients": [
+            "BlackRock",
+            "Apollo",
+            "KKR",
+            "Hamilton Lane",
+            "VanEck",
+            "Franklin Templeton"
+          ],
+          "totalAumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": 4000000000
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#sense": {
       "AgentSkill": null,
@@ -18026,7 +18984,21 @@
       "Twitter": "https://x.com/sherlockdefi",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://sherlock.xyz"
+      "Website": "https://sherlock.xyz",
+      "OtherTagMetrics": {
+        "underwriting": {
+          "coverModel": "claims-assessed",
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Optimism",
+              "Polygon"
+            ],
+            "evmCompatible": "yes"
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#sky": {
       "AgentSkill": null,
@@ -19289,7 +20261,19 @@
       "Twitter": "https://x.com/staderlabs",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.staderlabs.com"
+      "Website": "https://www.staderlabs.com",
+      "StakingTagMetrics": {
+        "liquidStaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Hybrid permissioned + permissionless operator pools.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#stake-dao": {
       "AgentSkill": null,
@@ -19476,7 +20460,25 @@
       "Twitter": "https://x.com/StakeDAOHQ",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:58Z",
-      "Website": "https://stakedao.org"
+      "Website": "https://stakedao.org",
+      "OtherTagMetrics": {
+        "governance": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Polygon",
+              "Optimism"
+            ],
+            "evmCompatible": "yes"
+          },
+          "targetProtocols": [
+            "Curve",
+            "Balancer",
+            "Frax"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#stakewise": {
       "AgentSkill": null,
@@ -19626,7 +20628,19 @@
       "Twitter": "https://x.com/stakewise_io",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.stakewise.io"
+      "Website": "https://www.stakewise.io",
+      "StakingTagMetrics": {
+        "liquidStaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Permissionless vaults (solo + curated operators).",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#stella": {
       "AgentSkill": null,
@@ -20127,7 +21141,19 @@
       "Twitter": "https://x.com/swellnetworkio",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.swellnetwork.io"
+      "Website": "https://www.swellnetwork.io",
+      "StakingTagMetrics": {
+        "liquidStaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Curated/permissioned operator set with DVT integrations.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#symbiotic": {
       "AgentSkill": null,
@@ -20270,7 +21296,19 @@
       "Twitter": "https://x.com/symbioticfi",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://symbiotic.fi"
+      "Website": "https://symbiotic.fi",
+      "StakingTagMetrics": {
+        "restaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Permissionless vaults + operators; networks set their own rules.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#synthetix": {
       "AgentSkill": null,
@@ -20426,7 +21464,21 @@
       "Twitter": "https://x.com/synthetix_io",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://synthetix.io"
+      "Website": "https://synthetix.io",
+      "DerivativesTagMetrics": {
+        "perpDex": {
+          "deployment": {
+            "chains": [
+              "Optimism",
+              "Base",
+              "Ethereum",
+              "Arbitrum One"
+            ],
+            "evmCompatible": "yes"
+          },
+          "pricingModel": "oracle"
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#tether": {
       "AgentSkill": null,
@@ -20999,7 +22051,28 @@
       "Twitter": "https://x.com/toucanprotocol",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:56Z",
-      "Website": "https://toucan.earth"
+      "Website": "https://toucan.earth",
+      "RwaTagMetrics": {
+        "carbon": {
+          "aumUsd": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": 618000
+          },
+          "creditsTokenizedTonnes": {
+            "dataSource": "derived",
+            "sourceLabel": "DefiLlama / rwa.xyz / issuer reports (2026-06-18)",
+            "updatedAt": null,
+            "value": null
+          },
+          "kind": "carbon",
+          "registryPartners": [
+            "Verra"
+          ],
+          "vintageRangeYears": "Mixed vintages bridged from Verra."
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#trader-joe": {
       "AgentSkill": null,
@@ -21616,7 +22689,30 @@
       "Twitter": "https://x.com/Uniswap",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://uniswap.org"
+      "Website": "https://uniswap.org",
+      "LiquidityTagMetrics": {
+        "pools": {
+          "auditHistory": "Trail of Bits, ABDK Consulting, ChainSecurity (V3 + V4).",
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Base",
+              "Arbitrum",
+              "Optimism",
+              "Polygon",
+              "BNB Chain",
+              "Avalanche",
+              "Blast",
+              "Celo",
+              "ZKsync",
+              "Worldchain",
+              "Unichain"
+            ],
+            "evmCompatible": "yes",
+            "notes": "Native on 12+ EVM chains; Unichain is Uniswap's own L2."
+          }
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#usd-ai": {
       "AgentSkill": null,
@@ -22603,7 +23699,21 @@
       "Twitter": "https://x.com/Votium",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://votium.app"
+      "Website": "https://votium.app",
+      "OtherTagMetrics": {
+        "governance": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "targetProtocols": [
+            "Curve",
+            "Convex"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#yearn-finance": {
       "AgentSkill": null,
@@ -22761,7 +23871,27 @@
       "Twitter": "https://x.com/yearnfi",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://yearn.fi"
+      "Website": "https://yearn.fi",
+      "LiquidityTagMetrics": {
+        "vaults": {
+          "deployment": {
+            "chains": [
+              "Ethereum",
+              "Arbitrum",
+              "Optimism",
+              "Base",
+              "Polygon"
+            ],
+            "evmCompatible": "yes"
+          },
+          "underlyingProtocols": [
+            "Curve",
+            "Convex",
+            "Aave",
+            "Compound"
+          ]
+        }
+      }
     },
     "CATEGORY#Entity|PROTOCOL#yieldnest": {
       "AgentSkill": null,
@@ -22911,7 +24041,19 @@
       "Twitter": "https://x.com/YieldNestFi",
       "TypedRisks": null,
       "UpdatedAt": "2026-06-29T15:30:57Z",
-      "Website": "https://www.yieldnest.finance"
+      "Website": "https://www.yieldnest.finance",
+      "StakingTagMetrics": {
+        "liquidRestaking": {
+          "deployment": {
+            "chains": [
+              "Ethereum"
+            ],
+            "evmCompatible": "yes"
+          },
+          "operatorModel": "Curated AVS/operator baskets managed by YieldNest.",
+          "underlyingAsset": "ETH"
+        }
+      }
     },
     "CATEGORY#RWA|PROTOCOL#benji": {
       "ArbitrumPortalMetadata": {

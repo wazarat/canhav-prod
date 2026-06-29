@@ -61,7 +61,15 @@ function hasMetricsContent(profile: NetworkProfile): boolean {
       profile.optionsVolume ||
       profile.openInterest ||
       profile.creditTagMetrics ||
-      profile.market,
+      profile.stakingTagMetrics ||
+      profile.liquidityTagMetrics ||
+      profile.derivativesTagMetrics ||
+      profile.otherTagMetrics ||
+      profile.rwaTagMetrics ||
+      profile.market ||
+      profile.universalMetrics?.identity.raises?.value.length ||
+      profile.universalMetrics?.identity.governanceIds?.value.length ||
+      profile.universalMetrics?.treasuryUsd?.value != null,
   );
 }
 

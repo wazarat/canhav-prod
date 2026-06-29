@@ -6,15 +6,32 @@ import { CANONICAL_PERP_DEX_SLUGS } from "@/data/derivatives-seed";
 import { CANONICAL_LIQUIDITY_POOL_SLUGS, LIQUIDITY_SEED } from "@/data/liquidity-seed";
 import { repoRoot } from "@/lib/server/env";
 import { hasUpstash, readAllItemsFromRedis } from "@/lib/server/redis";
+import {
+  DERIVATIVES_TAG_TO_KEY,
+  LIQUIDITY_TAG_TO_KEY,
+  OTHER_TAG_TO_KEY,
+  RWA_SUBSECTOR_TO_KEY,
+  STAKING_TAG_TO_KEY,
+} from "@/lib/server/tagMetricsOverlay";
 import type {
+  DerivativesSubSector,
+  DerivativesTagMetrics,
+  LiquiditySubSector,
+  LiquidityTagMetrics,
   NetworkProfile,
   NetworkRisk,
   NetworkSector,
+  OtherSubSector,
+  OtherTagMetrics,
   ReceiptProfile,
   RiskCategory,
   RwaProfile,
   RwaSecondaryTag,
+  RwaSubSector,
+  RwaTagMetrics,
   SectorAggregate,
+  StakingSubSector,
+  StakingTagMetrics,
   StablecoinProfile,
   TokenProfile,
 } from "@/lib/types";
@@ -209,6 +226,68 @@ function normalizeRwaTags(raw: unknown): RwaSecondaryTag[] | undefined {
     if (mapped) out.add(mapped);
   }
   return out.size ? [...out] : undefined;
+}
+
+/** Fallback: derive tag-keyed metrics from monolithic sector blocks when cron has not run yet. */
+function hydrateStakingTagMetrics(item: Record<string, unknown>): StakingTagMetrics | null {
+  const existing = item.StakingTagMetrics as StakingTagMetrics | null | undefined;
+  if (existing) return existing;
+  const sub = (item.StakingSubSector ?? item.SubSector) as StakingSubSector | null | undefined;
+  const block = item.Staking;
+  if (!sub || !block || typeof block !== "object") return null;
+  const key = STAKING_TAG_TO_KEY[sub];
+  if (!key) return null;
+  return { [key]: block } as StakingTagMetrics;
+}
+
+function hydrateLiquidityTagMetrics(item: Record<string, unknown>): LiquidityTagMetrics | null {
+  const existing = item.LiquidityTagMetrics as LiquidityTagMetrics | null | undefined;
+  if (existing) return existing;
+  const sub = (item.LiquiditySubSector ?? item.SubSector) as LiquiditySubSector | null | undefined;
+  const block = liquidityBlockFromItem(item, String(item.Slug ?? ""));
+  if (!sub || !block) return null;
+  const key = LIQUIDITY_TAG_TO_KEY[sub];
+  if (!key) return null;
+  return { [key]: block } as LiquidityTagMetrics;
+}
+
+function hydrateDerivativesTagMetrics(item: Record<string, unknown>): DerivativesTagMetrics | null {
+  const existing = item.DerivativesTagMetrics as DerivativesTagMetrics | null | undefined;
+  if (existing) return existing;
+  const sub = (item.DerivativesSubSector ?? item.SubSector) as DerivativesSubSector | null | undefined;
+  const block = item.Derivatives;
+  if (!sub || !block || typeof block !== "object") return null;
+  const key = DERIVATIVES_TAG_TO_KEY[sub];
+  if (!key) return null;
+  return { [key]: block } as DerivativesTagMetrics;
+}
+
+function hydrateOtherTagMetrics(item: Record<string, unknown>): OtherTagMetrics | null {
+  const existing = item.OtherTagMetrics as OtherTagMetrics | null | undefined;
+  if (existing) return existing;
+  const sub = (item.OtherSubSector ?? item.SubSector) as OtherSubSector | null | undefined;
+  const block = item.Other;
+  if (!sub || !block || typeof block !== "object") return null;
+  const key = OTHER_TAG_TO_KEY[sub];
+  if (!key) return null;
+  return { [key]: block } as OtherTagMetrics;
+}
+
+function hydrateRwaTagMetrics(item: Record<string, unknown>): RwaTagMetrics | null {
+  const existing = item.RwaTagMetrics as RwaTagMetrics | null | undefined;
+  if (existing) return existing;
+  const sub = item.RwaSubSector as RwaSubSector | null | undefined;
+  const rwa = item.Rwa as Record<string, unknown> | null | undefined;
+  if (!sub || !rwa) return null;
+  const key = RWA_SUBSECTOR_TO_KEY[sub];
+  if (!key) return null;
+  const subMetrics = rwa.subSectorMetrics;
+  return {
+    [key]: {
+      ...(rwa.aumUsd != null ? { aumUsd: rwa.aumUsd } : {}),
+      ...(subMetrics && typeof subMetrics === "object" ? subMetrics : {}),
+    },
+  } as RwaTagMetrics;
 }
 
 function common(item: Record<string, any>) {
@@ -425,6 +504,11 @@ export async function readLiveStore(): Promise<LiveStore> {
         competitors: item.Competitors ?? [],
         lending: item.Lending ?? null,
         creditTagMetrics: item.CreditTagMetrics ?? null,
+        stakingTagMetrics: hydrateStakingTagMetrics(item),
+        liquidityTagMetrics: hydrateLiquidityTagMetrics(item),
+        derivativesTagMetrics: hydrateDerivativesTagMetrics(item),
+        otherTagMetrics: hydrateOtherTagMetrics(item),
+        rwaTagMetrics: hydrateRwaTagMetrics(item),
         stablecoinSubSector: item.StablecoinSubSector ?? null,
         stablecoinSecondaryTags: item.StablecoinSecondaryTags ?? undefined,
         stablecoin: item.Stablecoin ?? null,

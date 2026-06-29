@@ -59,6 +59,18 @@ import { collectAllOtherMetrics } from "@/lib/server/other";
 import { OTHER_SEED } from "@/data/other-seed";
 import { refreshSectorAggregates } from "@/lib/server/sectorAggregates";
 import {
+  overlayDerivativesTagMetrics,
+  overlayLiquidityTagMetrics,
+  overlayOtherTagMetrics,
+  overlayRwaTagMetrics,
+  overlayStakingTagMetrics,
+  resolveDerivativesSubSector,
+  resolveLiquiditySubSector,
+  resolveOtherSubSector,
+  resolveRwaSubSector,
+  resolveStakingSubSector,
+} from "@/lib/server/tagMetricsOverlay";
+import {
   enrichCoinTaxonomyOnItem,
   enrichReceiptOnItem,
 } from "@/lib/server/coinRefresh";
@@ -1293,6 +1305,17 @@ export async function GET(req: Request): Promise<NextResponse> {
           lendingBlock.utilizationPct = sourced(borrow.utilizationPct);
         if (borrow?.supplyApyPct != null) lendingBlock.supplyApyPct = sourced(borrow.supplyApyPct);
         if (borrow?.borrowApyPct != null) lendingBlock.borrowApyPct = sourced(borrow.borrowApyPct);
+        if (
+          tvlUsd != null &&
+          borrow?.totalBorrowUsd != null
+        ) {
+          lendingBlock.availableLiquidityUsd = {
+            value: Math.max(0, tvlUsd - borrow.totalBorrowUsd),
+            dataSource: "derived",
+            sourceLabel: "Derived",
+            updatedAt: nowIso(),
+          };
+        }
         if (Object.keys(lendingBlock).length > 0) {
           ctm.lending = lendingBlock;
           wrote = true;
@@ -1392,6 +1415,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       const aumUsd = tvl && tvl.points.length > 0 ? tvl.points[tvl.points.length - 1].value : null;
       if (aumUsd != null) {
         item.Rwa = { ...(item.Rwa ?? {}), aumUsd: sourced(aumUsd) };
+        overlayRwaTagMetrics(item, item.Rwa as import("@/lib/types").RwaMetrics, resolveRwaSubSector(item));
         item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd: aumUsd };
         item.UpdatedAt = nowIso();
         await putItem(item);
@@ -1425,6 +1449,12 @@ export async function GET(req: Request): Promise<NextResponse> {
       if (!live || Object.keys(live).length === 0) continue;
       // Preserve curated Tier-2 fields; overlay live Tier-1 fields.
       item.Staking = { ...(item.Staking ?? {}), ...live };
+      const stakingSeed = STAKING_SEED.find((s) => s.slug === slug);
+      overlayStakingTagMetrics(
+        item,
+        live,
+        resolveStakingSubSector(item, stakingSeed?.subSector),
+      );
       const totalStakedUsd = live.totalStakedUsd?.value ?? null;
       if (totalStakedUsd != null) {
         item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd: totalStakedUsd };
@@ -1460,6 +1490,12 @@ export async function GET(req: Request): Promise<NextResponse> {
       if (!live || Object.keys(live).length === 0) continue;
       // Preserve curated Tier-2 fields; overlay live Tier-1 fields.
       item.Liquidity = { ...(item.Liquidity ?? {}), ...live };
+      const liquiditySeed = LIQUIDITY_SEED.find((s) => s.slug === slug);
+      overlayLiquidityTagMetrics(
+        item,
+        live,
+        resolveLiquiditySubSector(item, liquiditySeed?.subSector),
+      );
       const tvlUsd = live.tvlUsd?.value ?? null;
       if (tvlUsd != null && String(item.Sector ?? "") === "Liquidity") {
         item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
@@ -1496,6 +1532,12 @@ export async function GET(req: Request): Promise<NextResponse> {
       if (!live || Object.keys(live).length === 0) continue;
       // Preserve curated Tier-2 fields; overlay live Tier-1 fields.
       item.Derivatives = { ...(item.Derivatives ?? {}), ...live };
+      const derivativesSeed = DERIVATIVES_SEED.find((s) => s.slug === slug);
+      overlayDerivativesTagMetrics(
+        item,
+        live,
+        resolveDerivativesSubSector(item, derivativesSeed?.subSector),
+      );
       const tvlUsd = live.tvlUsd?.value ?? null;
       if (tvlUsd != null && String(item.Sector ?? "") === "Derivatives") {
         item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
@@ -1529,6 +1571,8 @@ export async function GET(req: Request): Promise<NextResponse> {
       const live = metricsBySlug.get(slug);
       if (!live || Object.keys(live).length === 0) continue;
       item.Other = { ...(item.Other ?? {}), ...live };
+      const otherSeed = OTHER_SEED.find((s) => s.slug === slug);
+      overlayOtherTagMetrics(item, live, resolveOtherSubSector(item, otherSeed?.subSector));
       const tvlUsd = live.tvlUsd?.value ?? null;
       if (String(item.OtherSubSector ?? "") === "Governance" && llamaProtocolForSlug(slug)) {
         const treasury = await fetchLlamaTreasury(slug);
@@ -1638,6 +1682,29 @@ export async function GET(req: Request): Promise<NextResponse> {
     await putItem(item);
     updated += 1;
     perpOiResults.push({ slug, openInterestUsd: oi.openInterestUsd });
+  }
+
+  // --- Tag metrics: enrich Derivatives perp panels with long/short OI --------
+  for (const item of networkItems) {
+    const oi = item.OpenInterest as
+      | {
+          longOpenInterestUsd?: number | null;
+          shortOpenInterestUsd?: number | null;
+        }
+      | null
+      | undefined;
+    const derivatives = item.Derivatives as import("@/lib/types").DerivativesMetrics | null | undefined;
+    if (!derivatives || !oi) continue;
+    const derivativesSeed = DERIVATIVES_SEED.find((s) => s.slug === String(item.Slug ?? ""));
+    overlayDerivativesTagMetrics(
+      item,
+      derivatives,
+      resolveDerivativesSubSector(item, derivativesSeed?.subSector),
+      oi,
+    );
+    item.UpdatedAt = nowIso();
+    await putItem(item);
+    updated += 1;
   }
 
   // --- Chain-native lending overlays (Morpho, Kamino, TronGrid, Helius) --------

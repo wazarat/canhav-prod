@@ -634,6 +634,22 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         "twitter": "https://twitter.com/aaveaave",
         "discord": "https://discord.com/invite/aave",
         "github": "https://github.com/aave/aave-protocol",
+        "sources": [
+            {"label": "Aave documentation", "url": "https://aave.com/docs"},
+            {"label": "Aave Docs — Security & Audits", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"label": "Aave Governance forum", "url": "https://governance.aave.com"},
+            {"label": "Aave V3 Origin (protocol source)", "url": "https://github.com/aave-dao/aave-v3-origin"},
+            {"label": "Immunefi — Aave bug bounty", "url": "https://immunefi.com/bug-bounty/aave/"},
+            {"label": "DeFiLlama — Aave", "url": "https://defillama.com/protocol/aave"},
+        ],
+        "audits": [
+            {"firm": "OpenZeppelin", "date": "2021-11-01", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"firm": "Trail of Bits", "date": "2022-01-07", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"firm": "PeckShield", "date": "2022-01-14", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"firm": "SigmaPrime", "date": "2022-01-27", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"firm": "ABDK", "date": "2022-01-27", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"firm": "Certora (formal verification)", "date": "2022-01", "url": "https://github.com/aave-dao/aave-v3-origin"},
+        ],
         "components": [
             {
                 "name": "Lending markets",

@@ -7,6 +7,8 @@
 # Markdown & Cursor rules (governance requirement)
 *.md
 *.mdc
+# Exception: tooling/skill docs under .claude/ ARE version-controlled (e.g. SKILL.md)
+!.claude/**/*.md
 
 # Node / Next.js
 node_modules/

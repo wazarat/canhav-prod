@@ -94,12 +94,19 @@ function lendingHasAssetCoverage(lending: NonNullable<NetworkProfile["lending"]>
 function hasAssetCoverageContent(profile: NetworkProfile): boolean {
   if (profile.lending && lendingHasAssetCoverage(profile.lending)) return true;
   const tagLending = profile.creditTagMetrics?.lending;
-  if (!tagLending) return false;
-  return Boolean(
-    tagLending.collateralAssets?.length ||
+  if (
+    tagLending &&
+    (tagLending.collateralAssets?.length ||
       tagLending.oracles?.length ||
-      tagLending.isolatedMarketCount != null,
-  );
+      tagLending.isolatedMarketCount != null)
+  ) {
+    return true;
+  }
+  // Non-lending networks surface their supported assets via member coins (the
+  // network's own token(s) + supported assets/markets). This lets the Asset
+  // Coverage tab appear for Staking/Liquidity/Derivatives/RWA/Other/Fixed-Income
+  // networks that have no lending block.
+  return profile.memberCoins.length > 0;
 }
 
 function hasRisksContent(profile: NetworkProfile): boolean {

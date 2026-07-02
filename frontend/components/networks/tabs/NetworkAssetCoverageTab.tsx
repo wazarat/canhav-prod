@@ -51,6 +51,27 @@ function TagLendingCoveragePanel({
   );
 }
 
+function MemberCoinsCoveragePanel({ coins }: { coins: NetworkProfile["memberCoins"] }) {
+  return (
+    <DataPanel title="Member coins & supported assets">
+      <div className="divide-y divide-ink-800/60">
+        {coins.map((c) => (
+          <div key={`${c.category}:${c.slug}`} className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0">
+            <div>
+              <p className="text-sm font-medium text-ink-100">
+                {c.name}
+                {c.symbol ? <span className="ml-1.5 text-ink-400">{c.symbol}</span> : null}
+              </p>
+              {c.role ? <p className="mt-0.5 text-xs text-ink-400">{c.role}</p> : null}
+            </div>
+            <Badge tone="neutral">{c.category}</Badge>
+          </div>
+        ))}
+      </div>
+    </DataPanel>
+  );
+}
+
 export function NetworkAssetCoverageTab({ profile }: { profile: NetworkProfile }) {
   const tagLending = profile.creditTagMetrics?.lending;
   const hasLending = Boolean(profile.lending);
@@ -60,8 +81,9 @@ export function NetworkAssetCoverageTab({ profile }: { profile: NetworkProfile }
         tagLending.oracles?.length ||
         tagLending.isolatedMarketCount != null),
   );
+  const hasMemberCoins = profile.memberCoins.length > 0;
 
-  if (!hasLending && !hasTagLending) {
+  if (!hasLending && !hasTagLending && !hasMemberCoins) {
     return (
       <div className="pt-6">
         <Card className="text-sm text-ink-300">
@@ -83,6 +105,7 @@ export function NetworkAssetCoverageTab({ profile }: { profile: NetworkProfile }
       </div>
       {profile.lending && <LendingAssetCoveragePanel lending={profile.lending} />}
       {tagLending && hasTagLending && <TagLendingCoveragePanel metrics={tagLending} />}
+      {hasMemberCoins && <MemberCoinsCoveragePanel coins={profile.memberCoins} />}
     </div>
   );
 }

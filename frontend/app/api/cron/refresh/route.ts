@@ -33,6 +33,7 @@ import {
   llamaLendingProjectForSlug,
   llamaOptionsProtocolForSlug,
   llamaProtocolForSlug,
+  llamaProtocolsForSlug,
   type LlamaPool,
   type LlamaProtocolMeta,
   resolveLlamaYieldPool,
@@ -1354,7 +1355,8 @@ export async function GET(req: Request): Promise<NextResponse> {
       isNetworkCategory(String(it.Category ?? "")) &&
       (String(it.Sector ?? "") === "DEX" ||
         (Array.isArray(it.SecondarySectors) && it.SecondarySectors.includes("DEX"))) &&
-      llamaProtocolForSlug(String(it.Slug ?? "")) !== null,
+      (llamaProtocolsForSlug(String(it.Slug ?? "")).length > 0 ||
+        Boolean(coinIdForNetworkSlug(String(it.Slug ?? "")))),
   );
   const dexResults: { slug: string; tvlUsd: number | null; volume30dUsd: number | null }[] = [];
   if (dexItems.length > 0) {
@@ -1398,7 +1400,8 @@ export async function GET(req: Request): Promise<NextResponse> {
     (it) =>
       isNetworkCategory(String(it.Category ?? "")) &&
       String(it.Sector ?? "") === "RWA" &&
-      llamaProtocolForSlug(String(it.Slug ?? "")) !== null,
+      (llamaProtocolsForSlug(String(it.Slug ?? "")).length > 0 ||
+        Boolean(coinIdForNetworkSlug(String(it.Slug ?? "")))),
   );
   const rwaResults: { slug: string; aumUsd: number | null }[] = [];
   const rwaMissingAum: string[] = [];

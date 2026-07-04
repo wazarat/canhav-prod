@@ -292,7 +292,7 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   "extra-finance": null, // EXTRA not listed on CoinGecko
   pendle: "pendle",
   notional: "notional-finance",
-  spectra: null, // no standalone tradable token
+  spectra: "spectra-finance", // Spectra (SPECTRA); "spectra-2" is a tiny impostor
   sense: null,
   radiant: "radiant-capital",
   // Staking sector — LST/LRT or governance token for the universal pass (verified 2026-06-25).

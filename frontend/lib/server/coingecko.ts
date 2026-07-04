@@ -6,6 +6,7 @@ import {
   coinIdForNetworkSlug,
   coinIdForSlug,
 } from "@/lib/coingeckoIds";
+import { fetchLlamaProtocolMeta } from "@/lib/server/defillama";
 import { readSecret } from "@/lib/server/env";
 import { fetchJson, sleep } from "@/lib/server/http";
 
@@ -162,12 +163,17 @@ export async function resolveCoin(
   };
 }
 
-/** Resolve via the curated COINGECKO_IDS map; null if unmapped. */
+/**
+ * Resolve via the curated COINGECKO_IDS map, falling back to DeFi Llama's exact
+ * `gecko_id` when unmapped (safe — it is an exact CoinGecko id, not a guess).
+ * Order: COINGECKO_IDS[slug] → Llama gecko_id → null.
+ */
 export async function resolveForSlug(
   slug: string,
   revalidate?: number,
 ): Promise<TokenResolution | null> {
-  const coinId = COINGECKO_IDS[slug];
+  const coinId =
+    COINGECKO_IDS[slug] ?? (await fetchLlamaProtocolMeta(slug, revalidate))?.geckoId ?? null;
   if (!coinId) return null;
   return resolveCoin(coinId, revalidate);
 }

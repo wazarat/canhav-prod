@@ -102,6 +102,42 @@ export function setStatusLocal(
   return item;
 }
 
+/**
+ * Offline-dev store accessors for the admin content editor (mirrors
+ * `setStatusLocal`). Only used when Upstash isn't configured; production goes
+ * through Redis. Reads/writes `backend/data/store.json` by `<PK>|<SK>` field.
+ */
+export function readNetworkItemLocal(
+  slug: string,
+): { field: string; item: Record<string, any> } | null {
+  let parsed: StoreFile;
+  try {
+    parsed = JSON.parse(readFileSync(storePath(), "utf-8")) as StoreFile;
+  } catch {
+    return null;
+  }
+  const items = (parsed.items ?? {}) as Record<string, Record<string, any>>;
+  for (const category of ["Network", "Entity"]) {
+    const field = `CATEGORY#${category}|PROTOCOL#${slug}`;
+    if (items[field]) return { field, item: items[field] };
+  }
+  return null;
+}
+
+export function writeNetworkItemLocal(field: string, item: Record<string, any>): boolean {
+  let parsed: StoreFile & Record<string, unknown>;
+  try {
+    parsed = JSON.parse(readFileSync(storePath(), "utf-8"));
+  } catch {
+    return false;
+  }
+  const items = (parsed.items ?? {}) as Record<string, Record<string, any>>;
+  items[field] = item;
+  parsed.items = items;
+  writeFileSync(storePath(), `${JSON.stringify(parsed, null, 2)}\n`, "utf-8");
+  return true;
+}
+
 function parseRisks(raw: unknown): NetworkRisk[] {
   if (!Array.isArray(raw)) return [];
   return raw.map((item) => {

@@ -431,7 +431,19 @@ export function PartnershipsSection({ partnerships }: { partnerships: Partnershi
             <li key={p.name} className="py-3 first:pt-0 last:pb-0">
               <div className="flex items-start justify-between gap-2">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-ink-50">{p.name}</p>
+                  <p className="text-sm font-medium text-ink-50">
+                    {p.slug ? (
+                      <a
+                        href={`/networks/${p.slug}`}
+                        className="inline-flex items-center gap-0.5 text-ink-50 transition-colors hover:text-electric-400"
+                      >
+                        {p.name}
+                        <ArrowUpRight className="h-3 w-3" />
+                      </a>
+                    ) : (
+                      p.name
+                    )}
+                  </p>
                   <p className="text-xs text-ink-400">{p.date}</p>
                   <p className="text-sm leading-relaxed text-ink-300">{p.description}</p>
                 </div>

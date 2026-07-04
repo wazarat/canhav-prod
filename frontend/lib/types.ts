@@ -868,6 +868,8 @@ export interface Partnership {
   date: string;
   amountLabel: string | null;
   description: string;
+  /** Network slug when the partner is also tracked on-platform (optional link). */
+  slug?: string | null;
 }
 
 export interface CurrentScale {

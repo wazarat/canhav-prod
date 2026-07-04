@@ -15,8 +15,14 @@
   "dependencies": {
     "@ai-sdk/openai": "^3.0.68",
     "@ai-sdk/react": "^3.0.199",
+    "@monaco-editor/react": "^4.7.0",
     "@privy-io/react-auth": "^3.29.2",
     "@privy-io/server-auth": "^1.32.5",
+    "@rjsf/core": "^5.24.13",
+    "@rjsf/utils": "^5.24.13",
+    "@rjsf/validator-ajv8": "^5.24.13",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.110.0",
     "@upstash/redis": "^1.38.0",
     "@zerodev/ecdsa-validator": "^5.4.9",
     "@zerodev/permissions": "^5.6.3",
@@ -43,6 +49,7 @@
     "eslint": "8.57.1",
     "eslint-config-next": "14.2.35",
     "postcss": "8.4.49",
+    "server-only": "^0.0.1",
     "tailwindcss": "3.4.16",
     "tailwindcss-animate": "1.0.7",
     "typescript": "5.7.2"

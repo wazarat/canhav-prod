@@ -157,7 +157,9 @@ export async function POST(req: Request): Promise<NextResponse> {
   }
   const { field, item } = found;
 
-  // Only ever merge allowlisted curated keys; ignore everything else.
+  // Only ever merge allowlisted curated keys; ignore everything else, and reject
+  // any structured key whose value arrives in the wrong shape (defense in depth
+  // against a buggy UI or script corrupting typed data — see isValidCuratedShape).
   const applied: string[] = [];
   const rejected: string[] = [];
   for (const [key, value] of Object.entries(patch)) {
@@ -165,7 +167,12 @@ export async function POST(req: Request): Promise<NextResponse> {
       rejected.push(key);
       continue;
     }
-    item[key] = sanitizeCuratedValue(key, value, slug);
+    const sanitized = sanitizeCuratedValue(key, value, slug);
+    if (!isValidCuratedShape(key, sanitized)) {
+      rejected.push(key);
+      continue;
+    }
+    item[key] = sanitized;
     applied.push(key);
   }
 
@@ -199,4 +206,67 @@ function sanitizeCuratedValue(key: string, value: unknown, ownSlug: string): unk
     });
   }
   return value;
+}
+
+/** Structured keys whose items must be objects (never bare/`[object Object]` strings). */
+const OBJECT_ARRAY_KEYS = new Set([
+  "Competitors",
+  "Partnerships",
+  "TypedRisks",
+  "Faq",
+  "OrgStructure",
+  "Timeline",
+  "InvestmentRounds",
+  "TradFiComparison",
+  "Sources",
+  "Audits",
+  "OffchainFacts",
+]);
+
+/** Classification keys that must be arrays of plain strings. */
+const STRING_ARRAY_KEYS = new Set([
+  "Tags",
+  "SecondarySectors",
+  "StakingSecondaryTags",
+  "LiquiditySecondaryTags",
+  "DerivativesSecondaryTags",
+  "OtherSecondaryTags",
+  "RwaSecondaryTags",
+  "StablecoinSecondaryTags",
+  "DexSecondaryTags",
+]);
+
+function isPlainObject(v: unknown): boolean {
+  return v !== null && typeof v === "object" && !Array.isArray(v);
+}
+
+/** A value that got String()-coerced from an object — the classic corruption. */
+function looksStringified(v: unknown): boolean {
+  return typeof v === "string" && v.trim() === "[object Object]";
+}
+
+/**
+ * Reject structured curated values arriving in the wrong primitive shape, so no
+ * UI or script can overwrite typed data (risk objects, competitor rows, …) with
+ * bare strings or scalars. Clearing a key (null/undefined) is always allowed;
+ * legacy `Risks` accepts BOTH string[] and object[]. Scalar keys pass through.
+ */
+function isValidCuratedShape(key: string, value: unknown): boolean {
+  if (value === null || value === undefined) return true;
+  if (OBJECT_ARRAY_KEYS.has(key)) {
+    return Array.isArray(value) && value.every(isPlainObject);
+  }
+  if (STRING_ARRAY_KEYS.has(key)) {
+    return Array.isArray(value) && value.every((it) => typeof it === "string" && !looksStringified(it));
+  }
+  if (key === "Risks") {
+    return (
+      Array.isArray(value) &&
+      value.every((it) => (typeof it === "string" && !looksStringified(it)) || isPlainObject(it))
+    );
+  }
+  if (key === "Tokenomics") {
+    return isPlainObject(value);
+  }
+  return true;
 }

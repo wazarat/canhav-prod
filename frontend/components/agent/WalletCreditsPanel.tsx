@@ -28,6 +28,7 @@ interface WalletCredits {
   balance?: string;
   granted?: boolean;
   mintConfig?: SpawnMintConfig | null;
+  rpcUrl?: string | null;
   error?: string;
 }
 
@@ -52,7 +53,7 @@ function bootstrapReasonMessage(reason?: BootstrapReason): string {
     case "mint_unconfigured":
       return "Minting isn't enabled on the server — set FACTORY_DEPLOYER_PRIVATE_KEY (and TCNHV_TOKEN_ADDRESS) on Vercel, then redeploy.";
     case "identity_unconfigured":
-      return "On-chain identity isn't configured — set ZERODEV_RPC and the registry addresses on Vercel.";
+      return "Wallet login isn't configured — set NEXT_PUBLIC_PRIVY_APP_ID and PRIVY_APP_SECRET on Vercel.";
     case "no_profile":
       return "Your profile isn't ready yet — sign out and back in, then try again.";
     default:
@@ -78,6 +79,7 @@ interface TransferPreflight {
   asset?: string;
   amount?: string;
   humanAmount?: string;
+  rpcUrl?: string;
   accountIndex?: number;
   mintConfig?: SpawnMintConfig;
   error?: string;
@@ -105,7 +107,7 @@ function TreasuryAddressRow({ address }: { address: string }) {
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-lg border border-ink-800/60 bg-ink-900/40 px-3 py-2">
       <span className="text-[10px] font-medium uppercase tracking-wider text-ink-500">
-        Treasury (kernel index 0)
+        Wallet address
       </span>
       <code className="flex-1 break-all font-mono text-[11px] text-ink-300">{address}</code>
       <button
@@ -160,7 +162,7 @@ function CreditsNotConfigured() {
  * two ways to move it — "Send credits" to any wallet / agent / user, and "Fund
  * this agent" to top up one of their own agents (the account they pay sellers
  * from). All movement is a gas-sponsored, client-signed ERC-20 transfer from the
- * user's kernel wallet (index 0).
+ * from the user's Privy wallet. All movement is a client-signed ERC-20 transfer.
  */
 export function WalletCreditsPanel({
   buyerAgents = [],
@@ -218,26 +220,9 @@ export function WalletCreditsPanel({
     }
   }, []);
 
-  const deriveTreasuryAddress = useCallback(
-    async (mintConfig: SpawnMintConfig): Promise<string | null> => {
-      if (!resolveActiveWallet(wallets)) return null;
-      try {
-        const signer = await buildPrivySigner(wallets);
-        const svc = await import("canhav-agent-service");
-        const cfg = svc.createConfig({
-          zerodevRpc: mintConfig.zerodevRpc,
-          rpcUrl: mintConfig.rpcUrl,
-          identityRegistry: mintConfig.identityRegistry,
-          securityRegistry: mintConfig.securityRegistry,
-        });
-        const kernel = await svc.createEcdsaKernelAccount(cfg, signer, 0n);
-        return kernel.address;
-      } catch {
-        return null;
-      }
-    },
-    [wallets],
-  );
+  const resolveTreasuryAddress = useCallback((): string | null => {
+    return resolveActiveWallet(wallets)?.address ?? null;
+  }, [wallets]);
 
   const loadAgentCredits = useCallback(async (agentId: string) => {
     if (!agentId) {
@@ -272,11 +257,10 @@ export function WalletCreditsPanel({
         setAddress(data.address);
         return;
       }
-      if (!data.mintConfig || derivedRef.current) return;
-      if (!resolveActiveWallet(wallets)) return;
+      if (derivedRef.current) return;
+      const treasury = resolveTreasuryAddress();
+      if (!treasury) return;
       derivedRef.current = true;
-      const treasury = await deriveTreasuryAddress(data.mintConfig);
-      if (!active || !treasury) return;
       setAddress(treasury);
       const withBalance = await loadBalance(treasury);
       if (active && withBalance) setInfo(withBalance);
@@ -284,7 +268,7 @@ export function WalletCreditsPanel({
     return () => {
       active = false;
     };
-  }, [wallets, loadBalance, deriveTreasuryAddress]);
+  }, [wallets, loadBalance, resolveTreasuryAddress]);
 
   useEffect(() => {
     if (!showMintActions || !fundAgentId) return;
@@ -321,20 +305,15 @@ export function WalletCreditsPanel({
       if (!boot.needsGrant) {
         throw new Error(bootstrapReasonMessage(boot.reason));
       }
-      const cfg = boot.mintConfig ?? info?.mintConfig;
-      if (!cfg) throw new Error("Wallet configuration is missing — check ZeroDev + tCNHV env vars.");
 
-      let treasury = address;
-      if (!treasury) {
-        treasury = await deriveTreasuryAddress(cfg);
-        if (!treasury) throw new Error("Connect MetaMask and try again.");
-        setAddress(treasury);
-      }
+      let treasury = address ?? resolveTreasuryAddress();
+      if (!treasury) throw new Error("Wait for your embedded wallet to finish loading, then try again.");
+      setAddress(treasury);
 
       const res = await fetch("/api/wallet/bootstrap", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: treasury }),
+        body: JSON.stringify({ address: treasury, signerAddress: treasury }),
       });
       const result = (await res.json()) as {
         ok?: boolean;
@@ -423,18 +402,22 @@ export function WalletCreditsPanel({
         body: JSON.stringify({ to: target, amount: amount.trim() }),
       });
       const pf = (await preRes.json()) as TransferPreflight;
-      if (!preRes.ok || !pf.ok || !pf.payTo || !pf.token || !pf.amount || pf.accountIndex == null || !pf.mintConfig) {
+      if (!preRes.ok || !pf.ok || !pf.payTo || !pf.token || !pf.amount) {
         throw new Error(pf.error ?? "Could not prepare the transfer.");
       }
 
-      const signer = await buildPrivySigner(wallets);
+      const wallet = resolveActiveWallet(wallets);
+      if (!wallet) throw new Error("No wallet connected yet.");
+
       const { txHash } = await transferCredits({
-        signer,
+        wallet,
+        signer: pf.mintConfig ? await buildPrivySigner(wallets) : undefined,
         accountIndex: pf.accountIndex,
         mintConfig: pf.mintConfig,
         token: pf.token,
         payTo: pf.payTo,
         amount: pf.amount,
+        rpcUrl: pf.rpcUrl,
       });
 
       await fetch("/api/wallet/transfer", {

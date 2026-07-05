@@ -470,7 +470,9 @@ export function CollabBrowser({
         accountIndex?: number;
         agentAddress?: string | null;
         signerAddress?: string | null;
-        mintConfig?: SpawnMintConfig;
+        payerAddress?: string | null;
+        mintConfig?: SpawnMintConfig | null;
+        rpcUrl?: string;
         settlementReady?: boolean;
         sufficient?: boolean;
         humanRequired?: string;
@@ -479,12 +481,20 @@ export function CollabBrowser({
         proof?: TheaterProofLinks;
         error?: string;
       };
-      if (!pfRes.ok || !pf.configured || pf.accountIndex == null || !pf.mintConfig) {
+      if (!pfRes.ok || !pf.configured) {
         const friendly =
           pfRes.status === 403
             ? "Pick one of your own agents to pay from in the “Pay from agent” menu, and fund it with credits above."
             : (pf.error ?? "Buyer preflight failed.");
         throw new Error(friendly);
+      }
+      if (pf.mintConfig && pf.accountIndex == null) {
+        throw new Error(pf.error ?? "Buyer preflight failed.");
+      }
+      if (!pf.mintConfig && !pf.payerAddress) {
+        throw new Error(
+          "Your Privy wallet address isn't ready yet — wait for the embedded wallet to load, then try again.",
+        );
       }
       if (pf.proof) setProofLinks(pf.proof);
       if (pf.settlementReady === false || pf.sufficient === false) {
@@ -500,14 +510,19 @@ export function CollabBrowser({
         fromAgentId: buyerAgentId,
       });
 
-      const signer = await buildAgentSigner(wallets, pf.signerAddress);
-      if (pf.agentAddress && pf.accountIndex != null && pf.mintConfig) {
+      const signer = pf.mintConfig ? await buildAgentSigner(wallets, pf.signerAddress) : null;
+      if (pf.mintConfig && pf.agentAddress && pf.accountIndex != null) {
         await assertAgentKernelMatch({
-          signer,
+          signer: signer!,
           accountIndex: pf.accountIndex,
           mintConfig: pf.mintConfig,
           expectedAgentAddress: pf.agentAddress,
         });
+      }
+
+      const wallet = resolveActiveWallet(wallets);
+      if (!wallet) {
+        throw new Error("No wallet connected yet — sign in and wait for your embedded wallet to load.");
       }
 
       // Lazily anchor the agreement on-chain (CollabAgreement.establish) before
@@ -522,10 +537,10 @@ export function CollabBrowser({
             configured?: boolean;
             establish?: EstablishParams;
           };
-          if (anchorRes.ok && anchor.configured && anchor.establish) {
+          if (anchorRes.ok && anchor.configured && anchor.establish && signer) {
             setPhase("anchoring");
             const { onChainAgreementId, txHash: establishTx } = await establishAgreementOnChain({
-              signer,
+              signer: signer!,
               establish: anchor.establish,
             });
             await fetch(
@@ -545,10 +560,12 @@ export function CollabBrowser({
 
       setPhase("paying");
       const { txHash } = await payStrategy({
-        signer,
-        accountIndex: pf.accountIndex,
-        mintConfig: pf.mintConfig,
+        wallet,
         quote,
+        rpcUrl: pf.rpcUrl,
+        signer: signer ?? undefined,
+        accountIndex: pf.accountIndex ?? undefined,
+        mintConfig: pf.mintConfig ?? undefined,
       });
       setPaymentTx(txHash);
 
@@ -585,7 +602,7 @@ export function CollabBrowser({
       if (reqData.settlement) setSettlement(reqData.settlement);
       if (reqData.proof) setProofLinks(reqData.proof as TheaterProofLinks);
 
-      if (reqData.record) {
+      if (reqData.record && signer) {
         try {
           setPhase("recording");
           const { txHash: recordHash } = await recordCollabOnChain({ signer, record: reqData.record });
@@ -607,6 +624,8 @@ export function CollabBrowser({
             }`,
           );
         }
+      } else if (reqData.record) {
+        setNotice("Exchange complete and added to your agent.");
       } else {
         setNotice("Exchange complete — the strategy was added to your agent's memory.");
       }

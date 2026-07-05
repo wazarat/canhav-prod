@@ -1,24 +1,20 @@
 "use client";
 
+import type { ConnectedWallet } from "@privy-io/react-auth";
 import type { Signer } from "@zerodev/sdk/types";
 
+import { sendErc20Transfer } from "@/lib/agent/privy-signer";
 import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 
 /**
  * Buyer-side x402 collaboration helpers (browser).
  *
- * Settlement is signed in the browser because the buyer agent's ZeroDev smart
- * account is driven by the user's Privy embedded signer (keys in Privy's TEE).
- * Flow: fetch the seller's 402 quote (canonical x402 v2 `accepts[]`) -> sign a
- * gas-sponsored USDC `transfer` to the seller's wallet -> hand the tx hash to
- * /api/collab/request, which wraps it in the canonical x402 v2 `X-PAYMENT`
- * payload for the seller's facilitator to verify + settle.
+ * Settlement is signed in the browser from the user's Privy wallet. Flow: fetch
+ * the seller's 402 quote -> sign a USDC `transfer` to the seller's wallet ->
+ * hand the tx hash to /api/collab/request for verification + settle.
  *
- * Deviation from the reference x402 implementation: the canonical EVM `exact`
- * scheme settles via EIP-3009 `transferWithAuthorization` through a CDP
- * facilitator on Arbitrum One. A ZeroDev Kernel (ERC-4337) smart account cannot
- * produce that authorization signature, so we keep the wire format but settle
- * with a smart-account `transfer` on Arbitrum Sepolia (see lib/server/x402.ts).
+ * When USE_ZERODEV=true, legacy gas-sponsored userOps from agent kernel accounts
+ * remain available for agent-scoped flows.
  */
 
 const erc20Abi = [
@@ -78,44 +74,57 @@ export async function getSellerQuote(params: {
 }
 
 /**
- * Sign + send a gas-sponsored USDC transfer from the buyer agent's smart account
- * to the seller's wallet. Returns the settling on-chain tx hash (the x402
- * payment reference).
+ * Sign + send a USDC transfer from the buyer's Privy wallet to the seller.
+ * Returns the settling on-chain tx hash (the x402 payment reference).
  */
 export async function payStrategy(params: {
-  signer: Signer;
-  accountIndex: number;
-  mintConfig: SpawnMintConfig;
+  wallet: ConnectedWallet;
   quote: SellerQuote;
-}): Promise<{ txHash: `0x${string}`; userOpHash: string }> {
-  const svc = await import("canhav-agent-service");
-  const { encodeFunctionData } = await import("viem");
+  rpcUrl?: string;
+  /** Legacy ZeroDev path — only when mintConfig is provided. */
+  signer?: Signer;
+  accountIndex?: number;
+  mintConfig?: SpawnMintConfig;
+}): Promise<{ txHash: `0x${string}`; userOpHash?: string }> {
+  if (params.mintConfig && params.signer != null && params.accountIndex != null) {
+    const svc = await import("canhav-agent-service");
+    const { encodeFunctionData } = await import("viem");
 
-  const cfg = svc.createConfig({
-    zerodevRpc: params.mintConfig.zerodevRpc,
-    rpcUrl: params.mintConfig.rpcUrl,
-    identityRegistry: params.mintConfig.identityRegistry,
-    securityRegistry: params.mintConfig.securityRegistry,
+    const cfg = svc.createConfig({
+      zerodevRpc: params.mintConfig.zerodevRpc,
+      rpcUrl: params.mintConfig.rpcUrl,
+      identityRegistry: params.mintConfig.identityRegistry,
+      securityRegistry: params.mintConfig.securityRegistry,
+    });
+
+    const account = await svc.createEcdsaKernelAccount(
+      cfg,
+      params.signer,
+      BigInt(params.accountIndex),
+    );
+
+    const data = encodeFunctionData({
+      abi: erc20Abi,
+      functionName: "transfer",
+      args: [params.quote.payTo, BigInt(params.quote.amount)],
+    });
+
+    const userOpHash = await account.kernelClient.sendUserOperation({
+      account: account.account,
+      calls: [{ to: params.quote.asset, data }],
+    });
+    const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
+    return { txHash: receipt.receipt.transactionHash, userOpHash };
+  }
+
+  const { txHash } = await sendErc20Transfer({
+    wallet: params.wallet,
+    token: params.quote.asset,
+    to: params.quote.payTo,
+    amount: BigInt(params.quote.amount),
+    rpcUrl: params.rpcUrl,
   });
-
-  const account = await svc.createEcdsaKernelAccount(
-    cfg,
-    params.signer,
-    BigInt(params.accountIndex),
-  );
-
-  const data = encodeFunctionData({
-    abi: erc20Abi,
-    functionName: "transfer",
-    args: [params.quote.payTo, BigInt(params.quote.amount)],
-  });
-
-  const userOpHash = await account.kernelClient.sendUserOperation({
-    account: account.account,
-    calls: [{ to: params.quote.asset, data }],
-  });
-  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
-  return { txHash: receipt.receipt.transactionHash, userOpHash };
+  return { txHash };
 }
 
 const faucetAbi = [
@@ -156,44 +165,60 @@ export async function claimCredits(params: {
 }
 
 /**
- * Transfer tCNHV credits from the user's treasury wallet (kernel index 0) to any
- * recipient — a peer's wallet or one of their own agents' smart accounts. A
- * gas-sponsored ERC-20 `transfer` userOp signed by the user's embedded signer.
- * The treasury is allowlisted at signup, so the transfer clears the token's
- * merit-signal transfer rule. Returns the settling tx hash.
+ * Transfer tCNHV credits from the user's Privy treasury wallet to any recipient.
+ * Default path: plain ERC-20 transfer signed by the embedded wallet.
+ * Legacy path (mintConfig provided): gas-sponsored userOp from a ZeroDev kernel.
  */
 export async function transferCredits(params: {
-  signer: Signer;
-  accountIndex: number;
-  mintConfig: SpawnMintConfig;
+  wallet: ConnectedWallet;
   token: `0x${string}`;
   payTo: `0x${string}`;
   /** Amount in base units (tCNHV = 18 decimals). */
   amount: string;
-}): Promise<{ txHash: `0x${string}`; userOpHash: string }> {
-  const svc = await import("canhav-agent-service");
-  const { encodeFunctionData } = await import("viem");
+  rpcUrl?: string;
+  /** Legacy ZeroDev path — only when mintConfig is provided. */
+  signer?: Signer;
+  accountIndex?: number;
+  mintConfig?: SpawnMintConfig;
+}): Promise<{ txHash: `0x${string}`; userOpHash?: string }> {
+  if (params.mintConfig && params.signer != null && params.accountIndex != null) {
+    const svc = await import("canhav-agent-service");
+    const { encodeFunctionData } = await import("viem");
 
-  const cfg = svc.createConfig({
-    zerodevRpc: params.mintConfig.zerodevRpc,
-    rpcUrl: params.mintConfig.rpcUrl,
-    identityRegistry: params.mintConfig.identityRegistry,
-    securityRegistry: params.mintConfig.securityRegistry,
-  });
+    const cfg = svc.createConfig({
+      zerodevRpc: params.mintConfig.zerodevRpc,
+      rpcUrl: params.mintConfig.rpcUrl,
+      identityRegistry: params.mintConfig.identityRegistry,
+      securityRegistry: params.mintConfig.securityRegistry,
+    });
 
-  const account = await svc.createEcdsaKernelAccount(cfg, params.signer, BigInt(params.accountIndex));
-  const data = encodeFunctionData({
-    abi: erc20Abi,
-    functionName: "transfer",
-    args: [params.payTo, BigInt(params.amount)],
-  });
+    const account = await svc.createEcdsaKernelAccount(
+      cfg,
+      params.signer,
+      BigInt(params.accountIndex),
+    );
+    const data = encodeFunctionData({
+      abi: erc20Abi,
+      functionName: "transfer",
+      args: [params.payTo, BigInt(params.amount)],
+    });
 
-  const userOpHash = await account.kernelClient.sendUserOperation({
-    account: account.account,
-    calls: [{ to: params.token, data }],
+    const userOpHash = await account.kernelClient.sendUserOperation({
+      account: account.account,
+      calls: [{ to: params.token, data }],
+    });
+    const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
+    return { txHash: receipt.receipt.transactionHash, userOpHash };
+  }
+
+  const { txHash } = await sendErc20Transfer({
+    wallet: params.wallet,
+    token: params.token,
+    to: params.payTo,
+    amount: BigInt(params.amount),
+    rpcUrl: params.rpcUrl,
   });
-  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
-  return { txHash: receipt.receipt.transactionHash, userOpHash };
+  return { txHash };
 }
 
 const collabRegistryAbi = [

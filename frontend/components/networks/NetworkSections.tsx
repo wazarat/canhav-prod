@@ -1085,6 +1085,27 @@ export function OtherTagMetricsSection({
             {"bribeVolumeUsd" in block && (
               <MetricTile label="Bribe volume" sourced={block.bribeVolumeUsd} kind="usd" />
             )}
+            {"crvEmissionsWeekly" in block && (
+              <MetricTile label="CRV emissions (weekly)" sourced={block.crvEmissionsWeekly} kind="count" />
+            )}
+            {"activeGaugeCount" in block && (
+              <MetricTile label="Active gauges" sourced={block.activeGaugeCount} kind="count" />
+            )}
+            {"totalProposals" in block && (
+              <MetricTile label="Proposals (Snapshot)" sourced={block.totalProposals} kind="count" />
+            )}
+            {"activeProposals" in block && (
+              <MetricTile label="Active proposals" sourced={block.activeProposals} kind="count" />
+            )}
+            {"uniqueVoters" in block && (
+              <MetricTile label="Unique voters" sourced={block.uniqueVoters} kind="count" />
+            )}
+            {"avgVotesPerProposal" in block && (
+              <MetricTile label="Avg votes / proposal" sourced={block.avgVotesPerProposal} kind="count" />
+            )}
+            {"snapshotFollowers" in block && (
+              <MetricTile label="Snapshot followers" sourced={block.snapshotFollowers} kind="count" />
+            )}
             <PlainTile
               label="Fees (24h)"
               value={fees?.fees24hUsd != null ? fmtUsd(fees.fees24hUsd) : "—"}

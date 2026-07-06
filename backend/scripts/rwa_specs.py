@@ -120,6 +120,9 @@ def _net(
     rwa: Dict[str, Any],
     member_coins: List[Dict[str, Any]],
     chains: List[str],
+    # --- M2 curated metric blocks (RwaGeneral rollup + characteristic tags) ---
+    rwa_general: Optional[Dict[str, Any]] = None,
+    rwa_characteristics: Optional[Dict[str, Any]] = None,
     audit_firms: Optional[str] = None,
     competitors: Optional[List[Dict[str, Any]]] = None,
     official_docs: Optional[str] = None,
@@ -187,6 +190,8 @@ def _net(
         "tags": [],
         "rwa_sub_sector": sub_sector,
         "rwa_secondary_tags": secondary_tags,
+        "rwa_general": rwa_general,
+        "rwa_characteristics": rwa_characteristics,
         "competitors": competitors or [_ONDO_COMPETITOR],
         "rwa": rwa,
         "member_coins": member_coins,
@@ -2890,6 +2895,42 @@ RWA_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 sub_category="Treasuries & Funds",
             ),
         ],
+        # --- M2 curated metric blocks (public-facts snapshot 2026-06-18) -------
+        rwa_general={
+            "aumUsd": _sourced(1_980_000_000),
+            "assetClasses": ["Short-duration US Treasuries", "Agency repo"],
+            "issuer": "Franklin Templeton (Franklin Advisers, Inc.)",
+            "jurisdiction": "United States (SEC)",
+            "regulatoryStatus": "SEC-registered '40 Act US Government Money Fund (FOBXX).",
+            "redemptionModel": "Daily subscription/redemption at $1 NAV via the Benji app; self transfer agent.",
+            "auditHistory": "PwC (audited mutual fund).",
+        },
+        rwa_characteristics={
+            "institutionalGated": {
+                "kycModel": "KYC/AML at onboarding via the Benji app; US-eligible investors.",
+                "accessModel": "Retail-accessible '40 Act fund ($20 minimum) — not a Reg D private placement.",
+                "minInvestmentUsd": 20,
+                "eligibleJurisdictions": ["United States"],
+                "transferRestrictions": "On-chain transfers restricted to whitelisted Benji wallets.",
+            },
+            "yieldBearing": {
+                "yieldSource": "Interest on short-duration US Treasuries and repo held by FOBXX.",
+                "distributionModel": "Daily yield accrues as new BENJI tokens (rebasing share count at $1 NAV).",
+                "underlyingInstrument": "FOBXX — Franklin OnChain U.S. Government Money Fund.",
+            },
+            "realWorldCustody": {
+                "custodians": ["Franklin Templeton (transfer agent + custodian)"],
+                "custodyModel": "Regulated '40 Act fund; Franklin Templeton is its own on-chain transfer agent.",
+                "reserveComposition": "≈100% US government securities and repo (money-market fund).",
+                "auditFirms": ["PwC"],
+            },
+            "multiChain": {
+                "chains": ["Stellar", "Polygon", "Avalanche", "Arbitrum", "Aptos", "Base", "Solana", "Sui", "Ethereum"],
+                "chainCount": 9,
+                "primaryChain": "Stellar",
+                "bridgeModel": "Benji issues native shares per chain via Franklin's transfer-agent system (no lock-mint bridge).",
+            },
+        },
     ),
 }
 

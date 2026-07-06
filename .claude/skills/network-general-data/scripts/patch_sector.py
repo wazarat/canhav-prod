@@ -29,6 +29,9 @@ EDITORIAL_KEYS = [
     "GitHub", "Components", "Faq", "OrgStructure", "TradFiComparison",
     "Risks", "Events", "Timeline", "OffchainFacts", "Sources", "Audits",
     "Competitors", "Partnerships", "InvestmentRounds",
+    # M2 curated metric blocks (only RWA specs set these; non-empty guard makes
+    # this a no-op for every other sector).
+    "RwaGeneral", "RwaCharacteristics",
 ]
 
 # Placeholder created_at; real CreatedAt on the existing store item is always preserved.

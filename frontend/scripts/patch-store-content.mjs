@@ -77,6 +77,8 @@ const MERGE_IF_NULL_FIELDS = [
   "DerivativesTagMetrics",
   "OtherTagMetrics",
   "RwaTagMetrics",
+  "RwaGeneral",
+  "RwaCharacteristics",
 ];
 
 /** Perp DEX venues whose taxonomy is canonical in bootstrap. */

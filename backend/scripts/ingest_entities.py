@@ -1436,6 +1436,14 @@ for _slug, _spec in ENTITY_SPECS.items():
     _spec["sub_sector"] = None
 
 
+# Milestone-2 RWA characteristic metric blocks (spec §7): curated custody / access /
+# yield / chain / governance research, merged onto the RWA-carrying specs after all
+# taxonomy backfills so it applies regardless of which spec module defined the entity.
+from rwa_m2_characteristics import apply_rwa_m2_characteristics  # noqa: E402
+
+apply_rwa_m2_characteristics(ENTITY_SPECS)
+
+
 def build_entity_item(
     slug: str, spec: Dict[str, Any], parent_row: Optional[Dict[str, str]], created_at: str
 ) -> dict:
@@ -1515,6 +1523,9 @@ def build_entity_item(
         "RwaSubSector": spec.get("rwa_sub_sector"),
         "RwaSecondaryTags": spec.get("rwa_secondary_tags"),
         "Rwa": spec.get("rwa"),
+        # RWA M2 curated blocks: General rollup + characteristic-tag metrics.
+        "RwaGeneral": spec.get("rwa_general"),
+        "RwaCharacteristics": spec.get("rwa_characteristics"),
         # Staking taxonomy + metrics (canhav-staking spec §2).
         "StakingSubSector": spec.get("staking_sub_sector"),
         "StakingSecondaryTags": spec.get("staking_secondary_tags"),

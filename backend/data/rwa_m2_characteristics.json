@@ -1,0 +1,1075 @@
+{
+  "arcton": {
+    "rwa_general": {
+      "aumUsd": null,
+      "assetClasses": [
+        "Tokenized private equity",
+        "Pre-IPO / startup shares"
+      ],
+      "issuer": "Arcton (Zurich-based Swiss fintech); each offering is issued by the underlying existing Swiss company whose shares are tokenized",
+      "jurisdiction": "Switzerland (Swiss DLT Act; shares entered in the Swiss Commercial Register)",
+      "regulatoryStatus": "Tokenized shares issued under the Swiss DLT Act (in force 2021) with notarial approval and Swiss Commercial Register entry; no securities-regulator license verified",
+      "redemptionModel": "No issuer redemption; investors exit via permissionless secondary trading of share tokens on Camelot (Arbitrum)",
+      "auditHistory": null
+    },
+    "characteristics": {
+      "institutionalGated": {
+        "kycModel": "KYC/AML required to participate; failure to complete KYC can limit participation or fund withdrawals",
+        "accessModel": "KYC-gated public offering open to retail investors (self-described as democratizing startup equity); no accredited/qualified-investor requirement verified",
+        "minInvestmentUsd": null,
+        "eligibleJurisdictions": [],
+        "transferRestrictions": "None found post-IPO; share tokens trade permissionlessly 24/7 on Camelot without lock-ups"
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Arcton docs - Share token",
+        "url": "https://arcton.gitbook.io/documentation/tokenomics/share-token"
+      },
+      {
+        "label": "MoneyToday - Arcton startup-IPO launch (min CHF 100, USDC/fiat)",
+        "url": "https://www.moneytoday.ch/news/fintech-arcton-will-startup-ipos-lancieren"
+      },
+      {
+        "label": "Aleare/Revelo research - Arcton (KYC required, retail focus)",
+        "url": "https://alearesearch.substack.com/p/what-you-need-to-know-about-arcton"
+      },
+      {
+        "label": "blocmates - Arcton: Democratizing Startup Investments",
+        "url": "https://www.blocmates.com/protocol-focus/arcton-democratizing-startup-investments"
+      }
+    ]
+  },
+  "aryze": {
+    "rwa_general": {
+      "aumUsd": null,
+      "assetClasses": [
+        "Short-term government bonds",
+        "Fiat cash reserves"
+      ],
+      "issuer": "ARYZE BVI (British Virgin Islands), wholly-owned subsidiary of ARYZE ApS, Denmark (CVR 38895052)",
+      "jurisdiction": "British Virgin Islands (issuer); Denmark (parent, EU/MiCA-exposed)",
+      "regulatoryStatus": "No completed EMI/MiCA authorization found in public sources; markets to licensed issuers as infrastructure provider",
+      "redemptionModel": "Full-reserve 1:1 redemption to underlying fiat, reliant on ARYZE BVI and its custodial banking relationships",
+      "auditHistory": null
+    },
+    "characteristics": {
+      "institutionalGated": {
+        "kycModel": null,
+        "accessModel": "Permissioned B2B infrastructure for licensed issuers: builders deploy on a self-serve layer under their own or a partner licence; banks and regulated institutions use it as a managed service with ARYZE as infrastructure provider",
+        "minInvestmentUsd": null,
+        "eligibleJurisdictions": [],
+        "transferRestrictions": null
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "FinTech Global - ARYZE closes EUR3m Pre-Series A",
+        "url": "https://fintech.global/2026/05/19/aryze-closes-e3m-pre-series-a-to-scale-stablecoin-infrastructure/"
+      },
+      {
+        "label": "National Law Review - ARYZE Pre-Series A (access model)",
+        "url": "https://natlawreview.com/press-releases/aryze-closes-eu3m-pre-series-stablecoin-issuers-move-integrated"
+      },
+      {
+        "label": "Hedgeweek - Mercado Bitcoin lists eUSD & eGBP by ARYZE (issuer, reserves)",
+        "url": "https://www.hedgeweek.com/mercado-bitcoin-lists-eusd-egbp-digital-cash-stablecoins-by-aryze/"
+      },
+      {
+        "label": "ARYZE official site",
+        "url": "https://aryze.io/"
+      }
+    ]
+  },
+  "atmosphera": {
+    "rwa_general": {
+      "aumUsd": null,
+      "assetClasses": [
+        "Live-event ticket-revenue receivables",
+        "Event-linked revenue-share and short-term debt"
+      ],
+      "issuer": null,
+      "jurisdiction": null,
+      "regulatoryStatus": "KYC/identity verification required per applicable regulation; compliance enforced at token level via Stobox STV3; no specific securities registration or regulator disclosed.",
+      "redemptionModel": "Funds held in escrow until a campaign's funding target is met (auto-refund if not reached); returns paid from ticket revenue, with debt-model campaigns repaying principal plus fixed interest ~1 week after the event.",
+      "auditHistory": null
+    },
+    "characteristics": {
+      "yieldBearing": {
+        "currentYieldPct": null,
+        "yieldSource": "Live-event ticket-sales revenue (per-campaign revenue share or event-linked debt interest).",
+        "distributionModel": "Per-event payout: revenue-share slice of ticket sales, or debt principal plus fixed interest repaid roughly one week after the event.",
+        "underlyingInstrument": "Tokenized event-revenue positions issued via Stobox STV3 (ERC-20, Arbitrum One)."
+      }
+    },
+    "tags_recommended": [
+      "Yield-Bearing"
+    ],
+    "sources": [
+      {
+        "label": "Atmosphera official website",
+        "url": "https://atmosphera.live/"
+      },
+      {
+        "label": "Stobox - Stobox Welcomes Atmosphera (partnership announcement)",
+        "url": "https://stobox.io/blog/stobox-welcomes-atmosphera-bringing-event-investments-on-chain"
+      },
+      {
+        "label": "Event Tech Live - Atmosphera opens live events to community investors",
+        "url": "https://eventtechlive.com/atmosphera-opens-live-events-to-community-investors-through-blockchain-platform/"
+      },
+      {
+        "label": "Stobox Technology - Stobox 4, STV3 Protocol & DID",
+        "url": "https://www.stobox.io/technology"
+      }
+    ]
+  },
+  "centrifuge": {
+    "rwa_general": {
+      "aumUsd": 1790000000,
+      "assetClasses": [
+        "Private credit",
+        "Trade-finance receivables",
+        "Real-estate loans",
+        "US Treasuries",
+        "AAA CLOs",
+        "Corporate bonds"
+      ],
+      "issuer": "Per-pool bankruptcy-remote SPVs; tokenized funds issued via Anemoy (BVI) and asset originators",
+      "jurisdiction": "Per-pool SPVs in Delaware, BVI and Cayman; Anemoy Treasury Fund licensed by the BVI Financial Services Commission",
+      "regulatoryStatus": "Tokenized securities under per-pool SPV structures with KYC/AML via Securitize; funds offered to accredited/professional non-US investors (Reg S)",
+      "redemptionModel": "Per-pool subscription and redemption at NAV, subject to fund liquidity and lock-up terms",
+      "auditHistory": "Audited by Cantina (2025), 0xMacro (2025) and earlier by SRLabs and Trail of Bits"
+    },
+    "characteristics": {
+      "daoGoverned": {
+        "governanceToken": "CFG (Ethereum-native ERC-20)",
+        "governanceForum": "https://gov.centrifuge.io",
+        "treasuryUsd": null
+      },
+      "institutionalGated": {
+        "kycModel": "KYC/AML and accredited/qualified-investor verification via Securitize ID",
+        "accessModel": "Permissioned allowlist; funds offered to accredited investors and non-US persons under Reg S",
+        "minInvestmentUsd": null,
+        "eligibleJurisdictions": [
+          "Non-US persons (Reg S)"
+        ],
+        "transferRestrictions": "Tranche and fund tokens transferable only between KYC-verified, allowlisted wallets"
+      },
+      "yieldBearing": {
+        "currentYieldPct": null,
+        "yieldSource": "Interest from tokenized private credit, US Treasury bills and AAA CLO holdings",
+        "distributionModel": "Accrual to NAV",
+        "underlyingInstrument": "DROP/TIN pool tranches plus tokenized funds (JTRSY short-term US T-bills, JAAA AAA CLOs)"
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Centrifuge Docs — Governance Process",
+        "url": "https://docs.centrifuge.io/getting-started/dao-summary/governance-process/"
+      },
+      {
+        "label": "Centrifuge Docs — The CFG Token",
+        "url": "https://docs.centrifuge.io/getting-started/token-summary/"
+      },
+      {
+        "label": "RWA.xyz — Janus Henderson Anemoy Treasury Fund (JTRSY)",
+        "url": "https://app.rwa.xyz/assets/JTRSY"
+      },
+      {
+        "label": "CryptoBriefing — Centrifuge JAAA tokenized AAA CLO in Kraken Custody",
+        "url": "https://cryptobriefing.com/centrifuge-jaaa-tokenized-clo-kraken-custody/"
+      },
+      {
+        "label": "Centrifuge — official site",
+        "url": "https://centrifuge.io/"
+      }
+    ]
+  },
+  "chateau-capital": {
+    "rwa_general": {
+      "aumUsd": null,
+      "assetClasses": [
+        "Private credit",
+        "Pre-IPO private equities",
+        "SPV / participation interests",
+        "Structured RWA credit products"
+      ],
+      "issuer": "Chateau Capital Corp (Panama), with asset SPVs organized in Panama, BVI, or another compliant jurisdiction",
+      "jurisdiction": "Panama (governed by the laws of the Republic of Panama)",
+      "regulatoryStatus": "Offerings limited to non-U.S. persons under Regulation S of the U.S. Securities Act of 1933; not a registered/regulated fund. Access gated by KYC/AML and OFAC screening.",
+      "redemptionModel": "On-chain mint/redeem of chUSD against approved stablecoin collateral (USDC/USDT); collateral moved manually between BitGo custody and mint/redeem contracts, capped at $100,000 per block; direct mint/redeem restricted to approved KYC/KYB market-maker counterparties.",
+      "auditHistory": "Zellic audit completed 2024-02-11 (3 critical, 1 medium, 2 informational findings, all reported fixed)."
+    },
+    "characteristics": {
+      "institutionalGated": {
+        "kycModel": "Mandatory KYC/AML for all platform participants; direct chUSD mint/redemption additionally requires KYC/KYB clearance as an approved market-maker counterparty; all operations OFAC/sanctions-screened.",
+        "accessModel": "Permissioned, non-U.S.-only access under Regulation S (verified eligible non-U.S. investors)",
+        "minInvestmentUsd": 1,
+        "eligibleJurisdictions": [
+          "Non-U.S. persons (as defined under Regulation S); U.S. persons excluded"
+        ],
+        "transferRestrictions": "Participation and offerings expressly limited to verified non-U.S. persons under Regulation S; U.S. persons excluded and OFAC/sanctioned addresses blacklisted."
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Chateau documentation - Legal (Regulation S, Panama governing law, SPV structure)",
+        "url": "https://docs.chateau.capital/chateau/legal"
+      },
+      {
+        "label": "Chateau documentation - Custodians (BitGo)",
+        "url": "https://docs.chateau.capital/chateau/security/custodians"
+      },
+      {
+        "label": "Chateau documentation - How chUSD works (collateral, $100k/block cap, KYC/KYB mint-redeem)",
+        "url": "https://docs.chateau.capital/chateau/how-chusd-works"
+      },
+      {
+        "label": "PR Newswire - Plume x Chateau $500M unlock, $1 USDC minimum",
+        "url": "https://www.prnewswire.com/news-releases/plume-and-chateau-capital-unlock-500m-private-market-investments-for-global-investors-302329124.html"
+      },
+      {
+        "label": "Chateau blog - Zellic audit completed",
+        "url": "https://www.chateau.capital/blog/chateau-completes-zellic-audit"
+      }
+    ]
+  },
+  "clearpool": {
+    "rwa_general": {
+      "aumUsd": 60000000,
+      "assetClasses": [
+        "Institutional uncollateralized credit",
+        "Single-borrower Credit Vaults",
+        "Tokenized private credit"
+      ],
+      "issuer": "Clearpool Finance",
+      "jurisdiction": null,
+      "regulatoryStatus": "KYC/AML-gated borrowers; permissionless lender side on Dynamic pools, whitelisted institutions on Prime (compliance via SecuritizeID).",
+      "redemptionModel": "Lenders hold ERC-20 cpTokens minted 1:1 on deposit and redeem them to withdraw principal plus block-accrued interest, subject to available pool liquidity.",
+      "auditHistory": "Audited by CertiK (Mar 2022), Pessimistic (Mar 2022) and Hacken (Prime, Jan 2025); grounding also cites PeckShield and ChainSecurity."
+    },
+    "characteristics": {
+      "institutionalGated": {
+        "kycModel": "KYC/KYB and AML verification via SecuritizeID (Securitize) for Prime; institutional borrowers whitelisted on all products.",
+        "accessModel": "Permissioned invite-only whitelist for Prime lenders and borrowers; Dynamic pools have a permissionless lender side over KYC'd institutional borrowers.",
+        "minInvestmentUsd": null,
+        "eligibleJurisdictions": [],
+        "transferRestrictions": "Prime access limited to whitelisted institutions invited to specific borrower pools; participation bounded by pool terms and supply windows."
+      },
+      "multiChain": {
+        "chains": [
+          "Ethereum",
+          "Optimism",
+          "Base",
+          "Arbitrum",
+          "Mantle",
+          "Polygon",
+          "Plume Network",
+          "Plasma"
+        ],
+        "chainCount": null,
+        "primaryChain": "Ethereum",
+        "crossChainStandard": "LayerZero OFT (for CPOOL token bridging)",
+        "bridgeModel": "Native per-chain deployment with chain-exclusive borrower pools; the CPOOL token is bridged across chains via the LayerZero Omnichain Fungible Token (OFT) standard."
+      },
+      "yieldBearing": {
+        "currentYieldPct": null,
+        "yieldSource": "Interest paid by whitelisted institutional borrowers on uncollateralized loans; cpUSD yield is tied to Credit Vault returns.",
+        "distributionModel": "Interest accrues every block into cpToken value, redeemed on withdrawal (accrual model).",
+        "underlyingInstrument": "Uncollateralized institutional loans (single-borrower pools and borrower-managed Credit Vaults)."
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Clearpool docs — What Is Clearpool (products)",
+        "url": "https://docs.clearpool.finance/clearpool"
+      },
+      {
+        "label": "Clearpool docs — Prime for Lenders",
+        "url": "https://docs.clearpool.finance/clearpool/how-it-works/prime/for-lenders"
+      },
+      {
+        "label": "Clearpool — 2026 Roadmap (chain list, ~$1B originations)",
+        "url": "https://clearpool.medium.com/2026-roadmap-the-tokenization-engine-for-the-on-chain-economy-d4da585f34d7"
+      },
+      {
+        "label": "Clearpool blog — LayerZero OFT cross-chain CPOOL bridging",
+        "url": "https://medium.com/clearpool-finance/clearpool-integrates-with-layerzero-to-enable-cross-chain-bridging-of-cpool-tokens-f28f53d421cd"
+      },
+      {
+        "label": "Clearpool blog — Launches on Base ($530M+ originations)",
+        "url": "https://medium.com/clearpool-finance/clearpool-launches-on-base-enabling-institutional-access-to-onchain-credit-2ec15d098742"
+      }
+    ]
+  },
+  "dinari": {
+    "rwa_general": {
+      "aumUsd": null,
+      "assetClasses": [
+        "Tokenized US equities",
+        "Tokenized US ETFs"
+      ],
+      "issuer": "Dinari Securities LLC",
+      "jurisdiction": "United States (SEC / FINRA)",
+      "regulatoryStatus": "SEC-registered broker-dealer (Dinari Securities LLC, file no. 8-71215; FINRA/SIPC member) and registered transfer agent issuing dShares.",
+      "redemptionModel": "dShares are backed 1:1 by underlying US securities held in custody by a registered US broker-dealer; holders can mint and redeem against the underlying shares.",
+      "auditHistory": "Smart contracts (sbt-contracts) audited by Hacken (Dec 2024 and Dec 2023)."
+    },
+    "characteristics": {
+      "institutionalGated": {
+        "kycModel": "Mandatory KYC/KYB before a wallet can hold or trade dShares; US users complete accredited-investor verification, non-US users complete standard KYC.",
+        "accessModel": "Permissioned allowlist enforced on-chain via TransferRestrictor contracts; US access under Rule 506(c) accredited-investor rules, non-US retail across 85+ jurisdictions.",
+        "minInvestmentUsd": null,
+        "eligibleJurisdictions": [
+          "United States (accredited investors)",
+          "85+ non-US jurisdictions"
+        ],
+        "transferRestrictions": "On-chain whitelist/blacklist via TransferRestrictor contracts blocks transfers to non-KYC or geographically restricted wallets, so dShares cannot trade freely on open DEXs."
+      },
+      "multiChain": {
+        "chains": [
+          "Ethereum",
+          "Arbitrum",
+          "Base",
+          "Avalanche",
+          "Plume",
+          "Hyperliquid"
+        ],
+        "chainCount": 6,
+        "primaryChain": "Ethereum",
+        "crossChainStandard": "LayerZero",
+        "bridgeModel": "Cross-chain expansion of dShares via LayerZero interoperability; Dinari also operates the Avalanche-based Dinari Financial Network L1 as an omni-chain orderbook to unify liquidity and settlement across chains."
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Dinari Documentation - Blockchain (supported chains)",
+        "url": "https://docs.dinari.com/docs/blockchain"
+      },
+      {
+        "label": "Dinari dShares (official)",
+        "url": "https://dinari.com/dshares"
+      },
+      {
+        "label": "SEC EDGAR - Dinari Securities Form X-17A-5 (FY2025)",
+        "url": "https://www.sec.gov/Archives/edgar/data/2012557/000201255726000004/Dinari_2025_Public.pdf"
+      },
+      {
+        "label": "LayerZero - Dinari tokenized US equities integration",
+        "url": "https://layerzero.network/blog/dinari-layerzero-tokenized-us-equities-global"
+      },
+      {
+        "label": "Hacken - Dinari SBT audit (Dec 2024)",
+        "url": "https://assets.dinari.com/audits/Audit_Hacken_241230.pdf"
+      }
+    ]
+  },
+  "dualmint": {
+    "rwa_general": {
+      "aumUsd": 50000000,
+      "assetClasses": [
+        "Revenue-generating physical equipment (laundromats, HVAC units, EV chargers, vending machines, arcade machines, vertical farms)"
+      ],
+      "issuer": "DualMint (BVI Special Purpose Company / bankruptcy-remote SPC)",
+      "jurisdiction": "British Virgin Islands (BVI SPC)",
+      "regulatoryStatus": null,
+      "redemptionModel": "Async ERC-4626 / ERC-7540 vault; redemptions settle within 30 days, with 20-70% of TVL held liquid in early stages to service withdrawals.",
+      "auditHistory": null
+    },
+    "characteristics": {
+      "institutionalGated": {
+        "kycModel": "Standard KYC/AML wallet onboarding flow (described by the issuer as not an accreditation gate).",
+        "accessModel": "Jurisdiction-gated: open to participants in supported jurisdictions only; US persons and unsupported jurisdictions excluded.",
+        "minInvestmentUsd": 500,
+        "eligibleJurisdictions": [],
+        "transferRestrictions": null
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "DualMint official website",
+        "url": "https://www.dualmint.com/"
+      },
+      {
+        "label": "Circle Alliance Directory - DualMint",
+        "url": "https://partners.circle.com/partner/dualmint"
+      },
+      {
+        "label": "Chainlink Today - DualMint joins Chainlink Build",
+        "url": "https://chainlinktoday.com/dualmint-joins-chainlink-build-to-bridge-everyday-businesses-and-blockchain/"
+      },
+      {
+        "label": "DualMint Medium - Real Yield vs Fantasy APY",
+        "url": "https://dualmintrwa.medium.com/real-yield-vs-fantasy-apy-dualmints-data-driven-case-for-boring-infrastructure-06d77e82382a"
+      }
+    ]
+  },
+  "estate-protocol": {
+    "rwa_general": {
+      "aumUsd": 12000000,
+      "assetClasses": [
+        "Commercial real estate",
+        "Residential real estate (Dubai/UAE)"
+      ],
+      "issuer": "Estate Protocol",
+      "jurisdiction": "United Arab Emirates (Dubai)",
+      "regulatoryStatus": null,
+      "redemptionModel": "No direct redemption; exit intended via a planned on-chain secondary marketplace for whitelisted holders (marked 'coming soon')",
+      "auditHistory": null
+    },
+    "characteristics": {
+      "realWorldCustody": {
+        "custodians": [],
+        "custodyModel": "Property title held off-chain by a per-property legally compliant trust that owns the asset on behalf of token holders; investors self-custody their property tokens via their own wallet private keys.",
+        "reserveComposition": "Each token is backed by a specific physical property (single-property offerings), not a pooled reserve.",
+        "attestationUrl": null,
+        "proofOfReservesUrl": null,
+        "auditFirms": []
+      },
+      "institutionalGated": {
+        "kycModel": "KYC provided by Persona; approved addresses are added to an on-chain whitelist before they can purchase or hold tokens.",
+        "accessModel": "Permissioned whitelist enforced via a Polymath ST-20 GeneralTransferManager module; only KYC-verified, whitelisted wallets may hold or receive tokens.",
+        "minInvestmentUsd": 250,
+        "eligibleJurisdictions": [],
+        "transferRestrictions": "On-chain transfer control via GeneralTransferManager restricts transfers to whitelisted (KYC-approved) addresses only; non-whitelisted transfers are blocked."
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Estate Protocol Whitepaper - Technology (KYC via Persona, GeneralTransferManager whitelist, ST-20, self-custody)",
+        "url": "https://docs.estateprotocol.com/whitepaper/protocol/technology"
+      },
+      {
+        "label": "Estate Protocol Whitepaper - Process (legal trust holds title on behalf of token holders)",
+        "url": "https://docs.estateprotocol.com/whitepaper/protocol/process"
+      },
+      {
+        "label": "Estate Protocol - official site (min investment 250 USDC, legally compliant trust)",
+        "url": "https://www.estateprotocol.com/"
+      },
+      {
+        "label": "TheStreet - Estate Protocol CEO on tokenization (31 properties, >$12M value, 2025)",
+        "url": "https://www.thestreet.com/crypto/markets/estate-protocol-ceo-tokenization-7-trillion-real-estate-liquidity"
+      }
+    ]
+  },
+  "florence-finance": {
+    "rwa_general": {
+      "aumUsd": null,
+      "assetClasses": [
+        "European SME private credit",
+        "SME invoice financing"
+      ],
+      "issuer": "Florence Finance (DMCC-registered LLC, Dubai) with administration via Florence Finance Europe BV (Netherlands)",
+      "jurisdiction": "United Arab Emirates (DMCC free zone, Dubai); operations administered from the Netherlands",
+      "regulatoryStatus": "Unregulated; per docs, not currently subject to financial or banking regulation in Dubai or the EU, as it focuses on B2B lending and crypto-denominated instruments",
+      "redemptionModel": "flrEUR intended to redeem 1:1 for EUR via the protocol Treasury from loan repayments; no guaranteed redemption while funds remain deployed within the pool mandate, otherwise reliant on secondary DEX liquidity",
+      "auditHistory": "Smart contracts audited per official docs; specific audit firms and dates not disclosed in public documentation"
+    },
+    "characteristics": {
+      "institutionalGated": {
+        "kycModel": "KYC/AML onboarding required for Primary Funders before their address is whitelisted",
+        "accessModel": "Permissioned allowlist (whitelisted public keys) for Primary Funders who have completed KYC/AML",
+        "minInvestmentUsd": null,
+        "eligibleJurisdictions": [],
+        "transferRestrictions": null
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Florence Finance docs - Glossary (Primary Funder / whitelist / EUR 100k threshold)",
+        "url": "https://docs.florence.finance/docs/support/glossary"
+      },
+      {
+        "label": "Florence Finance docs - FAQ (issuer entity, jurisdiction, regulatory status, redemption)",
+        "url": "https://docs.florence.finance/docs/support/faq"
+      },
+      {
+        "label": "Florence Finance docs - Introduction / How it works",
+        "url": "https://docs.florence.finance/docs/protocol-overview/how-it-works/introduction"
+      },
+      {
+        "label": "Clearpool - Florence Finance x Ozean partnership (loans originated, interest distributed)",
+        "url": "https://clearpool.medium.com/florence-finance-brings-european-private-credit-on-chain-to-ozean-b9802ca3a7e3"
+      }
+    ]
+  },
+  "goldfinch": {
+    "rwa_general": {
+      "aumUsd": 57000000,
+      "assetClasses": [
+        "Private credit",
+        "Emerging-market business loans",
+        "Tokenized private-credit fund exposure"
+      ],
+      "issuer": "Goldfinch Foundation / Warbler Labs (Goldfinch Prime managed by Heron Finance)",
+      "jurisdiction": null,
+      "regulatoryStatus": "Reg D / Reg S exempt offerings; Goldfinch Prime restricted to non-U.S. persons. Protocol is winding down into maintenance mode following governance proposal GIP-87 (June 2026).",
+      "redemptionModel": "LP tokens (FIDU senior pool, GPRIME) redeemable subject to pool liquidity; withdrawals currently constrained amid wind-down and borrower defaults.",
+      "auditHistory": "Multiple audits by Certik (2020-2021) and Trail of Bits (2021)."
+    },
+    "characteristics": {
+      "daoGoverned": {
+        "governanceToken": "GFI",
+        "governanceForum": "https://gov.goldfinch.finance",
+        "treasuryUsd": null
+      },
+      "institutionalGated": {
+        "kycModel": "KYC/AML required; Backers and investors must complete identity verification via the protocol's compliance flow.",
+        "accessModel": "Permissioned; Reg D / Reg S exempt offerings, with Goldfinch Prime restricted to non-U.S. persons.",
+        "minInvestmentUsd": null,
+        "eligibleJurisdictions": [
+          "Non-U.S. persons (Goldfinch Prime)"
+        ],
+        "transferRestrictions": "Securities-law transfer restrictions apply to exempt offerings; access is permissioned to verified, eligible participants."
+      },
+      "yieldBearing": {
+        "currentYieldPct": null,
+        "yieldSource": "Interest from real-world private-credit loans (originally EM business loans; Goldfinch Prime via major private-credit managers such as Apollo, Ares, Golub).",
+        "distributionModel": "Accrual to NAV; FIDU senior-pool token price drifts up as interest accrues.",
+        "underlyingInstrument": "USDC loans to real-world borrowers and tokenized exposure to private-credit funds."
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Goldfinch official site (Prime)",
+        "url": "https://www.goldfinch.finance/"
+      },
+      {
+        "label": "Goldfinch Governance Forum",
+        "url": "https://gov.goldfinch.finance"
+      },
+      {
+        "label": "The Block - Goldfinch Prime launch (Apollo)",
+        "url": "https://www.theblock.co/post/338843/defi-protocol-goldfinch-prime-pool-apollo"
+      },
+      {
+        "label": "The Defiant - Goldfinch winds down (GIP-87)",
+        "url": "https://thedefiant.io/news/defi/goldfinch-finance-winds-down-depositors-report-50m-defaults"
+      },
+      {
+        "label": "Goldfinch Developer Docs - audit reports",
+        "url": "https://dev.goldfinch.finance/docs/security/audit-reports/"
+      }
+    ]
+  },
+  "lofty-ai": {
+    "rwa_general": {
+      "aumUsd": 99600000,
+      "assetClasses": [
+        "US residential real estate (single-family rentals)"
+      ],
+      "issuer": "Lofty AI, Inc. (per-property Wyoming DAO LLCs)",
+      "jurisdiction": "United States (SEC, Reg D 506(c))",
+      "regulatoryStatus": "Each property is offered under Reg D 506(c) as a US LLC membership interest; Lofty AI, Inc. acts as the initial (removable) manager.",
+      "redemptionModel": "No direct redemption; holders exit via Lofty's on-platform secondary marketplace using a Proactive Market Maker (PMM) and liquidity pools.",
+      "auditHistory": "Reviewed by the Algorand Foundation as a flagship RWA case study; no third-party financial audit of reserves is publicly disclosed."
+    },
+    "characteristics": {
+      "yieldBearing": {
+        "currentYieldPct": null,
+        "yieldSource": "Net rental income from the underlying US residential properties (secondary sources cite roughly 6-10% annual gross rental yield, varying by property).",
+        "distributionModel": "Daily distribution of net rent, proportional to token ownership, paid in USDC (USDCa) on Algorand.",
+        "underlyingInstrument": "Fractional membership interest in a per-property US LLC that owns a single-family rental home."
+      },
+      "realWorldCustody": {
+        "custodians": [],
+        "custodyModel": "Each property's deed is held by a dedicated per-property Wyoming DAO LLC; token holders are the LLC members and Lofty AI, Inc. serves as the initial, holder-removable manager. Lofty also auto-creates and custodies managed Algorand wallets for users.",
+        "reserveComposition": "Each property LLC maintains an operating reserve for unexpected repairs; there is no pooled financial reserve backing token value.",
+        "attestationUrl": null,
+        "proofOfReservesUrl": null,
+        "auditFirms": []
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Lofty Help - Who legally has ownership of these properties",
+        "url": "https://www.lofty.ai/help/articles/6145595-who-legally-has-ownership-of-these-properties"
+      },
+      {
+        "label": "Lofty Help - How we ensure each DAO LLC owns the deed",
+        "url": "https://www.lofty.ai/help/articles/6145732-how-do-we-ensure-each-dao-llc-owns-the-deed-on-its-property"
+      },
+      {
+        "label": "Algorand case study - How Algorand helped Lofty transform real estate",
+        "url": "https://algorand.co/case-studies/lofty-transform-real-estate-industry"
+      },
+      {
+        "label": "Lofty Help - How PMM and liquidity pools work",
+        "url": "https://learn.lofty.ai/en/articles/8724946-how-does-lofty-s-pmm-proactive-market-maker-and-liquidity-pools-work"
+      },
+      {
+        "label": "Y Combinator - Lofty company profile (S19)",
+        "url": "https://www.ycombinator.com/companies/lofty"
+      }
+    ]
+  },
+  "mountain-protocol": {
+    "rwa_general": {
+      "aumUsd": null,
+      "assetClasses": [
+        "US Treasuries",
+        "Bank deposits"
+      ],
+      "issuer": "Mountain Protocol Ltd (Bermuda)",
+      "jurisdiction": "Bermuda (Bermuda Monetary Authority)",
+      "regulatoryStatus": "Bermuda Monetary Authority Digital Asset Business Act license (Class M) #202302512; USDM wound down and primary market closed August 2025.",
+      "redemptionModel": "KYC'd primary users redeemed 1:1 via USDC with T+1 to T+2 settlement (minimum $100,000); primary market closed August 22, 2025 under an orderly wind-down.",
+      "auditHistory": "Monthly third-party reserve attestations (Accountant Reports) by Nephos Group, plus yearly financial audits reviewing USDM Reserves."
+    },
+    "characteristics": {
+      "institutionalGated": {
+        "kycModel": "KYC-verified primary users access minting/redemption directly via Mountain Protocol portal and API.",
+        "accessModel": "Permissioned primary market (KYC required); USDM freely transferable on-chain to non-KYC secondary holders.",
+        "minInvestmentUsd": 100000,
+        "eligibleJurisdictions": [],
+        "transferRestrictions": "No on-chain transfer restrictions on USDM; only primary mint/redeem is gated to KYC'd users."
+      },
+      "yieldBearing": {
+        "currentYieldPct": null,
+        "yieldSource": "Interest on short-duration US Treasuries (average duration 60 days or less) held in reserves.",
+        "distributionModel": "Daily rebasing (balances increase at 14:00 UTC by accrued yield).",
+        "underlyingInstrument": "Short-term US Treasury bills"
+      },
+      "realWorldCustody": {
+        "custodians": [
+          "BNY Mellon",
+          "BitGo"
+        ],
+        "custodyModel": "Reserves held 1:1 in bankruptcy-remote, customer-segregated accounts with regulated custodians and insured banks under Bermuda DABA.",
+        "reserveComposition": "Short-duration US Treasuries plus dollar deposits at insured banks.",
+        "attestationUrl": "https://docs.mountainprotocol.com/legacy-docs/usdm-reserves-attestations",
+        "proofOfReservesUrl": null,
+        "auditFirms": [
+          "Nephos Group"
+        ]
+      },
+      "multiChain": {
+        "chains": [
+          "Ethereum",
+          "Polygon",
+          "Arbitrum",
+          "Optimism",
+          "Base",
+          "zkSync Era",
+          "Celo",
+          "Avalanche"
+        ],
+        "chainCount": 8,
+        "primaryChain": "Ethereum",
+        "crossChainStandard": null,
+        "bridgeModel": null
+      }
+    },
+    "tags_recommended": [
+      "Yield-Bearing",
+      "Real-World-Custody",
+      "Institutional-Gated",
+      "Multi-Chain"
+    ],
+    "sources": [
+      {
+        "label": "Mountain Protocol USDM Reserves (docs)",
+        "url": "https://docs.mountainprotocol.com/legacy-docs/usdm-reserves"
+      },
+      {
+        "label": "Mountain Protocol USDM Reserve Attestations (docs)",
+        "url": "https://docs.mountainprotocol.com/legacy-docs/usdm-reserves-attestations"
+      },
+      {
+        "label": "LlamaRisk Asset Risk Assessment: Mountain Protocol (USDM)",
+        "url": "https://www.llamarisk.com/research/archive-llamarisk-asset-risk-assessment-mountain-protocol-usdm"
+      },
+      {
+        "label": "USDM by Mountain (eco.com support)",
+        "url": "https://eco.com/support/en/articles/14798659-usdm-by-mountain-yield-bearing-stablecoin"
+      }
+    ]
+  },
+  "ondo-finance": {
+    "rwa_general": {
+      "aumUsd": null,
+      "assetClasses": [
+        "US Treasuries",
+        "Bank deposits",
+        "Tokenized money-market funds (BlackRock BUIDL)"
+      ],
+      "issuer": "Ondo Finance, Inc. (product issuers: Ondo USDY LLC for USDY; Ondo I LP / OUSG vehicle for OUSG)",
+      "jurisdiction": "United States (Delaware entities); USDY offered under Reg S to non-US persons, OUSG under Rule 506(c)/3(c)(7)",
+      "regulatoryStatus": "Securities offered under US exemptions: USDY via Regulation S (non-US persons); OUSG via Rule 506(c) / Section 3(c)(7) to accredited investors and qualified purchasers. Not a registered investment company.",
+      "redemptionModel": "24/7 on-chain mint/redeem; OUSG supports instant USDC subscription/redemption via a smart-contract gateway ($5K instant min) plus non-instant wire (min $100K invest / $50K redeem). USDY mint/redeem against USD.",
+      "auditHistory": "Multiple smart-contract audits: Halborn (Feb 2025, Jun 2024), Cyfrin (Jul 2025, Apr 2024), Code4rena (Apr 2024, Sep 2023, Jan 2023), Zokyo (Aug 2023), Nethermind (Apr 2023). Index at docs.ondo.finance/audits."
+    },
+    "characteristics": {
+      "institutionalGated": {
+        "kycModel": "Mandatory KYC/AML onboarding to Ondo's Qualified-Access / eligible-investor program; wallets are whitelisted before mint/redeem.",
+        "accessModel": "OUSG: permissioned allowlist under Rule 506(c)/3(c)(7) (accredited investors + qualified purchasers). USDY: Regulation S allowlist restricted to non-US persons.",
+        "minInvestmentUsd": 5000,
+        "eligibleJurisdictions": [
+          "Non-US persons (USDY, Reg S)",
+          "United States accredited investors / qualified purchasers (OUSG)"
+        ],
+        "transferRestrictions": "On-chain transfers limited to whitelisted, KYC-approved addresses; USDY carries a post-mint transfer lockup and Reg S resale restrictions."
+      },
+      "yieldBearing": {
+        "currentYieldPct": 4.65,
+        "yieldSource": "Short-term US Treasury yields plus blended interest on insured bank deposits (USDY, ~4.65% APY reported Apr 2026); OUSG tracks a BlackRock short-term Treasury / money-market portfolio.",
+        "distributionModel": "Accrual to NAV / token price (USDY price rises daily); rebasing variant rUSDY holds $1 with growing balance. OUSG accrues to token value.",
+        "underlyingInstrument": "Short-term US Treasuries and US-insured bank deposits (USDY); BlackRock BUIDL, BlackRock FedFund (TFDXX), bank deposits and USDC liquidity (OUSG)."
+      },
+      "realWorldCustody": {
+        "custodians": [
+          "Morgan Stanley",
+          "StoneX",
+          "Multiple US-insured banks (deposits)"
+        ],
+        "custodyModel": "Off-chain reserves held by a Delaware bankruptcy-remote vehicle (Ondo USDY LLC); Treasuries in cash-custody accounts at regulated broker-dealers, deposits at insured banks. OUSG reserves held largely in BlackRock BUIDL.",
+        "reserveComposition": "USDY targets ~65% US-insured bank deposits and ~35% short-term US Treasuries; OUSG portfolio is majority BlackRock BUIDL with TFDXX, bank deposits and USDC.",
+        "attestationUrl": null,
+        "proofOfReservesUrl": null,
+        "auditFirms": [
+          "Halborn",
+          "Cyfrin",
+          "Code4rena",
+          "Zokyo",
+          "Nethermind"
+        ]
+      },
+      "multiChain": {
+        "chains": [
+          "Ethereum",
+          "Solana",
+          "Mantle",
+          "Sui",
+          "Aptos",
+          "Polygon"
+        ],
+        "chainCount": 6,
+        "primaryChain": "Ethereum",
+        "crossChainStandard": null,
+        "bridgeModel": "Native issuance across supported chains (USDY: Ethereum, Solana, Mantle, Sui, Aptos; OUSG: Ethereum, Polygon, Solana, Sui, Mantle)."
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Ondo Finance OUSG docs — investing (minimums, access, portfolio)",
+        "url": "https://docs.ondo.finance/qualified-access-products/ousg/investing"
+      },
+      {
+        "label": "LlamaRisk — USDY asset overview (issuer, custody, reserve composition)",
+        "url": "https://research.llamarisk.com/research/archive-llamarisk-asset-overview-u-s-dollar-token-usdy"
+      },
+      {
+        "label": "Eco Support — Ondo USDY tokenized treasuries explained (yield, chains)",
+        "url": "https://eco.com/support/en/articles/14798657-ondo-usdy-tokenized-treasuries-explained"
+      },
+      {
+        "label": "Eco Support — OUSG deep dive 2026 (chains, BUIDL, minimums)",
+        "url": "https://eco.com/support/en/articles/15254014-ousg-deep-dive-2026-ondo-s-short-treasury-fund"
+      },
+      {
+        "label": "Ondo Finance official smart-contract audits index",
+        "url": "https://docs.ondo.finance/audits"
+      }
+    ]
+  },
+  "pleasing-market": {
+    "rwa_general": {
+      "aumUsd": 90000000,
+      "assetClasses": [
+        "Tokenized physical gold (LBMA-certified)"
+      ],
+      "issuer": "Pleasing International Limited",
+      "jurisdiction": "Hong Kong",
+      "regulatoryStatus": "Self-described licensed precious-metals enterprise based in Hong Kong; specific regulator/license not disclosed.",
+      "redemptionModel": "Physical redemption of PGOLD for allocated gold bars of nearly any size in Hong Kong, with planned expansion across APAC and Dubai.",
+      "auditHistory": "Reserve attestations offered monthly (standard) or weekly (premium); independent third-party audits described as optional/quarterly. No attestation or audit firm named."
+    },
+    "characteristics": {
+      "realWorldCustody": {
+        "custodians": [],
+        "custodyModel": "Allocated/segregated physical gold held in institutional vaults; PGOLD minted 1:1 against certified reserves with linkage to physical bars (serials, fineness, vault).",
+        "reserveComposition": "LBMA-certified physical gold at 99.99% fineness (gold only today; silver/platinum families flagged as possible future additions).",
+        "attestationUrl": null,
+        "proofOfReservesUrl": null,
+        "auditFirms": []
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Pleasing International launch press release (GlobeNewswire, 2025-10-29)",
+        "url": "https://www.globenewswire.com/news-release/2025/10/29/3176301/0/en/Pleasing-International-Launches-RWA-Platform-Pleasing-Golden-Introducing-Tokenized-Gold-PGOLD-and-Synthetic-Dollar-PUSD.html"
+      },
+      {
+        "label": "Pleasing Golden Tokenization-as-a-Service (TaaS) docs — custody, allocation, attestations",
+        "url": "https://pleasing.gitbook.io/docs/solutions/tokenization-as-a-service-taas"
+      },
+      {
+        "label": "Pleasing Market GitBook documentation",
+        "url": "https://pleasing.gitbook.io/docs"
+      },
+      {
+        "label": "PGOLD token page — real-time proof-of-reserve, institutional custody claims",
+        "url": "https://www.pleasingmarket.com/tokens/pgold"
+      },
+      {
+        "label": "Crypto Briefing: Pleasing Market migrates $90M TVL from LayerZero to Chainlink CCIP (2026-06-03)",
+        "url": "https://cryptobriefing.com/pleasing-market-migrates-90m-tvl-ayerzero-chainlink/"
+      }
+    ]
+  },
+  "realt": {
+    "rwa_general": {
+      "aumUsd": 156900000,
+      "assetClasses": [
+        "US residential real estate",
+        "US commercial real estate"
+      ],
+      "issuer": "RealToken Inc. (Managing Member) via per-property RealToken LLC series, Delaware",
+      "jurisdiction": "United States (Delaware LLC; Reg D Rule 506(c) / Reg S offerings)",
+      "regulatoryStatus": "Unregistered securities offered under Reg D Rule 506(c) (US accredited investors) and Reg S (offshore); per-property Delaware LLC; KYC/AML required. RealToken Inc. is not a registered broker-dealer or investment advisor.",
+      "redemptionModel": "No issuer redemption; secondary exit via permissioned YAM peer-to-peer market (per-property whitelisting) and thin DEX liquidity.",
+      "auditHistory": "Property-level legal opinions per series; on-chain smart-contract audits by Hexens; no published third-party proof-of-reserves attestation."
+    },
+    "characteristics": {
+      "yieldBearing": {
+        "currentYieldPct": null,
+        "yieldSource": "Net rental income from tenanted US single-family and commercial properties (2% of gross retained by RealT, ~98% distributed to holders).",
+        "distributionModel": "Weekly rental distribution paid in stablecoins (USDC or xDai), primarily on Gnosis Chain.",
+        "underlyingInstrument": "Fractional LLC membership interests in individual income-producing US real estate properties (per-property ERC-20 RealTokens)."
+      },
+      "realWorldCustody": {
+        "custodians": [],
+        "custodyModel": "Per-property Delaware LLC (series) holds legal title; property deeds custodied off-chain by the LLC / RealToken Inc.; token holders own LLC membership interests rather than the deed directly.",
+        "reserveComposition": "Physical US residential and commercial real estate (concentrated in Detroit and other US markets).",
+        "attestationUrl": null,
+        "proofOfReservesUrl": null,
+        "auditFirms": [
+          "Hexens"
+        ]
+      },
+      "multiChain": {
+        "chains": [
+          "Gnosis Chain",
+          "Ethereum"
+        ],
+        "chainCount": 2,
+        "primaryChain": "Gnosis Chain",
+        "crossChainStandard": "Native issuance",
+        "bridgeModel": "Native per-chain ERC-20 issuance; Gnosis Chain (xDai) used as primary low-fee chain for weekly rental distributions, with Ethereum deployment for the original issuance layer."
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "RealT official site",
+        "url": "https://realt.co/"
+      },
+      {
+        "label": "RealT FAQ - Weekly income and selling RealTokens",
+        "url": "https://faq.realt.co/en/article/weekly-income-and-selling-your-realtokens-1coru1j/"
+      },
+      {
+        "label": "RealT Series 1 Private Placement Memorandum (Reg D)",
+        "url": "https://realt.co/wp-content/uploads/2019/09/REALTOKEN-LLC-SERIES-1-9943-MARLOWE-1.pdf"
+      },
+      {
+        "label": "RealT US White Paper - Legally Compliant Ownership of Tokenized Real Estate",
+        "url": "https://realt.co/wp-content/uploads/2019/05/RealToken_White_Paper_US_v03.pdf"
+      },
+      {
+        "label": "Cointribune - RealT tokenized real estate",
+        "url": "https://www.cointribune.com/en/realt-revolutionizes-real-estate-investment-with-blockchain/"
+      },
+      {
+        "label": "Michigan Public - Detroit sues RealT over blight (2025-07-03)",
+        "url": "https://www.michiganpublic.org/criminal-justice-legal-system/2025-07-03/detroit-sues-crypto-based-real-estate-company-over-blight-violations"
+      }
+    ]
+  },
+  "securitize": {
+    "rwa_general": {
+      "aumUsd": 4000000000,
+      "assetClasses": [
+        "Tokenized money-market / US Treasury funds",
+        "Private credit",
+        "Private markets funds"
+      ],
+      "issuer": "Securitize, Inc. (via Securitize LLC, SEC-registered transfer agent; issuance on behalf of third-party managers such as BlackRock and Apollo)",
+      "jurisdiction": "United States (SEC / FINRA)",
+      "regulatoryStatus": "SEC-registered transfer agent; broker-dealer (Securitize Markets, LLC); ATS operator; FINRA/SIPC member.",
+      "redemptionModel": "Fund-level redemption processed via Securitize as transfer agent; underlying-fund terms apply (e.g. daily/at-NAV for BUIDL money-market; interval-fund limits for ACRED private credit).",
+      "auditHistory": "Big-4 fund attestations on underlying funds; smart-contract audits by Halborn (DSToken, Oct 2025) and ChainSecurity."
+    },
+    "characteristics": {
+      "institutionalGated": {
+        "kycModel": "KYC/AML and investor accreditation processed by Securitize before a wallet is added to the on-chain allowlist.",
+        "accessModel": "Permissioned allowlist (Reg D Rule 506(c)); DSToken enforces whitelist, lockups and jurisdictional limits on-chain.",
+        "minInvestmentUsd": 5000000,
+        "eligibleJurisdictions": [
+          "United States (accredited investors / qualified purchasers)"
+        ],
+        "transferRestrictions": "Transfers restricted to allowlisted, verified wallets only; DS Protocol compliance layer blocks transfers to non-whitelisted addresses."
+      },
+      "multiChain": {
+        "chains": [
+          "Ethereum",
+          "Arbitrum",
+          "Avalanche",
+          "Polygon",
+          "Optimism",
+          "Aptos",
+          "Solana",
+          "BNB Chain"
+        ],
+        "chainCount": null,
+        "primaryChain": "Ethereum",
+        "crossChainStandard": "Wormhole",
+        "bridgeModel": "Cross-chain movement of tokenized fund shares via Wormhole interoperability (share classes issued per network under the transfer agent's control)."
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "PR Newswire — BUIDL now on BNB Chain (nine networks incl. Arbitrum, Aptos, Avalanche, BNB, Ethereum, Optimism, Polygon, Solana), via Wormhole",
+        "url": "https://www.prnewswire.com/news-releases/blackrocks-buidl-tokenized-by-securitize-now-accepted-as-collateral-for-trading-on-binance-and-launches-on-bnb-chain-302613374.html"
+      },
+      {
+        "label": "Securitize — BlackRock BUIDL fund page",
+        "url": "https://securitize.io/blackrock/buidl"
+      },
+      {
+        "label": "BusinessWire — BlackRock launches BUIDL on Ethereum (transfer agent Securitize)",
+        "url": "https://www.businesswire.com/news/home/20240320771318/en/BlackRock-Launches-Its-First-Tokenized-Fund-BUIDL-on-the-Ethereum-Network"
+      },
+      {
+        "label": "Eco — BUIDL Deep Dive 2026 (Reg D 506(c), $5M minimum, qualified purchasers)",
+        "url": "https://eco.com/support/en/articles/15254013-buidl-deep-dive-2026"
+      },
+      {
+        "label": "CNBC — Securitize >$4B tokenized AUM, SPAC/NYSE listing",
+        "url": "https://www.cnbc.com/2025/10/28/-blackrock-linked-tokenization-firm-securitize-to-go-public-via-spac-deal.html"
+      },
+      {
+        "label": "Halborn — DSToken security audit",
+        "url": "https://www.halborn.com/audits/securitize/dstoken-e07b34"
+      }
+    ]
+  },
+  "stably": {
+    "rwa_general": {
+      "aumUsd": null,
+      "assetClasses": [
+        "Fiat-backed stablecoins",
+        "Tokenized gold (roadmap)"
+      ],
+      "issuer": "Stably (Stably Corporation, Wyoming, USA); partner tokens issued by regulated trustees",
+      "jurisdiction": "United States (FinCEN money-transmission framework; Wyoming-based)",
+      "regulatoryStatus": "Registered money services business under FinCEN; partner stablecoins issued via regulated trust companies. No securities/RWA-specific regulatory approval verified.",
+      "redemptionModel": "1:1 fiat mint/redemption via Stably Prime custodial accounts; VeUSD redeemed for USD within 1 business day during US banking hours.",
+      "auditHistory": null
+    },
+    "characteristics": {
+      "realWorldCustody": {
+        "custodians": [
+          "Prime Trust (VeUSD; Nevada-chartered trust company)"
+        ],
+        "custodyModel": "Partner-issued custodial model: fiat reserves held by a regulated trustee (Prime Trust) via Stably Prime custodial accounts; USD deposited across custodian banks syndicated through Reich & Tang Deposit Networks.",
+        "reserveComposition": "FDIC-insured USD cash held at custodian banks (per Stably Prime documentation); no independently verified breakdown of cash vs. treasuries. Tokenized-gold reserves not established (roadmap product).",
+        "attestationUrl": null,
+        "proofOfReservesUrl": null,
+        "auditFirms": []
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "Stably",
+        "url": "https://stably.io"
+      },
+      {
+        "label": "Stably - How to Mint and Redeem VeUSD with Stably Prime",
+        "url": "https://stably.growthgurus.com/post/how-to-mint-and-redeem-veusd-with-stably-prime/"
+      },
+      {
+        "label": "Lex - Prime Trust custodian collapse (2023)",
+        "url": "https://lex.substack.com/p/defi-sec-war-on-stablecoins-and-tusd"
+      }
+    ]
+  },
+  "toucan-protocol": {
+    "rwa_general": {
+      "aumUsd": 618000,
+      "assetClasses": [
+        "Tokenized voluntary carbon credits"
+      ],
+      "issuer": "Toucan Protocol",
+      "jurisdiction": null,
+      "regulatoryStatus": "Not treated as a security; value is tied to underlying Verra/Puro.earth registry credit retirement.",
+      "redemptionModel": "Pool reference tokens (BCT/NCT) are redeemed for underlying TCO2 tokens, which can then be retired against the source registry to claim the climate benefit.",
+      "auditHistory": "Smart-contract audits by byterocket (NCT, 2022); grounding also references Code4rena and Hexens."
+    },
+    "characteristics": {
+      "yieldBearing": {
+        "currentYieldPct": null,
+        "yieldSource": null,
+        "distributionModel": null,
+        "underlyingInstrument": "Tokenized verified carbon credits (BCT/NCT pool tokens backed by TCO2)."
+      },
+      "multiChain": {
+        "chains": [
+          "Polygon",
+          "Celo",
+          "Base",
+          "Regen Network"
+        ],
+        "chainCount": 4,
+        "primaryChain": "Polygon",
+        "crossChainStandard": "Native issuance / protocol bridge",
+        "bridgeModel": "Native two-way Toucan bridge for moving BCT/NCT between Celo and Polygon; Regen Network bridged into Polygon; CHAR bridged between Base and Celo."
+      },
+      "daoGoverned": {
+        "governanceToken": "KLIMA",
+        "governanceForum": "https://forum.klimadao.finance",
+        "treasuryUsd": null
+      }
+    },
+    "tags_recommended": [],
+    "sources": [
+      {
+        "label": "KlimaDAO docs — Carbon Pools (BCT owned/governed by KlimaDAO per KIP-57)",
+        "url": "https://docs.klimadao.finance/ecosystem/carbon-pools"
+      },
+      {
+        "label": "KlimaDAO docs — Governance Framework (forum RFC/KIP + Snapshot vote by KLIMA holders)",
+        "url": "https://docs.klimadao.finance/dao/governance-framework"
+      },
+      {
+        "label": "Toucan blog — carbon ecosystem coming to Celo (multi-chain, Celo-Polygon two-way bridge)",
+        "url": "https://blog.toucan.earth/toucans-carbon-ecosystem-celo/"
+      },
+      {
+        "label": "byterocket — Toucan NCT smart-contract audit",
+        "url": "https://byterocket.com/audit/toucan-nct"
+      },
+      {
+        "label": "Toucan Protocol contracts (GitHub)",
+        "url": "https://github.com/ToucanProtocol/contracts"
+      }
+    ]
+  }
+}

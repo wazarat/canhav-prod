@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:integration": "jest",
     "seed:upstash": "node scripts/seed-upstash.mjs",
+    "seed:upstash:tcp": "node scripts/seed-upstash-tcp.mjs",
     "collab:demo": "node scripts/collab-demo.mjs",
     "yield:demo": "node scripts/yield-agents-demo.mjs"
   },
@@ -42,16 +45,21 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "20.17.10",
     "@types/react": "18.3.16",
     "@types/react-dom": "18.3.5",
     "autoprefixer": "10.4.20",
     "eslint": "8.57.1",
     "eslint-config-next": "14.2.35",
+    "ioredis": "^5.11.1",
+    "jest": "^29.7.0",
     "postcss": "8.4.49",
     "server-only": "^0.0.1",
     "tailwindcss": "3.4.16",
     "tailwindcss-animate": "1.0.7",
+    "ts-jest": "^29.4.11",
+    "ts-node": "^10.9.2",
     "typescript": "5.7.2"
   }
 }

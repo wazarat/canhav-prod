@@ -32,7 +32,7 @@ export const ORACLE = "0x0dC4e24C63C24fE898Dda574C962Ba7Fbb146964" as const;
  * Re-verify if trades fail on collateral transfer.
  */
 export const SEPOLIA_USDC =
-  "0x75faf114eafb1BDbe2F84B1feaE60D0d5B5e9f0" as const;
+  "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d" as const;
 
 /** v1 fixed leverage cap. */
 export const MAX_LEVERAGE = 2;

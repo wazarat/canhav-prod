@@ -8,10 +8,12 @@ import {
   AGENT_CONFIG_LIMITS,
   OUTPUT_STYLES,
   RISK_LENSES,
+  TRADE_HITL_METHODS,
   type AgentConfig,
   type AgentGlossaryEntry,
   type AgentOutputStyle,
   type AgentRiskLens,
+  type TradeHitlMethod,
 } from "@/lib/agent/agentConfig";
 
 /**
@@ -39,6 +41,27 @@ export function AgentFrameworkPanel({
   const [sources, setSources] = useState<string[]>(config?.preferredSources ?? []);
   const [sourceDraft, setSourceDraft] = useState("");
   const [glossary, setGlossary] = useState<AgentGlossaryEntry[]>(config?.glossary ?? []);
+  const [tradeHitlMethod, setTradeHitlMethod] = useState<TradeHitlMethod>(
+    config?.tradeHitlMethod ?? "propose_approve",
+  );
+  const [tradeSpendingCapUsd, setTradeSpendingCapUsd] = useState(() => {
+    const raw = config?.tradeSpendingCapUsd;
+    if (!raw) return "";
+    try {
+      return String(Number(BigInt(raw) / 10n ** 30n));
+    } catch {
+      return "";
+    }
+  });
+  const [tradeCumulativeCapUsd, setTradeCumulativeCapUsd] = useState(() => {
+    const raw = config?.tradeCumulativeCapUsd;
+    if (!raw) return "";
+    try {
+      return String(Number(BigInt(raw) / 10n ** 30n));
+    } catch {
+      return "";
+    }
+  });
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -72,6 +95,13 @@ export function AgentFrameworkPanel({
           outputStyle,
           preferredSources: sources,
           glossary,
+          tradeHitlMethod,
+          tradeSpendingCapUsd: tradeSpendingCapUsd.trim()
+            ? (BigInt(tradeSpendingCapUsd.trim()) * 10n ** 30n).toString()
+            : null,
+          tradeCumulativeCapUsd: tradeCumulativeCapUsd.trim()
+            ? (BigInt(tradeCumulativeCapUsd.trim()) * 10n ** 30n).toString()
+            : null,
         }),
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
@@ -327,6 +357,56 @@ export function AgentFrameworkPanel({
           >
             <Plus className="h-3.5 w-3.5" /> Add term
           </button>
+        )}
+      </div>
+
+      {/* Trade HITL */}
+      <div className="space-y-3 rounded-xl border border-electric-500/20 bg-electric-500/5 p-4">
+        <p className="text-xs font-medium uppercase tracking-wider text-electric-300">
+          GMX trade approval (Pathway B)
+        </p>
+        <label className="block space-y-1.5">
+          <span className="text-xs text-ink-400">Method</span>
+          <select
+            value={tradeHitlMethod}
+            onChange={(e) => setTradeHitlMethod(e.target.value as TradeHitlMethod)}
+            disabled={busy}
+            className={selectClass}
+          >
+            {TRADE_HITL_METHODS.map((m) => (
+              <option key={m} value={m}>
+                {m === "manual"
+                  ? "Manual — suggestion only"
+                  : m === "propose_approve"
+                    ? "Propose → Approve (default)"
+                    : "Spending caps — auto within limits"}
+              </option>
+            ))}
+          </select>
+        </label>
+        {tradeHitlMethod === "spending_cap" && (
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block space-y-1.5">
+              <span className="text-xs text-ink-400">Per-trade cap (USD)</span>
+              <input
+                value={tradeSpendingCapUsd}
+                onChange={(e) => setTradeSpendingCapUsd(e.target.value.replace(/[^\d]/g, ""))}
+                disabled={busy}
+                placeholder="e.g. 50"
+                className={chipInputClass}
+              />
+            </label>
+            <label className="block space-y-1.5">
+              <span className="text-xs text-ink-400">Daily cumulative cap (USD)</span>
+              <input
+                value={tradeCumulativeCapUsd}
+                onChange={(e) => setTradeCumulativeCapUsd(e.target.value.replace(/[^\d]/g, ""))}
+                disabled={busy}
+                placeholder="optional"
+                className={chipInputClass}
+              />
+            </label>
+          </div>
         )}
       </div>
 

@@ -17,6 +17,7 @@ import { appendMemory, getDataFrame, getMemory, markSkillStudied } from "@/lib/a
 import { buildCustomTools, executeCustomTool, listCustomTools } from "@/lib/agent/customTools";
 import { resolveDataFrame } from "@/lib/agent/dataframes";
 import { canPublishVerdict, claimVerdictSlot } from "@/lib/agent/dunePublish";
+import { execTradePropose } from "@/lib/agent/trade/propose";
 import { searchKnowledge } from "@/lib/agent/knowledge";
 import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-binding";
 import { getAgentSkillById } from "@/lib/agent/skills";
@@ -58,9 +59,9 @@ function compactLendingMarket(market: LendingMarket | null | undefined) {
 /**
  * The CanHav research agent's toolset.
  *
- * Every tool is a thin, read-only wrapper over data that already exists
- * (lib/data.ts / dune.ts / alchemy.ts / skills + memory). No new data sources,
- * no write/execute trading tools — the platform is research-only. Each executor
+ * Every tool is a thin wrapper over data that already exists
+ * (lib/data.ts / dune.ts / alchemy.ts / skills + memory). Research reads are
+ * default; `trade_propose` is gated by research verdict + owner HITL settings.
  * returns a compact, JSON-serializable object that includes a one-line
  * `summary` the activity feed streams as a step ("📚 Read JLP profile").
  *
@@ -119,6 +120,12 @@ const schemas = {
       .max(300)
       .optional()
       .describe("Semicolon-separated source labels the verdict relies on."),
+  }),
+  trade_propose: z.object({
+    asset: z.string().describe("Research asset symbol, e.g. sUSDe or sUSDai."),
+    side: z.enum(["long", "short"]),
+    sizeUsdHuman: z.number().positive().optional().describe("Approx USD notional (default 10)."),
+    leverage: z.number().int().min(1).max(2).optional(),
   }),
 };
 
@@ -583,6 +590,12 @@ export async function buildAgentTools(
         execKnowledgeSearch(agentId, a),
       ),
     }),
+    trade_propose: tool({
+      description:
+        "Propose a research-gated GMX perp trade on Arbitrum Sepolia for a CanHav-researched coin (sUSDe, sUSDai). Respects owner HITL settings: manual suggestion, propose→approve, or spending-cap auto. Never executes without gate clearance.",
+      inputSchema: schemas.trade_propose,
+      execute: safe("trade_propose", (a: Args<"trade_propose">) => execTradePropose(agentId, a)),
+    }),
   };
 
   // Owner-configured custom tools (typed read-only catalog). Fails soft: a
@@ -678,6 +691,11 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
       source_refs: "funding_feed; ethena_gov_post",
     },
   },
+  {
+    name: "trade_propose",
+    description: "Propose a research-gated GMX perp on sUSDe/sUSDai (Arbitrum Sepolia).",
+    sample: { asset: "sUSDe", side: "long", sizeUsdHuman: 10, leverage: 1 },
+  },
 ];
 
 export interface RunToolResult {
@@ -761,6 +779,9 @@ export async function runTool(
       break;
     case "dune_publishVerdict":
       out = await execPublishVerdict(agentId, ownerUserId, a as Args<"dune_publishVerdict">);
+      break;
+    case "trade_propose":
+      out = await execTradePropose(agentId, a as Args<"trade_propose">);
       break;
     default:
       return { ok: false, error: `Unhandled tool "${name}".` };

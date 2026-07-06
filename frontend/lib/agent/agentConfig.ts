@@ -15,6 +15,10 @@ export type AgentRiskLens = (typeof RISK_LENSES)[number];
 export const OUTPUT_STYLES = ["brief", "detailed", "bullet", "analyst-report"] as const;
 export type AgentOutputStyle = (typeof OUTPUT_STYLES)[number];
 
+/** Human-in-the-loop trade execution method (Pathway B). */
+export const TRADE_HITL_METHODS = ["manual", "propose_approve", "spending_cap"] as const;
+export type TradeHitlMethod = (typeof TRADE_HITL_METHODS)[number];
+
 export interface AgentGlossaryEntry {
   term: string;
   definition: string;
@@ -35,6 +39,12 @@ export interface AgentConfig {
   publishToDune: boolean;
   /** Optional link to the Dune dashboard that overlays this agent's verdicts. */
   duneDashboardUrl: string;
+  /** How trades execute: manual suggestion, propose→approve (default), or spending caps. */
+  tradeHitlMethod: TradeHitlMethod;
+  /** Per-trade max size (USD with 30 decimals as decimal string). Null = no cap. */
+  tradeSpendingCapUsd: string | null;
+  /** Rolling 24h cumulative cap (USD-30d string). Null = no cap. */
+  tradeCumulativeCapUsd: string | null;
 }
 
 /** Hard caps that keep the rendered prompt block bounded. */
@@ -48,6 +58,7 @@ export const AGENT_CONFIG_LIMITS = {
   glossaryTermMaxChars: 40,
   glossaryDefinitionMaxChars: 200,
   duneDashboardUrlMaxChars: 300,
+  tradeSpendingCapMaxDigits: 40,
 } as const;
 
 export function defaultAgentConfig(): AgentConfig {
@@ -60,7 +71,17 @@ export function defaultAgentConfig(): AgentConfig {
     glossary: [],
     publishToDune: false,
     duneDashboardUrl: "",
+    tradeHitlMethod: "propose_approve",
+    tradeSpendingCapUsd: null,
+    tradeCumulativeCapUsd: null,
   };
+}
+
+function sanitizeCapUsd(value: unknown): string | null {
+  if (value == null || value === "") return null;
+  const raw = typeof value === "string" ? value.trim() : String(value).trim();
+  if (!/^\d+$/.test(raw)) return null;
+  return raw.slice(0, AGENT_CONFIG_LIMITS.tradeSpendingCapMaxDigits);
 }
 
 function clampString(value: unknown, maxChars: number): string {
@@ -125,6 +146,11 @@ export function sanitizeAgentConfig(input: unknown): AgentConfig {
     glossary,
     publishToDune: cfg.publishToDune === true,
     duneDashboardUrl: sanitizeHttpsUrl(cfg.duneDashboardUrl, L.duneDashboardUrlMaxChars),
+    tradeHitlMethod: TRADE_HITL_METHODS.includes(cfg.tradeHitlMethod as TradeHitlMethod)
+      ? (cfg.tradeHitlMethod as TradeHitlMethod)
+      : "propose_approve",
+    tradeSpendingCapUsd: sanitizeCapUsd(cfg.tradeSpendingCapUsd),
+    tradeCumulativeCapUsd: sanitizeCapUsd(cfg.tradeCumulativeCapUsd),
   };
 }
 
@@ -150,7 +176,10 @@ export function hasMeaningfulConfig(config: AgentConfig | null | undefined): boo
     config.preferredSources.length > 0 ||
     config.glossary.length > 0 ||
     config.publishToDune ||
-    config.duneDashboardUrl.length > 0
+    config.duneDashboardUrl.length > 0 ||
+    config.tradeHitlMethod !== "propose_approve" ||
+    config.tradeSpendingCapUsd != null ||
+    config.tradeCumulativeCapUsd != null
   );
 }
 

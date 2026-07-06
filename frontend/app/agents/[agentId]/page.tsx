@@ -10,6 +10,7 @@ import { AgentIdentityCard } from "@/components/agent/AgentIdentityCard";
 import { AgentMemoryPanel } from "@/components/agent/AgentMemoryPanel";
 import { AgentPerformanceCard } from "@/components/agent/AgentPerformanceCard";
 import { VerdictFeed } from "@/components/agent/VerdictFeed";
+import { ProposedTradesPanel } from "@/components/agent/ProposedTradesPanel";
 import { AttachSkillPanel } from "@/components/agent/AttachSkillPanel";
 import { CollabSettingsPanel } from "@/components/agent/CollabSettingsPanel";
 import { DunePublishPanel } from "@/components/agent/DunePublishPanel";
@@ -255,6 +256,7 @@ export default async function AgentHomePage({ params }: { params: { agentId: str
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           {hasVerdictLoop && <VerdictFeed agentId={agentId} />}
+          {isOwner && <ProposedTradesPanel agentId={agentId} />}
           <div id="panel-chat" className="scroll-mt-32">
             <AgentLabPanel agentId={agentId} llmConfigured={status.llm} />
           </div>

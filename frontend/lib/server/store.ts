@@ -138,6 +138,69 @@ export function writeNetworkItemLocal(field: string, item: Record<string, any>):
   return true;
 }
 
+/**
+ * Load every store item from the on-disk `backend/data/store.json`. Used by the
+ * live-metrics cron in offline mode (no Upstash) so it can refresh against the
+ * same file the frontend reads. Returns [] if the file is missing/unparseable.
+ */
+export function loadLocalStoreItems(): Record<string, unknown>[] {
+  return readItemsFromDisk();
+}
+
+/**
+ * Offline-dev batch writer that mirrors `putItem` (Upstash) against the on-disk
+ * store. The cron mutates existing items in place AND creates new ones (sector
+ * aggregates), so we seed a keyed map with the loaded items and overwrite/insert
+ * on every `put`, then serialize the whole store once via `flush`. Keeping the
+ * single flush avoids re-reading/re-writing the multi-MB file on every put.
+ */
+export interface LocalStoreWriter {
+  put(item: Record<string, any>): Promise<void>;
+  flush(): void;
+  count(): number;
+}
+
+export function createLocalStoreWriter(seed: Record<string, unknown>[]): LocalStoreWriter {
+  const map = new Map<string, Record<string, unknown>>();
+  for (const it of seed) {
+    const pk = (it as Record<string, unknown>).PK;
+    const sk = (it as Record<string, unknown>).SK;
+    if (pk && sk) map.set(`${String(pk)}|${String(sk)}`, it);
+  }
+  return {
+    async put(item: Record<string, any>): Promise<void> {
+      const { PK, SK } = item;
+      if (!PK || !SK) throw new Error("Item must include both 'PK' and 'SK'.");
+      map.set(`${String(PK)}|${String(SK)}`, item);
+    },
+    flush(): void {
+      const file = storePath();
+      let meta: Record<string, unknown> = {};
+      try {
+        const parsed = JSON.parse(readFileSync(file, "utf-8")) as { _meta?: Record<string, unknown> };
+        meta = parsed._meta ?? {};
+      } catch {
+        // No existing file / meta — start fresh.
+      }
+      const items: Record<string, unknown> = {};
+      for (const [k, v] of map) items[k] = v;
+      const out = {
+        _meta: {
+          ...meta,
+          backend: "local",
+          updatedAt: new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
+          count: map.size,
+        },
+        items,
+      };
+      writeFileSync(file, `${JSON.stringify(out, null, 2)}\n`, "utf-8");
+    },
+    count(): number {
+      return map.size;
+    },
+  };
+}
+
 function parseRisks(raw: unknown): NetworkRisk[] {
   if (!Array.isArray(raw)) return [];
   return raw.map((item) => {
@@ -539,12 +602,16 @@ export async function readLiveStore(): Promise<LiveStore> {
         tags: taxonomy.tags,
         competitors: item.Competitors ?? [],
         lending: item.Lending ?? null,
+        creditMetrics: item.CreditMetrics ?? null,
         creditTagMetrics: item.CreditTagMetrics ?? null,
         stakingTagMetrics: hydrateStakingTagMetrics(item),
         liquidityTagMetrics: hydrateLiquidityTagMetrics(item),
         derivativesTagMetrics: hydrateDerivativesTagMetrics(item),
         otherTagMetrics: hydrateOtherTagMetrics(item),
         rwaTagMetrics: hydrateRwaTagMetrics(item),
+        rwaGeneral: (item.RwaGeneral as NetworkProfile["rwaGeneral"]) ?? null,
+        rwaCharacteristics:
+          (item.RwaCharacteristics as NetworkProfile["rwaCharacteristics"]) ?? null,
         stablecoinSubSector: item.StablecoinSubSector ?? null,
         stablecoinSecondaryTags: item.StablecoinSecondaryTags ?? undefined,
         stablecoin: item.Stablecoin ?? null,

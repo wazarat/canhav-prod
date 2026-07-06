@@ -30,39 +30,80 @@ export interface FetchJsonOptions {
   timeoutMs?: number;
   /** Seconds for Next's data cache. Omit for no-store (always fresh). */
   revalidate?: number;
+  /** Extra attempts on transient socket failures (GET only). Default 2 → 3 total. */
+  retries?: number;
+  /** Base backoff before a retry; grows exponentially per attempt. Default 300ms. */
+  retryBackoffMs?: number;
 }
 
 export async function fetchJson(url: string, opts: FetchJsonOptions = {}): Promise<FetchResult> {
-  const { headers, method = "GET", body, timeoutMs = 20_000, revalidate } = opts;
+  const {
+    headers,
+    method = "GET",
+    body,
+    timeoutMs = 20_000,
+    revalidate,
+    retries = 2,
+    retryBackoffMs = 300,
+  } = opts;
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const init: RequestInit & { next?: { revalidate: number } } = {
-      method,
-      headers,
-      body,
-      signal: controller.signal,
-    };
-    if (typeof revalidate === "number") {
-      init.next = { revalidate };
-    } else {
-      init.cache = "no-store";
-    }
+  // Only idempotent GETs are safe to replay. A POST retry could double-submit.
+  const maxAttempts = method === "POST" ? 1 : retries + 1;
+  let lastResult: FetchResult = { status: 0, data: null };
 
-    const res = await fetch(url, init);
-    let data: any = null;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    // Fresh controller + timer per attempt — an aborted signal can't be reused.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      data = await res.json();
+      const init: RequestInit & { next?: { revalidate: number } } = {
+        method,
+        headers,
+        body,
+        signal: controller.signal,
+      };
+      if (typeof revalidate === "number") {
+        init.next = { revalidate };
+      } else {
+        init.cache = "no-store";
+      }
+
+      const res = await fetch(url, init);
+
+      // Real non-2xx (4xx/5xx) is terminal — not a transient socket failure, so
+      // don't burn retries on it. Return the status (with body if any) as before.
+      if (res.status < 200 || res.status >= 300) {
+        let data: any = null;
+        try {
+          data = await res.json();
+        } catch {
+          data = null;
+        }
+        return { status: res.status, data };
+      }
+
+      // 2xx: parse the body. If parsing throws, the stream was likely cut off
+      // mid-flight (the classic `terminated` symptom) — treat as retryable.
+      try {
+        const data = await res.json();
+        return { status: res.status, data };
+      } catch {
+        lastResult = { status: 0, data: null };
+      }
     } catch {
-      data = null;
+      // Network/abort/UND_ERR_SOCKET/terminated — retryable.
+      lastResult = { status: 0, data: null };
+    } finally {
+      clearTimeout(timer);
     }
-    return { status: res.status, data };
-  } catch {
-    return { status: 0, data: null };
-  } finally {
-    clearTimeout(timer);
+
+    // Backoff before the next attempt (skip after the final one).
+    if (attempt < maxAttempts - 1) {
+      await sleep(retryBackoffMs * 2 ** attempt);
+    }
   }
+
+  return lastResult;
 }
 
 export function sleep(ms: number): Promise<void> {

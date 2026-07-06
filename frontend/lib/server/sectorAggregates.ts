@@ -102,7 +102,10 @@ export async function refreshSectorAggregates(
 ): Promise<{ sector: NetworkSector; totalTvlUsd: number | null }[]> {
   const now = nowIso();
   const slugSets = sectorSlugSets(items);
-  const allProtocols = await fetchAllProtocols(1800);
+  // no-store on the multi-MB payloads: Next's data cache rejects bodies >2MB and
+  // the failed cache-set can throw outside fetchJson's soft-fail. This is cron-only,
+  // so there's no request-time caching to lose.
+  const allProtocols = await fetchAllProtocols();
   const byLlamaSlug = new Map(allProtocols.map((p) => [p.slug, p]));
 
   const totalDefiTvl = allProtocols.reduce((sum, p) => sum + (p.tvl ?? 0), 0);
@@ -113,8 +116,8 @@ export async function refreshSectorAggregates(
       fetchLlamaOverview("fees", "dailyFees", 1800),
       fetchLlamaOverview("fees", "dailyRevenue", 1800),
       fetchLlamaOverview("options", undefined, 1800),
-      fetchLlamaBorrowPools(1800),
-      fetchLlamaOpenInterestOverview(1800),
+      fetchLlamaBorrowPools(),
+      fetchLlamaOpenInterestOverview(),
     ]);
 
   const feesRevenueBlock =

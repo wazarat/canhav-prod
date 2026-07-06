@@ -46,7 +46,15 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
 
   const gate = await assertResearchGate(asset, defaultGmxTarget());
   if (!gate.ok) {
-    return { ok: false, blocked: true, summary: gate.reason };
+    return {
+      ok: false,
+      blocked: true,
+      summary: gate.reason,
+      hint:
+        gate.reason.includes("stale") || gate.reason.includes("No research verdict")
+          ? "Call research_refreshCombinedVerdict for this asset, then retry trade_propose."
+          : undefined,
+    };
   }
 
   const profile = await getAgentProfile(agentId);

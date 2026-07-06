@@ -17,6 +17,7 @@ import { appendMemory, getDataFrame, getMemory, markSkillStudied } from "@/lib/a
 import { buildCustomTools, executeCustomTool, listCustomTools } from "@/lib/agent/customTools";
 import { resolveDataFrame } from "@/lib/agent/dataframes";
 import { canPublishVerdict, claimVerdictSlot } from "@/lib/agent/dunePublish";
+import { refreshAssetCombinedVerdict } from "@/lib/agent/verdictRunner";
 import { execTradePropose } from "@/lib/agent/trade/propose";
 import { searchKnowledge } from "@/lib/agent/knowledge";
 import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-binding";
@@ -126,6 +127,11 @@ const schemas = {
     side: z.enum(["long", "short"]),
     sizeUsdHuman: z.number().positive().optional().describe("Approx USD notional (default 10)."),
     leverage: z.number().int().min(1).max(2).optional(),
+  }),
+  research_refreshCombinedVerdict: z.object({
+    asset: z
+      .string()
+      .describe("Trade-gated asset to refresh combined verdict for: sUSDe or sUSDai."),
   }),
 };
 
@@ -489,6 +495,19 @@ async function execPublishVerdict(
   };
 }
 
+async function execRefreshCombinedVerdict(
+  _agentId: string,
+  ownerUserId: string | null | undefined,
+  a: Args<"research_refreshCombinedVerdict">,
+) {
+  const out = await refreshAssetCombinedVerdict(a.asset, ownerUserId);
+  return {
+    ok: out.ok,
+    combined: out.combined,
+    summary: out.summary,
+  };
+}
+
 /* -------------------------------------------------------------------------- */
 /* AI SDK tool definitions (used by the streamText loop)                      */
 /* -------------------------------------------------------------------------- */
@@ -596,6 +615,14 @@ export async function buildAgentTools(
       inputSchema: schemas.trade_propose,
       execute: safe("trade_propose", (a: Args<"trade_propose">) => execTradePropose(agentId, a)),
     }),
+    research_refreshCombinedVerdict: tool({
+      description:
+        "Refresh the combined research verdict for a trade-gated asset (sUSDe or sUSDai) by re-running the stablecoin + yield demo research passes. Call this when trade_propose is blocked for a stale or missing verdict, then retry trade_propose.",
+      inputSchema: schemas.research_refreshCombinedVerdict,
+      execute: safe("research_refreshCombinedVerdict", (a: Args<"research_refreshCombinedVerdict">) =>
+        execRefreshCombinedVerdict(agentId, ownerUserId, a),
+      ),
+    }),
   };
 
   // Owner-configured custom tools (typed read-only catalog). Fails soft: a
@@ -696,6 +723,11 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
     description: "Propose a research-gated GMX perp on sUSDe/sUSDai (Arbitrum Sepolia).",
     sample: { asset: "sUSDe", side: "long", sizeUsdHuman: 10, leverage: 1 },
   },
+  {
+    name: "research_refreshCombinedVerdict",
+    description: "Refresh combined verdict for sUSDe/sUSDai (unblocks stale trade gate).",
+    sample: { asset: "sUSDe" },
+  },
 ];
 
 export interface RunToolResult {
@@ -782,6 +814,9 @@ export async function runTool(
       break;
     case "trade_propose":
       out = await execTradePropose(agentId, a as Args<"trade_propose">);
+      break;
+    case "research_refreshCombinedVerdict":
+      out = await execRefreshCombinedVerdict(agentId, ownerUserId, a as Args<"research_refreshCombinedVerdict">);
       break;
     default:
       return { ok: false, error: `Unhandled tool "${name}".` };

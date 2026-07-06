@@ -88,6 +88,44 @@ export async function refreshCombinedVerdict(asset: string): Promise<ResearchVer
   return combined;
 }
 
+/** Run stablecoin + yield demo passes for one asset and refresh the combined verdict (trade gate input). */
+export async function refreshAssetCombinedVerdict(
+  asset: string,
+  ownerUserId?: string | null,
+): Promise<{ ok: boolean; combined: ResearchVerdict | null; summary: string }> {
+  const normalized = asset.trim();
+  const stable = YIELD_DEMO_AGENTS.find((a) => a.asset === normalized && a.type === "stablecoin");
+  const yieldAgent = YIELD_DEMO_AGENTS.find((a) => a.asset === normalized && a.type === "yield");
+  if (!stable || !yieldAgent) {
+    return {
+      ok: false,
+      combined: null,
+      summary: `Cannot refresh: ${normalized} is not trade-gated (use sUSDe or sUSDai).`,
+    };
+  }
+
+  const stableRun = await runAndStoreVerdict(stable.agentId, stable.type, normalized, ownerUserId);
+  const yieldRun = await runAndStoreVerdict(yieldAgent.agentId, yieldAgent.type, normalized, ownerUserId);
+  if (!stableRun || !yieldRun) {
+    return {
+      ok: false,
+      combined: null,
+      summary: "Research run failed for stablecoin or yield demo agent.",
+    };
+  }
+
+  const combined = await refreshCombinedVerdict(normalized);
+  if (!combined) {
+    return { ok: false, combined: null, summary: "Failed to combine stablecoin + yield verdicts." };
+  }
+
+  return {
+    ok: true,
+    combined,
+    summary: `Refreshed combined verdict for ${normalized} (${combined.signal}, ${combined.severity}, ts=${combined.ts}). Re-run trade_propose to open the gate.`,
+  };
+}
+
 /** Cron entry: run all four demo agents + refresh combined reads. */
 export async function runAllDemoAgentVerdicts(): Promise<{
   ran: number;

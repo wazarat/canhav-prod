@@ -49,6 +49,21 @@ import {
   morphoMetricsToTagOverlay,
 } from "@/lib/server/morpho";
 import { hasUpstash, putItem, readAllItemsFromRedis } from "@/lib/server/redis";
+import { createLocalStoreWriter, loadLocalStoreItems } from "@/lib/server/store";
+import { fetchPendleLiveMetrics, pendleMetricsToTagOverlay } from "@/lib/server/pendle";
+import {
+  fetchHyperliquidLiveMetrics,
+  hyperliquidMetricsToTagOverlay,
+} from "@/lib/server/hyperliquid";
+import { fetchNexusLiveMetrics, nexusMetricsToTagOverlay } from "@/lib/server/nexus";
+import { fetchLidoLiveMetrics, lidoMetricsToTagOverlay } from "@/lib/server/lido";
+import { fetchCurveLiveMetrics, curveMetricsToTagOverlay } from "@/lib/server/curve";
+import { fetchSnapshotLiveMetrics, snapshotMetricsToTagOverlay } from "@/lib/server/snapshot";
+import {
+  fetchBeaconchainLiveMetrics,
+  beaconchainMetricsToTagOverlay,
+} from "@/lib/server/beaconchain";
+import { fetchRatesLiveMetrics, ratesMetricsToTagOverlay } from "@/lib/server/rates";
 import { rwaTokenForSlug } from "@/lib/server/rwaRegistry";
 import { collectAllStakingMetrics } from "@/lib/server/staking";
 import { STAKING_SEED } from "@/data/staking-seed";
@@ -938,6 +953,287 @@ async function refreshLlamaDimensions(
   return { mutated, note: notes.join("; ") };
 }
 
+/**
+ * Protocol-specific tag-metric overlays for the Phase A keyless clients. Each
+ * maps 1:1 to an entity + one tag-metric block; deep-merges at the block level
+ * so curated sibling fields survive. Fails soft (null/empty ⇒ no write). These
+ * clients hit their OWN APIs (Pendle / Hyperliquid / Nexus / Lido / Curve), not
+ * DeFiLlama — so `?only=clients` can refresh just these without the heavy Llama
+ * passes. (snapshot / beaconchain / rates are intentionally not wired: their
+ * fields have no typed destination on the tag blocks / MetricCard yet.)
+ */
+async function runProtocolClientOverlays(
+  items: Record<string, any>[],
+  persist: (item: Record<string, any>) => Promise<void>,
+): Promise<{ updated: number; status: Record<string, string> }> {
+  const status: Record<string, string> = {};
+  let updated = 0;
+
+  const mergeTagBlock = (
+    container: Record<string, any> | undefined,
+    overlayObj: Record<string, any>,
+  ): Record<string, any> => {
+    const out = { ...(container ?? {}) };
+    for (const [block, cells] of Object.entries(overlayObj)) {
+      out[block] = {
+        ...((out[block] as Record<string, any>) ?? {}),
+        ...(cells as Record<string, any>),
+      };
+    }
+    return out;
+  };
+
+  const overlay = async (
+    slug: string,
+    field: "CreditTagMetrics" | "DerivativesTagMetrics" | "OtherTagMetrics" | "StakingTagMetrics",
+    block: Record<string, any> | null,
+    statusKey: string,
+  ): Promise<void> => {
+    const hasCells =
+      block != null &&
+      Object.values(block).some((b) => b && typeof b === "object" && Object.keys(b).length > 0);
+    if (!hasCells) {
+      status[statusKey] = block === null ? "error" : "empty";
+      return;
+    }
+    const it = items.find(
+      (i) => isNetworkCategory(String(i.Category ?? "")) && String(i.Slug ?? "") === slug,
+    ) as Record<string, any> | undefined;
+    if (!it) {
+      status[statusKey] = "no_entity";
+      return;
+    }
+    it[field] = mergeTagBlock(it[field] as Record<string, any> | undefined, block!);
+    it.UpdatedAt = nowIso();
+    await persist(it);
+    updated += 1;
+    status[statusKey] = "ok";
+  };
+
+  const pendleLive = await fetchPendleLiveMetrics();
+  await overlay(
+    "pendle",
+    "CreditTagMetrics",
+    pendleLive ? pendleMetricsToTagOverlay(pendleLive) : null,
+    "pendle",
+  );
+
+  const hyperliquidLive = await fetchHyperliquidLiveMetrics();
+  await overlay(
+    "hyperliquid",
+    "DerivativesTagMetrics",
+    hyperliquidLive ? hyperliquidMetricsToTagOverlay(hyperliquidLive) : null,
+    "hyperliquid",
+  );
+
+  const nexusLive = await fetchNexusLiveMetrics();
+  await overlay(
+    "nexus-mutual",
+    "OtherTagMetrics",
+    nexusLive ? nexusMetricsToTagOverlay(nexusLive) : null,
+    "nexus",
+  );
+
+  const lidoLive = await fetchLidoLiveMetrics();
+  await overlay(
+    "lido",
+    "StakingTagMetrics",
+    lidoLive ? lidoMetricsToTagOverlay(lidoLive) : null,
+    "lido",
+  );
+
+  const curveLive = await fetchCurveLiveMetrics();
+  await overlay(
+    "curve-finance",
+    "OtherTagMetrics",
+    curveLive ? curveMetricsToTagOverlay(curveLive) : null,
+    "curve",
+  );
+
+  return { updated, status };
+}
+
+/**
+ * Curated Snapshot space IDs for Other-sector governance / vote-aggregator
+ * entities. Snapshot activity is keyed per-space (hub.snapshot.org), so a
+ * mapping is required. Kept small + high-confidence; wrong/empty spaces are
+ * skipped by the non-empty guard rather than writing blanks.
+ */
+const SNAPSHOT_SPACES: Record<string, string> = {
+  "curve-finance": "curve.eth",
+  "convex-finance": "cvx.eth",
+  aura: "aurafinance.eth",
+  "stake-dao": "stakedao.eth",
+  paladin: "palvote.eth",
+};
+
+/**
+ * Macro + cross-entity overlays for the remaining Phase A clients:
+ *  - snapshot   → governance activity on Other-sector governance entities
+ *                 (per {@link SNAPSHOT_SPACES}); `followers` → `snapshotFollowers`.
+ *  - beaconchain + rates.ethBaseRatePct → `StakingMetrics.networkConsensus`
+ *                 (NETWORK-WIDE ETH-consensus context on every Staking rollup).
+ *  - rates.sofrPct → `RwaCharacteristics.yieldBearing.benchmarkSofrPct`
+ *                 (macro SOFR reference on yield-bearing RWA issuers).
+ * Fetch-once for the macro sources; fails soft per entity.
+ */
+async function runMacroAndGovernanceOverlays(
+  items: Record<string, any>[],
+  persist: (item: Record<string, any>) => Promise<void>,
+): Promise<{ updated: number; status: Record<string, string> }> {
+  const status: Record<string, string> = {};
+  let updated = 0;
+  const isNet = (it: Record<string, any>) => isNetworkCategory(String(it.Category ?? ""));
+  const inSector = (it: Record<string, any>, s: string) =>
+    String(it.Sector ?? "") === s ||
+    (Array.isArray(it.SecondarySectors) && it.SecondarySectors.includes(s));
+
+  // --- Snapshot governance activity (per curated space) ---------------------
+  let snap = 0;
+  for (const [slug, space] of Object.entries(SNAPSHOT_SPACES)) {
+    const m = await fetchSnapshotLiveMetrics(space);
+    if (!m) continue;
+    const ov = snapshotMetricsToTagOverlay(m) as Record<string, any>;
+    const gov: Record<string, any> = {
+      ...(ov.totalProposals ? { totalProposals: ov.totalProposals } : {}),
+      ...(ov.activeProposals ? { activeProposals: ov.activeProposals } : {}),
+      ...(ov.uniqueVoters ? { uniqueVoters: ov.uniqueVoters } : {}),
+      ...(ov.avgVotesPerProposal ? { avgVotesPerProposal: ov.avgVotesPerProposal } : {}),
+      ...(ov.followers ? { snapshotFollowers: ov.followers } : {}),
+    };
+    if (Object.keys(gov).length === 0) continue;
+    const it = items.find((i) => isNet(i) && String(i.Slug ?? "") === slug);
+    if (!it) continue;
+    const other = (it.OtherTagMetrics ?? {}) as Record<string, any>;
+    other.governance = { ...((other.governance as Record<string, any>) ?? {}), ...gov };
+    it.OtherTagMetrics = other;
+    it.UpdatedAt = nowIso();
+    await persist(it);
+    updated += 1;
+    snap += 1;
+  }
+  status.snapshot = `${snap}/${Object.keys(SNAPSHOT_SPACES).length} ok`;
+
+  // --- Macro rates (fetch once) --------------------------------------------
+  const rates = await fetchRatesLiveMetrics();
+  const ratesOv = rates ? (ratesMetricsToTagOverlay(rates) as Record<string, any>) : null;
+
+  // --- Beaconchain → network-consensus context on every Staking rollup ------
+  const beacon = await fetchBeaconchainLiveMetrics();
+  const beaconOv = beacon ? (beaconchainMetricsToTagOverlay(beacon) as Record<string, any>) : null;
+  const consensus: Record<string, any> = {
+    ...(beaconOv?.totalEthStaked ? { totalEthStaked: beaconOv.totalEthStaked } : {}),
+    ...(beaconOv?.stakingAprPct ? { stakingAprPct: beaconOv.stakingAprPct } : {}),
+    ...(beaconOv?.finalizedEpoch ? { finalizedEpoch: beaconOv.finalizedEpoch } : {}),
+    ...(beaconOv?.withdrawalQueue ? { withdrawalQueue: beaconOv.withdrawalQueue } : {}),
+    ...(ratesOv?.ethBaseRatePct ? { ethBaseRatePct: ratesOv.ethBaseRatePct } : {}),
+  };
+  if (Object.keys(consensus).length > 0) {
+    let n = 0;
+    for (const it of items) {
+      if (!isNet(it) || !inSector(it, "Staking")) continue;
+      it.Staking = { ...((it.Staking as Record<string, any>) ?? {}), networkConsensus: consensus };
+      it.UpdatedAt = nowIso();
+      await persist(it);
+      updated += 1;
+      n += 1;
+    }
+    status.beaconchain = `applied to ${n} staking`;
+  } else {
+    status.beaconchain = beacon === null ? "error" : "empty";
+  }
+
+  // --- SOFR benchmark on yield-bearing RWA issuers --------------------------
+  if (ratesOv?.sofrPct) {
+    let n = 0;
+    for (const it of items) {
+      if (!isNet(it)) continue;
+      const rc = it.RwaCharacteristics as Record<string, any> | undefined;
+      if (!rc || !rc.yieldBearing) continue;
+      rc.yieldBearing = { ...(rc.yieldBearing as Record<string, any>), benchmarkSofrPct: ratesOv.sofrPct };
+      it.RwaCharacteristics = rc;
+      it.UpdatedAt = nowIso();
+      await persist(it);
+      updated += 1;
+      n += 1;
+    }
+    status.rates = `sofr applied to ${n} rwa`;
+  } else {
+    status.rates = rates === null ? "error" : "empty";
+  }
+
+  return { updated, status };
+}
+
+/**
+ * Aave V3 lending-rate overlay (on-chain, Arbitrum). Extracted so it can run
+ * both inside the full refresh and via the `?only=aave` fast path. Reserve coins
+ * (aUSDC/aUSDT/aWETH/GHO) get a live LendingMarket; aTokens also get live
+ * YieldMechanics; the Aave network entity's headline APR is the GHO supply APY.
+ */
+async function runAaveOnchainOverlay(
+  items: Record<string, any>[],
+  persist: (item: Record<string, any>) => Promise<void>,
+): Promise<{
+  updated: number;
+  touched: { category: string; slug: string }[];
+  results: { slug: string; supplyApyPct: number | null; borrowApyPct: number | null }[];
+}> {
+  const results: { slug: string; supplyApyPct: number | null; borrowApyPct: number | null }[] = [];
+  const touched: { category: string; slug: string }[] = [];
+  let updated = 0;
+  if (!hasAave()) return { updated, touched, results };
+
+  for (const item of items) {
+    const slug: string = item.Slug || "";
+    const category: string = item.Category || "";
+
+    if (isAaveReserveSlug(slug)) {
+      const rates = await fetchReserveRatesForSlug(slug);
+      if (rates && rates.supplyApyPct !== null) {
+        item.LendingMarket = { ...rates };
+        const aTokenAddr = aTokenAddressForSlug(slug);
+        if (aTokenAddr) {
+          item.ContractAddress = aTokenAddr.toLowerCase();
+        }
+        if (AAVE_ATOKEN_SLUGS.has(slug)) {
+          const underlying = rates.underlyingSymbol ?? slug.replace(/^a/, "").toUpperCase();
+          item.YieldMechanics = {
+            currentApyPct: rates.supplyApyPct,
+            feeShareToHoldersPct: 0,
+            yieldSource: `Aave V3 supply APY on ${underlying} (interest paid by borrowers)`,
+            isAutoCompounding: true,
+            emissionsBased: false,
+            payoutAsset:
+              "Accrues continuously into the aToken balance (redeemable for the underlying + interest)",
+            dataSource: "live",
+          };
+        }
+        item.UpdatedAt = nowIso();
+        await persist(item);
+        updated += 1;
+        if (slug) touched.push({ category, slug });
+        results.push({
+          slug,
+          supplyApyPct: rates.supplyApyPct,
+          borrowApyPct: rates.variableBorrowApyPct,
+        });
+      }
+    } else if (isNetworkCategory(category) && slug === "aave") {
+      const gho = await fetchReserveRatesForSlug("gho");
+      if (gho && gho.supplyApyPct !== null) {
+        item.CurrentScale = { ...(item.CurrentScale ?? {}), aprPct: gho.supplyApyPct };
+        item.ScaleLabels = { ...(item.ScaleLabels ?? {}), apr: "GHO supply APY" };
+        item.UpdatedAt = nowIso();
+        await persist(item);
+        updated += 1;
+        results.push({ slug: "aave", supplyApyPct: gho.supplyApyPct, borrowApyPct: null });
+      }
+    }
+  }
+  return { updated, touched, results };
+}
+
 export async function GET(req: Request): Promise<NextResponse> {
   if (!authorized(req)) {
     // 500 if the secret isn't configured at all; 401 otherwise.
@@ -945,20 +1241,66 @@ export async function GET(req: Request): Promise<NextResponse> {
     const error = status === 500 ? "CRON_SECRET is not set." : "Unauthorized.";
     return NextResponse.json({ ok: false, error }, { status });
   }
-  if (!hasUpstash()) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          "Upstash is not configured (set KV_REST_API_URL/KV_REST_API_TOKEN from the " +
-          "Vercel integration, or UPSTASH_REDIS_REST_URL/UPSTASH_REDIS_REST_TOKEN).",
-      },
-      { status: 400 },
-    );
+  // Offline mode: with no Upstash creds (or an explicit `?local=1`), refresh
+  // against the on-disk `backend/data/store.json` that the frontend already
+  // reads as its fallback. Lets the whole live pipeline run locally without a
+  // Redis instance — writes are buffered and flushed once at the end.
+  const url = new URL(req.url);
+  const local = !hasUpstash() || url.searchParams.get("local") === "1";
+
+  // Use the readSecret-backed check (reads backend/.env), not a raw process.env
+  // lookup — the shared key lives in backend/.env locally, so a process.env probe
+  // wrongly reports it missing and skips every on-chain supply/TVL read.
+  const alchemyReady = hasAlchemy();
+  const items = local ? loadLocalStoreItems() : await readAllItemsFromRedis();
+  const localWriter = local ? createLocalStoreWriter(items) : null;
+  const persist: (item: Record<string, any>) => Promise<void> = localWriter
+    ? (item) => localWriter.put(item)
+    : putItem;
+
+  // Fast path: refresh ONLY the protocol-specific client overlays (Pendle/
+  // Hyperliquid/Nexus/Lido/Curve — no DeFiLlama), so it completes quickly and
+  // reliably. Useful for ops + validating the client wiring end-to-end.
+  if (url.searchParams.get("only") === "clients") {
+    const r = await runProtocolClientOverlays(items, persist);
+    const r2 = await runMacroAndGovernanceOverlays(items, persist);
+    if (localWriter) localWriter.flush();
+    revalidatePath("/networks/[slug]", "page");
+    return NextResponse.json({
+      ok: true,
+      backend: local ? "local" : "upstash",
+      mode: "clients-only",
+      updated: r.updated + r2.updated,
+      integrations: { ...r.status, ...r2.status },
+    });
   }
 
-  const hasAlchemy = Boolean(process.env.ALCHEMY_API_KEY);
-  const items = await readAllItemsFromRedis();
+  // Fast path: refresh ONLY the Aave V3 on-chain lending rates (a handful of
+  // cheap Arbitrum view reads). Completes in seconds — useful for ops and for
+  // validating the on-chain client wiring without the heavy full refresh.
+  if (url.searchParams.get("only") === "aave") {
+    const r = await runAaveOnchainOverlay(items, persist);
+    if (localWriter) localWriter.flush();
+    revalidatePath("/networks/[slug]", "page");
+    revalidatePath("/tokens/[slug]", "page");
+    revalidatePath("/stablecoins/[slug]", "page");
+    return NextResponse.json({
+      ok: true,
+      backend: local ? "local" : "upstash",
+      mode: "aave-only",
+      alchemy: alchemyReady ? "present" : "missing",
+      updated: r.updated,
+      reserves: r.results,
+    });
+  }
+
+  // Accumulators hoisted above the try so the top-level catch can report partial
+  // progress if a mid-run throw escapes fetchJson's soft-fail (e.g. Next's cache
+  // machinery choking on a multi-MB payload).
+  let updated = 0;
+  const integrationStatus: Record<string, string> = {};
+
+  try {
 
   // Yields `/pools` is one large keyless payload; fetch it once and reuse the
   // snapshot for every slug's pool resolution. Fails soft to an empty list.
@@ -979,7 +1321,6 @@ export async function GET(req: Request): Promise<NextResponse> {
   ];
   await cgCache.prefetchMarkets(productCoinIds);
 
-  let updated = 0;
   const touchedSlugs: { category: string; slug: string }[] = [];
   const results: { slug: string; address: string | null; metric: number | null; note: string }[] =
     [];
@@ -1059,7 +1400,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         item.VaultAddresses = [address];
       }
 
-      if (!hasAlchemy) {
+      if (!alchemyReady) {
         row.note = "address persisted; ALCHEMY_API_KEY missing (metric skipped)";
       } else if (category === CATEGORY_STABLECOIN || category === CATEGORY_TOKEN) {
         // Tokens, like stablecoins, expose circulating supply. Never overwrite
@@ -1113,7 +1454,7 @@ export async function GET(req: Request): Promise<NextResponse> {
 
     if (mutated) {
       item.UpdatedAt = nowIso();
-      await putItem(item);
+      await persist(item);
       updated += 1;
       if (slug) touchedSlugs.push({ category, slug });
     }
@@ -1125,57 +1466,10 @@ export async function GET(req: Request): Promise<NextResponse> {
   // (aTokens like aUSDC have no CoinGecko mapping). Reserve coins get a
   // LendingMarket; aTokens also get a live YieldMechanics; the Aave entity's
   // headline APR is derived from the GHO supply APY.
-  const aaveResults: { slug: string; supplyApyPct: number | null; borrowApyPct: number | null }[] =
-    [];
-  if (hasAave()) {
-    for (const item of items) {
-      const slug: string = item.Slug || "";
-      const category: string = item.Category || "";
-
-      if (isAaveReserveSlug(slug)) {
-        const rates = await fetchReserveRatesForSlug(slug);
-        if (rates && rates.supplyApyPct !== null) {
-          item.LendingMarket = { ...rates };
-          const aTokenAddr = aTokenAddressForSlug(slug);
-          if (aTokenAddr) {
-            item.ContractAddress = aTokenAddr.toLowerCase();
-          }
-          if (AAVE_ATOKEN_SLUGS.has(slug)) {
-            const underlying = rates.underlyingSymbol ?? slug.replace(/^a/, "").toUpperCase();
-            item.YieldMechanics = {
-              currentApyPct: rates.supplyApyPct,
-              feeShareToHoldersPct: 0,
-              yieldSource: `Aave V3 supply APY on ${underlying} (interest paid by borrowers)`,
-              isAutoCompounding: true,
-              emissionsBased: false,
-              payoutAsset:
-                "Accrues continuously into the aToken balance (redeemable for the underlying + interest)",
-              dataSource: "live",
-            };
-          }
-          item.UpdatedAt = nowIso();
-          await putItem(item);
-          updated += 1;
-          if (slug) touchedSlugs.push({ category, slug });
-          aaveResults.push({
-            slug,
-            supplyApyPct: rates.supplyApyPct,
-            borrowApyPct: rates.variableBorrowApyPct,
-          });
-        }
-      } else if (isNetworkCategory(category) && slug === "aave") {
-        const gho = await fetchReserveRatesForSlug("gho");
-        if (gho && gho.supplyApyPct !== null) {
-          item.CurrentScale = { ...(item.CurrentScale ?? {}), aprPct: gho.supplyApyPct };
-          item.ScaleLabels = { ...(item.ScaleLabels ?? {}), apr: "GHO supply APY" };
-          item.UpdatedAt = nowIso();
-          await putItem(item);
-          updated += 1;
-          aaveResults.push({ slug: "aave", supplyApyPct: gho.supplyApyPct, borrowApyPct: null });
-        }
-      }
-    }
-  }
+  const aaveOverlay = await runAaveOnchainOverlay(items, persist);
+  updated += aaveOverlay.updated;
+  touchedSlugs.push(...aaveOverlay.touched);
+  const aaveResults = aaveOverlay.results;
 
   // --- Credit networks: DeFi Llama live metrics ----------------------------
   // For each network tagged sector "Credit", overlay live supply/borrow/APY/
@@ -1256,7 +1550,7 @@ export async function GET(req: Request): Promise<NextResponse> {
           item.ScaleLabels = { ...(item.ScaleLabels ?? {}), apr: "Supply APY" };
         }
         item.UpdatedAt = nowIso();
-        await putItem(item);
+        await persist(item);
         updated += 1;
         lendingResults.push({ slug, tvlUsd, utilizationPct: borrow?.utilizationPct ?? null });
       }
@@ -1337,7 +1631,7 @@ export async function GET(req: Request): Promise<NextResponse> {
           item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
         }
         item.UpdatedAt = nowIso();
-        await putItem(item);
+        await persist(item);
         updated += 1;
         creditTagResults.push({ slug, tags });
       }
@@ -1385,7 +1679,7 @@ export async function GET(req: Request): Promise<NextResponse> {
           item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
         }
         item.UpdatedAt = nowIso();
-        await putItem(item);
+        await persist(item);
         updated += 1;
         dexResults.push({ slug, tvlUsd, volume30dUsd });
       }
@@ -1421,7 +1715,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         overlayRwaTagMetrics(item, item.Rwa as import("@/lib/types").RwaMetrics, resolveRwaSubSector(item));
         item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd: aumUsd };
         item.UpdatedAt = nowIso();
-        await putItem(item);
+        await persist(item);
         updated += 1;
         rwaResults.push({ slug, aumUsd });
       } else {
@@ -1464,7 +1758,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         syncUniversalTvlFromCurrentScale(item, "DeFi Llama staking TVL");
       }
       item.UpdatedAt = nowIso();
-      await putItem(item);
+      await persist(item);
       updated += 1;
       stakingResults.push({ slug, totalStakedUsd });
     }
@@ -1505,7 +1799,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         syncUniversalTvlFromCurrentScale(item, "DeFi Llama liquidity TVL");
       }
       item.UpdatedAt = nowIso();
-      await putItem(item);
+      await persist(item);
       updated += 1;
       liquidityResults.push({ slug, tvlUsd });
     }
@@ -1547,7 +1841,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         syncUniversalTvlFromCurrentScale(item, "DeFi Llama derivatives TVL");
       }
       item.UpdatedAt = nowIso();
-      await putItem(item);
+      await persist(item);
       updated += 1;
       derivativesResults.push({ slug, tvlUsd });
     }
@@ -1596,7 +1890,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         syncUniversalTvlFromCurrentScale(item, "DeFi Llama other TVL");
       }
       item.UpdatedAt = nowIso();
-      await putItem(item);
+      await persist(item);
       updated += 1;
       otherResults.push({ slug, tvlUsd });
     }
@@ -1634,13 +1928,13 @@ export async function GET(req: Request): Promise<NextResponse> {
     });
     if (res.wrote) {
       item.UpdatedAt = nowIso();
-      await putItem(item);
+      await persist(item);
       updated += 1;
     }
     universalResults.push({ slug, tvlUsd: res.tvlUsd, priceUsd: res.priceUsd, note: res.note });
   }
 
-  const sectorAggregateResults = await refreshSectorAggregates(items, putItem);
+  const sectorAggregateResults = await refreshSectorAggregates(items, persist);
 
   // --- Options volume (sector === Options) ------------------------------------
   const optionsResults: { slug: string; notional24hUsd: number | null }[] = [];
@@ -1660,7 +1954,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       updatedAt: nowIso(),
     };
     item.UpdatedAt = nowIso();
-    await putItem(item);
+    await persist(item);
     updated += 1;
     optionsResults.push({ slug, notional24hUsd: opts.notionalVolume24hUsd });
   }
@@ -1682,7 +1976,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       updatedAt: nowIso(),
     };
     item.UpdatedAt = nowIso();
-    await putItem(item);
+    await persist(item);
     updated += 1;
     perpOiResults.push({ slug, openInterestUsd: oi.openInterestUsd });
   }
@@ -1706,17 +2000,15 @@ export async function GET(req: Request): Promise<NextResponse> {
       oi,
     );
     item.UpdatedAt = nowIso();
-    await putItem(item);
+    await persist(item);
     updated += 1;
   }
 
   // --- Chain-native lending overlays (Morpho, Kamino, TronGrid, Helius) --------
-  const integrationStatus: Record<string, string> = {
-    morpho: "skipped",
-    kamino: "skipped",
-    trongrid: hasTronGrid() ? "pending" : "missing_key",
-    helius: hasHelius() ? "pending" : "missing_key",
-  };
+  integrationStatus.morpho = "skipped";
+  integrationStatus.kamino = "skipped";
+  integrationStatus.trongrid = hasTronGrid() ? "pending" : "missing_key";
+  integrationStatus.helius = hasHelius() ? "pending" : "missing_key";
 
   const morphoMetrics = await fetchMorphoLiveMetrics();
   if (morphoMetrics?.tvlUsd != null) {
@@ -1739,7 +2031,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       };
       syncUniversalTvlFromCurrentScale(morphoItem, "Morpho API");
       morphoItem.UpdatedAt = nowIso();
-      await putItem(morphoItem);
+      await persist(morphoItem);
       updated += 1;
     }
   } else if (morphoMetrics === null) {
@@ -1763,7 +2055,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       };
       syncUniversalTvlFromCurrentScale(kaminoItem, "Kamino API");
       kaminoItem.UpdatedAt = nowIso();
-      await putItem(kaminoItem);
+      await persist(kaminoItem);
       updated += 1;
     }
   } else if (kaminoMetrics === null) {
@@ -1792,7 +2084,7 @@ export async function GET(req: Request): Promise<NextResponse> {
           syncUniversalTvlFromCurrentScale(justItem, "TronGrid / JustLend");
         }
         justItem.UpdatedAt = nowIso();
-        await putItem(justItem);
+        await persist(justItem);
         updated += 1;
       }
     } else {
@@ -1814,13 +2106,22 @@ export async function GET(req: Request): Promise<NextResponse> {
           updatedAt: nowIso(),
         };
         kmnoItem.UpdatedAt = nowIso();
-        await putItem(kmnoItem);
+        await persist(kmnoItem);
         updated += 1;
       }
     } else {
       integrationStatus.helius = "error";
     }
   }
+
+  // --- Protocol-specific tag-metric overlays (Phase A keyless clients) -------
+  const clientOverlay = await runProtocolClientOverlays(items, persist);
+  updated += clientOverlay.updated;
+  Object.assign(integrationStatus, clientOverlay.status);
+
+  const macroOverlay = await runMacroAndGovernanceOverlays(items, persist);
+  updated += macroOverlay.updated;
+  Object.assign(integrationStatus, macroOverlay.status);
 
   // --- Entity headline TVL aggregation --------------------------------------
   // A few entities ship with CurrentScale.tvlUsd = null (e.g. Monerium, Pleasing
@@ -1867,7 +2168,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       stablecoinSupplyUpdated += 1;
     }
     item.UpdatedAt = nowIso();
-    await putItem(item);
+    await persist(item);
     updated += 1;
   }
 
@@ -1890,10 +2191,13 @@ export async function GET(req: Request): Promise<NextResponse> {
     else if (String(item.Sector ?? "") === "Liquidity") label = "DeFi Llama liquidity TVL";
     if (syncUniversalTvlFromCurrentScale(item, label)) {
       item.UpdatedAt = nowIso();
-      await putItem(item);
+      await persist(item);
       updated += 1;
     }
   }
+
+  // In offline mode, serialize the whole mutated store to disk once.
+  if (localWriter) localWriter.flush();
 
   // Refresh public surfaces + each touched detail page.
   revalidatePath("/");
@@ -1915,8 +2219,8 @@ export async function GET(req: Request): Promise<NextResponse> {
 
   return NextResponse.json({
     ok: true,
-    backend: "upstash",
-    alchemy: hasAlchemy ? "present" : "missing",
+    backend: local ? "local" : "upstash",
+    alchemy: alchemyReady ? "present" : "missing",
     total: items.length,
     updated,
     results,
@@ -1937,4 +2241,24 @@ export async function GET(req: Request): Promise<NextResponse> {
     stablecoinSupplyUpdated,
     integrations: integrationStatus,
   });
+
+  } catch (err) {
+    // Never hard-fail the cron. Persist whatever partial work landed (local mode
+    // buffers writes; Upstash writes are already incremental), then report a 200
+    // with `partial: true` so schedulers read it as "ran & reported" rather than
+    // a bare 500 they'd retry blindly.
+    if (localWriter) localWriter.flush();
+    console.error("[cron] refresh aborted mid-run:", err);
+    return NextResponse.json(
+      {
+        ok: false,
+        partial: true,
+        backend: local ? "local" : "upstash",
+        error: String(err),
+        updated,
+        integrations: integrationStatus,
+      },
+      { status: 200 },
+    );
+  }
 }

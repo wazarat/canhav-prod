@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createPublicClient, http, type Address } from "viem";
+import { createPublicClient, http, fallback, type Address } from "viem";
 import { arbitrum } from "viem/chains";
 
 import { readSecret } from "@/lib/server/env";
@@ -97,20 +97,35 @@ const DATA_PROVIDER_ABI = [
   },
 ] as const;
 
-function rpcUrl(): string {
+/**
+ * Ordered Arbitrum RPC endpoints, best first. The keyed Alchemy endpoint is used
+ * only when it is a genuine Arbitrum URL; a mis-set base (e.g. an eth-mainnet URL
+ * accidentally placed in ALCHEMY_ARBITRUM_BASE_URL) is ignored in favour of the
+ * arb default, and a base that already ends with the key is not double-appended.
+ * The public Arbitrum RPC always trails so these cheap view reads keep working
+ * when the Alchemy app lacks Arbitrum access or no key is configured at all.
+ */
+function arbitrumRpcUrls(): string[] {
+  const urls: string[] = [];
   const key = readSecret("ALCHEMY_API_KEY");
   if (key) {
-    const base = readSecret("ALCHEMY_ARBITRUM_BASE_URL") || DEFAULT_BASE_URL;
-    return `${base.replace(/\/$/, "")}/${key}`;
+    let base = readSecret("ALCHEMY_ARBITRUM_BASE_URL") || DEFAULT_BASE_URL;
+    if (!/arb/i.test(base)) base = DEFAULT_BASE_URL; // only trust an Arbitrum host
+    base = base.replace(/\/+$/, "");
+    urls.push(base.endsWith(key) ? base : `${base}/${key}`);
   }
-  return PUBLIC_FALLBACK_RPC;
+  urls.push(PUBLIC_FALLBACK_RPC);
+  return urls;
 }
 
 let client: ReturnType<typeof createPublicClient> | null = null;
 
 function getClient(): ReturnType<typeof createPublicClient> | null {
   if (client) return client;
-  client = createPublicClient({ chain: arbitrum, transport: http(rpcUrl()) });
+  client = createPublicClient({
+    chain: arbitrum,
+    transport: fallback(arbitrumRpcUrls().map((u) => http(u))),
+  });
   return client;
 }
 

@@ -25,6 +25,12 @@ import { fetchJson, nowIso } from "@/lib/server/http";
 const SELECTOR_TOTAL_SUPPLY = "0x18160ddd"; // totalSupply()
 const SELECTOR_DECIMALS = "0x313ce567"; // decimals()
 const DEFAULT_BASE_URL = "https://arb-mainnet.g.alchemy.com/v2";
+// Keyless public Arbitrum RPC. Standard JSON-RPC reads (eth_call/eth_blockNumber
+// /eth_getBlockByNumber) work here, so basic supply/TVL reads keep functioning
+// when the Alchemy app lacks Arbitrum access or no key is set. The proprietary
+// `alchemy_*` methods (token metadata / asset transfers) are unavailable on it
+// and fail soft to null/[] as before.
+const PUBLIC_FALLBACK_RPC = "https://arbitrum-one.publicnode.com";
 
 export interface MetricResult {
   value: number | null;
@@ -38,11 +44,23 @@ export interface Holding {
   priceUsd: number | null;
 }
 
-function rpcUrl(): string | null {
+/**
+ * Ordered Arbitrum RPC endpoints, best first (see aave.ts for the same policy):
+ * a genuine keyed Alchemy Arbitrum URL when configured, then the keyless public
+ * Arbitrum RPC. A mis-set non-Arbitrum base is ignored and a base already ending
+ * with the key is not double-appended.
+ */
+function arbitrumRpcUrls(): string[] {
+  const urls: string[] = [];
   const key = readSecret("ALCHEMY_API_KEY");
-  if (!key) return null;
-  const base = readSecret("ALCHEMY_ARBITRUM_BASE_URL") || DEFAULT_BASE_URL;
-  return `${base.replace(/\/$/, "")}/${key}`;
+  if (key) {
+    let base = readSecret("ALCHEMY_ARBITRUM_BASE_URL") || DEFAULT_BASE_URL;
+    if (!/arb/i.test(base)) base = DEFAULT_BASE_URL;
+    base = base.replace(/\/+$/, "");
+    urls.push(base.endsWith(key) ? base : `${base}/${key}`);
+  }
+  urls.push(PUBLIC_FALLBACK_RPC);
+  return urls;
 }
 
 /** Whether an Alchemy key is configured (cheap guard before rendering panels). */
@@ -51,20 +69,25 @@ export function hasAlchemy(): boolean {
 }
 
 /**
- * Low-level JSON-RPC call. Pass `revalidate` (seconds) for cached live-render
- * reads; omit it for the always-fresh cron path.
+ * Low-level JSON-RPC call. Tries each Arbitrum endpoint in order and returns the
+ * first successful result, so a keyed endpoint that errors (e.g. Arbitrum not
+ * enabled on the Alchemy app) transparently falls back to the public RPC. Pass
+ * `revalidate` (seconds) for cached live-render reads; omit it for the cron path.
  */
 async function rpcCall(method: string, params: unknown[], revalidate?: number): Promise<any | null> {
-  const url = rpcUrl();
-  if (!url) return null;
-  const { data } = await fetchJson(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-    revalidate,
-  });
-  if (!data || typeof data !== "object" || data.error) return null;
-  return data.result ?? null;
+  const body = JSON.stringify({ jsonrpc: "2.0", id: 1, method, params });
+  for (const url of arbitrumRpcUrls()) {
+    const { data } = await fetchJson(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body,
+      revalidate,
+    });
+    if (data && typeof data === "object" && !data.error) {
+      return data.result ?? null;
+    }
+  }
+  return null;
 }
 
 async function ethCall(
@@ -100,7 +123,7 @@ export async function fetchTotalSupply(
   revalidate?: number,
 ): Promise<MetricResult> {
   const empty: MetricResult = { value: null, source: "alchemy", updatedAt: null };
-  if (!rpcUrl() || !tokenAddress) return empty;
+  if (!tokenAddress) return empty;
 
   const raw = hexToBigInt(await ethCall(tokenAddress, SELECTOR_TOTAL_SUPPLY, "latest", revalidate));
   if (raw === null) return empty;
@@ -124,7 +147,7 @@ export async function probeErc20Standard(
   tokenAddress: string,
   revalidate?: number,
 ): Promise<string | null> {
-  if (!rpcUrl() || !tokenAddress) return null;
+  if (!tokenAddress) return null;
   const decRaw = hexToBigInt(await ethCall(tokenAddress, SELECTOR_DECIMALS, "latest", revalidate));
   if (decRaw === null) return null;
   return "ERC-20";
@@ -139,7 +162,7 @@ export async function fetchTotalValueLocked(
   revalidate?: number,
 ): Promise<MetricResult> {
   const empty: MetricResult = { value: null, source: "alchemy", updatedAt: null };
-  if (!rpcUrl() || !holdings.length) return empty;
+  if (!holdings.length) return empty;
 
   let total = 0;
   let pricedAny = false;
@@ -266,7 +289,7 @@ export async function fetchSupplyHistory(
   decimals: number | null,
   { days = 30, points = 6 }: { days?: number; points?: number } = {},
 ): Promise<SupplyPoint[]> {
-  if (!address || !rpcUrl()) return [];
+  if (!address) return [];
 
   const latest = await latestBlockNumber();
   if (latest === null) return [];

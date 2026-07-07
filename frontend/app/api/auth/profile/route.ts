@@ -5,8 +5,8 @@ import { getUserProfile, updateUserProfile } from "@/lib/auth/users";
 
 /**
  * Read or update the signed-in user's thin profile (the human-readable name on
- * top of their self-custodial wallet). Privy social login → ZeroDev account
- * remains the only login — this just lets users be identified by name.
+ * top of their self-custodial wallet). Privy social login remains the only
+ * login — this just lets users be identified by name.
  */
 
 export const runtime = "nodejs";

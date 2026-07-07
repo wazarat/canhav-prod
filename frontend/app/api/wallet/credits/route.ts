@@ -7,7 +7,7 @@ import {
   TCNHV_DECIMALS,
   tcnhvAssetAddress,
 } from "@/lib/agent/collab-config";
-import { hasPrivyWallet, zeroDevEnabled } from "@/lib/agent/config";
+import { hasPrivyWallet } from "@/lib/agent/config";
 import { readTcnhvBalance } from "@/lib/agent/onchain";
 import { getSession } from "@/lib/auth/session";
 import { getUserProfile } from "@/lib/auth/users";
@@ -45,9 +45,6 @@ export async function GET(req: Request) {
       ? profile.address
       : null;
 
-  const zerodevRpc = readSecret("ZERODEV_RPC");
-  const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
-  const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
   const rpcUrl =
     readSecret("ARBITRUM_SEPOLIA_RPC_URL") ?? "https://sepolia-rollup.arbitrum.io/rpc";
   const canTransact = hasPrivyWallet();
@@ -64,9 +61,5 @@ export async function GET(req: Request) {
     balanceRaw: balanceRaw ?? "0",
     granted: Boolean(profile?.tcnhvGranted),
     rpcUrl: canTransact ? rpcUrl : null,
-    mintConfig:
-      canTransact && zeroDevEnabled() && zerodevRpc && identityRegistry && securityRegistry
-        ? { zerodevRpc, rpcUrl, identityRegistry, securityRegistry }
-        : null,
   });
 }

@@ -7,7 +7,7 @@ import {
   TCNHV_DECIMALS,
   tcnhvAssetAddress,
 } from "@/lib/agent/collab-config";
-import { hasPrivyWallet, zeroDevEnabled } from "@/lib/agent/config";
+import { hasPrivyWallet } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
@@ -141,10 +141,6 @@ export async function POST(req: Request) {
     );
   }
 
-  const zerodevRpc = readSecret("ZERODEV_RPC");
-  const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
-  const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
-
   return NextResponse.json({
     ok: true,
     payTo: recipient.address,
@@ -155,11 +151,5 @@ export async function POST(req: Request) {
     amount: amount.toString(),
     humanAmount: amountHuman,
     rpcUrl,
-    ...(zeroDevEnabled() && zerodevRpc && identityRegistry && securityRegistry
-      ? {
-          accountIndex: 0,
-          mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
-        }
-      : {}),
   });
 }

@@ -1,34 +1,67 @@
 "use client";
 
 import type { ConnectedWallet } from "@privy-io/react-auth";
-import type { Signer } from "@zerodev/sdk/types";
 
-import { sendErc20Transfer } from "@/lib/agent/privy-signer";
-import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
+import {
+  buildPrivyWalletClient,
+  sendErc20Transfer,
+  type Signer,
+} from "@/lib/agent/privy-signer";
 
 /**
  * Buyer-side x402 collaboration helpers (browser).
  *
- * Settlement is signed in the browser from the user's Privy wallet. Flow: fetch
- * the seller's 402 quote -> sign a USDC `transfer` to the seller's wallet ->
- * hand the tx hash to /api/collab/request for verification + settle.
- *
- * When USE_ZERODEV=true, legacy gas-sponsored userOps from agent kernel accounts
- * remain available for agent-scoped flows.
+ * Everything is signed in the browser by the user's Privy wallet (embedded or
+ * external), which pays its own Sepolia gas. Flow: fetch the seller's 402
+ * quote -> sign a USDC `transfer` to the seller's wallet -> hand the tx hash
+ * to /api/collab/request for verification + settle. On-chain attestations
+ * (CollabRegistry / CollabAgreement / ReputationRegistry) are plain
+ * wallet-signed transactions gated through the SecurityRegistry allowlist.
  */
 
-const erc20Abi = [
+const DEFAULT_RPC = "https://sepolia-rollup.arbitrum.io/rpc";
+
+const securityRegistryAbi = [
   {
     type: "function",
-    name: "transfer",
-    stateMutability: "nonpayable",
-    inputs: [
-      { name: "to", type: "address" },
-      { name: "amount", type: "uint256" },
-    ],
+    name: "isAllowed",
+    stateMutability: "view",
+    inputs: [{ name: "target", type: "address" }],
     outputs: [{ name: "", type: "bool" }],
   },
 ] as const;
+
+/** Registry addresses + RPC the server hands back for on-chain writes. */
+export interface OnchainWriteConfig {
+  rpcUrl: string;
+  securityRegistry: `0x${string}`;
+}
+
+async function publicClient(rpcUrl: string) {
+  const { createPublicClient, http } = await import("viem");
+  const { arbitrumSepolia } = await import("viem/chains");
+  return createPublicClient({ chain: arbitrumSepolia, transport: http(rpcUrl || DEFAULT_RPC) });
+}
+
+/**
+ * Gate: refuse to write to a target that isn't on the SecurityRegistry
+ * allowlist — matching every other on-chain write in the platform.
+ */
+async function assertTargetAllowed(
+  cfg: OnchainWriteConfig,
+  target: `0x${string}`,
+): Promise<void> {
+  const client = await publicClient(cfg.rpcUrl);
+  const allowed = await client.readContract({
+    address: cfg.securityRegistry,
+    abi: securityRegistryAbi,
+    functionName: "isAllowed",
+    args: [target],
+  });
+  if (!allowed) {
+    throw new Error(`Target ${target} is not allowlisted by the SecurityRegistry.`);
+  }
+}
 
 export interface SellerQuote {
   payTo: `0x${string}`;
@@ -81,42 +114,7 @@ export async function payStrategy(params: {
   wallet: ConnectedWallet;
   quote: SellerQuote;
   rpcUrl?: string;
-  /** Legacy ZeroDev path — only when mintConfig is provided. */
-  signer?: Signer;
-  accountIndex?: number;
-  mintConfig?: SpawnMintConfig;
-}): Promise<{ txHash: `0x${string}`; userOpHash?: string }> {
-  if (params.mintConfig && params.signer != null && params.accountIndex != null) {
-    const svc = await import("canhav-agent-service");
-    const { encodeFunctionData } = await import("viem");
-
-    const cfg = svc.createConfig({
-      zerodevRpc: params.mintConfig.zerodevRpc,
-      rpcUrl: params.mintConfig.rpcUrl,
-      identityRegistry: params.mintConfig.identityRegistry,
-      securityRegistry: params.mintConfig.securityRegistry,
-    });
-
-    const account = await svc.createEcdsaKernelAccount(
-      cfg,
-      params.signer,
-      BigInt(params.accountIndex),
-    );
-
-    const data = encodeFunctionData({
-      abi: erc20Abi,
-      functionName: "transfer",
-      args: [params.quote.payTo, BigInt(params.quote.amount)],
-    });
-
-    const userOpHash = await account.kernelClient.sendUserOperation({
-      account: account.account,
-      calls: [{ to: params.quote.asset, data }],
-    });
-    const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
-    return { txHash: receipt.receipt.transactionHash, userOpHash };
-  }
-
+}): Promise<{ txHash: `0x${string}` }> {
   const { txHash } = await sendErc20Transfer({
     wallet: params.wallet,
     token: params.quote.asset,
@@ -132,42 +130,31 @@ const faucetAbi = [
 ] as const;
 
 /**
- * Claim testnet credits (tCNHV) for the buyer agent by sending a gas-sponsored
- * `faucet()` userOp from the agent's own kernel account — so the credits land in
- * the same smart account that spends them in settlement (no popup, no gas). The
- * token's faucet mint is always allowed regardless of the transfer allowlist.
+ * Claim testnet credits (tCNHV) by calling `faucet()` from the user's Privy
+ * wallet — the credits land in the same treasury wallet that spends them in
+ * settlement. The token's faucet mint is always allowed regardless of the
+ * transfer allowlist. The wallet pays its own Sepolia gas.
  */
 export async function claimCredits(params: {
-  signer: Signer;
-  accountIndex: number;
-  mintConfig: SpawnMintConfig;
+  wallet: ConnectedWallet;
   token: `0x${string}`;
-}): Promise<{ txHash: `0x${string}`; userOpHash: string }> {
-  const svc = await import("canhav-agent-service");
-  const { encodeFunctionData } = await import("viem");
-
-  const cfg = svc.createConfig({
-    zerodevRpc: params.mintConfig.zerodevRpc,
-    rpcUrl: params.mintConfig.rpcUrl,
-    identityRegistry: params.mintConfig.identityRegistry,
-    securityRegistry: params.mintConfig.securityRegistry,
+  rpcUrl?: string;
+}): Promise<{ txHash: `0x${string}` }> {
+  const walletClient = await buildPrivyWalletClient(params.wallet);
+  const hash = await walletClient.writeContract({
+    abi: faucetAbi,
+    address: params.token,
+    functionName: "faucet",
+    args: [],
   });
-
-  const account = await svc.createEcdsaKernelAccount(cfg, params.signer, BigInt(params.accountIndex));
-  const data = encodeFunctionData({ abi: faucetAbi, functionName: "faucet", args: [] });
-
-  const userOpHash = await account.kernelClient.sendUserOperation({
-    account: account.account,
-    calls: [{ to: params.token, data }],
-  });
-  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
-  return { txHash: receipt.receipt.transactionHash, userOpHash };
+  const client = await publicClient(params.rpcUrl ?? DEFAULT_RPC);
+  const receipt = await client.waitForTransactionReceipt({ hash });
+  return { txHash: receipt.transactionHash };
 }
 
 /**
- * Transfer tCNHV credits from the user's Privy treasury wallet to any recipient.
- * Default path: plain ERC-20 transfer signed by the embedded wallet.
- * Legacy path (mintConfig provided): gas-sponsored userOp from a ZeroDev kernel.
+ * Transfer tCNHV credits from the user's Privy treasury wallet to any recipient
+ * (plain ERC-20 transfer signed by the connected wallet).
  */
 export async function transferCredits(params: {
   wallet: ConnectedWallet;
@@ -176,41 +163,7 @@ export async function transferCredits(params: {
   /** Amount in base units (tCNHV = 18 decimals). */
   amount: string;
   rpcUrl?: string;
-  /** Legacy ZeroDev path — only when mintConfig is provided. */
-  signer?: Signer;
-  accountIndex?: number;
-  mintConfig?: SpawnMintConfig;
-}): Promise<{ txHash: `0x${string}`; userOpHash?: string }> {
-  if (params.mintConfig && params.signer != null && params.accountIndex != null) {
-    const svc = await import("canhav-agent-service");
-    const { encodeFunctionData } = await import("viem");
-
-    const cfg = svc.createConfig({
-      zerodevRpc: params.mintConfig.zerodevRpc,
-      rpcUrl: params.mintConfig.rpcUrl,
-      identityRegistry: params.mintConfig.identityRegistry,
-      securityRegistry: params.mintConfig.securityRegistry,
-    });
-
-    const account = await svc.createEcdsaKernelAccount(
-      cfg,
-      params.signer,
-      BigInt(params.accountIndex),
-    );
-    const data = encodeFunctionData({
-      abi: erc20Abi,
-      functionName: "transfer",
-      args: [params.payTo, BigInt(params.amount)],
-    });
-
-    const userOpHash = await account.kernelClient.sendUserOperation({
-      account: account.account,
-      calls: [{ to: params.token, data }],
-    });
-    const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
-    return { txHash: receipt.receipt.transactionHash, userOpHash };
-  }
-
+}): Promise<{ txHash: `0x${string}` }> {
   const { txHash } = await sendErc20Transfer({
     wallet: params.wallet,
     token: params.token,
@@ -239,7 +192,7 @@ const collabRegistryAbi = [
 ] as const;
 
 /** Params returned by POST /api/collab/request for the on-chain attestation. */
-export interface RecordParams {
+export interface RecordParams extends OnchainWriteConfig {
   collabRegistry: `0x${string}`;
   fromAgentId: string;
   toAgentId: string;
@@ -249,37 +202,23 @@ export interface RecordParams {
   agreementId: `0x${string}`;
   /** Interaction magnitude recorded on-chain (data slices); must be > 0. */
   units: number;
-  accountIndex: number;
-  mintConfig: SpawnMintConfig;
 }
 
 /**
- * Attest a completed exchange on-chain via CollabRegistry.recordCollab, signed by
- * the buyer agent's kernel account. Routed through the SecurityRegistry gate
- * (`assertTargetAllowed`) so a non-allowlisted registry is refused — matching
- * every other on-chain write in the platform.
+ * Attest a completed exchange on-chain via CollabRegistry.recordCollab, signed
+ * by the buyer's wallet. Routed through the SecurityRegistry gate so a
+ * non-allowlisted registry is refused.
  */
 export async function recordCollabOnChain(params: {
   signer: Signer;
   record: RecordParams;
-}): Promise<{ userOpHash: string; txHash: string }> {
+}): Promise<{ txHash: `0x${string}` }> {
   const { signer, record } = params;
-  const svc = await import("canhav-agent-service");
-  const { encodeFunctionData } = await import("viem");
+  await assertTargetAllowed(record, record.collabRegistry);
 
-  const cfg = svc.createConfig({
-    zerodevRpc: record.mintConfig.zerodevRpc,
-    rpcUrl: record.mintConfig.rpcUrl,
-    identityRegistry: record.mintConfig.identityRegistry,
-    securityRegistry: record.mintConfig.securityRegistry,
-  });
-
-  // Gate: refuse to write to a registry that isn't on the SecurityRegistry allowlist.
-  await svc.assertTargetAllowed(cfg, record.collabRegistry);
-
-  const account = await svc.createEcdsaKernelAccount(cfg, signer, BigInt(record.accountIndex));
-  const data = encodeFunctionData({
+  const hash = await signer.writeContract({
     abi: collabRegistryAbi,
+    address: record.collabRegistry,
     functionName: "recordCollab",
     args: [
       BigInt(record.fromAgentId),
@@ -290,13 +229,9 @@ export async function recordCollabOnChain(params: {
       Math.max(1, Math.min(0xffffffff, Math.floor(record.units))),
     ],
   });
-
-  const userOpHash = await account.kernelClient.sendUserOperation({
-    account: account.account,
-    calls: [{ to: record.collabRegistry, data }],
-  });
-  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
-  return { userOpHash, txHash: receipt.receipt.transactionHash };
+  const client = await publicClient(record.rpcUrl);
+  const receipt = await client.waitForTransactionReceipt({ hash });
+  return { txHash: receipt.transactionHash };
 }
 
 const collabAgreementAbi = [
@@ -364,7 +299,7 @@ const collabAgreementAbi = [
 ] as const;
 
 /** Params returned by the agreement anchor preflight for CollabAgreement.establish. */
-export interface EstablishParams {
+export interface EstablishParams extends OnchainWriteConfig {
   collabAgreement: `0x${string}`;
   /** Numeric ERC-8004 agent ids (on-chain establish takes uint256). */
   buyerAgentId: string;
@@ -391,36 +326,26 @@ export interface EstablishParams {
   duneLinked: boolean;
   /** keccak of the canonical off-chain terms (bytes32 hex). */
   termsHash: `0x${string}`;
-  accountIndex: number;
-  mintConfig: SpawnMintConfig;
 }
 
 /**
  * Anchor a human-approved agreement on-chain via CollabAgreement.establish,
- * signed by the buyer agent's kernel account. Decodes the deterministic
- * agreementId from the AgreementEstablished event so the off-chain record can be
- * linked to its on-chain twin. Gated through the SecurityRegistry allowlist.
+ * signed by the buyer's wallet. Decodes the deterministic agreementId from the
+ * AgreementEstablished event so the off-chain record can be linked to its
+ * on-chain twin. Gated through the SecurityRegistry allowlist.
  */
 export async function establishAgreementOnChain(params: {
   signer: Signer;
   establish: EstablishParams;
-}): Promise<{ onChainAgreementId: `0x${string}`; txHash: string; userOpHash: string }> {
+}): Promise<{ onChainAgreementId: `0x${string}`; txHash: `0x${string}` }> {
   const { signer, establish } = params;
-  const svc = await import("canhav-agent-service");
-  const { encodeFunctionData, decodeEventLog } = await import("viem");
+  const { decodeEventLog } = await import("viem");
 
-  const cfg = svc.createConfig({
-    zerodevRpc: establish.mintConfig.zerodevRpc,
-    rpcUrl: establish.mintConfig.rpcUrl,
-    identityRegistry: establish.mintConfig.identityRegistry,
-    securityRegistry: establish.mintConfig.securityRegistry,
-  });
+  await assertTargetAllowed(establish, establish.collabAgreement);
 
-  await svc.assertTargetAllowed(cfg, establish.collabAgreement);
-
-  const account = await svc.createEcdsaKernelAccount(cfg, signer, BigInt(establish.accountIndex));
-  const data = encodeFunctionData({
+  const hash = await signer.writeContract({
     abi: collabAgreementAbi,
+    address: establish.collabAgreement,
     functionName: "establish",
     args: [
       {
@@ -447,17 +372,12 @@ export async function establishAgreementOnChain(params: {
       },
     ],
   });
-
-  const userOpHash = await account.kernelClient.sendUserOperation({
-    account: account.account,
-    calls: [{ to: establish.collabAgreement, data }],
-  });
-  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
+  const client = await publicClient(establish.rpcUrl);
+  const receipt = await client.waitForTransactionReceipt({ hash });
 
   // Recover the agreementId from the AgreementEstablished event in the receipt.
   let onChainAgreementId: `0x${string}` | null = null;
-  const logs = receipt.receipt.logs ?? [];
-  for (const log of logs) {
+  for (const log of receipt.logs ?? []) {
     if (log.address.toLowerCase() !== establish.collabAgreement.toLowerCase()) continue;
     try {
       const decoded = decodeEventLog({
@@ -476,18 +396,16 @@ export async function establishAgreementOnChain(params: {
   if (!onChainAgreementId) {
     throw new Error("Anchored, but could not read the on-chain agreement id from the receipt.");
   }
-  return { onChainAgreementId, txHash: receipt.receipt.transactionHash, userOpHash };
+  return { onChainAgreementId, txHash: receipt.transactionHash };
 }
 
 /** Params returned by POST /api/collab/request for the per-period agreement write. */
-export interface AgreementInteractionParams {
+export interface AgreementInteractionParams extends OnchainWriteConfig {
   collabAgreement: `0x${string}`;
   onChainAgreementId: `0x${string}`;
   units: number;
   /** Tokens/credits drawn this call, base units (checked vs the per-period budget). */
   tokens: string;
-  accountIndex: number;
-  mintConfig: SpawnMintConfig;
 }
 
 /**
@@ -498,27 +416,13 @@ export interface AgreementInteractionParams {
 export async function recordInteractionOnChain(params: {
   signer: Signer;
   interaction: AgreementInteractionParams;
-}): Promise<{ userOpHash: string; txHash: string }> {
+}): Promise<{ txHash: `0x${string}` }> {
   const { signer, interaction } = params;
-  const svc = await import("canhav-agent-service");
-  const { encodeFunctionData } = await import("viem");
+  await assertTargetAllowed(interaction, interaction.collabAgreement);
 
-  const cfg = svc.createConfig({
-    zerodevRpc: interaction.mintConfig.zerodevRpc,
-    rpcUrl: interaction.mintConfig.rpcUrl,
-    identityRegistry: interaction.mintConfig.identityRegistry,
-    securityRegistry: interaction.mintConfig.securityRegistry,
-  });
-
-  await svc.assertTargetAllowed(cfg, interaction.collabAgreement);
-
-  const account = await svc.createEcdsaKernelAccount(
-    cfg,
-    signer,
-    BigInt(interaction.accountIndex),
-  );
-  const data = encodeFunctionData({
+  const hash = await signer.writeContract({
     abi: collabAgreementAbi,
+    address: interaction.collabAgreement,
     functionName: "recordInteraction",
     args: [
       interaction.onChainAgreementId,
@@ -526,13 +430,9 @@ export async function recordInteractionOnChain(params: {
       BigInt(interaction.tokens || "0"),
     ],
   });
-
-  const userOpHash = await account.kernelClient.sendUserOperation({
-    account: account.account,
-    calls: [{ to: interaction.collabAgreement, data }],
-  });
-  const receipt = await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
-  return { userOpHash, txHash: receipt.receipt.transactionHash };
+  const client = await publicClient(interaction.rpcUrl);
+  const receipt = await client.waitForTransactionReceipt({ hash });
+  return { txHash: receipt.transactionHash };
 }
 
 const reputationAbi = [
@@ -555,13 +455,11 @@ const reputationAbi = [
 ] as const;
 
 /** Params returned by POST /api/collab/feedback when the on-chain hook is enabled. */
-export interface FeedbackParams {
+export interface FeedbackParams extends OnchainWriteConfig {
   reputationRegistry: `0x${string}`;
   toAgentId: string;
   value: number;
   valueDecimals: number;
-  accountIndex: number;
-  mintConfig: SpawnMintConfig;
 }
 
 /**
@@ -572,23 +470,13 @@ export interface FeedbackParams {
 export async function submitFeedbackOnChain(params: {
   signer: Signer;
   feedback: FeedbackParams;
-}): Promise<{ userOpHash: string }> {
+}): Promise<{ txHash: `0x${string}` }> {
   const { signer, feedback } = params;
-  const svc = await import("canhav-agent-service");
-  const { encodeFunctionData } = await import("viem");
+  await assertTargetAllowed(feedback, feedback.reputationRegistry);
 
-  const cfg = svc.createConfig({
-    zerodevRpc: feedback.mintConfig.zerodevRpc,
-    rpcUrl: feedback.mintConfig.rpcUrl,
-    identityRegistry: feedback.mintConfig.identityRegistry,
-    securityRegistry: feedback.mintConfig.securityRegistry,
-  });
-
-  await svc.assertTargetAllowed(cfg, feedback.reputationRegistry);
-
-  const account = await svc.createEcdsaKernelAccount(cfg, signer, BigInt(feedback.accountIndex));
-  const data = encodeFunctionData({
+  const hash = await signer.writeContract({
     abi: reputationAbi,
+    address: feedback.reputationRegistry,
     functionName: "giveFeedback",
     args: [
       BigInt(feedback.toAgentId),
@@ -601,11 +489,7 @@ export async function submitFeedbackOnChain(params: {
       "0x0000000000000000000000000000000000000000000000000000000000000000",
     ],
   });
-
-  const userOpHash = await account.kernelClient.sendUserOperation({
-    account: account.account,
-    calls: [{ to: feedback.reputationRegistry, data }],
-  });
-  await account.kernelClient.waitForUserOperationReceipt({ hash: userOpHash });
-  return { userOpHash };
+  const client = await publicClient(feedback.rpcUrl);
+  const receipt = await client.waitForTransactionReceipt({ hash });
+  return { txHash: receipt.transactionHash };
 }

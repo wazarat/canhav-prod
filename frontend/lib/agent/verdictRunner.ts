@@ -9,12 +9,12 @@ import {
 } from "@/lib/agent/memory";
 import { canPublishVerdict } from "@/lib/agent/dunePublish";
 import { insertVerdict, ensureVerdictTable } from "@/lib/server/dune";
-import {
-  combineVerdicts,
-  runOnceBySymbol,
-  type AgentType,
-  type ResearchVerdict,
-} from "canhav-agent-service";
+// Deep imports (not the package barrel): the index re-exports the kernel spawn
+// path whose deps only exist under agent-service/ — with webpack symlink
+// resolution off (see next.config.mjs) those bare imports would not resolve.
+import { combineVerdicts } from "canhav-agent-service/src/agent/combine";
+import { runOnceBySymbol } from "canhav-agent-service/src/agent/schedule";
+import type { AgentType, ResearchVerdict } from "canhav-agent-service";
 
 /** Alpha demo agents seeded by yield-agents-demo.mjs */
 export const YIELD_DEMO_AGENTS = [

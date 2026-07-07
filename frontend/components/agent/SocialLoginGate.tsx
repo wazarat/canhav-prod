@@ -162,7 +162,7 @@ export function SocialLoginGate({
         {error && <p className="text-center text-xs text-rose-300">{error}</p>}
 
         <p className="text-center text-[10px] text-ink-500">
-          ZeroDev smart accounts · tCNHV test credits · Arbitrum Sepolia testnet only
+          Self-custodial Privy wallets · tCNHV test credits · Arbitrum Sepolia testnet only
         </p>
       </div>
     </div>

@@ -13,7 +13,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { agentConfigStatus } from "@/lib/agent/config";
 
 interface CapabilityRow {
-  key: "openai" | "upstash" | "zerodev" | "tcnhv";
+  key: "openai" | "upstash" | "identity" | "tcnhv";
   icon: typeof BrainCircuit;
   label: string;
   ready: boolean;
@@ -77,13 +77,14 @@ export function ProvisioningCard() {
         "No Upstash credentials — memory falls back to a local JSON file for offline dev.",
     },
     {
-      key: "zerodev",
+      key: "identity",
       icon: Fingerprint,
-      label: "On-chain identity (ZeroDev + ERC-8004)",
-      ready: status.zerodev,
-      readyHint: "Agents can mint a wallet-owned ERC-8004 identity (gas sponsored).",
+      label: "On-chain identity (ERC-8004)",
+      ready: status.onchainIdentity,
+      readyHint:
+        "Agents can mint a wallet-owned ERC-8004 identity (signed by the user's Privy wallet).",
       pendingHint:
-        "Deploy the registries + create a ZeroDev project, then set ZERODEV_RPC, IDENTITY_REGISTRY_ADDRESS, SECURITY_REGISTRY_ADDRESS, NEXT_PUBLIC_PRIVY_APP_ID, and PRIVY_APP_SECRET.",
+        "Deploy the registries, then set IDENTITY_REGISTRY_ADDRESS, SECURITY_REGISTRY_ADDRESS, NEXT_PUBLIC_PRIVY_APP_ID, and PRIVY_APP_SECRET.",
     },
     {
       key: "tcnhv",

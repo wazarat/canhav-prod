@@ -8,10 +8,10 @@ import { AlertTriangle, CheckCircle2, Loader2, LogIn, Rocket, Wallet } from "luc
 
 import { Badge } from "@/components/ui/Badge";
 import { AGENT_CATEGORIES, type AgentCategory } from "@/lib/agent/categories";
-import { buildPrivySigner, resolveActiveWallet } from "@/lib/agent/privy-signer";
+import { resolveActiveWallet } from "@/lib/agent/privy-signer";
 import { mintAgentOnClient, type SpawnPreflightResponse } from "@/lib/agent/spawn-client";
 import { cn } from "@/lib/utils";
-import type { AgentProductRef, AgentSkill } from "canhav-agent-service";
+import type { AgentProductRef } from "canhav-agent-service";
 import {
   ENTITY_AGENT_MINTED_EVENT,
   openResearchChat,
@@ -46,11 +46,11 @@ function newNonce(): string {
 
 export function LaunchAgentButton({
   skills,
-  zerodevConfigured,
+  mintConfigured,
   entitySlug,
 }: {
   skills: SkillOption[];
-  zerodevConfigured: boolean;
+  mintConfigured: boolean;
   /**
    * Legacy: when set, the agent is launched pre-bound to this project (Entity).
    * Omitted on the Agents tab, where agents are general (no entity binding).
@@ -75,7 +75,7 @@ export function LaunchAgentButton({
   const { wallets } = useWallets();
 
   const isGeneral = !entitySlug;
-  const configured = zerodevConfigured;
+  const configured = mintConfigured;
   const busy = phase !== "idle";
 
   // Keep the core-skill selection valid as the catalog/props resolve.
@@ -149,14 +149,18 @@ export function LaunchAgentButton({
     }
 
     try {
-      // 1) Resolve the user's connected wallet (MetaMask or embedded) and build a
-      //    viem signer. This signer drives the ZeroDev Kernel account's ECDSA validator.
+      // 1) Resolve the user's connected wallet (MetaMask or embedded). It signs
+      //    the mint directly, owns the identity, and pays its own Sepolia gas.
       setPhase("wallet");
-      const signer = await buildPrivySigner(wallets);
       const activeWallet = resolveActiveWallet(wallets);
-      const signerAddress = activeWallet?.address ?? null;
+      if (!activeWallet) {
+        throw new Error(
+          "No wallet connected yet — sign in with MetaMask or wait for your embedded wallet to finish loading.",
+        );
+      }
+      const signerAddress = activeWallet.address;
 
-      // 2) Preflight: reuse check + mint config (userOp signing stays in-browser).
+      // 2) Preflight: reuse check + mint config (wallet signing stays in-browser).
       //    General agents key off a per-create nonce; legacy mints off an entity.
       setPhase("minting");
       const slotQuery = isGeneral
@@ -181,20 +185,13 @@ export function LaunchAgentButton({
         }
         return;
       }
-      if (
-        preflight.accountIndex == null ||
-        !preflight.mintConfig ||
-        !preflight.baseUrl ||
-        !preflight.skill
-      ) {
+      if (!preflight.mintConfig || !preflight.baseUrl) {
         throw new Error("Spawn preflight missing mint parameters.");
       }
 
-      // 3) Mint in the browser (the connected wallet signs userOps).
+      // 3) Mint in the browser (the connected wallet signs the transactions).
       const mintResult = await mintAgentOnClient({
-        skill: preflight.skill as AgentSkill,
-        signer,
-        accountIndex: preflight.accountIndex,
+        wallet: activeWallet,
         entitySlug: entitySlug ?? null,
         associatedProducts: (preflight.associatedProducts as AgentProductRef[]) ?? [],
         mintConfig: preflight.mintConfig,
@@ -256,7 +253,8 @@ export function LaunchAgentButton({
             Launch agent
           </h3>
           <p className="mt-1 text-sm text-ink-300">
-            Mint an on-chain ERC-8004 identity owned by your self-custodial wallet.
+            Mint an on-chain ERC-8004 identity owned by your self-custodial wallet. Your
+            wallet signs the mint and pays a small amount of Arbitrum Sepolia ETH gas.
           </p>
         </div>
         {!configured && (
@@ -268,8 +266,7 @@ export function LaunchAgentButton({
 
       {!configured ? (
         <p className="text-sm text-ink-400">
-          Deploy the registries, create a ZeroDev project, then set{" "}
-          <code className="font-mono text-ink-200">ZERODEV_RPC</code>,{" "}
+          Deploy the registries, then set{" "}
           <code className="font-mono text-ink-200">IDENTITY_REGISTRY_ADDRESS</code>,{" "}
           <code className="font-mono text-ink-200">SECURITY_REGISTRY_ADDRESS</code> and the{" "}
           <code className="font-mono text-ink-200">NEXT_PUBLIC_PRIVY_APP_ID</code> /{" "}

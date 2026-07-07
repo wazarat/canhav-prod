@@ -7,19 +7,17 @@ import {
   TCNHV_DECIMALS,
   tcnhvAssetAddress,
 } from "@/lib/agent/collab-config";
-import { hasZeroDev } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { userOwnsAgent } from "@/lib/agent/ownership";
 import { readFaucetStatus, readTcnhvBalance } from "@/lib/agent/onchain";
 import { getSession } from "@/lib/auth/session";
-import { readSecret } from "@/lib/server/env";
 
 /**
- * Credits readout + faucet-claim params for an owned agent.
+ * Credits readout + faucet state for an owned agent.
  *
- * Returns the agent smart account's tCNHV balance (the spendable settlement
- * credit), faucet cooldown state, and the params the browser needs to send a
- * gas-sponsored `faucet()` userOp from that same account. Session-gated +
+ * Returns the agent treasury wallet's tCNHV balance (the spendable settlement
+ * credit) and faucet cooldown state; the browser claims by calling `faucet()`
+ * directly from the wallet that minted the agent. Session-gated +
  * ownership-checked; degrades to `configured:false` when tCNHV is unset so the
  * UI hides the faucet entirely.
  */
@@ -46,7 +44,7 @@ export async function GET(req: Request) {
   }
 
   const profile = await getAgentProfile(agentId);
-  if (!profile || !profile.onChain || profile.accountIndex == null || !profile.agentAddress) {
+  if (!profile || !profile.onChain || !profile.agentAddress) {
     return NextResponse.json(
       { configured: false, error: "Agent must be on-chain to hold credits." },
       { status: 400 },
@@ -59,13 +57,6 @@ export async function GET(req: Request) {
     readFaucetStatus(account),
   ]);
 
-  const zerodevRpc = readSecret("ZERODEV_RPC");
-  const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
-  const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
-  const rpcUrl =
-    readSecret("ARBITRUM_SEPOLIA_RPC_URL") ?? "https://sepolia-rollup.arbitrum.io/rpc";
-  const claimable = hasZeroDev() && Boolean(zerodevRpc && identityRegistry && securityRegistry);
-
   return NextResponse.json({
     configured: true,
     account,
@@ -76,8 +67,6 @@ export async function GET(req: Request) {
     canClaim: faucet?.canClaim ?? false,
     nextClaimAt: faucet?.nextClaimAt ?? 0,
     cooldownSeconds: faucet?.cooldownSeconds ?? 0,
-    accountIndex: profile.accountIndex,
     signerAddress: profile.signerAddress ?? null,
-    mintConfig: claimable ? { zerodevRpc, rpcUrl, identityRegistry, securityRegistry } : null,
   });
 }

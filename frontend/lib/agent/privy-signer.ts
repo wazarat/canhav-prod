@@ -1,9 +1,12 @@
 "use client";
 
 import type { ConnectedWallet } from "@privy-io/react-auth";
-import type { Signer } from "@zerodev/sdk/types";
+import type { Account, Chain, Transport, WalletClient } from "viem";
 
 import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
+
+/** A viem wallet client bound to the active Privy wallet (the only signer). */
+export type Signer = WalletClient<Transport, Chain, Account>;
 
 /**
  * Resolve the wallet that signs transactions for this session.
@@ -34,7 +37,7 @@ export async function walletToSigner(wallet: ConnectedWallet): Promise<Signer> {
   try {
     await wallet.switchChain(ARBITRUM_SEPOLIA_CHAIN_ID);
   } catch {
-    /* kernel client pins the chain regardless */
+    /* wallet client pins the chain regardless */
   }
   const provider = await wallet.getEthereumProvider();
   const { createWalletClient, custom } = await import("viem");
@@ -92,7 +95,7 @@ export async function buildPrivyWalletClient(wallet: ConnectedWallet) {
 }
 
 /**
- * Sign and broadcast a plain ERC-20 transfer from the Privy wallet (no ZeroDev kernel).
+ * Sign and broadcast a plain ERC-20 transfer from the Privy wallet.
  */
 export async function sendErc20Transfer(params: {
   wallet: ConnectedWallet;
@@ -121,9 +124,9 @@ export async function sendErc20Transfer(params: {
 }
 
 /**
- * Resolve the wallet that controls a minted agent kernel. Each agent smart
- * account is salted from (mint-signer EOA, accountIndex) — paying or claiming
- * with a different connected wallet targets a different address (0 balance).
+ * Resolve the wallet that minted (and therefore controls) an agent. Paying or
+ * claiming with a different connected wallet targets a different address
+ * (0 balance), so agent-scoped signing pins the recorded mint signer.
  */
 export function resolveWalletForAgent(
   wallets: ConnectedWallet[],

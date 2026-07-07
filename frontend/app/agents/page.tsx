@@ -147,7 +147,7 @@ export default async function AgentsPage({
         }
       />
 
-      {activeTab === "agents" && <AgentsTab session={session} defaultAgentId={defaultAgentId} zerodevConfigured={status.zerodev} />}
+      {activeTab === "agents" && <AgentsTab session={session} defaultAgentId={defaultAgentId} mintConfigured={status.onchainIdentity} />}
 
       {activeTab === "credits" && session && (
         <CreditsTab userId={session.userId} defaultAgentId={defaultAgentId} />
@@ -178,11 +178,11 @@ export default async function AgentsPage({
 async function AgentsTab({
   session,
   defaultAgentId,
-  zerodevConfigured,
+  mintConfigured,
 }: {
   session: { userId: string } | null;
   defaultAgentId: string;
-  zerodevConfigured: boolean;
+  mintConfigured: boolean;
 }) {
   const [skills, { agents, agentChain }] = await Promise.all([
     getAgentSkills(),
@@ -243,7 +243,7 @@ async function AgentsTab({
         </div>
         <LaunchAgentButton
           skills={skills.map((s: PlatformSkill) => ({ id: s.id, title: s.title }))}
-          zerodevConfigured={zerodevConfigured}
+          mintConfigured={mintConfigured}
         />
       </div>
     </>

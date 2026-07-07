@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { hasPrivyWallet, zeroDevEnabled } from "@/lib/agent/config";
+import { hasPrivyWallet } from "@/lib/agent/config";
 import { getSession } from "@/lib/auth/session";
 import { getUserProfile, updateUserProfile } from "@/lib/auth/users";
 import { grantSignupCredits, startingTcnhvHuman } from "@/lib/server/credits";
 import { canMintTcnhv } from "@/lib/server/factory";
-import { readSecret } from "@/lib/server/env";
 
 /**
  * Wallet treasury bootstrap.
@@ -20,16 +19,6 @@ import { readSecret } from "@/lib/server/env";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function mintConfig() {
-  const zerodevRpc = readSecret("ZERODEV_RPC");
-  const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
-  const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
-  const rpcUrl =
-    readSecret("ARBITRUM_SEPOLIA_RPC_URL") ?? "https://sepolia-rollup.arbitrum.io/rpc";
-  if (!zerodevRpc || !identityRegistry || !securityRegistry) return null;
-  return { zerodevRpc, rpcUrl, identityRegistry, securityRegistry };
-}
-
 export async function GET() {
   const session = getSession();
   if (!session) {
@@ -37,7 +26,6 @@ export async function GET() {
   }
 
   const profile = await getUserProfile(session.userId);
-  const cfg = mintConfig();
   const granted = Boolean(profile?.tcnhvGranted);
   const needsGrant = Boolean(profile && !granted && canMintTcnhv() && hasPrivyWallet());
 
@@ -60,7 +48,6 @@ export async function GET() {
     granted,
     reason,
     startingAmount: startingTcnhvHuman(),
-    mintConfig: needsGrant && zeroDevEnabled() ? cfg : null,
   });
 }
 

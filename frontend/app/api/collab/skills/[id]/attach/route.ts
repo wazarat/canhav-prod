@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 
-import { hasZeroDev } from "@/lib/agent/config";
 import { groundUserSkillOnAgent } from "@/lib/agent/attachUserSkill";
 import { getAgentProfile, getAttachedSkillIds } from "@/lib/agent/memory";
 import { userOwnsAgent } from "@/lib/agent/ownership";
@@ -64,26 +63,19 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const attachedSkillIds = await getAttachedSkillIds(agentId);
 
   // Parameters for the optional in-browser setMetadata advertise (only when the
-  // agent is minted on-chain and the chain stack is provisioned).
-  const zerodevRpc = readSecret("ZERODEV_RPC");
+  // agent is minted on-chain and the registry is provisioned).
   const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
-  const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
   const rpcUrl =
     readSecret("ARBITRUM_SEPOLIA_RPC_URL") ?? "https://sepolia-rollup.arbitrum.io/rpc";
 
   const advertise =
-    profile.onChain &&
-    profile.accountIndex != null &&
-    hasZeroDev() &&
-    zerodevRpc &&
-    identityRegistry &&
-    securityRegistry
+    profile.onChain && identityRegistry
       ? {
           agentId,
-          accountIndex: profile.accountIndex,
           skillsCsv: attachedSkillIds.join(","),
           newSkill: { id: skillId, hash: skillHash },
-          mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
+          identityRegistry,
+          rpcUrl,
         }
       : null;
 

@@ -88,13 +88,13 @@ export interface AgentProfile {
   entitySlug: string | null;
   /** The Privy user id (DID) of the creator/owner. Null for legacy/seeded agents. */
   ownerUserId: string | null;
-  /** MetaMask / embedded EOA that controls this agent's ZeroDev kernel. */
+  /** MetaMask / embedded EOA that minted (and controls) this agent. */
   signerAddress: string | null;
   /** Owner-authored bio shown in the collaboration marketplace. Null = none. */
   description: string | null;
   /** Member products of the bound entity, denormalized for fast scoping. */
   associatedProducts: AgentProductRef[];
-  /** Deterministic salt used for this agent's ZeroDev sub-account (per project). */
+  /** Deterministic per-slot salt (legacy kernel-era field; kept for old agents). */
   accountIndex: number | null;
   agentAddress: string | null;
   agentURI: string | null;

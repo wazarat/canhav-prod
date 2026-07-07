@@ -204,20 +204,34 @@ export type ReclaimResult = { ok: true } | { ok: false; error: string };
 export async function reclaimAgentByProof(
   userId: string,
   agentId: string,
-  proof: { agentAddress: string; signerAddress?: string | null },
+  proof: { signerAddress: string },
 ): Promise<ReclaimResult> {
   const profile = await getAgentProfile(agentId);
   if (!profile) return { ok: false, error: "Agent not found." };
-  if (!profile.onChain || profile.accountIndex == null || !profile.agentAddress) {
+  if (!profile.onChain || !profile.agentAddress) {
     return { ok: false, error: "Agent must be on-chain to reclaim." };
   }
 
-  const derived = proof.agentAddress.trim();
-  if (!ADDRESS_RE.test(derived)) {
-    return { ok: false, error: "A valid derived agent address is required." };
+  const signer = proof.signerAddress.trim();
+  if (!ADDRESS_RE.test(signer)) {
+    return { ok: false, error: "A valid signer address is required." };
   }
-  if (!sameAddress(derived, profile.agentAddress)) {
-    return { ok: false, error: "Derived address does not match this agent." };
+
+  // The proof is the wallet that minted the agent: the recorded mint signer,
+  // or (Privy-direct mints) the agent address itself. Legacy kernel-era agents
+  // that never recorded a signerAddress can no longer be reclaimed — the
+  // ZeroDev kernel-address derivation that used to prove control is retired.
+  const mintSigner = profile.signerAddress ?? null;
+  const matchesSigner = mintSigner ? sameAddress(mintSigner, signer) : false;
+  const matchesAgentAddress = sameAddress(profile.agentAddress, signer);
+  if (!matchesSigner && !matchesAgentAddress) {
+    if (!mintSigner) {
+      return {
+        ok: false,
+        error: "This agent predates signer records and can no longer be reclaimed.",
+      };
+    }
+    return { ok: false, error: "Signer does not match the wallet that minted this agent." };
   }
 
   const verification = await verifyAgentOnChain(agentId, profile.agentAddress);
@@ -230,22 +244,13 @@ export async function reclaimAgentByProof(
     return { ok: false, error: "On-chain owner does not match this agent." };
   }
 
-  const signer = proof.signerAddress?.trim() ?? null;
-  if (signer) {
-    if (!ADDRESS_RE.test(signer)) {
-      return { ok: false, error: "Invalid signer address." };
-    }
-    if (profile.signerAddress && !sameAddress(profile.signerAddress, signer)) {
-      return { ok: false, error: "Signer does not match the wallet that minted this agent." };
-    }
-    await updateUserProfile(userId, { signerAddress: signer });
-    if (!profile.signerAddress) {
-      await seedAgentProfile({
-        agentId,
-        name: profile.name,
-        signerAddress: signer,
-      });
-    }
+  await updateUserProfile(userId, { signerAddress: signer });
+  if (!mintSigner) {
+    await seedAgentProfile({
+      agentId,
+      name: profile.name,
+      signerAddress: signer,
+    });
   }
 
   await setAgentOwner(agentId, userId);

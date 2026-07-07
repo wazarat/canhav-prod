@@ -20,14 +20,15 @@ export interface UserProfile {
    */
   displayName: string | null;
   /**
-   * The user's canonical ZeroDev Kernel smart-account (wallet) address, derived
-   * from their Privy embedded signer (index 0). Null until first derived. This
-   * is the wallet "treasury" that holds the user's spendable tCNHV credits.
+   * The user's canonical Privy wallet address (embedded or connected external
+   * wallet). Null until first reported by the browser. This is the wallet
+   * "treasury" that holds the user's spendable tCNHV credits.
    */
   address: string | null;
   /**
-   * The ECDSA root (MetaMask EOA or Privy embedded wallet) that drives the user's
-   * ZeroDev kernels. Stable across Privy DID changes when the same wallet reconnects.
+   * The signing EOA (MetaMask or Privy embedded wallet) that mints and controls
+   * the user's agents. Stable across Privy DID changes when the same wallet
+   * reconnects.
    */
   signerAddress: string | null;
   /**
@@ -169,11 +170,10 @@ export async function upsertUserFromPrivy(input: {
  * Update mutable profile fields (the human name, and optionally the proven
  * wallet address). Returns null if the user doesn't exist yet.
  *
- * NOTE: login is a Privy social login → self-custodial embedded wallet →
- * ZeroDev Kernel account. The session cookie is minted only after the Privy
- * access token is verified server-side (see lib/auth/privy.ts), so the cookie is
- * backed by a real, verified identity. `address` holds the canonical Kernel
- * smart account derived from the embedded signer.
+ * NOTE: login is a Privy social login → self-custodial embedded wallet. The
+ * session cookie is minted only after the Privy access token is verified
+ * server-side (see lib/auth/privy.ts), so the cookie is backed by a real,
+ * verified identity. `address` holds the canonical Privy wallet (the treasury).
  */
 export async function updateUserProfile(
   userId: string,

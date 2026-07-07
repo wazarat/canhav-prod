@@ -7,9 +7,7 @@ import {
   formatAmount,
   parseAmountToBaseUnits,
 } from "@/lib/agent/collab-config";
-import { zeroDevEnabled } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
-import { readAgentWallet } from "@/lib/agent/onchain";
 import { resolveAgentOffer } from "@/lib/agent/agentOffer";
 import { getUserProfile } from "@/lib/auth/users";
 import { resolveSellerPayTo } from "@/lib/server/collabPrepare";
@@ -111,8 +109,10 @@ export async function POST(req: Request) {
   }
 
   const payment = decoded.txHash;
-  let expectedFrom = body.fromAgentId ? await readAgentWallet(body.fromAgentId.trim()) : null;
-  if (!zeroDevEnabled() && body.fromAgentId) {
+  // The settlement is paid from the buyer owner's Privy treasury wallet, so the
+  // expected payer is the owner's wallet (falling back to the header's `from`).
+  let expectedFrom: string | null = null;
+  if (body.fromAgentId) {
     const buyerAgent = await getAgentProfile(body.fromAgentId.trim());
     if (buyerAgent?.ownerUserId) {
       const owner = await getUserProfile(buyerAgent.ownerUserId);

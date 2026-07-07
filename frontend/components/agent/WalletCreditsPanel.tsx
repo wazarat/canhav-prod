@@ -16,8 +16,7 @@ import {
 } from "lucide-react";
 
 import { transferCredits, claimCredits } from "@/lib/agent/collab-client";
-import { buildPrivySigner, resolveActiveWallet } from "@/lib/agent/privy-signer";
-import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
+import { resolveActiveWallet, resolveWalletForAgent } from "@/lib/agent/privy-signer";
 
 interface WalletCredits {
   configured: boolean;
@@ -27,7 +26,6 @@ interface WalletCredits {
   decimals?: number;
   balance?: string;
   granted?: boolean;
-  mintConfig?: SpawnMintConfig | null;
   rpcUrl?: string | null;
   error?: string;
 }
@@ -44,7 +42,6 @@ interface BootstrapStatus {
   granted: boolean;
   reason?: BootstrapReason;
   startingAmount: string;
-  mintConfig: SpawnMintConfig | null;
 }
 
 /** Map a bootstrap GET reason to an actionable user-facing message. */
@@ -65,9 +62,9 @@ interface AgentCreditsStatus {
   configured: boolean;
   canClaim: boolean;
   nextClaimAt: number;
-  accountIndex: number;
+  account?: string;
   token: string;
-  mintConfig: SpawnMintConfig | null;
+  signerAddress?: string | null;
   error?: string;
 }
 
@@ -80,8 +77,6 @@ interface TransferPreflight {
   amount?: string;
   humanAmount?: string;
   rpcUrl?: string;
-  accountIndex?: number;
-  mintConfig?: SpawnMintConfig;
   error?: string;
 }
 
@@ -161,8 +156,8 @@ function CreditsNotConfigured() {
  * Wallet-as-treasury panel: the user's spendable tCNHV credit balance plus the
  * two ways to move it — "Send credits" to any wallet / agent / user, and "Fund
  * this agent" to top up one of their own agents (the account they pay sellers
- * from). All movement is a gas-sponsored, client-signed ERC-20 transfer from the
- * from the user's Privy wallet. All movement is a client-signed ERC-20 transfer.
+ * from). All movement is a client-signed ERC-20 transfer from the user's Privy
+ * wallet, which pays its own Sepolia gas.
  */
 export function WalletCreditsPanel({
   buyerAgents = [],
@@ -358,14 +353,19 @@ export function WalletCreditsPanel({
         ((await fetch(`/api/agent/credits?agentId=${encodeURIComponent(fundAgentId)}`).then((r) =>
           r.json(),
         )) as AgentCreditsStatus);
-      if (!credits?.configured || !credits.canClaim || !credits.mintConfig) {
+      if (!credits?.configured || !credits.canClaim || !credits.token) {
         throw new Error("Faucet is on cooldown or this agent cannot claim yet.");
       }
-      const signer = await buildPrivySigner(wallets);
+      // Claim from the wallet that minted the agent so the credits land in the
+      // treasury that pays in settlement.
+      const wallet = resolveWalletForAgent(wallets, credits.signerAddress);
+      if (!wallet) {
+        throw new Error(
+          "Connect the wallet that minted this agent (or wait for your embedded wallet to load), then try again.",
+        );
+      }
       await claimCredits({
-        signer,
-        accountIndex: credits.accountIndex,
-        mintConfig: credits.mintConfig,
+        wallet,
         token: credits.token as `0x${string}`,
       });
       setNotice("Claimed 100 tCNHV from the on-chain faucet to your agent.");
@@ -411,9 +411,6 @@ export function WalletCreditsPanel({
 
       const { txHash } = await transferCredits({
         wallet,
-        signer: pf.mintConfig ? await buildPrivySigner(wallets) : undefined,
-        accountIndex: pf.accountIndex,
-        mintConfig: pf.mintConfig,
         token: pf.token,
         payTo: pf.payTo,
         amount: pf.amount,
@@ -512,7 +509,7 @@ export function WalletCreditsPanel({
                 busy ||
                 minting ||
                 !agentCredits?.canClaim ||
-                !agentCredits?.mintConfig
+                !agentCredits?.token
               }
               className="inline-flex items-center gap-1.5 rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-2 text-xs font-medium text-electric-300 transition-colors hover:bg-electric-500/20 disabled:opacity-40"
             >
@@ -528,14 +525,12 @@ export function WalletCreditsPanel({
             fundAgentId &&
             agentCredits &&
             !claiming &&
-            (!agentCredits.canClaim || !agentCredits.mintConfig) && (
+            (!agentCredits.canClaim || !agentCredits.token) && (
               <span className="text-[11px] text-ink-500">
                 {!agentCredits.configured
                   ? (agentCredits.error ??
                     "Mint this agent on-chain to enable the faucet.")
-                  : !agentCredits.mintConfig
-                    ? "On-chain identity isn't configured — set ZERODEV_RPC and registry addresses on Vercel."
-                    : "Faucet is on cooldown — try again later."}
+                  : "Faucet is on cooldown — try again later."}
               </span>
             )}
           {!bootstrap?.needsGrant && bootstrap?.granted && (

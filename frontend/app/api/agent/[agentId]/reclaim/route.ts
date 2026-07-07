@@ -1,31 +1,21 @@
 import { NextResponse } from "next/server";
 
-import { hasZeroDev } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { reclaimAgentByProof, userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
-import { readSecret } from "@/lib/server/env";
 
 /**
  * Re-link a minted agent to the signed-in user when Privy DID changed but the
- * same wallet still controls the agent kernel.
+ * same wallet still controls the agent.
  *
- * GET  -> params the browser needs to derive the agent kernel and prove control
- * POST -> verify derived address + optional signer, then migrate ownerUserId
+ * GET  -> reclaim eligibility (the browser just needs the connected wallet)
+ * POST -> verify the connected wallet against the recorded mint signer, then
+ *         migrate ownerUserId. Legacy kernel-era agents without a recorded
+ *         signerAddress are no longer reclaimable (kernel derivation retired).
  */
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-function mintConfig() {
-  const zerodevRpc = readSecret("ZERODEV_RPC");
-  const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
-  const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
-  const rpcUrl =
-    readSecret("ARBITRUM_SEPOLIA_RPC_URL") ?? "https://sepolia-rollup.arbitrum.io/rpc";
-  if (!zerodevRpc || !identityRegistry || !securityRegistry) return null;
-  return { zerodevRpc, rpcUrl, identityRegistry, securityRegistry };
-}
 
 export async function GET(_req: Request, { params }: { params: { agentId: string } }) {
   const session = getSession();
@@ -38,7 +28,7 @@ export async function GET(_req: Request, { params }: { params: { agentId: string
   if (!profile) {
     return NextResponse.json({ ok: false, error: "Agent not found." }, { status: 404 });
   }
-  if (!profile.onChain || profile.accountIndex == null || !profile.agentAddress) {
+  if (!profile.onChain || !profile.agentAddress) {
     return NextResponse.json(
       { ok: false, error: "Agent must be on-chain to reclaim." },
       { status: 400 },
@@ -51,15 +41,16 @@ export async function GET(_req: Request, { params }: { params: { agentId: string
       alreadyOwned: true,
       agentId,
       agentAddress: profile.agentAddress,
-      accountIndex: profile.accountIndex,
     });
   }
 
-  const cfg = mintConfig();
-  if (!hasZeroDev() || !cfg) {
+  if (!profile.signerAddress) {
     return NextResponse.json(
-      { ok: false, error: "On-chain identity not configured." },
-      { status: 503 },
+      {
+        ok: false,
+        error: "This agent predates signer records and can no longer be reclaimed.",
+      },
+      { status: 400 },
     );
   }
 
@@ -68,8 +59,7 @@ export async function GET(_req: Request, { params }: { params: { agentId: string
     alreadyOwned: false,
     agentId,
     agentAddress: profile.agentAddress,
-    accountIndex: profile.accountIndex,
-    mintConfig: cfg,
+    signerAddress: profile.signerAddress,
   });
 }
 
@@ -81,25 +71,20 @@ export async function POST(req: Request, { params }: { params: { agentId: string
 
   const agentId = decodeURIComponent(params.agentId).trim();
 
-  let body: { agentAddress?: unknown; signerAddress?: unknown } = {};
+  let body: { signerAddress?: unknown } = {};
   try {
     body = (await req.json()) as typeof body;
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const agentAddress = typeof body.agentAddress === "string" ? body.agentAddress.trim() : "";
-  if (!agentAddress) {
-    return NextResponse.json({ ok: false, error: "agentAddress is required." }, { status: 400 });
+  const signerAddress =
+    typeof body.signerAddress === "string" ? body.signerAddress.trim() : "";
+  if (!signerAddress) {
+    return NextResponse.json({ ok: false, error: "signerAddress is required." }, { status: 400 });
   }
 
-  const signerAddress =
-    typeof body.signerAddress === "string" ? body.signerAddress.trim() : undefined;
-
-  const result = await reclaimAgentByProof(session.userId, agentId, {
-    agentAddress,
-    signerAddress,
-  });
+  const result = await reclaimAgentByProof(session.userId, agentId, { signerAddress });
 
   if (!result.ok) {
     return NextResponse.json({ ok: false, error: result.error }, { status: 403 });

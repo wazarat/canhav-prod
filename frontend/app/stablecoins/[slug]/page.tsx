@@ -20,7 +20,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { ChartCardSkeleton, StatGridSkeleton } from "@/components/ui/Skeletons";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { agentConfigStatus } from "@/lib/agent/config";
-import { getApprovedStablecoinBySlug, getApprovedStablecoins, getNetworkBySlug } from "@/lib/data";
+import { getApprovedStablecoinBySlug, getNetworkBySlug } from "@/lib/data";
 import { deriveSecurityStatus } from "@/lib/security";
 
 interface PageProps {
@@ -29,9 +29,10 @@ interface PageProps {
 
 export const revalidate = 300;
 
-// Pre-render all profiles present in the store.
 export async function generateStaticParams() {
-  return (await getApprovedStablecoins()).map((p) => ({ slug: p.slug }));
+  // Generated on demand (dynamicParams default) and cached via ISR, like
+  // /receipts/[slug]. Pre-rendering every store item inflated build time.
+  return [];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

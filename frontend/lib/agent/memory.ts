@@ -150,6 +150,10 @@ export const MAX_TRADE_PROPOSALS = 50;
 
 export const MAX_VERDICTS = 50;
 
+export const MAX_RUNS = 50;
+
+export const MAX_MEMORY_FACTS = 200;
+
 const combinedVerdictKey = (asset: string) => `combined:verdict:${asset}`;
 
 function nowIso(): string {
@@ -496,10 +500,12 @@ export async function getAgentByAddress(address: string): Promise<AgentProfile |
 
 export async function appendRun(agentId: string, run: AgentRun): Promise<void> {
   if (hasUpstash()) {
-    await getRedisClient().lpush(key.runs(agentId), JSON.stringify(run));
+    const redis = getRedisClient();
+    await redis.lpush(key.runs(agentId), JSON.stringify(run));
+    await redis.ltrim(key.runs(agentId), 0, MAX_RUNS - 1);
   } else {
     const store = readFile();
-    store.runs[agentId] = [run, ...(store.runs[agentId] ?? [])];
+    store.runs[agentId] = [run, ...(store.runs[agentId] ?? [])].slice(0, MAX_RUNS);
     writeFile(store);
   }
 }
@@ -533,10 +539,13 @@ export async function appendMemory(
 
   const entry: AgentMemoryFact = { id: randomId("fact"), ts: nowIso(), text, source };
   if (hasUpstash()) {
-    await getRedisClient().rpush(key.memory(agentId), JSON.stringify(entry));
+    // Memory is oldest-first (rpush); trim from the head so the newest facts win.
+    const redis = getRedisClient();
+    await redis.rpush(key.memory(agentId), JSON.stringify(entry));
+    await redis.ltrim(key.memory(agentId), -MAX_MEMORY_FACTS, -1);
   } else {
     const store = readFile();
-    store.memory[agentId] = [...(store.memory[agentId] ?? []), entry];
+    store.memory[agentId] = [...(store.memory[agentId] ?? []), entry].slice(-MAX_MEMORY_FACTS);
     writeFile(store);
   }
   return entry;
@@ -544,10 +553,15 @@ export async function appendMemory(
 
 export async function getMemory(agentId: string): Promise<AgentMemoryFact[]> {
   if (hasUpstash()) {
-    const raw = (await getRedisClient().lrange(key.memory(agentId), 0, -1)) as unknown[];
+    // Bounded read: also caps legacy lists that grew before ltrim was added.
+    const raw = (await getRedisClient().lrange(
+      key.memory(agentId),
+      -MAX_MEMORY_FACTS,
+      -1,
+    )) as unknown[];
     return raw.map((v) => coerce<AgentMemoryFact>(v)).filter((f): f is AgentMemoryFact => Boolean(f));
   }
-  return readFile().memory[agentId] ?? [];
+  return (readFile().memory[agentId] ?? []).slice(-MAX_MEMORY_FACTS);
 }
 
 /* -------------------------------------------------------------------------- */

@@ -1,8 +1,9 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { readSecret } from "@/lib/server/env";
 import { hasUpstash, STORE_KEY, getRedisClient } from "@/lib/server/redis";
+import { STORE_CACHE_TAG } from "@/lib/server/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -83,6 +84,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     legacyRemoved += await redis.hdel(STORE_KEY, field);
   }
 
+  revalidateTag(STORE_CACHE_TAG);
   revalidatePath("/");
   revalidatePath("/networks");
   revalidatePath("/stablecoins");

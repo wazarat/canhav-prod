@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import { fetchReserveRatesForSlug, hasAave, isAaveReserveSlug, aTokenAddressForSlug } from "@/lib/server/aave";
 import { fetchTotalSupply, fetchTotalValueLocked, hasAlchemy, probeErc20Standard } from "@/lib/server/alchemy";
@@ -49,7 +49,7 @@ import {
   morphoMetricsToTagOverlay,
 } from "@/lib/server/morpho";
 import { hasUpstash, putItem, readAllItemsFromRedis } from "@/lib/server/redis";
-import { createLocalStoreWriter, loadLocalStoreItems } from "@/lib/server/store";
+import { createLocalStoreWriter, loadLocalStoreItems, STORE_CACHE_TAG } from "@/lib/server/store";
 import { fetchPendleLiveMetrics, pendleMetricsToTagOverlay } from "@/lib/server/pendle";
 import {
   fetchHyperliquidLiveMetrics,
@@ -1265,6 +1265,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const r = await runProtocolClientOverlays(items, persist);
     const r2 = await runMacroAndGovernanceOverlays(items, persist);
     if (localWriter) localWriter.flush();
+    revalidateTag(STORE_CACHE_TAG);
     revalidatePath("/networks/[slug]", "page");
     return NextResponse.json({
       ok: true,
@@ -1281,6 +1282,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   if (url.searchParams.get("only") === "aave") {
     const r = await runAaveOnchainOverlay(items, persist);
     if (localWriter) localWriter.flush();
+    revalidateTag(STORE_CACHE_TAG);
     revalidatePath("/networks/[slug]", "page");
     revalidatePath("/tokens/[slug]", "page");
     revalidatePath("/stablecoins/[slug]", "page");
@@ -2200,6 +2202,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   if (localWriter) localWriter.flush();
 
   // Refresh public surfaces + each touched detail page.
+  revalidateTag(STORE_CACHE_TAG);
   revalidatePath("/");
   revalidatePath("/networks");
   revalidatePath("/stablecoins");

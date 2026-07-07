@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
 
 import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
@@ -65,17 +66,32 @@ function readItemsFromDisk(): Record<string, unknown>[] {
   }
 }
 
+/** Invalidate with `revalidateTag(STORE_CACHE_TAG)` after any store write. */
+export const STORE_CACHE_TAG = "canhav-store";
+
+// Cross-request cache of the raw items array. TTL matches the pages'
+// `revalidate = 300`, so freshness is unchanged; force-dynamic routes drop from
+// one HGETALL per request to at most one per 5 minutes. The serialized entry is
+// ~1MB today — Vercel caps unstable_cache entries at 2MB; if the store grows
+// near that, split the entry per Category instead. On overflow Next logs a
+// cache-set failure and serves uncached (degraded, not broken).
+const readItemsShared = unstable_cache(
+  async (): Promise<Record<string, unknown>[]> => {
+    if (hasUpstash()) {
+      const fromRedis = await readAllItemsFromRedis();
+      // Upstash creds are often set locally before the hash is seeded. Fall back to
+      // the on-disk store so dev isn't blank after demo overlays were removed.
+      if (fromRedis.length > 0) return fromRedis;
+    }
+    return readItemsFromDisk();
+  },
+  ["canhav-store-items"],
+  { revalidate: 300, tags: [STORE_CACHE_TAG] },
+);
+
 // react `cache()`: one store read per render pass, no matter how many
 // accessors (homepage fires six) ask for it.
-const readItems = cache(async (): Promise<Record<string, unknown>[]> => {
-  if (hasUpstash()) {
-    const fromRedis = await readAllItemsFromRedis();
-    // Upstash creds are often set locally before the hash is seeded. Fall back to
-    // the on-disk store so dev isn't blank after demo overlays were removed.
-    if (fromRedis.length > 0) return fromRedis;
-  }
-  return readItemsFromDisk();
-});
+const readItems = cache(() => readItemsShared());
 
 /**
  * Offline-dev fallback writer: flip a protocol's status directly in

@@ -4,6 +4,7 @@ import { openai } from "@ai-sdk/openai";
 import type { EmbeddingModel, LanguageModel } from "ai";
 
 import { readSecret } from "@/lib/server/env";
+import { securityRegistryConfigured } from "@/lib/server/securityGate";
 import { canMintTcnhv, deployerKeyDiagnostics } from "@/lib/server/factory";
 
 import { hasTcnhv } from "./collab-config";
@@ -129,17 +130,39 @@ export function hasPrivy(): boolean {
 }
 
 /**
- * Whether the on-chain identity stack is provisioned: a ZeroDev project RPC,
- * both deployed registry addresses, and Privy social login (the smart-account
- * signer that mints + owns the ERC-8004 identity).
+ * Whether ZeroDev env vars are present (RPC + registries + Privy). Does not
+ * imply the ZeroDev path is active — see {@link zeroDevEnabled}.
  */
-export function hasZeroDev(): boolean {
+export function hasZeroDevConfigured(): boolean {
   return Boolean(
     readSecret("ZERODEV_RPC") &&
       readSecret("IDENTITY_REGISTRY_ADDRESS") &&
       readSecret("SECURITY_REGISTRY_ADDRESS") &&
       hasPrivy(),
   );
+}
+
+/**
+ * Whether the legacy ZeroDev kernel path is enabled. Default off; set
+ * `USE_ZERODEV=true` to re-enable agent mint + gas-sponsored userOps.
+ */
+export function zeroDevEnabled(): boolean {
+  return readSecret("USE_ZERODEV") === "true" && hasZeroDevConfigured();
+}
+
+/**
+ * Whether agent spawn / on-chain identity uses ZeroDev (alias for {@link zeroDevEnabled}).
+ */
+export function hasZeroDev(): boolean {
+  return zeroDevEnabled();
+}
+
+/**
+ * Whether the Privy-direct wallet path is live: social login + tCNHV token.
+ * Used for treasury bootstrap, balance readout, and plain ERC-20 transfers.
+ */
+export function hasPrivyWallet(): boolean {
+  return hasPrivy() && hasTcnhv();
 }
 
 /** EntryPoint v0.7 (used to shape the paymaster probe userOp). */
@@ -307,6 +330,8 @@ export interface AgentConfigStatus {
   factoryDeployerKeySet: boolean;
   /** Whether the key passes format validation (0x + 64 hex chars). */
   factoryDeployerKeyValid: boolean;
+  /** SECURITY_REGISTRY_ADDRESS explicitly set (else Sepolia singleton fallback). */
+  securityRegistryExplicit: boolean;
 }
 
 /** Snapshot of which agent-layer capabilities are live in this environment. */
@@ -318,7 +343,7 @@ export function agentConfigStatus(): AgentConfigStatus {
     provider: agentProvider(),
     embeddings: hasEmbeddings(),
     upstash: hasUpstash(),
-    zerodev: hasZeroDev(),
+    zerodev: zeroDevEnabled(),
     privy: hasPrivy(),
     zerodevProject: maskedZeroDevProject(),
     zerodevChain: parseZeroDevRpc().chainId,
@@ -328,5 +353,6 @@ export function agentConfigStatus(): AgentConfigStatus {
     canMintTcnhv: canMintTcnhv(),
     factoryDeployerKeySet: key.set,
     factoryDeployerKeyValid: key.valid,
+    securityRegistryExplicit: securityRegistryConfigured(),
   };
 }

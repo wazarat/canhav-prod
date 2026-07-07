@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { hasZeroDev } from "@/lib/agent/config";
+import { hasPrivyWallet, zeroDevEnabled } from "@/lib/agent/config";
 import { getSession } from "@/lib/auth/session";
 import { getUserProfile, updateUserProfile } from "@/lib/auth/users";
 import { grantSignupCredits, startingTcnhvHuman } from "@/lib/server/credits";
@@ -10,13 +10,11 @@ import { readSecret } from "@/lib/server/env";
 /**
  * Wallet treasury bootstrap.
  *
- * GET  -> whether the signed-in user still needs the one-time tCNHV grant, plus
- *         the ZeroDev mint config the browser needs to derive its canonical
- *         kernel (index 0) wallet address.
- * POST -> grants the starting credits to that wallet address (idempotent).
+ * GET  -> whether the signed-in user still needs the one-time tCNHV grant.
+ * POST -> grants the starting credits to the user's Privy wallet address (idempotent).
  *
- * The address is derived in the browser (the embedded signer lives client-side),
- * then posted here so the owner-keyed mint can run server-side.
+ * The address comes from the browser (Privy embedded wallet); the owner-keyed
+ * mint runs server-side.
  */
 
 export const runtime = "nodejs";
@@ -41,7 +39,7 @@ export async function GET() {
   const profile = await getUserProfile(session.userId);
   const cfg = mintConfig();
   const granted = Boolean(profile?.tcnhvGranted);
-  const needsGrant = Boolean(profile && !granted && canMintTcnhv() && hasZeroDev() && cfg);
+  const needsGrant = Boolean(profile && !granted && canMintTcnhv() && hasPrivyWallet());
 
   // Explain *why* a grant isn't offered so the UI can show an actionable
   // message instead of a generic "not available in this environment".
@@ -62,7 +60,7 @@ export async function GET() {
     granted,
     reason,
     startingAmount: startingTcnhvHuman(),
-    mintConfig: needsGrant ? cfg : null,
+    mintConfig: needsGrant && zeroDevEnabled() ? cfg : null,
   });
 }
 

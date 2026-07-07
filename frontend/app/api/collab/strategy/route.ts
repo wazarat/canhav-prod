@@ -7,9 +7,11 @@ import {
   formatAmount,
   parseAmountToBaseUnits,
 } from "@/lib/agent/collab-config";
+import { zeroDevEnabled } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { readAgentWallet } from "@/lib/agent/onchain";
 import { resolveAgentOffer } from "@/lib/agent/agentOffer";
+import { getUserProfile } from "@/lib/auth/users";
 import { resolveSellerPayTo } from "@/lib/server/collabPrepare";
 import { buildStrategyPacket } from "@/lib/agent/strategyPacket";
 import { generateTailoredBrief } from "@/lib/agent/tailoredBrief";
@@ -109,7 +111,16 @@ export async function POST(req: Request) {
   }
 
   const payment = decoded.txHash;
-  const expectedFrom = body.fromAgentId ? await readAgentWallet(body.fromAgentId.trim()) : null;
+  let expectedFrom = body.fromAgentId ? await readAgentWallet(body.fromAgentId.trim()) : null;
+  if (!zeroDevEnabled() && body.fromAgentId) {
+    const buyerAgent = await getAgentProfile(body.fromAgentId.trim());
+    if (buyerAgent?.ownerUserId) {
+      const owner = await getUserProfile(buyerAgent.ownerUserId);
+      expectedFrom = owner?.address ?? decoded.from ?? null;
+    } else {
+      expectedFrom = decoded.from ?? null;
+    }
+  }
 
   const claimed = await tryConsumePaymentRef(
     payment,

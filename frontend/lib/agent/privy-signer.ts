@@ -6,11 +6,11 @@ import type { Signer } from "@zerodev/sdk/types";
 import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
 
 /**
- * Resolve the wallet that signs ZeroDev userOps for this session.
+ * Resolve the wallet that signs transactions for this session.
  *
  * External wallets (MetaMask, etc.) take precedence over the Privy embedded
- * wallet so wallet-login users control their treasury + agent kernels from the
- * extension they connected with. Social-login users fall back to embedded.
+ * wallet so wallet-login users control their treasury from the extension they
+ * connected with. Social-login users fall back to embedded.
  */
 export function resolveActiveWallet(wallets: ConnectedWallet[]): ConnectedWallet | null {
   const external = wallets.find((w) => w.walletClientType !== "privy");
@@ -55,6 +55,69 @@ export async function buildPrivySigner(wallets: ConnectedWallet[]): Promise<Sign
     );
   }
   return walletToSigner(wallet);
+}
+
+const erc20TransferAbi = [
+  {
+    type: "function",
+    name: "transfer",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "to", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "bool" }],
+  },
+] as const;
+
+const DEFAULT_RPC = "https://sepolia-rollup.arbitrum.io/rpc";
+
+/**
+ * Build a viem wallet client from a Privy-connected wallet, pinned to Arbitrum Sepolia.
+ */
+export async function buildPrivyWalletClient(wallet: ConnectedWallet) {
+  try {
+    await wallet.switchChain(ARBITRUM_SEPOLIA_CHAIN_ID);
+  } catch {
+    /* wallet client pins the chain regardless */
+  }
+  const provider = await wallet.getEthereumProvider();
+  const { createWalletClient, custom } = await import("viem");
+  const { arbitrumSepolia } = await import("viem/chains");
+  return createWalletClient({
+    account: wallet.address as `0x${string}`,
+    chain: arbitrumSepolia,
+    transport: custom(provider),
+  });
+}
+
+/**
+ * Sign and broadcast a plain ERC-20 transfer from the Privy wallet (no ZeroDev kernel).
+ */
+export async function sendErc20Transfer(params: {
+  wallet: ConnectedWallet;
+  token: `0x${string}`;
+  to: `0x${string}`;
+  amount: bigint;
+  rpcUrl?: string;
+}): Promise<{ txHash: `0x${string}` }> {
+  const client = await buildPrivyWalletClient(params.wallet);
+  const { createPublicClient, http } = await import("viem");
+  const { arbitrumSepolia } = await import("viem/chains");
+
+  const hash = await client.writeContract({
+    abi: erc20TransferAbi,
+    address: params.token,
+    functionName: "transfer",
+    args: [params.to, params.amount],
+  });
+
+  const publicClient = createPublicClient({
+    chain: arbitrumSepolia,
+    transport: http(params.rpcUrl ?? DEFAULT_RPC),
+  });
+  const receipt = await publicClient.waitForTransactionReceipt({ hash });
+  return { txHash: receipt.transactionHash };
 }
 
 /**

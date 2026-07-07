@@ -5,8 +5,9 @@ import { createHash } from "node:crypto";
 /**
  * Derive a deterministic ZeroDev sub-account salt for a (wallet, slot) pair.
  *
- * Each agent a wallet creates gets its OWN smart-account address. The `slot` is
- * the creation key — a per-agent creation nonce for general agents (created on
+ * Each agent a wallet creates gets its OWN smart-account address when
+ * USE_ZERODEV=true. The user's treasury wallet is the Privy EOA directly when
+ * ZeroDev is off. The `slot` is the creation key — a per-agent creation nonce for general agents (created on
  * the Agents tab) or a legacy entity slug for older entity-bound mints. The
  * index salts the counterfactual address, so:
  *   - different slots under the same wallet -> different addresses, and

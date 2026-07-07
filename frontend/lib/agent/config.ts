@@ -4,6 +4,7 @@ import { openai } from "@ai-sdk/openai";
 import type { EmbeddingModel, LanguageModel } from "ai";
 
 import { readSecret } from "@/lib/server/env";
+import { securityRegistryConfigured } from "@/lib/server/securityGate";
 import { canMintTcnhv, deployerKeyDiagnostics } from "@/lib/server/factory";
 
 import { hasTcnhv } from "./collab-config";
@@ -329,6 +330,8 @@ export interface AgentConfigStatus {
   factoryDeployerKeySet: boolean;
   /** Whether the key passes format validation (0x + 64 hex chars). */
   factoryDeployerKeyValid: boolean;
+  /** SECURITY_REGISTRY_ADDRESS explicitly set (else Sepolia singleton fallback). */
+  securityRegistryExplicit: boolean;
 }
 
 /** Snapshot of which agent-layer capabilities are live in this environment. */
@@ -350,5 +353,6 @@ export function agentConfigStatus(): AgentConfigStatus {
     canMintTcnhv: canMintTcnhv(),
     factoryDeployerKeySet: key.set,
     factoryDeployerKeyValid: key.valid,
+    securityRegistryExplicit: securityRegistryConfigured(),
   };
 }

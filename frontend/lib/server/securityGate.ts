@@ -17,10 +17,20 @@ const securityRegistryAbi = [
   },
 ] as const;
 
-function registryAddress(): Address | null {
+/** Deployed SecurityRegistry singleton on Arbitrum Sepolia (AllowlistGmx target). */
+export const ARBITRUM_SEPOLIA_SECURITY_REGISTRY =
+  "0x0Fa1b8bBd33410e316B9d512bAd59DFCaf12097D" as const;
+
+function registryAddress(): Address {
   const raw = readSecret("SECURITY_REGISTRY_ADDRESS");
-  if (!raw || !/^0x[0-9a-fA-F]{40}$/.test(raw)) return null;
-  return raw as Address;
+  if (raw && /^0x[0-9a-fA-F]{40}$/.test(raw)) return raw as Address;
+  return ARBITRUM_SEPOLIA_SECURITY_REGISTRY;
+}
+
+/** Whether SECURITY_REGISTRY_ADDRESS is explicitly set in env (vs Sepolia fallback). */
+export function securityRegistryConfigured(): boolean {
+  const raw = readSecret("SECURITY_REGISTRY_ADDRESS");
+  return Boolean(raw && /^0x[0-9a-fA-F]{40}$/.test(raw));
 }
 
 function publicClient() {
@@ -35,7 +45,6 @@ function publicClient() {
 /** Read the on-chain SecurityRegistry allowlist for a target. */
 export async function isTargetAllowed(target: Address): Promise<boolean> {
   const registry = registryAddress();
-  if (!registry) return false;
   return publicClient().readContract({
     address: registry,
     abi: securityRegistryAbi,

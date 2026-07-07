@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { cache } from "react";
 
 import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
 import { CANONICAL_PERP_DEX_SLUGS } from "@/data/derivatives-seed";
@@ -64,7 +65,9 @@ function readItemsFromDisk(): Record<string, unknown>[] {
   }
 }
 
-async function readItems(): Promise<Record<string, unknown>[]> {
+// react `cache()`: one store read per render pass, no matter how many
+// accessors (homepage fires six) ask for it.
+const readItems = cache(async (): Promise<Record<string, unknown>[]> => {
   if (hasUpstash()) {
     const fromRedis = await readAllItemsFromRedis();
     // Upstash creds are often set locally before the hash is seeded. Fall back to
@@ -72,7 +75,7 @@ async function readItems(): Promise<Record<string, unknown>[]> {
     if (fromRedis.length > 0) return fromRedis;
   }
   return readItemsFromDisk();
-}
+});
 
 /**
  * Offline-dev fallback writer: flip a protocol's status directly in
@@ -447,7 +450,9 @@ export interface LiveStore {
   networks: NetworkProfile[];
 }
 
-export async function readLiveStore(): Promise<LiveStore> {
+// react `cache()`: parse/map the 350+ raw items once per render pass instead of
+// once per accessor call.
+export const readLiveStore = cache(async (): Promise<LiveStore> => {
   const stablecoins: StablecoinProfile[] = [];
   const rwas: RwaProfile[] = [];
   const tokens: TokenProfile[] = [];
@@ -697,7 +702,7 @@ export async function readLiveStore(): Promise<LiveStore> {
   receipts.sort((a, b) => a.name.localeCompare(b.name));
   networks.sort((a, b) => a.name.localeCompare(b.name));
   return { stablecoins, rwas, tokens, receipts, networks };
-}
+});
 
 function mapSectorAggregateItem(item: Record<string, unknown>): SectorAggregate {
   return {
@@ -726,10 +731,10 @@ function mapSectorAggregateItem(item: Record<string, unknown>): SectorAggregate 
 }
 
 /** Read sector-level aggregate snapshots written by the cron sector pass. */
-export async function getSectorAggregates(): Promise<SectorAggregate[]> {
+export const getSectorAggregates = cache(async (): Promise<SectorAggregate[]> => {
   const items = await readItems();
   return items
     .filter((it) => String(it.Category ?? "") === "SectorAggregate")
     .map((it) => mapSectorAggregateItem(it as Record<string, unknown>))
     .sort((a, b) => a.sector.localeCompare(b.sector));
-}
+});

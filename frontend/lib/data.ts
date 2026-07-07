@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { coinIdForNetworkSlug, resolveCoinsBatch, type TokenResolution } from "@/lib/server/coingecko";
 import { fetchLlamaProtocolMeta, llamaProtocolForSlug } from "@/lib/server/defillama";
 import { enrichNetworksWithCompetitors } from "@/lib/networks/competitors";
@@ -199,13 +201,15 @@ export async function getAllNetworks(): Promise<NetworkProfile[]> {
   return [...networks].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-async function loadEnrichedNetworks(): Promise<NetworkProfile[]> {
+// react `cache()`: `generateMetadata` and the page body both enrich networks on
+// a slug render; dedup so the full enrichment pass runs once per request.
+const loadEnrichedNetworks = cache(async (): Promise<NetworkProfile[]> => {
   const store = await readLiveStore();
   const networks = [...store.networks].sort((a, b) => a.name.localeCompare(b.name));
   const withTvl = enrichNetworksWithTvl(networks, store);
   const withMarket = await enrichNetworksWithMarketMetrics(withTvl, store);
   return enrichNetworksWithCompetitors(withMarket);
-}
+});
 
 export async function getApprovedNetworks(): Promise<NetworkProfile[]> {
   return loadEnrichedNetworks();

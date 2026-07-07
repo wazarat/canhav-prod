@@ -55,17 +55,6 @@
     "tag": "Lending"
   },
   {
-    "slug": "dlp",
-    "symbol": "dLP",
-    "name": "dLP",
-    "coinType": "LockedEscrow",
-    "entitySlug": "radiant",
-    "geckoId": null,
-    "isStablecoin": false,
-    "sector": "Credit",
-    "tag": "Lending"
-  },
-  {
     "slug": "spark-no-token",
     "symbol": "\u2014",
     "name": "Spark (no native token)",
@@ -187,34 +176,12 @@
     "tag": "Fixed Income"
   },
   {
-    "slug": "sense-token",
-    "symbol": "SENSE",
-    "name": "SENSE",
-    "coinType": "Governance",
-    "entitySlug": "sense",
-    "geckoId": null,
-    "isStablecoin": false,
-    "sector": "Credit",
-    "tag": "Fixed Income"
-  },
-  {
     "slug": "apw",
     "symbol": "APW",
     "name": "APW",
     "coinType": "Governance",
     "entitySlug": "spectra",
     "geckoId": "apwine",
-    "isStablecoin": false,
-    "sector": "Credit",
-    "tag": "Fixed Income"
-  },
-  {
-    "slug": "tprotocol-tru",
-    "symbol": "TProtocol/TRU",
-    "name": "TProtocol/TRU",
-    "coinType": "Governance",
-    "entitySlug": "term-finance",
-    "geckoId": null,
     "isStablecoin": false,
     "sector": "Credit",
     "tag": "Fixed Income"
@@ -319,17 +286,6 @@
     "tag": "Option Vaults"
   },
   {
-    "slug": "dpx",
-    "symbol": "DPX",
-    "name": "DPX",
-    "coinType": "GovernanceUtility",
-    "entitySlug": "dopex",
-    "geckoId": null,
-    "isStablecoin": false,
-    "sector": "Derivatives",
-    "tag": "Option Vaults"
-  },
-  {
     "slug": "jones",
     "symbol": "JONES",
     "name": "JONES",
@@ -350,28 +306,6 @@
     "isStablecoin": false,
     "sector": "Derivatives",
     "tag": "Option Vaults"
-  },
-  {
-    "slug": "neu",
-    "symbol": "NEU",
-    "name": "NEU",
-    "coinType": "GovernanceUtility",
-    "entitySlug": "neutra-finance",
-    "geckoId": "neucoin-2",
-    "isStablecoin": false,
-    "sector": "Derivatives",
-    "tag": "Delta-Neutral"
-  },
-  {
-    "slug": "rage",
-    "symbol": "RAGE",
-    "name": "RAGE",
-    "coinType": "GovernanceUtility",
-    "entitySlug": "rage-trade",
-    "geckoId": "rage-coin",
-    "isStablecoin": false,
-    "sector": "Derivatives",
-    "tag": "Delta-Neutral"
   },
   {
     "slug": "ena",
@@ -462,17 +396,6 @@
     "tag": "Pools"
   },
   {
-    "slug": "spice",
-    "symbol": "SPICE",
-    "name": "SPICE",
-    "coinType": "Governance",
-    "entitySlug": "arrakis",
-    "geckoId": "spice-2",
-    "isStablecoin": false,
-    "sector": "Liquidity",
-    "tag": "Vaults"
-  },
-  {
     "slug": "aura-token",
     "symbol": "AURA",
     "name": "AURA",
@@ -550,39 +473,6 @@
     "tag": "Underwriting (Insurance)"
   },
   {
-    "slug": "armor",
-    "symbol": "ARMOR",
-    "name": "ARMOR",
-    "coinType": "GovernanceUtility",
-    "entitySlug": "ease-org",
-    "geckoId": "armor",
-    "isStablecoin": false,
-    "sector": "Other",
-    "tag": "Underwriting (Insurance)"
-  },
-  {
-    "slug": "insur",
-    "symbol": "INSUR",
-    "name": "INSUR",
-    "coinType": "GovernanceUtility",
-    "entitySlug": "insurace",
-    "geckoId": null,
-    "isStablecoin": false,
-    "sector": "Other",
-    "tag": "Underwriting (Insurance)"
-  },
-  {
-    "slug": "npm",
-    "symbol": "NPM",
-    "name": "NPM",
-    "coinType": "GovernanceUtility",
-    "entitySlug": "neptune-mutual",
-    "geckoId": "nipmod",
-    "isStablecoin": false,
-    "sector": "Other",
-    "tag": "Underwriting (Insurance)"
-  },
-  {
     "slug": "wnxm",
     "symbol": "wNXM",
     "name": "wNXM",
@@ -592,39 +482,6 @@
     "isStablecoin": false,
     "sector": "Other",
     "tag": "Underwriting (Insurance)"
-  },
-  {
-    "slug": "sher",
-    "symbol": "SHER",
-    "name": "SHER",
-    "coinType": "Governance",
-    "entitySlug": "sherlock",
-    "geckoId": "sherlock",
-    "isStablecoin": false,
-    "sector": "Other",
-    "tag": "Underwriting (Insurance)"
-  },
-  {
-    "slug": "pal",
-    "symbol": "PAL",
-    "name": "PAL",
-    "coinType": "GovernanceUtility",
-    "entitySlug": "paladin",
-    "geckoId": "palio",
-    "isStablecoin": false,
-    "sector": "Other",
-    "tag": "Governance"
-  },
-  {
-    "slug": "btrfly",
-    "symbol": "BTRFLY",
-    "name": "BTRFLY",
-    "coinType": "GovernanceUtility",
-    "entitySlug": "hidden-hand",
-    "geckoId": null,
-    "isStablecoin": false,
-    "sector": "Other",
-    "tag": "Governance"
   },
   {
     "slug": "sdt",
@@ -722,17 +579,6 @@
     "entitySlug": "ethena",
     "geckoId": "ethena-usde",
     "isStablecoin": true,
-    "sector": "RWA",
-    "tag": "RWA Yield"
-  },
-  {
-    "slug": "fflr",
-    "symbol": "FFLR",
-    "name": "FFLR",
-    "coinType": "Governance",
-    "entitySlug": "florence-finance",
-    "geckoId": null,
-    "isStablecoin": false,
     "sector": "RWA",
     "tag": "RWA Yield"
   },
@@ -886,17 +732,6 @@
     "coinType": "NativeStablecoin",
     "entitySlug": "reserve",
     "geckoId": "reservoir-rusd",
-    "isStablecoin": true,
-    "sector": "RWA",
-    "tag": "RWA Yield"
-  },
-  {
-    "slug": "m",
-    "symbol": "M",
-    "name": "M",
-    "coinType": "NativeStablecoin",
-    "entitySlug": "m-zero",
-    "geckoId": null,
     "isStablecoin": true,
     "sector": "RWA",
     "tag": "RWA Yield"

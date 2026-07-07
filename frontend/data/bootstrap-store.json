@@ -1,9 +1,9 @@
 {
   "_meta": {
     "backend": "local",
-    "count": 378,
+    "count": 363,
     "table": "canhav-research",
-    "updatedAt": "2026-07-05T22:34:42Z"
+    "updatedAt": "2026-07-07T18:00:01Z"
   },
   "items": {
     "CATEGORY#Entity|PROTOCOL#aave": {
@@ -2659,17 +2659,7 @@
       "LiquiditySubSector": "Vaults",
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [
-        {
-          "category": "Token",
-          "coinType": "Governance",
-          "name": "SPICE",
-          "role": "Governance token",
-          "slug": "spice",
-          "subCategory": "Governance Token",
-          "symbol": "SPICE"
-        }
-      ],
+      "MemberCoins": [],
       "Name": "Arrakis Finance",
       "OffchainFacts": [
         {
@@ -11103,15 +11093,6 @@
       "Market": null,
       "MemberCoins": [
         {
-          "category": "Token",
-          "coinType": "GovernanceUtility",
-          "name": "DPX",
-          "role": "Governance & utility token",
-          "slug": "dpx",
-          "subCategory": "Governance Token",
-          "symbol": "DPX"
-        },
-        {
           "category": "Receipt",
           "name": "rDPX",
           "receiptType": "YieldVault",
@@ -12734,15 +12715,6 @@
           "slug": "ease",
           "subCategory": "Governance Token",
           "symbol": "EASE"
-        },
-        {
-          "category": "Token",
-          "coinType": "GovernanceUtility",
-          "name": "ARMOR",
-          "role": "Governance & utility token",
-          "slug": "armor",
-          "subCategory": "Governance Token",
-          "symbol": "ARMOR"
         }
       ],
       "Name": "Ease.org",
@@ -15693,17 +15665,7 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [
-        {
-          "category": "Token",
-          "coinType": "Governance",
-          "name": "FFLR",
-          "role": "Governance token",
-          "slug": "fflr",
-          "subCategory": "Governance Token",
-          "symbol": "FFLR"
-        }
-      ],
+      "MemberCoins": [],
       "Name": "Florence Finance",
       "OffchainFacts": [
         {
@@ -19598,14 +19560,6 @@
       "Market": null,
       "MemberCoins": [
         {
-          "category": "Token",
-          "name": "Redacted",
-          "role": "Governance token (Redacted Cartel)",
-          "slug": "btrfly",
-          "subCategory": "Governance Token",
-          "symbol": "BTRFLY"
-        },
-        {
           "category": "Receipt",
           "name": "rlBTRFLY",
           "receiptType": "LockedEscrowReceipt",
@@ -20416,16 +20370,7 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [
-        {
-          "category": "Token",
-          "name": "InsurAce",
-          "role": "Governance + staking token",
-          "slug": "insur",
-          "subCategory": "Governance Token",
-          "symbol": "INSUR"
-        }
-      ],
+      "MemberCoins": [],
       "Name": "InsurAce",
       "OffchainFacts": [
         {
@@ -24630,15 +24575,6 @@
           "slug": "m0",
           "subCategory": "Stablecoin",
           "symbol": "M"
-        },
-        {
-          "category": "Stablecoin",
-          "coinType": "NativeStablecoin",
-          "name": "M",
-          "role": "Native stablecoin",
-          "slug": "m",
-          "subCategory": "Stablecoin",
-          "symbol": "M"
         }
       ],
       "Name": "M^0 Foundation",
@@ -27192,16 +27128,7 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [
-        {
-          "category": "Token",
-          "name": "Neptune Mutual",
-          "role": "Governance token",
-          "slug": "npm",
-          "subCategory": "Governance Token",
-          "symbol": "NPM"
-        }
-      ],
+      "MemberCoins": [],
       "Name": "Neptune Mutual",
       "OffchainFacts": [
         {
@@ -27522,17 +27449,7 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [
-        {
-          "category": "Token",
-          "coinType": "GovernanceUtility",
-          "name": "NEU",
-          "role": "Governance & utility token",
-          "slug": "neu",
-          "subCategory": "Governance Token",
-          "symbol": "NEU"
-        }
-      ],
+      "MemberCoins": [],
       "Name": "Neutra Finance",
       "OffchainFacts": [
         {
@@ -29320,14 +29237,6 @@
       "LongDescription": null,
       "Market": null,
       "MemberCoins": [
-        {
-          "category": "Token",
-          "name": "Paladin",
-          "role": "Governance token",
-          "slug": "pal",
-          "subCategory": "Governance Token",
-          "symbol": "PAL"
-        },
         {
           "category": "Receipt",
           "name": "hPAL",
@@ -31593,15 +31502,6 @@
           "symbol": "RDNT"
         },
         {
-          "category": "Token",
-          "coinType": "LockedEscrow",
-          "name": "dLP",
-          "role": "Locked / vote-escrow token",
-          "slug": "dlp",
-          "subCategory": "Yield-generating Token",
-          "symbol": "dLP"
-        },
-        {
           "category": "Receipt",
           "name": "rUSDC, rWETH, rUSDT (and other rTokens)",
           "receiptType": "LendingReceipt",
@@ -31914,17 +31814,7 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [
-        {
-          "category": "Token",
-          "coinType": "GovernanceUtility",
-          "name": "RAGE",
-          "role": "Governance & utility token",
-          "slug": "rage",
-          "subCategory": "Governance Token",
-          "symbol": "RAGE"
-        }
-      ],
+      "MemberCoins": [],
       "Name": "Rage Trade",
       "OffchainFacts": [
         {
@@ -35137,17 +35027,7 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [
-        {
-          "category": "Token",
-          "coinType": "Governance",
-          "name": "SENSE",
-          "role": "Governance token",
-          "slug": "sense-token",
-          "subCategory": "Governance Token",
-          "symbol": "SENSE"
-        }
-      ],
+      "MemberCoins": [],
       "Name": "Sense Finance",
       "OffchainFacts": [
         {
@@ -35538,17 +35418,7 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [
-        {
-          "category": "Token",
-          "coinType": "Governance",
-          "name": "SHER",
-          "role": "Governance token",
-          "slug": "sher",
-          "subCategory": "Governance Token",
-          "symbol": "SHER"
-        }
-      ],
+      "MemberCoins": [],
       "Name": "Sherlock",
       "OffchainFacts": [
         {
@@ -48041,53 +47911,6 @@
       "UpdatedAt": "2026-06-27T14:03:04Z",
       "Website": "https://liquity.org"
     },
-    "CATEGORY#Stablecoin|PROTOCOL#m": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Stablecoin",
-      "CoinGecko": null,
-      "CoinType": "NativeStablecoin",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "M — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "m-zero",
-      "GitHub": null,
-      "HistoricalPegData": {
-        "points": [],
-        "source": "coingecko",
-        "updatedAt": null
-      },
-      "IsStablecoin": true,
-      "Name": "M",
-      "PK": "CATEGORY#Stablecoin",
-      "PegTarget": "USD",
-      "SK": "PROTOCOL#m",
-      "Sector": "RWA",
-      "Slug": "m",
-      "Status": "APPROVED",
-      "SubCategory": "Stablecoin",
-      "Symbol": "M",
-      "Tag": "RWA Yield",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
     "CATEGORY#Stablecoin|PROTOCOL#m0": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": null,
@@ -50544,48 +50367,6 @@
       "UpdatedAt": "2026-06-29T17:38:33Z",
       "Website": null
     },
-    "CATEGORY#Token|PROTOCOL#armor": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/armor",
-      "CoinType": "GovernanceUtility",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "ARMOR — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "ease-org",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "ARMOR",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#armor",
-      "Sector": "Other",
-      "Slug": "armor",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "ARMOR",
-      "Tag": "Underwriting (Insurance)",
-      "TokenType": "Utility",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
     "CATEGORY#Token|PROTOCOL#aura-gov": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": null,
@@ -50897,50 +50678,6 @@
       "Twitter": null,
       "UpdatedAt": "2026-06-29T17:38:33Z",
       "Website": null
-    },
-    "CATEGORY#Token|PROTOCOL#btrfly": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [
-          "Ethereum"
-        ],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": "Governance Token"
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/redacted",
-      "CoinType": "GovernanceUtility",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-25T23:16:56Z",
-      "Description": "Governance token of Redacted Cartel (Hidden Hand), operating bribe marketplaces for vote-escrow protocols across Curve, Balancer, and Frax.",
-      "Discord": null,
-      "EntitySlug": "hidden-hand",
-      "GitHub": "https://github.com/redacted-cartel",
-      "IsStablecoin": false,
-      "Name": "Redacted",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#btrfly",
-      "Sector": "Other",
-      "Slug": "btrfly",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "BTRFLY",
-      "Tag": "Governance",
-      "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://x.com/redactedcartel",
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": "https://redacted.finance"
     },
     "CATEGORY#Token|PROTOCOL#cake": {
       "ArbitrumPortalMetadata": {
@@ -51428,90 +51165,6 @@
       "Symbol": "—",
       "Tag": "RWA Yield",
       "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
-    "CATEGORY#Token|PROTOCOL#dlp": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": null,
-      "CoinType": "LockedEscrow",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "dLP — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "radiant",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "dLP",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#dlp",
-      "Sector": "Credit",
-      "Slug": "dlp",
-      "Status": "APPROVED",
-      "SubCategory": "Yield-generating Token",
-      "Symbol": "dLP",
-      "Tag": "Lending",
-      "TokenType": "Utility",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
-    "CATEGORY#Token|PROTOCOL#dpx": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": null,
-      "CoinType": "GovernanceUtility",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "DPX — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "dopex",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "DPX",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#dpx",
-      "Sector": "Derivatives",
-      "Slug": "dpx",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "DPX",
-      "Tag": "Option Vaults",
-      "TokenType": "Utility",
       "TotalSupply": {
         "source": "coingecko",
         "updatedAt": null,
@@ -52042,48 +51695,6 @@
       "Symbol": "EXTRA",
       "Tag": "Leveraged Yield",
       "TokenType": "Utility",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
-    "CATEGORY#Token|PROTOCOL#fflr": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": null,
-      "CoinType": "Governance",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "FFLR — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "florence-finance",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "FFLR",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#fflr",
-      "Sector": "RWA",
-      "Slug": "fflr",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "FFLR",
-      "Tag": "RWA Yield",
-      "TokenType": "Governance",
       "TotalSupply": {
         "source": "coingecko",
         "updatedAt": null,
@@ -52722,53 +52333,6 @@
       "Twitter": "https://x.com/HyperliquidX",
       "UpdatedAt": "2026-06-29T17:38:33Z",
       "Website": "https://hyperliquid.xyz"
-    },
-    "CATEGORY#Token|PROTOCOL#insur": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [
-          "Ethereum",
-          "BSC",
-          "Polygon",
-          "Arbitrum One"
-        ],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": "Governance Token"
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/insurace",
-      "CoinType": "GovernanceUtility",
-      "ContractAddress": "0x1440d19436beeaf85178960255fe0112df1fe9ed",
-      "CreatedAt": "2026-06-25T23:16:56Z",
-      "Description": "Governance + staking token of InsurAce, a multi-chain DeFi insurance protocol with portfolio-level cover and a pooled capital model.",
-      "Discord": null,
-      "EntitySlug": "insurace",
-      "GitHub": "https://github.com/InsurAce-Protocol",
-      "IsStablecoin": false,
-      "Name": "InsurAce",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#insur",
-      "Sector": "Other",
-      "Slug": "insur",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "INSUR",
-      "Tag": "Underwriting (Insurance)",
-      "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://x.com/InsurAce_io",
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": "https://www.insurace.io"
     },
     "CATEGORY#Token|PROTOCOL#iusde": {
       "ArbitrumPortalMetadata": {
@@ -53641,48 +53205,6 @@
       "UpdatedAt": "2026-06-29T17:38:33Z",
       "Website": null
     },
-    "CATEGORY#Token|PROTOCOL#neu": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/neucoin-2",
-      "CoinType": "GovernanceUtility",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "NEU — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "neutra-finance",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "NEU",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#neu",
-      "Sector": "Derivatives",
-      "Slug": "neu",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "NEU",
-      "Tag": "Delta-Neutral",
-      "TokenType": "Utility",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
     "CATEGORY#Token|PROTOCOL#note": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": null,
@@ -53737,52 +53259,6 @@
       "Twitter": "https://x.com/NotionalFinance",
       "UpdatedAt": "2026-06-29T17:38:33Z",
       "Website": "https://notional.finance"
-    },
-    "CATEGORY#Token|PROTOCOL#npm": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [
-          "Ethereum",
-          "Arbitrum One",
-          "BSC"
-        ],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": "Governance Token"
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/neptune-mutual",
-      "CoinType": "GovernanceUtility",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-25T23:16:56Z",
-      "Description": "Governance token of Neptune Mutual, a parametric cover protocol where payouts trigger on predefined on-chain loss conditions.",
-      "Discord": null,
-      "EntitySlug": "neptune-mutual",
-      "GitHub": "https://github.com/neptune-mutual",
-      "IsStablecoin": false,
-      "Name": "Neptune Mutual",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#npm",
-      "Sector": "Other",
-      "Slug": "npm",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "NPM",
-      "Tag": "Underwriting (Insurance)",
-      "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://x.com/neptune_mutual",
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": "https://neptune-mutual.com"
     },
     "CATEGORY#Token|PROTOCOL#ondo": {
       "ArbitrumPortalMetadata": {
@@ -53888,53 +53364,6 @@
       "Twitter": "https://x.com/OndoFinance",
       "UpdatedAt": "2026-06-27T14:04:26Z",
       "Website": "https://ondo.finance"
-    },
-    "CATEGORY#Token|PROTOCOL#pal": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [
-          "Ethereum",
-          "Arbitrum One",
-          "Optimism",
-          "Polygon"
-        ],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": "Governance Token"
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/paladin",
-      "CoinType": "GovernanceUtility",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-25T23:16:56Z",
-      "Description": "Governance token of Paladin, operating Paladin Vote bribe marketplaces and liquid locker products for vote-escrow governance positions.",
-      "Discord": null,
-      "EntitySlug": "paladin",
-      "GitHub": "https://github.com/PaladinFinance",
-      "IsStablecoin": false,
-      "Name": "Paladin",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#pal",
-      "Sector": "Other",
-      "Slug": "pal",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "PAL",
-      "Tag": "Governance",
-      "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "alchemy",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": "https://x.com/PaladinVote",
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": "https://paladin.vote"
     },
     "CATEGORY#Token|PROTOCOL#pendle": {
       "ArbitrumPortalMetadata": {
@@ -54064,48 +53493,6 @@
       "Symbol": "—",
       "Tag": "Liquid Restaking",
       "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
-    "CATEGORY#Token|PROTOCOL#rage": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/rage-coin",
-      "CoinType": "GovernanceUtility",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "RAGE — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "rage-trade",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "RAGE",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#rage",
-      "Sector": "Derivatives",
-      "Slug": "rage",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "RAGE",
-      "Tag": "Delta-Neutral",
-      "TokenType": "Utility",
       "TotalSupply": {
         "source": "coingecko",
         "updatedAt": null,
@@ -54654,48 +54041,6 @@
       "UpdatedAt": "2026-06-27T14:04:48Z",
       "Website": "https://ethena.fi/"
     },
-    "CATEGORY#Token|PROTOCOL#sense-token": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": null,
-      "CoinType": "Governance",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "SENSE — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "sense",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "SENSE",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#sense-token",
-      "Sector": "Credit",
-      "Slug": "sense-token",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "SENSE",
-      "Tag": "Fixed Income",
-      "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
     "CATEGORY#Token|PROTOCOL#sfrxeth": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": null,
@@ -54747,48 +54092,6 @@
       "Twitter": "https://x.com/fraxfinance",
       "UpdatedAt": "2026-06-27T14:04:35Z",
       "Website": "https://frax.finance"
-    },
-    "CATEGORY#Token|PROTOCOL#sher": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/sherlock",
-      "CoinType": "Governance",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "SHER — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "sherlock",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "SHER",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#sher",
-      "Sector": "Other",
-      "Slug": "sher",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "SHER",
-      "Tag": "Underwriting (Insurance)",
-      "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
     },
     "CATEGORY#Token|PROTOCOL#sky-gov": {
       "ArbitrumPortalMetadata": {
@@ -54974,48 +54277,6 @@
       "SubCategory": "Governance Token",
       "Symbol": "—",
       "Tag": "Lending",
-      "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
-    "CATEGORY#Token|PROTOCOL#spice": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/spice-2",
-      "CoinType": "Governance",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "SPICE — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "arrakis",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "SPICE",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#spice",
-      "Sector": "Liquidity",
-      "Slug": "spice",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "SPICE",
-      "Tag": "Vaults",
       "TokenType": "Governance",
       "TotalSupply": {
         "source": "coingecko",
@@ -55522,48 +54783,6 @@
       "Twitter": "https://x.com/maplefinance",
       "UpdatedAt": "2026-06-27T14:04:49Z",
       "Website": "https://maple.finance"
-    },
-    "CATEGORY#Token|PROTOCOL#tprotocol-tru": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": null,
-      "CoinType": "Governance",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "TProtocol/TRU — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "term-finance",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "TProtocol/TRU",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#tprotocol-tru",
-      "Sector": "Credit",
-      "Slug": "tprotocol-tru",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "TProtocol/TRU",
-      "Tag": "Fixed Income",
-      "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
     },
     "CATEGORY#Token|PROTOCOL#true": {
       "ArbitrumPortalMetadata": {

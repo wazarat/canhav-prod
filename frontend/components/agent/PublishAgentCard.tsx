@@ -91,10 +91,10 @@ export function PublishAgentCard({
         "Buyers can see the expertise this agent advertises."
       ) : (
         <Link
-          href="#panel-attach-skill"
+          href={`/agents/${encodeURIComponent(agentId)}?tab=train#panel-attach-skill`}
           className="font-medium text-electric-400 hover:text-electric-300"
         >
-          Attach a skill below →
+          Attach a skill on the Train tab →
         </Link>
       ),
     },

@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Lightbulb, X } from "lucide-react";
 
 import type { AgentSuggestion } from "@/lib/agent/suggestions";
 
 /**
  * Dismissible training nudges from the suggestions analyzer. Dismissals are
- * remembered per agent in localStorage; clicking a nudge scrolls to the
- * matching enrichment panel.
+ * remembered per agent in localStorage; clicking a nudge opens the Train tab
+ * anchored at the matching enrichment panel.
  */
 export function AgentSuggestions({
   agentId,
@@ -17,6 +18,7 @@ export function AgentSuggestions({
   agentId: string;
   suggestions: AgentSuggestion[];
 }) {
+  const router = useRouter();
   const storageKey = `agent-suggestions-dismissed:${agentId}`;
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [hydrated, setHydrated] = useState(false);
@@ -55,11 +57,17 @@ export function AgentSuggestions({
           <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-neon-400" />
           <button
             type="button"
-            onClick={() =>
-              document
-                .getElementById(`panel-${s.target}`)
-                ?.scrollIntoView({ behavior: "smooth", block: "center" })
-            }
+            onClick={() => {
+              const el = document.getElementById(`panel-${s.target}`);
+              if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "center" });
+                return;
+              }
+              // Panel lives on the Train tab — navigate there with the anchor.
+              router.push(
+                `/agents/${encodeURIComponent(agentId)}?tab=train#panel-${s.target}`,
+              );
+            }}
             className="min-w-0 flex-1 text-left text-sm text-ink-200 transition-colors hover:text-ink-50"
           >
             {s.text}

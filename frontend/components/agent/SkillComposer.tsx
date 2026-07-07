@@ -98,7 +98,7 @@ export function SkillComposer({ returnAgentId }: { returnAgentId?: string | null
       // with the freshly-created skill preselected so they can attach in one click.
       if (returnAgentId && data.skill?.id) {
         router.push(
-          `/agents/${encodeURIComponent(returnAgentId)}?skill=${encodeURIComponent(
+          `/agents/${encodeURIComponent(returnAgentId)}?tab=train&skill=${encodeURIComponent(
             data.skill.id,
           )}#panel-attach-skill`,
         );

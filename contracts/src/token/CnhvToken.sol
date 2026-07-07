@@ -26,7 +26,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  *             through legitimate platform actions (faucet, collab router, ledgers).
  *
  *         Built on OpenZeppelin: `ERC20` (v5 `_update` hook), `ERC20Permit`
- *         (gasless approvals — pairs with ZeroDev smart accounts), and `Ownable`.
+ *         (gasless approvals — pairs with ERC-4337 smart accounts), and `Ownable`.
  */
 contract CnhvToken is ERC20, ERC20Permit, Ownable {
     uint256 internal constant ARBITRUM_SEPOLIA = 421614;

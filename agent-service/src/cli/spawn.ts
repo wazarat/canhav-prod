@@ -13,8 +13,9 @@ import type { AgentSkill } from "../types";
  *
  * In the app the signer is the user's self-custodial embedded wallet (a Privy
  * social-login wallet) and minting runs in the browser. For local CLI testing
- * only, a throwaway private key stands in for that signer — never use a key
- * with real funds, and only on Arbitrum Sepolia (the pinned testnet).
+ * only, a throwaway private key stands in for that signer — it pays its own
+ * gas, so fund it with a little Arbitrum Sepolia ETH (the pinned testnet).
+ * Never use a key holding real funds.
  */
 async function main(): Promise<void> {
   const skillPath = process.argv[2];

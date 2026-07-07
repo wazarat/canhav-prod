@@ -30,6 +30,16 @@ export const identityRegistryAbi = [
   },
   {
     type: "function",
+    name: "setAgentURI",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "agentId", type: "uint256" },
+      { name: "agentURI", type: "string" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "function",
     name: "setMetadata",
     stateMutability: "nonpayable",
     inputs: [

@@ -198,8 +198,8 @@ export async function userOwnsAgent(
 export type ReclaimResult = { ok: true } | { ok: false; error: string };
 
 /**
- * Re-link an agent to the current user by proving control of its kernel address
- * (client-derived from the connected wallet + stored accountIndex).
+ * Re-link an agent to the current user by proving the connected wallet is the
+ * one that minted it (the recorded mint signer or the agent address itself).
  */
 export async function reclaimAgentByProof(
   userId: string,
@@ -218,9 +218,9 @@ export async function reclaimAgentByProof(
   }
 
   // The proof is the wallet that minted the agent: the recorded mint signer,
-  // or (Privy-direct mints) the agent address itself. Legacy kernel-era agents
-  // that never recorded a signerAddress can no longer be reclaimed — the
-  // ZeroDev kernel-address derivation that used to prove control is retired.
+  // or (Privy-direct mints) the agent address itself. Legacy smart-account-era
+  // agents that never recorded a signerAddress can no longer be reclaimed —
+  // the address derivation that used to prove control is retired.
   const mintSigner = profile.signerAddress ?? null;
   const matchesSigner = mintSigner ? sameAddress(mintSigner, signer) : false;
   const matchesAgentAddress = sameAddress(profile.agentAddress, signer);

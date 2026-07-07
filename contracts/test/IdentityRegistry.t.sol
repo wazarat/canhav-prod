@@ -183,7 +183,7 @@ contract IdentityRegistryTest is CanHavTest {
         vm.prank(alice);
         uint256 a = identity.register("ipfs://agent-a");
 
-        // A 1-of-1 smart account controlled by walletPk (mirrors a ZeroDev kernel).
+        // A 1-of-1 smart account controlled by walletPk (mirrors an ERC-4337 kernel).
         MockERC1271Wallet smartAccount = new MockERC1271Wallet(walletEOA);
 
         uint256 deadline = block.timestamp + 240;
@@ -265,7 +265,7 @@ contract IdentityRegistryTest is CanHavTest {
 
 /**
  * @dev Minimal 1-of-1 ERC-1271 smart account: approves a hash when the supplied
- *      signature recovers to its configured owner. Mirrors how a ZeroDev kernel
+ *      signature recovers to its configured owner. Mirrors how an ERC-4337 kernel
  *      account validates a signature for {SignatureChecker}.
  */
 contract MockERC1271Wallet {

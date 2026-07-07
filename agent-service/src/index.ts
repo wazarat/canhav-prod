@@ -14,7 +14,6 @@ export type {
   AgentSkillSection,
   AgentProductRef,
   AgentRegistrationFile,
-  ScopedAction,
   WatchedAsset,
   ResearchVerdict,
   AssetSnapshot,
@@ -22,14 +21,7 @@ export type {
 } from "./types";
 
 export { buildAgentRegistrationFile, toAgentURI } from "./agent/registration";
-export {
-  createEcdsaKernelAccount,
-  createScopedSessionKernelAccount,
-  type AgentKernelAccount,
-  type ScopedSessionParams,
-} from "./zerodev/account";
 export { spawnAgentFromSkill, type SpawnParams, type SpawnResult } from "./agent/spawn";
-export { executeScopedAction, type ExecuteResult } from "./agent/execute";
 export { assertTargetAllowed, isTargetAllowed, GateError } from "./security/gate";
 export {
   identityRegistryAbi,
@@ -44,5 +36,4 @@ export { readOffchainMarket, type OffchainMarket } from "./data/offchain";
 export { runStablecoinAgent } from "./agent/stablecoin";
 export { runYieldAgent } from "./agent/yield";
 export { combineVerdicts } from "./agent/combine";
-export { recordVerdictOnChain } from "./agent/verdict";
 export { runOnce, runOnceBySymbol, startSchedule, type RunOnceResult } from "./agent/schedule";

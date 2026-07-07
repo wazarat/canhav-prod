@@ -1,4 +1,4 @@
-import type { Address, Hex } from "viem";
+import type { Address } from "viem";
 
 /**
  * Subset of the CanHav `AgentSkill` shape (mirrors frontend/lib/types.ts). A
@@ -94,13 +94,6 @@ export interface AgentRegistrationFile {
   /** CanHav extension: member products the agent is scoped to. */
   associatedProducts?: AgentProductRef[];
   createdAt: string;
-}
-
-/** A single scoped on-chain action an agent may execute (gated before send). */
-export interface ScopedAction {
-  target: Address;
-  data: Hex;
-  value?: bigint;
 }
 
 /** The three on-chain anchors an agent tracks per asset (Arbitrum One reads). */

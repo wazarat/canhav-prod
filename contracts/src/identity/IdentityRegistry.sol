@@ -20,7 +20,7 @@ import {IIdentityRegistry} from "../interfaces/IIdentityRegistry.sol";
  *         Ownership, transfer and operator delegation are inherited from
  *         OpenZeppelin's audited `ERC721URIStorage`. CanHav agents are spun up by
  *         the `agent-service` which calls {register} after creating the agent's
- *         ZeroDev smart account.
+ *         ERC-4337 smart account.
  *
  *         The reserved `agentWallet` metadata key follows ERC-8004 exactly: it
  *         auto-initializes to the owner on {register}, can only be changed via a
@@ -136,7 +136,7 @@ contract IdentityRegistry is ERC721URIStorage, EIP712, IIdentityRegistry {
         bytes32 structHash = keccak256(abi.encode(AGENT_WALLET_SET_TYPEHASH, agentId, newWallet, owner, deadline));
         bytes32 digest = _hashTypedDataV4(structHash);
         // Single call covers both EOA (ECDSA) and smart-account (ERC-1271) signers
-        // — exactly what the agent's ZeroDev kernel account needs to prove control.
+        // — exactly what an agent's ERC-4337 smart account needs to prove control.
         if (!SignatureChecker.isValidSignatureNow(newWallet, digest, signature)) {
             revert InvalidWalletSignature();
         }

@@ -9,11 +9,9 @@ import { skillToJson, skillToMarkdown } from "@/lib/agent/skillExport";
 
 export const revalidate = 300;
 
-export async function generateStaticParams() {
-  // Generated on demand (dynamicParams default) and cached via ISR, like
-  // /receipts/[slug]. Pre-rendering every skill inflated build time.
-  return [];
-}
+// No generateStaticParams: rendered on demand like /receipts/[slug].
+// Pre-rendering every skill inflated build time while production served every
+// request dynamically anyway.
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const skill = await getAgentSkillById(decodeURIComponent(params.id));

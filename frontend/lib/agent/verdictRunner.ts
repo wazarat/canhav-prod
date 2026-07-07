@@ -11,10 +11,11 @@ import { canPublishVerdict } from "@/lib/agent/dunePublish";
 import { insertVerdict, ensureVerdictTable } from "@/lib/server/dune";
 // Deep imports (not the package barrel): the index re-exports the kernel spawn
 // path whose deps only exist under agent-service/ — with webpack symlink
-// resolution off (see next.config.mjs) those bare imports would not resolve.
+// resolution off (see next.config.mjs) those bare imports would not resolve,
+// and even type-only barrel imports pull spawn.ts into the TS program.
 import { combineVerdicts } from "canhav-agent-service/src/agent/combine";
 import { runOnceBySymbol } from "canhav-agent-service/src/agent/schedule";
-import type { AgentType, ResearchVerdict } from "canhav-agent-service";
+import type { AgentType, ResearchVerdict } from "canhav-agent-service/src/types";
 
 /** Alpha demo agents seeded by yield-agents-demo.mjs */
 export const YIELD_DEMO_AGENTS = [

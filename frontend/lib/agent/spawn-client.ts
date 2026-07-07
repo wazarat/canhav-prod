@@ -3,7 +3,10 @@
 import type { ConnectedWallet } from "@privy-io/react-auth";
 import type { Log } from "viem";
 
-import type { AgentProductRef, AgentSkill } from "canhav-agent-service";
+// Deep import (not the package barrel): the index re-exports the kernel spawn
+// path whose @zerodev deps only install under agent-service/ — absent on
+// Vercel, so pulling the barrel into the TS program breaks the build.
+import type { AgentProductRef, AgentSkill } from "canhav-agent-service/src/types";
 
 import { ARBITRUM_SEPOLIA_CHAIN_ID } from "@/lib/agent/chain";
 import {

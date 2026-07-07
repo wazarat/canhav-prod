@@ -11,7 +11,7 @@ import { AGENT_CATEGORIES, type AgentCategory } from "@/lib/agent/categories";
 import { resolveActiveWallet } from "@/lib/agent/privy-signer";
 import { mintAgentOnClient, type SpawnPreflightResponse } from "@/lib/agent/spawn-client";
 import { cn } from "@/lib/utils";
-import type { AgentProductRef } from "canhav-agent-service";
+import type { AgentProductRef } from "canhav-agent-service/src/types";
 import {
   ENTITY_AGENT_MINTED_EVENT,
   openResearchChat,

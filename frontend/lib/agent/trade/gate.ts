@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { ResearchVerdict } from "canhav-agent-service";
+import type { ResearchVerdict } from "canhav-agent-service/src/types";
 
 import { getCombinedVerdict } from "@/lib/agent/memory";
 import { EXCHANGE_ROUTER, ORDER_VAULT } from "@/lib/agent/trade/gmx";

@@ -16,7 +16,7 @@ import {
 } from "@/lib/agent/trade/types";
 import { isAgentCategory, type AgentCategory } from "@/lib/agent/categories";
 import type { DataFrame } from "@/lib/types";
-import type { AssetSnapshot, ResearchVerdict } from "canhav-agent-service";
+import type { AssetSnapshot, ResearchVerdict } from "canhav-agent-service/src/types";
 
 /**
  * Agent memory layer (no Supabase).

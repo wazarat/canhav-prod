@@ -868,6 +868,8 @@ export interface Partnership {
   date: string;
   amountLabel: string | null;
   description: string;
+  /** Network slug when the partner is also tracked on-platform (optional link). */
+  slug?: string | null;
 }
 
 export interface CurrentScale {
@@ -1381,6 +1383,129 @@ export interface RwaMetrics {
 }
 
 /* -------------------------------------------------------------------------- */
+/* RWA sector — General + characteristic metric blocks (M2, additive)         */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * RWA "General" rollup block (the "General RWA" sub-tab in the Metrics view).
+ * Live `aumUsd` comes from the DeFiLlama RWA pass; the rest are curated research
+ * that Phase D seeds via `rwa_specs.py`. Everything optional/nullable.
+ */
+export interface RwaGeneralMetrics {
+  /** Assets under management / TVL (USD) — live where mapped, else curated. */
+  aumUsd?: Sourced<number | null>;
+  /** AUM change over 1d / 7d (%). */
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  /** On-chain holders of the tokenized asset. */
+  holders?: Sourced<number | null>;
+  /** Underlying asset classes (e.g. US Treasuries, private credit). */
+  assetClasses?: string[];
+  /** Issuer / sponsor name (curated). */
+  issuer?: string | null;
+  /** Jurisdiction of the issuing entity / vehicle (curated). */
+  jurisdiction?: string | null;
+  /** Regulatory status summary (curated). */
+  regulatoryStatus?: string | null;
+  /** Redemption / subscription model (curated). */
+  redemptionModel?: string | null;
+  /** Audit / attestation history (curated). */
+  auditHistory?: string | null;
+  /** Chain / ecosystem deployment. */
+  deployment?: ChainDeployment | null;
+}
+
+/** "Institutional-Gated" characteristic — access controls & eligibility (curated). */
+export interface RwaInstitutionalGatedMetrics {
+  /** KYC/AML requirement summary. */
+  kycModel?: string | null;
+  /** Access model (e.g. "Permissioned allowlist", "Reg D 506(c)"). */
+  accessModel?: string | null;
+  /** Minimum investment (USD). */
+  minInvestmentUsd?: number | null;
+  /** Eligible investor jurisdictions. */
+  eligibleJurisdictions?: string[];
+  /** Transfer restrictions summary. */
+  transferRestrictions?: string | null;
+  /** Whitelisted / KYC'd addresses (live where indexed). */
+  whitelistedAddresses?: Sourced<number | null>;
+}
+
+/** "Yield-Bearing" characteristic — yield source & benchmark spread. */
+export interface RwaYieldBearingMetrics {
+  /** Current net yield to holders (%). */
+  currentYieldPct?: Sourced<number | null>;
+  /** Yield source (e.g. "US T-bills", "Repo", "Private credit interest"). */
+  yieldSource?: string | null;
+  /** Spread vs benchmark (SOFR / T-bill), % — derived from rates.ts (YB7). */
+  benchmarkSpreadPct?: Sourced<number | null>;
+  /** SOFR benchmark reference (%) — NY Fed (rates.ts). Macro, not per-issuer. */
+  benchmarkSofrPct?: Sourced<number | null>;
+  /** Yield distribution model (e.g. "Rebasing", "Accrual to NAV", "Coupon"). */
+  distributionModel?: string | null;
+  /** Underlying instrument description (curated). */
+  underlyingInstrument?: string | null;
+}
+
+/** "Real-World-Custody" characteristic — custody & reserve attestation. */
+export interface RwaRealWorldCustodyMetrics {
+  /** Custodian(s) of the underlying real-world assets. */
+  custodians?: string[];
+  /** Custody model (e.g. "Bankruptcy-remote SPV", "Qualified custodian"). */
+  custodyModel?: string | null;
+  /** Reserve / collateral composition summary. */
+  reserveComposition?: string | null;
+  /** Attestation / transparency page URL. */
+  attestationUrl?: string | null;
+  /** Chainlink Proof-of-Reserves (or equivalent) page URL. */
+  proofOfReservesUrl?: string | null;
+  /** Attestation / audit firm(s). */
+  auditFirms?: string[];
+}
+
+/** "DAO-Governed" characteristic — on-chain governance activity (Snapshot-fed). */
+export interface RwaDaoGovernedMetrics {
+  /** Governance token symbol (curated). */
+  governanceToken?: string | null;
+  /** Total governance proposals (live via Snapshot). */
+  proposalCount?: Sourced<number | null>;
+  /** Recent voter turnout / participation (%). */
+  voterTurnoutPct?: Sourced<number | null>;
+  /** DAO treasury size (USD). */
+  treasuryUsd?: Sourced<number | null>;
+  /** Governance forum / Snapshot space URL. */
+  governanceForum?: string | null;
+  /** Structured governance metrics (proposals, turnout, treasury). */
+  governanceDetail?: GovernanceActivityDetail | null;
+}
+
+/** "Multi-Chain" characteristic — cross-chain deployment topology. */
+export interface RwaMultiChainMetrics {
+  /** Chains the asset is deployed on. */
+  chains?: string[];
+  /** Number of chains (curated or derived from `chains`). */
+  chainCount?: number | null;
+  /** Primary / canonical chain (curated). */
+  primaryChain?: string | null;
+  /** Cross-chain messaging standard (e.g. "LayerZero OFT", "Chainlink CCIP"). */
+  crossChainStandard?: string | null;
+  /** Bridge / mint-burn model summary (curated). */
+  bridgeModel?: string | null;
+}
+
+/**
+ * Container of RWA characteristic-tag metric blocks, keyed by the 5-tag
+ * `RwaSecondaryTag` vocabulary (camelCase keys). Each block is curated research
+ * (Phase D) with a few live overlays where a source exists.
+ */
+export interface RwaCharacteristicMetrics {
+  institutionalGated?: RwaInstitutionalGatedMetrics | null;
+  yieldBearing?: RwaYieldBearingMetrics | null;
+  realWorldCustody?: RwaRealWorldCustodyMetrics | null;
+  daoGoverned?: RwaDaoGovernedMetrics | null;
+  multiChain?: RwaMultiChainMetrics | null;
+}
+
+/* -------------------------------------------------------------------------- */
 /* Staking sector — metric block + supporting types (additive)                */
 /* -------------------------------------------------------------------------- */
 
@@ -1448,10 +1573,30 @@ export interface StakingMetrics {
   collateralBasket?: { asset: string; pct: number }[] | null;
   /** Structured governance metrics (reuse existing type). */
   governanceDetail?: GovernanceActivityDetail | null;
+  /**
+   * Ethereum-consensus network context — NETWORK-WIDE figures (beaconcha.in /
+   * ultrasound.money), not this protocol's own. Shown on the Staking rollup as
+   * baseline context (total ETH staked, consensus APR, ETH base rate).
+   */
+  networkConsensus?: NetworkConsensusContext | null;
   /** Audit / exploit history (curated). */
   auditHistory?: string | null;
   /** Chain / ecosystem deployment (reuse existing type). */
   deployment?: ChainDeployment | null;
+}
+
+/** Ethereum-consensus network context (beaconcha.in + ultrasound.money). */
+export interface NetworkConsensusContext {
+  /** Total ETH staked on the beacon chain (native ETH count). */
+  totalEthStaked?: Sourced<number | null>;
+  /** Network-wide consensus staking APR (%). */
+  stakingAprPct?: Sourced<number | null>;
+  /** ETH "risk-free" base / issuance rate (%) — ultrasound.money. */
+  ethBaseRatePct?: Sourced<number | null>;
+  /** Latest finalized epoch. */
+  finalizedEpoch?: Sourced<number | null>;
+  /** Withdrawal / exit queue summary (curated text). */
+  withdrawalQueue?: string | null;
 }
 
 /**
@@ -1834,6 +1979,12 @@ export interface DerivativesPerpDexTagMetrics {
   longOpenInterestUsd?: Sourced<number | null>;
   shortOpenInterestUsd?: Sourced<number | null>;
   volume24hUsd?: Sourced<number | null>;
+  /** Current perp funding rate as a percent (Hyperliquid: hourly reference rate). */
+  fundingRatePct?: Sourced<number | null>;
+  /** Funding rate annualized from the hourly rate (× 24 × 365) — derived. */
+  fundingRateAnnualizedPct?: Sourced<number | null>;
+  /** Count of listed perp markets (Hyperliquid universe). */
+  marketsCount?: Sourced<number | null>;
   feesRevenue?: ProtocolFeesRevenue | null;
   tokenPriceUsd?: Sourced<number | null>;
   marketCapUsd?: Sourced<number | null>;
@@ -1891,8 +2042,12 @@ export interface OtherUnderwritingTagMetrics {
   marketCapUsd?: Sourced<number | null>;
   marketSharePct?: number | null;
   activeCoverUsd?: Sourced<number | null>;
+  /** Available underwriting capacity, USD (Nexus /v2/capacity). */
+  availableCapacityUsd?: Sourced<number | null>;
   capitalPoolUsd?: Sourced<number | null>;
   claimsPaidUsd?: Sourced<number | null>;
+  /** Number of listed cover products / covered protocols (Nexus /v2/products). */
+  coveredProtocolCount?: Sourced<number | null>;
   coverModel?: string | null;
   coveredProtocols?: string[];
   auditHistory?: string | null;
@@ -1912,6 +2067,18 @@ export interface OtherGovernanceTagMetrics {
   targetProtocols?: string[];
   bribeVolumeUsd?: Sourced<number | null>;
   lockedTokenValueUsd?: Sourced<number | null>;
+  /** Gauge-emission metrics (Curve getAllGauges — G7). */
+  crvInflationPerSec?: Sourced<number | null>;
+  crvEmissionsWeekly?: Sourced<number | null>;
+  crvEmissionsAnnual?: Sourced<number | null>;
+  activeGaugeCount?: Sourced<number | null>;
+  totalGaugeRelativeWeight?: Sourced<number | null>;
+  /** Snapshot governance activity (hub.snapshot.org) — live per-space. */
+  totalProposals?: Sourced<number | null>;
+  activeProposals?: Sourced<number | null>;
+  uniqueVoters?: Sourced<number | null>;
+  avgVotesPerProposal?: Sourced<number | null>;
+  snapshotFollowers?: Sourced<number | null>;
   governanceDetail?: GovernanceActivityDetail | null;
   auditHistory?: string | null;
   deployment?: ChainDeployment | null;
@@ -1995,6 +2162,35 @@ export interface LendingMetrics {
   governanceDetail?: GovernanceActivityDetail | null;
   /** Audit / exploit history (curated). */
   auditHistory?: string | null;
+  /** Chain / ecosystem deployment. */
+  deployment?: ChainDeployment | null;
+}
+
+/**
+ * Credit sector-rollup block (the "Credit" sub-tab in the Metrics view). A thin
+ * aggregate over the tag blocks: headline supply/borrow/utilization plus the
+ * blended rates and fee/revenue. Live fields come from the DeFiLlama credit pass;
+ * `activeTagCount` is derived from `creditTagMetrics`. Everything optional.
+ */
+export interface CreditMetrics {
+  /** Total value supplied across the protocol (USD). */
+  totalSuppliedUsd?: Sourced<number | null>;
+  /** Total outstanding borrows (USD). */
+  totalBorrowsUsd?: Sourced<number | null>;
+  /** Borrowed / supplied (0–100). */
+  utilizationPct?: Sourced<number | null>;
+  /** Supplied minus borrowed (USD) — derived. */
+  availableLiquidityUsd?: Sourced<number | null>;
+  /** Blended supply APY (%). */
+  supplyApyPct?: Sourced<number | null>;
+  /** Blended variable borrow APY (%). */
+  borrowApyPct?: Sourced<number | null>;
+  /** Net interest margin / spread (borrow − supply, %). */
+  netInterestMarginPct?: Sourced<number | null>;
+  /** Protocol fees/revenue (30d + annualized), mirrors ProtocolFeesRevenue. */
+  feesRevenue?: ProtocolFeesRevenue | null;
+  /** Number of active Credit tags on this network (derived). */
+  activeTagCount?: number | null;
   /** Chain / ecosystem deployment. */
   deployment?: ChainDeployment | null;
 }
@@ -2194,6 +2390,8 @@ export interface NetworkProfile {
    * (defillama.ts / aave.ts / data.ts read `profile.lending`).
    */
   lending?: LendingMetrics | null;
+  /** Credit sector-rollup metrics (the "Credit" Metrics sub-tab). */
+  creditMetrics?: CreditMetrics | null;
   /** Tag-specific curated metric blocks (Lending / Leveraged Yield / Fixed Income). */
   creditTagMetrics?: CreditTagMetrics | null;
   /** Tag-specific metric blocks (Liquid Staking / Restaking / Liquid Restaking). */
@@ -2206,6 +2404,10 @@ export interface NetworkProfile {
   otherTagMetrics?: OtherTagMetrics | null;
   /** Tag-specific metric blocks keyed by RWA sub-sector. */
   rwaTagMetrics?: RwaTagMetrics | null;
+  /** RWA "General" rollup metrics (the "General RWA" Metrics sub-tab). */
+  rwaGeneral?: RwaGeneralMetrics | null;
+  /** RWA characteristic-tag metric blocks (Institutional-Gated / Yield-Bearing / …). */
+  rwaCharacteristics?: RwaCharacteristicMetrics | null;
   /** Stablecoin primary sub-sector (when sector === "Stablecoin", or as a secondary marker). */
   stablecoinSubSector?: StablecoinSubSector | null;
   /** Stablecoin secondary tags (0–2): Yield-Bearing, Multi-Currency, Wound-Down, etc. */

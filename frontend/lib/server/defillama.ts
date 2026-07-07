@@ -102,15 +102,22 @@ export const LLAMA_STABLECOIN_IDS: Record<string, number | null> = {
 };
 
 /**
- * Curated slug -> DeFi Llama protocol slug (TVL series). `null` = verified
- * absent. Slugs verified against https://api.llama.fi/protocols on 2026-06-12.
+ * Curated slug -> DeFi Llama protocol slug(s) (TVL series). A `string[]` value
+ * aggregates a multi-product protocol (its per-product TVL/fees/volume are
+ * SUMmed and per-chain TVL merged; identity/mcap come from the primary/first
+ * entry). `null` = verified absent. Verified against
+ * https://api.llama.fi/protocols on 2026-06-12 (arrays re-verified 2026-07-04).
  */
-export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
+export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
   // Lending networks (PDF Week 7+8) — protocol TVL series (verified 2026-06-18).
-  aave: "aave-v3",
+  // Aave/Compound span v3 (primary) + legacy v2; the parent "aave"/"compound"
+  // slugs 404, so both products must be summed for a complete TVL.
+  aave: ["aave-v3", "aave-v2"],
   morpho: "morpho-blue",
+  // TODO: revisit — sparklend (lending ~$3.6B) vs spark (ecosystem ~$4.65B).
+  // Keeping the "spark" parent (resolves live) for now.
   spark: "spark",
-  compound: "compound-v3",
+  compound: ["compound-v3", "compound-v2"],
   fluid: "fluid",
   venus: "venus-core-pool",
   justlend: "justlend",
@@ -121,7 +128,9 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
   stella: "stella",
   "extra-finance": "extra-finance-leverage-farming",
   pendle: "pendle",
-  notional: "notional-v3",
+  // notional-v3 is effectively dead (~$800 TVL); the live TVL/token is v2.
+  // v2 primary so identity/mcap resolve from the active product.
+  notional: ["notional-v2", "notional-v3"],
   spectra: "spectra-v2",
   sense: "sense",
   radiant: "radiant-v2",
@@ -162,10 +171,11 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
   "florence-finance": "florence-finance",
   pgold: "pleasing-gold", // listed but adapter reports 0 — CoinGecko mcap covers it
   // DEX networks (sector expansion) — parent-protocol TVL (verified 2026-06-18).
-  uniswap: "uniswap",
+  // Parent "uniswap"/"aerodrome" slugs 404; sum the live per-version products.
+  uniswap: ["uniswap-v3", "uniswap-v2"],
   "curve-finance": "curve-finance",
   balancer: "balancer",
-  aerodrome: "aerodrome-slipstream", // parent "aerodrome" 400s; Slipstream is the live CLMM // verify
+  aerodrome: ["aerodrome-v1", "aerodrome-slipstream"], // parent 404s; sum v1 + Slipstream CLMM
   pancakeswap: "pancakeswap",
   "trader-joe": "lfj", // verify (LFJ, fka Trader Joe)
   sushiswap: "sushiswap",
@@ -228,12 +238,12 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | null> = {
  * Seeded with the obvious revenue-bearing protocols; mark `// verify` entries
  * before relying on them. Verify against https://defillama.com/fees.
  */
-export const LLAMA_FEES_SLUGS: Record<string, string | null> = {
-  aave: "aave-v3", // Aave V3 fees/revenue
+export const LLAMA_FEES_SLUGS: Record<string, string | string[] | null> = {
+  aave: ["aave-v3", "aave-v2"], // Aave V3 + legacy V2 fees/revenue (summed)
   // Lending networks (PDF Week 7+8) — fees/revenue adapters (verified 2026-06-18).
   morpho: "morpho-blue",
   spark: "spark",
-  compound: "compound-v3",
+  compound: ["compound-v3", "compound-v2"],
   fluid: "fluid",
   venus: "venus",
   justlend: "justlend",
@@ -250,13 +260,14 @@ export const LLAMA_FEES_SLUGS: Record<string, string | null> = {
   // Verified absent / no fees adapter:
   monerium: null,
   centrifuge: null,
+  aevo: null, // aevo-perps has no fees adapter — diagnostics reports no-api-coverage
 };
 
 /**
  * Curated slug -> DeFi Llama DEX protocol slug (volume). `null` = not a DEX /
  * no volume adapter. Verify against https://defillama.com/dexs.
  */
-export const LLAMA_DEX_SLUGS: Record<string, string | null> = {
+export const LLAMA_DEX_SLUGS: Record<string, string | string[] | null> = {
   jupiter: null, // Jupiter aggregator - no working volume adapter on DeFi Llama
   uniswap: "uniswap", // verify
   camelot: "camelot", // Arbitrum-native DEX // verify
@@ -303,18 +314,42 @@ export function llamaStablecoinIdForSlug(slug: string): number | null {
   return LLAMA_STABLECOIN_IDS[slug] ?? null;
 }
 
+/** Normalize a `string | string[] | null | undefined` slug value to an array. */
+export function normalizeSlugList(value: string | string[] | null | undefined): string[] {
+  if (value == null) return [];
+  const arr = Array.isArray(value) ? value : [value];
+  return arr.filter((s): s is string => typeof s === "string" && s.trim() !== "");
+}
+
+/** All DeFi Llama protocol slug(s) for a network slug (multi-product aware). */
+export function llamaProtocolsForSlug(slug: string): string[] {
+  return normalizeSlugList(LLAMA_PROTOCOL_SLUGS[slug] ?? null);
+}
+
+/** Back-compat: primary (first) protocol slug, or null. */
 export function llamaProtocolForSlug(slug: string): string | null {
-  return LLAMA_PROTOCOL_SLUGS[slug] ?? null;
+  return llamaProtocolsForSlug(slug)[0] ?? null;
 }
 
-/** Fees protocol slug: dedicated map first, then the shared TVL slug map. */
+/** Fees protocol slug(s): dedicated map first, then the shared TVL slug map. */
+export function llamaFeesProtocolsForSlug(slug: string): string[] {
+  if (slug in LLAMA_FEES_SLUGS) return normalizeSlugList(LLAMA_FEES_SLUGS[slug]);
+  return normalizeSlugList(LLAMA_PROTOCOL_SLUGS[slug] ?? null);
+}
+
+/** Back-compat: primary (first) fees protocol slug, or null. */
 export function llamaFeesProtocolForSlug(slug: string): string | null {
-  if (slug in LLAMA_FEES_SLUGS) return LLAMA_FEES_SLUGS[slug];
-  return LLAMA_PROTOCOL_SLUGS[slug] ?? null;
+  return llamaFeesProtocolsForSlug(slug)[0] ?? null;
 }
 
+/** DEX protocol slug(s) for a network slug (multi-product aware). */
+export function llamaDexProtocolsForSlug(slug: string): string[] {
+  return normalizeSlugList(LLAMA_DEX_SLUGS[slug] ?? null);
+}
+
+/** Back-compat: primary (first) DEX protocol slug, or null. */
 export function llamaDexProtocolForSlug(slug: string): string | null {
-  return LLAMA_DEX_SLUGS[slug] ?? null;
+  return llamaDexProtocolsForSlug(slug)[0] ?? null;
 }
 
 /** Llama protocol slug for options volume (falls back to TVL protocol map). */
@@ -529,8 +564,49 @@ export async function fetchLlamaProtocolTvl(
   days = 90,
   revalidate?: number,
 ): Promise<LlamaProtocolTvl | null> {
-  const protocol = llamaProtocolForSlug(slug);
-  if (!protocol) return null;
+  const protocols = llamaProtocolsForSlug(slug);
+  if (protocols.length === 0) return null;
+
+  const results = (
+    await Promise.all(
+      protocols.map((p) => fetchOneLlamaProtocolTvl(p, revalidate).catch(() => null)),
+    )
+  ).filter((r): r is LlamaProtocolTvl => r !== null);
+  if (results.length === 0) return null;
+
+  const combined = results.length === 1 ? results[0] : combineProtocolTvls(results);
+  return {
+    ...combined,
+    points: days > 0 ? combined.points.slice(-days) : combined.points,
+  };
+}
+
+/** Merge multiple products' TVL series (SUM by date) + chain TVLs (SUM by chain). */
+function combineProtocolTvls(results: LlamaProtocolTvl[]): LlamaProtocolTvl {
+  const byDate = new Map<string, number>();
+  for (const r of results) {
+    for (const pt of r.points) byDate.set(pt.date, (byDate.get(pt.date) ?? 0) + pt.value);
+  }
+  const points = Array.from(byDate, ([date, value]) => ({ date, value })).sort((a, b) =>
+    a.date.localeCompare(b.date),
+  );
+
+  const byChain = new Map<string, number>();
+  for (const r of results) {
+    for (const c of r.chainTvls) byChain.set(c.chain, (byChain.get(c.chain) ?? 0) + c.tvlUsd);
+  }
+  const chainTvls = Array.from(byChain, ([chain, tvlUsd]) => ({ chain, tvlUsd })).sort(
+    (a, b) => b.tvlUsd - a.tvlUsd,
+  );
+
+  return { points, scope: results[0].scope, chainTvls };
+}
+
+/** Fetch + parse a single protocol's full (unsliced) TVL series. */
+async function fetchOneLlamaProtocolTvl(
+  protocol: string,
+  revalidate?: number,
+): Promise<LlamaProtocolTvl | null> {
   const data = await getJson(
     `${PROTOCOLS_BASE}/protocol/${encodeURIComponent(protocol)}`,
     revalidate,
@@ -573,8 +649,9 @@ export async function fetchLlamaProtocolTvl(
   // A dead adapter reports a flat-zero series — treat as no data.
   if (points[points.length - 1].value <= 0 && points.every((p) => p.value <= 0)) return null;
 
+  // Full (unsliced) series — the caller slices after combining products.
   return {
-    points: days > 0 ? points.slice(-days) : points,
+    points,
     scope: arbSeries.length >= 2 ? "Arbitrum" : "all",
     chainTvls,
   };
@@ -662,17 +739,60 @@ export function isSyntheticChainKey(chain: string): boolean {
   return /^(?:borrowed|staking|pool2|treasury|vesting|doublecounted|excludeParent)$/i.test(chain);
 }
 
-/** Identity, links, and TVL universals for a network slug (single call). */
+/**
+ * Identity, links, and TVL universals for a network slug. Resolves to one or
+ * more DeFi Llama products; when several, per-product TVL is SUMmed and chain
+ * TVLs merged, while identity/mcap/gecko come from the primary (first) product.
+ * `overrideSlugs` (e.g. from `seed.llamaSlug`) takes precedence over the map.
+ */
 export async function fetchLlamaProtocolMeta(
   slug: string,
   revalidate?: number,
+  overrideSlugs?: string[],
 ): Promise<LlamaProtocolMeta | null> {
-  const protocol = llamaProtocolForSlug(slug);
-  if (!protocol) return null;
-  const data = await getJson(
-    `${PROTOCOLS_BASE}/protocol/${encodeURIComponent(protocol)}`,
-    revalidate,
+  const protocols =
+    overrideSlugs && overrideSlugs.length > 0 ? overrideSlugs : llamaProtocolsForSlug(slug);
+  if (protocols.length === 0) return null;
+
+  const metas = (
+    await Promise.all(
+      protocols.map((p) =>
+        getJson(`${PROTOCOLS_BASE}/protocol/${encodeURIComponent(p)}`, revalidate)
+          .then((data) =>
+            data && typeof data === "object" ? parseProtocolMetaPayload(data) : null,
+          )
+          .catch(() => null),
+      ),
+    )
+  ).filter((m): m is LlamaProtocolMeta => m !== null);
+  if (metas.length === 0) return null;
+  return metas.length === 1 ? metas[0] : combineProtocolMetas(metas);
+}
+
+/**
+ * Merge multiple products' meta: SUM latest TVL, merge per-chain TVL; identity,
+ * mcap, gecko id, change%, raises, and governance come from the primary/first.
+ */
+function combineProtocolMetas(metas: LlamaProtocolMeta[]): LlamaProtocolMeta {
+  const primary = metas[0];
+  let tvlUsdLatest: number | null = null;
+  for (const m of metas) {
+    if (m.tvlUsdLatest !== null) tvlUsdLatest = (tvlUsdLatest ?? 0) + m.tvlUsdLatest;
+  }
+  const byChain = new Map<string, number>();
+  for (const m of metas) {
+    for (const c of m.currentChainTvls) {
+      byChain.set(c.chain, (byChain.get(c.chain) ?? 0) + c.tvlUsd);
+    }
+  }
+  const currentChainTvls = Array.from(byChain, ([chain, tvlUsd]) => ({ chain, tvlUsd })).sort(
+    (a, b) => b.tvlUsd - a.tvlUsd,
   );
+  return { ...primary, tvlUsdLatest, currentChainTvls };
+}
+
+/** Parse a single `/protocol/{slug}` payload into `LlamaProtocolMeta`. */
+function parseProtocolMetaPayload(data: any): LlamaProtocolMeta | null {
   if (!data || typeof data !== "object") return null;
 
   // Daily total-TVL series for latest value + 1d/7d change.
@@ -894,9 +1014,50 @@ export async function fetchLlamaFeesRevenue(
   slug: string,
   revalidate?: number,
 ): Promise<LlamaFeesRevenue | null> {
-  const protocol = llamaFeesProtocolForSlug(slug);
-  if (!protocol) return null;
+  const protocols = llamaFeesProtocolsForSlug(slug);
+  if (protocols.length === 0) return null;
 
+  const results = (
+    await Promise.all(
+      protocols.map((p) => fetchOneFeesRevenue(p, revalidate).catch(() => null)),
+    )
+  ).filter((r): r is LlamaFeesRevenue => r !== null);
+  if (results.length === 0) return null;
+  return results.length === 1 ? results[0] : combineFeesRevenue(results);
+}
+
+/** SUM fees/revenue across products; keep methodology/category from the primary. */
+function combineFeesRevenue(results: LlamaFeesRevenue[]): LlamaFeesRevenue {
+  const primary = results[0];
+  const sum = (pick: (r: LlamaFeesRevenue) => number | null): number | null => {
+    let acc: number | null = null;
+    for (const r of results) {
+      const v = pick(r);
+      if (v !== null) acc = (acc ?? 0) + v;
+    }
+    return acc;
+  };
+  return {
+    fees24hUsd: sum((r) => r.fees24hUsd),
+    fees7dUsd: sum((r) => r.fees7dUsd),
+    fees30dUsd: sum((r) => r.fees30dUsd),
+    feesAllTimeUsd: sum((r) => r.feesAllTimeUsd),
+    revenue24hUsd: sum((r) => r.revenue24hUsd),
+    revenue7dUsd: sum((r) => r.revenue7dUsd),
+    revenue30dUsd: sum((r) => r.revenue30dUsd),
+    holdersRevenue24hUsd: sum((r) => r.holdersRevenue24hUsd),
+    feesChange1dPct: primary.feesChange1dPct,
+    methodology: primary.methodology,
+    methodologyUrl: primary.methodologyUrl,
+    category: primary.category,
+    githubUrls: primary.githubUrls,
+  };
+}
+
+async function fetchOneFeesRevenue(
+  protocol: string,
+  revalidate?: number,
+): Promise<LlamaFeesRevenue | null> {
   const fees = await fetchFeesSummary(protocol, "dailyFees", revalidate);
   if (!fees || typeof fees !== "object") return null;
   const revenue = await fetchFeesSummary(protocol, "dailyRevenue", revalidate);
@@ -950,13 +1111,44 @@ export interface LlamaDexVolume {
   change1dPct: number | null;
 }
 
-/** DEX trading volume summary for a slug. */
+/** DEX trading volume summary for a slug (SUMmed across products when multiple). */
 export async function fetchLlamaDexVolume(
   slug: string,
   revalidate?: number,
 ): Promise<LlamaDexVolume | null> {
-  const protocol = llamaDexProtocolForSlug(slug);
-  if (!protocol) return null;
+  const protocols = llamaDexProtocolsForSlug(slug);
+  if (protocols.length === 0) return null;
+
+  const results = (
+    await Promise.all(
+      protocols.map((p) => fetchOneDexVolume(p, revalidate).catch(() => null)),
+    )
+  ).filter((r): r is LlamaDexVolume => r !== null);
+  if (results.length === 0) return null;
+  if (results.length === 1) return results[0];
+
+  const primary = results[0];
+  const sum = (pick: (r: LlamaDexVolume) => number | null): number | null => {
+    let acc: number | null = null;
+    for (const r of results) {
+      const v = pick(r);
+      if (v !== null) acc = (acc ?? 0) + v;
+    }
+    return acc;
+  };
+  return {
+    volume24hUsd: sum((r) => r.volume24hUsd),
+    volume7dUsd: sum((r) => r.volume7dUsd),
+    volume30dUsd: sum((r) => r.volume30dUsd),
+    volumeAllTimeUsd: sum((r) => r.volumeAllTimeUsd),
+    change1dPct: primary.change1dPct,
+  };
+}
+
+async function fetchOneDexVolume(
+  protocol: string,
+  revalidate?: number,
+): Promise<LlamaDexVolume | null> {
   const data = await getJson(
     `${PROTOCOLS_BASE}/summary/dexs/${encodeURIComponent(protocol)}`,
     revalidate,

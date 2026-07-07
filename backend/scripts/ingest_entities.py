@@ -573,6 +573,45 @@ ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 ),
             },
         ],
+        "competitors": [
+            {
+                "name": "Maple Finance",
+                "slug": "maple",
+                "rank": 1,
+                "positioning": "Institutional on-chain private credit.",
+                "similarities": "Both originate real-world credit on-chain and pass yield to stablecoin depositors via a staked receipt token.",
+                "differences": "Maple lends to vetted institutional borrowers (trading firms, funds) via syrupUSDC; USD.AI lends against tokenized AI GPU hardware for compute infrastructure.",
+            },
+            {
+                "name": "Aave (Horizon / GHO)",
+                "slug": "aave",
+                "rank": 2,
+                "positioning": "Broad money market with RWA and stablecoin-yield products.",
+                "similarities": "Competes for stablecoin deposits seeking yield and is expanding into RWA-backed lending.",
+                "differences": "Aave is a general overcollateralized crypto money market; USD.AI is a purpose-built synthetic dollar collateralized by financed GPU hardware.",
+            },
+            {
+                "name": "Centrifuge",
+                "rank": 3,
+                "positioning": "Tokenized real-world asset credit.",
+                "similarities": "Brings off-chain real-world collateral on-chain to back credit and generate yield.",
+                "differences": "Centrifuge covers broad RWA pools (invoices, structured credit); USD.AI specializes in AI compute hardware.",
+            },
+            {
+                "name": "Huma Finance",
+                "rank": 4,
+                "positioning": "PayFi / receivables-backed on-chain credit.",
+                "similarities": "On-chain credit against real-world cash flows/assets with stablecoin liquidity.",
+                "differences": "Huma finances receivables and payments; USD.AI finances GPU/AI infrastructure.",
+            },
+        ],
+        "sources": [
+            {"label": "USD.AI documentation", "url": "https://docs.usd.ai/"},
+            {"label": "CoinDesk — USD.AI raises $13M for GPU-backed lending (Aug 2025)", "url": "https://www.coindesk.com/business/2025/08/13/usd-ai-raises-usd13m-to-expand-gpu-backed-stablecoin-lending"},
+            {"label": "Delphi Digital — USD.AI: Financing the Future of AI Infra", "url": "https://members.delphidigital.io/reports/usd-ai-financing-the-future-of-ai-infra"},
+            {"label": "MEXC — USDai, sUSDai, CHIP, Allo Points explained", "url": "https://www.mexc.com/learn/article/what-is-usd-ai-crypto-usdai-susdai-chip-token-and-allo-points-explained/1"},
+            {"label": "M^0 Research — USDai composable synthetic dollar", "url": "https://research.m0.org/research/usdai-uses-m0s-stablecoin-platform-to-launch-composable-synthetic-dollar"},
+        ],
         "current_scale": {
             "tvlUsd": 398_000_000,
             "users": 75_000,
@@ -1397,6 +1436,14 @@ for _slug, _spec in ENTITY_SPECS.items():
     _spec["sub_sector"] = None
 
 
+# Milestone-2 RWA characteristic metric blocks (spec §7): curated custody / access /
+# yield / chain / governance research, merged onto the RWA-carrying specs after all
+# taxonomy backfills so it applies regardless of which spec module defined the entity.
+from rwa_m2_characteristics import apply_rwa_m2_characteristics  # noqa: E402
+
+apply_rwa_m2_characteristics(ENTITY_SPECS)
+
+
 def build_entity_item(
     slug: str, spec: Dict[str, Any], parent_row: Optional[Dict[str, str]], created_at: str
 ) -> dict:
@@ -1476,6 +1523,9 @@ def build_entity_item(
         "RwaSubSector": spec.get("rwa_sub_sector"),
         "RwaSecondaryTags": spec.get("rwa_secondary_tags"),
         "Rwa": spec.get("rwa"),
+        # RWA M2 curated blocks: General rollup + characteristic-tag metrics.
+        "RwaGeneral": spec.get("rwa_general"),
+        "RwaCharacteristics": spec.get("rwa_characteristics"),
         # Staking taxonomy + metrics (canhav-staking spec §2).
         "StakingSubSector": spec.get("staking_sub_sector"),
         "StakingSecondaryTags": spec.get("staking_secondary_tags"),

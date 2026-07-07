@@ -431,7 +431,19 @@ export function PartnershipsSection({ partnerships }: { partnerships: Partnershi
             <li key={p.name} className="py-3 first:pt-0 last:pb-0">
               <div className="flex items-start justify-between gap-2">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-ink-50">{p.name}</p>
+                  <p className="text-sm font-medium text-ink-50">
+                    {p.slug ? (
+                      <a
+                        href={`/networks/${p.slug}`}
+                        className="inline-flex items-center gap-0.5 text-ink-50 transition-colors hover:text-electric-400"
+                      >
+                        {p.name}
+                        <ArrowUpRight className="h-3 w-3" />
+                      </a>
+                    ) : (
+                      p.name
+                    )}
+                  </p>
                   <p className="text-xs text-ink-400">{p.date}</p>
                   <p className="text-sm leading-relaxed text-ink-300">{p.description}</p>
                 </div>
@@ -1072,6 +1084,27 @@ export function OtherTagMetricsSection({
             )}
             {"bribeVolumeUsd" in block && (
               <MetricTile label="Bribe volume" sourced={block.bribeVolumeUsd} kind="usd" />
+            )}
+            {"crvEmissionsWeekly" in block && (
+              <MetricTile label="CRV emissions (weekly)" sourced={block.crvEmissionsWeekly} kind="count" />
+            )}
+            {"activeGaugeCount" in block && (
+              <MetricTile label="Active gauges" sourced={block.activeGaugeCount} kind="count" />
+            )}
+            {"totalProposals" in block && (
+              <MetricTile label="Proposals (Snapshot)" sourced={block.totalProposals} kind="count" />
+            )}
+            {"activeProposals" in block && (
+              <MetricTile label="Active proposals" sourced={block.activeProposals} kind="count" />
+            )}
+            {"uniqueVoters" in block && (
+              <MetricTile label="Unique voters" sourced={block.uniqueVoters} kind="count" />
+            )}
+            {"avgVotesPerProposal" in block && (
+              <MetricTile label="Avg votes / proposal" sourced={block.avgVotesPerProposal} kind="count" />
+            )}
+            {"snapshotFollowers" in block && (
+              <MetricTile label="Snapshot followers" sourced={block.snapshotFollowers} kind="count" />
             )}
             <PlainTile
               label="Fees (24h)"

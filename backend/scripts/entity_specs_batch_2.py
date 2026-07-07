@@ -191,6 +191,70 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 ),
             },
         ],
+        "competitors": [
+            {
+                'name': 'Ondo Finance',
+                'slug': 'ondo-finance',
+                'rank': 1,
+                'positioning': 'Closest on-platform RWA peer by structure: like Pleasing Market, Ondo pairs a tokenized real-world asset with a companion dollar-denominated instrument, and is a multi-chain RWA issuer.',
+                'similarities': 'Multi-token RWA model (asset token + dollar instrument); multi-chain deployment; institutional custody of the underlying; on-chain redemption.',
+                'differences': 'Ondo tokenizes US Treasuries / money-market exposure (USDY, OUSG) for yield, whereas Pleasing Market tokenizes LBMA-certified physical gold (PGOLD) with a synthetic dollar (USDpm/PUSD) backed by USDT plus tokenized metal. Ondo is far larger and US/institutional-focused; Pleasing Market is a Hong Kong precious-metals enterprise.',
+            },
+            {
+                'name': 'Dinari',
+                'slug': 'dinari',
+                'rank': 2,
+                'positioning': "On-platform RWA issuer tokenizing real-world assets with 1:1 physical/underlying backing and on-chain redemption, structurally similar to PGOLD's fully-backed model.",
+                'similarities': 'Fully-backed tokenized RWA with verifiable off-chain collateral; retail-accessible fractional exposure; multi-chain.',
+                'differences': 'Dinari focuses on tokenized equities/securities (dShares); Pleasing Market focuses on tokenized physical gold and precious metals, redeemable for allocated bars.',
+            },
+            {
+                'name': 'Securitize',
+                'slug': 'securitize',
+                'rank': 3,
+                'positioning': 'On-platform RWA tokenization infrastructure/issuer; a generic institutional-grade peer in the tokenized-asset space.',
+                'similarities': 'Institutional RWA tokenization with compliant issuance and multi-chain distribution.',
+                'differences': 'Securitize is a regulated broker-dealer / tokenization platform for funds and securities (e.g., BUIDL), not a commodity/gold-backed token issuer; it is a platform whereas Pleasing Market is a vertically integrated precious-metals operator.',
+            },
+            {
+                'name': 'DualMint',
+                'slug': 'dualmint',
+                'rank': 4,
+                'positioning': 'On-platform RWA peer; nearest generic comparable for a fully-backed tokenized-asset issuer.',
+                'similarities': 'Tokenization of real-world assets with backing and on-chain distribution.',
+                'differences': "Not gold/precious-metals specific; Pleasing Market's differentiator is LBMA-certified physical gold with Hong Kong redemption and a hybrid-reserve synthetic dollar.",
+            },
+        ],
+        "sources": [
+            {
+                'label': 'Pleasing International launch press release (GlobeNewswire, 2025-10-29)',
+                'url': 'https://www.globenewswire.com/news-release/2025/10/29/3176301/0/en/Pleasing-International-Launches-RWA-Platform-Pleasing-Golden-Introducing-Tokenized-Gold-PGOLD-and-Synthetic-Dollar-PUSD.html',
+            },
+            {
+                'label': 'Crypto Briefing: Pleasing Market migrates $90M TVL from LayerZero to Chainlink CCIP (2026-06-03)',
+                'url': 'https://cryptobriefing.com/pleasing-market-migrates-90m-tvl-ayerzero-chainlink/',
+            },
+            {
+                'label': 'CoinInsider: Pleasing Market moves $90M metals to Chainlink',
+                'url': 'https://www.coininsider.com/news/pleasing-market-moves-90m-metals-to-chainlink/',
+            },
+            {
+                'label': 'Pleasing Market GitBook documentation',
+                'url': 'https://pleasing.gitbook.io/docs',
+            },
+            {
+                'label': 'Pleasing Market official website',
+                'url': 'https://www.pleasingmarket.com/',
+            },
+            {
+                'label': 'Pleasing Gold (PGOLD) on Coinbase price/data',
+                'url': 'https://www.coinbase.com/price/pleasing-gold',
+            },
+            {
+                'label': 'Dune analytics dashboard for PGOLD',
+                'url': 'https://dune.com/bomi_papa/pgold',
+            },
+        ],
         "current_scale": {
             "tvlUsd": None,
             "users": None,
@@ -485,6 +549,117 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "description": "Cross-border OUSG redemption pilot on XRPL.",
             },
         ],
+        "competitors": [
+            {
+                'name': 'Securitize',
+                'slug': 'securitize',
+                'rank': 1,
+                'positioning': "Largest RWA tokenization platform and SEC-registered transfer agent/broker-dealer; issuer and transfer agent behind BlackRock's BUIDL, the largest tokenized Treasury product on public chains (~$2.5B-$3B AUM).",
+                'similarities': "Core tokenized U.S. Treasury exposure on public blockchains; both are foundational institutional RWA infrastructure. Ondo's OUSG is directly tied to Securitize's ecosystem, holding BlackRock BUIDL (tokenized by Securitize) as an underlying asset.",
+                'differences': 'Securitize operates as regulated infrastructure (transfer agent, broker-dealer, ATS) serving institutional issuers like BlackRock, Apollo, and KKR, with high minimums. Ondo is a consumer/DeFi-facing issuer that repackages such institutional funds into permissionless, lower-minimum, composable tokens (OUSG ~$5k, USDY retail) and also builds tokenized equities.',
+            },
+            {
+                'name': 'Franklin Templeton',
+                'slug': 'franklin-templeton',
+                'rank': 2,
+                'positioning': 'Traditional asset manager running the FOBXX / BENJI OnChain U.S. Government Money Fund, the first U.S.-registered mutual fund to record share ownership on a public blockchain (Stellar); ~$860M AUM.',
+                'similarities': 'Direct tokenized U.S. Treasury / government money-fund competitor producing on-chain yield-bearing instruments backed by short-term Treasuries.',
+                'differences': "Franklin directly manages the underlying fund as a registered '40 Act mutual fund with its own transfer-agent system, primarily on Stellar/Polygon. Ondo does not run its own mutual fund; it aggregates and redistributes institutional funds (e.g. BUIDL) into DeFi-composable tokens across many chains, and is far more DeFi- and multi-chain-native.",
+            },
+            {
+                'name': 'Dinari',
+                'slug': 'dinari',
+                'rank': 3,
+                'positioning': 'Tokenized U.S. equities issuer (dShares) offering 1:1 fully-backed on-chain stocks and ETFs to non-U.S. investors.',
+                'similarities': 'Direct competitor to Ondo Global Markets: both issue tokenized U.S. stocks/ETFs backed 1:1 by real securities held with regulated broker-dealers, targeting global (non-U.S.) access to U.S. equities on public chains.',
+                'differences': 'Dinari is focused primarily on tokenized equities and is smaller in scale. Ondo Global Markets launched later (Sept 2025) but rapidly became the largest tokenized-stock platform by TVL/volume, and Ondo pairs equities with a large tokenized-Treasury franchise (OUSG/USDY) and the ONDO token.',
+            },
+            {
+                'name': 'BlackRock BUIDL',
+                'slug': '',
+                'rank': 4,
+                'positioning': 'BlackRock USD Institutional Digital Liquidity Fund, the single largest tokenized Treasury product on public blockchains (~$2.5B-$3B AUM), tokenized by Securitize.',
+                'similarities': 'The benchmark tokenized U.S. Treasury money-market product; the reference competitor for OUSG and USDY yield.',
+                'differences': 'BUIDL is a high-minimum (historically ~$5M) institutional-only fund with limited direct DeFi composability. Ondo intermediates BUIDL (holding it as OUSG collateral) to deliver permissionless, lower-minimum, composable exposure to a broader market.',
+            },
+        ],
+        "audits": [
+            {
+                'firm': 'Halborn',
+                'date': '2025-02-01',
+                'url': 'https://docs.ondo.finance/pdf/Ondo-Halborn-Audit-Feb-2025.pdf',
+            },
+            {
+                'firm': 'Code4rena',
+                'date': '2024-04-24',
+                'url': 'https://code4rena.com/reports/2024-03-ondo-finance',
+            },
+            {
+                'firm': 'Cyfrin',
+                'date': '2024-04-01',
+                'url': 'https://docs.ondo.finance/pdf/Ondo-Cyfrin-Audit-April-2024.pdf',
+            },
+            {
+                'firm': 'Halborn',
+                'date': '2024-06-01',
+                'url': 'https://docs.ondo.finance/pdf/Ondo-Halborn-Audit-June-2024.pdf',
+            },
+            {
+                'firm': 'Code4rena',
+                'date': '2023-09-01',
+                'url': 'https://code4rena.com/reports/2023-09-ondo/',
+            },
+            {
+                'firm': 'Zokyo',
+                'date': '2023-08-01',
+                'url': 'https://docs.ondo.finance/pdf/Ondo-Zokyo-Audit-August-2023.pdf',
+            },
+            {
+                'firm': 'Nethermind',
+                'date': '2023-04-01',
+                'url': 'https://docs.ondo.finance/pdf/Ondo-NetherMind-Audit-April-2023.pdf',
+            },
+            {
+                'firm': 'Code4rena',
+                'date': '2023-01-01',
+                'url': 'https://code4rena.com/reports/2023-01-ondo/',
+            },
+            {
+                'firm': 'Cyfrin',
+                'date': '2025-07-14',
+                'url': 'https://docs.ondo.finance/audits',
+            },
+        ],
+        "sources": [
+            {
+                'label': 'Ondo Finance official smart-contract audits index',
+                'url': 'https://docs.ondo.finance/audits',
+            },
+            {
+                'label': 'Ondo Finance OUSG product page',
+                'url': 'https://ondo.finance/ousg',
+            },
+            {
+                'label': 'Ondo Global Markets (tokenized equities) product page',
+                'url': 'https://ondo.finance/global-markets',
+            },
+            {
+                'label': 'Code4rena Ondo Finance audit report (OUSG / rOUSG / OUSGInstantManager, Apr 2024)',
+                'url': 'https://code4rena.com/reports/2024-03-ondo-finance',
+            },
+            {
+                'label': 'Messari — Ondo Finance project profile',
+                'url': 'https://messari.io/project/ondo-finance',
+            },
+            {
+                'label': 'Gate Blog — BlackRock BUIDL, Ondo, and Franklin dividing the tokenized Treasury market',
+                'url': 'https://miniapp.gate.com/blog/102069/rwa-market-triopoly-blackrock-buidl-ondo-franklin-templeton-tokenized-us-treasury-market-real-world-assets-rwa-competition-onchain-treasuries-institutional-adoption-analysis',
+            },
+            {
+                'label': 'Ondo Finance — 2025 Recap (Global Markets scale, product overview)',
+                'url': 'https://ondo.finance/blog/2025-recap',
+            },
+        ],
         "current_scale": {
             "tvlUsd": 2_140_000_000,
             "users": None,
@@ -634,6 +809,22 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         "twitter": "https://twitter.com/aaveaave",
         "discord": "https://discord.com/invite/aave",
         "github": "https://github.com/aave/aave-protocol",
+        "sources": [
+            {"label": "Aave documentation", "url": "https://aave.com/docs"},
+            {"label": "Aave Docs — Security & Audits", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"label": "Aave Governance forum", "url": "https://governance.aave.com"},
+            {"label": "Aave V3 Origin (protocol source)", "url": "https://github.com/aave-dao/aave-v3-origin"},
+            {"label": "Immunefi — Aave bug bounty", "url": "https://immunefi.com/bug-bounty/aave/"},
+            {"label": "DeFiLlama — Aave", "url": "https://defillama.com/protocol/aave"},
+        ],
+        "audits": [
+            {"firm": "OpenZeppelin", "date": "2021-11-01", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"firm": "Trail of Bits", "date": "2022-01-07", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"firm": "PeckShield", "date": "2022-01-14", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"firm": "SigmaPrime", "date": "2022-01-27", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"firm": "ABDK", "date": "2022-01-27", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"firm": "Certora (formal verification)", "date": "2022-01", "url": "https://github.com/aave-dao/aave-v3-origin"},
+        ],
         "components": [
             {
                 "name": "Lending markets",

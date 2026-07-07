@@ -69,7 +69,7 @@ export function getRedisClient(): Redis {
 }
 
 /** Normalize a hash value that may be a JSON string or an already-parsed object. */
-function parseItem(value: unknown): Record<string, any> | null {
+export function parseItem(value: unknown): Record<string, any> | null {
   if (value == null) return null;
   if (typeof value === "object") return value as Record<string, any>;
   if (typeof value === "string") {
@@ -82,7 +82,7 @@ function parseItem(value: unknown): Record<string, any> | null {
   return null;
 }
 
-function fieldKey(category: string, slug: string): string {
+export function fieldKey(category: string, slug: string): string {
   return `CATEGORY#${category}|PROTOCOL#${slug}`;
 }
 

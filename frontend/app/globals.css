@@ -90,4 +90,43 @@
       0 10px 30px -8px rgba(61, 123, 255, 0.55),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
+
+  /* Uppercase section label — the landing page's signature kicker. */
+  .kicker {
+    @apply text-xs font-semibold uppercase text-electric-400;
+    letter-spacing: 0.14em;
+  }
+
+  /* Primary CTA — landing's gradient pill button. Pair with btn-glow. */
+  .btn-gradient {
+    background-image: linear-gradient(to bottom, #3d7bff 0%, #1d4ed8 100%);
+    @apply text-white transition-all duration-200;
+  }
+  .btn-gradient:hover {
+    background-image: linear-gradient(to bottom, #5c92ff 0%, #2563eb 100%);
+  }
+
+  /* Landing show-card surface: vertical dark gradient panel. */
+  .card-surface {
+    background: linear-gradient(180deg, rgba(20, 24, 36, 0.9) 0%, rgba(10, 12, 19, 0.94) 100%);
+  }
+
+  /* Hover lift + electric border + glow, from the landing's sector cards. */
+  .card-lift {
+    transition:
+      transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-lift:hover {
+    transform: translateY(-3px);
+    border-color: rgba(61, 123, 255, 0.42);
+    box-shadow: 0 30px 70px -34px rgba(61, 123, 255, 0.55);
+  }
+
+  /* Terminal-window traffic-light dot (landing "mwin" chrome). */
+  .term-dot {
+    @apply block h-2 w-2 rounded-full;
+    background: rgba(124, 132, 153, 0.35);
+  }
 }

@@ -8,9 +8,15 @@ import { getRedisClient, hasUpstash } from "@/lib/server/redis";
 
 import { agentOfferHash } from "@/lib/agent/agentOffer";
 import { sanitizeAgentConfig, type AgentConfig } from "@/lib/agent/agentConfig";
+import {
+  tradeProposalFromJson,
+  tradeProposalToJson,
+  type TradeProposal,
+  type TradeProposalJson,
+} from "@/lib/agent/trade/types";
 import { isAgentCategory, type AgentCategory } from "@/lib/agent/categories";
 import type { DataFrame } from "@/lib/types";
-import type { AssetSnapshot, ResearchVerdict } from "canhav-agent-service";
+import type { AssetSnapshot, ResearchVerdict } from "canhav-agent-service/src/types";
 
 /**
  * Agent memory layer (no Supabase).
@@ -82,13 +88,13 @@ export interface AgentProfile {
   entitySlug: string | null;
   /** The Privy user id (DID) of the creator/owner. Null for legacy/seeded agents. */
   ownerUserId: string | null;
-  /** MetaMask / embedded EOA that controls this agent's ZeroDev kernel. */
+  /** MetaMask / embedded EOA that minted (and controls) this agent. */
   signerAddress: string | null;
   /** Owner-authored bio shown in the collaboration marketplace. Null = none. */
   description: string | null;
   /** Member products of the bound entity, denormalized for fast scoping. */
   associatedProducts: AgentProductRef[];
-  /** Deterministic salt used for this agent's ZeroDev sub-account (per project). */
+  /** Deterministic per-slot salt (legacy kernel-era field; kept for old agents). */
   accountIndex: number | null;
   agentAddress: string | null;
   agentURI: string | null;
@@ -136,10 +142,17 @@ const key = {
   offerHash: (id: string) => `agent:${id}:offerHash`,
   frames: (id: string) => `agent:${id}:frames`,
   verdicts: (id: string) => `agent:${id}:verdicts`,
+  tradeProposals: (id: string) => `agent:${id}:trade-proposals`,
   snapshot: (id: string, asset: string) => `agent:${id}:snapshot:${asset}`,
 };
 
+export const MAX_TRADE_PROPOSALS = 50;
+
 export const MAX_VERDICTS = 50;
+
+export const MAX_RUNS = 50;
+
+export const MAX_MEMORY_FACTS = 200;
 
 const combinedVerdictKey = (asset: string) => `combined:verdict:${asset}`;
 
@@ -189,6 +202,8 @@ interface FileStore {
   snapshots?: Record<string, AssetSnapshot>;
   /** asset symbol -> latest combined verdict. */
   combinedVerdicts?: Record<string, ResearchVerdict>;
+  /** agentId -> trade proposals (newest first). */
+  tradeProposals?: Record<string, TradeProposalJson[]>;
 }
 
 function filePath(): string {
@@ -211,6 +226,7 @@ function readFile(): FileStore {
       verdicts: parsed.verdicts ?? {},
       snapshots: parsed.snapshots ?? {},
       combinedVerdicts: parsed.combinedVerdicts ?? {},
+      tradeProposals: parsed.tradeProposals ?? {},
     };
   } catch {
     return {
@@ -226,6 +242,7 @@ function readFile(): FileStore {
       verdicts: {},
       snapshots: {},
       combinedVerdicts: {},
+      tradeProposals: {},
     };
   }
 }
@@ -483,10 +500,12 @@ export async function getAgentByAddress(address: string): Promise<AgentProfile |
 
 export async function appendRun(agentId: string, run: AgentRun): Promise<void> {
   if (hasUpstash()) {
-    await getRedisClient().lpush(key.runs(agentId), JSON.stringify(run));
+    const redis = getRedisClient();
+    await redis.lpush(key.runs(agentId), JSON.stringify(run));
+    await redis.ltrim(key.runs(agentId), 0, MAX_RUNS - 1);
   } else {
     const store = readFile();
-    store.runs[agentId] = [run, ...(store.runs[agentId] ?? [])];
+    store.runs[agentId] = [run, ...(store.runs[agentId] ?? [])].slice(0, MAX_RUNS);
     writeFile(store);
   }
 }
@@ -520,10 +539,13 @@ export async function appendMemory(
 
   const entry: AgentMemoryFact = { id: randomId("fact"), ts: nowIso(), text, source };
   if (hasUpstash()) {
-    await getRedisClient().rpush(key.memory(agentId), JSON.stringify(entry));
+    // Memory is oldest-first (rpush); trim from the head so the newest facts win.
+    const redis = getRedisClient();
+    await redis.rpush(key.memory(agentId), JSON.stringify(entry));
+    await redis.ltrim(key.memory(agentId), -MAX_MEMORY_FACTS, -1);
   } else {
     const store = readFile();
-    store.memory[agentId] = [...(store.memory[agentId] ?? []), entry];
+    store.memory[agentId] = [...(store.memory[agentId] ?? []), entry].slice(-MAX_MEMORY_FACTS);
     writeFile(store);
   }
   return entry;
@@ -531,10 +553,15 @@ export async function appendMemory(
 
 export async function getMemory(agentId: string): Promise<AgentMemoryFact[]> {
   if (hasUpstash()) {
-    const raw = (await getRedisClient().lrange(key.memory(agentId), 0, -1)) as unknown[];
+    // Bounded read: also caps legacy lists that grew before ltrim was added.
+    const raw = (await getRedisClient().lrange(
+      key.memory(agentId),
+      -MAX_MEMORY_FACTS,
+      -1,
+    )) as unknown[];
     return raw.map((v) => coerce<AgentMemoryFact>(v)).filter((f): f is AgentMemoryFact => Boolean(f));
   }
-  return readFile().memory[agentId] ?? [];
+  return (readFile().memory[agentId] ?? []).slice(-MAX_MEMORY_FACTS);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -770,6 +797,87 @@ export async function setCombinedVerdict(asset: string, verdict: ResearchVerdict
     store.combinedVerdicts = { ...(store.combinedVerdicts ?? {}), [asset]: verdict };
     writeFile(store);
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Trade proposals (Pathway B HITL)                                            */
+/* -------------------------------------------------------------------------- */
+
+export async function listTradeProposals(
+  agentId: string,
+  limit = MAX_TRADE_PROPOSALS,
+): Promise<TradeProposal[]> {
+  if (hasUpstash()) {
+    const raw = await getRedisClient().lrange(key.tradeProposals(agentId), 0, limit - 1);
+    return raw
+      .map((v) => {
+        const json = coerce<TradeProposalJson>(v);
+        return json ? tradeProposalFromJson(json) : null;
+      })
+      .filter((p): p is TradeProposal => p != null);
+  }
+  const list = readFile().tradeProposals?.[agentId] ?? [];
+  return list.slice(0, limit).map(tradeProposalFromJson);
+}
+
+export async function getTradeProposal(
+  agentId: string,
+  proposalId: string,
+): Promise<TradeProposal | null> {
+  const proposals = await listTradeProposals(agentId, MAX_TRADE_PROPOSALS);
+  return proposals.find((p) => p.id === proposalId) ?? null;
+}
+
+export async function appendTradeProposal(
+  agentId: string,
+  proposal: TradeProposal,
+): Promise<void> {
+  const json = tradeProposalToJson(proposal);
+  if (hasUpstash()) {
+    const redis = getRedisClient();
+    await redis.lpush(key.tradeProposals(agentId), JSON.stringify(json));
+    await redis.ltrim(key.tradeProposals(agentId), 0, MAX_TRADE_PROPOSALS - 1);
+    return;
+  }
+  const store = readFile();
+  const list = store.tradeProposals?.[agentId] ?? [];
+  store.tradeProposals = {
+    ...(store.tradeProposals ?? {}),
+    [agentId]: [json, ...list].slice(0, MAX_TRADE_PROPOSALS),
+  };
+  writeFile(store);
+}
+
+export async function updateTradeProposalStatus(
+  agentId: string,
+  proposalId: string,
+  patch: Partial<Pick<TradeProposal, "status" | "reason" | "txHash">>,
+): Promise<TradeProposal | null> {
+  const proposals = await listTradeProposals(agentId, MAX_TRADE_PROPOSALS);
+  const idx = proposals.findIndex((p) => p.id === proposalId);
+  if (idx < 0) return null;
+
+  const updated: TradeProposal = { ...proposals[idx], ...patch };
+  const rest = proposals.filter((p) => p.id !== proposalId);
+  const next = [updated, ...rest];
+
+  if (hasUpstash()) {
+    const redis = getRedisClient();
+    const k = key.tradeProposals(agentId);
+    await redis.del(k);
+    if (next.length) {
+      await redis.lpush(k, ...next.map((p) => JSON.stringify(tradeProposalToJson(p))));
+    }
+    return updated;
+  }
+
+  const store = readFile();
+  store.tradeProposals = {
+    ...(store.tradeProposals ?? {}),
+    [agentId]: next.map(tradeProposalToJson),
+  };
+  writeFile(store);
+  return updated;
 }
 
 /* -------------------------------------------------------------------------- */

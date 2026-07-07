@@ -4,15 +4,14 @@ import { ChevronRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import { getAgentSkillById, getAgentSkills } from "@/lib/agent/skills";
+import { getAgentSkillById } from "@/lib/agent/skills";
 import { skillToJson, skillToMarkdown } from "@/lib/agent/skillExport";
 
 export const revalidate = 300;
 
-export async function generateStaticParams() {
-  const skills = await getAgentSkills();
-  return skills.map((s) => ({ id: s.id }));
-}
+// No generateStaticParams: rendered on demand like /receipts/[slug].
+// Pre-rendering every skill inflated build time while production served every
+// request dynamically anyway.
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const skill = await getAgentSkillById(decodeURIComponent(params.id));

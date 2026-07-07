@@ -8,7 +8,6 @@ import {
   TCNHV_DECIMALS,
   tcnhvRewardForRating,
 } from "@/lib/agent/collab-config";
-import { hasZeroDev } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { userOwnsAgent } from "@/lib/agent/ownership";
 import { recordReputation } from "@/lib/agent/reputation";
@@ -154,28 +153,19 @@ export async function POST(req: Request) {
 
   // Flag-off on-chain attestation params.
   const registry = reputationRegistryAddress();
-  const zerodevRpc = readSecret("ZERODEV_RPC");
-  const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
   const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
   const rpcUrl =
     readSecret("ARBITRUM_SEPOLIA_RPC_URL") ?? "https://sepolia-rollup.arbitrum.io/rpc";
 
   const onChain =
-    reputationEnabled() &&
-    registry &&
-    buyer?.onChain &&
-    buyer.accountIndex != null &&
-    hasZeroDev() &&
-    zerodevRpc &&
-    identityRegistry &&
-    securityRegistry
+    reputationEnabled() && registry && buyer?.onChain && securityRegistry
       ? {
           reputationRegistry: registry,
           toAgentId,
           value: Math.round(rating),
           valueDecimals: 0,
-          accountIndex: buyer.accountIndex,
-          mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
+          rpcUrl,
+          securityRegistry,
         }
       : null;
 

@@ -4,7 +4,6 @@ import { keccak256, toHex } from "viem";
 
 import { agentOfferHash, agentOfferSkillId } from "@/lib/agent/agentOffer";
 import { collabAgreementAddress, collabRegistryAddress } from "@/lib/agent/collab-config";
-import { hasZeroDev } from "@/lib/agent/config";
 import { appendMemory, getAgentProfile, markSkillStudied } from "@/lib/agent/memory";
 import { userOwnsAgent } from "@/lib/agent/ownership";
 import { strategyPacketToMarkdown } from "@/lib/agent/strategyPacket";
@@ -270,20 +269,12 @@ export async function POST(req: Request) {
 
   const registry = collabRegistryAddress();
   const buyer = await getAgentProfile(fromAgentId);
-  const zerodevRpc = readSecret("ZERODEV_RPC");
-  const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
   const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
   const rpcUrl =
     readSecret("ARBITRUM_SEPOLIA_RPC_URL") ?? "https://sepolia-rollup.arbitrum.io/rpc";
 
   const record =
-    registry &&
-    buyer?.onChain &&
-    buyer.accountIndex != null &&
-    hasZeroDev() &&
-    zerodevRpc &&
-    identityRegistry &&
-    securityRegistry
+    registry && buyer?.onChain && securityRegistry
       ? {
           collabRegistry: registry,
           fromAgentId,
@@ -292,8 +283,8 @@ export async function POST(req: Request) {
           paymentRef,
           agreementId: onChainAgreementId,
           units: Math.min(disclosedUnits, 0xffffffff),
-          accountIndex: buyer.accountIndex,
-          mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
+          rpcUrl,
+          securityRegistry,
         }
       : null;
 
@@ -302,21 +293,14 @@ export async function POST(req: Request) {
   // writes. Only when the agreement was actually anchored on-chain.
   const collabAgreement = collabAgreementAddress();
   const agreementRecord =
-    anchoredAgreementOnChainId &&
-    collabAgreement &&
-    buyer?.onChain &&
-    buyer.accountIndex != null &&
-    hasZeroDev() &&
-    zerodevRpc &&
-    identityRegistry &&
-    securityRegistry
+    anchoredAgreementOnChainId && collabAgreement && buyer?.onChain && securityRegistry
       ? {
           collabAgreement,
           onChainAgreementId: anchoredAgreementOnChainId,
           units: Math.min(disclosedUnits, 0xffffffff),
           tokens: String(recordTokens),
-          accountIndex: buyer.accountIndex,
-          mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
+          rpcUrl,
+          securityRegistry,
         }
       : null;
 

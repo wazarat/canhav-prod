@@ -18,7 +18,7 @@ import { readSecret } from "@/lib/server/env";
  *
  * `createLedger`, `setTransferAllowed`, and `recordWork` are owner-gated on the
  * already-deployed contracts, so they are signed here with the platform deployer
- * key (a plain viem wallet client — NOT a ZeroDev smart account, and never the
+ * key (a plain viem wallet client — never the user's wallet, and never the
  * agent's wallet). This is the one server-side signer in the app: it is the
  * platform owner key (can mint tCNHV) and is testnet-only — it must never reach
  * the client.

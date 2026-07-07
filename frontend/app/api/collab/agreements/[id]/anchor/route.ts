@@ -6,7 +6,6 @@ import {
   hasCollabAgreement,
   parseAmountToBaseUnits,
 } from "@/lib/agent/collab-config";
-import { hasZeroDev } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { getSession } from "@/lib/auth/session";
 import {
@@ -69,7 +68,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   // Graceful degradation: when the contract isn't deployed, the agents aren't
   // minted, or the agreement is already anchored, there's nothing to sign.
   const collabAgreement = collabAgreementAddress();
-  if (!hasCollabAgreement() || !collabAgreement || !hasZeroDev()) {
+  if (!hasCollabAgreement() || !collabAgreement) {
     return NextResponse.json({ configured: false, reason: "contract-unset" });
   }
   if (agreement.onChainAgreementId) {
@@ -83,16 +82,14 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   }
 
   const buyer = await getAgentProfile(agreement.buyerAgentId);
-  if (!buyer || !buyer.onChain || buyer.accountIndex == null) {
+  if (!buyer || !buyer.onChain) {
     return NextResponse.json({ configured: false, reason: "buyer-not-minted" });
   }
 
-  const zerodevRpc = readSecret("ZERODEV_RPC");
-  const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
   const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
   const rpcUrl =
     readSecret("ARBITRUM_SEPOLIA_RPC_URL") ?? "https://sepolia-rollup.arbitrum.io/rpc";
-  if (!zerodevRpc || !identityRegistry || !securityRegistry) {
+  if (!securityRegistry) {
     return NextResponse.json({ configured: false, reason: "registry-unset" });
   }
 
@@ -132,8 +129,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       updatesPerPeriod: agreement.updatesPerPeriod,
       duneLinked: agreement.duneLinked,
       termsHash,
-      accountIndex: buyer.accountIndex,
-      mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
+      rpcUrl,
+      securityRegistry,
     },
   });
 }

@@ -3,18 +3,16 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 /**
- * Derive a deterministic ZeroDev sub-account salt for a (wallet, slot) pair.
+ * Derive a deterministic creation-slot index for a (user, slot) pair.
  *
- * Each agent a wallet creates gets its OWN smart-account address. The `slot` is
- * the creation key — a per-agent creation nonce for general agents (created on
- * the Agents tab) or a legacy entity slug for older entity-bound mints. The
- * index salts the counterfactual address, so:
- *   - different slots under the same wallet -> different addresses, and
- *   - re-spawning the SAME slot              -> the SAME address (idempotent
- *     mint, no duplicate identities on retry).
+ * The `slot` is the creation key — a per-agent creation nonce for general
+ * agents (created on the Agents tab) or a legacy entity slug for older
+ * entity-bound mints. The index keys spawn idempotency (re-spawning the SAME
+ * slot reuses the existing agent instead of minting a duplicate on retry) and
+ * is stored on the profile; legacy kernel-era agents also used it as their
+ * smart-account salt.
  *
- * Returns a 31-bit positive integer (widened to bigint in agent-service before
- * it reaches ZeroDev's `createKernelAccount({ index })`).
+ * Returns a 31-bit positive integer.
  */
 export function deriveAccountIndex(userId: string, slot: string): number {
   const digest = createHash("sha256").update(`${userId}:${slot}`).digest();

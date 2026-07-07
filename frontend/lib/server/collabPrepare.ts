@@ -64,6 +64,7 @@ export interface CollabPrepareResult {
 export async function prepareCollabSettlement(
   fromAgentId: string,
   toAgentId: string,
+  options?: { payerAddress?: string | null },
 ): Promise<CollabPrepareResult> {
   const settle = collabSettlement();
   const [buyer, seller] = await Promise.all([
@@ -82,7 +83,7 @@ export async function prepareCollabSettlement(
     sellerPayTo: null,
   };
 
-  if (!buyer?.onChain || buyer.accountIndex == null) {
+  if (!options?.payerAddress && (!buyer?.onChain || buyer.accountIndex == null)) {
     return fail(proof, "Buyer agent must be minted on-chain to pay.");
   }
 
@@ -96,7 +97,10 @@ export async function prepareCollabSettlement(
   }
 
   const buyerWallet =
-    buyer.agentAddress ?? (await readAgentWallet(fromAgentId)) ?? null;
+    options?.payerAddress ??
+    buyer?.agentAddress ??
+    (await readAgentWallet(fromAgentId)) ??
+    null;
   proof.buyerWallet = buyerWallet;
   if (!buyerWallet) {
     return fail(proof, "Buyer agent wallet is not available on-chain.");
@@ -146,7 +150,9 @@ export async function prepareCollabSettlement(
     proof,
     error: sufficient
       ? undefined
-      : `Your agent has ${humanBalance} ${settle.name} but this costs ${humanRequired}. Fund your agent from the treasury above, or tap “Claim free credits” on the agent.`,
+      : options?.payerAddress
+        ? `Your wallet has ${humanBalance} ${settle.name} but this costs ${humanRequired}. Fund your Privy wallet from the treasury above.`
+        : `Your agent has ${humanBalance} ${settle.name} but this costs ${humanRequired}. Fund your agent from the treasury above, or tap “Claim free credits” on the agent.`,
   };
 }
 

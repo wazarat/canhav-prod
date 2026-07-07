@@ -13,7 +13,7 @@ import { NetworkResearchTab } from "@/components/networks/tabs/NetworkResearchTa
 import { NetworkRisksTab } from "@/components/networks/tabs/NetworkRisksTab";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { buildSkillFromEntity } from "@/lib/agent/skills";
-import { getApprovedNetworks, getApprovedNetworkBySlug } from "@/lib/data";
+import { getApprovedNetworkBySlug } from "@/lib/data";
 import { loadNetworkDashboardData } from "@/lib/networks/dashboard-data";
 import {
   networkHeadlineMarketCapUsd,
@@ -30,9 +30,10 @@ interface PageProps {
 
 export const revalidate = 300;
 
-export async function generateStaticParams() {
-  return (await getApprovedNetworks()).map((p) => ({ slug: p.slug }));
-}
+// No generateStaticParams: rendered on demand like /receipts/[slug].
+// Pre-rendering ~120 networks fanned out to CoinGecko / Alchemy / DefiLlama at
+// build time and dominated deploy duration, while production served every
+// request dynamically anyway.
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const profile = await getApprovedNetworkBySlug(params.slug);

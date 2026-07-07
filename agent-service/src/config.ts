@@ -16,8 +16,6 @@ export const chain = arbitrumSepolia;
 
 export interface AgentServiceConfig {
   chainId: number;
-  /** ZeroDev unified RPC (bundler + paymaster) for Arbitrum Sepolia. */
-  zerodevRpc: string;
   /** Public RPC for read calls (gate checks, event parsing). */
   rpcUrl: string;
   /** Deployed ERC-8004 IdentityRegistry address. */
@@ -50,7 +48,6 @@ export function assertArbitrumSepolia(chainId: number): void {
 /** Build the service config from the environment, asserting the chain pin. */
 export function loadConfig(): AgentServiceConfig {
   return createConfig({
-    zerodevRpc: required("ZERODEV_RPC"),
     rpcUrl:
       optional("ARBITRUM_SEPOLIA_RPC_URL") ??
       chain.rpcUrls.default.http[0] ??
@@ -67,7 +64,6 @@ export function createConfig(
 ): AgentServiceConfig {
   const cfg: AgentServiceConfig = {
     chainId: params.chainId ?? chain.id,
-    zerodevRpc: params.zerodevRpc,
     rpcUrl: params.rpcUrl,
     identityRegistry: params.identityRegistry,
     securityRegistry: params.securityRegistry,

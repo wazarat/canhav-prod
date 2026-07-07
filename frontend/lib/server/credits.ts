@@ -12,7 +12,7 @@ import {
 /**
  * Wallet-as-treasury starting grant.
  *
- * Each user's canonical ZeroDev kernel wallet (index 0) is seeded ONCE with
+ * Each user's canonical Privy treasury wallet is seeded ONCE with
  * tCNHV so they can immediately pay sellers, fund their agents, and transfer
  * credits to other people. The mint is owner-signed (bypasses the transfer
  * allowlist), and the wallet is allowlisted so it can SEND afterwards.

@@ -4,12 +4,13 @@ import { openai } from "@ai-sdk/openai";
 import type { EmbeddingModel, LanguageModel } from "ai";
 
 import { readSecret } from "@/lib/server/env";
+import { securityRegistryConfigured } from "@/lib/server/securityGate";
 import { canMintTcnhv, deployerKeyDiagnostics } from "@/lib/server/factory";
 
 import { hasTcnhv } from "./collab-config";
 import { hasUpstash } from "@/lib/server/redis";
 
-import { AGENT_CHAIN, ARBITRUM_SEPOLIA_CHAIN_ID } from "./chain";
+import { AGENT_CHAIN } from "./chain";
 
 /**
  * Server-only configuration probes for the CanHav AI agent layer (Pillar 2).
@@ -19,8 +20,8 @@ import { AGENT_CHAIN, ARBITRUM_SEPOLIA_CHAIN_ID } from "./chain";
  *   - OpenAI    -> the LLM research loop (app/api/agent)
  *   - Upstash   -> persistent agent memory (lib/agent/memory.ts); a local JSON
  *                  fallback is used in offline dev when this is false
- *   - ZeroDev   -> on-chain ERC-8004 registration (app/api/agent/spawn), which
- *                  reuses the standalone agent-service + deployed registries
+ *   - Identity  -> on-chain ERC-8004 registration (app/api/agent/spawn) against
+ *                  the deployed registries, signed by the user's Privy wallet
  *
  * Secrets resolve via `readSecret` (process.env first, then backend/.env), the
  * same convention the Alchemy/Dune/CoinGecko overlays already use.
@@ -129,145 +130,23 @@ export function hasPrivy(): boolean {
 }
 
 /**
- * Whether the on-chain identity stack is provisioned: a ZeroDev project RPC,
- * both deployed registry addresses, and Privy social login (the smart-account
- * signer that mints + owns the ERC-8004 identity).
+ * Whether on-chain ERC-8004 identity is configured: the deployed registries
+ * plus Privy (the user's wallet signs the mint directly and pays its own gas).
  */
-export function hasZeroDev(): boolean {
+export function hasOnchainIdentity(): boolean {
   return Boolean(
-    readSecret("ZERODEV_RPC") &&
-      readSecret("IDENTITY_REGISTRY_ADDRESS") &&
+    readSecret("IDENTITY_REGISTRY_ADDRESS") &&
       readSecret("SECURITY_REGISTRY_ADDRESS") &&
       hasPrivy(),
   );
 }
 
-/** EntryPoint v0.7 (used to shape the paymaster probe userOp). */
-const ENTRYPOINT_07 = "0x0000000071727De22E5E9d8BAf0edAc6f37da032" as const;
-
 /**
- * Parse the `/api/v<n>/<projectId>/chain/<chainId>` segments from `ZERODEV_RPC`.
- * Lets the status readout report *which* ZeroDev project + chain the running
- * deployment actually resolves — the only way to catch a stale env snapshot or
- * a wrong/typo'd project id without leaking the full (sponsorship-capable) URL.
+ * Whether the Privy-direct wallet path is live: social login + tCNHV token.
+ * Used for treasury bootstrap, balance readout, and plain ERC-20 transfers.
  */
-function parseZeroDevRpc(): {
-  url: string | null;
-  projectId: string | null;
-  chainId: number | null;
-} {
-  const url = readSecret("ZERODEV_RPC");
-  if (!url) return { url: null, projectId: null, chainId: null };
-  const m = url.match(/\/api\/v\d+\/([0-9a-fA-F-]{36})(?:\/chain\/(\d+))?/);
-  return {
-    url,
-    projectId: m?.[1] ?? null,
-    chainId: m?.[2] ? Number(m[2]) : null,
-  };
-}
-
-/**
- * Masked ZeroDev project identifier for the public status readout: the first 8
- * chars of the project UUID (e.g. `"0988370e"`), never the full id/URL (which
- * could be replayed to drain sponsored gas). Returns `"set:unparseable"` when
- * `ZERODEV_RPC` is present but not the expected v3 `.../<uuid>/chain/<id>` shape
- * — that itself signals a copy-paste artifact (quotes/whitespace) or wrong URL.
- */
-function maskedZeroDevProject(): string | null {
-  const { url, projectId } = parseZeroDevRpc();
-  if (!url) return null;
-  if (!projectId) return "set:unparseable";
-  return `${projectId.slice(0, 8)}…`;
-}
-
-export interface PaymasterProbe {
-  /** True only when the live RPC returned sponsored paymaster data. */
-  ok: boolean;
-  httpStatus: number | null;
-  /** Chain id parsed from `ZERODEV_RPC` and used for the probe. */
-  chainId: number | null;
-  /** The paymaster contract address returned on success (proof it resolved). */
-  paymaster?: string | null;
-  /** The verbatim RPC error on failure (e.g. `Unauthorized: wapk`). */
-  error?: string | null;
-}
-
-/**
- * Server-side reproduction of the exact sponsorship call the mint makes
- * (`pm_getPaymasterStubData`), using the running deployment's real `ZERODEV_RPC`.
- *
- * On-demand only (it can count against the project's daily request budget), so
- * it is never run by `agentConfigStatus()` — the status route gates it behind a
- * query flag + the admin token. A green probe here means the live deployment
- * can sponsor the mint; a red probe surfaces the real reason (wrong project,
- * no matching policy, exhausted credits) instead of the generic UI "403".
- */
-export async function probeZeroDevPaymaster(): Promise<PaymasterProbe> {
-  const { url, chainId } = parseZeroDevRpc();
-  if (!url) {
-    return { ok: false, httpStatus: null, chainId: null, error: "ZERODEV_RPC not set." };
-  }
-  const probeChain = chainId ?? ARBITRUM_SEPOLIA_CHAIN_ID;
-  const chainHex = `0x${probeChain.toString(16)}`;
-  const body = {
-    jsonrpc: "2.0",
-    id: 1,
-    method: "pm_getPaymasterStubData",
-    params: [
-      {
-        sender: "0x0000000000000000000000000000000000000001",
-        nonce: "0x0",
-        callData: "0x",
-        callGasLimit: "0x186a0",
-        verificationGasLimit: "0x186a0",
-        preVerificationGas: "0x186a0",
-        maxFeePerGas: "0x3b9aca00",
-        maxPriorityFeePerGas: "0x3b9aca00",
-      },
-      ENTRYPOINT_07,
-      chainHex,
-      {},
-    ],
-  };
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const text = await res.text();
-    type PaymasterRpcResponse = {
-      result?: { paymaster?: string };
-      error?: { message?: string } | string;
-    };
-    let json: PaymasterRpcResponse | null = null;
-    try {
-      json = JSON.parse(text) as PaymasterRpcResponse;
-    } catch {
-      // Non-JSON body (e.g. an HTML 403 page) — fall back to the raw text.
-    }
-    const rpcError = json?.error;
-    if (!res.ok || rpcError) {
-      const message =
-        typeof rpcError === "string"
-          ? rpcError
-          : (rpcError?.message ?? text.slice(0, 300) ?? "Paymaster rejected the request.");
-      return { ok: false, httpStatus: res.status, chainId, error: message };
-    }
-    return {
-      ok: true,
-      httpStatus: res.status,
-      chainId,
-      paymaster: json?.result?.paymaster ?? null,
-    };
-  } catch (e) {
-    return {
-      ok: false,
-      httpStatus: null,
-      chainId,
-      error: e instanceof Error ? e.message : "Paymaster probe failed.",
-    };
-  }
+export function hasPrivyWallet(): boolean {
+  return hasPrivy() && hasTcnhv();
 }
 
 export { hasUpstash };
@@ -283,18 +162,10 @@ export interface AgentConfigStatus {
   embeddings: boolean;
   /** Persistent memory store (Upstash) is configured; false uses local fallback. */
   upstash: boolean;
-  /** On-chain ERC-8004 registration is configured (RPC + registries + Privy). */
-  zerodev: boolean;
+  /** On-chain ERC-8004 registration is configured (registries + Privy). */
+  onchainIdentity: boolean;
   /** Privy social login is configured (app id + server secret). */
   privy: boolean;
-  /**
-   * Masked ZeroDev project the running deployment resolves (first 8 chars of the
-   * project UUID, e.g. `"0988370e"`), or `"set:unparseable"` / `null`. Surfaces a
-   * stale env snapshot or wrong/typo'd project id without leaking the full URL.
-   */
-  zerodevProject: string | null;
-  /** Chain id parsed from `ZERODEV_RPC`; should be 421614 (Arbitrum Sepolia). */
-  zerodevChain: number | null;
   /** The only chain agents touch. */
   chain: typeof AGENT_CHAIN;
   /** Resolved model id (informational; reflects OPENAI_AGENT_MODEL or default). */
@@ -307,6 +178,8 @@ export interface AgentConfigStatus {
   factoryDeployerKeySet: boolean;
   /** Whether the key passes format validation (0x + 64 hex chars). */
   factoryDeployerKeyValid: boolean;
+  /** SECURITY_REGISTRY_ADDRESS explicitly set (else Sepolia singleton fallback). */
+  securityRegistryExplicit: boolean;
 }
 
 /** Snapshot of which agent-layer capabilities are live in this environment. */
@@ -318,15 +191,14 @@ export function agentConfigStatus(): AgentConfigStatus {
     provider: agentProvider(),
     embeddings: hasEmbeddings(),
     upstash: hasUpstash(),
-    zerodev: hasZeroDev(),
+    onchainIdentity: hasOnchainIdentity(),
     privy: hasPrivy(),
-    zerodevProject: maskedZeroDevProject(),
-    zerodevChain: parseZeroDevRpc().chainId,
     chain: AGENT_CHAIN,
     model: agentModel(),
     tcnhv: hasTcnhv(),
     canMintTcnhv: canMintTcnhv(),
     factoryDeployerKeySet: key.set,
     factoryDeployerKeyValid: key.valid,
+    securityRegistryExplicit: securityRegistryConfigured(),
   };
 }

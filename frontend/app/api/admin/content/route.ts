@@ -1,9 +1,9 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { authorizeAdminRequest } from "@/lib/auth/admin";
 import { fieldKey, getRedisClient, hasUpstash, parseItem, STORE_KEY } from "@/lib/server/redis";
-import { readNetworkItemLocal, writeNetworkItemLocal } from "@/lib/server/store";
+import { readNetworkItemLocal, STORE_CACHE_TAG, writeNetworkItemLocal } from "@/lib/server/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -186,6 +186,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   item.UpdatedAt = nowIso();
   await writeNetworkItem(field, item);
 
+  revalidateTag(STORE_CACHE_TAG);
   revalidatePath(`/networks/${slug}`);
   revalidatePath("/networks");
 

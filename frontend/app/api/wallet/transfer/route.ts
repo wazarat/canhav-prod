@@ -7,7 +7,7 @@ import {
   TCNHV_DECIMALS,
   tcnhvAssetAddress,
 } from "@/lib/agent/collab-config";
-import { hasZeroDev } from "@/lib/agent/config";
+import { hasPrivyWallet } from "@/lib/agent/config";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
@@ -23,8 +23,7 @@ import {
  *
  * POST (preflight)  body { to, amount }            -> resolves the recipient
  *   address (raw 0x / agent id / user id) and returns the params the browser
- *   needs to sign a gas-sponsored ERC-20 `transfer` userOp from the user's
- *   kernel wallet (index 0).
+ *   needs to sign a plain ERC-20 `transfer` from the user's Privy wallet.
  * POST (confirm)    body { to, amount, txHash, .. } -> records the settled
  *   transfer in the user's `wallet:transfers` log.
  *
@@ -133,12 +132,9 @@ export async function POST(req: Request) {
   }
 
   // Preflight path: return the signing params for a client-signed transfer.
-  const zerodevRpc = readSecret("ZERODEV_RPC");
-  const identityRegistry = readSecret("IDENTITY_REGISTRY_ADDRESS");
-  const securityRegistry = readSecret("SECURITY_REGISTRY_ADDRESS");
   const rpcUrl =
     readSecret("ARBITRUM_SEPOLIA_RPC_URL") ?? "https://sepolia-rollup.arbitrum.io/rpc";
-  if (!hasZeroDev() || !zerodevRpc || !identityRegistry || !securityRegistry) {
+  if (!hasPrivyWallet()) {
     return NextResponse.json(
       { ok: false, error: "On-chain transfers aren't available in this environment." },
       { status: 400 },
@@ -154,7 +150,6 @@ export async function POST(req: Request) {
     asset: collabSettlement().name,
     amount: amount.toString(),
     humanAmount: amountHuman,
-    accountIndex: 0,
-    mintConfig: { zerodevRpc, rpcUrl, identityRegistry, securityRegistry },
+    rpcUrl,
   });
 }

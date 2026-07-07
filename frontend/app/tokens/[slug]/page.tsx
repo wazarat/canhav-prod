@@ -25,7 +25,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGridSkeleton } from "@/components/ui/Skeletons";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { agentConfigStatus } from "@/lib/agent/config";
-import { getApprovedTokenBySlug, getApprovedTokens, getNetworkBySlug } from "@/lib/data";
+import { getApprovedTokenBySlug, getNetworkBySlug } from "@/lib/data";
 import { deriveSecurityStatus } from "@/lib/security";
 
 interface PageProps {
@@ -34,9 +34,9 @@ interface PageProps {
 
 export const revalidate = 300;
 
-export async function generateStaticParams() {
-  return (await getApprovedTokens()).map((p) => ({ slug: p.slug }));
-}
+// No generateStaticParams: rendered on demand like /receipts/[slug].
+// Pre-rendering every store item inflated build time while production served
+// every request dynamically anyway.
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const profile = await getApprovedTokenBySlug(params.slug);

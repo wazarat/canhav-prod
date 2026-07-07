@@ -23,9 +23,11 @@ import {
 } from "lucide-react";
 
 import { AGENT_CATEGORIES } from "@/lib/agent/categories";
-import { buildAgentSigner, buildPrivySigner, resolveActiveWallet } from "@/lib/agent/privy-signer";
-import { assertAgentKernelMatch } from "@/lib/agent/verify-agent-signer";
-import { deriveKernelAddress } from "@/lib/agent/kernel-address";
+import {
+  buildAgentSigner,
+  resolveActiveWallet,
+  resolveWalletForAgent,
+} from "@/lib/agent/privy-signer";
 import {
   claimCredits,
   establishAgreementOnChain,
@@ -43,7 +45,6 @@ import {
 import { formatUserOpError } from "@/lib/agent/userOpErrors";
 import { AgentInteractionTheater, type TheaterProofLinks, type TheaterSettlement } from "@/components/agent/AgentInteractionTheater";
 import { WalletCreditsPanel } from "@/components/agent/WalletCreditsPanel";
-import type { SpawnMintConfig } from "@/lib/agent/spawn-client";
 import type { StrategyPacket } from "@/lib/types";
 import { arbiscanSepoliaTx } from "@/lib/utils";
 
@@ -181,9 +182,7 @@ interface CreditsInfo {
   balance?: string;
   canClaim?: boolean;
   nextClaimAt?: number;
-  accountIndex?: number;
   signerAddress?: string | null;
-  mintConfig?: SpawnMintConfig | null;
   error?: string;
 }
 
@@ -344,10 +343,6 @@ export function CollabBrowser({
     }
   }
 
-  async function buildSigner() {
-    return buildPrivySigner(wallets);
-  }
-
   async function handleReclaimAgent() {
     if (!buyerAgentId) return;
     if (!authenticated) {
@@ -363,9 +358,6 @@ export function CollabBrowser({
         ok?: boolean;
         alreadyOwned?: boolean;
         error?: string;
-        accountIndex?: number;
-        agentAddress?: string;
-        mintConfig?: SpawnMintConfig;
       };
       if (!preRes.ok || !pre.ok) {
         throw new Error(pre.error ?? "Could not prepare agent reclaim.");
@@ -375,23 +367,15 @@ export function CollabBrowser({
         setNotice("This agent is already linked to your account.");
         return;
       }
-      if (pre.accountIndex == null || !pre.agentAddress || !pre.mintConfig) {
-        throw new Error("Reclaim parameters are missing.");
-      }
 
       const activeWallet = resolveActiveWallet(wallets);
       if (!activeWallet) throw new Error("Connect MetaMask or your embedded wallet and try again.");
 
-      const signer = await buildSigner();
-      const derived = await deriveKernelAddress(signer, pre.accountIndex, pre.mintConfig);
-
+      // Proof of control: the connected wallet must match the recorded mint signer.
       const res = await fetch(`/api/agent/${encodeURIComponent(buyerAgentId)}/reclaim`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          agentAddress: derived,
-          signerAddress: activeWallet.address,
-        }),
+        body: JSON.stringify({ signerAddress: activeWallet.address }),
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) {
@@ -408,7 +392,7 @@ export function CollabBrowser({
   }
 
   async function handleClaimCredits() {
-    if (!credits?.configured || !credits.token || credits.accountIndex == null || !credits.mintConfig) {
+    if (!credits?.configured || !credits.token) {
       return;
     }
     if (!authenticated) {
@@ -419,19 +403,21 @@ export function CollabBrowser({
     setError(null);
     setNotice(null);
     try {
-      const signer = await buildAgentSigner(wallets, credits.signerAddress);
-      if (credits.account && credits.accountIndex != null && credits.mintConfig) {
-        await assertAgentKernelMatch({
-          signer,
-          accountIndex: credits.accountIndex,
-          mintConfig: credits.mintConfig,
-          expectedAgentAddress: credits.account,
-        });
+      // Claim from the wallet that minted the agent so the credits land in the
+      // treasury that pays in settlement.
+      const wallet = resolveWalletForAgent(wallets, credits.signerAddress);
+      if (!wallet) {
+        throw new Error(
+          "Connect the wallet that minted this agent (or wait for your embedded wallet to load), then try again.",
+        );
+      }
+      if (credits.account && wallet.address.toLowerCase() !== credits.account.toLowerCase()) {
+        throw new Error(
+          `Your connected wallet is ${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}, but this agent's credits live at ${credits.account.slice(0, 6)}…${credits.account.slice(-4)}. Switch to the wallet that minted the agent.`,
+        );
       }
       await claimCredits({
-        signer,
-        accountIndex: credits.accountIndex,
-        mintConfig: credits.mintConfig,
+        wallet,
         token: credits.token as `0x${string}`,
       });
       setNotice("Credits added to your agent.");
@@ -467,10 +453,10 @@ export function CollabBrowser({
       );
       const pf = (await pfRes.json()) as {
         configured?: boolean;
-        accountIndex?: number;
         agentAddress?: string | null;
         signerAddress?: string | null;
-        mintConfig?: SpawnMintConfig;
+        payerAddress?: string | null;
+        rpcUrl?: string;
         settlementReady?: boolean;
         sufficient?: boolean;
         humanRequired?: string;
@@ -479,12 +465,17 @@ export function CollabBrowser({
         proof?: TheaterProofLinks;
         error?: string;
       };
-      if (!pfRes.ok || !pf.configured || pf.accountIndex == null || !pf.mintConfig) {
+      if (!pfRes.ok || !pf.configured) {
         const friendly =
           pfRes.status === 403
             ? "Pick one of your own agents to pay from in the “Pay from agent” menu, and fund it with credits above."
             : (pf.error ?? "Buyer preflight failed.");
         throw new Error(friendly);
+      }
+      if (!pf.payerAddress) {
+        throw new Error(
+          "Your Privy wallet address isn't ready yet — wait for the embedded wallet to load, then try again.",
+        );
       }
       if (pf.proof) setProofLinks(pf.proof);
       if (pf.settlementReady === false || pf.sufficient === false) {
@@ -500,14 +491,19 @@ export function CollabBrowser({
         fromAgentId: buyerAgentId,
       });
 
-      const signer = await buildAgentSigner(wallets, pf.signerAddress);
-      if (pf.agentAddress && pf.accountIndex != null && pf.mintConfig) {
-        await assertAgentKernelMatch({
-          signer,
-          accountIndex: pf.accountIndex,
-          mintConfig: pf.mintConfig,
-          expectedAgentAddress: pf.agentAddress,
-        });
+      const wallet = resolveActiveWallet(wallets);
+      if (!wallet) {
+        throw new Error("No wallet connected yet — sign in and wait for your embedded wallet to load.");
+      }
+
+      // Signer for the optional on-chain writes (agreement anchor / collab
+      // record). Best-effort: when the mint wallet isn't connected those writes
+      // are skipped and the off-chain settlement still completes.
+      let signer: Awaited<ReturnType<typeof buildAgentSigner>> | null = null;
+      try {
+        signer = await buildAgentSigner(wallets, pf.signerAddress);
+      } catch {
+        signer = null;
       }
 
       // Lazily anchor the agreement on-chain (CollabAgreement.establish) before
@@ -522,10 +518,10 @@ export function CollabBrowser({
             configured?: boolean;
             establish?: EstablishParams;
           };
-          if (anchorRes.ok && anchor.configured && anchor.establish) {
+          if (anchorRes.ok && anchor.configured && anchor.establish && signer) {
             setPhase("anchoring");
             const { onChainAgreementId, txHash: establishTx } = await establishAgreementOnChain({
-              signer,
+              signer: signer!,
               establish: anchor.establish,
             });
             await fetch(
@@ -545,10 +541,9 @@ export function CollabBrowser({
 
       setPhase("paying");
       const { txHash } = await payStrategy({
-        signer,
-        accountIndex: pf.accountIndex,
-        mintConfig: pf.mintConfig,
+        wallet,
         quote,
+        rpcUrl: pf.rpcUrl,
       });
       setPaymentTx(txHash);
 
@@ -585,7 +580,7 @@ export function CollabBrowser({
       if (reqData.settlement) setSettlement(reqData.settlement);
       if (reqData.proof) setProofLinks(reqData.proof as TheaterProofLinks);
 
-      if (reqData.record) {
+      if (reqData.record && signer) {
         try {
           setPhase("recording");
           const { txHash: recordHash } = await recordCollabOnChain({ signer, record: reqData.record });
@@ -607,6 +602,8 @@ export function CollabBrowser({
             }`,
           );
         }
+      } else if (reqData.record) {
+        setNotice("Exchange complete and added to your agent.");
       } else {
         setNotice("Exchange complete — the strategy was added to your agent's memory.");
       }
@@ -779,7 +776,7 @@ export function CollabBrowser({
               <button
                 type="button"
                 onClick={handleClaimCredits}
-                disabled={claiming || busy || !credits.canClaim || !credits.mintConfig}
+                disabled={claiming || busy || !credits.canClaim || !credits.token}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-neon-500/40 bg-neon-500/10 px-3 py-1.5 text-xs font-medium text-neon-400 transition-colors hover:bg-neon-500/20 disabled:opacity-40"
               >
                 {claiming ? (

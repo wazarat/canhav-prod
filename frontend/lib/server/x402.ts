@@ -9,12 +9,11 @@ import { verifyErc20Transfer, type VerifyTransferResult } from "@/lib/server/col
  * We adopt the canonical x402 shapes — the structured `accepts[]` /
  * `PaymentRequirements` in the 402 challenge, the base64 `X-PAYMENT` request
  * header, and the base64 `X-PAYMENT-RESPONSE` settlement header — but keep the
- * existing **smart-account USDC transfer** as the settlement primitive instead
+ * existing **wallet-signed USDC transfer** as the settlement primitive instead
  * of the reference's EIP-3009 `transferWithAuthorization` + CDP facilitator.
  *
- * Why the deviation: the buyer is a ZeroDev Kernel (ERC-4337) smart account,
- * which cannot produce a canonical EIP-3009 authorization signature. So the
- * buyer's smart account performs a gas-sponsored `transfer` and hands us the
+ * Why the deviation: settlement predates an EIP-3009 flow — the buyer's Privy
+ * wallet performs a plain `transfer` and hands us the
  * settling tx hash inside the structured `X-PAYMENT` payload; our facilitator
  * `verify()` proves that transfer on-chain (decoding the ERC-20 `Transfer`
  * event) and `settle()` returns the confirmed settlement as `X-PAYMENT-RESPONSE`.

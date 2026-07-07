@@ -30,7 +30,7 @@ export function AgentMemoryPanel({
         <div className="flex items-center gap-2">
           <Brain className="h-4 w-4 text-neon-400" />
           <h3 className="font-display text-base font-semibold tracking-tight text-ink-50">
-            Knowledge
+            Memory
           </h3>
         </div>
         <Badge tone="neon">

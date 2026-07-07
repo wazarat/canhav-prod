@@ -1,5 +1,5 @@
 /**
- * Turn viem / ERC-4337 UserOperation failures into actionable copy for the UI.
+ * Turn viem transaction failures into actionable copy for the UI.
  */
 
 const INSUFFICIENT_BALANCE = "0xe450d38c";
@@ -15,7 +15,11 @@ export function formatUserOpError(err: unknown): string {
     return "This payment is blocked by the tCNHV transfer rules. The platform is preparing on-chain allowlists — refresh and try again in a moment.";
   }
 
-  if (raw.includes("UserOperation reverted")) {
+  if (/insufficient funds|exceeds the balance|gas required exceeds/i.test(raw)) {
+    return "Your wallet needs a small amount of Arbitrum Sepolia ETH to pay gas. Fund it from an Arbitrum Sepolia faucet, then try again.";
+  }
+
+  if (raw.includes("reverted")) {
     const short = raw.split("Details:")[0]?.trim() ?? raw;
     if (short.length > 280) return `${short.slice(0, 277)}…`;
     return short;

@@ -1,5 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { unstable_cache } from "next/cache";
+import { cache } from "react";
 
 import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
 import { CANONICAL_PERP_DEX_SLUGS } from "@/data/derivatives-seed";
@@ -64,15 +66,32 @@ function readItemsFromDisk(): Record<string, unknown>[] {
   }
 }
 
-async function readItems(): Promise<Record<string, unknown>[]> {
-  if (hasUpstash()) {
-    const fromRedis = await readAllItemsFromRedis();
-    // Upstash creds are often set locally before the hash is seeded. Fall back to
-    // the on-disk store so dev isn't blank after demo overlays were removed.
-    if (fromRedis.length > 0) return fromRedis;
-  }
-  return readItemsFromDisk();
-}
+/** Invalidate with `revalidateTag(STORE_CACHE_TAG)` after any store write. */
+export const STORE_CACHE_TAG = "canhav-store";
+
+// Cross-request cache of the raw items array. TTL matches the pages'
+// `revalidate = 300`, so freshness is unchanged; force-dynamic routes drop from
+// one HGETALL per request to at most one per 5 minutes. The serialized entry is
+// ~1MB today — Vercel caps unstable_cache entries at 2MB; if the store grows
+// near that, split the entry per Category instead. On overflow Next logs a
+// cache-set failure and serves uncached (degraded, not broken).
+const readItemsShared = unstable_cache(
+  async (): Promise<Record<string, unknown>[]> => {
+    if (hasUpstash()) {
+      const fromRedis = await readAllItemsFromRedis();
+      // Upstash creds are often set locally before the hash is seeded. Fall back to
+      // the on-disk store so dev isn't blank after demo overlays were removed.
+      if (fromRedis.length > 0) return fromRedis;
+    }
+    return readItemsFromDisk();
+  },
+  ["canhav-store-items"],
+  { revalidate: 300, tags: [STORE_CACHE_TAG] },
+);
+
+// react `cache()`: one store read per render pass, no matter how many
+// accessors (homepage fires six) ask for it.
+const readItems = cache(() => readItemsShared());
 
 /**
  * Offline-dev fallback writer: flip a protocol's status directly in
@@ -447,7 +466,9 @@ export interface LiveStore {
   networks: NetworkProfile[];
 }
 
-export async function readLiveStore(): Promise<LiveStore> {
+// react `cache()`: parse/map the 350+ raw items once per render pass instead of
+// once per accessor call.
+export const readLiveStore = cache(async (): Promise<LiveStore> => {
   const stablecoins: StablecoinProfile[] = [];
   const rwas: RwaProfile[] = [];
   const tokens: TokenProfile[] = [];
@@ -697,7 +718,7 @@ export async function readLiveStore(): Promise<LiveStore> {
   receipts.sort((a, b) => a.name.localeCompare(b.name));
   networks.sort((a, b) => a.name.localeCompare(b.name));
   return { stablecoins, rwas, tokens, receipts, networks };
-}
+});
 
 function mapSectorAggregateItem(item: Record<string, unknown>): SectorAggregate {
   return {
@@ -726,10 +747,10 @@ function mapSectorAggregateItem(item: Record<string, unknown>): SectorAggregate 
 }
 
 /** Read sector-level aggregate snapshots written by the cron sector pass. */
-export async function getSectorAggregates(): Promise<SectorAggregate[]> {
+export const getSectorAggregates = cache(async (): Promise<SectorAggregate[]> => {
   const items = await readItems();
   return items
     .filter((it) => String(it.Category ?? "") === "SectorAggregate")
     .map((it) => mapSectorAggregateItem(it as Record<string, unknown>))
     .sort((a, b) => a.sector.localeCompare(b.sector));
-}
+});

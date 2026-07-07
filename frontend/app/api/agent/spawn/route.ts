@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { hasZeroDev } from "@/lib/agent/config";
+import { hasOnchainIdentity } from "@/lib/agent/config";
 import { creationSlotKey, deriveAccountIndex } from "@/lib/agent/account-index";
 import { resolveEntityBinding } from "@/lib/agent/entity-binding";
 import {
@@ -65,11 +65,11 @@ export async function POST(req: Request) {
     );
   }
 
-  if (!hasZeroDev()) {
+  if (!hasOnchainIdentity()) {
     return NextResponse.json(
       {
         configured: false,
-        error: "On-chain identity not configured (ZERODEV_RPC + registry addresses).",
+        error: "On-chain identity not configured (registry addresses + Privy).",
       },
       { status: 503 },
     );

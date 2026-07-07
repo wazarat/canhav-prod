@@ -1,9 +1,9 @@
 {
   "_meta": {
     "backend": "local",
-    "count": 363,
+    "count": 361,
     "table": "canhav-research",
-    "updatedAt": "2026-07-07T18:00:01Z"
+    "updatedAt": "2026-07-07T21:05:48Z"
   },
   "items": {
     "CATEGORY#Entity|PROTOCOL#aave": {
@@ -14084,15 +14084,6 @@
           "symbol": "iUSDe"
         },
         {
-          "category": "Token",
-          "coinType": "Governance",
-          "name": "ENA",
-          "role": "Governance token",
-          "slug": "ethena-ena",
-          "subCategory": "Governance Token",
-          "symbol": "ENA"
-        },
-        {
           "category": "Stablecoin",
           "coinType": "SyntheticDollar",
           "name": "USDe",
@@ -16956,15 +16947,6 @@
           "name": "FXS",
           "role": "Governance token",
           "slug": "fxs",
-          "subCategory": "Governance Token",
-          "symbol": "FXS"
-        },
-        {
-          "category": "Token",
-          "coinType": "GovernanceUtility",
-          "name": "FXS",
-          "role": "Governance & utility token",
-          "slug": "frax-fxs",
           "subCategory": "Governance Token",
           "symbol": "FXS"
         },
@@ -51536,48 +51518,6 @@
       "UpdatedAt": "2026-06-29T17:38:33Z",
       "Website": "https://ethena.fi/"
     },
-    "CATEGORY#Token|PROTOCOL#ethena-ena": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": "https://www.coingecko.com/en/coins/ethena",
-      "CoinType": "Governance",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "ENA — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "ethena",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "ENA",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#ethena-ena",
-      "Sector": "RWA",
-      "Slug": "ethena-ena",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "ENA",
-      "Tag": "RWA Yield",
-      "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
     "CATEGORY#Token|PROTOCOL#ethfi": {
       "ArbitrumPortalMetadata": {
         "bannerUrl": null,
@@ -51874,48 +51814,6 @@
       "Symbol": "—",
       "Tag": "RWA Yield",
       "TokenType": "Governance",
-      "TotalSupply": {
-        "source": "coingecko",
-        "updatedAt": null,
-        "value": null
-      },
-      "Twitter": null,
-      "UpdatedAt": "2026-06-29T17:38:33Z",
-      "Website": null
-    },
-    "CATEGORY#Token|PROTOCOL#frax-fxs": {
-      "ArbitrumPortalMetadata": {
-        "bannerUrl": null,
-        "chains": [],
-        "foundedDate": null,
-        "isArbitrumNative": false,
-        "isLive": true,
-        "isPubliclyAudited": false,
-        "logoUrl": null,
-        "portalUrl": null,
-        "subCategory": null
-      },
-      "AuditURL": null,
-      "Category": "Token",
-      "CoinGecko": null,
-      "CoinType": "GovernanceUtility",
-      "ContractAddress": null,
-      "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "FXS — tracked via compiled coin integration.",
-      "Discord": null,
-      "EntitySlug": "frax",
-      "GitHub": null,
-      "IsStablecoin": false,
-      "Name": "FXS",
-      "PK": "CATEGORY#Token",
-      "SK": "PROTOCOL#frax-fxs",
-      "Sector": "Staking",
-      "Slug": "frax-fxs",
-      "Status": "APPROVED",
-      "SubCategory": "Governance Token",
-      "Symbol": "FXS",
-      "Tag": "Liquid Staking",
-      "TokenType": "Utility",
       "TotalSupply": {
         "source": "coingecko",
         "updatedAt": null,

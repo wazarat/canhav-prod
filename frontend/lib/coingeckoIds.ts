@@ -239,7 +239,6 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   // store, not mapped here.
   "mpl-syrup": "syrup", // Maple (SYRUP) — ~$204M
   fxs: "frax-share", // Frax Share (prev. FXS) — ~$22.5M
-  "frax-fxs": "frax-share", // FXS cross-tag (Staking)
   ondo: "ondo-finance", // ~$1.6B
   usds: "usds", // Sky USDS — ~$11B
   sd: "stader", // ~$8.7M

@@ -278,16 +278,9 @@ def resolve_gecko(symbol: str, name: str, cg_list: list[dict], slug: str, existi
     sym_lower = symbol.lower().strip()
     if sym_lower in existing and existing[sym_lower]:
         return existing[sym_lower]
-    # match by symbol
-    matches = [c for c in cg_list if c.get("symbol", "").upper() == sym]
-    if len(matches) == 1:
-        return matches[0]["id"]
-    if matches:
-        name_l = name.lower()
-        for c in matches:
-            if name_l in c.get("name", "").lower() or c.get("name", "").lower() in name_l:
-                return c["id"]
-        return matches[0]["id"]
+    # NEVER fuzzy-match by symbol (cross-cutting rule #1: symbol matches return
+    # wrong tokens, e.g. BCT->bonk-computer-token, PAL->palio). Unresolved ids
+    # stay null and must be curated in GECKO_OVERRIDES or COINGECKO_IDS by hand.
     return None
 
 

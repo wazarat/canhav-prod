@@ -561,17 +561,6 @@
     "tag": "RWA Yield"
   },
   {
-    "slug": "ethena-ena",
-    "symbol": "ENA",
-    "name": "ENA",
-    "coinType": "Governance",
-    "entitySlug": "ethena",
-    "geckoId": "ethena",
-    "isStablecoin": false,
-    "sector": "RWA",
-    "tag": "RWA Yield"
-  },
-  {
     "slug": "usde",
     "symbol": "USDe",
     "name": "USDe",
@@ -831,17 +820,6 @@
     "coinType": "Governance",
     "entitySlug": "swell",
     "geckoId": "sweth",
-    "isStablecoin": false,
-    "sector": "Staking",
-    "tag": "Liquid Staking"
-  },
-  {
-    "slug": "frax-fxs",
-    "symbol": "FXS",
-    "name": "FXS",
-    "coinType": "GovernanceUtility",
-    "entitySlug": "frax",
-    "geckoId": null,
     "isStablecoin": false,
     "sector": "Staking",
     "tag": "Liquid Staking"

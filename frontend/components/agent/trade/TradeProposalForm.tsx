@@ -184,7 +184,7 @@ export function TradeProposalForm({
           type="button"
           onClick={propose}
           disabled={busy || refreshing || !asset}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-electric-500/40 bg-electric-500/10 px-3 py-2 text-sm font-medium text-electric-300 transition-colors hover:bg-electric-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+          className="btn-gradient btn-glow inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           Propose

@@ -145,7 +145,9 @@ export default async function AgentHomePage({
   const hasVerdictLoop = Boolean(demoAgentConfig(agentId));
 
   return (
-    <div className="container space-y-8 py-12">
+    <div className="relative">
+      <div aria-hidden className="grid-bg pointer-events-none absolute inset-x-0 top-0 h-[380px]" />
+      <div className="container relative space-y-8 py-12">
       <TabHashRedirect
         hashToTab={agentHashToTab({ isOwner })}
         activeTab={activeTab}
@@ -166,6 +168,9 @@ export default async function AgentHomePage({
       </nav>
 
       <header id="agent-overview" className="space-y-3 scroll-mt-32">
+        <span className="kicker">
+          {isOwner ? "Your research agent" : "Research agent"} · Research-gated trading
+        </span>
         <div className="flex flex-wrap items-center gap-3">
           <AgentNameEditor
             agentId={agentId}
@@ -330,6 +335,7 @@ export default async function AgentHomePage({
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

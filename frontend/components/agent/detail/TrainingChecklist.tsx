@@ -72,13 +72,14 @@ export function TrainingChecklist({
     <Card className="space-y-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <CardTitle className="text-base">Training progress</CardTitle>
+          <span className="kicker">Train your agent</span>
+          <CardTitle className="mt-1 text-base">Training progress</CardTitle>
           <CardDescription className="mt-1">
             Work down the list — each step levels the agent up and sharpens its research.
           </CardDescription>
         </div>
-        <span className="font-mono text-xs text-ink-400">
-          {doneCount}/{steps.length}
+        <span className="tabular font-mono text-xs text-ink-400">
+          {doneCount}/{steps.length} complete
         </span>
       </div>
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
@@ -88,10 +89,10 @@ export function TrainingChecklist({
             href={step.href}
             title={step.hint}
             className={cn(
-              "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-colors",
+              "card-lift flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium",
               step.done
-                ? "border-neon-500/30 bg-neon-500/5 text-neon-400"
-                : "border-ink-800/60 bg-ink-900/30 text-ink-300 hover:border-electric-500/40 hover:text-ink-100",
+                ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-300"
+                : "card-surface border-ink-800/60 text-ink-300 hover:text-ink-100",
             )}
           >
             {step.done ? (

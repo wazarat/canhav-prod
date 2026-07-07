@@ -364,7 +364,7 @@ export function LaunchAgentButton({
             type="button"
             onClick={launch}
             disabled={busy || !skillId || !ready}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-neon-500/40 bg-neon-500/10 px-3 py-2 text-sm font-medium text-neon-400 transition-colors hover:bg-neon-500/20 disabled:opacity-50"
+            className="btn-gradient btn-glow inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
           >
             {busy ? (
               <Loader2 className="h-4 w-4 animate-spin" />

@@ -33,7 +33,7 @@ export function TabBar({ basePath, activeTab, tabs, defaultTab, trailing, classN
   return (
     <div className={cn("sticky top-16 z-30 -mx-4 px-4 sm:-mx-6 sm:px-6", className)}>
       <div
-        className="flex items-center gap-1 overflow-x-auto rounded-xl border border-ink-800/60 bg-ink-950/90 px-2 py-2 backdrop-blur"
+        className="glass-strong flex items-center gap-1 overflow-x-auto rounded-full px-2 py-2"
         role="tablist"
         aria-label="Page sections"
       >

@@ -68,7 +68,7 @@ export function AgentRoster({
                 <Link
                   key={agent.agentId}
                   href={`/agents/${encodeURIComponent(agent.agentId)}`}
-                  className="group flex items-start gap-3 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-3 transition-colors hover:border-electric-500/40 hover:bg-ink-900/60"
+                  className="group card-surface card-lift flex items-start gap-3 rounded-xl border border-ink-800/60 px-4 py-3"
                 >
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-ink-700/80 bg-ink-900/60 text-electric-400">
                     <Bot className="h-4 w-4" />

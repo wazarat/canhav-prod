@@ -96,7 +96,9 @@ export default async function AgentsPage({
   const defaultAgentId = session ? userAgentId(session.userId) : "sandbox";
 
   return (
-    <div className="container space-y-8 py-12">
+    <div className="relative">
+      <div aria-hidden className="grid-bg pointer-events-none absolute inset-x-0 top-0 h-[420px]" />
+      <div className="container relative space-y-8 py-12">
       <TabHashRedirect
         hashToTab={HASH_TO_TAB}
         activeTab={activeTab}
@@ -113,9 +115,10 @@ export default async function AgentsPage({
       </nav>
 
       <header className="space-y-3">
+        <span className="kicker">Autonomous research · Research-gated trading</span>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-ink-50">
-            Agent Lab
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-ink-50">
+            Agent <span className="text-gradient-brand">Lab</span>
           </h1>
           <Badge tone="signal">Arbitrum Sepolia · Testnet</Badge>
           {session && <WalletBalanceChip />}
@@ -167,6 +170,7 @@ export default async function AgentsPage({
       )}
 
       {activeTab === "provisioning" && isAdmin && <ProvisioningCard />}
+      </div>
     </div>
   );
 }
@@ -226,7 +230,8 @@ async function AgentsTab({
       <div id="create" className="scroll-mt-32 space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
+            <span className="kicker">Mint on-chain</span>
+            <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink-50">
               Launch an agent
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-ink-300">

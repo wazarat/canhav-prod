@@ -5,6 +5,9 @@ const COINGECKO_BASE = "https://api.coingecko.com/api/v3";
 const COINGECKO_IDS: Record<string, string> = {
   susde: "ethena-staked-usde",
   susdai: "susdai",
+  // Majors — L1 base assets (roadmap B1).
+  eth: "ethereum",
+  btc: "bitcoin",
 };
 
 export interface OffchainMarket {
@@ -13,6 +16,8 @@ export interface OffchainMarket {
   /** Trailing 24h price change as a fraction (e.g. -0.02 = -2%). */
   priceChange24h: number | null;
   apy: number | null;
+  /** Trailing 30d price change as a fraction (majors momentum input). */
+  trend30d: number | null;
 }
 
 async function fetchJson<T>(url: string): Promise<T | null> {
@@ -29,7 +34,7 @@ async function fetchJson<T>(url: string): Promise<T | null> {
 export async function readOffchainMarket(asset: WatchedAsset): Promise<OffchainMarket> {
   const coinId = COINGECKO_IDS[asset.slug];
   if (!coinId) {
-    return { priceUsd: null, marketCapUsd: null, priceChange24h: null, apy: null };
+    return { priceUsd: null, marketCapUsd: null, priceChange24h: null, apy: null, trend30d: null };
   }
 
   type CoinDetail = {
@@ -51,8 +56,10 @@ export async function readOffchainMarket(asset: WatchedAsset): Promise<OffchainM
       ? detail.market_data.price_change_percentage_24h / 100
       : null;
 
-  // APY proxy: for yield-bearing stables, derive from 30d price appreciation when available.
+  // 30d price change: APY proxy for yield-bearing stables (annualized), raw
+  // momentum input for majors.
   let apy: number | null = null;
+  let trend30d: number | null = null;
   type MarketChart = { prices?: [number, number][] };
   const chart = await fetchJson<MarketChart>(
     `${COINGECKO_BASE}/coins/${coinId}/market_chart?vs_currency=usd&days=30&interval=daily`,
@@ -63,9 +70,10 @@ export async function readOffchainMarket(asset: WatchedAsset): Promise<OffchainM
     const last = prices[prices.length - 1]?.[1];
     if (first != null && last != null && first > 0 && last > 0) {
       const growth = (last - first) / first;
+      trend30d = growth;
       apy = growth * (365 / 30);
     }
   }
 
-  return { priceUsd, marketCapUsd, priceChange24h, apy };
+  return { priceUsd, marketCapUsd, priceChange24h, apy, trend30d };
 }

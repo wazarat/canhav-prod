@@ -27,6 +27,11 @@ const SUSDAI_CORE = "0x0b2b2b2076d95dda7817e785989fe353fe955ef9" as Address;
 const SUSDAI_FACTORY = "0x0000000000000000000000000000000000000000" as Address;
 const SUSDAI_POOL: Address[] = [];
 
+// Majors (ETH, BTC) — market agents read CoinGecko only (slug key), so the
+// on-chain fields are zeroed: native L1 assets have no ERC-20 token/factory/
+// core to read, and runMarketAgent never calls readCoreState.
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as Address;
+
 export const WATCHED_ASSETS: Record<string, WatchedAsset> = {
   sUSDe: {
     symbol: "sUSDe",
@@ -47,6 +52,26 @@ export const WATCHED_ASSETS: Record<string, WatchedAsset> = {
     decimals: 18,
     slug: "susdai",
     entitySlug: "usd-ai",
+  },
+  ETH: {
+    symbol: "ETH",
+    token: ZERO_ADDRESS,
+    factory: ZERO_ADDRESS,
+    pools: [],
+    core: ZERO_ADDRESS,
+    decimals: 18,
+    slug: "eth",
+    entitySlug: "ethereum",
+  },
+  BTC: {
+    symbol: "BTC",
+    token: ZERO_ADDRESS,
+    factory: ZERO_ADDRESS,
+    pools: [],
+    core: ZERO_ADDRESS,
+    decimals: 8,
+    slug: "btc",
+    entitySlug: "bitcoin",
   },
 };
 

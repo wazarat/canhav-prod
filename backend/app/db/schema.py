@@ -36,6 +36,7 @@ CATEGORY_TOKEN = "Token"
 TOKEN_TYPES = (
     "Governance",
     "Utility",
+    "Native",  # L1 base asset (ETH, BTC)
 )
 
 # Categories queued for the sequential rollout (kept here for reference).
@@ -216,10 +217,12 @@ DERIVATIVES_SECONDARY_TAGS = (
     "Multi-Chain",
 )
 
-# Other sub-sectors — Underwriting + Governance (canhav-other-spec §1.2).
+# Other sub-sectors — Underwriting + Governance (canhav-other-spec §1.2),
+# plus Majors for L1 base assets with GMX-verified markets (roadmap Step B1).
 OTHER_SUBSECTORS = (
     "Underwriting",  # decentralized insurance / coverage pools
     "Governance",    # governance bribes & meta-governance
+    "Majors",        # L1 base assets (ETH, BTC) tradable on GMX Sepolia
 )
 
 OTHER_SECONDARY_TAGS = (

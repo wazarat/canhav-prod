@@ -48,6 +48,51 @@ MONERIUM_PARENT_SLUG = "monerium"
 # mostly strings, but specs MAY also carry rich overlay objects/lists
 # (tokenomics, yieldMechanics, poolComposition, offchainFacts, ...).
 TOKENS: Dict[str, Dict[str, Any]] = {
+    # Majors — L1 base assets (roadmap Step B1; GMX Sepolia markets verified
+    # 2026-07-08). Native chain assets: no ERC-20 contract address; live price /
+    # market cap resolve via CoinGecko ("eth" / "btc" in COINGECKO_IDS).
+    "eth": {
+        "name": "Ether",
+        "symbol": "ETH",
+        "tokenType": "Native",
+        "subCategory": "Native Asset",
+        "description": (
+            "Ether is the native asset of Ethereum: it pays gas, secures the "
+            "network via proof-of-stake, and is DeFi's primary collateral and "
+            "unit of account. On CanHav it is a first-class major with a "
+            "GMX-verified perp market on Arbitrum Sepolia."
+        ),
+        "entitySlug": "ethereum",
+        "coingecko": "https://www.coingecko.com/en/coins/ethereum",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Ethereum", "Arbitrum One"],
+        "website": "https://ethereum.org",
+        "twitter": "https://x.com/ethereum",
+        "discord": None,
+        "github": "https://github.com/ethereum",
+    },
+    "btc": {
+        "name": "Bitcoin",
+        "symbol": "BTC",
+        "tokenType": "Native",
+        "subCategory": "Native Asset",
+        "description": (
+            "Bitcoin is the native asset of the Bitcoin network, secured by "
+            "proof-of-work — the largest digital store of value. On EVM chains it "
+            "circulates as wrapped representations; on CanHav it is a first-class "
+            "major with a GMX-verified perp market on Arbitrum Sepolia."
+        ),
+        "entitySlug": "bitcoin",
+        "coingecko": "https://www.coingecko.com/en/coins/bitcoin",
+        "contractAddress": None,
+        "csvParentSlug": None,
+        "chains": ["Bitcoin"],
+        "website": "https://bitcoin.org",
+        "twitter": None,
+        "discord": None,
+        "github": "https://github.com/bitcoin/bitcoin",
+    },
     "chip": {
         "name": "CHIP",
         "symbol": "CHIP",

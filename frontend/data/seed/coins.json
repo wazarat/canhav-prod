@@ -1109,5 +1109,27 @@
     "isStablecoin": false,
     "sector": "Staking",
     "tag": "Liquid Restaking"
+  },
+  {
+    "slug": "eth",
+    "symbol": "ETH",
+    "name": "Ether",
+    "coinType": "Native",
+    "entitySlug": "ethereum",
+    "geckoId": "ethereum",
+    "isStablecoin": false,
+    "sector": "Other",
+    "tag": "Majors"
+  },
+  {
+    "slug": "btc",
+    "symbol": "BTC",
+    "name": "Bitcoin",
+    "coinType": "Native",
+    "entitySlug": "bitcoin",
+    "geckoId": "bitcoin",
+    "isStablecoin": false,
+    "sector": "Other",
+    "tag": "Majors"
   }
 ]

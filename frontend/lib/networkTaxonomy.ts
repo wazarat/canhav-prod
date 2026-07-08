@@ -43,7 +43,7 @@ export const DERIVATIVES_PRIMARY_TAGS: DerivativesSubSector[] = [
 ];
 
 /** Primary Other tag vocabulary for the network-tab filter row. */
-export const OTHER_PRIMARY_TAGS: OtherSubSector[] = ["Underwriting", "Governance"];
+export const OTHER_PRIMARY_TAGS: OtherSubSector[] = ["Underwriting", "Governance", "Majors"];
 
 /** RWA attribute-tag vocabulary for the network-tab filter row (5-tag revamp). */
 export const RWA_SECONDARY_TAGS: RwaSecondaryTag[] = [
@@ -86,10 +86,11 @@ export const DERIVATIVES_TAG_METRICS_KEY: Record<
 /** Other tag label → OtherTagMetrics object key. */
 export const OTHER_TAG_METRICS_KEY: Record<
   OtherSubSector,
-  "underwriting" | "governance"
+  "underwriting" | "governance" | "majors"
 > = {
   Underwriting: "underwriting",
   Governance: "governance",
+  Majors: "majors",
 };
 
 /** RWA sub-sector label → RwaTagMetrics object key. */

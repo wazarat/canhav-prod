@@ -113,11 +113,11 @@ export interface WatchedAsset {
   entitySlug: string;
 }
 
-/** Typed research verdict emitted by stablecoin or yield agents. */
+/** Typed research verdict emitted by stablecoin, yield, or market agents. */
 export interface ResearchVerdict {
   agentId: string;
   asset: string;
-  kind: "stablecoin" | "yield";
+  kind: "stablecoin" | "yield" | "market";
   signal: string;
   severity: "low" | "medium" | "high";
   confidence: number;
@@ -134,4 +134,9 @@ export interface AssetSnapshot {
   ts: string;
 }
 
-export type AgentType = "stablecoin" | "yield";
+/**
+ * Research agent flavors. "stablecoin"/"yield" run peg/APY logic for
+ * yield-bearing stables; "market" is price/momentum research for majors
+ * (ETH, BTC) where peg and APY semantics don't apply.
+ */
+export type AgentType = "stablecoin" | "yield" | "market";

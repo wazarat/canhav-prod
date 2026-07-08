@@ -77,6 +77,8 @@ def _net(
     other_sub_sector: str,
     other_secondary_tags: List[str],
     chains: List[str],
+    sub_category: str = "Protocol",
+    evm_compatible: str = "yes",
     member_coins: Optional[List[Dict[str, Any]]] = None,
     cover_model: Optional[str] = None,
     covered_protocols: Optional[List[str]] = None,
@@ -106,7 +108,7 @@ def _net(
     `build_entity_item` expects. `other` holds the curated Tier-2 block; the
     cron overlays Tier-1 live fields."""
     other: Dict[str, Any] = {
-        "deployment": {"chains": chains, "evmCompatible": "yes"},
+        "deployment": {"chains": chains, "evmCompatible": evm_compatible},
     }
     if cover_model is not None:
         other["coverModel"] = cover_model
@@ -145,7 +147,7 @@ def _net(
         "partnerships": partnerships or [],
         "current_scale": _empty_scale(),
         "scale_labels": scale_labels or {"tvl": "Protocol TVL"},
-        "sub_category": "Protocol",
+        "sub_category": sub_category,
         "sector": "Other",
         "sub_sector": other_sub_sector,
         "other_sub_sector": other_sub_sector,
@@ -3456,6 +3458,125 @@ OTHER_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         github="https://github.com/StakeDAO",
         member_coins=[
             _coin("sdt", "Stake DAO", "SDT", "Governance token"),
+        ],
+    ),
+    # --------------------------- MAJORS ---------------------------------------
+    # L1 base assets with GMX-verified Arbitrum Sepolia markets (roadmap Step B1,
+    # verified 2026-07-08). Minimal coverage: enough for the coins to exist as
+    # first-class platform assets with live CoinGecko metrics; full six-tab
+    # editorial is deliberately out of B1 scope.
+    "ethereum": _net(
+        name="Ethereum",
+        symbol="ETH",
+        tagline="The leading smart-contract L1 and settlement layer for DeFi.",
+        description=(
+            "Ethereum is the dominant general-purpose smart-contract blockchain. "
+            "Ether (ETH) is its native asset: it pays gas, secures the network via "
+            "proof-of-stake, and serves as DeFi's primary collateral and unit of "
+            "account. On CanHav, ETH is a first-class major with a GMX-verified "
+            "perp market on Arbitrum Sepolia."
+        ),
+        differentiator=(
+            "Largest smart-contract ecosystem by TVL and developer activity; ETH is "
+            "the base collateral asset most on-chain markets price against."
+        ),
+        other_sub_sector="Majors",
+        other_secondary_tags=[],
+        chains=["Ethereum", "Arbitrum One"],
+        sub_category="Chain",
+        official_docs="https://ethereum.org/en/developers/docs/",
+        website="https://ethereum.org",
+        twitter="https://x.com/ethereum",
+        github="https://github.com/ethereum",
+        scale_labels={"tvl": "Market Cap"},
+        risks=[
+            {
+                "category": "Market",
+                "description": (
+                    "ETH is a volatile risk asset: drawdowns of 30%+ within weeks have "
+                    "occurred repeatedly. Leveraged exposure (e.g. GMX perps) amplifies "
+                    "both direction of moves and liquidation risk."
+                ),
+            },
+            {
+                "category": "Protocol Upgrade",
+                "description": (
+                    "Ethereum ships consequential protocol upgrades (the Merge, "
+                    "Dencun, Pectra). Upgrades are well-rehearsed but introduce "
+                    "transition risk, and staking/MEV dynamics continue to evolve."
+                ),
+            },
+        ],
+        sources=[
+            {
+                "label": "ethereum.org — What is Ethereum",
+                "url": "https://ethereum.org/en/what-is-ethereum/",
+            },
+            {
+                "label": "CoinGecko — Ethereum",
+                "url": "https://www.coingecko.com/en/coins/ethereum",
+            },
+        ],
+        member_coins=[
+            _coin("eth", "Ether", "ETH", "Native gas + settlement asset", "Native Asset"),
+        ],
+    ),
+    "bitcoin": _net(
+        name="Bitcoin",
+        symbol="BTC",
+        tagline="The original cryptocurrency and largest digital store of value.",
+        description=(
+            "Bitcoin is the first and largest cryptocurrency, secured by "
+            "proof-of-work. BTC functions primarily as a store of value and macro "
+            "risk asset; in DeFi it circulates via wrapped and bridged "
+            "representations. On CanHav, BTC is a first-class major with a "
+            "GMX-verified perp market on Arbitrum Sepolia."
+        ),
+        differentiator=(
+            "Deepest liquidity and longest track record of any crypto asset; the "
+            "benchmark 'digital gold' most portfolios and derivatives reference."
+        ),
+        other_sub_sector="Majors",
+        other_secondary_tags=[],
+        chains=["Bitcoin"],
+        sub_category="Chain",
+        evm_compatible="no",
+        official_docs="https://developer.bitcoin.org/",
+        website="https://bitcoin.org",
+        twitter=None,
+        github="https://github.com/bitcoin/bitcoin",
+        scale_labels={"tvl": "Market Cap"},
+        risks=[
+            {
+                "category": "Market",
+                "description": (
+                    "BTC remains a volatile risk asset despite its size; multi-week "
+                    "drawdowns of 20-50% recur across cycles. Leveraged exposure "
+                    "(e.g. GMX perps) amplifies moves and liquidation risk."
+                ),
+            },
+            {
+                "category": "Counterparty",
+                "description": (
+                    "On EVM chains BTC exposure is synthetic or custodial (WBTC, "
+                    "tBTC, index tokens): holders carry bridge, custodian, or oracle "
+                    "risk on top of BTC price risk. GMX's Sepolia BTC market uses a "
+                    "test BTC token priced by GMX oracles."
+                ),
+            },
+        ],
+        sources=[
+            {
+                "label": "bitcoin.org — How it works",
+                "url": "https://bitcoin.org/en/how-it-works",
+            },
+            {
+                "label": "CoinGecko — Bitcoin",
+                "url": "https://www.coingecko.com/en/coins/bitcoin",
+            },
+        ],
+        member_coins=[
+            _coin("btc", "Bitcoin", "BTC", "Native store-of-value asset", "Native Asset"),
         ],
     ),
 }

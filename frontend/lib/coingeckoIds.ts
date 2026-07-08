@@ -244,6 +244,9 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   fflr: null,
   fxs: null,
   sense: null,
+  // Majors — L1 base assets (roadmap B1; GMX Sepolia markets verified 2026-07-08).
+  eth: "ethereum",
+  btc: "bitcoin",
 };
 
 /**
@@ -337,6 +340,9 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   "neutra-finance": null, // tokenless — TVL sourced from DeFi Llama only
   // Other sector — governance / underwriting tokens (verified 2026-06-25).
   // Convex & Aura already mapped above (Liquidity). Sherlock, Cozy, Votium tokenless.
+  // Majors — L1 base assets (roadmap B1; GMX Sepolia markets verified 2026-07-08).
+  ethereum: "ethereum",
+  bitcoin: "bitcoin",
   "nexus-mutual": "wrapped-nxm",
   insurace: "insurace",
   "neptune-mutual": "neptune-mutual",

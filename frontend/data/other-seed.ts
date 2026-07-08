@@ -139,4 +139,27 @@ export const OTHER_SEED: OtherSeed[] = [
     coingeckoId: "aura-finance",
     seedMode: "extend-existing",
   },
+  // --------------------------- MAJORS ---------------------------------------
+  // L1 base assets with GMX-verified Arbitrum Sepolia markets (roadmap B1,
+  // verified 2026-07-08). No DeFiLlama protocol TVL — CoinGecko market data only.
+  {
+    name: "Ethereum",
+    slug: "ethereum",
+    token: "ETH",
+    subSector: "Majors",
+    secondaryTags: [],
+    llamaSlug: null,
+    coingeckoId: "ethereum",
+    seedMode: "new",
+  },
+  {
+    name: "Bitcoin",
+    slug: "bitcoin",
+    token: "BTC",
+    subSector: "Majors",
+    secondaryTags: [],
+    llamaSlug: null,
+    coingeckoId: "bitcoin",
+    seedMode: "new",
+  },
 ];

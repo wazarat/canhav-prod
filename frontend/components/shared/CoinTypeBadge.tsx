@@ -7,6 +7,7 @@ const COIN_TYPE_LABELS: Record<CoinType, string> = {
   NativeStablecoin: "Native Stable",
   SyntheticDollar: "Synthetic $",
   LockedEscrow: "Locked / Escrow",
+  Native: "Native Asset",
   NoToken: "No Token",
 };
 

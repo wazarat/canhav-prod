@@ -131,7 +131,7 @@ const schemas = {
   research_refreshCombinedVerdict: z.object({
     asset: z
       .string()
-      .describe("Trade-gated asset to refresh combined verdict for: sUSDe or sUSDai."),
+      .describe("Researched asset to refresh the combined verdict for: sUSDe, sUSDai, ETH, or BTC."),
   }),
 };
 
@@ -617,7 +617,7 @@ export async function buildAgentTools(
     }),
     research_refreshCombinedVerdict: tool({
       description:
-        "Refresh the combined research verdict for a trade-gated asset (sUSDe or sUSDai) by re-running the stablecoin + yield demo research passes. Call this when trade_propose is blocked for a stale or missing verdict, then retry trade_propose.",
+        "Refresh the combined research verdict for a researched asset (sUSDe/sUSDai: stablecoin + yield passes; ETH/BTC: market pass). Call this when trade_propose is blocked for a stale or missing verdict, then retry trade_propose.",
       inputSchema: schemas.research_refreshCombinedVerdict,
       execute: safe("research_refreshCombinedVerdict", (a: Args<"research_refreshCombinedVerdict">) =>
         execRefreshCombinedVerdict(agentId, ownerUserId, a),
@@ -725,7 +725,7 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
   },
   {
     name: "research_refreshCombinedVerdict",
-    description: "Refresh combined verdict for sUSDe/sUSDai (unblocks stale trade gate).",
+    description: "Refresh combined verdict for sUSDe/sUSDai/ETH/BTC (unblocks stale trade gate).",
     sample: { asset: "sUSDe" },
   },
 ];

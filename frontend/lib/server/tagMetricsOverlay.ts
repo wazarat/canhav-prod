@@ -37,6 +37,7 @@ export const DERIVATIVES_TAG_TO_KEY = {
 export const OTHER_TAG_TO_KEY = {
   Underwriting: "underwriting",
   Governance: "governance",
+  Majors: "majors",
 } as const satisfies Record<OtherSubSector, string>;
 
 /** Map RWA sub-sector label → RwaTagMetrics key. */

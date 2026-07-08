@@ -1,4 +1,5 @@
 import { getWatchedAsset } from "../data/assets";
+import { runMarketAgent } from "./market";
 import { runStablecoinAgent } from "./stablecoin";
 import { runYieldAgent } from "./yield";
 import type { AgentType, AssetSnapshot, ResearchVerdict, WatchedAsset } from "../types";
@@ -15,9 +16,9 @@ export async function runOnce(
   agentId: string,
   priorSnapshot: AssetSnapshot | null = null,
 ): Promise<RunOnceResult> {
-  return type === "stablecoin"
-    ? runStablecoinAgent(asset, agentId, priorSnapshot)
-    : runYieldAgent(asset, agentId, priorSnapshot);
+  if (type === "stablecoin") return runStablecoinAgent(asset, agentId, priorSnapshot);
+  if (type === "market") return runMarketAgent(asset, agentId, priorSnapshot);
+  return runYieldAgent(asset, agentId, priorSnapshot);
 }
 
 /** Resolve asset symbol to WatchedAsset preset and run once. */

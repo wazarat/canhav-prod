@@ -6,14 +6,10 @@ import { YIELD_DEMO_AGENTS } from "@/lib/agent/verdictRunner";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const ASSET_ENTITY: Record<string, string> = {
-  sUSDe: "ethena",
-  sUSDai: "usd-ai",
-};
-
 /**
- * Public combined verdict for an entity's yield-bearing stablecoin pair.
- * Query: ?asset=sUSDe | sUSDai  OR  ?entity=ethena | usd-ai
+ * Public combined verdict for a researched asset: a yield-bearing stablecoin
+ * pair (sUSDe, sUSDai) or a majors market agent (ETH, BTC).
+ * Query: ?asset=sUSDe | ETH | …  OR  ?entity=ethena | ethereum | …
  */
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -25,9 +21,12 @@ export async function GET(req: Request) {
     asset = match?.asset ?? null;
   }
 
-  if (!asset || !(asset in ASSET_ENTITY)) {
+  const entityMatch = asset ? YIELD_DEMO_AGENTS.find((a) => a.asset === asset) : null;
+  if (!asset || !entityMatch) {
+    const assets = [...new Set(YIELD_DEMO_AGENTS.map((a) => a.asset))].join("|");
+    const entities = [...new Set(YIELD_DEMO_AGENTS.map((a) => a.entitySlug))].join("|");
     return NextResponse.json(
-      { ok: false, error: "Provide ?asset=sUSDe|sUSDai or ?entity=ethena|usd-ai" },
+      { ok: false, error: `Provide ?asset=${assets} or ?entity=${entities}` },
       { status: 400 },
     );
   }
@@ -35,15 +34,17 @@ export async function GET(req: Request) {
   const combined = await getCombinedVerdict(asset);
   const stableAgent = YIELD_DEMO_AGENTS.find((a) => a.asset === asset && a.type === "stablecoin");
   const yieldAgent = YIELD_DEMO_AGENTS.find((a) => a.asset === asset && a.type === "yield");
+  const marketAgent = YIELD_DEMO_AGENTS.find((a) => a.asset === asset && a.type === "market");
 
   return NextResponse.json({
     ok: true,
     asset,
-    entitySlug: ASSET_ENTITY[asset],
+    entitySlug: entityMatch.entitySlug,
     combined,
     agents: {
       stablecoin: stableAgent?.agentId ?? null,
       yield: yieldAgent?.agentId ?? null,
+      market: marketAgent?.agentId ?? null,
     },
   });
 }

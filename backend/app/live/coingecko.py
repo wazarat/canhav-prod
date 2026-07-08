@@ -165,6 +165,9 @@ COINGECKO_IDS: dict[str, Optional[str]] = {
     "cpool": "clearpool",
     "stsyrup": None,
     "vai": None,
+    # Majors — L1 base assets (roadmap B1; GMX Sepolia markets verified 2026-07-08).
+    "eth": "ethereum",
+    "btc": "bitcoin",
 }
 
 

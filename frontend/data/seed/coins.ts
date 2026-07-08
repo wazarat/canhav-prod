@@ -115,4 +115,7 @@ export const COIN_SEED: CoinSeed[] = [
   { slug: "puffer-finance-no-token", symbol: "\u2014", name: "Puffer Finance (no native token)", coinType: "NoToken", entitySlug: "puffer", geckoId: null, isStablecoin: false, sector: "Staking", tag: "Liquid Restaking" },
   { slug: "rez", symbol: "REZ", name: "REZ", coinType: "Governance", entitySlug: "renzo", geckoId: "renzo", isStablecoin: false, sector: "Staking", tag: "Liquid Restaking" },
   { slug: "yieldnest-no-token", symbol: "\u2014", name: "YieldNest (no native token)", coinType: "NoToken", entitySlug: "yieldnest", geckoId: null, isStablecoin: false, sector: "Staking", tag: "Liquid Restaking" },
+  // Majors \u2014 L1 base assets (roadmap Step B1; GMX Sepolia markets verified 2026-07-08).
+  { slug: "eth", symbol: "ETH", name: "Ether", coinType: "Native", entitySlug: "ethereum", geckoId: "ethereum", isStablecoin: false, sector: "Other", tag: "Majors" },
+  { slug: "btc", symbol: "BTC", name: "Bitcoin", coinType: "Native", entitySlug: "bitcoin", geckoId: "bitcoin", isStablecoin: false, sector: "Other", tag: "Majors" },
 ];

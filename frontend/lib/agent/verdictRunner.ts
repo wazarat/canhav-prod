@@ -17,16 +17,36 @@ import { combineVerdicts } from "canhav-agent-service/src/agent/combine";
 import { runOnceBySymbol } from "canhav-agent-service/src/agent/schedule";
 import type { AgentType, ResearchVerdict } from "canhav-agent-service/src/types";
 
-/** Alpha demo agents seeded by yield-agents-demo.mjs */
+/**
+ * Alpha demo agents seeded by yield-agents-demo.mjs, plus the majors market
+ * agents (roadmap B1). Yield-bearing stables run a stablecoin+yield pair whose
+ * verdicts are combined; majors run a single market agent whose verdict is
+ * stored as the combined verdict directly (no fake second leg).
+ */
 export const YIELD_DEMO_AGENTS = [
   { agentId: "900101", type: "stablecoin" as AgentType, asset: "sUSDe", entitySlug: "ethena" },
   { agentId: "900102", type: "yield" as AgentType, asset: "sUSDe", entitySlug: "ethena" },
   { agentId: "900103", type: "stablecoin" as AgentType, asset: "sUSDai", entitySlug: "usd-ai" },
   { agentId: "900104", type: "yield" as AgentType, asset: "sUSDai", entitySlug: "usd-ai" },
+  { agentId: "900105", type: "market" as AgentType, asset: "ETH", entitySlug: "ethereum" },
+  { agentId: "900106", type: "market" as AgentType, asset: "BTC", entitySlug: "bitcoin" },
 ] as const;
 
 export function demoAgentConfig(agentId: string) {
   return YIELD_DEMO_AGENTS.find((a) => a.agentId === agentId) ?? null;
+}
+
+/** Assets with a research loop capable of opening the trade gate. */
+export function gatedResearchAssets(): string[] {
+  return [...new Set(YIELD_DEMO_AGENTS.map((a) => a.asset))];
+}
+
+function demoAgentsForAsset(asset: string) {
+  return {
+    stable: YIELD_DEMO_AGENTS.find((a) => a.asset === asset && a.type === "stablecoin"),
+    yieldAgent: YIELD_DEMO_AGENTS.find((a) => a.asset === asset && a.type === "yield"),
+    market: YIELD_DEMO_AGENTS.find((a) => a.asset === asset && a.type === "market"),
+  };
 }
 
 export interface RunAgentVerdictResult {
@@ -69,55 +89,78 @@ export async function runAndStoreVerdict(
   return { verdict, publishedToDune };
 }
 
-/** Combine latest stablecoin + yield verdicts for an asset and persist. */
+/**
+ * Refresh the gate-facing combined verdict for an asset and persist it.
+ * Stablecoin+yield pairs are merged via combineVerdicts; a majors asset has a
+ * single market agent whose latest verdict is stored directly.
+ */
 export async function refreshCombinedVerdict(asset: string): Promise<ResearchVerdict | null> {
-  const stable = YIELD_DEMO_AGENTS.find((a) => a.asset === asset && a.type === "stablecoin");
-  const yieldAgent = YIELD_DEMO_AGENTS.find((a) => a.asset === asset && a.type === "yield");
-  if (!stable || !yieldAgent) return null;
-
+  const { stable, yieldAgent, market } = demoAgentsForAsset(asset);
   const { listVerdicts } = await import("@/lib/agent/memory");
-  const [stableVerdicts, yieldVerdicts] = await Promise.all([
-    listVerdicts(stable.agentId, 1),
-    listVerdicts(yieldAgent.agentId, 1),
-  ]);
-  const a = stableVerdicts[0];
-  const b = yieldVerdicts[0];
-  if (!a || !b) return null;
 
-  const combined = combineVerdicts(a, b);
-  await setCombinedVerdict(asset, combined);
-  return combined;
+  if (stable && yieldAgent) {
+    const [stableVerdicts, yieldVerdicts] = await Promise.all([
+      listVerdicts(stable.agentId, 1),
+      listVerdicts(yieldAgent.agentId, 1),
+    ]);
+    const a = stableVerdicts[0];
+    const b = yieldVerdicts[0];
+    if (!a || !b) return null;
+
+    const combined = combineVerdicts(a, b);
+    await setCombinedVerdict(asset, combined);
+    return combined;
+  }
+
+  if (market) {
+    const verdicts = await listVerdicts(market.agentId, 1);
+    const latest = verdicts[0];
+    if (!latest) return null;
+    await setCombinedVerdict(asset, latest);
+    return latest;
+  }
+
+  return null;
 }
 
-/** Run stablecoin + yield demo passes for one asset and refresh the combined verdict (trade gate input). */
+/** Run the asset's research passes and refresh the combined verdict (trade gate input). */
 export async function refreshAssetCombinedVerdict(
   asset: string,
   ownerUserId?: string | null,
 ): Promise<{ ok: boolean; combined: ResearchVerdict | null; summary: string }> {
   const normalized = asset.trim();
-  const stable = YIELD_DEMO_AGENTS.find((a) => a.asset === normalized && a.type === "stablecoin");
-  const yieldAgent = YIELD_DEMO_AGENTS.find((a) => a.asset === normalized && a.type === "yield");
-  if (!stable || !yieldAgent) {
-    return {
-      ok: false,
-      combined: null,
-      summary: `Cannot refresh: ${normalized} is not trade-gated (use sUSDe or sUSDai).`,
-    };
-  }
+  const { stable, yieldAgent, market } = demoAgentsForAsset(normalized);
 
-  const stableRun = await runAndStoreVerdict(stable.agentId, stable.type, normalized, ownerUserId);
-  const yieldRun = await runAndStoreVerdict(yieldAgent.agentId, yieldAgent.type, normalized, ownerUserId);
-  if (!stableRun || !yieldRun) {
+  if (stable && yieldAgent) {
+    const stableRun = await runAndStoreVerdict(stable.agentId, stable.type, normalized, ownerUserId);
+    const yieldRun = await runAndStoreVerdict(yieldAgent.agentId, yieldAgent.type, normalized, ownerUserId);
+    if (!stableRun || !yieldRun) {
+      return {
+        ok: false,
+        combined: null,
+        summary: "Research run failed for stablecoin or yield demo agent.",
+      };
+    }
+  } else if (market) {
+    const marketRun = await runAndStoreVerdict(market.agentId, market.type, normalized, ownerUserId);
+    if (!marketRun) {
+      return {
+        ok: false,
+        combined: null,
+        summary: `Market research run failed for ${normalized}.`,
+      };
+    }
+  } else {
     return {
       ok: false,
       combined: null,
-      summary: "Research run failed for stablecoin or yield demo agent.",
+      summary: `Cannot refresh: ${normalized} is not trade-gated (use ${gatedResearchAssets().join(", ")}).`,
     };
   }
 
   const combined = await refreshCombinedVerdict(normalized);
   if (!combined) {
-    return { ok: false, combined: null, summary: "Failed to combine stablecoin + yield verdicts." };
+    return { ok: false, combined: null, summary: "Failed to refresh the combined verdict." };
   }
 
   return {
@@ -127,7 +170,7 @@ export async function refreshAssetCombinedVerdict(
   };
 }
 
-/** Cron entry: run all four demo agents + refresh combined reads. */
+/** Cron entry: run all demo agents + refresh combined reads. */
 export async function runAllDemoAgentVerdicts(): Promise<{
   ran: number;
   combined: string[];
@@ -138,7 +181,7 @@ export async function runAllDemoAgentVerdicts(): Promise<{
     if (out) ran++;
   }
   const combined: string[] = [];
-  for (const asset of ["sUSDe", "sUSDai"] as const) {
+  for (const asset of gatedResearchAssets()) {
     const c = await refreshCombinedVerdict(asset);
     if (c) combined.push(asset);
   }

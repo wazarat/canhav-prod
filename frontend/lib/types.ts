@@ -714,7 +714,7 @@ export interface CustomTool {
 /* Tokens — governance / utility tokens (e.g. CHIP)                           */
 /* -------------------------------------------------------------------------- */
 
-export type TokenType = "Governance" | "Utility" | "Yield" | "LST";
+export type TokenType = "Governance" | "Utility" | "Yield" | "LST" | "Native";
 
 /** Finer taxonomy for stablecoins (e.g. staked stablecoin). */
 export type StablecoinSubCategory = "Stablecoin" | "Staked Stablecoin";
@@ -724,7 +724,8 @@ export type TokenSubCategory =
   | "Governance Token"
   | "Yield-generating Token"
   | "LST"
-  | "Utility Token";
+  | "Utility Token"
+  | "Native Asset";
 
 export interface TokenProfile {
   category: "Token";
@@ -980,13 +981,14 @@ export type NetworkSector =
   | "Derivatives"
   | "Other";
 
-/** Consolidated 6-type coin taxonomy (primary tokens only). */
+/** Consolidated coin taxonomy (primary tokens only). */
 export type CoinType =
   | "Governance"
   | "GovernanceUtility"
   | "NativeStablecoin"
   | "SyntheticDollar"
   | "LockedEscrow"
+  | "Native"
   | "NoToken";
 
 /** Consolidated 8-type receipt taxonomy. */
@@ -1147,10 +1149,11 @@ export type DerivativesSecondaryTag =
   | "Funding-Rate-Yield" // delta-neutral funding capture (Ethena)
   | "Multi-Chain";
 
-/** "Other" primary sub-sector — the two specialized tags. */
+/** "Other" primary sub-sector — the specialized tags. */
 export type OtherSubSector =
   | "Underwriting" // decentralized insurance / coverage pools (Nexus, Sherlock, InsurAce…)
-  | "Governance"; // governance bribes & meta-governance (Convex, Votium, Aura…)
+  | "Governance" // governance bribes & meta-governance (Convex, Votium, Aura…)
+  | "Majors"; // L1 base assets with GMX-verified markets (Ethereum, Bitcoin)
 
 /** "Other" cross-cutting secondary tags (0+, multi-select). */
 export type OtherSecondaryTag =
@@ -2084,10 +2087,23 @@ export interface OtherGovernanceTagMetrics {
   deployment?: ChainDeployment | null;
 }
 
+/** "Majors" tag metrics — L1 base assets; market data only (no protocol TVL). */
+export interface OtherMajorsTagMetrics {
+  tvlUsd?: Sourced<number | null>;
+  tvlChangePct?: { d1: number | null; d7: number | null } | null;
+  feesRevenue?: ProtocolFeesRevenue | null;
+  tokenPriceUsd?: Sourced<number | null>;
+  marketCapUsd?: Sourced<number | null>;
+  marketSharePct?: number | null;
+  auditHistory?: string | null;
+  deployment?: ChainDeployment | null;
+}
+
 /** Tag-specific metric blocks keyed by the Other tag vocabulary. */
 export interface OtherTagMetrics {
   underwriting?: OtherUnderwritingTagMetrics | null;
   governance?: OtherGovernanceTagMetrics | null;
+  majors?: OtherMajorsTagMetrics | null;
 }
 
 /** Tag-specific metric blocks keyed by RWA sub-sector (camelCase keys). */

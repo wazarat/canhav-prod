@@ -611,7 +611,7 @@ export async function buildAgentTools(
     }),
     trade_propose: tool({
       description:
-        "Propose a research-gated GMX perp trade on Arbitrum Sepolia for a CanHav-researched coin (sUSDe, sUSDai). Respects owner HITL settings: manual suggestion, propose→approve, or spending-cap auto. Never executes without gate clearance.",
+        "Propose a research-gated GMX perp trade on Arbitrum Sepolia for a tradable major (ETH, BTC). Respects owner HITL settings: manual suggestion, propose→approve, or spending-cap auto. Never executes without gate clearance.",
       inputSchema: schemas.trade_propose,
       execute: safe("trade_propose", (a: Args<"trade_propose">) => execTradePropose(agentId, a)),
     }),
@@ -720,8 +720,8 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
   },
   {
     name: "trade_propose",
-    description: "Propose a research-gated GMX perp on sUSDe/sUSDai (Arbitrum Sepolia).",
-    sample: { asset: "sUSDe", side: "long", sizeUsdHuman: 10, leverage: 1 },
+    description: "Propose a research-gated GMX perp on ETH/BTC (Arbitrum Sepolia).",
+    sample: { asset: "ETH", side: "long", sizeUsdHuman: 10, leverage: 1 },
   },
   {
     name: "research_refreshCombinedVerdict",

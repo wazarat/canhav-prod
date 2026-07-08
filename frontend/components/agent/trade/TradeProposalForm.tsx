@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDownRight, ArrowUpRight, Loader2, RefreshCcw, Send } from "lucide-react";
 
@@ -46,8 +46,41 @@ export function TradeProposalForm({
   const [busy, setBusy] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [result, setResult] = useState<ProposeResult | null>(null);
+  const [spot, setSpot] = useState<{ symbol: string; priceUsd: number } | null>(null);
 
   const base = `/api/agent/${encodeURIComponent(agentId)}`;
+
+  // Live reference price for sizing (matches the endpoint's ~60s cache).
+  // GMX's on-chain oracle still prices the actual fill.
+  useEffect(() => {
+    if (!asset) return;
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch(`/api/agent/trade/price?symbol=${encodeURIComponent(asset)}`);
+        const data = (await res.json()) as { ok: boolean; symbol?: string; priceUsd?: number };
+        if (!cancelled) {
+          setSpot(
+            data.ok && typeof data.priceUsd === "number" && data.symbol
+              ? { symbol: data.symbol, priceUsd: data.priceUsd }
+              : null,
+          );
+        }
+      } catch {
+        if (!cancelled) setSpot(null);
+      }
+    }
+    void load();
+    const timer = setInterval(load, 60_000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [asset]);
+
+  const spotForAsset = spot && spot.symbol.toLowerCase() === asset.toLowerCase() ? spot : null;
+  const positionUnits =
+    spotForAsset && spotForAsset.priceUsd > 0 ? (sizeUsd * leverage) / spotForAsset.priceUsd : null;
 
   async function propose() {
     setBusy(true);
@@ -190,6 +223,27 @@ export function TradeProposalForm({
           Propose
         </button>
       </div>
+
+      {spotForAsset && (
+        <p className="font-mono text-[11px] text-ink-400">
+          {spotForAsset.symbol} ref ·{" "}
+          <span className="text-ink-200">
+            $
+            {spotForAsset.priceUsd.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </span>
+          {positionUnits != null && (
+            <>
+              {" "}
+              · ≈{positionUnits.toLocaleString("en-US", { maximumSignificantDigits: 4 })}{" "}
+              {spotForAsset.symbol} position
+            </>
+          )}{" "}
+          <span className="text-ink-500">(GMX oracle prices the fill)</span>
+        </p>
+      )}
 
       <p className="text-[11px] text-ink-500">
         {hitlMethod === "manual"

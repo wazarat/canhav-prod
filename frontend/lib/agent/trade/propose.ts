@@ -8,7 +8,7 @@ import {
   type TradeHitlMethod,
 } from "@/lib/agent/agentConfig";
 import { assertResearchGate } from "@/lib/agent/trade/gate";
-import { defaultGmxTarget, getTradeCoin } from "@/lib/agent/trade/coins";
+import { defaultGmxTarget, getTradeCoin, listTradeCoinSymbols } from "@/lib/agent/trade/coins";
 import { MAX_LEVERAGE, MAX_SIZE_USD, EXCHANGE_ROUTER } from "@/lib/agent/trade/gmx";
 import type { TradeSide } from "@/lib/agent/trade/types";
 import {
@@ -40,7 +40,7 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
     return {
       ok: false,
       blocked: true,
-      summary: `${asset} is not a supported trade coin (sUSDe, sUSDai).`,
+      summary: `${asset} is not a supported trade coin (${listTradeCoinSymbols().join(", ")}).`,
     };
   }
 

@@ -1,4 +1,4 @@
-import { EXCHANGE_ROUTER, SEPOLIA_USDC } from "@/lib/agent/trade/gmx";
+import { EXCHANGE_ROUTER, USDC_SG } from "@/lib/agent/trade/gmx";
 
 export interface TradeCoin {
   symbol: string;
@@ -12,23 +12,31 @@ export interface TradeCoin {
   gmxMarket: `0x${string}` | null;
   /** Index token symbol for Reader market lookup (e.g. WETH for ETH/USD). */
   marketIndexToken: string;
+  /** CoinGecko coin id for the live spot-price endpoint. */
+  geckoId: string;
 }
 
-/** v1: sUSDe + sUSDai research assets → ETH/USD GMX market on Sepolia. */
+/**
+ * v2: the verified GMX Sepolia majors (on-chain via Reader.getMarkets,
+ * 2026-07-08 — re-verify with `node scripts/verify-gmx-markets.mjs`).
+ * Honest mapping: you trade the market the research covers.
+ */
 export const TRADE_COINS: TradeCoin[] = [
   {
-    symbol: "sUSDe",
-    entitySlug: "ethena",
-    collateralToken: SEPOLIA_USDC,
-    gmxMarket: null,
+    symbol: "ETH",
+    entitySlug: "ethereum",
+    collateralToken: USDC_SG,
+    gmxMarket: "0xb6fC4C9eB02C35A134044526C62bb15014Ac0Bcc",
     marketIndexToken: "WETH",
+    geckoId: "ethereum",
   },
   {
-    symbol: "sUSDai",
-    entitySlug: "usd-ai",
-    collateralToken: SEPOLIA_USDC,
-    gmxMarket: null,
-    marketIndexToken: "WETH",
+    symbol: "BTC",
+    entitySlug: "bitcoin",
+    collateralToken: USDC_SG,
+    gmxMarket: "0x3A83246bDDD60c4e71c91c10D9A66Fd64399bBCf",
+    marketIndexToken: "BTC",
+    geckoId: "bitcoin",
   },
 ];
 

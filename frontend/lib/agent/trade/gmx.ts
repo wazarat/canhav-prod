@@ -28,11 +28,13 @@ export const DATA_STORE = "0xCF4c2C4c53157BcC01A596e3788fFF69cBBCD201" as const;
 export const ORACLE = "0x0dC4e24C63C24fE898Dda574C962Ba7Fbb146964" as const;
 
 /**
- * Circle USDC on Arbitrum Sepolia — common GMX testnet collateral.
- * Re-verify if trades fail on collateral transfer.
+ * Stargate USDC (USDC.SG) — the short/collateral token of BOTH live GMX
+ * Arbitrum Sepolia markets (ETH/USD, BTC/USD). NOT Circle's testnet USDC
+ * (0x75faf114…AA4d); orders funded with that token fail on collateral
+ * transfer. Re-verify with `node scripts/verify-gmx-markets.mjs`.
  */
-export const SEPOLIA_USDC =
-  "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d" as const;
+export const USDC_SG =
+  "0x3253a335E7bFfB4790Aa4C25C4250d206E9b9773" as const;
 
 /** v1 fixed leverage cap. */
 export const MAX_LEVERAGE = 2;

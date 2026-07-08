@@ -141,6 +141,19 @@ const CATEGORY_NETWORK = "Network";
 const CATEGORY_NETWORK_LEGACY = "Entity";
 const isNetworkCategory = (c: string) =>
   c === CATEGORY_NETWORK || c === CATEGORY_NETWORK_LEGACY;
+
+/**
+ * Effective CoinGecko id for a coin/receipt item: a curated `CoingeckoId` on the
+ * item (set via the admin editor) wins over the static COINGECKO_IDS map. This is
+ * the hook that makes admin id edits actually populate the Market block on the
+ * next cron run. Returns null when neither is set.
+ */
+function effectiveCoinId(item: Record<string, any>): string | null {
+  const explicit = String(item.CoingeckoId ?? "").trim();
+  if (explicit) return explicit;
+  return COINGECKO_IDS[String(item.Slug ?? "")] ?? null;
+}
+
 const COINGECKO_DELAY_MS = 1_500; // free-tier etiquette between lookups
 const HISTORY_DAYS = 90; // stored peg/TVL history window
 
@@ -1312,12 +1325,8 @@ export async function GET(req: Request): Promise<NextResponse> {
   const productCoinIds = [
     ...new Set(
       items
-        .filter((it) => {
-          const slug = String(it.Slug ?? "");
-          const category = String(it.Category ?? "");
-          return COINGECKO_IDS[slug] && !isNetworkCategory(category);
-        })
-        .map((it) => COINGECKO_IDS[String(it.Slug ?? "")])
+        .filter((it) => !isNetworkCategory(String(it.Category ?? "")))
+        .map((it) => effectiveCoinId(it))
         .filter((id): id is string => Boolean(id)),
     ),
   ];
@@ -1338,8 +1347,10 @@ export async function GET(req: Request): Promise<NextResponse> {
     let resolution: TokenResolution | null = null;
 
     // 1. CoinGecko resolution for member coins only (networks use the universal pass).
-    if (COINGECKO_IDS[slug] && !isNetworkCategory(category)) {
-      resolution = await cgCache.resolveForProductSlug(slug, true);
+    //    Effective id prefers a curated `CoingeckoId` on the item over the static map.
+    const effectiveId = effectiveCoinId(item);
+    if (effectiveId && !isNetworkCategory(category)) {
+      resolution = await cgCache.resolve(effectiveId, { platforms: true });
       if (resolution) {
         address = resolution.address;
         decimals = resolution.decimals;

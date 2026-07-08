@@ -143,6 +143,29 @@ export function readNetworkItemLocal(
   return null;
 }
 
+/**
+ * Generic offline-dev reader: find a store item by trying each candidate
+ * category for the given slug. Used by the admin content editor for
+ * coins/receipts (mirrors {@link readNetworkItemLocal}, which is network-only).
+ */
+export function readStoreItemLocal(
+  categories: string[],
+  slug: string,
+): { field: string; item: Record<string, any> } | null {
+  let parsed: StoreFile;
+  try {
+    parsed = JSON.parse(readFileSync(storePath(), "utf-8")) as StoreFile;
+  } catch {
+    return null;
+  }
+  const items = (parsed.items ?? {}) as Record<string, Record<string, any>>;
+  for (const category of categories) {
+    const field = `CATEGORY#${category}|PROTOCOL#${slug}`;
+    if (items[field]) return { field, item: items[field] };
+  }
+  return null;
+}
+
 export function writeNetworkItemLocal(field: string, item: Record<string, any>): boolean {
   let parsed: StoreFile & Record<string, unknown>;
   try {
@@ -455,6 +478,11 @@ function coinTaxonomyFields(item: Record<string, any>) {
     stakingApr: item.StakingApr ?? null,
     backing: item.Backing ?? null,
     sector: item.Sector ?? null,
+    // Curated/editable scaffolds (admin editor writes these; cron never touches).
+    coingeckoId: item.CoingeckoId ?? null,
+    hasNativeToken: item.HasNativeToken ?? null,
+    backingApy: item.BackingApy ?? null,
+    lockDuration: item.LockDuration ?? null,
   };
 }
 
@@ -516,6 +544,16 @@ export const readLiveStore = cache(async (): Promise<LiveStore> => {
         aumUsd: item.AumUsd ?? null,
         underlyingYield: item.UnderlyingYield ?? null,
         holders: item.Holders ?? null,
+        // Curated/editable scaffolds (admin editor writes these; cron never touches).
+        coingeckoId: item.CoingeckoId ?? null,
+        avsCount: item.AvsCount ?? null,
+        underlyingAssets: item.UnderlyingAssets ?? null,
+        trancheSize: item.TrancheSize ?? null,
+        navUsd: item.NavUsd ?? null,
+        assetClass: item.AssetClass ?? null,
+        custodian: item.Custodian ?? null,
+        regulatory: item.Regulatory ?? null,
+        lockDuration: item.LockDuration ?? null,
         market: item.Market ?? undefined,
         yieldMechanics: item.YieldMechanics ?? undefined,
         lendingMarket: item.LendingMarket ?? undefined,

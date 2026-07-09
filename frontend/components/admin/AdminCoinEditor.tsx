@@ -156,7 +156,17 @@ export function AdminCoinEditor({
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(baseline), [draft, baseline]);
   useEffect(() => onDirtyChange?.(dirty), [dirty, onDirtyChange]);
 
-  const type = kind === "coin" ? (loaded?.coinType ?? null) : (loaded?.receiptType ?? null);
+  // Derive the active type from the live draft (falling back to the loaded value)
+  // so the type-conditional curated scaffolds + No-Token suppression refresh the
+  // moment the dropdown changes — not only after a reload.
+  const type =
+    kind === "coin"
+      ? typeof draft.CoinType === "string"
+        ? draft.CoinType
+        : (loaded?.coinType ?? null)
+      : typeof draft.ReceiptType === "string"
+        ? draft.ReceiptType
+        : (loaded?.receiptType ?? null);
 
   const setField = useCallback((key: string, value: unknown) => {
     setDraft((prev) => ({ ...prev, [key]: value }));

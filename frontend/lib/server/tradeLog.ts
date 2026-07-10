@@ -71,16 +71,24 @@ export async function recordTrade(entry: TradeLogEntry): Promise<void> {
 
 export async function listTrades(agentId: string, limit = 20): Promise<TradeLogEntry[]> {
   if (hasUpstash()) {
-    const raw = await getRedisClient().lrange(logKey(agentId), 0, limit - 1);
+    // @upstash/redis auto-deserializes JSON values by default, so lrange
+    // yields objects, not strings — JSON.parse on those throws and every
+    // entry was silently dropped (breaking cumulative-cap sums). Accept both.
+    const raw = await getRedisClient().lrange<TradeLogEntry | string>(
+      logKey(agentId),
+      0,
+      limit - 1,
+    );
     return raw
       .map((line) => {
+        if (typeof line !== "string") return line;
         try {
           return JSON.parse(line) as TradeLogEntry;
         } catch {
           return null;
         }
       })
-      .filter((e): e is TradeLogEntry => e !== null);
+      .filter((e): e is TradeLogEntry => e !== null && typeof e === "object");
   }
   return (readFile()[agentId] ?? []).slice(0, limit);
 }

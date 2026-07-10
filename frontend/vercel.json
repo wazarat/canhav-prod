@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
+  "installCommand": "rm -rf node_modules/canhav-agent-service && npm install",
   "crons": [
     {
       "path": "/api/cron/refresh",

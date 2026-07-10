@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldCheck, ShieldX } from "lucide-react";
+import { ExternalLink, ShieldCheck, ShieldX, Wallet } from "lucide-react";
 
 import { TradeProposalForm } from "@/components/agent/trade/TradeProposalForm";
 import { Badge } from "@/components/ui/Badge";
@@ -10,8 +10,11 @@ import {
 } from "@/lib/agent/agentConfig";
 import { getCombinedVerdict } from "@/lib/agent/memory";
 import { TRADE_COINS } from "@/lib/agent/trade/coins";
+import { readTradeFunding } from "@/lib/agent/trade/funding";
 import { evaluateVerdictGate, VERDICT_MAX_AGE_MS } from "@/lib/agent/trade/gate";
 import { MAX_LEVERAGE, MAX_SIZE_USD } from "@/lib/agent/trade/gmx";
+import { getSession } from "@/lib/auth/session";
+import { getUserProfile } from "@/lib/auth/users";
 
 const HITL_LABELS: Record<TradeHitlMethod, string> = {
   manual: "Manual — the agent only suggests, you place trades yourself",
@@ -63,6 +66,17 @@ export async function TradeDesk({
 
   const cfg = sanitizeAgentConfig(config ?? {});
   const maxSizeUsdHuman = Number(MAX_SIZE_USD / 10n ** 30n);
+
+  // Owner-only funding readout: the treasury wallet that signs trades needs
+  // Sepolia ETH (gas + execution fee) and USDC.SG (the markets' collateral).
+  let funding = null;
+  if (isOwner) {
+    const session = getSession();
+    const profile = session ? await getUserProfile(session.userId) : null;
+    if (profile?.address && /^0x[0-9a-fA-F]{40}$/.test(profile.address)) {
+      funding = await readTradeFunding(profile.address as `0x${string}`);
+    }
+  }
 
   return (
     <div className="card-surface glow-ring overflow-hidden rounded-2xl border border-ink-800/60">
@@ -128,6 +142,47 @@ export async function TradeDesk({
 
         {isOwner ? (
           <>
+            {funding && (
+              <div className="rounded-xl border border-ink-800/60 bg-ink-950/40 px-4 py-3">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                  <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-400">
+                    <Wallet className="h-3.5 w-3.5" /> Trading wallet
+                  </p>
+                  <a
+                    href={`https://sepolia.arbiscan.io/address/${funding.address}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 font-mono text-[11px] text-ink-400 transition-colors hover:text-electric-300"
+                  >
+                    {funding.address.slice(0, 6)}…{funding.address.slice(-4)}
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                  <span className="tabular font-mono text-xs text-ink-200">
+                    {funding.usdcSgBalance}{" "}
+                    <span className="text-ink-400">USDC.SG collateral</span>
+                  </span>
+                  <span className="tabular font-mono text-xs text-ink-200">
+                    {funding.ethBalance} <span className="text-ink-400">ETH gas</span>
+                  </span>
+                </div>
+                {funding.usdcSgRaw === 0n ? (
+                  <p className="mt-1.5 text-xs text-amber-400">
+                    No USDC.SG collateral — GMX orders will fail. tCNHV credits are marketplace-only
+                    and can&apos;t back trades.
+                  </p>
+                ) : funding.ethRaw === 0n ? (
+                  <p className="mt-1.5 text-xs text-amber-400">
+                    No Sepolia ETH — the wallet can&apos;t pay gas or the GMX execution fee.
+                  </p>
+                ) : (
+                  <p className="mt-1.5 text-xs text-ink-500">
+                    GMX collateral is USDC.SG; tCNHV credits are marketplace-only. Execution fee is
+                    paid in Sepolia ETH.
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="rounded-xl border border-ink-800/60 bg-ink-950/40 px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-ink-400">
                 Approval method

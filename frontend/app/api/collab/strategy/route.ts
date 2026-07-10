@@ -22,6 +22,7 @@ import {
   settlePayment,
   verifyPayment,
 } from "@/lib/server/x402";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Seller endpoint — canonical x402 v2 on Arbitrum Sepolia.
@@ -50,6 +51,7 @@ interface SellerBody {
 }
 
 export async function POST(req: Request) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   let body: SellerBody;
   try {
     body = (await req.json()) as SellerBody;

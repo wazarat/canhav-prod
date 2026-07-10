@@ -6,6 +6,7 @@ import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
 import { getUserSkill } from "@/lib/server/userSkills";
 import { readSecret } from "@/lib/server/env";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Attach a user-authored skill to one of the caller's agents = "training".
@@ -21,6 +22,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sign in to attach a skill." }, { status: 401 });

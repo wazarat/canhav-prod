@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
 import { CollabExchangeProof } from "@/components/agent/CollabExchangeProof";
@@ -17,6 +17,7 @@ import {
 } from "viem";
 import { arbitrumSepolia } from "viem/chains";
 import { readSecret } from "@/lib/server/env";
+import { collabEnabled } from "@/lib/collab-flag";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,7 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function CollabExchangePage({ params }: PageProps) {
+  if (!collabEnabled()) redirect("/");
   const { hash: rawHash } = await params;
   const paymentRef = rawHash.startsWith("0x") ? rawHash : `0x${rawHash}`;
   if (!/^0x[0-9a-fA-F]{64}$/.test(paymentRef)) notFound();

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AlertTriangle, Loader2, Users } from "lucide-react";
 
+import { collabEnabled } from "@/lib/collab-flag";
+
 import { Badge } from "@/components/ui/Badge";
 
 interface ResearchVerdict {
@@ -130,10 +132,14 @@ export function CombinedVerdictCard({ entitySlug, asset }: CombinedVerdictCardPr
               yield agent
             </Link>
           )}
-          {" · "}
-          <Link href="/collab" className="text-neon-400 hover:text-neon-300">
-            marketplace
-          </Link>
+          {collabEnabled() && (
+            <>
+              {" · "}
+              <Link href="/collab" className="text-neon-400 hover:text-neon-300">
+                marketplace
+              </Link>
+            </>
+          )}
         </p>
       )}
     </div>

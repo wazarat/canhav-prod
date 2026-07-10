@@ -34,6 +34,7 @@ import { DataFramesPanel } from "@/components/agent/DataFramesPanel";
 import { KnowledgePanel } from "@/components/agent/KnowledgePanel";
 import { agentConfigStatus, hasEmbeddings } from "@/lib/agent/config";
 import { hasMeaningfulConfig } from "@/lib/agent/agentConfig";
+import { collabEnabled } from "@/lib/collab-flag";
 import {
   CUSTOM_TOOL_LIMITS,
   customToolHttpAllowlist,
@@ -237,12 +238,14 @@ export default async function AgentHomePage({
         tabs={tabs}
         defaultTab={DEFAULT_AGENT_TAB}
         trailing={
-          <Link
-            href="/collab"
-            className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-neon-500/40 bg-neon-500/10 px-3 py-1.5 text-xs font-medium text-neon-400 transition-colors hover:bg-neon-500/20"
-          >
-            <Store className="h-3 w-3" /> Browse marketplace
-          </Link>
+          collabEnabled() ? (
+            <Link
+              href="/collab"
+              className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-neon-500/40 bg-neon-500/10 px-3 py-1.5 text-xs font-medium text-neon-400 transition-colors hover:bg-neon-500/20"
+            >
+              <Store className="h-3 w-3" /> Browse marketplace
+            </Link>
+          ) : undefined
         }
       />
 
@@ -495,23 +498,27 @@ async function PublishTab({
 
   return (
     <div className="space-y-6">
-      <div id="panel-marketplace" className="scroll-mt-32">
-        <PublishAgentCard
-          agentId={agentId}
-          minted={isMinted}
-          hasSkill={attachedSkillIds.length > 0}
-          discoverable={profile.discoverable}
-          collabPriceUsdc={profile.collabPriceUsdc}
-          settlementAsset={collabSettlement().name}
-          tcnhvRewards={hasTcnhv() && canMintTcnhv()}
-        />
-      </div>
-      <CollabSettingsPanel
-        agentId={agentId}
-        description={profile.description}
-        collabMaxUnits={profile.collabMaxUnits}
-        services={profile.services}
-      />
+      {collabEnabled() && (
+        <>
+          <div id="panel-marketplace" className="scroll-mt-32">
+            <PublishAgentCard
+              agentId={agentId}
+              minted={isMinted}
+              hasSkill={attachedSkillIds.length > 0}
+              discoverable={profile.discoverable}
+              collabPriceUsdc={profile.collabPriceUsdc}
+              settlementAsset={collabSettlement().name}
+              tcnhvRewards={hasTcnhv() && canMintTcnhv()}
+            />
+          </div>
+          <CollabSettingsPanel
+            agentId={agentId}
+            description={profile.description}
+            collabMaxUnits={profile.collabMaxUnits}
+            services={profile.services}
+          />
+        </>
+      )}
       <div id="panel-dune" className="scroll-mt-32">
         <DunePublishPanel agentId={agentId} config={profile.config} />
       </div>

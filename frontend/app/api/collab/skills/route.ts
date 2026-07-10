@@ -4,6 +4,7 @@ import { normalizeDraft, validateUserSkill } from "@/lib/agent/userSkill";
 import { getSession } from "@/lib/auth/session";
 import { listUserSkillsByAuthor, saveUserSkill } from "@/lib/server/userSkills";
 import type { SkillVisibility } from "@/lib/types";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * User-authored skills collection.
@@ -15,6 +16,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ error: "Sign in to manage skills." }, { status: 401 });
@@ -24,6 +26,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ error: "Sign in to create a skill." }, { status: 401 });

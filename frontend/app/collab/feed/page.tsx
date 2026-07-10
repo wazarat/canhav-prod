@@ -4,7 +4,9 @@ import { ChevronRight, ArrowRight, CircleDot, ScrollText } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { collabRegistryAddress } from "@/lib/agent/collab-config";
+import { collabEnabled } from "@/lib/collab-flag";
 import { listFeed } from "@/lib/server/collabFeed";
+import { redirect } from "next/navigation";
 
 export const metadata = { title: "Collaboration feed" };
 export const dynamic = "force-dynamic";
@@ -19,6 +21,7 @@ const STAGES = [
 ];
 
 export default async function CollabFeedPage() {
+  if (!collabEnabled()) redirect("/");
   const entries = await listFeed(50);
   const registry = collabRegistryAddress();
 

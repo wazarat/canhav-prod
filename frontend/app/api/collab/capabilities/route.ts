@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { collabUsdcAsset, USDC_DECIMALS } from "@/lib/agent/collab-config";
 import { listDiscoverableAgents } from "@/lib/server/collabDiscovery";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Public capability manifest of discoverable agents and their bundled expertise.
@@ -11,6 +12,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const agents = await listDiscoverableAgents();
   return NextResponse.json({
     network: "arbitrum-sepolia",

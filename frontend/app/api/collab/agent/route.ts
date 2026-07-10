@@ -4,6 +4,7 @@ import { getAgentProfile, setAgentCollabSettings, type AgentService } from "@/li
 import { parseUsdcToBaseUnits } from "@/lib/agent/collab-config";
 import { userOwnsAgent } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
+import { collabEnabled } from "@/lib/collab-flag";
 
 const MAX_SERVICES = 8;
 const SERVICE_TITLE_MAX = 80;
@@ -39,6 +40,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });

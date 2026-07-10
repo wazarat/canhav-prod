@@ -16,6 +16,7 @@ import {
 } from "@/lib/agent/trade/gateStatus";
 import { MAX_LEVERAGE, MAX_SIZE_USD } from "@/lib/agent/trade/gmx";
 import { getSession } from "@/lib/auth/session";
+import { collabEnabled } from "@/lib/collab-flag";
 import { getUserProfile } from "@/lib/auth/users";
 
 function formatAge(ageMs: number | null): string {
@@ -234,8 +235,8 @@ export async function TradeDesk({
                 </div>
                 {funding.usdcSgRaw === 0n ? (
                   <p className="mt-1.5 text-xs text-amber-400">
-                    No USDC.SG collateral — GMX orders will fail. tCNHV credits are marketplace-only
-                    and can&apos;t back trades.
+                    No USDC.SG collateral — GMX orders will fail.
+                    {collabEnabled() && " tCNHV credits are marketplace-only and can't back trades."}
                   </p>
                 ) : funding.ethRaw === 0n ? (
                   <p className="mt-1.5 text-xs text-amber-400">
@@ -243,7 +244,8 @@ export async function TradeDesk({
                   </p>
                 ) : (
                   <p className="mt-1.5 text-xs text-ink-500">
-                    GMX collateral is USDC.SG; tCNHV credits are marketplace-only. Execution fee is
+                    GMX collateral is USDC.SG
+                    {collabEnabled() && "; tCNHV credits are marketplace-only"}. Execution fee is
                     paid in Sepolia ETH.
                   </p>
                 )}

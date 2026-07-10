@@ -4,6 +4,8 @@
  * renders only the active tab's sections.
  */
 
+import { collabEnabled } from "@/lib/collab-flag";
+
 export const LAB_TAB_IDS = ["agents", "credits", "skills", "sandbox", "provisioning"] as const;
 
 export type LabTabId = (typeof LAB_TAB_IDS)[number];
@@ -33,7 +35,8 @@ export interface LabTabContext {
 /** Tabs visible for this viewer. */
 export function buildLabTabs(ctx: LabTabContext): LabTabDefinition[] {
   const tabs: LabTabDefinition[] = [{ id: "agents", label: TAB_LABELS.agents }];
-  if (ctx.hasSession) tabs.push({ id: "credits", label: TAB_LABELS.credits });
+  // tCNHV credits only pay for marketplace exchanges — hidden with it (C2).
+  if (ctx.hasSession && collabEnabled()) tabs.push({ id: "credits", label: TAB_LABELS.credits });
   tabs.push({ id: "skills", label: TAB_LABELS.skills });
   tabs.push({ id: "sandbox", label: TAB_LABELS.sandbox });
   if (ctx.isAdmin) tabs.push({ id: "provisioning", label: TAB_LABELS.provisioning });

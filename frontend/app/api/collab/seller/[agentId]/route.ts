@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getSellerDetail } from "@/lib/server/sellerDetail";
 import { getSession } from "@/lib/auth/session";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Seller marketplace detail: description, exchange-verified reviews, creator
@@ -14,6 +15,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(_req: Request, { params }: { params: { agentId: string } }) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ error: "Sign in to view this seller." }, { status: 401 });

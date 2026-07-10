@@ -22,6 +22,7 @@ import { ProvisioningCard } from "@/components/agent/lab/ProvisioningCard";
 import { SkillCatalogCard } from "@/components/agent/lab/SkillCatalogCard";
 import { WalletBalanceChip } from "@/components/agent/lab/WalletBalanceChip";
 import { getSession } from "@/lib/auth/session";
+import { collabEnabled } from "@/lib/collab-flag";
 import { isLabAdmin } from "@/lib/auth/labAdmin";
 import { buildLabTabs, DEFAULT_LAB_TAB, resolveLabTab } from "@/lib/agent/labTabs";
 import { getAgentProfile, getAttachedSkillIds, type AgentProfile } from "@/lib/agent/memory";
@@ -67,7 +68,7 @@ async function loadOwnedAgents(userId: string | null, defaultAgentId: string) {
         return;
       }
       const [balanceRaw, ver] = await Promise.all([
-        hasTcnhv() ? readTcnhvBalance(a.agentAddress) : Promise.resolve(null),
+        collabEnabled() && hasTcnhv() ? readTcnhvBalance(a.agentAddress) : Promise.resolve(null),
         verifyAgentOnChain(a.agentId, a.agentAddress),
       ]);
       agentChain.set(a.agentId, {
@@ -121,7 +122,7 @@ export default async function AgentsPage({
             Agent <span className="text-gradient-brand">Lab</span>
           </h1>
           <Badge tone="signal">Arbitrum Sepolia · Testnet</Badge>
-          {session && <WalletBalanceChip />}
+          {session && collabEnabled() && <WalletBalanceChip />}
         </div>
         <p className="max-w-2xl text-sm leading-relaxed text-ink-300">
           Your roster of CanHav research agents. Name an agent, tag it with a research category,
@@ -138,12 +139,14 @@ export default async function AgentsPage({
         tabs={tabs}
         defaultTab={DEFAULT_LAB_TAB}
         trailing={
-          <Link
-            href="/collab"
-            className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-neon-500/40 bg-neon-500/10 px-3 py-1.5 text-xs font-medium text-neon-400 transition-colors hover:bg-neon-500/20"
-          >
-            <Store className="h-3 w-3" /> Browse marketplace
-          </Link>
+          collabEnabled() ? (
+            <Link
+              href="/collab"
+              className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-neon-500/40 bg-neon-500/10 px-3 py-1.5 text-xs font-medium text-neon-400 transition-colors hover:bg-neon-500/20"
+            >
+              <Store className="h-3 w-3" /> Browse marketplace
+            </Link>
+          ) : undefined
         }
       />
 
@@ -192,15 +195,19 @@ async function AgentsTab({
   // An agent is live in the marketplace when it's discoverable AND advertises at
   // least one attached skill (the same gate buildAgentEntry enforces). Surface a
   // "Listed" badge so owners can see at a glance which agents are public.
-  const listedAgentIds = new Set(
-    (
-      await Promise.all(
-        agents.map(async (a) =>
-          a.discoverable && (await getAttachedSkillIds(a.agentId)).length > 0 ? a.agentId : null,
-        ),
+  const listedAgentIds = collabEnabled()
+    ? new Set(
+        (
+          await Promise.all(
+            agents.map(async (a) =>
+              a.discoverable && (await getAttachedSkillIds(a.agentId)).length > 0
+                ? a.agentId
+                : null,
+            ),
+          )
+        ).filter((id): id is string => Boolean(id)),
       )
-    ).filter((id): id is string => Boolean(id)),
-  );
+    : new Set<string>();
 
   // Group agents by project (Entity). Unbound agents fall into "General research".
   const entities = await getApprovedNetworks();

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, ScrollText } from "lucide-react";
 
+import { collabEnabled } from "@/lib/collab-flag";
+
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { SKILL_GROUPS, type PlatformSkill } from "@/lib/agent/skills";
@@ -34,12 +36,14 @@ export function SkillCatalogCard({ skills }: { skills: PlatformSkill[] }) {
           >
             My skills
           </Link>
-          <Link
-            href="/collab"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm font-medium text-ink-200 transition-colors hover:border-electric-500/40"
-          >
-            Discover agents
-          </Link>
+          {collabEnabled() && (
+            <Link
+              href="/collab"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm font-medium text-ink-200 transition-colors hover:border-electric-500/40"
+            >
+              Discover agents
+            </Link>
+          )}
         </div>
       </Card>
 

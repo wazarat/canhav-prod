@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { listReviews } from "@/lib/agent/reviews";
 import { getSession } from "@/lib/auth/session";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Public-to-signed-in list of an agent's exchange-verified reviews (newest
@@ -12,6 +13,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ error: "Sign in to read reviews." }, { status: 401 });

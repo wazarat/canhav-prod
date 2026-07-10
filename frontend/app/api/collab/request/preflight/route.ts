@@ -8,6 +8,7 @@ import { getSession } from "@/lib/auth/session";
 import { getUserProfile } from "@/lib/auth/users";
 import { prepareCollabSettlement } from "@/lib/server/collabPrepare";
 import { readSecret } from "@/lib/server/env";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Buyer preflight: params to sign a settlement transfer from the buyer's Privy
@@ -19,6 +20,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ configured: false, error: "Sign in." }, { status: 401 });

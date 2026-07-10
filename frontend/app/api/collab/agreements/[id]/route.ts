@@ -6,6 +6,7 @@ import {
   getAgreement,
   type AgreementAction,
 } from "@/lib/server/collabAgreements";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Single agreement:
@@ -20,6 +21,7 @@ export const dynamic = "force-dynamic";
 const ACTIONS: AgreementAction[] = ["approve", "reject", "cancel"];
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });
@@ -40,6 +42,7 @@ interface ActionBody {
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });

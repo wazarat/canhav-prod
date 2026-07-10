@@ -28,6 +28,7 @@ import {
 } from "@/lib/server/x402";
 import { readAgentWallet } from "@/lib/agent/onchain";
 import type { StrategyPacket } from "@/lib/types";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Buyer-side orchestrator for agent-centric bundled offers.
@@ -59,6 +60,7 @@ interface RequestBody {
 }
 
 export async function POST(req: Request) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });

@@ -15,6 +15,7 @@ import {
   type AgreementMode,
 } from "@/lib/server/collabAgreements";
 import { readSecret } from "@/lib/server/env";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * On-chain anchoring for a human-approved agreement (CollabAgreement.establish).
@@ -49,6 +50,7 @@ function cadenceEnum(cadence: AgreementCadence): number {
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ configured: false, error: "Sign in." }, { status: 401 });
@@ -141,6 +143,7 @@ interface AnchorBody {
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });

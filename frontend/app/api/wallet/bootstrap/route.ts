@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth/session";
 import { getUserProfile, updateUserProfile } from "@/lib/auth/users";
 import { grantSignupCredits, startingTcnhvHuman } from "@/lib/server/credits";
 import { canMintTcnhv } from "@/lib/server/factory";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Wallet treasury bootstrap.
@@ -20,6 +21,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ needsGrant: false, error: "Sign in." }, { status: 401 });
@@ -52,6 +54,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });

@@ -17,6 +17,7 @@ import { listCollabExchanges } from "@/lib/server/collabLog";
 import { tryConsumeRatingRef } from "@/lib/server/collabPayments";
 import { readSecret } from "@/lib/server/env";
 import { canMintTcnhv, hasFactory, mintTcnhvReward, recordWorkOnLedger } from "@/lib/server/factory";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Buyer feedback after a completed exchange — EXCHANGE-VERIFIED reputation.
@@ -35,6 +36,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });

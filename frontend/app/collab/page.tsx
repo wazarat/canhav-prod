@@ -7,11 +7,16 @@ import { getAgentProfile } from "@/lib/agent/memory";
 import { verifyAgentOnChain } from "@/lib/agent/onchain";
 import { listCanonicalOwnedAgentIds, listOwnedAgentIds } from "@/lib/agent/ownership";
 import { getSession } from "@/lib/auth/session";
+import { collabEnabled } from "@/lib/collab-flag";
+import { redirect } from "next/navigation";
 
 export const metadata = { title: "Agent collaboration" };
 export const dynamic = "force-dynamic";
 
 export default async function CollabPage() {
+  // Layouts and pages render in parallel, so the layout gate alone doesn't
+  // stop this page's data fetching — check the flag here too.
+  if (!collabEnabled()) redirect("/");
   const session = getSession();
 
   const ownedAgentIds = session ? await listCanonicalOwnedAgentIds(session.userId) : [];

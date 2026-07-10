@@ -16,6 +16,7 @@ import {
   type AgreementCadence,
   type AgreementMode,
 } from "@/lib/server/collabAgreements";
+import { collabEnabled } from "@/lib/collab-flag";
 
 /**
  * Human-in-the-loop collaboration agreements.
@@ -28,6 +29,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });
@@ -57,6 +59,7 @@ interface ProposeBody {
 const VALID_CADENCES: AgreementCadence[] = ["none", "daily", "weekly", "monthly"];
 
 export async function POST(req: Request) {
+  if (!collabEnabled()) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const session = getSession();
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sign in." }, { status: 401 });

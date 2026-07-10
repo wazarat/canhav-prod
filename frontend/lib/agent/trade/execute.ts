@@ -36,6 +36,15 @@ export async function executeTrade(params: ExecuteTradeParams): Promise<{ txHash
 
   const account = wallet.address as `0x${string}`;
 
+  // Fee headroom: wallet estimators on Arbitrum Sepolia quote maxFeePerGas at
+  // the current base fee with no margin, so the signed tx is rejected with
+  // "max fee per gas less than block base fee" whenever the base fee ticks up
+  // between estimate and submission. Quote 3x the estimate — the chain only
+  // charges the actual base fee, so the surplus is never spent.
+  const fees = await publicClient.estimateFeesPerGas();
+  const maxFeePerGas = (fees.maxFeePerGas ?? 20_000_000n) * 3n;
+  const maxPriorityFeePerGas = fees.maxPriorityFeePerGas ?? 0n;
+
   const allowance = await publicClient.readContract({
     address: intent.collateralToken,
     abi: erc20ApproveAbi,
@@ -49,6 +58,8 @@ export async function executeTrade(params: ExecuteTradeParams): Promise<{ txHash
       address: intent.collateralToken,
       functionName: "approve",
       args: [ROUTER, collateralAmount],
+      maxFeePerGas,
+      maxPriorityFeePerGas,
     });
     await publicClient.waitForTransactionReceipt({ hash: approveHash });
   }
@@ -63,6 +74,8 @@ export async function executeTrade(params: ExecuteTradeParams): Promise<{ txHash
     to: call.target,
     data: call.data,
     value: call.value,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
   });
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash });

@@ -26,6 +26,7 @@ import type { CofheClient } from "@cofhe/sdk";
 
 import { buildPrivyWalletClient } from "@/lib/agent/privy-signer";
 import { encryptedIntentsAbi } from "@/lib/agent/fhe/abi";
+import { agentCapKey } from "@/lib/agent/fhe/agentKey";
 import { fheIntentsAddress } from "@/lib/agent/fhe/config";
 import {
   microToUsd30,
@@ -79,15 +80,29 @@ export async function encryptSizeUsd(
   };
 }
 
+/** Envelope input tuple for register/setCaps/registerAndCheck calls. */
+function toInEuint64(cipher: EncryptedUsdCipherJson) {
+  return {
+    ctHash: BigInt(cipher.ctHash),
+    securityZone: cipher.securityZone,
+    utype: cipher.utype,
+    signature: cipher.signature as `0x${string}`,
+  };
+}
+
 /**
- * Register the encrypted input on-chain (owner pays Sepolia gas) so the owner
- * can decrypt it later. Returns the envelope updated with the authoritative
- * emitted handle + register tx hash.
+ * Send an EncryptedIntents write and return the decoded receipt events.
+ * Same 3x fee headroom as executeTrade — wallet estimators quote the bare
+ * base fee and get rejected when it ticks up; the chain only charges actual.
  */
-export async function registerIntent(
+async function writeIntents(
   wallet: ConnectedWallet,
-  cipher: EncryptedUsdCipherJson,
-): Promise<EncryptedUsdCipherJson> {
+  functionName: "register" | "setCaps" | "registerAndCheck" | "recordSpend",
+  args: readonly unknown[],
+): Promise<{
+  txHash: `0x${string}`;
+  events: { eventName: string; args: Record<string, unknown> }[];
+}> {
   const address = fheIntentsAddress();
   if (!address) throw new Error("EncryptedIntents contract address is not configured.");
 
@@ -99,8 +114,6 @@ export async function registerIntent(
     transport: http(DEFAULT_RPC),
   });
 
-  // Same 3x fee headroom as executeTrade — wallet estimators quote the bare
-  // base fee and get rejected when it ticks up; the chain only charges actual.
   const fees = await publicClient.estimateFeesPerGas();
   const maxFeePerGas = (fees.maxFeePerGas ?? 20_000_000n) * 3n;
   const maxPriorityFeePerGas = fees.maxPriorityFeePerGas ?? 0n;
@@ -108,42 +121,139 @@ export async function registerIntent(
   const txHash = await walletClient.writeContract({
     address,
     abi: encryptedIntentsAbi,
-    functionName: "register",
-    args: [
-      {
-        ctHash: BigInt(cipher.ctHash),
-        securityZone: cipher.securityZone,
-        utype: cipher.utype,
-        signature: cipher.signature as `0x${string}`,
-      },
-    ],
+    functionName,
+    // Viem cannot narrow a dynamic functionName across this ABI union.
+    args: args as never,
     maxFeePerGas,
     maxPriorityFeePerGas,
   });
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
   if (receipt.status !== "success") {
-    throw new Error("EncryptedIntents.register() reverted.");
+    throw new Error(`EncryptedIntents.${functionName}() reverted.`);
   }
 
+  const events: { eventName: string; args: Record<string, unknown> }[] = [];
   for (const log of receipt.logs) {
+    if (log.address.toLowerCase() !== address.toLowerCase()) continue;
     try {
       const ev = decodeEventLog({
         abi: encryptedIntentsAbi,
         data: log.data,
         topics: log.topics,
       });
-      if (ev.eventName === "IntentRegistered") {
-        return {
-          ...cipher,
-          ctHash: ev.args.handle.toString(),
-          registerTxHash: receipt.transactionHash,
-        };
-      }
+      events.push({ eventName: ev.eventName, args: ev.args as Record<string, unknown> });
     } catch {
       // not our event
     }
   }
-  throw new Error("register() succeeded but emitted no IntentRegistered event.");
+  return { txHash: receipt.transactionHash, events };
+}
+
+/**
+ * Register the encrypted input on-chain (owner pays Sepolia gas) so the owner
+ * can decrypt it later. Returns the envelope updated with the authoritative
+ * emitted handle + register tx hash.
+ */
+export async function registerIntent(
+  wallet: ConnectedWallet,
+  cipher: EncryptedUsdCipherJson,
+): Promise<EncryptedUsdCipherJson> {
+  const { txHash, events } = await writeIntents(wallet, "register", [toInEuint64(cipher)]);
+  const registered = events.find((e) => e.eventName === "IntentRegistered");
+  if (!registered) {
+    throw new Error("register() succeeded but emitted no IntentRegistered event.");
+  }
+  return {
+    ...cipher,
+    ctHash: (registered.args.handle as bigint).toString(),
+    registerTxHash: txHash,
+  };
+}
+
+/**
+ * FHE Phase 2: encrypt both caps (euint64 micro-USD) and store them on-chain
+ * for (owner wallet, agentId). One wallet signature; testnet gas.
+ */
+export async function setCapsOnchain(
+  wallet: ConnectedWallet,
+  agentId: string,
+  perTradeUsd30: bigint,
+  cumulativeUsd30: bigint,
+  onStep?: (step: string) => void,
+): Promise<`0x${string}`> {
+  const client = await getFheClient(wallet);
+  const [perTrade, cumulative] = await client
+    .encryptInputs([
+      Encryptable.uint64(usd30ToMicro(perTradeUsd30)),
+      Encryptable.uint64(usd30ToMicro(cumulativeUsd30)),
+    ])
+    .setAccount(wallet.address)
+    .onStep((step) => onStep?.(String(step)))
+    .execute();
+  const { txHash } = await writeIntents(wallet, "setCaps", [
+    agentCapKey(agentId),
+    { ctHash: perTrade.ctHash, securityZone: perTrade.securityZone, utype: perTrade.utype, signature: perTrade.signature },
+    { ctHash: cumulative.ctHash, securityZone: cumulative.securityZone, utype: cumulative.utype, signature: cumulative.signature },
+  ]);
+  return txHash;
+}
+
+/**
+ * FHE Phase 2: register an encrypted size AND compare it to the on-chain
+ * encrypted caps in one tx. Returns the updated envelope plus the ebool
+ * handle whose (owner-only) decryption says "within caps".
+ */
+export async function registerAndCheckIntent(
+  wallet: ConnectedWallet,
+  agentId: string,
+  cipher: EncryptedUsdCipherJson,
+): Promise<{ envelope: EncryptedUsdCipherJson; okHandle: bigint }> {
+  const { txHash, events } = await writeIntents(wallet, "registerAndCheck", [
+    agentCapKey(agentId),
+    toInEuint64(cipher),
+  ]);
+  const checked = events.find((e) => e.eventName === "CapChecked");
+  if (!checked) {
+    throw new Error("registerAndCheck() succeeded but emitted no CapChecked event.");
+  }
+  const okHandle = checked.args.okHandle as bigint;
+  return {
+    envelope: {
+      ...cipher,
+      ctHash: (checked.args.sizeHandle as bigint).toString(),
+      registerTxHash: txHash,
+      capOkHandle: okHandle.toString(),
+    },
+    okHandle,
+  };
+}
+
+/**
+ * Decrypt the cap-check ebool via the threshold network in attested form:
+ * the returned signature lets ANYONE (the CanHav server) verify that this
+ * handle decrypts to this boolean — without seeing size, caps, or spend.
+ */
+export async function attestCapCheck(
+  wallet: ConnectedWallet,
+  okHandle: bigint,
+): Promise<{ within: boolean; signature: `0x${string}` }> {
+  const client = await getFheClient(wallet);
+  await client.permits.getOrCreateSelfPermit();
+  const result = await client.decryptForTx(okHandle).withPermit().execute();
+  return { within: BigInt(result.decryptedValue) !== 0n, signature: result.signature };
+}
+
+/**
+ * FHE Phase 2: add an executed intent's size to the encrypted 24h spend
+ * counter. Owner-initiated by design — call best-effort after a GMX fill.
+ */
+export async function recordSpendOnchain(
+  wallet: ConnectedWallet,
+  agentId: string,
+  sizeHandle: bigint,
+): Promise<`0x${string}`> {
+  const { txHash } = await writeIntents(wallet, "recordSpend", [agentCapKey(agentId), sizeHandle]);
+  return txHash;
 }
 
 /** Owner-only reveal: self-permit + threshold-network decrypt → 30-dec USD. */

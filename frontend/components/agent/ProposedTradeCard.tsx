@@ -43,6 +43,8 @@ export function ProposedTradeCard({
   // FHE Phase 1: owner-revealed plaintext for an encrypted proposal (30-dec).
   const [revealedUsd30, setRevealedUsd30] = useState<bigint | null>(null);
   const [revealing, setRevealing] = useState(false);
+  // FHE Phase 2: outcome of the best-effort encrypted spend recording.
+  const [spendNote, setSpendNote] = useState<string | null>(null);
 
   const parsed = tradeProposalFromJson(proposal);
   const isEncrypted = parsed.sizeUsd.kind === "encrypted";
@@ -161,6 +163,28 @@ export function ProposedTradeCard({
       });
 
       await patchProposal({ action: "executed", txHash });
+
+      // FHE Phase 2, best-effort: add the executed size to the on-chain
+      // encrypted 24h counter so future ciphertext cap checks see it. A
+      // failure (declined tx, RPC blip) never blocks the executed trade —
+      // the plaintext execute-time cap check already enforced the caps.
+      if (
+        parsed.sizeUsd.kind === "encrypted" &&
+        parsed.sizeUsd.capOkHandle != null &&
+        fheEnabled()
+      ) {
+        try {
+          setSpendNote("Recording encrypted spend on-chain — confirm in your wallet…");
+          const { recordSpendOnchain } = await import("@/lib/agent/fhe/client");
+          await recordSpendOnchain(wallet, agentId, parsed.sizeUsd.ctHash);
+          setSpendNote("Encrypted 24h spend counter updated.");
+        } catch {
+          setSpendNote(
+            "Trade executed, but the encrypted spend counter was not updated — future ciphertext cap checks won't count this trade.",
+          );
+        }
+      }
+
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Approve failed.");
@@ -171,7 +195,10 @@ export function ProposedTradeCard({
 
   const done = proposal.status === "executed" || proposal.status === "rejected";
   const capMode = hitlMethod === "spending_cap" && proposal.status === "proposed";
-  const autoApproved = capMode && withinCaps === true;
+  // Encrypted rows may carry a server-verified ON-CHAIN cap verdict (Phase 2:
+  // attested threshold decrypt of the registerAndCheck ebool).
+  const encCapVerdict = isEncrypted ? proposal.capCheckOnchain ?? null : null;
+  const autoApproved = capMode && (withinCaps === true || encCapVerdict === "within");
   // Encrypted rows have no server-side cap verdict (withinCaps undefined) and
   // need a reveal before Approve; if the FHE flag was later turned off, fail
   // closed: the row renders but cannot be revealed or approved (Reject works).
@@ -200,15 +227,19 @@ export function ProposedTradeCard({
         )}
         {autoApproved && (
           <Badge tone="electric" className="font-mono text-[10px]">
-            within caps · auto-approved
+            {encCapVerdict === "within"
+              ? "within caps · encrypted check · auto-approved"
+              : "within caps · auto-approved"}
           </Badge>
         )}
-        {capMode && withinCaps === false && (
+        {capMode && (withinCaps === false || encCapVerdict === "over") && (
           <Badge tone="warning" className="font-mono text-[10px]">
-            over caps · approval required
+            {encCapVerdict === "over"
+              ? "over caps · encrypted check · approval required"
+              : "over caps · approval required"}
           </Badge>
         )}
-        {capMode && isEncrypted && withinCaps === undefined && (
+        {capMode && isEncrypted && withinCaps === undefined && encCapVerdict === null && (
           <Badge tone="neutral" className="font-mono text-[10px]">
             caps checked at signing
           </Badge>
@@ -294,6 +325,7 @@ export function ProposedTradeCard({
         </div>
       )}
 
+      {spendNote && <p className="mt-2 text-xs text-ink-400">{spendNote}</p>}
       {error && <p className="mt-2 text-xs text-rose-300">{error}</p>}
     </div>
   );

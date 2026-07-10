@@ -34,6 +34,12 @@ export interface TradeProposeArgs {
    * MUST run validateEncryptedEnvelope first — this module trusts it.
    */
   sizeUsdEnc?: EncryptedUsdCipherJson;
+  /**
+   * FHE Phase 2: result of the ON-CHAIN encrypted cap check, present only
+   * after the route verified the threshold-network attestation
+   * (verifyCapCheckClaim) — this module trusts it, mirroring sizeUsdEnc.
+   */
+  capCheckOnchain?: { within: boolean };
 }
 
 export async function execTradePropose(agentId: string, args: TradeProposeArgs) {
@@ -111,6 +117,11 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
   const id = `tp_${randomUUID().replace(/-/g, "").slice(0, 16)}`;
   const now = new Date().toISOString();
 
+  // Phase 2: only spending_cap mode carries a cap verdict — other modes
+  // approve by click, so a stray claim is dropped rather than persisted.
+  const onchainCap =
+    method === "spending_cap" && encrypted ? args.capCheckOnchain ?? null : null;
+
   await appendTradeProposal(agentId, {
     id,
     asset,
@@ -122,21 +133,30 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
     createdAt: now,
     status: "proposed",
     gmxTarget: EXCHANGE_ROUTER,
+    capCheckOnchain: onchainCap ? (onchainCap.within ? "within" : "over") : undefined,
   });
 
   const action =
     method === "spending_cap"
       ? encrypted
-        ? "proposed (size encrypted — caps are checked when you sign)"
+        ? onchainCap
+          ? onchainCap.within
+            ? "proposed (within caps — verified on ciphertext, auto-approved)"
+            : "proposed (over caps — verified on ciphertext, needs approval)"
+          : "proposed (size encrypted — caps are checked when you sign)"
         : "proposed (auto-executes if within spending cap)"
       : "proposed — awaiting owner approval";
 
-  // Ciphertext can't be compared to caps here: auto-execute is off and the
-  // cap verdict is deferred to the authoritative execute-time check.
+  // Without an on-chain check, ciphertext can't be compared to caps here:
+  // auto-execute is off and the cap verdict is deferred to the authoritative
+  // execute-time check.
   let autoExecute = false;
-  let capCheck: "checked" | "deferred" = "checked";
+  let capCheck: "checked" | "deferred" | "onchain" = "checked";
   if (method === "spending_cap") {
-    if (encrypted) {
+    if (encrypted && onchainCap) {
+      capCheck = "onchain";
+      autoExecute = onchainCap.within;
+    } else if (encrypted) {
       capCheck = "deferred";
     } else {
       const cap = await checkSpendingCap({

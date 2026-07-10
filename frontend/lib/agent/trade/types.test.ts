@@ -93,4 +93,32 @@ describe("EncryptedUsd seam", () => {
     expect(() => usd30ToMicro(fifty + 1n)).toThrow(/precision/);
     expect(() => usd30ToMicro(-1n)).toThrow(/non-negative/);
   });
+
+  test("Phase 2: capOkHandle + capCheckOnchain survive the status-update rewrite", () => {
+    const withCap: EncryptedUsdCipherJson = { ...envelope, capOkHandle: "987654321" };
+    let json: TradeProposalJson = {
+      ...baseProposal,
+      sizeUsd: "0",
+      sizeUsdEnc: withCap,
+      capCheckOnchain: "within",
+    };
+    for (const status of ["proposed", "executed"] as const) {
+      const parsed = tradeProposalFromJson(json);
+      expect(parsed.sizeUsd.kind).toBe("encrypted");
+      if (parsed.sizeUsd.kind === "encrypted") {
+        expect(parsed.sizeUsd.capOkHandle).toBe(987654321n);
+      }
+      json = tradeProposalToJson({ ...parsed, status });
+    }
+    expect(json.sizeUsdEnc).toEqual(withCap);
+    expect(json.capCheckOnchain).toBe("within");
+  });
+
+  test("Phase 2: rows without a cap check keep undefined fields (legacy shape)", () => {
+    const json = tradeProposalToJson(
+      tradeProposalFromJson({ ...baseProposal, sizeUsd: "0", sizeUsdEnc: envelope }),
+    );
+    expect(json.capCheckOnchain).toBeUndefined();
+    expect(json.sizeUsdEnc?.capOkHandle).toBeUndefined();
+  });
 });

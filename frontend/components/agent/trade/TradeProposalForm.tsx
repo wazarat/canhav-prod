@@ -18,8 +18,11 @@ interface ProposeResult {
   hint?: string;
   proposalId?: string;
   autoExecute?: boolean;
-  /** "deferred" when the size is encrypted — caps run at signing instead. */
-  capCheck?: "checked" | "deferred";
+  /**
+   * "deferred" when the size is encrypted with no on-chain caps — caps run at
+   * signing instead; "onchain" when the encrypted cap check was verified.
+   */
+  capCheck?: "checked" | "deferred" | "onchain";
   suggestion?: Record<string, unknown>;
   error?: string;
 }
@@ -50,8 +53,10 @@ export function TradeProposalForm({
   const [sizeUsd, setSizeUsd] = useState(10);
   const [leverage, setLeverage] = useState(1);
   const [busy, setBusy] = useState(false);
-  // FHE Phase 1 progress phase (encrypt → register tx → POST).
-  const [fhePhase, setFhePhase] = useState<"encrypting" | "registering" | "filing" | null>(null);
+  // FHE progress phase (encrypt → register tx [→ encrypted cap check] → POST).
+  const [fhePhase, setFhePhase] = useState<
+    "encrypting" | "registering" | "checking" | "filing" | null
+  >(null);
   const [refreshing, setRefreshing] = useState(false);
   const [result, setResult] = useState<ProposeResult | null>(null);
   const [spot, setSpot] = useState<{ symbol: string; priceUsd: number } | null>(null);
@@ -104,13 +109,44 @@ export function TradeProposalForm({
         const wallet = resolveActiveWallet(wallets);
         if (!wallet) throw new Error("Connect a wallet to file an encrypted proposal.");
         // Dynamic import keeps the CoFHE SDK (WASM) out of every other chunk.
-        const { encryptSizeUsd, registerIntent } = await import("@/lib/agent/fhe/client");
+        const { encryptSizeUsd, registerIntent, registerAndCheckIntent, attestCapCheck } =
+          await import("@/lib/agent/fhe/client");
         setFhePhase("encrypting");
         const cipher = await encryptSizeUsd(wallet, BigInt(Math.floor(sizeUsd)) * 10n ** 30n);
-        setFhePhase("registering");
-        const registered = await registerIntent(wallet, cipher);
-        setFhePhase("filing");
-        body = { asset, side, leverage, sizeUsdEnc: registered };
+
+        // Phase 2: with on-chain encrypted caps, register+compare in one tx,
+        // then have the threshold network attest the boolean — the server
+        // verifies the attestation and can auto-approve without seeing sizes.
+        let useOnchainCaps = false;
+        if (hitlMethod === "spending_cap") {
+          const { readOnchainCaps } = await import("@/lib/agent/fhe/reads");
+          const caps = await readOnchainCaps(wallet.address, agentId);
+          useOnchainCaps = caps.configured && caps.hasCaps;
+        }
+
+        if (useOnchainCaps) {
+          setFhePhase("registering");
+          const { envelope, okHandle } = await registerAndCheckIntent(wallet, agentId, cipher);
+          setFhePhase("checking");
+          const attested = await attestCapCheck(wallet, okHandle);
+          setFhePhase("filing");
+          body = {
+            asset,
+            side,
+            leverage,
+            sizeUsdEnc: envelope,
+            capClaim: {
+              okHandle: okHandle.toString(),
+              within: attested.within,
+              signature: attested.signature,
+            },
+          };
+        } else {
+          setFhePhase("registering");
+          const registered = await registerIntent(wallet, cipher);
+          setFhePhase("filing");
+          body = { asset, side, leverage, sizeUsdEnc: registered };
+        }
       }
       const res = await fetch(`${base}/trade-proposals`, {
         method: "POST",
@@ -251,9 +287,11 @@ export function TradeProposalForm({
             ? "Encrypting…"
             : fhePhase === "registering"
               ? "Confirm registration in wallet…"
-              : fhePhase === "filing"
-                ? "Filing proposal…"
-                : "Propose"}
+              : fhePhase === "checking"
+                ? "Checking caps (encrypted)…"
+                : fhePhase === "filing"
+                  ? "Filing proposal…"
+                  : "Propose"}
         </button>
       </div>
 
@@ -283,7 +321,7 @@ export function TradeProposalForm({
           ? "Research only: you'll get a suggestion to place yourself on GMX — nothing is filed."
           : hitlMethod === "spending_cap"
             ? fheEnabled()
-              ? "Auto within limits: the size is encrypted at rest, so caps are checked when you sign — every trade still needs your wallet signature."
+              ? "Auto within limits: with encrypted caps set on-chain, the cap check runs on ciphertext (nobody sees the numbers); otherwise caps are checked when you sign. Every trade still needs your wallet signature."
               : "Auto within limits: proposals inside your caps skip the approval click — you still sign every trade in your wallet."
             : "The proposal appears in the feed on the left — nothing trades until you approve it and sign."}
         {fheEnabled() && hitlMethod !== "manual" && (
@@ -308,11 +346,15 @@ export function TradeProposalForm({
           <p>{result.summary ?? result.error ?? (result.ok ? "Proposed." : "Failed.")}</p>
           {result.ok && result.mode === "spending_cap" && result.proposalId && (
             <p className="text-xs text-ink-400">
-              {result.capCheck === "deferred"
-                ? "Size encrypted — caps are checked when you reveal and sign in the feed."
-                : result.autoExecute
-                  ? "Within caps — auto-approved. Open it in the feed and sign to execute; no unattended signer exists."
-                  : "Over your caps — it needs your explicit approval in the feed."}
+              {result.capCheck === "onchain"
+                ? result.autoExecute
+                  ? "Within your encrypted caps — verified on ciphertext, auto-approved. Open it in the feed and sign to execute; no unattended signer exists."
+                  : "Over your encrypted caps — verified on ciphertext without revealing the size. It needs your explicit approval in the feed."
+                : result.capCheck === "deferred"
+                  ? "Size encrypted — caps are checked when you reveal and sign in the feed."
+                  : result.autoExecute
+                    ? "Within caps — auto-approved. Open it in the feed and sign to execute; no unattended signer exists."
+                    : "Over your caps — it needs your explicit approval in the feed."}
             </p>
           )}
           {result.ok && result.suggestion && (

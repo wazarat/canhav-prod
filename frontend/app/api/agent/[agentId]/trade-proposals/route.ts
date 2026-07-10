@@ -6,6 +6,7 @@ import type { EncryptedUsdCipherJson, TradeSide } from "@/lib/agent/trade/types"
 import { tradeProposalToJson } from "@/lib/agent/trade/types";
 import { requireOwnedAgent } from "@/lib/agent/ownership";
 import { fheEnabled } from "@/lib/fhe-flag";
+import { verifyCapCheckClaim, type CapCheckClaim } from "@/lib/server/fheCapCheck";
 import { validateEncryptedEnvelope } from "@/lib/server/fheValidate";
 
 export const runtime = "nodejs";
@@ -41,6 +42,7 @@ export async function POST(req: Request, { params }: { params: { agentId: string
     sizeUsdHuman?: unknown;
     leverage?: unknown;
     sizeUsdEnc?: unknown;
+    capClaim?: unknown;
   };
   try {
     body = await req.json();
@@ -83,12 +85,31 @@ export async function POST(req: Request, { params }: { params: { agentId: string
     sizeUsdEnc = env;
   }
 
+  // FHE Phase 2: optional attested on-chain cap-check verdict. A present but
+  // unverifiable claim is tampering → 422 (same posture as the envelope);
+  // an absent claim just defers caps to execute time as in Phase 1.
+  let capCheckOnchain: { within: boolean } | undefined;
+  if (body.capClaim != null) {
+    if (!sizeUsdEnc) {
+      return NextResponse.json(
+        { ok: false, error: "capClaim requires an encrypted size." },
+        { status: 400 },
+      );
+    }
+    const verdict = await verifyCapCheckClaim(agentId, sizeUsdEnc, body.capClaim as CapCheckClaim);
+    if (!verdict.ok) {
+      return NextResponse.json({ ok: false, error: verdict.error }, { status: 422 });
+    }
+    capCheckOnchain = { within: verdict.within === true };
+  }
+
   const result = await execTradePropose(agentId, {
     asset,
     side,
     sizeUsdHuman,
     leverage,
     sizeUsdEnc,
+    capCheckOnchain,
   });
   return NextResponse.json(result, { status: result.ok ? 200 : 422 });
 }

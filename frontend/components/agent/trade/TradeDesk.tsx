@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink, Gauge, ShieldCheck, ShieldX, Wallet } from "lucide-react";
 
+import { EncryptedCapsCard } from "@/components/agent/trade/EncryptedCapsCard";
 import { TradeModeSelector } from "@/components/agent/trade/TradeModeSelector";
 import { TradeProposalForm } from "@/components/agent/trade/TradeProposalForm";
 import { Badge } from "@/components/ui/Badge";
@@ -17,6 +18,7 @@ import {
 import { MAX_LEVERAGE, MAX_SIZE_USD } from "@/lib/agent/trade/gmx";
 import { getSession } from "@/lib/auth/session";
 import { collabEnabled } from "@/lib/collab-flag";
+import { fheEnabled } from "@/lib/fhe-flag";
 import { getUserProfile } from "@/lib/auth/users";
 
 function formatAge(ageMs: number | null): string {
@@ -282,6 +284,14 @@ export async function TradeDesk({
                     : "Proposals inside these caps auto-approve; you still sign each trade."}
                 </p>
               </div>
+            )}
+
+            {fheEnabled() && showCaps && caps && (
+              <EncryptedCapsCard
+                agentId={agentId}
+                defaultPerTradeUsd={caps.perTradeCapUsd}
+                defaultCumulativeUsd={caps.cumulativeCapUsd}
+              />
             )}
 
             <TradeModeSelector agentId={agentId} method={cfg.tradeHitlMethod} hasCaps={hasCaps} />

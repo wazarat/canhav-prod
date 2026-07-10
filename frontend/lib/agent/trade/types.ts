@@ -48,6 +48,11 @@ export interface EncryptedUsdCipherJson {
   signature: string;
   /** EncryptedIntents.register() tx that granted the owner ACL access. */
   registerTxHash?: `0x${string}`;
+  /**
+   * FHE Phase 2: ebool handle from registerAndCheck() — decrypts (owner-only)
+   * to "size is within the on-chain encrypted caps".
+   */
+  capOkHandle?: string;
 }
 
 /** At-rest money number: plaintext 30-dec USD or a CoFHE ciphertext handle. */
@@ -60,6 +65,7 @@ export type EncryptedUsd =
       utype: number;
       signature: string;
       registerTxHash?: `0x${string}`;
+      capOkHandle?: bigint;
     };
 
 export function plainUsd(usd30: bigint): EncryptedUsd {
@@ -102,6 +108,13 @@ export interface TradeProposal extends Omit<TradeIntent, "sizeUsd"> {
   gmxTarget: `0x${string}`;
   reason?: string;
   txHash?: `0x${string}`;
+  /**
+   * FHE Phase 2: server-verified result of the ON-CHAIN encrypted cap check
+   * (threshold-network attestation over the registerAndCheck ebool). Display
+   * + auto-approve gate only — the plaintext execute-time check is still the
+   * enforcement backstop.
+   */
+  capCheckOnchain?: "within" | "over";
 }
 
 /** Serializable shape for API / storage (bigint as string). */
@@ -126,6 +139,8 @@ export interface TradeProposalJson extends TradeIntentJson {
    * never read the sentinel as money (plainUsdOrNull guards every consumer).
    */
   sizeUsdEnc?: EncryptedUsdCipherJson;
+  /** See TradeProposal.capCheckOnchain. */
+  capCheckOnchain?: "within" | "over";
 }
 
 export function tradeIntentToJson(intent: TradeIntent): TradeIntentJson {
@@ -156,6 +171,7 @@ function encryptedUsdToCipherJson(value: EncryptedUsd & { kind: "encrypted" }): 
     utype: value.utype,
     signature: value.signature,
     registerTxHash: value.registerTxHash,
+    capOkHandle: value.capOkHandle?.toString(),
   };
 }
 
@@ -167,6 +183,7 @@ export function encryptedUsdFromCipherJson(json: EncryptedUsdCipherJson): Encryp
     utype: json.utype,
     signature: json.signature,
     registerTxHash: json.registerTxHash,
+    capOkHandle: json.capOkHandle != null ? BigInt(json.capOkHandle) : undefined,
   };
 }
 
@@ -183,6 +200,7 @@ export function tradeProposalToJson(proposal: TradeProposal): TradeProposalJson 
     gmxTarget: proposal.gmxTarget,
     reason: proposal.reason,
     txHash: proposal.txHash,
+    capCheckOnchain: proposal.capCheckOnchain,
   };
   if (proposal.sizeUsd.kind === "encrypted") {
     return { ...base, sizeUsd: "0", sizeUsdEnc: encryptedUsdToCipherJson(proposal.sizeUsd) };
@@ -206,6 +224,7 @@ export function tradeProposalFromJson(json: TradeProposalJson): TradeProposal {
     gmxTarget: json.gmxTarget,
     reason: json.reason,
     txHash: json.txHash,
+    capCheckOnchain: json.capCheckOnchain,
   };
 }
 

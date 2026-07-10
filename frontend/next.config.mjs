@@ -38,6 +38,19 @@ const nextConfig = {
     // symlink resolution off makes those imports resolve against frontend/node_modules.
     config.resolve.symlinks = false;
 
+    // Webpack's persistent cache treats node_modules as "managed" — assumed
+    // immutable and revalidated by package version only. canhav-agent-service
+    // is a file: link whose version never changes, so a restored Vercel build
+    // cache kept serving stale compiled copies of its modules (prod lambdas
+    // ran pre-B1 WATCHED_ASSETS with no ETH/BTC). Exclude it from managedPaths
+    // so its sources are revalidated by content like first-party code.
+    config.snapshot = {
+      ...config.snapshot,
+      managedPaths: [
+        /^(.+?[\\/]node_modules[\\/](?!canhav-agent-service)(@.+?[\\/])?.+?)[\\/]/,
+      ],
+    };
+
     // Privy's bundle references optional integrations we don't use (fiat onramp,
     // Farcaster mini-apps, React Native storage, pretty logging). They aren't
     // installed; alias them to `false` so webpack emits an empty module instead

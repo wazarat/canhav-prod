@@ -244,6 +244,14 @@ export interface StablecoinProfile {
   backing?: string | null;
   /** Sector tag from compiled coin sheet (Credit, Staking, etc.). */
   sector?: string | null;
+  /** Curated CoinGecko coin id (overrides the static COINGECKO_IDS map on cron). */
+  coingeckoId?: string | null;
+  /** No-Token entities: false suppresses market diagnostics (mirrors coinType NoToken). */
+  hasNativeToken?: boolean | null;
+  /** Tier 2 curated backing/funding APY for synthetic dollars. */
+  backingApy?: number | null;
+  /** Tier 2 curated lock duration for Locked/Vote-Escrow tokens. */
+  lockDuration?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -781,6 +789,14 @@ export interface TokenProfile {
   stakingApr?: number | null;
   backing?: string | null;
   sector?: string | null;
+  /** Curated CoinGecko coin id (overrides the static COINGECKO_IDS map on cron). */
+  coingeckoId?: string | null;
+  /** No-Token entities: false suppresses market diagnostics (mirrors coinType NoToken). */
+  hasNativeToken?: boolean | null;
+  /** Tier 2 curated backing/funding APY for synthetic dollars. */
+  backingApy?: number | null;
+  /** Tier 2 curated lock duration for Locked/Vote-Escrow tokens. */
+  lockDuration?: string | null;
 }
 
 /** Receipt token profile — CATEGORY#Receipt partition. */
@@ -821,6 +837,24 @@ export interface ReceiptProfile {
   aumUsd?: number | null;
   underlyingYield?: number | null;
   holders?: number | null;
+  /** Curated CoinGecko coin id (overrides the static COINGECKO_IDS map on cron). */
+  coingeckoId?: string | null;
+  /** Tier 2 curated: LRT AVS count. */
+  avsCount?: number | null;
+  /** Tier 2 curated: Yield-Bearing Vault underlying asset list. */
+  underlyingAssets?: string | null;
+  /** Tier 2 curated: Fixed-Income/Tranche size. */
+  trancheSize?: string | null;
+  /** Tier 2 curated: Tokenized RWA exact NAV (USD). */
+  navUsd?: number | null;
+  /** Tier 2 curated: Tokenized RWA asset class. */
+  assetClass?: string | null;
+  /** Tier 2 curated: Tokenized RWA custodian. */
+  custodian?: string | null;
+  /** Tier 2 curated: Tokenized RWA regulatory wrapper. */
+  regulatory?: string | null;
+  /** Tier 2 curated: Locked/Vote-Escrow lock duration. */
+  lockDuration?: string | null;
   market?: TokenMarket;
   yieldMechanics?: YieldMechanics;
   lendingMarket?: LendingMarket | null;

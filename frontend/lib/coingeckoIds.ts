@@ -29,8 +29,8 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   // USD.AI synthetic dollars (verified on CoinGecko, Arbitrum One).
   usdai: "usdai",
   susdai: "susdai",
-  // CHIP (USD.AI governance token) — not listed on CoinGecko yet.
-  chip: null,
+  // CHIP (USD.AI governance token) — listed as chip-2 on CoinGecko (~$71M mcap).
+  chip: "chip-2",
   // Jupiter (Solana) — market data via CoinGecko; on-chain supply is Solana-only.
   jup: "jupiter-exchange-solana",
   jlp: "jupiter-perpetuals-liquidity-provider-token",
@@ -106,7 +106,6 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   rbn: "ribbon-finance",
   drv: "derive", // Derive (ex-Lyra)
   jones: "jones-dao",
-  dpx: null, // Dopex — no reliable CoinGecko markets entry (TVL via DeFi Llama)
   // Lending-network governance tokens (PDF Week 7+8). Ids verified via the
   // CoinGecko /search endpoint; `// verify` ones should be confirmed before
   // relying on live price/supply (the cron fails soft to null otherwise).
@@ -234,15 +233,22 @@ export const COINGECKO_IDS: Record<string, string | null> = {
   "radiant-rtokens": null,
   "spark-sptokens": null,
   "usd-ai-susdai": "susdai",
-  dlp: null,
-  m: null,
-  "mpl-syrup": null,
-  "tprotocol-tru": null,
-  ease: null,
-  insur: null,
-  btrfly: null,
-  fflr: null,
-  fxs: null,
+  // Coins integration (canhav-coins-compiled vFinal): live ids verified on
+  // CoinGecko. Dead/near-dead tokens (dlp, m, tprotocol-tru, ease, insur,
+  // btrfly, fflr, sher, pal, npm, neu, rage, spice, dpx) are removed from the
+  // store, not mapped here.
+  "mpl-syrup": "syrup", // Maple (SYRUP) — ~$204M
+  fxs: "frax-share", // Frax Share (prev. FXS) — ~$22.5M
+  ondo: "ondo-finance", // ~$1.6B
+  usds: "usds", // Sky USDS — ~$11B
+  sd: "stader", // ~$8.7M
+  sdt: "stake-dao", // ~$6.2M
+  swise: "stakewise", // ~$1.7M
+  wnxm: "wrapped-nxm", // ~$19M
+  "aura-token": "aura-finance", // ~$539k
+  alpha: "alpha-finance", // Stella / Alpha — ~$546k
+  apw: "spectra-finance", // Spectra (current; not apwine = "Spectra [OLD]")
+  bct: "toucan-protocol-base-carbon-tonne", // ~$14k
   sense: null,
   // Majors — L1 base assets (roadmap B1; GMX Sepolia markets verified 2026-07-08).
   eth: "ethereum",

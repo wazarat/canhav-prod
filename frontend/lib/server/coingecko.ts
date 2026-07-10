@@ -179,6 +179,53 @@ export async function resolveForSlug(
 }
 
 
+/** Minimal identity payload for the admin "Verify" eyeball before saving an id. */
+export interface CoinIdentity {
+  id: string;
+  name: string | null;
+  symbol: string | null;
+  image: string | null;
+  currentPrice: number | null;
+}
+
+/**
+ * Fetch just enough of `/coins/{id}` to let an admin confirm they curated the
+ * right CoinGecko id (name, ticker, logo, spot price). Returns null on any miss.
+ */
+export async function verifyCoinId(
+  coinId: string,
+  revalidate?: number,
+): Promise<CoinIdentity | null> {
+  const params = new URLSearchParams({
+    localization: "false",
+    tickers: "false",
+    market_data: "true",
+    community_data: "false",
+    developer_data: "false",
+    sparkline: "false",
+  });
+  const data = await getJson(
+    `${COINGECKO_BASE}/coins/${encodeURIComponent(coinId)}?${params}`,
+    revalidate,
+  );
+  if (!data || typeof data !== "object") return null;
+  const m = data.market_data;
+  const price =
+    m && typeof m === "object" && m.current_price && typeof m.current_price === "object"
+      ? typeof (m.current_price as any).usd === "number"
+        ? (m.current_price as any).usd
+        : null
+      : null;
+  const img = data.image && typeof data.image === "object" ? (data.image as any) : null;
+  return {
+    id: coinId,
+    name: typeof data.name === "string" ? data.name : null,
+    symbol: typeof data.symbol === "string" ? data.symbol.toUpperCase() : null,
+    image: img ? img.small || img.thumb || img.large || null : null,
+    currentPrice: price,
+  };
+}
+
 /* -------------------------------------------------------------------------- */
 /* Cron batch cache (/coins/markets + throttled /coins/{id} for platforms)    */
 /* -------------------------------------------------------------------------- */

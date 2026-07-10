@@ -20,6 +20,8 @@ interface Summary {
   missing: number;
   fixable: number;
   noCoverage: number;
+  needOnchain?: number;
+  curatedEmpty?: number;
 }
 
 const STATUS_CHIP: Record<FieldCoverage["status"], string> = {
@@ -37,7 +39,15 @@ function fmtValue(v: string | number | null): string {
   return v;
 }
 
-export function AdminDiagnosticsView({ slug, name }: { slug: string; name: string }) {
+export function AdminDiagnosticsView({
+  slug,
+  name,
+  category = "networks",
+}: {
+  slug: string;
+  name: string;
+  category?: "networks" | "coins" | "receipts";
+}) {
   const [rows, setRows] = useState<FieldCoverage[] | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,9 +56,10 @@ export function AdminDiagnosticsView({ slug, name }: { slug: string; name: strin
     let cancelled = false;
     setRows(null);
     setError(null);
-    fetch(`/api/admin/diagnostics?slug=${encodeURIComponent(slug)}`, {
-      credentials: "include",
-    })
+    fetch(
+      `/api/admin/diagnostics?category=${encodeURIComponent(category)}&slug=${encodeURIComponent(slug)}`,
+      { credentials: "include" },
+    )
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
@@ -64,10 +75,16 @@ export function AdminDiagnosticsView({ slug, name }: { slug: string; name: strin
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, category]);
 
   if (error) return <p className="text-sm text-rose-400">{error}</p>;
   if (!rows) return <p className="text-sm text-ink-400">Loading diagnostics…</p>;
+
+  const linkageBroken = rows.some(
+    (r) =>
+      (r.field === "entityLink" && r.reason === "no-entity-link") ||
+      (r.field === "memberOf" && r.reason === "dangling-ref"),
+  );
 
   return (
     <div className="space-y-3">
@@ -75,7 +92,16 @@ export function AdminDiagnosticsView({ slug, name }: { slug: string; name: strin
         <p className="text-sm text-ink-300">
           <span className="font-medium text-ink-100">{name}</span>: {summary.live} of{" "}
           {summary.total} API fields live · {summary.missing} missing ({summary.fixable} fixable via
-          slug/id, {summary.noCoverage} no coverage)
+          CoinGecko id/slug, {summary.noCoverage} no coverage
+          {summary.needOnchain ? `, ${summary.needOnchain} need on-chain adapter` : ""})
+          {summary.curatedEmpty ? ` · ${summary.curatedEmpty} curated scaffolds empty` : ""}
+        </p>
+      )}
+
+      {linkageBroken && (
+        <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+          This {category === "receipts" ? "receipt" : "coin"} won&apos;t appear under any network&apos;s
+          &ldquo;View all coins&rdquo; — fix the Entity link / MemberCoins in the Content editor tab.
         </p>
       )}
       <div className="overflow-x-auto rounded-md border border-ink-800">

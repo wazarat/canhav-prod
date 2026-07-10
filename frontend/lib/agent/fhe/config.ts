@@ -11,7 +11,7 @@
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 
 /** Filled from the DeployEncryptedIntents broadcast. Empty = not yet deployed. */
-const FHE_INTENTS_FALLBACK = "";
+const FHE_INTENTS_FALLBACK = "0xF783423e211A54a9A5D0E544784c2f6A48B482fB";
 
 export function fheIntentsAddress(): `0x${string}` | null {
   const fromEnv = process.env.NEXT_PUBLIC_FHE_INTENTS_ADDRESS;

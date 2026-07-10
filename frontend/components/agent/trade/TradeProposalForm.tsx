@@ -247,10 +247,10 @@ export function TradeProposalForm({
 
       <p className="text-[11px] text-ink-500">
         {hitlMethod === "manual"
-          ? "Manual mode: you'll get a suggestion to place yourself on GMX."
+          ? "Research only: you'll get a suggestion to place yourself on GMX — nothing is filed."
           : hitlMethod === "spending_cap"
-            ? "Cap mode: proposals inside your spending caps are marked auto-executable."
-            : "The proposal appears in the feed on the left — nothing trades until you approve it."}
+            ? "Auto within limits: proposals inside your caps skip the approval click — you still sign every trade in your wallet."
+            : "The proposal appears in the feed on the left — nothing trades until you approve it and sign."}
       </p>
 
       {result && (
@@ -263,6 +263,13 @@ export function TradeProposalForm({
           )}
         >
           <p>{result.summary ?? result.error ?? (result.ok ? "Proposed." : "Failed.")}</p>
+          {result.ok && result.mode === "spending_cap" && result.proposalId && (
+            <p className="text-xs text-ink-400">
+              {result.autoExecute
+                ? "Within caps — auto-approved. Open it in the feed and sign to execute; no unattended signer exists."
+                : "Over your caps — it needs your explicit approval in the feed."}
+            </p>
+          )}
           {result.ok && result.suggestion && (
             <pre className="overflow-x-auto rounded bg-ink-950/60 p-2 font-mono text-[10px] text-ink-300">
               {JSON.stringify(result.suggestion, null, 2)}

@@ -9,9 +9,11 @@
     "fmt": "forge fmt",
     "check:deployer": "bash scripts/check-deployer.sh",
     "deploy:arbitrum-sepolia": "bash scripts/check-deployer.sh && forge script script/Deploy.s.sol:Deploy --rpc-url arbitrum_sepolia --broadcast --slow",
-    "deploy:arbitrum-sepolia:verify": "bash scripts/check-deployer.sh && forge script script/Deploy.s.sol:Deploy --rpc-url arbitrum_sepolia --broadcast --slow --verify"
+    "deploy:arbitrum-sepolia:verify": "bash scripts/check-deployer.sh && forge script script/Deploy.s.sol:Deploy --rpc-url arbitrum_sepolia --broadcast --slow --verify",
+    "deploy:encrypted-intents": "bash scripts/check-deployer.sh && forge script script/DeployEncryptedIntents.s.sol:DeployEncryptedIntents --rpc-url arbitrum_sepolia --broadcast --slow"
   },
   "dependencies": {
+    "@fhenixprotocol/cofhe-contracts": "^0.1.4",
     "@openzeppelin/contracts": "^5.1.0"
   }
 }

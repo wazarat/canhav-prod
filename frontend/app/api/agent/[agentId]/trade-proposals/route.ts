@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 
 import { listTradeProposals } from "@/lib/agent/memory";
 import { execTradePropose } from "@/lib/agent/trade/propose";
-import type { TradeSide } from "@/lib/agent/trade/types";
+import type { EncryptedUsdCipherJson, TradeSide } from "@/lib/agent/trade/types";
 import { tradeProposalToJson } from "@/lib/agent/trade/types";
 import { requireOwnedAgent } from "@/lib/agent/ownership";
+import { fheEnabled } from "@/lib/fhe-flag";
+import { validateEncryptedEnvelope } from "@/lib/server/fheValidate";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -38,6 +40,7 @@ export async function POST(req: Request, { params }: { params: { agentId: string
     side?: unknown;
     sizeUsdHuman?: unknown;
     leverage?: unknown;
+    sizeUsdEnc?: unknown;
   };
   try {
     body = await req.json();
@@ -56,6 +59,36 @@ export async function POST(req: Request, { params }: { params: { agentId: string
       ? body.leverage
       : undefined;
 
-  const result = await execTradePropose(agentId, { asset, side, sizeUsdHuman, leverage });
+  // FHE Phase 1: encrypted size envelope (form path). Provenance-validated
+  // here — the value itself is invisible to the server by design.
+  let sizeUsdEnc: EncryptedUsdCipherJson | undefined;
+  if (body.sizeUsdEnc != null) {
+    if (!fheEnabled()) {
+      return NextResponse.json(
+        { ok: false, error: "Encrypted proposals are disabled." },
+        { status: 400 },
+      );
+    }
+    if (sizeUsdHuman !== undefined) {
+      return NextResponse.json(
+        { ok: false, error: "Send either sizeUsdHuman or sizeUsdEnc, not both." },
+        { status: 400 },
+      );
+    }
+    const env = body.sizeUsdEnc as EncryptedUsdCipherJson;
+    const check = await validateEncryptedEnvelope(agentId, env);
+    if (!check.ok) {
+      return NextResponse.json({ ok: false, error: check.error }, { status: 422 });
+    }
+    sizeUsdEnc = env;
+  }
+
+  const result = await execTradePropose(agentId, {
+    asset,
+    side,
+    sizeUsdHuman,
+    leverage,
+    sizeUsdEnc,
+  });
   return NextResponse.json(result, { status: result.ok ? 200 : 422 });
 }

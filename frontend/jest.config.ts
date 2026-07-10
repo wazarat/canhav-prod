@@ -13,7 +13,7 @@ import type { Config } from "jest";
 const config: Config = {
   testEnvironment: "node",
   roots: ["<rootDir>/lib"],
-  testMatch: ["<rootDir>/lib/server/**/*.test.ts"],
+  testMatch: ["<rootDir>/lib/server/**/*.test.ts", "<rootDir>/lib/agent/**/*.test.ts"],
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",

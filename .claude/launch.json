@@ -24,6 +24,25 @@
         "dev"
       ],
       "port": 3000
+    },
+    {
+      "name": "frontend-dev-offline-fhe",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "KV_REST_API_READ_ONLY_TOKEN=",
+        "KV_URL=",
+        "REDIS_URL=",
+        "SESSION_SECRET=",
+        "NEXT_PUBLIC_FHE_ENABLED=1",
+        "npm",
+        "--prefix",
+        "frontend",
+        "run",
+        "dev"
+      ],
+      "port": 3000
     }
   ]
 }

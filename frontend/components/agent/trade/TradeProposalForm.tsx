@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDownRight, ArrowUpRight, Loader2, RefreshCcw, Send } from "lucide-react";
+import { useWallets } from "@privy-io/react-auth";
 
 import type { TradeHitlMethod } from "@/lib/agent/agentConfig";
+import { resolveActiveWallet } from "@/lib/agent/privy-signer";
+import { fheEnabled } from "@/lib/fhe-flag";
 import { cn } from "@/lib/utils";
 
 interface ProposeResult {
@@ -15,6 +18,8 @@ interface ProposeResult {
   hint?: string;
   proposalId?: string;
   autoExecute?: boolean;
+  /** "deferred" when the size is encrypted — caps run at signing instead. */
+  capCheck?: "checked" | "deferred";
   suggestion?: Record<string, unknown>;
   error?: string;
 }
@@ -39,11 +44,14 @@ export function TradeProposalForm({
   hitlMethod: TradeHitlMethod;
 }) {
   const router = useRouter();
+  const { wallets } = useWallets();
   const [asset, setAsset] = useState(coins.find((c) => c.gateOpen)?.symbol ?? coins[0]?.symbol ?? "");
   const [side, setSide] = useState<"long" | "short">("long");
   const [sizeUsd, setSizeUsd] = useState(10);
   const [leverage, setLeverage] = useState(1);
   const [busy, setBusy] = useState(false);
+  // FHE Phase 1 progress phase (encrypt → register tx → POST).
+  const [fhePhase, setFhePhase] = useState<"encrypting" | "registering" | "filing" | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [result, setResult] = useState<ProposeResult | null>(null);
   const [spot, setSpot] = useState<{ symbol: string; priceUsd: number } | null>(null);
@@ -86,10 +94,28 @@ export function TradeProposalForm({
     setBusy(true);
     setResult(null);
     try {
+      // FHE Phase 1: encrypt the size client-side before it leaves the
+      // browser. Manual mode is exempt — nothing is persisted there, so
+      // there is no "at rest" to protect (and no register gas to spend).
+      // If the research gate turns out to be closed, the registration tx is
+      // wasted testnet gas — accepted for flow simplicity.
+      let body: Record<string, unknown> = { asset, side, sizeUsdHuman: sizeUsd, leverage };
+      if (fheEnabled() && hitlMethod !== "manual") {
+        const wallet = resolveActiveWallet(wallets);
+        if (!wallet) throw new Error("Connect a wallet to file an encrypted proposal.");
+        // Dynamic import keeps the CoFHE SDK (WASM) out of every other chunk.
+        const { encryptSizeUsd, registerIntent } = await import("@/lib/agent/fhe/client");
+        setFhePhase("encrypting");
+        const cipher = await encryptSizeUsd(wallet, BigInt(Math.floor(sizeUsd)) * 10n ** 30n);
+        setFhePhase("registering");
+        const registered = await registerIntent(wallet, cipher);
+        setFhePhase("filing");
+        body = { asset, side, leverage, sizeUsdEnc: registered };
+      }
       const res = await fetch(`${base}/trade-proposals`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ asset, side, sizeUsdHuman: sizeUsd, leverage }),
+        body: JSON.stringify(body),
       });
       const data = (await res.json()) as ProposeResult;
       setResult(data);
@@ -101,6 +127,7 @@ export function TradeProposalForm({
       setResult({ ok: false, error: e instanceof Error ? e.message : "Request failed." });
     } finally {
       setBusy(false);
+      setFhePhase(null);
     }
   }
 
@@ -220,7 +247,13 @@ export function TradeProposalForm({
           className="btn-gradient btn-glow inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          Propose
+          {fhePhase === "encrypting"
+            ? "Encrypting…"
+            : fhePhase === "registering"
+              ? "Confirm registration in wallet…"
+              : fhePhase === "filing"
+                ? "Filing proposal…"
+                : "Propose"}
         </button>
       </div>
 
@@ -249,8 +282,18 @@ export function TradeProposalForm({
         {hitlMethod === "manual"
           ? "Research only: you'll get a suggestion to place yourself on GMX — nothing is filed."
           : hitlMethod === "spending_cap"
-            ? "Auto within limits: proposals inside your caps skip the approval click — you still sign every trade in your wallet."
+            ? fheEnabled()
+              ? "Auto within limits: the size is encrypted at rest, so caps are checked when you sign — every trade still needs your wallet signature."
+              : "Auto within limits: proposals inside your caps skip the approval click — you still sign every trade in your wallet."
             : "The proposal appears in the feed on the left — nothing trades until you approve it and sign."}
+        {fheEnabled() && hitlMethod !== "manual" && (
+          <>
+            {" "}
+            Encrypted filing: your size is encrypted in this browser and registered on-chain
+            (one wallet signature + testnet gas) before it&apos;s stored — the server only
+            ever sees ciphertext until you sign the trade.
+          </>
+        )}
       </p>
 
       {result && (
@@ -265,9 +308,11 @@ export function TradeProposalForm({
           <p>{result.summary ?? result.error ?? (result.ok ? "Proposed." : "Failed.")}</p>
           {result.ok && result.mode === "spending_cap" && result.proposalId && (
             <p className="text-xs text-ink-400">
-              {result.autoExecute
-                ? "Within caps — auto-approved. Open it in the feed and sign to execute; no unattended signer exists."
-                : "Over your caps — it needs your explicit approval in the feed."}
+              {result.capCheck === "deferred"
+                ? "Size encrypted — caps are checked when you reveal and sign in the feed."
+                : result.autoExecute
+                  ? "Within caps — auto-approved. Open it in the feed and sign to execute; no unattended signer exists."
+                  : "Over your caps — it needs your explicit approval in the feed."}
             </p>
           )}
           {result.ok && result.suggestion && (

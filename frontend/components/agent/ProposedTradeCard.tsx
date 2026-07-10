@@ -2,13 +2,21 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Loader2, TrendingDown, TrendingUp, XCircle } from "lucide-react";
+import { CheckCircle2, Loader2, Lock, TrendingDown, TrendingUp, XCircle } from "lucide-react";
 import { useWallets } from "@privy-io/react-auth";
+
+import { fheEnabled } from "@/lib/fhe-flag";
 
 import { Badge } from "@/components/ui/Badge";
 import type { TradeHitlMethod } from "@/lib/agent/agentConfig";
 import { executeTrade } from "@/lib/agent/trade/execute";
-import { tradeProposalFromJson, type TradeProposalJson } from "@/lib/agent/trade/types";
+import {
+  plainUsdOrNull,
+  proposalToIntent,
+  requirePlainUsd,
+  tradeProposalFromJson,
+  type TradeProposalJson,
+} from "@/lib/agent/trade/types";
 import { resolveActiveWallet } from "@/lib/agent/privy-signer";
 import { arbiscanSepoliaTx } from "@/lib/utils";
 
@@ -32,9 +40,31 @@ export function ProposedTradeCard({
   const [proposal, setProposal] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // FHE Phase 1: owner-revealed plaintext for an encrypted proposal (30-dec).
+  const [revealedUsd30, setRevealedUsd30] = useState<bigint | null>(null);
+  const [revealing, setRevealing] = useState(false);
 
   const parsed = tradeProposalFromJson(proposal);
-  const sizeHuman = (Number(parsed.sizeUsd) / 10 ** 30).toFixed(2);
+  const isEncrypted = parsed.sizeUsd.kind === "encrypted";
+  const plainSize = plainUsdOrNull(parsed.sizeUsd) ?? revealedUsd30;
+  const sizeHuman = plainSize !== null ? (Number(plainSize) / 10 ** 30).toFixed(2) : null;
+
+  async function onReveal() {
+    if (parsed.sizeUsd.kind !== "encrypted") return;
+    setRevealing(true);
+    setError(null);
+    try {
+      const wallet = resolveActiveWallet(wallets);
+      if (!wallet) throw new Error("Connect a wallet to reveal the size.");
+      // Dynamic import keeps the CoFHE SDK (WASM) out of every other chunk.
+      const { revealSizeUsd } = await import("@/lib/agent/fhe/client");
+      setRevealedUsd30(await revealSizeUsd(wallet, parsed.sizeUsd.ctHash));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Reveal failed.");
+    } finally {
+      setRevealing(false);
+    }
+  }
 
   const patchProposal = useCallback(
     async (body: Record<string, unknown>) => {
@@ -73,6 +103,12 @@ export function ProposedTradeCard({
     setBusy(true);
     setError(null);
     try {
+      // Encrypted proposals must be revealed first (Approve is disabled until
+      // then); the plaintext exists only here and at the execute endpoint,
+      // which re-runs the research gate, spending caps, and MAX_SIZE_USD clamp.
+      const sizeUsd30 =
+        parsed.sizeUsd.kind === "plain" ? requirePlainUsd(parsed.sizeUsd) : revealedUsd30;
+      if (sizeUsd30 === null) throw new Error("Reveal the size before approving.");
       const preflight = await fetch("/api/agent/trade", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,7 +116,7 @@ export function ProposedTradeCard({
           agentId,
           asset: parsed.asset,
           side: parsed.side,
-          sizeUsd: parsed.sizeUsd.toString(),
+          sizeUsd: sizeUsd30.toString(),
           leverage: parsed.leverage,
           humanApproved: true,
         }),
@@ -102,7 +138,7 @@ export function ProposedTradeCard({
 
       const { txHash } = await executeTrade({
         wallet,
-        intent: parsed,
+        intent: proposalToIntent(parsed, sizeUsd30),
         market: pre.market as `0x${string}`,
         collateralAmount: BigInt(pre.collateralAmount ?? "1000000"),
         rpcUrl: pre.rpcUrl,
@@ -115,7 +151,7 @@ export function ProposedTradeCard({
           agentId,
           asset: parsed.asset,
           side: parsed.side,
-          sizeUsd: parsed.sizeUsd.toString(),
+          sizeUsd: sizeUsd30.toString(),
           leverage: parsed.leverage,
           market: pre.market,
           txHash,
@@ -136,6 +172,11 @@ export function ProposedTradeCard({
   const done = proposal.status === "executed" || proposal.status === "rejected";
   const capMode = hitlMethod === "spending_cap" && proposal.status === "proposed";
   const autoApproved = capMode && withinCaps === true;
+  // Encrypted rows have no server-side cap verdict (withinCaps undefined) and
+  // need a reveal before Approve; if the FHE flag was later turned off, fail
+  // closed: the row renders but cannot be revealed or approved (Reject works).
+  const canReveal = isEncrypted && revealedUsd30 === null && fheEnabled();
+  const approveBlocked = isEncrypted && revealedUsd30 === null;
 
   return (
     <div className="glass rounded-2xl border border-electric-500/25 bg-electric-500/5 p-5">
@@ -151,6 +192,12 @@ export function ProposedTradeCard({
         <Badge tone={proposal.status === "executed" ? "positive" : "warning"}>
           {proposal.status}
         </Badge>
+        {isEncrypted && (
+          <Badge tone="neutral" className="font-mono text-[10px]">
+            <Lock className="mr-1 inline h-3 w-3" />
+            size encrypted
+          </Badge>
+        )}
         {autoApproved && (
           <Badge tone="electric" className="font-mono text-[10px]">
             within caps · auto-approved
@@ -161,10 +208,20 @@ export function ProposedTradeCard({
             over caps · approval required
           </Badge>
         )}
+        {capMode && isEncrypted && withinCaps === undefined && (
+          <Badge tone="neutral" className="font-mono text-[10px]">
+            caps checked at signing
+          </Badge>
+        )}
       </div>
 
       <p className="mt-2 text-sm text-ink-300">
-        ~${sizeHuman} USD · {parsed.leverage}x leverage · Arbitrum Sepolia
+        {sizeHuman !== null
+          ? `~$${sizeHuman} USD`
+          : fheEnabled()
+            ? "Size encrypted · reveal to view"
+            : "Size encrypted — enable FHE to reveal"}{" "}
+        · {parsed.leverage}x leverage · Arbitrum Sepolia
       </p>
       <p className="mt-1 font-mono text-[10px] text-ink-500">verdict: {parsed.verdictRef}</p>
 
@@ -187,10 +244,21 @@ export function ProposedTradeCard({
 
       {!done && proposal.status === "proposed" && (
         <div className="mt-4 flex flex-wrap gap-2">
+          {canReveal && (
+            <button
+              type="button"
+              onClick={onReveal}
+              disabled={busy || revealing}
+              className="inline-flex items-center gap-1.5 rounded-full border border-electric-500/40 bg-electric-500/10 px-4 py-2 text-sm font-semibold text-electric-300 transition-colors hover:bg-electric-500/20 disabled:opacity-50"
+            >
+              {revealing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+              {revealing ? "Decrypting…" : "Reveal size"}
+            </button>
+          )}
           <button
             type="button"
             onClick={onApprove}
-            disabled={busy}
+            disabled={busy || approveBlocked}
             className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-300 shadow-[0_10px_30px_-8px_rgba(16,185,129,0.45)] transition-colors hover:bg-emerald-500/20 disabled:opacity-50"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
@@ -208,6 +276,19 @@ export function ProposedTradeCard({
           {autoApproved && (
             <p className="w-full text-[11px] text-ink-500">
               No unattended signer — your wallet signature is what executes this trade.
+            </p>
+          )}
+          {revealing && (
+            <p className="w-full text-[11px] text-ink-500">
+              Decrypting via the CoFHE threshold network — first reveal also asks your
+              wallet for a one-time permit signature.
+            </p>
+          )}
+          {isEncrypted && revealedUsd30 === null && !revealing && (
+            <p className="w-full text-[11px] text-ink-500">
+              {fheEnabled()
+                ? "The size is encrypted at rest — reveal it to approve. Caps and the research gate re-run when you sign."
+                : "Filed while FHE was enabled; re-enable NEXT_PUBLIC_FHE_ENABLED to reveal or approve. Reject works without revealing."}
             </p>
           )}
         </div>

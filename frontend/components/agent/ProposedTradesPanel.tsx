@@ -1,7 +1,7 @@
 import { sanitizeAgentConfig } from "@/lib/agent/agentConfig";
 import { getAgentProfile, listTradeProposals } from "@/lib/agent/memory";
 import { isWithinCaps, readCapStatus } from "@/lib/agent/trade/gateStatus";
-import { tradeProposalToJson } from "@/lib/agent/trade/types";
+import { plainUsdOrNull, tradeProposalToJson } from "@/lib/agent/trade/types";
 import { ProposedTradeCard } from "@/components/agent/ProposedTradeCard";
 
 export async function ProposedTradesPanel({ agentId }: { agentId: string }) {
@@ -20,7 +20,10 @@ export async function ProposedTradesPanel({ agentId }: { agentId: string }) {
     const caps = await readCapStatus(agentId, cfg);
     for (const p of open) {
       if (p.status !== "proposed") continue;
-      withinCapsById.set(p.id, isWithinCaps(p.sizeUsd, caps));
+      // Encrypted sizes get no within/over verdict here — the "0" sentinel
+      // must never reach isWithinCaps (it would read as "within caps").
+      const plain = plainUsdOrNull(p.sizeUsd);
+      if (plain !== null) withinCapsById.set(p.id, isWithinCaps(plain, caps));
     }
   }
 

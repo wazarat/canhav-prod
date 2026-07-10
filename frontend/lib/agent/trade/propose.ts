@@ -10,7 +10,12 @@ import {
 import { assertResearchGate } from "@/lib/agent/trade/gate";
 import { defaultGmxTarget, getTradeCoin, listTradeCoinSymbols } from "@/lib/agent/trade/coins";
 import { MAX_LEVERAGE, MAX_SIZE_USD, EXCHANGE_ROUTER } from "@/lib/agent/trade/gmx";
-import type { TradeSide } from "@/lib/agent/trade/types";
+import {
+  encryptedUsdFromCipherJson,
+  plainUsd,
+  type EncryptedUsdCipherJson,
+  type TradeSide,
+} from "@/lib/agent/trade/types";
 import {
   appendTradeProposal,
   getAgentProfile,
@@ -23,6 +28,12 @@ export interface TradeProposeArgs {
   /** Human USD amount (e.g. 10 = $10). */
   sizeUsdHuman?: number;
   leverage?: number;
+  /**
+   * FHE Phase 1 (form path, flag ON): CoFHE ciphertext envelope instead of a
+   * plaintext size. Mutually exclusive with sizeUsdHuman. The caller (route)
+   * MUST run validateEncryptedEnvelope first — this module trusts it.
+   */
+  sizeUsdEnc?: EncryptedUsdCipherJson;
 }
 
 export async function execTradePropose(agentId: string, args: TradeProposeArgs) {
@@ -65,6 +76,11 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
     Math.max(1, args.leverage ?? 1),
     MAX_LEVERAGE,
   );
+  // Encrypted sizes (FHE flag ON, form path) skip the human→30-dec conversion
+  // and the MAX_SIZE_USD clamp — both impossible on ciphertext. The clamp and
+  // cap check re-run authoritatively at /api/agent/trade, where plaintext
+  // legitimately exists at signing time.
+  const encrypted = args.sizeUsdEnc ?? null;
   const human = args.sizeUsdHuman ?? 10;
   const sizeUsd = BigInt(Math.floor(human)) * 10n ** 30n;
   const clampedSize = sizeUsd > MAX_SIZE_USD ? MAX_SIZE_USD : sizeUsd;
@@ -72,7 +88,7 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
   const intentSummary = {
     asset,
     side,
-    sizeUsd: clampedSize.toString(),
+    sizeUsd: encrypted ? "encrypted" : clampedSize.toString(),
     leverage,
     collateralToken: coin.collateralToken,
     verdictRef: gate.verdictRef,
@@ -80,11 +96,15 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
   };
 
   if (method === "manual") {
+    // Manual suggestions are never persisted, so the form does not encrypt
+    // them; tolerate an envelope anyway without inventing a plaintext size.
     return {
       ok: true,
       mode: "manual",
       suggestion: intentSummary,
-      summary: `Trade suggestion (manual): ${side} ${asset} ~$${human} at ${leverage}x — owner executes manually on GMX Sepolia.`,
+      summary: encrypted
+        ? `Trade suggestion (manual): ${side} ${asset} (size encrypted) at ${leverage}x — owner executes manually on GMX Sepolia.`
+        : `Trade suggestion (manual): ${side} ${asset} ~$${human} at ${leverage}x — owner executes manually on GMX Sepolia.`,
     };
   }
 
@@ -95,7 +115,7 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
     id,
     asset,
     side,
-    sizeUsd: clampedSize,
+    sizeUsd: encrypted ? encryptedUsdFromCipherJson(encrypted) : plainUsd(clampedSize),
     leverage,
     collateralToken: coin.collateralToken,
     verdictRef: gate.verdictRef,
@@ -106,17 +126,26 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
 
   const action =
     method === "spending_cap"
-      ? "proposed (auto-executes if within spending cap)"
+      ? encrypted
+        ? "proposed (size encrypted — caps are checked when you sign)"
+        : "proposed (auto-executes if within spending cap)"
       : "proposed — awaiting owner approval";
 
+  // Ciphertext can't be compared to caps here: auto-execute is off and the
+  // cap verdict is deferred to the authoritative execute-time check.
   let autoExecute = false;
+  let capCheck: "checked" | "deferred" = "checked";
   if (method === "spending_cap") {
-    const cap = await checkSpendingCap({
-      agentId,
-      sizeUsd: clampedSize,
-      autoExecute: true,
-    });
-    autoExecute = cap.ok;
+    if (encrypted) {
+      capCheck = "deferred";
+    } else {
+      const cap = await checkSpendingCap({
+        agentId,
+        sizeUsd: clampedSize,
+        autoExecute: true,
+      });
+      autoExecute = cap.ok;
+    }
   }
 
   return {
@@ -124,6 +153,7 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
     mode: method,
     proposalId: id,
     autoExecute,
+    capCheck,
     proposal: { ...intentSummary, id, status: "proposed" },
     summary: `GMX ${side} on ${asset} ${action}.`,
   };

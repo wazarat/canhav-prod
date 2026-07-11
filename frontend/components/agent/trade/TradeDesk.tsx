@@ -199,11 +199,6 @@ export async function TradeDesk({
                   )}
                 </div>
                 {!coin.gateOpen && <p className="mt-1 text-xs text-ink-400">{coin.reason}</p>}
-                {!coin.executable && (
-                  <p className="mt-1 text-xs text-ink-500">
-                    No GMX Sepolia market — buy/sell recommendations only.
-                  </p>
-                )}
               </div>
             </div>
           ))}
@@ -257,6 +252,52 @@ export async function TradeDesk({
             </div>
           </div>
           )}
+        </div>
+
+        {/* Every gate below is enforced server-side at proposal time (assertResearchGate);
+            this card is a readout of those rules, not the enforcement itself. */}
+        <div className="rounded-xl border border-ink-800/60 bg-ink-950/40 px-4 py-3">
+          <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-400">
+            <ShieldCheck className="h-3.5 w-3.5" /> Research guardrails
+          </p>
+          <ul className="mt-2 space-y-1.5">
+            <li className="text-xs leading-relaxed text-ink-400">
+              <span className="font-mono text-[11px] text-ink-200">fresh verdict</span> — every{" "}
+              {deskExecutable ? "trade" : "recommendation"} gates on a CanHav research verdict no
+              older than {VERDICT_MAX_AGE_MS / 3_600_000}h. Stale or missing research closes the
+              gate.
+            </li>
+            <li className="text-xs leading-relaxed text-ink-400">
+              <span className="font-mono text-[11px] text-ink-200">positive signal</span> —
+              high-severity verdicts and risk signals (peg risk, supply contraction) block the
+              coin even when research is fresh.
+            </li>
+            {deskExecutable ? (
+              <>
+                <li className="text-xs leading-relaxed text-ink-400">
+                  <span className="font-mono text-[11px] text-ink-200">allowlist check</span> —
+                  the GMX ExchangeRouter and OrderVault must be on the on-chain SecurityRegistry
+                  allowlist, re-verified server-side at trade time.
+                </li>
+                <li className="text-xs leading-relaxed text-ink-400">
+                  <span className="font-mono text-[11px] text-ink-200">hard limits</span> —
+                  proposals are capped at ${maxSizeUsdHuman} notional and {MAX_LEVERAGE}x
+                  leverage regardless of your spending-cap settings.
+                </li>
+                <li className="text-xs leading-relaxed text-ink-400">
+                  <span className="font-mono text-[11px] text-ink-200">your signature</span> — no
+                  unattended signer exists. Caps can skip the approval click, but every trade
+                  still requires your wallet signature.
+                </li>
+              </>
+            ) : (
+              <li className="text-xs leading-relaxed text-ink-400">
+                <span className="font-mono text-[11px] text-ink-200">nothing executes</span> —
+                the agent files a buy/sell call and stops. No order is built, signed, or filled;
+                acting on it is entirely your decision.
+              </li>
+            )}
+          </ul>
         </div>
 
         {isOwner ? (

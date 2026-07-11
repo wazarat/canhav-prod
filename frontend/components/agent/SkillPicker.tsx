@@ -52,6 +52,7 @@ export function SkillPicker({
   selected,
   onToggle,
   lockedIds = [],
+  suggested,
   disabled = false,
   maxHeightClass = "max-h-72",
 }: {
@@ -60,6 +61,8 @@ export function SkillPicker({
   onToggle: (id: string) => void;
   /** Always-selected ids the user can't remove (e.g. the entity's own skill). */
   lockedIds?: string[];
+  /** Auto-suggested ids mapped to the reason ("dependency", "related", ...). */
+  suggested?: Record<string, string>;
   disabled?: boolean;
   maxHeightClass?: string;
 }) {
@@ -122,15 +125,22 @@ export function SkillPicker({
                     core
                   </span>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => onToggle(option.id)}
-                    disabled={disabled}
-                    aria-label={`Remove ${shortTitle(option.title)}`}
-                    className="rounded-full p-0.5 transition-colors hover:bg-electric-500/20 disabled:opacity-50"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
+                  <>
+                    {suggested?.[option.id] && (
+                      <span className="font-mono text-[9px] uppercase tracking-wider opacity-70">
+                        suggested
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => onToggle(option.id)}
+                      disabled={disabled}
+                      aria-label={`Remove ${shortTitle(option.title)}`}
+                      className="rounded-full p-0.5 transition-colors hover:bg-electric-500/20 disabled:opacity-50"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </>
                 )}
               </span>
             );
@@ -226,8 +236,15 @@ export function SkillPicker({
                             <Check className="h-3 w-3" />
                           </span>
                           <span className="min-w-0 flex-1">
-                            <span className="block truncate text-sm text-ink-100">
-                              {shortTitle(option.title)}
+                            <span className="flex items-center gap-1.5">
+                              <span className="min-w-0 truncate text-sm text-ink-100">
+                                {shortTitle(option.title)}
+                              </span>
+                              {suggested?.[option.id] && (
+                                <span className="shrink-0 rounded-full border border-neon-500/30 bg-neon-500/10 px-1.5 text-[10px] text-neon-300">
+                                  Suggested · {suggested[option.id]}
+                                </span>
+                              )}
                             </span>
                             {option.summary && (
                               <span className="mt-0.5 block truncate text-[11px] text-ink-500">

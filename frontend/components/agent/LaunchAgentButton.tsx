@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
@@ -21,6 +21,12 @@ import { SkillPicker, type SkillPickerOption } from "./SkillPicker";
 interface SkillOption {
   id: string;
   title: string;
+}
+
+interface SkillSuggestion {
+  id: string;
+  title: string;
+  reason: string;
 }
 
 interface SpawnResponse {
@@ -63,6 +69,13 @@ export function LaunchAgentButton({
   const [category, setCategory] = useState<AgentCategory | null>(null);
   const [catalog, setCatalog] = useState<SkillPickerOption[]>([]);
   const [extraSkillIds, setExtraSkillIds] = useState<string[]>([]);
+  // Auto-suggested extras for the current core skill (id -> reason, drives the
+  // "Suggested" badges). The refs track which selections the effect added (so
+  // manual picks survive core changes) and which suggestions the user
+  // dismissed (so unchecking sticks across core-skill changes).
+  const [suggested, setSuggested] = useState<Record<string, string>>({});
+  const autoAddedRef = useRef<Set<string>>(new Set());
+  const dismissedRef = useRef<Set<string>>(new Set());
   const [phase, setPhase] = useState<"idle" | "wallet" | "minting">("idle");
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<{ agentId: string; pending: boolean } | null>(null);
@@ -121,6 +134,61 @@ export function LaunchAgentButton({
     };
   }, [authenticated]);
 
+  // Auto-suggest related skills for an entity core (its dependencies, peers,
+  // and member coins) and pre-check them. Suggestions the user dismissed stay
+  // unchecked; the previous core's auto-adds are dropped when the core changes.
+  useEffect(() => {
+    const clearAutoAdds = () => {
+      setSuggested({});
+      const stale = autoAddedRef.current;
+      autoAddedRef.current = new Set();
+      if (stale.size > 0) {
+        setExtraSkillIds((prev) => prev.filter((id) => !stale.has(id)));
+      }
+    };
+    // Product (`token:` etc.) cores have no suggestion sources.
+    if (!skillId || skillId.includes(":")) {
+      clearAutoAdds();
+      return;
+    }
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/agent/skills?suggestFor=${encodeURIComponent(skillId)}`,
+          { signal: controller.signal },
+        );
+        if (!res.ok) return;
+        const data = (await res.json()) as { suggestions?: SkillSuggestion[] };
+        if (controller.signal.aborted) return;
+        const suggestions = (data.suggestions ?? []).filter((s) => s.id !== skillId);
+        const idSet = new Set(suggestions.map((s) => s.id));
+        // Snapshot the refs so the updater stays pure: StrictMode invokes it
+        // twice, and reading a ref it already reassigned would keep stale ids.
+        const prevAuto = new Set(autoAddedRef.current);
+        const dismissed = new Set(dismissedRef.current);
+        setSuggested(Object.fromEntries(suggestions.map((s) => [s.id, s.reason])));
+        setExtraSkillIds((prev) => {
+          // Drop the previous core's auto-adds; manual picks are untouched.
+          const kept = prev.filter((id) => !(prevAuto.has(id) && !idSet.has(id)));
+          const additions = [...idSet].filter(
+            (id) => !dismissed.has(id) && !kept.includes(id),
+          );
+          autoAddedRef.current = new Set([
+            ...[...prevAuto].filter((id) => idSet.has(id) && kept.includes(id)),
+            ...additions,
+          ]);
+          return additions.length > 0 || kept.length !== prev.length
+            ? [...kept, ...additions]
+            : prev;
+        });
+      } catch {
+        // Aborted or offline: suggestions are optional sugar.
+      }
+    })();
+    return () => controller.abort();
+  }, [skillId]);
+
   // The bound entity skill is always part of the selection and can't be removed.
   const pickerSelection = useMemo(
     () => [skillId, ...extraSkillIds.filter((id) => id !== skillId)],
@@ -129,9 +197,16 @@ export function LaunchAgentButton({
 
   function toggleExtraSkill(id: string) {
     if (id === skillId) return;
-    setExtraSkillIds((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
-    );
+    setExtraSkillIds((prev) => {
+      if (prev.includes(id)) {
+        // Unchecking a suggestion is a dismissal that sticks across core changes.
+        if (suggested[id]) dismissedRef.current.add(id);
+        autoAddedRef.current.delete(id);
+        return prev.filter((s) => s !== id);
+      }
+      dismissedRef.current.delete(id);
+      return [...prev, id];
+    });
   }
 
   async function launch() {
@@ -233,6 +308,7 @@ export function LaunchAgentButton({
         setAgentName("");
         setCategory(null);
         setExtraSkillIds([]);
+        autoAddedRef.current = new Set();
         router.refresh();
       } else {
         openResearchChat();
@@ -345,13 +421,14 @@ export function LaunchAgentButton({
               </span>
               <p className="text-xs text-ink-500">
                 The project&apos;s core skill is included. Add knowledge from other entities,
-                stablecoins, RWAs, and tokens — the agent studies everything you select.
+                stablecoins, RWAs, and tokens: the agent studies everything you select.
               </p>
               <SkillPicker
                 options={catalog}
                 selected={pickerSelection}
                 onToggle={toggleExtraSkill}
                 lockedIds={[skillId]}
+                suggested={suggested}
                 disabled={busy}
               />
             </div>

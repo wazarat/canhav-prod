@@ -16,7 +16,9 @@ import type {
   AgentSkillAction,
   AgentSkillFact,
   AgentSkillSection,
+  MemberCoinCategory,
   NetworkProfile,
+  RiskSeverity,
   RwaProfile,
   SourceRef,
   StablecoinProfile,
@@ -520,4 +522,97 @@ export async function getAgentSkillById(id: string): Promise<PlatformSkill | nul
   }
   const entity = await getApprovedNetworkBySlug(id);
   return entity ? buildSkillFromEntity(entity) : null;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Launch suggestions                                                         */
+/* -------------------------------------------------------------------------- */
+
+export type SkillSuggestionReason = "dependency" | "related" | "its token";
+
+export interface SkillSuggestion {
+  id: string;
+  title: string;
+  reason: SkillSuggestionReason;
+}
+
+const SEVERITY_RANK: Record<RiskSeverity, number> = { high: 0, medium: 1, low: 2 };
+
+const MEMBER_COIN_GROUP: Partial<Record<MemberCoinCategory, Exclude<SkillGroup, "entity">>> = {
+  Stablecoin: "stablecoin",
+  Token: "token",
+  RWA: "rwa",
+  // Receipt tokens have no skill group and are intentionally absent.
+};
+
+/**
+ * Related-skill suggestions for an entity core skill, derived from the
+ * entity's own profile: dependency entities first (most severe first), then
+ * competitor peers, then its member-coin product skills. Per-source quotas
+ * keep the mix representative instead of letting one source fill the list.
+ * Unknown slugs and off-platform names (no store entity) are skipped, so the
+ * result only ever contains resolvable platform skill ids.
+ */
+export async function suggestSkillsForEntity(slug: string): Promise<SkillSuggestion[]> {
+  const profile = await getApprovedNetworkBySlug(slug);
+  if (!profile) return [];
+  const networks = await getApprovedNetworks();
+  const networkBySlug = new Map(networks.map((n) => [n.slug, n]));
+
+  const seen = new Set<string>([entitySkillId(slug)]);
+  const out: SkillSuggestion[] = [];
+  const add = (id: string, title: string, reason: SkillSuggestionReason) => {
+    if (seen.has(id)) return false;
+    seen.add(id);
+    out.push({ id, title, reason });
+    return true;
+  };
+
+  // Dependencies, most severe first (stable within a severity tier).
+  const deps = (profile.dependencies ?? [])
+    .filter((dep) => Boolean(dep.slug))
+    .sort(
+      (a, b) =>
+        (a.severity ? SEVERITY_RANK[a.severity] : 3) -
+        (b.severity ? SEVERITY_RANK[b.severity] : 3),
+    );
+  let taken = 0;
+  for (const dep of deps) {
+    if (taken >= 2) break;
+    const net = networkBySlug.get(dep.slug as string);
+    if (net && add(entitySkillId(net.slug), net.name, "dependency")) taken += 1;
+  }
+
+  // Competitor peers by curated/derived rank.
+  const competitors = [...(profile.competitors ?? [])].sort((a, b) => a.rank - b.rank);
+  taken = 0;
+  for (const competitor of competitors) {
+    if (taken >= 2) break;
+    if (!competitor.slug) continue;
+    const net = networkBySlug.get(competitor.slug);
+    if (net && add(entitySkillId(net.slug), net.name, "related")) taken += 1;
+  }
+
+  // Member coins: at most one per product category, two total.
+  const usedGroups = new Set<string>();
+  taken = 0;
+  for (const coin of profile.memberCoins) {
+    if (taken >= 2) break;
+    const group = MEMBER_COIN_GROUP[coin.category];
+    if (!group || usedGroups.has(group)) continue;
+    const id = productSkillId(group, coin.slug);
+    if (seen.has(id)) continue;
+    const exists =
+      group === "stablecoin"
+        ? await getApprovedStablecoinBySlug(coin.slug)
+        : group === "rwa"
+          ? await getApprovedRwaBySlug(coin.slug)
+          : await getApprovedTokenBySlug(coin.slug);
+    if (exists && add(id, `${coin.name} (${coin.symbol})`, "its token")) {
+      usedGroups.add(group);
+      taken += 1;
+    }
+  }
+
+  return out;
 }

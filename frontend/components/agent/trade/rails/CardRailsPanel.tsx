@@ -1,0 +1,415 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { History, SlidersHorizontal } from "lucide-react";
+
+import { Badge } from "@/components/ui/Badge";
+import { cn } from "@/lib/utils";
+import {
+  countCaught,
+  RAIL_BACKTEST_EVENTS,
+  runBacktest,
+  type EventResult,
+  type RailFire,
+} from "./backtest";
+import {
+  defaultRailState,
+  FAMILY_LABELS,
+  RAILS,
+  type RailDef,
+  type RailFamily,
+  type RailSeverity,
+  type RailState,
+} from "./railDefs";
+
+/** Live desk readings the server component passes down; every field fails soft. */
+export interface RailLiveInputs {
+  utilizationPct: number | null;
+  utilizationSymbol: string | null;
+  change24hPct: number | null;
+  priceUsd: number | null;
+}
+
+const SEVERITY_TONE: Record<RailSeverity, "danger" | "warning" | "neutral"> = {
+  high: "danger",
+  medium: "warning",
+  low: "neutral",
+};
+
+/** Results at factory defaults, the fixed baseline the delta chips compare against. */
+const DEFAULT_RESULTS = runBacktest(RAILS, defaultRailState(RAILS), RAIL_BACKTEST_EVENTS);
+
+function formatValue(value: number, unit: string): string {
+  return `${value}${unit}`;
+}
+
+function tripLabel(rail: RailDef, value: number): string {
+  if (!rail.threshold) return "event-driven";
+  const cmp = rail.threshold.direction === "gte" ? "≥" : "≤";
+  return `trips ${cmp} ${formatValue(value, rail.threshold.unit)}`;
+}
+
+/** The live reading that matches a rail's watched metric, if the desk has one. */
+function liveReading(
+  rail: RailDef,
+  live: RailLiveInputs | null,
+): { label: string; value: number; trips: boolean } | null {
+  if (!live || !rail.threshold) return null;
+  const { key } = rail.threshold;
+  if ((key === "utilizationPct" || key === "sustainedUtilizationPct") &&
+      live.utilizationPct != null) {
+    const label = live.utilizationSymbol
+      ? `now ${live.utilizationPct.toFixed(1)}% (${live.utilizationSymbol})`
+      : `now ${live.utilizationPct.toFixed(1)}%`;
+    return { label, value: live.utilizationPct, trips: false };
+  }
+  if (key === "change24hPct" && live.change24hPct != null) {
+    return {
+      label: `AAVE 24h ${live.change24hPct >= 0 ? "+" : ""}${live.change24hPct.toFixed(1)}%`,
+      value: live.change24hPct,
+      trips: false,
+    };
+  }
+  return null;
+}
+
+function RailCard({
+  rail,
+  state,
+  onToggle,
+  onValue,
+  live,
+}: {
+  rail: RailDef;
+  state: { enabled: boolean; value: number };
+  onToggle: () => void;
+  onValue: (value: number) => void;
+  live: RailLiveInputs | null;
+}) {
+  const reading = liveReading(rail, live);
+  const readingTrips =
+    reading != null &&
+    state.enabled &&
+    rail.threshold != null &&
+    (rail.threshold.direction === "gte"
+      ? reading.value >= state.value
+      : reading.value <= state.value);
+  const changed = rail.threshold != null && state.value !== rail.threshold.defaultValue;
+
+  return (
+    <div
+      className={cn(
+        "rounded-xl border px-4 py-3 transition-colors",
+        state.enabled
+          ? "border-ink-800/60 bg-ink-950/40"
+          : "border-ink-800/40 bg-ink-950/20 opacity-60",
+      )}
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          role="switch"
+          aria-checked={state.enabled}
+          aria-label={`${rail.name} rail`}
+          onClick={onToggle}
+          className={cn(
+            "relative h-4 w-7 shrink-0 rounded-full border transition-colors",
+            state.enabled
+              ? "border-electric-500/40 bg-electric-500/30"
+              : "border-ink-700 bg-ink-900",
+          )}
+        >
+          <span
+            className={cn(
+              "absolute top-0.5 h-2.5 w-2.5 rounded-full transition-all",
+              state.enabled ? "left-3.5 bg-electric-400" : "left-0.5 bg-ink-500",
+            )}
+          />
+        </button>
+        <span className="text-sm font-semibold text-ink-100">{rail.name}</span>
+        <Badge tone={SEVERITY_TONE[rail.severity]} className="px-1.5 py-0 font-mono text-[9px]">
+          {rail.suggests.action.toLowerCase()}
+        </Badge>
+        {reading && (
+          <span
+            className={cn(
+              "ml-auto rounded-full border px-2 py-0.5 font-mono text-[10px]",
+              readingTrips
+                ? "border-amber-400/40 bg-amber-400/10 text-amber-200"
+                : "border-ink-700/80 bg-ink-900/60 text-ink-400",
+            )}
+          >
+            {reading.label}
+            {readingTrips && " · tripping"}
+          </span>
+        )}
+      </div>
+
+      <p className="mt-1.5 font-mono text-[10px] text-ink-400">
+        watch {rail.watch} <span className="text-ink-600">·</span> {tripLabel(rail, state.value)}
+        {rail.note && (
+          <>
+            {" "}
+            <span className="text-ink-600">·</span> {rail.note}
+          </>
+        )}
+        {rail.secondary && (
+          <>
+            {" "}
+            <span className="text-ink-600">·</span> {rail.secondary.label}
+          </>
+        )}
+        {rail.emits && (
+          <>
+            {" "}
+            <span className="text-ink-600">·</span> emits{" "}
+            <span className="text-ink-200">{rail.emits}</span>
+          </>
+        )}
+      </p>
+
+      {rail.interactive && rail.threshold && (
+        <div className="mt-2 flex items-center gap-3">
+          <input
+            type="range"
+            min={rail.threshold.min}
+            max={rail.threshold.max}
+            step={rail.threshold.step}
+            value={state.value}
+            disabled={!state.enabled}
+            onChange={(e) => onValue(Number(e.target.value))}
+            aria-label={`${rail.name} threshold`}
+            className="h-1 flex-1 cursor-pointer accent-electric-500 disabled:cursor-not-allowed"
+          />
+          <span className="tabular w-14 text-right font-mono text-xs text-ink-100">
+            {formatValue(state.value, rail.threshold.unit)}
+          </span>
+          {changed && (
+            <span className="font-mono text-[10px] text-ink-500">
+              default {formatValue(rail.threshold.defaultValue, rail.threshold.unit)}
+            </span>
+          )}
+        </div>
+      )}
+
+      <p className="mt-1.5 text-[11px] leading-relaxed text-ink-500">
+        suggests <span className="text-ink-300">{rail.suggests.detail}</span>
+      </p>
+    </div>
+  );
+}
+
+function fireChip(fire: RailFire): string {
+  if (fire.threshold == null) return fire.railName.toLowerCase();
+  const cmp = fire.observed >= fire.threshold ? "≥" : "≤";
+  return `${fire.railName.toLowerCase()} ${formatValue(fire.observed, fire.unit)} ${cmp} ${formatValue(fire.threshold, fire.unit)}`;
+}
+
+function EventRow({
+  result,
+  defaultResult,
+}: {
+  result: EventResult;
+  defaultResult: EventResult;
+}) {
+  const fired = result.fired;
+  const changedByUser = fired !== defaultResult.fired;
+  const firedFires = result.fires.filter((f) => f.fired);
+  // Rails that caught this event at defaults but no longer trip at the
+  // presenter's current settings: render struck through, not hidden.
+  const lostFires = defaultResult.fires.filter(
+    (f) => f.fired && !firedFires.some((g) => g.railId === f.railId),
+  );
+  const maxSeverity: RailSeverity = firedFires.some((f) => f.severity === "high")
+    ? "high"
+    : firedFires.some((f) => f.severity === "medium")
+      ? "medium"
+      : "low";
+
+  return (
+    <div
+      key={`${result.event.id}-${fired}`}
+      className={cn(
+        "px-4 py-3 transition-colors",
+        changedByUser && "animate-[pulse_0.6s_ease-in-out_2]",
+      )}
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="font-mono text-[10px] text-ink-500">{result.event.date}</span>
+        <span className="text-sm font-medium text-ink-100">{result.event.title}</span>
+        {fired ? (
+          <Badge tone={SEVERITY_TONE[maxSeverity]} className="px-1.5 py-0 font-mono text-[9px]">
+            fired · {maxSeverity}
+          </Badge>
+        ) : (
+          <Badge tone="neutral" className="px-1.5 py-0 font-mono text-[9px]">
+            suppressed
+          </Badge>
+        )}
+        {changedByUser && (
+          <Badge tone="warning" className="px-1.5 py-0 font-mono text-[9px]">
+            changed by your settings
+          </Badge>
+        )}
+      </div>
+      <p className="mt-1 text-xs leading-relaxed text-ink-400">{result.event.summary}</p>
+      {(firedFires.length > 0 || lostFires.length > 0) && (
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          {firedFires.map((fire) => (
+            <span
+              key={fire.railId}
+              className={cn(
+                "rounded-full border px-2 py-0.5 font-mono text-[10px]",
+                fire.severity === "high"
+                  ? "border-rose-500/40 bg-rose-500/10 text-rose-300"
+                  : "border-amber-400/30 bg-amber-400/10 text-amber-200",
+              )}
+            >
+              {fireChip(fire)}
+            </span>
+          ))}
+          {lostFires.map((fire) => (
+            <span
+              key={fire.railId}
+              className="rounded-full border border-ink-800/60 bg-ink-950/40 px-2 py-0.5 font-mono text-[10px] text-ink-500 line-through"
+            >
+              {fireChip(fire)}
+            </span>
+          ))}
+        </div>
+      )}
+      {fired ? (
+        <p className="mt-1.5 text-[11px] leading-relaxed text-ink-300">
+          <span className="font-mono text-[10px] text-ink-500">agent files:</span>{" "}
+          {result.event.wouldHaveSaid}
+        </p>
+      ) : (
+        <p className="mt-1.5 text-[11px] leading-relaxed text-ink-500">
+          No rail trips at these settings; the agent stays silent through this one.
+        </p>
+      )}
+      <p className="mt-1 text-[11px] leading-relaxed text-ink-500">{result.event.outcome}</p>
+    </div>
+  );
+}
+
+/**
+ * Card rails for the AAVE desk: toggleable trigger rules the agent watches,
+ * with editable thresholds and a live backtest showing how each setting
+ * would have fired on real Aave history. Settings live in this session only
+ * (nothing persists); rails only ever propose through the existing
+ * research gate and approval pipeline.
+ */
+export function CardRailsPanel({ live }: { live: RailLiveInputs | null }) {
+  const [state, setState] = useState<RailState>(() => defaultRailState(RAILS));
+
+  const results = useMemo(() => runBacktest(RAILS, state, RAIL_BACKTEST_EVENTS), [state]);
+  const { caught, total } = countCaught(results);
+  const isDefault = useMemo(
+    () => JSON.stringify(state) === JSON.stringify(defaultRailState(RAILS)),
+    [state],
+  );
+
+  function toggle(id: string) {
+    setState((s) => ({ ...s, [id]: { ...s[id], enabled: !s[id].enabled } }));
+  }
+  function setValue(id: string, value: number) {
+    setState((s) => ({ ...s, [id]: { ...s[id], value } }));
+  }
+
+  const families: RailFamily[] = ["dependency", "protocol", "market", "governance"];
+  // Families holding the three interactive sliders stay open; the rest fold.
+  const openFamilies = new Set<RailFamily>(["dependency", "market"]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-400">
+          <SlidersHorizontal className="h-3.5 w-3.5" /> Card rails
+        </p>
+        <Badge tone="signal" className="px-1.5 py-0 font-mono text-[9px] uppercase">
+          propose only
+        </Badge>
+        {!isDefault && (
+          <button
+            type="button"
+            onClick={() => setState(defaultRailState(RAILS))}
+            className="ml-auto font-mono text-[10px] text-electric-400 transition-colors hover:text-electric-300"
+          >
+            reset defaults
+          </button>
+        )}
+      </div>
+      <p className="text-xs leading-relaxed text-ink-500">
+        Each rail watches an input, trips a threshold, and suggests an action. Rails only ever
+        propose; the research gate stays first and every fire needs your approval. Move a
+        threshold to see how the call would have changed on real Aave history below. Settings
+        here are session-only.
+      </p>
+
+      {families.map((family) => {
+        const familyRails = RAILS.filter((r) => r.family === family);
+        const body = (
+          <div className="space-y-2">
+            {familyRails.map((rail) => (
+              <RailCard
+                key={rail.id}
+                rail={rail}
+                state={state[rail.id]}
+                onToggle={() => toggle(rail.id)}
+                onValue={(v) => setValue(rail.id, v)}
+                live={live}
+              />
+            ))}
+          </div>
+        );
+        if (openFamilies.has(family)) {
+          return (
+            <div key={family} className="space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-500">
+                {FAMILY_LABELS[family]}
+              </p>
+              {body}
+            </div>
+          );
+        }
+        return (
+          <details key={family} className="group space-y-2">
+            <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-wider text-ink-500 transition-colors hover:text-ink-300">
+              <span className="mr-1 inline-block transition-transform group-open:rotate-90">
+                ›
+              </span>
+              {FAMILY_LABELS[family]}{" "}
+              <span className="font-mono text-[10px] normal-case text-ink-600">
+                {familyRails.length} rails
+              </span>
+            </summary>
+            <div className="mt-2">{body}</div>
+          </details>
+        );
+      })}
+
+      <div className="rounded-xl border border-ink-800/60 bg-ink-950/40">
+        <div className="flex flex-wrap items-center gap-2 border-b border-ink-800/60 px-4 py-3">
+          <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-400">
+            <History className="h-3.5 w-3.5" /> Backtest
+          </p>
+          <span className="tabular font-mono text-xs text-ink-200">
+            {caught} of {total}{" "}
+            <span className="text-ink-400">historical events caught at current settings</span>
+          </span>
+        </div>
+        <div className="divide-y divide-ink-800/60">
+          {results.map((result, i) => (
+            <EventRow key={result.event.id} result={result} defaultResult={DEFAULT_RESULTS[i]} />
+          ))}
+        </div>
+      </div>
+
+      <p className="text-[11px] leading-relaxed text-ink-500">
+        A fired rail only files a proposal through the same propose, then approve path as every
+        other call. Nothing executes without your approval, and AAVE stays recommendation-only.
+      </p>
+    </div>
+  );
+}

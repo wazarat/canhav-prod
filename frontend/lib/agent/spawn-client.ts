@@ -138,6 +138,15 @@ export async function mintAgentOnClient(params: {
     transport: http(params.mintConfig.rpcUrl),
   });
 
+  // Fee headroom: wallet estimators on Arbitrum Sepolia quote maxFeePerGas at
+  // the current base fee with no margin, so the signed tx is rejected with
+  // "max fee per gas less than block base fee" whenever the base fee ticks up
+  // between estimate and submission. Quote 3x the estimate — the chain only
+  // charges the actual base fee, so the surplus is never spent.
+  const fees = await publicClient.estimateFeesPerGas();
+  const maxFeePerGas = (fees.maxFeePerGas ?? 20_000_000n) * 3n;
+  const maxPriorityFeePerGas = fees.maxPriorityFeePerGas ?? 0n;
+
   let tokenId: bigint;
   let agentURI: string;
   try {
@@ -151,12 +160,16 @@ export async function mintAgentOnClient(params: {
             abi: identityRegistryAbi,
             functionName: "register",
             args: ["", metadata],
+            maxFeePerGas,
+            maxPriorityFeePerGas,
           })
         : await walletClient.writeContract({
             address: registry,
             abi: identityRegistryAbi,
             functionName: "register",
             args: [""],
+            maxFeePerGas,
+            maxPriorityFeePerGas,
           });
     const receipt = await publicClient.waitForTransactionReceipt({ hash: registerHash });
     tokenId = await parseRegisteredAgentId(receipt.logs, registry);
@@ -169,6 +182,8 @@ export async function mintAgentOnClient(params: {
       abi: identityRegistryAbi,
       functionName: "setAgentURI",
       args: [tokenId, agentURI],
+      maxFeePerGas,
+      maxPriorityFeePerGas,
     });
     await publicClient.waitForTransactionReceipt({ hash: uriHash });
   } catch (e) {
@@ -198,6 +213,8 @@ export async function mintAgentOnClient(params: {
       abi: identityRegistryAbi,
       functionName: "setAgentWallet",
       args: [tokenId, owner, deadline, signature],
+      maxFeePerGas,
+      maxPriorityFeePerGas,
     });
     await publicClient.waitForTransactionReceipt({ hash: bindHash });
     walletVerified = true;

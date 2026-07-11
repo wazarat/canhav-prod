@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { authorizeAdminRequest } from "@/lib/auth/admin";
 import { fieldKey, getRedisClient, hasUpstash, parseItem, STORE_KEY } from "@/lib/server/redis";
+import { isValidSlug } from "@/lib/slug";
 import {
   readStoreItemLocal,
   STORE_CACHE_TAG,
@@ -177,9 +178,14 @@ interface ContentPatchBody {
   category?: string;
   patch?: Record<string, unknown>;
   // Linkage op (mutates the PARENT network's MemberCoins, not this item):
-  op?: "linkMemberCoin" | "unlinkMemberCoin";
+  op?: "linkMemberCoin" | "unlinkMemberCoin" | "createCoin";
   networkSlug?: string;
   setEntity?: boolean;
+  // createCoin op:
+  name?: string;
+  symbol?: string;
+  coinType?: string;
+  entitySlug?: string;
 }
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -199,6 +205,11 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: "Missing slug." }, { status: 400 });
   }
   const category = (body.category ?? "Network").trim();
+
+  // --- Create op: mint a minimal Token item + attach to its parent network ---
+  if (body.op === "createCoin") {
+    return handleCreateCoin(body, slug);
+  }
 
   // --- Linkage op: mutate the parent network's MemberCoins -------------------
   if (body.op === "linkMemberCoin" || body.op === "unlinkMemberCoin") {
@@ -270,6 +281,97 @@ interface MemberCoinRef {
   symbol: string;
   category: string;
   role: string;
+}
+
+/** Categories a new slug must not collide with (all share the /tokens-style key space). */
+const CREATE_COLLISION_CATEGORIES = ["Token", "Stablecoin", "RWA", "Receipt", "Network"];
+
+/**
+ * Create a minimal APPROVED Token item and attach it to its parent network's
+ * MemberCoins[]. EntitySlug is set at creation, so no separate setEntity write.
+ * CoinType is deliberately omitted: the reader treats it as null (which passes
+ * the NoToken filter) and it stays patchable later via the coin editor.
+ */
+async function handleCreateCoin(body: ContentPatchBody, slug: string): Promise<NextResponse> {
+  const name = typeof body.name === "string" ? body.name.trim() : "";
+  const symbol = typeof body.symbol === "string" ? body.symbol.trim().toUpperCase() : "";
+  const entitySlug = body.entitySlug?.trim();
+
+  if (body.coinType !== "Token") {
+    return NextResponse.json({ ok: false, error: 'coinType must be "Token".' }, { status: 400 });
+  }
+  if (!name || !symbol) {
+    return NextResponse.json({ ok: false, error: "Missing name or symbol." }, { status: 400 });
+  }
+  if (!isValidSlug(slug)) {
+    return NextResponse.json(
+      { ok: false, error: "Slug must be lowercase letters, digits, and single hyphens (2-64 chars)." },
+      { status: 400 },
+    );
+  }
+  if (!entitySlug) {
+    return NextResponse.json({ ok: false, error: "Missing entitySlug." }, { status: 400 });
+  }
+  if (entitySlug === slug) {
+    return NextResponse.json(
+      { ok: false, error: "A token can't share its parent network's slug." },
+      { status: 400 },
+    );
+  }
+
+  const net = await readItem("Network", entitySlug);
+  if (!net) {
+    return NextResponse.json({ ok: false, error: `No network "${entitySlug}".` }, { status: 404 });
+  }
+  for (const cat of CREATE_COLLISION_CATEGORIES) {
+    if (await readItem(cat, slug)) {
+      return NextResponse.json({ ok: false, error: `Slug "${slug}" already exists.` }, { status: 409 });
+    }
+  }
+
+  const now = nowIso();
+  const item: Record<string, unknown> = {
+    PK: "CATEGORY#Token",
+    SK: `PROTOCOL#${slug}`,
+    Category: "Token",
+    Status: "APPROVED",
+    Slug: slug,
+    Name: name,
+    Symbol: symbol,
+    TokenType: "Governance",
+    SubCategory: "Governance Token",
+    Description: `${name} is a token in the ${String(net.item.Name ?? entitySlug)} ecosystem.`,
+    EntitySlug: entitySlug,
+    CreatedAt: now,
+    UpdatedAt: now,
+  };
+  await writeItem(fieldKey("Token", slug), item);
+
+  // Attach to the parent network's MemberCoins (mirrors handleLinkageOp's link branch).
+  const members: MemberCoinRef[] = Array.isArray(net.item.MemberCoins)
+    ? [...(net.item.MemberCoins as MemberCoinRef[])]
+    : [];
+  const idx = members.findIndex((m) => m?.slug === slug);
+  const ref: MemberCoinRef = { slug, name, symbol, category: "Token", role: "" };
+  if (idx >= 0) members[idx] = { ...members[idx], ...ref };
+  else members.push(ref);
+  net.item.MemberCoins = members;
+  net.item.UpdatedAt = nowIso();
+  await writeItem(net.field, net.item);
+
+  revalidateTag(STORE_CACHE_TAG);
+  revalidatePath(`/networks/${entitySlug}`);
+  revalidatePath("/networks");
+  revalidatePath(`/tokens/${slug}`);
+
+  return NextResponse.json({
+    ok: true,
+    op: "createCoin",
+    slug,
+    category: "Token",
+    entitySlug,
+    memberCount: members.length,
+  });
 }
 
 /**

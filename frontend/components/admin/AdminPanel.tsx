@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { AdminCoinEditor } from "@/components/admin/AdminCoinEditor";
 import { AdminContentEditor } from "@/components/admin/AdminContentEditor";
+import { AdminCreateTokenCard } from "@/components/admin/AdminCreateTokenCard";
 import { AdminDiagnosticsView } from "@/components/admin/AdminDiagnosticsView";
 import { CoinPicker } from "@/components/admin/CoinPicker";
 import { NetworkPicker } from "@/components/admin/NetworkPicker";
@@ -98,6 +99,11 @@ export function AdminPanel({
     const n = networks.find((x) => x.slug === urlSlug);
     return n ? { slug: n.slug, name: n.name, category: "Network", kind: "networks" } : null;
   });
+
+  // One-shot capture: the URL-sync effect below rewrites the query to only
+  // tab/cls/slug, so ?create=token&entity=... must be read before it runs.
+  const [showCreateToken, setShowCreateToken] = useState(() => searchParams.get("create") === "token");
+  const [createEntity] = useState(() => searchParams.get("entity") ?? "");
 
   const dirtyRef = useRef(false);
 
@@ -209,6 +215,16 @@ export function AdminPanel({
           </button>
         ))}
       </div>
+
+      {showCreateToken && (
+        <div className="mb-6">
+          <AdminCreateTokenCard
+            networks={networks}
+            defaultEntitySlug={createEntity}
+            onClose={() => setShowCreateToken(false)}
+          />
+        </div>
+      )}
 
       <div className="mb-6">
         {cls === "networks" ? (

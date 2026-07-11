@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 
 import { MemberCoinsLauncher } from "@/components/networks/MemberCoinsLauncher";
@@ -49,6 +50,14 @@ async function OverviewDashboard({ profile, labels }: { profile: NetworkProfile;
         tvlSeriesSource={data.tvlSeriesSource}
       />
       <MemberCoinsLauncher coins={data.coins} networkName={profile.name} />
+      <div className="flex justify-end">
+        <Link
+          href={`/admin?create=token&entity=${profile.slug}`}
+          className="text-xs text-ink-500 underline-offset-2 transition-colors hover:text-ink-300 hover:underline"
+        >
+          Create token (admin)
+        </Link>
+      </div>
     </>
   );
 }

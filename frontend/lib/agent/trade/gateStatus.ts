@@ -55,6 +55,10 @@ function parseCapRaw(raw: string | null): bigint | null {
 }
 
 function toHumanUsd(raw: bigint): number {
+  // Caps and logged trade sizes are whole dollars by construction; the exact
+  // integer path avoids float drift ($12 must not render as $11.9999…98).
+  const whole = raw / 10n ** 30n;
+  if (whole * 10n ** 30n === raw) return Number(whole);
   return Number(raw) / 1e30;
 }
 

@@ -15,6 +15,7 @@ import {
   type AgentToolCall,
 } from "@/lib/agent/memory";
 import { listCustomTools } from "@/lib/agent/customTools";
+import { userOwnsAgent } from "@/lib/agent/ownership";
 import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-binding";
 import { listKnowledgeDocs } from "@/lib/agent/knowledge";
 import { buildSystemPrompt } from "@/lib/agent/prompt";
@@ -112,6 +113,12 @@ export async function POST(req: Request) {
     listCustomTools(agentId),
   ]);
 
+  // Owner sessions unlock the guardrail-update tool. Gated on a stored profile:
+  // without one there is no config to merge into (setAgentConfig would no-op).
+  const viewerOwnsAgent =
+    Boolean(profile) &&
+    (await userOwnsAgent(session.userId, agentId, profile?.ownerUserId ?? null));
+
   // Bind the agent to its project (Entity) so it defaults to that entity + its
   // member products without the user re-specifying slugs.
   let scope: AgentScope | undefined;
@@ -139,6 +146,7 @@ export async function POST(req: Request) {
       .filter((t) => t.enabled)
       .map((t) => ({ name: `custom_${t.id}`, description: t.template.title })),
     dunePublishEnabled: hasDuneWrite() && Boolean(profile?.config?.publishToDune),
+    guardrailsToolEnabled: viewerOwnsAgent,
   });
 
   // `ai@6` throws here if the incoming UIMessage[] from @ai-sdk/react doesn't
@@ -169,7 +177,7 @@ export async function POST(req: Request) {
     model: resolveAgentModel(),
     system,
     messages: modelMessages,
-    tools: await buildAgentTools(agentId, scope, session.userId),
+    tools: await buildAgentTools(agentId, scope, session.userId, viewerOwnsAgent),
     stopWhen: stepCountIs(8),
     abortSignal: budget.signal,
     onFinish: async (event) => {

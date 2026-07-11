@@ -13,7 +13,22 @@ import {
   getApprovedTokenBySlug,
   getApprovedTokens,
 } from "@/lib/data";
-import { appendMemory, getDataFrame, getMemory, markSkillStudied } from "@/lib/agent/memory";
+import {
+  appendMemory,
+  getAgentProfile,
+  getDataFrame,
+  getMemory,
+  markSkillStudied,
+  setAgentConfig,
+} from "@/lib/agent/memory";
+import {
+  defaultAgentConfig,
+  sanitizeAgentConfig,
+  TRADE_HITL_METHODS,
+  type AgentConfig,
+} from "@/lib/agent/agentConfig";
+import { userOwnsAgent } from "@/lib/agent/ownership";
+import { TRADE_MODES } from "@/components/agent/trade/tradeModes";
 import { buildCustomTools, executeCustomTool, listCustomTools } from "@/lib/agent/customTools";
 import { resolveDataFrame } from "@/lib/agent/dataframes";
 import { canPublishVerdict, claimVerdictSlot } from "@/lib/agent/dunePublish";
@@ -132,6 +147,30 @@ const schemas = {
     asset: z
       .string()
       .describe("Researched asset to refresh the combined verdict for: sUSDe, sUSDai, ETH, or BTC."),
+  }),
+  config_updateGuardrails: z.object({
+    tradeHitlMethod: z
+      .union([z.enum(TRADE_HITL_METHODS), z.null()])
+      .optional()
+      .describe("New trade HITL method. Pass null (or omit) to leave it unchanged."),
+    tradeSpendingCapUsd: z
+      .union([z.number(), z.string(), z.null()])
+      .optional()
+      .describe(
+        "Per-trade cap in whole USD (e.g. 15). Pass null (or omit) to leave it unchanged; pass 0 or 'none' to remove the cap.",
+      ),
+    tradeCumulativeCapUsd: z
+      .union([z.number(), z.string(), z.null()])
+      .optional()
+      .describe(
+        "Rolling 24h cumulative cap in whole USD (e.g. 25). Pass null (or omit) to leave it unchanged; pass 0 or 'none' to remove the cap.",
+      ),
+    confirm: z
+      .boolean()
+      .optional()
+      .describe(
+        "false or omitted returns a preview WITHOUT writing. Only pass true after restating the exact change to the user and receiving their explicit confirmation.",
+      ),
   }),
 };
 
@@ -508,6 +547,106 @@ async function execRefreshCombinedVerdict(
   };
 }
 
+/**
+ * Coerce a human cap input (whole USD) to the stored 30-decimal string.
+ * Models routinely fill optional fields, so null/omitted means "leave
+ * unchanged" (returns undefined); removing a cap is an explicit 0/"none"
+ * (returns null). Non-numeric garbage is IGNORED (unchanged) rather than
+ * silently clearing a safety cap, and never throws into the stream.
+ */
+function capInputToUsd30(value: number | string | null | undefined): string | null | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  if (typeof value === "string" && /^(none|clear|remove|off)$/i.test(value.trim())) return null;
+  const n = typeof value === "number" ? value : Number(String(value).trim());
+  if (!Number.isFinite(n) || n < 0) return undefined;
+  if (n === 0) return null;
+  return (BigInt(Math.floor(n)) * 10n ** 30n).toString();
+}
+
+/** Human-readable view of the trade-guardrail slice of a config. */
+function describeGuardrails(cfg: AgentConfig) {
+  const capToHuman = (raw: string | null) => (raw == null ? null : Number(BigInt(raw) / 10n ** 30n));
+  const mode = TRADE_MODES.find((m) => m.value === cfg.tradeHitlMethod);
+  return {
+    tradeHitlMethod: cfg.tradeHitlMethod,
+    methodName: mode?.name ?? cfg.tradeHitlMethod,
+    perTradeCapUsd: capToHuman(cfg.tradeSpendingCapUsd),
+    dailyCapUsd: capToHuman(cfg.tradeCumulativeCapUsd),
+  };
+}
+
+function guardrailsLine(g: ReturnType<typeof describeGuardrails>): string {
+  const caps = [
+    g.perTradeCapUsd != null ? `$${g.perTradeCapUsd} per trade` : "no per-trade cap",
+    g.dailyCapUsd != null ? `$${g.dailyCapUsd} per 24h` : "no 24h cap",
+  ].join(", ");
+  return `${g.methodName} (${g.tradeHitlMethod}); ${caps}`;
+}
+
+/**
+ * Owner-only, two-phase guardrail update. Without `confirm` it returns a
+ * current-vs-proposed preview and writes nothing; with `confirm: true` it
+ * persists the merged config. The merge is mandatory: `setAgentConfig`
+ * REPLACES the whole config, so we overlay only the provided trade fields on
+ * top of the full existing config to preserve focusAreas/instructions/etc.
+ */
+async function execUpdateGuardrails(
+  agentId: string,
+  sessionUserId: string | null | undefined,
+  a: Args<"config_updateGuardrails">,
+) {
+  const profile = await getAgentProfile(agentId);
+  if (!profile) {
+    return {
+      updated: false,
+      reason: "no-profile",
+      summary: "This agent has no stored profile, so guardrails cannot be updated here.",
+    };
+  }
+  if (!sessionUserId || !(await userOwnsAgent(sessionUserId, agentId, profile.ownerUserId))) {
+    return {
+      updated: false,
+      reason: "owner-only",
+      summary: "Only this agent's owner can change its trade guardrails.",
+    };
+  }
+
+  const current = profile.config ?? defaultAgentConfig();
+  const spendingCap = capInputToUsd30(a.tradeSpendingCapUsd);
+  const cumulativeCap = capInputToUsd30(a.tradeCumulativeCapUsd);
+  const proposed = sanitizeAgentConfig({
+    ...current,
+    ...(a.tradeHitlMethod != null ? { tradeHitlMethod: a.tradeHitlMethod } : {}),
+    ...(spendingCap !== undefined ? { tradeSpendingCapUsd: spendingCap } : {}),
+    ...(cumulativeCap !== undefined ? { tradeCumulativeCapUsd: cumulativeCap } : {}),
+  });
+
+  const currentView = describeGuardrails(current);
+  const proposedView = describeGuardrails(proposed);
+
+  if (!a.confirm) {
+    return {
+      updated: false,
+      preview: { current: currentView, proposed: proposedView },
+      summary: `Preview only, nothing written. Current: ${guardrailsLine(currentView)}. Proposed: ${guardrailsLine(proposedView)}. Restate this to the owner and call again with confirm: true once they agree.`,
+    };
+  }
+
+  const written = await setAgentConfig(agentId, proposed);
+  if (!written) {
+    return {
+      updated: false,
+      reason: "write-failed",
+      summary: "Could not persist the guardrail update (agent profile disappeared).",
+    };
+  }
+  return {
+    updated: true,
+    guardrails: proposedView,
+    summary: `Updated trade guardrails: ${guardrailsLine(proposedView)}.`,
+  };
+}
+
 /* -------------------------------------------------------------------------- */
 /* AI SDK tool definitions (used by the streamText loop)                      */
 /* -------------------------------------------------------------------------- */
@@ -536,6 +675,7 @@ export async function buildAgentTools(
   agentId: string,
   scope?: AgentScope,
   ownerUserId?: string | null,
+  viewerOwnsAgent?: boolean,
 ) {
   const base = {
     research_getEntity: tool({
@@ -649,6 +789,19 @@ export async function buildAgentTools(
     });
   }
 
+  // Owner-only write tool: registered only when the chatting user owns this
+  // agent (the route verifies ownership); the exec re-verifies server-side.
+  if (viewerOwnsAgent && ownerUserId) {
+    tools.config_updateGuardrails = tool({
+      description:
+        "Update this agent's trade guardrails (HITL method, per-trade cap, rolling 24h cap) for its owner. Set ONLY the fields the user asked to change; pass null for everything else. Two-phase: call WITHOUT confirm first to get a current-vs-proposed preview, restate the exact change in plain dollars, and only call with confirm: true after the owner explicitly agrees. Caps are whole USD.",
+      inputSchema: schemas.config_updateGuardrails,
+      execute: safe("config_updateGuardrails", (a: Args<"config_updateGuardrails">) =>
+        execUpdateGuardrails(agentId, ownerUserId, a),
+      ),
+    });
+  }
+
   if (scope?.entitySlug) {
     tools.agent_scope = tool({
       description:
@@ -727,6 +880,12 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
     name: "research_refreshCombinedVerdict",
     description: "Refresh combined verdict for sUSDe/sUSDai/ETH/BTC (unblocks stale trade gate).",
     sample: { asset: "sUSDe" },
+  },
+  {
+    name: "config_updateGuardrails",
+    description:
+      "Owner-only: preview/apply a trade-guardrail change (HITL method + caps in whole USD; confirm: true writes).",
+    sample: { tradeHitlMethod: "spending_cap", tradeSpendingCapUsd: 15, confirm: false },
   },
 ];
 
@@ -817,6 +976,9 @@ export async function runTool(
       break;
     case "research_refreshCombinedVerdict":
       out = await execRefreshCombinedVerdict(agentId, ownerUserId, a as Args<"research_refreshCombinedVerdict">);
+      break;
+    case "config_updateGuardrails":
+      out = await execUpdateGuardrails(agentId, ownerUserId, a as Args<"config_updateGuardrails">);
       break;
     default:
       return { ok: false, error: `Unhandled tool "${name}".` };

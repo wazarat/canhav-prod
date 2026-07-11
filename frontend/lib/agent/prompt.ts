@@ -1,6 +1,7 @@
 import "server-only";
 
 import { renderAgentConfigPrompt, type AgentConfig } from "@/lib/agent/agentConfig";
+import { MAX_LEVERAGE, MAX_SIZE_USD } from "@/lib/agent/trade/gmx";
 import type { AgentMemoryFact } from "@/lib/agent/memory";
 
 /**
@@ -60,6 +61,8 @@ export interface SystemPromptInput {
   customTools?: PromptCustomToolRef[];
   /** True when the gated dune_publishVerdict tool is available this session. */
   dunePublishEnabled?: boolean;
+  /** True when the chatting user owns this agent (config_updateGuardrails registered). */
+  guardrailsToolEnabled?: boolean;
 }
 
 export function buildSystemPrompt(input: SystemPromptInput): string {
@@ -103,6 +106,11 @@ export function buildSystemPrompt(input: SystemPromptInput): string {
     prompt += `\n\n--- Owner custom data feeds ---\nThe owner configured extra read-only data tools for this agent:\n${input.customTools
       .map((t) => `- ${t.name}: ${t.description}`)
       .join("\n")}\nUse them when relevant.`;
+  }
+
+  if (input.guardrailsToolEnabled) {
+    const maxSizeHuman = Number(MAX_SIZE_USD / 10n ** 30n);
+    prompt += `\n\n--- Trade guardrails (owner session) ---\nThe chatting user owns this agent and can adjust its trade guardrails (HITL method, per-trade cap, rolling 24h cap) with config_updateGuardrails. Set ONLY the fields the user asked to change and pass null for the rest. Two-phase protocol: first call it WITHOUT confirm to get a current-vs-proposed preview, restate the exact change in plain dollars, and only after the user explicitly confirms call it again with confirm: true. Caps are whole USD; removing a cap is an explicit 0. Platform hard caps always apply: $${maxSizeHuman} max per trade, ${MAX_LEVERAGE}x max leverage.`;
   }
 
   if (input.dunePublishEnabled) {

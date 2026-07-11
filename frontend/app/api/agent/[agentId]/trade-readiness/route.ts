@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { getCombinedVerdict } from "@/lib/agent/memory";
+import { getAgentProfile, getCombinedVerdict } from "@/lib/agent/memory";
 import { requireOwnedAgent } from "@/lib/agent/ownership";
-import { TRADE_COINS } from "@/lib/agent/trade/coins";
+import { getTradeCoinsForAgent } from "@/lib/agent/trade/coins";
 import { evaluateVerdictGate, VERDICT_MAX_AGE_MS } from "@/lib/agent/trade/gate";
 import { refreshAssetCombinedVerdict } from "@/lib/agent/verdictRunner";
 
@@ -22,14 +22,16 @@ export async function GET(_req: Request, { params }: { params: { agentId: string
   if (guard.error) return guard.error;
 
   const now = Date.now();
+  const profile = await getAgentProfile(agentId);
   const coins = await Promise.all(
-    TRADE_COINS.map(async (coin) => {
+    getTradeCoinsForAgent(profile?.skillId).map(async (coin) => {
       const verdict = await getCombinedVerdict(coin.symbol);
       const gate = evaluateVerdictGate(verdict, now);
       const ts = verdict ? Date.parse(verdict.ts) : NaN;
       return {
         symbol: coin.symbol,
         entitySlug: coin.entitySlug,
+        executable: coin.executable,
         verdict: verdict
           ? {
               signal: verdict.signal,

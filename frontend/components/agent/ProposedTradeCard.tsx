@@ -48,6 +48,9 @@ export function ProposedTradeCard({
 
   const parsed = tradeProposalFromJson(proposal);
   const isEncrypted = parsed.sizeUsd.kind === "encrypted";
+  // Recommendation-only proposal: no GMX market exists, so there is no
+  // approve/execute path — only the research-gated call itself and Dismiss.
+  const isRecommendation = proposal.executionMode === "recommendation";
   const plainSize = plainUsdOrNull(parsed.sizeUsd) ?? revealedUsd30;
   const sizeHuman = plainSize !== null ? (Number(plainSize) / 10 ** 30).toFixed(2) : null;
 
@@ -92,7 +95,10 @@ export function ProposedTradeCard({
     setBusy(true);
     setError(null);
     try {
-      await patchProposal({ action: "reject", reason: "Rejected by owner." });
+      await patchProposal({
+        action: "reject",
+        reason: isRecommendation ? "Recommendation dismissed." : "Rejected by owner.",
+      });
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Reject failed.");
@@ -214,11 +220,18 @@ export function ProposedTradeCard({
           <TrendingDown className="h-4 w-4 text-rose-400" />
         )}
         <h3 className="font-display text-sm font-semibold text-ink-50">
-          Proposed GMX {parsed.side} · {parsed.asset}
+          {isRecommendation
+            ? `Recommended ${parsed.side === "long" ? "buy" : "sell"} · ${parsed.asset}`
+            : `Proposed GMX ${parsed.side} · ${parsed.asset}`}
         </h3>
         <Badge tone={proposal.status === "executed" ? "positive" : "warning"}>
-          {proposal.status}
+          {proposal.status === "rejected" && isRecommendation ? "dismissed" : proposal.status}
         </Badge>
+        {isRecommendation && (
+          <Badge tone="neutral" className="font-mono text-[10px]">
+            recommendation only · no GMX market
+          </Badge>
+        )}
         {isEncrypted && (
           <Badge tone="neutral" className="font-mono text-[10px]">
             <Lock className="mr-1 inline h-3 w-3" />
@@ -252,7 +265,7 @@ export function ProposedTradeCard({
           : fheEnabled()
             ? "Size encrypted · reveal to view"
             : "Size encrypted (enable FHE to reveal)"}{" "}
-        · {parsed.leverage}x leverage · Arbitrum
+        {isRecommendation ? "· research-gated call · not executed" : `· ${parsed.leverage}x leverage · Arbitrum`}
       </p>
       <p className="mt-1 font-mono text-[10px] text-ink-500">verdict: {parsed.verdictRef}</p>
 
@@ -286,15 +299,17 @@ export function ProposedTradeCard({
               {revealing ? "Decrypting…" : "Reveal size"}
             </button>
           )}
-          <button
-            type="button"
-            onClick={onApprove}
-            disabled={busy || approveBlocked}
-            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-300 shadow-[0_10px_30px_-8px_rgba(16,185,129,0.45)] transition-colors hover:bg-emerald-500/20 disabled:opacity-50"
-          >
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-            {autoApproved ? "Sign & execute" : "Approve & trade"}
-          </button>
+          {!isRecommendation && (
+            <button
+              type="button"
+              onClick={onApprove}
+              disabled={busy || approveBlocked}
+              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-300 shadow-[0_10px_30px_-8px_rgba(16,185,129,0.45)] transition-colors hover:bg-emerald-500/20 disabled:opacity-50"
+            >
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+              {autoApproved ? "Sign & execute" : "Approve & trade"}
+            </button>
+          )}
           <button
             type="button"
             onClick={onReject}
@@ -302,7 +317,7 @@ export function ProposedTradeCard({
             className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/40 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-300 transition-colors hover:bg-rose-500/20 disabled:opacity-50"
           >
             <XCircle className="h-4 w-4" />
-            Reject
+            {isRecommendation ? "Dismiss" : "Reject"}
           </button>
           {autoApproved && (
             <p className="w-full text-[11px] text-ink-500">

@@ -30,6 +30,7 @@ export const YIELD_DEMO_AGENTS = [
   { agentId: "900104", type: "yield" as AgentType, asset: "sUSDai", entitySlug: "usd-ai" },
   { agentId: "900105", type: "market" as AgentType, asset: "ETH", entitySlug: "ethereum" },
   { agentId: "900106", type: "market" as AgentType, asset: "BTC", entitySlug: "bitcoin" },
+  { agentId: "900107", type: "market" as AgentType, asset: "AAVE", entitySlug: "aave" },
 ] as const;
 
 export function demoAgentConfig(agentId: string) {

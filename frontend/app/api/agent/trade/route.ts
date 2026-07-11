@@ -88,6 +88,19 @@ export async function POST(req: Request) {
     );
   }
 
+  // Execution backstop: recommendation-only coins have no GMX Sepolia market
+  // and must never reach the Reader lookup / order build below.
+  if (!coin.executable || coin.marketIndexToken === null) {
+    return NextResponse.json(
+      {
+        ok: false,
+        blocked: true,
+        error: `${coin.symbol} has no GMX market on Arbitrum Sepolia — recommendation only, no on-chain execution.`,
+      },
+      { status: 400 },
+    );
+  }
+
   const gmxTarget = defaultGmxTarget();
   const gate = await assertResearchGate(asset, gmxTarget);
   if (!gate.ok) {

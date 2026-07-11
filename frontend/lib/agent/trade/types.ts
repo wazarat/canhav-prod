@@ -106,6 +106,12 @@ export interface TradeProposal extends Omit<TradeIntent, "sizeUsd"> {
   id: string;
   status: TradeProposalStatus;
   gmxTarget: `0x${string}`;
+  /**
+   * "recommendation": the coin has no GMX Sepolia market — the proposal is a
+   * research-gated buy/sell call and can never be executed on-chain.
+   * Absent = "gmx" (legacy rows).
+   */
+  executionMode?: "gmx" | "recommendation";
   reason?: string;
   txHash?: `0x${string}`;
   /**
@@ -132,6 +138,8 @@ export interface TradeProposalJson extends TradeIntentJson {
   id: string;
   status: TradeProposalStatus;
   gmxTarget: `0x${string}`;
+  /** See TradeProposal.executionMode. Absent = "gmx". */
+  executionMode?: "gmx" | "recommendation";
   reason?: string;
   txHash?: `0x${string}`;
   /**
@@ -198,6 +206,7 @@ export function tradeProposalToJson(proposal: TradeProposal): TradeProposalJson 
     id: proposal.id,
     status: proposal.status,
     gmxTarget: proposal.gmxTarget,
+    executionMode: proposal.executionMode,
     reason: proposal.reason,
     txHash: proposal.txHash,
     capCheckOnchain: proposal.capCheckOnchain,
@@ -222,6 +231,7 @@ export function tradeProposalFromJson(json: TradeProposalJson): TradeProposal {
     id: json.id,
     status: json.status,
     gmxTarget: json.gmxTarget,
+    executionMode: json.executionMode,
     reason: json.reason,
     txHash: json.txHash,
     capCheckOnchain: json.capCheckOnchain,

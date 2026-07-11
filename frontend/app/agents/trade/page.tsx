@@ -150,6 +150,7 @@ export default async function TradePage({
                 agentId={agent.agentId}
                 config={agent.config}
                 isOwner
+                skillId={agent.skillId}
                 defaultAsset={asset}
               />
             </div>

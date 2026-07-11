@@ -40,6 +40,13 @@ export async function PATCH(
     return NextResponse.json({ ok: true, proposal: tradeProposalToJson(updated!) });
   }
 
+  if (action === "executed" && existing.executionMode === "recommendation") {
+    return NextResponse.json(
+      { ok: false, error: "Recommendation-only proposal — no GMX market to execute on." },
+      { status: 400 },
+    );
+  }
+
   if (action === "executed" && typeof body.txHash === "string" && body.txHash) {
     const updated = await updateTradeProposalStatus(agentId, proposalId, {
       status: "executed",

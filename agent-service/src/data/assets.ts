@@ -73,6 +73,18 @@ export const WATCHED_ASSETS: Record<string, WatchedAsset> = {
     slug: "btc",
     entitySlug: "bitcoin",
   },
+  // Skill token (recommendation-only trade desk): CoinGecko reads only, same
+  // zeroed on-chain surface as the majors above.
+  AAVE: {
+    symbol: "AAVE",
+    token: ZERO_ADDRESS,
+    factory: ZERO_ADDRESS,
+    pools: [],
+    core: ZERO_ADDRESS,
+    decimals: 18,
+    slug: "aave",
+    entitySlug: "aave",
+  },
 };
 
 export function getWatchedAsset(symbol: string): WatchedAsset | null {

@@ -138,7 +138,11 @@ const schemas = {
       .describe("Semicolon-separated source labels the verdict relies on."),
   }),
   trade_propose: z.object({
-    asset: z.string().describe("Research asset symbol, e.g. sUSDe or sUSDai."),
+    asset: z
+      .string()
+      .describe(
+        "Coin on this agent's trade desk: the skill token (e.g. AAVE, recommendation-only) or a GMX major (ETH, BTC).",
+      ),
     side: z.enum(["long", "short"]),
     sizeUsdHuman: z.number().positive().optional().describe("Approx USD notional (default 10)."),
     leverage: z.number().int().min(1).max(2).optional(),
@@ -146,7 +150,9 @@ const schemas = {
   research_refreshCombinedVerdict: z.object({
     asset: z
       .string()
-      .describe("Researched asset to refresh the combined verdict for: sUSDe, sUSDai, ETH, or BTC."),
+      .describe(
+        "Researched asset to refresh the combined verdict for: sUSDe, sUSDai, ETH, BTC, or AAVE.",
+      ),
   }),
   config_updateGuardrails: z.object({
     tradeHitlMethod: z
@@ -751,13 +757,13 @@ export async function buildAgentTools(
     }),
     trade_propose: tool({
       description:
-        "Propose a research-gated GMX perp trade on Arbitrum Sepolia for a tradable major (ETH, BTC). Respects owner HITL settings: manual suggestion, propose→approve, or spending-cap auto. Never executes without gate clearance.",
+        "Propose a research-gated trade for a coin on this agent's desk: GMX majors (ETH, BTC) execute as perps on Arbitrum Sepolia; a skill token without a GMX market (e.g. AAVE) files a buy/sell recommendation only. Respects owner HITL settings: manual suggestion, propose→approve, or spending-cap auto. Never executes without gate clearance.",
       inputSchema: schemas.trade_propose,
       execute: safe("trade_propose", (a: Args<"trade_propose">) => execTradePropose(agentId, a)),
     }),
     research_refreshCombinedVerdict: tool({
       description:
-        "Refresh the combined research verdict for a researched asset (sUSDe/sUSDai: stablecoin + yield passes; ETH/BTC: market pass). Call this when trade_propose is blocked for a stale or missing verdict, then retry trade_propose.",
+        "Refresh the combined research verdict for a researched asset (sUSDe/sUSDai: stablecoin + yield passes; ETH/BTC/AAVE: market pass). Call this when trade_propose is blocked for a stale or missing verdict, then retry trade_propose.",
       inputSchema: schemas.research_refreshCombinedVerdict,
       execute: safe("research_refreshCombinedVerdict", (a: Args<"research_refreshCombinedVerdict">) =>
         execRefreshCombinedVerdict(agentId, ownerUserId, a),
@@ -873,12 +879,14 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
   },
   {
     name: "trade_propose",
-    description: "Propose a research-gated GMX perp on ETH/BTC (Arbitrum Sepolia).",
+    description:
+      "Propose a research-gated trade on a desk coin (ETH/BTC perps; skill tokens like AAVE are recommendation-only).",
     sample: { asset: "ETH", side: "long", sizeUsdHuman: 10, leverage: 1 },
   },
   {
     name: "research_refreshCombinedVerdict",
-    description: "Refresh combined verdict for sUSDe/sUSDai/ETH/BTC (unblocks stale trade gate).",
+    description:
+      "Refresh combined verdict for sUSDe/sUSDai/ETH/BTC/AAVE (unblocks stale trade gate).",
     sample: { asset: "sUSDe" },
   },
   {

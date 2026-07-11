@@ -7,7 +7,7 @@ import { TradeProposalForm } from "@/components/agent/trade/TradeProposalForm";
 import { Badge } from "@/components/ui/Badge";
 import { sanitizeAgentConfig, type AgentConfig } from "@/lib/agent/agentConfig";
 import { getCombinedVerdict } from "@/lib/agent/memory";
-import { TRADE_COINS } from "@/lib/agent/trade/coins";
+import { getTradeCoinsForAgent } from "@/lib/agent/trade/coins";
 import { readTradeFunding, type TradeFunding } from "@/lib/agent/trade/funding";
 import { evaluateVerdictGate, VERDICT_MAX_AGE_MS } from "@/lib/agent/trade/gate";
 import {
@@ -41,24 +41,32 @@ export async function TradeDesk({
   agentId,
   config,
   isOwner,
+  skillId,
   defaultAsset,
 }: {
   agentId: string;
   config: AgentConfig | null | undefined;
   isOwner: boolean;
+  /** Agent skill id — drives which coins the desk covers (majors fallback). */
+  skillId?: string | null;
   /** Optional coin symbol to preselect in the proposal form (e.g. from a ?asset= param). */
   defaultAsset?: string;
 }) {
   const now = Date.now();
+  const deskCoins = getTradeCoinsForAgent(skillId);
+  // A desk with no executable coin (skill token without a GMX Sepolia market)
+  // is recommendation-only: no fills, so no GMX allowlist/funding concerns.
+  const deskExecutable = deskCoins.some((c) => c.executable);
   const [coins, allowlist] = await Promise.all([
     Promise.all(
-      TRADE_COINS.map(async (coin) => {
+      deskCoins.map(async (coin) => {
         const verdict = await getCombinedVerdict(coin.symbol);
         const gate = evaluateVerdictGate(verdict, now);
         const ts = verdict ? Date.parse(verdict.ts) : NaN;
         return {
           symbol: coin.symbol,
           entitySlug: coin.entitySlug,
+          executable: coin.executable,
           signal: verdict?.signal ?? null,
           severity: verdict?.severity ?? null,
           gateOpen: gate.ok,
@@ -67,7 +75,7 @@ export async function TradeDesk({
         };
       }),
     ),
-    readAllowlistStatus(),
+    deskExecutable ? readAllowlistStatus() : Promise.resolve(null),
   ]);
 
   const cfg = sanitizeAgentConfig(config ?? {});
@@ -98,33 +106,58 @@ export async function TradeDesk({
         <i className="term-dot" />
         <span className="flex-1" />
         <Badge tone="signal" className="px-2 py-0 font-mono text-[10px] uppercase">
-          perps
+          {deskExecutable ? "perps" : "signals"}
         </Badge>
         <span className="font-mono text-[10px] tracking-wide text-ink-500">
-          gmx · arbitrum
+          {deskExecutable ? "gmx · arbitrum" : "research · recommendations"}
         </span>
       </div>
 
       <div className="space-y-4 p-5">
         <div className="space-y-1.5">
           <span className="kicker">Trade desk</span>
-          <p className="text-sm leading-relaxed text-ink-300">
-            Research-gated perps: a coin is tradable only while it has a fresh, positive CanHav
-            verdict (≤{VERDICT_MAX_AGE_MS / 3_600_000}h) and GMX is allowlisted on the
-            SecurityRegistry. <span className="font-medium text-ink-100">No research, no trade.</span>
-          </p>
-          <p className="font-mono text-[11px] text-ink-400">
-            research <span className="text-ink-600">→</span> verdict{" "}
-            <span className="text-ink-600">→</span> proposal <span className="text-ink-600">→</span>{" "}
-            {cfg.tradeHitlMethod === "spending_cap" ? "caps auto-approve" : "your approval"}{" "}
-            <span className="text-ink-600">→</span> your signature{" "}
-            <span className="text-ink-600">→</span> GMX fill
-          </p>
-          <p className="text-xs leading-relaxed text-ink-500">
-            The agent researches a coin; a fresh positive verdict opens the gate; the agent files a
-            proposal; you approve it (or your caps auto-approve it); you sign in your wallet, and
-            GMX fills on Arbitrum.
-          </p>
+          {deskExecutable ? (
+            <>
+              <p className="text-sm leading-relaxed text-ink-300">
+                Research-gated perps: a coin is tradable only while it has a fresh, positive CanHav
+                verdict (≤{VERDICT_MAX_AGE_MS / 3_600_000}h) and GMX is allowlisted on the
+                SecurityRegistry.{" "}
+                <span className="font-medium text-ink-100">No research, no trade.</span>
+              </p>
+              <p className="font-mono text-[11px] text-ink-400">
+                research <span className="text-ink-600">→</span> verdict{" "}
+                <span className="text-ink-600">→</span> proposal{" "}
+                <span className="text-ink-600">→</span>{" "}
+                {cfg.tradeHitlMethod === "spending_cap" ? "caps auto-approve" : "your approval"}{" "}
+                <span className="text-ink-600">→</span> your signature{" "}
+                <span className="text-ink-600">→</span> GMX fill
+              </p>
+              <p className="text-xs leading-relaxed text-ink-500">
+                The agent researches a coin; a fresh positive verdict opens the gate; the agent
+                files a proposal; you approve it (or your caps auto-approve it); you sign in your
+                wallet, and GMX fills on Arbitrum.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm leading-relaxed text-ink-300">
+                Research-gated recommendations: the agent can call a buy or sell only while its
+                coin has a fresh, positive CanHav verdict (≤{VERDICT_MAX_AGE_MS / 3_600_000}h).
+                There is no GMX market for it on Arbitrum Sepolia, so nothing executes on-chain.{" "}
+                <span className="font-medium text-ink-100">No research, no recommendation.</span>
+              </p>
+              <p className="font-mono text-[11px] text-ink-400">
+                research <span className="text-ink-600">→</span> verdict{" "}
+                <span className="text-ink-600">→</span> recommendation{" "}
+                <span className="text-ink-600">→</span> your call
+              </p>
+              <p className="text-xs leading-relaxed text-ink-500">
+                The agent researches its coin; a fresh positive verdict opens the gate; the agent
+                files a buy/sell recommendation. Acting on it is up to you — no order is built,
+                signed, or filled.
+              </p>
+            </>
+          )}
         </div>
 
         <div className="divide-y divide-ink-800/60 rounded-xl border border-ink-800/60 bg-ink-950/40">
@@ -154,6 +187,11 @@ export async function TradeDesk({
                       blocked
                     </Badge>
                   )}
+                  {!coin.executable && (
+                    <Badge tone="neutral" className="font-mono text-[10px]">
+                      recommendation only
+                    </Badge>
+                  )}
                   {coin.signal && (
                     <span className="tabular font-mono text-[10px] text-ink-400">
                       {coin.signal} · {coin.severity} · {formatAge(coin.ageMs)}
@@ -161,10 +199,16 @@ export async function TradeDesk({
                   )}
                 </div>
                 {!coin.gateOpen && <p className="mt-1 text-xs text-ink-400">{coin.reason}</p>}
+                {!coin.executable && (
+                  <p className="mt-1 text-xs text-ink-500">
+                    No GMX Sepolia market — buy/sell recommendations only.
+                  </p>
+                )}
               </div>
             </div>
           ))}
 
+          {deskExecutable && (
           <div className="flex items-start gap-3 px-4 py-3">
             <span className="mt-0.5 shrink-0">
               {allowlist && allowlist.routerAllowed && allowlist.vaultAllowed ? (
@@ -212,11 +256,12 @@ export async function TradeDesk({
               ) : null}
             </div>
           </div>
+          )}
         </div>
 
         {isOwner ? (
           <>
-            {funding && (
+            {deskExecutable && funding && (
               <div className="rounded-xl border border-ink-800/60 bg-ink-950/40 px-4 py-3">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
                   <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-400">
@@ -302,7 +347,11 @@ export async function TradeDesk({
 
             <TradeProposalForm
               agentId={agentId}
-              coins={coins.map((c) => ({ symbol: c.symbol, gateOpen: c.gateOpen }))}
+              coins={coins.map((c) => ({
+                symbol: c.symbol,
+                gateOpen: c.gateOpen,
+                executable: c.executable,
+              }))}
               maxSizeUsd={maxSizeUsdHuman}
               maxLeverage={MAX_LEVERAGE}
               hitlMethod={cfg.tradeHitlMethod}

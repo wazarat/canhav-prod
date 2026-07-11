@@ -38,10 +38,13 @@ function isFreshVerdict(verdict: ResearchVerdict, now = Date.now()): boolean {
 /**
  * Server-side research + allowlist gate. Runs before any trade is built or signed.
  * Checks ExchangeRouter (gmxTarget) and OrderVault on SecurityRegistry.
+ * `requireAllowlist: false` skips the SecurityRegistry checks — they gate
+ * on-chain execution, which recommendation-only coins never reach.
  */
 export async function assertResearchGate(
   asset: string,
   gmxTarget: `0x${string}` = EXCHANGE_ROUTER,
+  { requireAllowlist = true }: { requireAllowlist?: boolean } = {},
 ): Promise<ResearchGateResult> {
   const normalized = asset.trim();
   if (!normalized) {
@@ -68,6 +71,10 @@ export async function assertResearchGate(
       ok: false,
       reason: `Research blocks trading ${normalized}: signal=${verdict.signal}, severity=${verdict.severity}.`,
     };
+  }
+
+  if (!requireAllowlist) {
+    return { ok: true, verdictRef: verdictRef(verdict) };
   }
 
   const [routerAllowed, vaultAllowed] = await Promise.all([

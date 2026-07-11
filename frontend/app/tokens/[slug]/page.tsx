@@ -54,13 +54,15 @@ export default async function TokenProfilePage({ params }: PageProps) {
   const agentStatus = agentConfigStatus();
   // Tradability is keyed on the SYMBOL (ETH/BTC): TRADE_COINS entitySlugs are
   // "ethereum"/"bitcoin" while these token pages live at /tokens/eth|btc.
+  // Recommendation-only coins (no GMX market) don't get a Trade button.
   const tradeCoin = getTradeCoin(profile.symbol);
+  const tradable = tradeCoin?.executable === true;
 
   return (
     <div className="container space-y-8 py-12">
       <PageHeader
         actions={
-          tradeCoin ? (
+          tradable && tradeCoin ? (
             <Button asChild size="sm">
               <Link href={`/agents/trade?asset=${tradeCoin.symbol}`}>Trade {tradeCoin.symbol}</Link>
             </Button>

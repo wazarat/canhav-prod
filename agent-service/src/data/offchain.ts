@@ -8,6 +8,8 @@ const COINGECKO_IDS: Record<string, string> = {
   // Majors — L1 base assets (roadmap B1).
   eth: "ethereum",
   btc: "bitcoin",
+  // Skill tokens — recommendation-only trade desks.
+  aave: "aave",
 };
 
 export interface OffchainMarket {

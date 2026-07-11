@@ -8,7 +8,7 @@ import {
   type TradeHitlMethod,
 } from "@/lib/agent/agentConfig";
 import { assertResearchGate } from "@/lib/agent/trade/gate";
-import { defaultGmxTarget, getTradeCoin, listTradeCoinSymbols } from "@/lib/agent/trade/coins";
+import { defaultGmxTarget, getTradeCoin, getTradeCoinsForAgent } from "@/lib/agent/trade/coins";
 import { MAX_LEVERAGE, MAX_SIZE_USD, EXCHANGE_ROUTER } from "@/lib/agent/trade/gmx";
 import {
   encryptedUsdFromCipherJson,
@@ -52,16 +52,22 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
     };
   }
 
+  const profile = await getAgentProfile(agentId);
+  const deskCoins = getTradeCoinsForAgent(profile?.skillId);
   const coin = getTradeCoin(asset);
-  if (!coin) {
+  if (!coin || !deskCoins.some((c) => c.symbol === coin.symbol)) {
     return {
       ok: false,
       blocked: true,
-      summary: `${asset} is not a supported trade coin (${listTradeCoinSymbols().join(", ")}).`,
+      summary: `${asset} is not on this agent's trade desk (${deskCoins.map((c) => c.symbol).join(", ")}).`,
     };
   }
 
-  const gate = await assertResearchGate(asset, defaultGmxTarget());
+  // Recommendation-only coins (no GMX Sepolia market) still require a fresh
+  // positive verdict, but the SecurityRegistry allowlist only gates execution.
+  const gate = await assertResearchGate(asset, defaultGmxTarget(), {
+    requireAllowlist: coin.executable,
+  });
   if (!gate.ok) {
     return {
       ok: false,
@@ -74,7 +80,6 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
     };
   }
 
-  const profile = await getAgentProfile(agentId);
   const config = sanitizeAgentConfig(profile?.config ?? defaultAgentConfig());
   const method: TradeHitlMethod = config.tradeHitlMethod;
 
@@ -101,7 +106,9 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
     gmxTarget: EXCHANGE_ROUTER,
   };
 
-  if (method === "manual") {
+  // A recommendation's whole point is the persisted record, so unlike GMX
+  // proposals it is stored even under manual HITL mode.
+  if (method === "manual" && coin.executable) {
     // Manual suggestions are never persisted, so the form does not encrypt
     // them; tolerate an envelope anyway without inventing a plaintext size.
     return {
@@ -120,7 +127,9 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
   // Phase 2: only spending_cap mode carries a cap verdict — other modes
   // approve by click, so a stray claim is dropped rather than persisted.
   const onchainCap =
-    method === "spending_cap" && encrypted ? args.capCheckOnchain ?? null : null;
+    method === "spending_cap" && encrypted && coin.executable
+      ? args.capCheckOnchain ?? null
+      : null;
 
   await appendTradeProposal(agentId, {
     id,
@@ -133,8 +142,21 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
     createdAt: now,
     status: "proposed",
     gmxTarget: EXCHANGE_ROUTER,
+    executionMode: coin.executable ? undefined : "recommendation",
     capCheckOnchain: onchainCap ? (onchainCap.within ? "within" : "over") : undefined,
   });
+
+  if (!coin.executable) {
+    return {
+      ok: true,
+      mode: "recommendation",
+      proposalId: id,
+      autoExecute: false,
+      capCheck: "checked" as const,
+      proposal: { ...intentSummary, id, status: "proposed" },
+      summary: `${asset} ${side} recommendation filed — no GMX Sepolia market, no on-chain execution.`,
+    };
+  }
 
   const action =
     method === "spending_cap"

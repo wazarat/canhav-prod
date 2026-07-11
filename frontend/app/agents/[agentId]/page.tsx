@@ -292,7 +292,12 @@ export default async function AgentHomePage({
 
       {activeTab === "desk" && (
         <div className={isOwner ? "grid gap-6 lg:grid-cols-2" : "max-w-2xl"}>
-          <TradeDesk agentId={agentId} config={profile.config} isOwner={isOwner} />
+          <TradeDesk
+            agentId={agentId}
+            config={profile.config}
+            isOwner={isOwner}
+            skillId={profile.skillId}
+          />
           {isOwner && (
             <div className="space-y-6">
               <ProposedTradesPanel agentId={agentId} />

@@ -42,7 +42,7 @@ export function TradeProposalForm({
   defaultAsset,
 }: {
   agentId: string;
-  coins: { symbol: string; gateOpen: boolean }[];
+  coins: { symbol: string; gateOpen: boolean; executable?: boolean }[];
   maxSizeUsd: number;
   maxLeverage: number;
   hitlMethod: TradeHitlMethod;
@@ -100,6 +100,11 @@ export function TradeProposalForm({
     };
   }, [asset]);
 
+  // Recommendation-only coin (no GMX market): the proposal is a buy/sell call,
+  // never an order — no encryption/signing path exists for it.
+  const isRecommendation =
+    coins.find((c) => c.symbol.toLowerCase() === asset.toLowerCase())?.executable === false;
+
   const spotForAsset = spot && spot.symbol.toLowerCase() === asset.toLowerCase() ? spot : null;
   const positionUnits =
     spotForAsset && spotForAsset.priceUsd > 0 ? (sizeUsd * leverage) / spotForAsset.priceUsd : null;
@@ -114,7 +119,7 @@ export function TradeProposalForm({
       // If the research gate turns out to be closed, the registration tx is
       // wasted testnet gas — accepted for flow simplicity.
       let body: Record<string, unknown> = { asset, side, sizeUsdHuman: sizeUsd, leverage };
-      if (fheEnabled() && hitlMethod !== "manual") {
+      if (fheEnabled() && hitlMethod !== "manual" && !isRecommendation) {
         const wallet = resolveActiveWallet(wallets);
         if (!wallet) throw new Error("Connect a wallet to file an encrypted proposal.");
         // Dynamic import keeps the CoFHE SDK (WASM) out of every other chunk.
@@ -208,7 +213,7 @@ export function TradeProposalForm({
   return (
     <div className="space-y-3 rounded-xl border border-ink-800/60 bg-ink-900/30 px-4 py-4">
       <p className="text-xs font-semibold uppercase tracking-wider text-ink-400">
-        Propose a trade
+        {isRecommendation ? "File a recommendation" : "Propose a trade"}
       </p>
 
       <div className="flex flex-wrap gap-2">
@@ -300,7 +305,9 @@ export function TradeProposalForm({
                 ? "Checking caps (encrypted)…"
                 : fhePhase === "filing"
                   ? "Filing proposal…"
-                  : "Propose"}
+                  : isRecommendation
+                    ? "File recommendation"
+                    : "Propose"}
         </button>
       </div>
 
@@ -321,19 +328,23 @@ export function TradeProposalForm({
               {spotForAsset.symbol} position
             </>
           )}{" "}
-          <span className="text-ink-500">(GMX oracle prices the fill)</span>
+          <span className="text-ink-500">
+            {isRecommendation ? "(reference price — nothing fills)" : "(GMX oracle prices the fill)"}
+          </span>
         </p>
       )}
 
       <p className="text-[11px] text-ink-500">
-        {hitlMethod === "manual"
+        {isRecommendation
+          ? "Recommendation only: there is no GMX Sepolia market for this coin, so the research-gated buy/sell call is filed to the feed — nothing is built, signed, or executed on-chain."
+          : hitlMethod === "manual"
           ? "Research only: you'll get a suggestion to place yourself on GMX; nothing is filed."
           : hitlMethod === "spending_cap"
             ? fheEnabled()
               ? "Auto within limits: with encrypted caps set on-chain, the cap check runs on ciphertext (nobody sees the numbers); otherwise caps are checked when you sign. Every trade still needs your wallet signature."
               : "Auto within limits: proposals inside your caps skip the approval click, but you still sign every trade in your wallet."
             : "The proposal appears in the proposals feed; nothing trades until you approve it and sign."}
-        {fheEnabled() && hitlMethod !== "manual" && (
+        {fheEnabled() && hitlMethod !== "manual" && !isRecommendation && (
           <>
             {" "}
             Encrypted filing: your size is encrypted in this browser and registered on-chain

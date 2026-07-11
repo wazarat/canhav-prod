@@ -816,6 +816,12 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             {"label": "Aave V3 Origin (protocol source)", "url": "https://github.com/aave-dao/aave-v3-origin"},
             {"label": "Immunefi — Aave bug bounty", "url": "https://immunefi.com/bug-bounty/aave/"},
             {"label": "DeFiLlama — Aave", "url": "https://defillama.com/protocol/aave"},
+            {"label": "Token Terminal: Aave metrics", "url": "https://x.com/tokenterminal/status/2030984957393359050"},
+            {"label": "Aave 2025 Year in Review", "url": "https://aave.com/blog/aave-2025-recap"},
+            {"label": "ACI Full Transparency Report", "url": "https://governance.aave.com/t/aci-full-transparency-report/24085"},
+            {"label": "LlamaRisk: rsETH collateral risk assessment", "url": "https://llamarisk.com/research/collateral-risk-rseth"},
+            {"label": "Blokz: LRT hidden collateral risk", "url": "https://www.blokz.dev/articles/the-shadow-peg-liquid-restaking-tokens-and-the-hidden-collateral-risk-for-ai-defi-agents"},
+            {"label": "Aave V4 architecture analysis", "url": "https://blog.ju.com/aave-v4-upgrade-analysis/"},
         ],
         "audits": [
             {"firm": "OpenZeppelin", "date": "2021-11-01", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
@@ -886,6 +892,39 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 ),
                 "pinned": False,
             },
+            {
+                "question": "How big is Aave versus competitors?",
+                "answer": (
+                    "Roughly 59-65% of DeFi lending market share by active loans, more than "
+                    "all tracked rivals combined, and more than 10x Compound by TVL."
+                ),
+                "pinned": False,
+            },
+            {
+                "question": "What is Aave V4?",
+                "answer": (
+                    "A hub-and-spoke redesign: central per-chain liquidity hubs feed "
+                    "customizable spoke markets, with health-targeted liquidations and "
+                    "ERC-4626 tokenization. Testnet ran Q4 2025; mainnet is slated for 2026."
+                ),
+                "pinned": False,
+            },
+            {
+                "question": "Where does Aave revenue come from?",
+                "answer": (
+                    "Borrow interest and spreads, reserve factors, liquidation fees, "
+                    "flash-loan fees, GHO revenue, and Aave-app revenue."
+                ),
+                "pinned": False,
+            },
+            {
+                "question": "How concentrated is Aave by chain?",
+                "answer": (
+                    "Ethereum is roughly 80%+ of TVL, loans, fees, and revenue; Plasma, Base, "
+                    "and Arbitrum are the largest non-Ethereum deployments."
+                ),
+                "pinned": False,
+            },
         ],
         "org_structure": [
             {
@@ -929,6 +968,17 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                     "Minted via Aave collateral vs fiat or Treasury reserves."
                 ),
             },
+            {
+                "product": "Systemically important lending institution",
+                "similarity": (
+                    "Deposit scale above $25B, more than $1T in cumulative loans, and a "
+                    "SOC 2 Type II attestation rival a mid-tier US bank's deposit base."
+                ),
+                "differences": (
+                    "Overcollateralized, non-custodial, and transparent on-chain; governed "
+                    "by AAVE holders with no fractional reserve."
+                ),
+            },
         ],
         "risks": [
             {
@@ -968,50 +1018,290 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 ),
             },
         ],
-        # A1 sample entries proving the dependencies/incidents pipeline; A2
-        # completes the full sourced set.
+        "typed_risks": [
+            {
+                "category": "Collateral",
+                "severity": "high",
+                "description": (
+                    "Bad collateral or oracle failure can create protocol bad debt; "
+                    "shortfalls have historically been covered by the Safety Module "
+                    "and Umbrella backstop rather than by lenders."
+                ),
+            },
+            {
+                "category": "Oracle",
+                "severity": "medium",
+                "description": (
+                    "Liquidations depend on price feeds; Aave mitigates with "
+                    "Chainlink feeds, internal LST/LRT exchange rates, TWAP "
+                    "smoothing, and circuit breakers."
+                ),
+            },
+            {
+                "category": "Smart Contract",
+                "severity": "medium",
+                "description": (
+                    "Large surface across V3/V4 markets, GHO, and Umbrella upgrades; "
+                    "heavily audited (OpenZeppelin, Trail of Bits, Certora formal "
+                    "verification) with an Immunefi bounty."
+                ),
+            },
+            {
+                "category": "Liquidity",
+                "severity": "medium",
+                "description": (
+                    "Thin secondary liquidity for long-tail collateral impairs "
+                    "orderly liquidations during stress; managed via supply and "
+                    "borrow caps and E-Mode limits."
+                ),
+            },
+            {
+                "category": "Governance",
+                "severity": "medium",
+                "description": (
+                    "AAVE-tokenholder governance controls listings, parameters, "
+                    "emissions, and buybacks: concentration and coordination risk."
+                ),
+            },
+            {
+                "category": "Regulatory",
+                "severity": "medium",
+                "description": (
+                    "Aave-branded apps are not regulated financial products, so "
+                    "jurisdictional exposure remains. A multi-year SEC inquiry "
+                    "closed in 2026 with no charges."
+                ),
+            },
+            {
+                "category": "Counterparty / Dependency",
+                "severity": "high",
+                "description": (
+                    "Relies on external oracles, bridges, LST/LRT issuers, and "
+                    "partner vaults (e.g. Veda/Whop); a dependency's failure can "
+                    "propagate, as the April 2026 rsETH bridge exploit showed. See "
+                    "the dependencies list below."
+                ),
+            },
+            {
+                "category": "Depeg / Correlated collateral",
+                "severity": "high",
+                "description": (
+                    "LST/LRT and stablecoin collateral can depeg, and leveraged "
+                    "looping positions amplify liquidation cascades. Aave's "
+                    "exchange-rate oracles have historically limited direct "
+                    "borrower liquidations."
+                ),
+            },
+        ],
         "dependencies": [
             {
-                "name": "Chainlink price feeds",
+                "name": "Chainlink price feeds + LST/LRT rate providers",
                 "kind": "oracle",
                 "slug": None,
                 "severity": "high",
                 "description": (
-                    "Aave prices collateral through Chainlink feeds combined with "
-                    "exchange-rate adapters for staked assets; stale or manipulated "
-                    "feeds would impair liquidations and collateral valuation."
+                    "Liquidations and GHO valuation depend on external price "
+                    "oracles combined with exchange-rate adapters for staked "
+                    "assets. Aave mitigates with internal exchange rates, TWAP "
+                    "smoothing, and circuit breakers."
                 ),
-                "link": "https://aave.com/docs",
+                "link": "https://www.blokz.dev/articles/the-shadow-peg-liquid-restaking-tokens-and-the-hidden-collateral-risk-for-ai-defi-agents",
+            },
+            {
+                "name": "Lido (wstETH)",
+                "kind": "collateral-issuer",
+                "slug": "lido",
+                "coins": ["wstETH"],
+                "severity": "high",
+                "description": (
+                    "wstETH is a core ETH-correlated collateral, often looped in "
+                    "E-Mode; issuer or withdrawal problems drive depeg and "
+                    "liquidation risk."
+                ),
+                "link": "https://governance.aave.com/t/arfc-wsteth-and-weeth-e-modes-and-lt-ltv-adjustments-on-ethereum-arbitrum-base-03-12-25/21370",
+            },
+            {
+                "name": "ether.fi (weETH)",
+                "kind": "collateral-issuer",
+                "slug": "ether-fi",
+                "coins": ["weETH"],
+                "severity": "medium",
+                "description": (
+                    "weETH is accepted as ETH-correlated restaking collateral, "
+                    "often in E-Mode; withdrawal or confidence shocks at the "
+                    "issuer transmit into Aave collateral quality."
+                ),
+                "link": "https://governance.aave.com/t/arfc-wsteth-and-weeth-e-modes-and-lt-ltv-adjustments-on-ethereum-arbitrum-base-03-12-25/21370",
+            },
+            {
+                "name": "Renzo (ezETH)",
+                "kind": "collateral-issuer",
+                "slug": "renzo",
+                "coins": ["ezETH"],
+                "severity": "medium",
+                "description": (
+                    "ezETH is accepted as ETH-correlated restaking collateral; its "
+                    "April 2024 depeg liquidated leveraged loopers across DeFi "
+                    "while Aave's averaging oracle limited direct impact."
+                ),
+                "link": "https://governance.aave.com/t/arfc-onboard-ezeth-to-aave-v3-lido-instance/18504",
             },
             {
                 "name": "Kelp DAO (rsETH)",
                 "kind": "collateral-issuer",
                 "slug": "kelp-dao",
                 "coins": ["rsETH"],
-                "severity": "medium",
+                "severity": "high",
                 "description": (
                     "rsETH is accepted as ETH-correlated collateral, so Kelp DAO "
-                    "restaking and peg integrity feed directly into Aave collateral "
-                    "quality."
+                    "restaking, bridging, and peg integrity feed directly into "
+                    "Aave collateral quality; the April 2026 bridge exploit made "
+                    "this exposure concrete."
                 ),
-                "link": None,
+                "link": "https://llamarisk.com/research/collateral-risk-rseth",
+            },
+            {
+                "name": "Circle (USDC)",
+                "kind": "stablecoin-issuer",
+                "slug": "circle",
+                "coins": ["USDC"],
+                "severity": "high",
+                "description": (
+                    "USDC is among the most supplied and borrowed assets on Aave; "
+                    "WETH, USDT, and USDC together make up roughly 78% of active "
+                    "loans, so issuer integrity is systemic."
+                ),
+                "link": "https://x.com/tokenterminal/status/2030984957393359050",
+            },
+            {
+                "name": "Tether (USDT)",
+                "kind": "stablecoin-issuer",
+                "slug": "tether",
+                "coins": ["USDT"],
+                "severity": "high",
+                "description": (
+                    "USDT is one of the largest borrowed assets on Aave; a USDT "
+                    "depeg or redemption shock would stress the biggest loan "
+                    "markets on the protocol."
+                ),
+                "link": "https://x.com/tokenterminal/status/2030984957393359050",
+            },
+            {
+                "name": "Ethena (USDe)",
+                "kind": "stablecoin-issuer",
+                "slug": "ethena",
+                "coins": ["USDe"],
+                "severity": "medium",
+                "description": (
+                    "USDe is synthetic-dollar collateral whose backing depends on "
+                    "Ethena's basis-trade strategy; a depeg would stress "
+                    "correlated stablecoin markets on Aave."
+                ),
+                "link": "https://x.com/tokenterminal/status/2030984957393359050",
+            },
+            {
+                "name": "Bridges & cross-chain infrastructure",
+                "kind": "bridge",
+                "slug": None,
+                "severity": "high",
+                "description": (
+                    "Aave runs on 20+ chains; a bridge failure can isolate a "
+                    "deployment or, as with rsETH in April 2026, mint unbacked "
+                    "collateral that reaches Aave markets."
+                ),
+                "link": "https://www.bitget.com/news/detail/12560605440354",
+            },
+            {
+                "name": "Partner vaults (Veda / Whop)",
+                "kind": "vault-partner",
+                "slug": None,
+                "severity": "low",
+                "description": (
+                    "Veda and Whop route treasury balances into Aave Plasma V3; "
+                    "partner vault issues would affect deposit flows rather than "
+                    "protocol solvency."
+                ),
+                "link": "https://aave.com/blog/aave-2025-recap",
+            },
+            {
+                "name": "Umbrella backstop stakers (stkGHO / stkABPT)",
+                "kind": "backstop",
+                "slug": None,
+                "coins": ["stkGHO", "stkABPT"],
+                "severity": "medium",
+                "description": (
+                    "Umbrella stakers (about $246.6M) absorb first loss; if "
+                    "slashing coverage is insufficient, shortfall risk shifts to "
+                    "the DAO treasury."
+                ),
+                "link": "https://aave.com/docs/aave-v3/umbrella",
             },
         ],
         "incidents": [
             {
+                "date": "2022-11",
+                "title": "CRV bad debt (Mango attacker)",
+                "severity": "medium",
+                "affectedCoins": ["CRV"],
+                "via": "failed short squeeze",
+                "description": (
+                    "Avraham Eisenberg, the Mango Markets attacker, opened "
+                    "oversized CRV shorts on Aave attempting a squeeze; the trade "
+                    "failed and left about 2.7M CRV of bad debt, with the CRV "
+                    "market frozen. Cleared in January 2023 when governance "
+                    "approved acquiring the CRV via ParaSwap with a spending "
+                    "limit of $3,105,000 in USDC."
+                ),
+                "link": "https://github.com/aave-dao/aave-proposals-reports/blob/master/reports/146-acquisition-and-repayment-crv-bad-debt.md",
+            },
+            {
                 "date": "2024-04",
-                "title": "Renzo ezETH depeg",
+                "title": "ezETH (Renzo) restaking depeg",
                 "severity": "medium",
                 "affectedCoins": ["ezETH"],
                 "via": "collateral depeg",
                 "description": (
-                    "ezETH briefly traded near $700 on Uniswap after Renzo released "
-                    "REZ tokenomics, liquidating over $56M of looped positions on "
-                    "Morpho and Gearbox. Aave's exchange-rate oracle valued ezETH at "
-                    "its redemption rate, so on Aave only highly leveraged loopers "
-                    "were affected."
+                    "ezETH briefly traded near $700 on Uniswap after Renzo's REZ "
+                    "airdrop terms triggered panic selling, causing $60M+ of "
+                    "liquidations across Morpho and Gearbox. Aave's averaging "
+                    "exchange-rate oracle reported a far smaller depeg, so only "
+                    "highly leveraged loopers (roughly 5x and above) were at risk "
+                    "and most Aave borrowers were not liquidated."
                 ),
                 "link": "https://www.dlnews.com/articles/defi/renzos-ezeth-loses-ether-peg-drops-79-in-under-one-hour/",
+            },
+            {
+                "date": "2024-08",
+                "title": "Aug 5 carry-trade unwind, LST/LRT stress",
+                "severity": "medium",
+                "affectedCoins": ["wstETH", "weETH", "ezETH"],
+                "via": "correlated collateral stress",
+                "description": (
+                    "During the yen carry-trade unwind WETH fell about 21%; "
+                    "wstETH depegged about 1.85% on Ethereum (2.1% on Base) and "
+                    "mean-reverted quickly along with weETH and ezETH. The "
+                    "episode informed later E-Mode LT/LTV recalibrations for "
+                    "wstETH and weETH."
+                ),
+                "link": "https://governance.aave.com/t/arfc-wsteth-and-weeth-e-modes-and-lt-ltv-adjustments-on-ethereum-arbitrum-base-03-12-25/21370",
+            },
+            {
+                "date": "2026-04",
+                "title": "rsETH bridge exploit (Kelp DAO)",
+                "severity": "high",
+                "affectedCoins": ["rsETH", "WETH", "wstETH"],
+                "via": "bridge exploit, unbacked collateral",
+                "description": (
+                    "An attacker forged a LayerZero bridge packet and released "
+                    "116,500 unbacked rsETH; about 89,567 rsETH (roughly $221M) "
+                    "was deposited as Aave collateral on Ethereum, Arbitrum, and "
+                    "other markets to borrow WETH and wstETH. Aave froze rsETH "
+                    "reserves and set LTV to zero within hours; the incident "
+                    "report estimated bad debt of $123.7M to $230.1M depending "
+                    "on how losses are allocated, and governance coordinated an "
+                    "ecosystem recovery effort."
+                ),
+                "link": "https://governance.aave.com/t/rseth-incident-report-april-20-2026/24580",
             },
         ],
         "events": [
@@ -1042,7 +1332,48 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "link": "https://aave.com/blog/aave-powers-whop-treasury",
             },
         ],
-        "investment_rounds": [],
+        "investment_rounds": [
+            {
+                "date": "2017-09",
+                "round": "Pre-sale (ETHLend)",
+                "amountUsd": 600_000,
+                "amountLabel": "$600k",
+                "investors": ["Early contributors (~2,000 ETH)"],
+                "link": "https://icodrops.com/ethlend/",
+            },
+            {
+                "date": "2017-11",
+                "round": "ICO (ETHLend, LEND)",
+                "amountUsd": 16_200_000,
+                "amountLabel": "$16.2M",
+                "investors": ["Public sale (1B LEND at ~$0.0162)"],
+                "link": "https://icodrops.com/ethlend/",
+            },
+            {
+                "date": "2020-07",
+                "round": "Private token sale",
+                "amountUsd": 4_500_000,
+                "amountLabel": "$4.5M",
+                "investors": ["ParaFi Capital"],
+                "link": "https://defillama.com/protocol/aave-v2",
+            },
+            {
+                "date": "2020-07",
+                "round": "Private token sale",
+                "amountUsd": 3_000_000,
+                "amountLabel": "$3M",
+                "investors": ["Framework Ventures", "Three Arrows Capital"],
+                "link": "https://www.theblock.co/post/71559/defi-lending-protocol-aave-raised-3-million-from-framework-ventures-and-three-arrows-capital",
+            },
+            {
+                "date": "2020-10",
+                "round": "Strategic round",
+                "amountUsd": 25_000_000,
+                "amountLabel": "$25M",
+                "investors": ["Blockchain Capital", "Blockchain.com Ventures", "Standard Crypto"],
+                "link": "https://defillama.com/protocol/aave-v2",
+            },
+        ],
         "partnerships": [
             {
                 "name": "Whop",
@@ -1285,6 +1616,20 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         ],
         "timeline": [
             {
+                "date": "2017-11",
+                "title": "ETHLend ICO",
+                "description": "Raised $16.2M selling LEND; the peer-to-peer lending origin of what became Aave.",
+                "link": "https://medium.com/rf-capital/defi-deep-dive-aave-865a8a31cc51",
+                "status": "executed",
+            },
+            {
+                "date": "2018-09",
+                "title": "ETHLend rebrands to Aave",
+                "description": "Pivot from peer-to-peer loan matching to the pooled liquidity model.",
+                "link": "https://www.gate.com/learn/articles/from-ethlend-to-aave-v4-the-building-plan-of-the-leading-lending-ecosystem/3115",
+                "status": "executed",
+            },
+            {
                 "date": "2020-10",
                 "title": "LEND → AAVE migration",
                 "description": "LEND migrates to AAVE at 100:1, fixing a 16M max supply and launching the Aave governance token.",
@@ -1292,24 +1637,59 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "status": "executed",
             },
             {
-                "date": "2022",
+                "date": "2023-07",
                 "title": "GHO stablecoin launches",
                 "description": "Aave introduces GHO, a native overcollateralized stablecoin minted against Aave collateral.",
                 "link": "https://aave.com",
                 "status": "executed",
             },
             {
-                "date": "2025",
-                "title": "Aavenomics + Umbrella go live",
-                "description": "Protocol revenue funds AAVE buybacks (~$50M/yr scale); Umbrella replaces the legacy Safety Module.",
+                "date": "2025-04-09",
+                "title": "Aavenomics buyback begins",
+                "description": "Revenue-funded AAVE buybacks start under the Aavenomics framework (~$1M/week scale).",
+                "link": "https://coinstats.app/ai/a/investment-analysis-aave",
+                "status": "executed",
+            },
+            {
+                "date": "2025-06-05",
+                "title": "Umbrella launches",
+                "description": "On-chain automated bad-debt backstop replaces the legacy Safety Module.",
+                "link": "https://cryptoslate.com/aave-dao-activates-on-chain-slashing-mechanism-with-umbrella-launch/",
+                "status": "executed",
+            },
+            {
+                "date": "2025-10",
+                "title": "Record TVL near $73.9B",
+                "description": "Aave reaches a record of roughly $73.9B in TVL, the first DeFi protocol above $1B in deposits on six chains.",
+                "link": "https://x.com/OAK_Res_EN/status/1975112021474423060",
+                "status": "executed",
+            },
+            {
+                "date": "2026-01",
+                "title": "SEC inquiry closed with no charges",
+                "description": "A multi-year SEC investigation into Aave ends without enforcement action.",
+                "link": "https://blockeden.xyz/blog/2026/01/21/aave-v4-defi-lending-dominance-sec-investigation-revenue-sharing/",
+                "status": "executed",
+            },
+            {
+                "date": "2026-02-25",
+                "title": "$1T cumulative loans",
+                "description": "First DeFi protocol to cross $1 trillion in cumulative loan originations.",
+                "link": "https://coinmarketcap.com/academy/article/aave-crosses-dollar1t-in-lending-volume-with-institutional-push",
+                "status": "executed",
+            },
+            {
+                "date": "2026-05",
+                "title": "sGHO savings experience ships",
+                "description": "A new sGHO savings experience ships, wrapping GHO in a yield-bearing product.",
                 "link": "https://aave.com",
                 "status": "executed",
             },
             {
                 "date": "2026",
-                "title": "sGHO savings + Aave V4 direction",
-                "description": "A new sGHO savings experience ships and governance advances Aave V4 (e.g. deployment on Arc).",
-                "link": "https://aave.com",
+                "title": "Aave V4 hub-and-spoke",
+                "description": "Unified per-chain liquidity hubs feed customizable spoke markets with health-targeted liquidations, ERC-4626 tokenization, and a Reinvestment Module; testnet ran Q4 2025.",
+                "link": "https://blog.ju.com/aave-v4-upgrade-analysis/",
                 "status": "stated",
             },
         ],
@@ -1333,6 +1713,87 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "freshness": "static",
                 "source": {"label": "Aave", "url": "https://aave.com"},
                 "capturedAt": "2026-06-08",
+            },
+            {
+                "key": "scale",
+                "value": (
+                    "TVL grew from about $32B in early 2025 to a record of roughly $73.9B in "
+                    "October 2025, settling around $25-42B in 2026 amid market moves; "
+                    "consistently the largest DeFi protocol by TVL."
+                ),
+                "freshness": "semi-live",
+                "source": {"label": "OAK Research", "url": "https://x.com/OAK_Res_EN/status/1975112021474423060"},
+                "capturedAt": "2026-07-11",
+            },
+            {
+                "key": "marketShare",
+                "value": (
+                    "Roughly 59-65% of DeFi lending active-loan market share, more than all "
+                    "tracked competitors combined (Morpho, Spark, Compound, Kamino, Venus)."
+                ),
+                "freshness": "semi-live",
+                "source": {"label": "CryptoSlate", "url": "https://cryptoslate.com/aave-active-loans-hit-record-30-5b-commanding-65-of-defi-lending-market/"},
+                "capturedAt": "2026-07-11",
+            },
+            {
+                "key": "cumulativeLoans",
+                "value": (
+                    "First DeFi protocol to cross $1 trillion in cumulative loan originations "
+                    "(February 25, 2026); about $3.33T in cumulative deposits since 2020."
+                ),
+                "freshness": "static",
+                "source": {"label": "CoinMarketCap", "url": "https://coinmarketcap.com/academy/article/aave-crosses-dollar1t-in-lending-volume-with-institutional-push"},
+                "capturedAt": "2026-07-11",
+            },
+            {
+                "key": "revenue",
+                "value": (
+                    "2025 protocol revenue was $141.8M, with rolling 365-day revenue around "
+                    "$142.9M; annualized fees ran about $549M as of April 2026."
+                ),
+                "freshness": "semi-live",
+                "source": {"label": "ACI Full Transparency Report", "url": "https://governance.aave.com/t/aci-full-transparency-report/24085"},
+                "capturedAt": "2026-07-11",
+            },
+            {
+                "key": "buybackProgress",
+                "value": (
+                    "The Aavenomics buyback (launched April 9, 2025) had acquired more than "
+                    "205,000 AAVE, about 1.28% of supply, by April 2026."
+                ),
+                "freshness": "semi-live",
+                "source": {"label": "CoinStats", "url": "https://coinstats.app/ai/a/investment-analysis-aave"},
+                "capturedAt": "2026-07-11",
+            },
+            {
+                "key": "chainConcentration",
+                "value": (
+                    "Ethereum accounts for roughly 80%+ of TVL, loans, fees, and revenue; the "
+                    "largest non-Ethereum chains are Plasma (about 9-10%), Base, and Arbitrum One."
+                ),
+                "freshness": "semi-live",
+                "source": {"label": "Token Terminal", "url": "https://x.com/tokenterminal/status/2030984957393359050"},
+                "capturedAt": "2026-07-11",
+            },
+            {
+                "key": "institutional",
+                "value": (
+                    "Secured a SOC 2 Type II attestation in 2026, appears on asset-manager "
+                    "approved-counterparty lists, and runs the Horizon RWA market."
+                ),
+                "freshness": "static",
+                "source": {"label": "BlockEden", "url": "https://blockeden.xyz/blog/2026/01/21/aave-v4-defi-lending-dominance-sec-investigation-revenue-sharing/"},
+                "capturedAt": "2026-07-11",
+            },
+            {
+                "key": "umbrella",
+                "value": (
+                    "Umbrella went live June 5, 2025; each vault is an ERC-4626 strategy "
+                    "staking aUSDC, aUSDT, aETH, or GHO, with the backstop cited around $246.6M."
+                ),
+                "freshness": "static",
+                "source": {"label": "Blockworks", "url": "https://blockworks.com/news/umbrella-reshapes-aave-staking"},
+                "capturedAt": "2026-07-11",
             },
         ],
         "tokenomics": {

@@ -22,10 +22,6 @@ export default async function NetworksPage() {
     0,
   );
   const totalCoins = profiles.reduce((sum, p) => sum + p.memberCoins.length, 0);
-  const totalFees24h = profiles.reduce(
-    (sum, p) => sum + (p.protocolFeesRevenue?.fees24hUsd ?? 0),
-    0,
-  );
 
   return (
     <div className="container space-y-8 py-12">
@@ -44,24 +40,16 @@ export default async function NetworksPage() {
         }
       />
 
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard
           label="Aggregate TVL"
           value={formatUsdCompact(aggregateTvl)}
           hint="Across networks"
-          source="Store"
-        />
-        <StatCard
-          label="Fees paid (24h)"
-          value={totalFees24h > 0 ? formatUsdCompact(totalFees24h) : "—"}
-          hint="Mapped DeFi Llama protocols"
-          source="DeFi Llama"
         />
         <StatCard
           label="Networks tracked"
           value={`${profiles.length}`}
           hint="In the live store"
-          source="Store"
         />
         <StatCard
           label="Grouped coins"

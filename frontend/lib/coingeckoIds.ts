@@ -365,7 +365,8 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   bitget: null,
   stably: null,
   "gmo-trust": null,
-  agora: null,
+  // AUSD itself — surfaces issuer market cap / volume on the networks listing.
+  agora: "agora-dollar",
   cap: null,
   anzen: null,
   falcon: null,

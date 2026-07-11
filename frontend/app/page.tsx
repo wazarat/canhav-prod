@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Network } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { CategoryGrid } from "@/components/CategoryGrid";
-import { Badge } from "@/components/ui/Badge";
+import { HeroVideo } from "@/components/home/HeroVideo";
 import { Button } from "@/components/ui/Button";
 import { StatCard } from "@/components/ui/StatCard";
 import {
@@ -11,7 +11,6 @@ import {
   getAllRwas,
   getAllStablecoins,
   getAllTokens,
-  getApprovedNetworks,
   getApprovedStablecoins,
   pegDeviationBps,
 } from "@/lib/data";
@@ -20,17 +19,14 @@ import { formatUsdCompact } from "@/lib/utils";
 export const revalidate = 300;
 
 export default async function DashboardPage() {
-  const [approved, allStablecoins, allRwas, allNetworks, allTokens, approvedNetworks] =
-    await Promise.all([
-      getApprovedStablecoins(),
-      getAllStablecoins(),
-      getAllRwas(),
-      getAllNetworks(),
-      getAllTokens(),
-      getApprovedNetworks(),
-    ]);
+  const [approved, allStablecoins, allRwas, allNetworks, allTokens] = await Promise.all([
+    getApprovedStablecoins(),
+    getAllStablecoins(),
+    getAllRwas(),
+    getAllNetworks(),
+    getAllTokens(),
+  ]);
   const activeCategories = CATEGORIES.filter((c) => c.status === "active").length;
-  const featuredNetwork = approvedNetworks[0] ?? null;
 
   const trackedBySlug: Record<string, number> = {
     networks: allNetworks.length,
@@ -52,89 +48,81 @@ export default async function DashboardPage() {
       : null;
 
   return (
-    <div className="container space-y-16 py-14 md:py-20">
-      {/* Hero */}
-      <section className="max-w-3xl space-y-6 animate-fade-in-up">
-        <span className="inline-flex items-center gap-2 rounded-full border border-ink-800 bg-ink-900/60 px-3 py-1 text-xs font-medium text-ink-300">
-          <span className="h-1.5 w-1.5 rounded-full bg-electric-500" />
-          Arbitrum Ecosystem Intelligence
-        </span>
-        <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight text-ink-50 md:text-5xl">
-          A capital-markets terminal for the{" "}
-          <span className="text-gradient-brand">DeFi ecosystem</span>.
-        </h1>
-        <p className="text-lg text-ink-300">
-          Research-grade taxonomy and datasets across stablecoins, RWAs, networks, tokens, credit,
-          perpetuals and more, published as soon as data is ingested and synced.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <Button asChild>
-            <Link href="/networks">
-              Explore networks
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild variant="secondary">
-            <Link href="/stablecoins">
-              Explore stablecoins
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
+    <div>
+      {/* Hero: full-bleed muted background video */}
+      <section className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#3c72ab]">
+        <HeroVideo src="/hero-video.mp4" />
+
+        {/* scrims: darken top (for nav edge) + left (for hero copy) + fade into page bg */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[1]"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(6,14,26,0.80) 0%, rgba(6,14,26,0.32) 20%, rgba(6,14,26,0) 40%)",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[1]"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(6,14,26,0.74) 0%, rgba(6,14,26,0.42) 34%, rgba(6,14,26,0) 62%)",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 left-0 right-0 z-[1] h-44"
+          style={{
+            background: "linear-gradient(180deg, rgba(5,6,10,0) 0%, #05060A 100%)",
+          }}
+        />
+
+        <div className="container relative z-[2] flex min-h-[calc(100vh-4rem)] items-center py-16">
+          <div className="max-w-2xl space-y-7 animate-fade-in-up">
+            <h1
+              className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-ink-50 md:text-6xl"
+              style={{ textShadow: "0 2px 20px rgba(4,10,20,0.35)" }}
+            >
+              Where DeFi research gets{" "}
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(120deg,#7cb0ff 0%,#b79bff 50%,#4fe3f5 100%)",
+                }}
+              >
+                real context
+              </span>
+              , beyond on-chain data.
+            </h1>
+            <p
+              className="max-w-xl text-lg leading-relaxed text-ink-50/90 md:text-xl"
+              style={{ textShadow: "0 1px 12px rgba(4,10,20,0.4)" }}
+            >
+              Track what is happening on-chain, understand what is happening off-chain, and
+              connect the dots across protocols, narratives, and external terminals from one
+              place.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              <Button asChild>
+                <Link href="/networks">
+                  Explore networks
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="secondary">
+                <Link href="/stablecoins">
+                  Explore stablecoins
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Featured network */}
-      {featuredNetwork && (
-        <section>
-          <Link href={`/networks/${featuredNetwork.slug}`} className="block">
-            <div className="group glass relative overflow-hidden rounded-2xl border border-neon-500/30 p-6 transition-all duration-200 hover:border-neon-500/60 hover:glow-ring md:p-8">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="max-w-2xl space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="grid h-9 w-9 place-items-center rounded-xl border border-neon-500/30 bg-neon-500/10 text-neon-400">
-                      <Network className="h-5 w-5" />
-                    </span>
-                    <Badge tone="neon">Featured network</Badge>
-                  </div>
-                  <h2 className="font-display text-2xl font-semibold tracking-tight text-ink-50">
-                    {featuredNetwork.name}
-                    <ArrowUpRight className="ml-1 inline h-5 w-5 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neon-400" />
-                  </h2>
-                  <p className="text-sm leading-relaxed text-ink-300">
-                    {featuredNetwork.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {featuredNetwork.memberCoins.map((c) => (
-                      <Badge key={c.slug} tone={c.category === "Token" ? "neon" : "electric"}>
-                        {c.symbol}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-6">
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-ink-300">TVL</p>
-                    <p className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink-50">
-                      {formatUsdCompact(featuredNetwork.currentScale.tvlUsd)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-ink-300">
-                      sUSDai APR
-                    </p>
-                    <p className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink-50">
-                      {featuredNetwork.currentScale.aprPct != null
-                        ? `${featuredNetwork.currentScale.aprPct.toFixed(2)}%`
-                        : "—"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Link>
-        </section>
-      )}
-
+      <div className="container space-y-16 py-14 md:py-20">
       {/* Summary stats */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Active categories" value={`${activeCategories} / ${CATEGORIES.length}`} hint="Stablecoins live; more in progress" />
@@ -161,6 +149,7 @@ export default async function DashboardPage() {
         </div>
         <CategoryGrid categories={categories} />
       </section>
+      </div>
     </div>
   );
 }

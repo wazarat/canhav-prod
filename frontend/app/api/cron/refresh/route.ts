@@ -674,6 +674,60 @@ async function refreshUniversalMetrics(
 }
 
 /**
+ * The universal-metrics pass over every network item: DeFi Llama meta + TVL,
+ * CoinGecko market data, treasury. Shared by the full refresh and the
+ * `?only=universal` fast path (optionally scoped to specific slugs).
+ */
+async function runUniversalMetricsPass(
+  items: Record<string, any>[],
+  persist: (item: Record<string, any>) => Promise<void>,
+  cgCache: CoinGeckoCronCache,
+  onlySlugs?: Set<string>,
+): Promise<{
+  updated: number;
+  results: { slug: string; tvlUsd: number | null; priceUsd: number | null; note: string }[];
+}> {
+  const networkItems = items.filter(
+    (it) =>
+      isNetworkCategory(String(it.Category ?? "")) &&
+      (!onlySlugs || onlySlugs.has(String(it.Slug ?? ""))),
+  );
+  const llamaMetaBySlug = new Map<string, LlamaProtocolMeta | null>();
+  const networkGeckoIds: string[] = [];
+
+  for (const item of networkItems) {
+    const slug = String(item.Slug ?? "");
+    if (!slug) continue;
+    const meta = await fetchLlamaProtocolMeta(slug);
+    llamaMetaBySlug.set(slug, meta);
+    const geckoId = meta?.geckoId ?? coinIdForNetworkSlug(slug);
+    if (geckoId) networkGeckoIds.push(geckoId);
+  }
+
+  await cgCache.prefetchMarkets(networkGeckoIds);
+
+  let updated = 0;
+  const results: { slug: string; tvlUsd: number | null; priceUsd: number | null; note: string }[] =
+    [];
+  for (const item of networkItems) {
+    const slug = String(item.Slug ?? "");
+    if (!slug) continue;
+    const res = await refreshUniversalMetrics(item, slug, {
+      meta: llamaMetaBySlug.get(slug) ?? null,
+      cgCache,
+      feesGithub: item.GitHub ? String(item.GitHub) : null,
+    });
+    if (res.wrote) {
+      item.UpdatedAt = nowIso();
+      await persist(item);
+      updated += 1;
+    }
+    results.push({ slug, tvlUsd: res.tvlUsd, priceUsd: res.priceUsd, note: res.note });
+  }
+  return { updated, results };
+}
+
+/**
  * DeFi Llama enrichment for a stablecoin item. Runs whether or not an Arbitrum
  * address resolved (this is the recovery path for unlisted coins). Writes:
  * peg history, cross-chain distribution, issuance metadata, and a circulating
@@ -1309,6 +1363,36 @@ export async function GET(req: Request): Promise<NextResponse> {
     });
   }
 
+  // Fast path: refresh ONLY the universal Tier-1 metrics (DeFi Llama TVL +
+  // CoinGecko market data) for network entities, optionally scoped via
+  // `&slugs=a,b,c`. Completes in a couple of minutes — used to backfill the
+  // headline TVL / mkt cap / volume after a store patch clobbers them.
+  if (url.searchParams.get("only") === "universal") {
+    const slugsParam = url.searchParams.get("slugs");
+    const onlySlugs = slugsParam
+      ? new Set(
+          slugsParam
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        )
+      : undefined;
+    const cgCache = new CoinGeckoCronCache();
+    const r = await runUniversalMetricsPass(items, persist, cgCache, onlySlugs);
+    if (localWriter) localWriter.flush();
+    revalidateTag(STORE_CACHE_TAG);
+    revalidatePath("/");
+    revalidatePath("/networks");
+    revalidatePath("/networks/[slug]", "page");
+    return NextResponse.json({
+      ok: true,
+      backend: local ? "local" : "upstash",
+      mode: "universal-only",
+      updated: r.updated,
+      networks: r.results,
+    });
+  }
+
   // Accumulators hoisted above the try so the top-level catch can report partial
   // progress if a mid-run throw escapes fetchJson's soft-fail (e.g. Next's cache
   // machinery choking on a multi-MB payload).
@@ -1911,41 +1995,9 @@ export async function GET(req: Request): Promise<NextResponse> {
 
   // --- Universal metrics: consistent Tier-1 block for EVERY network ----------
   const networkItems = items.filter((it) => isNetworkCategory(String(it.Category ?? "")));
-  const llamaMetaBySlug = new Map<string, LlamaProtocolMeta | null>();
-  const networkGeckoIds: string[] = [];
-
-  for (const item of networkItems) {
-    const slug = String(item.Slug ?? "");
-    if (!slug) continue;
-    const meta = await fetchLlamaProtocolMeta(slug);
-    llamaMetaBySlug.set(slug, meta);
-    const geckoId = meta?.geckoId ?? coinIdForNetworkSlug(slug);
-    if (geckoId) networkGeckoIds.push(geckoId);
-  }
-
-  await cgCache.prefetchMarkets(networkGeckoIds);
-
-  const universalResults: {
-    slug: string;
-    tvlUsd: number | null;
-    priceUsd: number | null;
-    note: string;
-  }[] = [];
-  for (const item of networkItems) {
-    const slug = String(item.Slug ?? "");
-    if (!slug) continue;
-    const res = await refreshUniversalMetrics(item, slug, {
-      meta: llamaMetaBySlug.get(slug) ?? null,
-      cgCache,
-      feesGithub: item.GitHub ? String(item.GitHub) : null,
-    });
-    if (res.wrote) {
-      item.UpdatedAt = nowIso();
-      await persist(item);
-      updated += 1;
-    }
-    universalResults.push({ slug, tvlUsd: res.tvlUsd, priceUsd: res.priceUsd, note: res.note });
-  }
+  const universalPass = await runUniversalMetricsPass(items, persist, cgCache);
+  updated += universalPass.updated;
+  const universalResults = universalPass.results;
 
   const sectorAggregateResults = await refreshSectorAggregates(items, persist);
 

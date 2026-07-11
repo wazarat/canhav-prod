@@ -40,10 +40,13 @@ export async function TradeDesk({
   agentId,
   config,
   isOwner,
+  defaultAsset,
 }: {
   agentId: string;
   config: AgentConfig | null | undefined;
   isOwner: boolean;
+  /** Optional coin symbol to preselect in the proposal form (e.g. from a ?asset= param). */
+  defaultAsset?: string;
 }) {
   const now = Date.now();
   const [coins, allowlist] = await Promise.all([
@@ -302,6 +305,7 @@ export async function TradeDesk({
               maxSizeUsd={maxSizeUsdHuman}
               maxLeverage={MAX_LEVERAGE}
               hitlMethod={cfg.tradeHitlMethod}
+              defaultAsset={defaultAsset}
             />
           </>
         ) : (

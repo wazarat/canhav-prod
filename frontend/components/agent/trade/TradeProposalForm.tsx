@@ -39,16 +39,25 @@ export function TradeProposalForm({
   maxSizeUsd,
   maxLeverage,
   hitlMethod,
+  defaultAsset,
 }: {
   agentId: string;
   coins: { symbol: string; gateOpen: boolean }[];
   maxSizeUsd: number;
   maxLeverage: number;
   hitlMethod: TradeHitlMethod;
+  /** Preselects this coin when it is in `coins` (blocked gates still preselect; the server re-enforces). */
+  defaultAsset?: string;
 }) {
   const router = useRouter();
   const { wallets } = useWallets();
-  const [asset, setAsset] = useState(coins.find((c) => c.gateOpen)?.symbol ?? coins[0]?.symbol ?? "");
+  const [asset, setAsset] = useState(
+    () =>
+      coins.find((c) => c.symbol.toLowerCase() === defaultAsset?.toLowerCase())?.symbol ??
+      coins.find((c) => c.gateOpen)?.symbol ??
+      coins[0]?.symbol ??
+      "",
+  );
   const [side, setSide] = useState<"long" | "short">("long");
   const [sizeUsd, setSizeUsd] = useState(10);
   const [leverage, setLeverage] = useState(1);

@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { href: "/rwas", label: "RWAs" },
   { href: "/tokens", label: "Tokens" },
   { href: "/agents", label: "Agents" },
+  { href: "/agents/trade", label: "Trade" },
 ];
 
 export function Nav() {

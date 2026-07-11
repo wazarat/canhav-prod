@@ -20,11 +20,13 @@ import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { TokenomicsCard } from "@/components/shared/TokenomicsCard";
 import { UnlistedMarketNotice } from "@/components/shared/UnlistedMarketNotice";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGridSkeleton } from "@/components/ui/Skeletons";
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
 import { agentConfigStatus } from "@/lib/agent/config";
+import { getTradeCoin } from "@/lib/agent/trade/coins";
 import { getApprovedTokenBySlug, getNetworkBySlug } from "@/lib/data";
 import { deriveSecurityStatus } from "@/lib/security";
 
@@ -50,10 +52,20 @@ export default async function TokenProfilePage({ params }: PageProps) {
 
   const entity = profile.entitySlug ? await getNetworkBySlug(profile.entitySlug) : null;
   const agentStatus = agentConfigStatus();
+  // Tradability is keyed on the SYMBOL (ETH/BTC): TRADE_COINS entitySlugs are
+  // "ethereum"/"bitcoin" while these token pages live at /tokens/eth|btc.
+  const tradeCoin = getTradeCoin(profile.symbol);
 
   return (
     <div className="container space-y-8 py-12">
       <PageHeader
+        actions={
+          tradeCoin ? (
+            <Button asChild size="sm">
+              <Link href={`/agents/trade?asset=${tradeCoin.symbol}`}>Trade {tradeCoin.symbol}</Link>
+            </Button>
+          ) : undefined
+        }
         breadcrumbs={[
           { label: "Dashboard", href: "/" },
           { label: "Tokens", href: "/tokens" },

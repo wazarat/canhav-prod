@@ -968,6 +968,52 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 ),
             },
         ],
+        # A1 sample entries proving the dependencies/incidents pipeline; A2
+        # completes the full sourced set.
+        "dependencies": [
+            {
+                "name": "Chainlink price feeds",
+                "kind": "oracle",
+                "slug": None,
+                "severity": "high",
+                "description": (
+                    "Aave prices collateral through Chainlink feeds combined with "
+                    "exchange-rate adapters for staked assets; stale or manipulated "
+                    "feeds would impair liquidations and collateral valuation."
+                ),
+                "link": "https://aave.com/docs",
+            },
+            {
+                "name": "Kelp DAO (rsETH)",
+                "kind": "collateral-issuer",
+                "slug": "kelp-dao",
+                "coins": ["rsETH"],
+                "severity": "medium",
+                "description": (
+                    "rsETH is accepted as ETH-correlated collateral, so Kelp DAO "
+                    "restaking and peg integrity feed directly into Aave collateral "
+                    "quality."
+                ),
+                "link": None,
+            },
+        ],
+        "incidents": [
+            {
+                "date": "2024-04",
+                "title": "Renzo ezETH depeg",
+                "severity": "medium",
+                "affectedCoins": ["ezETH"],
+                "via": "collateral depeg",
+                "description": (
+                    "ezETH briefly traded near $700 on Uniswap after Renzo released "
+                    "REZ tokenomics, liquidating over $56M of looped positions on "
+                    "Morpho and Gearbox. Aave's exchange-rate oracle valued ezETH at "
+                    "its redemption rate, so on Aave only highly leveraged loopers "
+                    "were affected."
+                ),
+                "link": "https://www.dlnews.com/articles/defi/renzos-ezeth-loses-ether-peg-drops-79-in-under-one-hour/",
+            },
+        ],
         "events": [
             {
                 "date": "2026-03",

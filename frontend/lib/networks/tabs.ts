@@ -110,7 +110,12 @@ function hasAssetCoverageContent(profile: NetworkProfile): boolean {
 }
 
 function hasRisksContent(profile: NetworkProfile): boolean {
-  return (profile.typedRisks?.length ?? 0) > 0 || profile.risks.length > 0;
+  return (
+    (profile.typedRisks?.length ?? 0) > 0 ||
+    profile.risks.length > 0 ||
+    (profile.dependencies?.length ?? 0) > 0 ||
+    (profile.incidents?.length ?? 0) > 0
+  );
 }
 
 /** Tabs visible for this network profile (always includes overview + agent-skills). */

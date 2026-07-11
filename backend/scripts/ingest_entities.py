@@ -1486,6 +1486,8 @@ def build_entity_item(
         "Market": spec.get("market"),
         "PriceHistory": spec.get("price_history"),
         "TypedRisks": spec.get("typed_risks"),
+        "Dependencies": spec.get("dependencies"),
+        "Incidents": spec.get("incidents"),
         "Audits": spec.get("audits"),
         "Sources": spec.get("sources"),
         "AgentSkill": spec.get("agent_skill"),

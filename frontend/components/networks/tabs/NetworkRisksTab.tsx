@@ -1,3 +1,7 @@
+import {
+  ContagionHistorySection,
+  DependenciesSection,
+} from "@/components/networks/DependencySections";
 import { RisksSection } from "@/components/networks/NetworkSections";
 import { TypedRiskList } from "@/components/shared/TypedRiskList";
 import type { NetworkProfile } from "@/lib/types";
@@ -10,6 +14,8 @@ export function NetworkRisksTab({ profile }: { profile: NetworkProfile }) {
       ) : (
         <RisksSection risks={profile.risks} />
       )}
+      <DependenciesSection dependencies={profile.dependencies} />
+      <ContagionHistorySection incidents={profile.incidents} />
     </div>
   );
 }

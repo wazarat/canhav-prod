@@ -435,6 +435,40 @@ export interface TypedRisk {
   description: string;
 }
 
+/**
+ * External protocol/infrastructure this network depends on (oracles, collateral
+ * issuers, bridges, backstops). `kind` is a free string like `TypedRisk.category`;
+ * suggested vocab: "oracle" | "collateral-issuer" | "stablecoin-issuer" | "bridge" |
+ * "vault-partner" | "backstop".
+ */
+export interface NetworkDependency {
+  name: string;
+  kind: string;
+  /** Platform entity slug when the dependency is covered here (cross-link), else null. */
+  slug?: string | null;
+  /** Symbols this dependency touches (e.g. wstETH, weETH, ezETH). */
+  coins?: string[];
+  severity?: RiskSeverity;
+  description: string;
+  link?: string | null;
+}
+
+/**
+ * Dated contagion/incident event rendered on the Risks tab (distinct from the
+ * legacy `events` array, which the Research tab supersedes with `timeline`).
+ */
+export interface IncidentEvent {
+  date: string;
+  title: string;
+  description: string;
+  severity?: RiskSeverity;
+  /** Symbols affected (e.g. ["rsETH", "AAVE"]). */
+  affectedCoins?: string[];
+  /** Transmission channel: "oracle", "collateral depeg", ... (free string). */
+  via?: string;
+  link?: string | null;
+}
+
 export interface SourceRef {
   label: string;
   url: string;
@@ -776,6 +810,8 @@ export interface TokenProfile {
   /** DEX trading volume when this token is a DEX governance token (DeFi Llama). */
   dexVolume?: DexVolume | null;
   typedRisks?: TypedRisk[];
+  dependencies?: NetworkDependency[];
+  incidents?: IncidentEvent[];
   tokenomics?: Tokenomics;
   audits?: { firm: string; date: string; url: string | null }[];
   sources?: SourceRef[];
@@ -2521,6 +2557,10 @@ export interface NetworkProfile {
   priceHistory?: PriceHistory;
   tokenomics?: Tokenomics;
   typedRisks?: TypedRisk[];
+  /** External dependencies (oracles, collateral issuers, bridges) — Risks tab. */
+  dependencies?: NetworkDependency[];
+  /** Dated contagion/incident history — Risks tab. */
+  incidents?: IncidentEvent[];
   audits?: { firm: string; date: string; url: string | null }[];
   sources?: SourceRef[];
   /** Curated off-chain facts (reg status, ratings, org structure) with provenance. */

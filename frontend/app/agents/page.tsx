@@ -122,6 +122,12 @@ export default async function AgentsPage({
             Agent <span className="text-gradient-brand">Lab</span>
           </h1>
           <Badge tone="signal">Arbitrum</Badge>
+          <Link
+            href="/contracts"
+            className="inline-flex items-center whitespace-nowrap rounded-full border border-ink-700/80 bg-ink-900/60 px-2.5 py-0.5 text-xs font-medium text-ink-300 transition-colors hover:border-ink-500 hover:text-ink-50"
+          >
+            Contracts &amp; stack
+          </Link>
           {session && collabEnabled() && <WalletBalanceChip />}
         </div>
         <p className="max-w-2xl text-sm leading-relaxed text-ink-300">

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Logo } from "@/components/ui/Logo";
 
 export function Footer() {
@@ -12,7 +14,12 @@ export function Footer() {
           </p>
         </div>
         <div className="text-xs text-ink-500">
-          <p>Data: Arbitrum Portal · Alchemy · Dune (free tier).</p>
+          <p>
+            <Link href="/contracts" className="transition-colors hover:text-ink-200">
+              Contracts &amp; stack
+            </Link>
+          </p>
+          <p className="mt-1">Data: Arbitrum Portal · Alchemy · Dune (free tier).</p>
           <p className="mt-1">
             © {new Date().getFullYear()} CanHav. Research preview, not financial advice.
           </p>

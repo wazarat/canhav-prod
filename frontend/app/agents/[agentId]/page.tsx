@@ -18,7 +18,9 @@ import { DunePublishPanel } from "@/components/agent/DunePublishPanel";
 import { PublishAgentCard } from "@/components/agent/PublishAgentCard";
 import { SkillShelf } from "@/components/agent/SkillShelf";
 import { TrainingChecklist } from "@/components/agent/detail/TrainingChecklist";
+import { CardRailsSection } from "@/components/agent/trade/rails/CardRailsSection";
 import { TradeDesk } from "@/components/agent/trade/TradeDesk";
+import { getTradeCoinsForAgent } from "@/lib/agent/trade/coins";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { SectionNav, type SectionNavItem } from "@/components/ui/SectionNav";
@@ -291,26 +293,31 @@ export default async function AgentHomePage({
       )}
 
       {activeTab === "desk" && (
-        <div className={isOwner ? "grid gap-6 lg:grid-cols-2" : "max-w-2xl"}>
-          <TradeDesk
-            agentId={agentId}
-            config={profile.config}
-            isOwner={isOwner}
-            skillId={profile.skillId}
-          />
-          {isOwner && (
-            <div className="space-y-6">
-              <ProposedTradesPanel agentId={agentId} />
-              {openProposals === 0 && (
-                <Card className="space-y-2">
-                  <CardTitle>No open proposals</CardTitle>
-                  <CardDescription>
-                    Proposals show up here for review. File one from the desk, or ask the agent
-                    in its research chat.
-                  </CardDescription>
-                </Card>
-              )}
-            </div>
+        <div className="space-y-6">
+          <div className={isOwner ? "grid gap-6 lg:grid-cols-2" : "max-w-2xl"}>
+            <TradeDesk
+              agentId={agentId}
+              config={profile.config}
+              isOwner={isOwner}
+              skillId={profile.skillId}
+            />
+            {isOwner && (
+              <div className="space-y-6">
+                <ProposedTradesPanel agentId={agentId} />
+                {openProposals === 0 && (
+                  <Card className="space-y-2">
+                    <CardTitle>No open proposals</CardTitle>
+                    <CardDescription>
+                      Proposals show up here for review. File one from the desk, or ask the agent
+                      in its research chat.
+                    </CardDescription>
+                  </Card>
+                )}
+              </div>
+            )}
+          </div>
+          {getTradeCoinsForAgent(profile.skillId).some((c) => c.symbol === "AAVE") && (
+            <CardRailsSection />
           )}
         </div>
       )}

@@ -347,62 +347,72 @@ export function CardRailsPanel({ live }: { live: RailLiveInputs | null }) {
         here are session-only.
       </p>
 
-      {families.map((family) => {
-        const familyRails = RAILS.filter((r) => r.family === family);
-        const body = (
-          <div className="space-y-2">
-            {familyRails.map((rail) => (
-              <RailCard
-                key={rail.id}
-                rail={rail}
-                state={state[rail.id]}
-                onToggle={() => toggle(rail.id)}
-                onValue={(v) => setValue(rail.id, v)}
-                live={live}
+      {/* Rails left, backtest right: moving a threshold updates the fired /
+          suppressed calls next to it instead of below the fold. */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="space-y-3">
+          {families.map((family) => {
+            const familyRails = RAILS.filter((r) => r.family === family);
+            const body = (
+              <div className="space-y-2">
+                {familyRails.map((rail) => (
+                  <RailCard
+                    key={rail.id}
+                    rail={rail}
+                    state={state[rail.id]}
+                    onToggle={() => toggle(rail.id)}
+                    onValue={(v) => setValue(rail.id, v)}
+                    live={live}
+                  />
+                ))}
+              </div>
+            );
+            if (openFamilies.has(family)) {
+              return (
+                <div key={family} className="space-y-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-500">
+                    {FAMILY_LABELS[family]}
+                  </p>
+                  {body}
+                </div>
+              );
+            }
+            return (
+              <details key={family} className="group space-y-2">
+                <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-wider text-ink-500 transition-colors hover:text-ink-300">
+                  <span className="mr-1 inline-block transition-transform group-open:rotate-90">
+                    ›
+                  </span>
+                  {FAMILY_LABELS[family]}{" "}
+                  <span className="font-mono text-[10px] normal-case text-ink-600">
+                    {familyRails.length} rails
+                  </span>
+                </summary>
+                <div className="mt-2">{body}</div>
+              </details>
+            );
+          })}
+        </div>
+
+        <div className="self-start rounded-xl border border-ink-800/60 bg-ink-950/40 lg:sticky lg:top-24">
+          <div className="flex flex-wrap items-center gap-2 border-b border-ink-800/60 px-4 py-3">
+            <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-400">
+              <History className="h-3.5 w-3.5" /> Backtest
+            </p>
+            <span className="tabular font-mono text-xs text-ink-200">
+              {caught} of {total}{" "}
+              <span className="text-ink-400">historical events caught at current settings</span>
+            </span>
+          </div>
+          <div className="divide-y divide-ink-800/60">
+            {results.map((result, i) => (
+              <EventRow
+                key={result.event.id}
+                result={result}
+                defaultResult={DEFAULT_RESULTS[i]}
               />
             ))}
           </div>
-        );
-        if (openFamilies.has(family)) {
-          return (
-            <div key={family} className="space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-500">
-                {FAMILY_LABELS[family]}
-              </p>
-              {body}
-            </div>
-          );
-        }
-        return (
-          <details key={family} className="group space-y-2">
-            <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-wider text-ink-500 transition-colors hover:text-ink-300">
-              <span className="mr-1 inline-block transition-transform group-open:rotate-90">
-                ›
-              </span>
-              {FAMILY_LABELS[family]}{" "}
-              <span className="font-mono text-[10px] normal-case text-ink-600">
-                {familyRails.length} rails
-              </span>
-            </summary>
-            <div className="mt-2">{body}</div>
-          </details>
-        );
-      })}
-
-      <div className="rounded-xl border border-ink-800/60 bg-ink-950/40">
-        <div className="flex flex-wrap items-center gap-2 border-b border-ink-800/60 px-4 py-3">
-          <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-400">
-            <History className="h-3.5 w-3.5" /> Backtest
-          </p>
-          <span className="tabular font-mono text-xs text-ink-200">
-            {caught} of {total}{" "}
-            <span className="text-ink-400">historical events caught at current settings</span>
-          </span>
-        </div>
-        <div className="divide-y divide-ink-800/60">
-          {results.map((result, i) => (
-            <EventRow key={result.event.id} result={result} defaultResult={DEFAULT_RESULTS[i]} />
-          ))}
         </div>
       </div>
 

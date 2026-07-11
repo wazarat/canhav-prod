@@ -2,10 +2,6 @@ import Link from "next/link";
 import { ExternalLink, Gauge, ShieldCheck, ShieldX, Wallet } from "lucide-react";
 
 import { EncryptedCapsCard } from "@/components/agent/trade/EncryptedCapsCard";
-import {
-  CardRailsPanel,
-  type RailLiveInputs,
-} from "@/components/agent/trade/rails/CardRailsPanel";
 import { TradeModeSelector } from "@/components/agent/trade/TradeModeSelector";
 import { TradeProposalForm } from "@/components/agent/trade/TradeProposalForm";
 import { Badge } from "@/components/ui/Badge";
@@ -21,8 +17,6 @@ import {
 } from "@/lib/agent/trade/gateStatus";
 import { MAX_LEVERAGE, MAX_SIZE_USD } from "@/lib/agent/trade/gmx";
 import { getSession } from "@/lib/auth/session";
-import { fetchReserveRatesForSlug } from "@/lib/server/aave";
-import { resolveCoin } from "@/lib/server/coingecko";
 import { collabEnabled } from "@/lib/collab-flag";
 import { fheEnabled } from "@/lib/fhe-flag";
 import { getUserProfile } from "@/lib/auth/users";
@@ -63,11 +57,7 @@ export async function TradeDesk({
   // A desk with no executable coin (skill token without a GMX Sepolia market)
   // is recommendation-only: no fills, so no GMX allowlist/funding concerns.
   const deskExecutable = deskCoins.some((c) => c.executable);
-  // The card-rails panel is AAVE-desk only; its live readings (reserve
-  // utilization + AAVE market data) all fail soft to null so the panel's
-  // sliders and backtest work even fully offline.
-  const isAaveDesk = deskCoins.some((c) => c.symbol === "AAVE");
-  const [coins, allowlist, railReserves, railMarket] = await Promise.all([
+  const [coins, allowlist] = await Promise.all([
     Promise.all(
       deskCoins.map(async (coin) => {
         const verdict = await getCombinedVerdict(coin.symbol);
@@ -86,30 +76,7 @@ export async function TradeDesk({
       }),
     ),
     deskExecutable ? readAllowlistStatus() : Promise.resolve(null),
-    isAaveDesk
-      ? Promise.all(["aweth", "ausdc", "ausdt", "gho"].map(fetchReserveRatesForSlug)).catch(
-          () => null,
-        )
-      : Promise.resolve(null),
-    isAaveDesk ? resolveCoin("aave", 60).catch(() => null) : Promise.resolve(null),
   ]);
-
-  // Surface the most stressed reserve next to the utilization rails.
-  let railLive: RailLiveInputs | null = null;
-  if (isAaveDesk) {
-    const hottest = (railReserves ?? [])
-      .filter(
-        (r): r is NonNullable<typeof r> & { utilizationPct: number } =>
-          r != null && r.utilizationPct != null,
-      )
-      .sort((a, b) => b.utilizationPct - a.utilizationPct)[0];
-    railLive = {
-      utilizationPct: hottest?.utilizationPct ?? null,
-      utilizationSymbol: hottest?.underlyingSymbol ?? null,
-      change24hPct: railMarket?.change24hPct ?? null,
-      priceUsd: railMarket?.priceUsd ?? null,
-    };
-  }
 
   const cfg = sanitizeAgentConfig(config ?? {});
   const maxSizeUsdHuman = Number(MAX_SIZE_USD / 10n ** 30n);
@@ -332,8 +299,6 @@ export async function TradeDesk({
             )}
           </ul>
         </div>
-
-        {isAaveDesk && <CardRailsPanel live={railLive} />}
 
         {isOwner ? (
           <>

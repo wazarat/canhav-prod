@@ -20,6 +20,7 @@ import { SkillShelf } from "@/components/agent/SkillShelf";
 import { TrainingChecklist } from "@/components/agent/detail/TrainingChecklist";
 import { TradeDesk } from "@/components/agent/trade/TradeDesk";
 import { Badge } from "@/components/ui/Badge";
+import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { SectionNav, type SectionNavItem } from "@/components/ui/SectionNav";
 import { TabBar } from "@/components/ui/TabBar";
 import { TabHashRedirect } from "@/components/ui/TabHashRedirect";
@@ -92,15 +93,18 @@ export default async function AgentHomePage({
   const activeTab = resolveAgentTab(searchParams.tab, { isOwner });
   const basePath = `/agents/${encodeURIComponent(agentId)}`;
 
-  // Pending-proposal count badges the Trade tab on every tab, so it is
-  // computed here rather than in ProposedTradesPanel (trade tab only).
+  // Pending-proposal count badges the Trade desk tab on every tab, so it is
+  // computed here rather than in ProposedTradesPanel (desk tab only).
   // ProposalNotifier keeps it fresh via router.refresh().
   const agentCfg = sanitizeAgentConfig(profile.config ?? {});
-  const pendingProposals = isOwner
-    ? (await listTradeProposals(agentId)).filter((p) => p.status === "proposed").length
-    : 0;
+  const proposals = isOwner ? await listTradeProposals(agentId) : [];
+  const pendingProposals = proposals.filter((p) => p.status === "proposed").length;
+  // Feed rows on the desk tab (proposed + executed) — drives its empty state.
+  const openProposals = proposals.filter(
+    (p) => p.status === "proposed" || p.status === "executed",
+  ).length;
   const tabs = buildAgentTabs({ isOwner }).map((tab) =>
-    tab.id === "trade" && pendingProposals > 0 ? { ...tab, badge: pendingProposals } : tab,
+    tab.id === "desk" && pendingProposals > 0 ? { ...tab, badge: pendingProposals } : tab,
   );
 
   // Enrichment counts feed the level badge for everyone (and the Train tab's
@@ -265,7 +269,7 @@ export default async function AgentHomePage({
         <ProposalNotifier
           agentId={agentId}
           hitlMethod={agentCfg.tradeHitlMethod}
-          basePath={basePath}
+          basePath={`${basePath}?tab=desk`}
         />
       )}
 
@@ -274,21 +278,35 @@ export default async function AgentHomePage({
       )}
 
       {activeTab === "trade" && (
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
-            {hasVerdictLoop && (
-              <div id="panel-verdicts" className="scroll-mt-32">
-                <VerdictFeed agentId={agentId} />
-              </div>
-            )}
-            {isOwner && <ProposedTradesPanel agentId={agentId} />}
-            <div id="panel-chat" className="scroll-mt-32">
-              <AgentLabPanel agentId={agentId} llmConfigured={status.llm} />
+        <div className="space-y-6">
+          {hasVerdictLoop && (
+            <div id="panel-verdicts" className="scroll-mt-32">
+              <VerdictFeed agentId={agentId} />
             </div>
+          )}
+          <div id="panel-chat" className="scroll-mt-32">
+            <AgentLabPanel agentId={agentId} llmConfigured={status.llm} />
           </div>
-          <div className="space-y-6">
-            <TradeDesk agentId={agentId} config={profile.config} isOwner={isOwner} />
-          </div>
+        </div>
+      )}
+
+      {activeTab === "desk" && (
+        <div className={isOwner ? "grid gap-6 lg:grid-cols-2" : "max-w-2xl"}>
+          <TradeDesk agentId={agentId} config={profile.config} isOwner={isOwner} />
+          {isOwner && (
+            <div className="space-y-6">
+              <ProposedTradesPanel agentId={agentId} />
+              {openProposals === 0 && (
+                <Card className="space-y-2">
+                  <CardTitle>No open proposals</CardTitle>
+                  <CardDescription>
+                    Proposals show up here for review. File one from the desk, or ask the agent
+                    in its research chat.
+                  </CardDescription>
+                </Card>
+              )}
+            </div>
+          )}
         </div>
       )}
 

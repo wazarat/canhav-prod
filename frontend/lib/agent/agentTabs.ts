@@ -4,7 +4,7 @@
  * `?tab=` tabs so only the active tab renders.
  */
 
-export const AGENT_TAB_IDS = ["trade", "train", "publish", "overview"] as const;
+export const AGENT_TAB_IDS = ["trade", "desk", "train", "publish", "overview"] as const;
 
 export type AgentTabId = (typeof AGENT_TAB_IDS)[number];
 
@@ -14,7 +14,8 @@ export interface AgentTabDefinition {
 }
 
 const TAB_LABELS: Record<AgentTabId, string> = {
-  trade: "Trade & research",
+  trade: "Research",
+  desk: "Trade desk",
   train: "Train",
   publish: "Publish",
   overview: "Overview",
@@ -24,7 +25,11 @@ export const DEFAULT_AGENT_TAB: AgentTabId = "trade";
 
 /** Tabs visible for this viewer. Train/Publish are owner editing surfaces. */
 export function buildAgentTabs(opts: { isOwner: boolean }): AgentTabDefinition[] {
-  const tabs: AgentTabDefinition[] = [{ id: "trade", label: TAB_LABELS.trade }];
+  // Desk is public: non-owners see the read-only gate/verdict view there.
+  const tabs: AgentTabDefinition[] = [
+    { id: "trade", label: TAB_LABELS.trade },
+    { id: "desk", label: TAB_LABELS.desk },
+  ];
   if (opts.isOwner) {
     tabs.push({ id: "train", label: TAB_LABELS.train });
     tabs.push({ id: "publish", label: TAB_LABELS.publish });

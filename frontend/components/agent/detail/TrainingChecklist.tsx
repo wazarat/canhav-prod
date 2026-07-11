@@ -57,7 +57,7 @@ export function TrainingChecklist({
       hint: "Pinned metric snapshots the agent loads during research.",
     },
     {
-      // Chat lives on the Trade & research tab — full href so the hash
+      // Chat lives on the Research tab — full href so the hash
       // redirect lands it on the right tab.
       href: `/agents/${encodeURIComponent(agentId)}#panel-chat`,
       label: "Correct it in chat",

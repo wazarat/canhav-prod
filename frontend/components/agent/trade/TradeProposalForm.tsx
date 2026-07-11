@@ -332,7 +332,7 @@ export function TradeProposalForm({
             ? fheEnabled()
               ? "Auto within limits: with encrypted caps set on-chain, the cap check runs on ciphertext (nobody sees the numbers); otherwise caps are checked when you sign. Every trade still needs your wallet signature."
               : "Auto within limits: proposals inside your caps skip the approval click, but you still sign every trade in your wallet."
-            : "The proposal appears in the feed on the left; nothing trades until you approve it and sign."}
+            : "The proposal appears in the proposals feed; nothing trades until you approve it and sign."}
         {fheEnabled() && hitlMethod !== "manual" && (
           <>
             {" "}

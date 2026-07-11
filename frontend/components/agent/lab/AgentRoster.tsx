@@ -20,7 +20,7 @@ export interface AgentChainInfo {
 
 /**
  * "Your agents" roster grouped by project. Each card links to the agent
- * detail page (default tab: Trade & research).
+ * detail page (default tab: Research).
  */
 export function AgentRoster({
   groups,

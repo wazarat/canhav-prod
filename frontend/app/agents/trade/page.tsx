@@ -118,7 +118,7 @@ export default async function TradePage({
                 </Link>
               ))}
             <Link
-              href={`/agents/${encodeURIComponent(agent.agentId)}?tab=trade`}
+              href={`/agents/${encodeURIComponent(agent.agentId)}?tab=desk`}
               className="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium text-ink-400 transition-colors hover:text-ink-50"
             >
               Open {agent.name} →

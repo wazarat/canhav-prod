@@ -29,7 +29,8 @@ function formatAge(ageMs: number | null): string {
 }
 
 /**
- * Guided GMX execution surface on the Trade & research tab, styled as the
+ * Guided GMX execution surface on the agent's Trade desk tab (and the
+ * standalone /agents/trade page), styled as the
  * landing page's terminal window ("mwin" chrome: traffic dots + mono tag).
  * Shows, per supported coin, the research-gate state ("no research, no
  * trade"), and lets the owner file a trade proposal through the exact same

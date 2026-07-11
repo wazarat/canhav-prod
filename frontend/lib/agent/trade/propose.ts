@@ -141,11 +141,11 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
       ? encrypted
         ? onchainCap
           ? onchainCap.within
-            ? "proposed (within caps — verified on ciphertext, auto-approved)"
-            : "proposed (over caps — verified on ciphertext, needs approval)"
-          : "proposed (size encrypted — caps are checked when you sign)"
+            ? "proposed (within caps: verified on ciphertext, auto-approved)"
+            : "proposed (over caps: verified on ciphertext, needs approval)"
+          : "proposed (size encrypted: caps are checked when you sign)"
         : "proposed (auto-executes if within spending cap)"
-      : "proposed — awaiting owner approval";
+      : "proposed, awaiting owner approval";
 
   // Without an on-chain check, ciphertext can't be compared to caps here:
   // auto-execute is off and the cap verdict is deferred to the authoritative

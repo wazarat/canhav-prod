@@ -1816,7 +1816,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             "isLive": True,
             "isArbitrumNative": False,
             "isPubliclyAudited": True,
-            "foundedDate": None,
+            "foundedDate": "2017",
             "logoUrl": None,
             "bannerUrl": None,
             "portalUrl": None,

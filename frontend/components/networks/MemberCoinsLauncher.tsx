@@ -11,7 +11,7 @@ import { categoryBadgeTone } from "@/lib/categoryTone";
 import type { CoinLiveData } from "@/lib/server/coin";
 import { cn, formatPct, formatUsdCompact } from "@/lib/utils";
 
-const PREVIEW_ROWS = 5;
+const PREVIEW_ROWS = 3;
 
 function hasMarketData(coin: CoinLiveData): boolean {
   return coin.market != null && (coin.market.currentPrice != null || coin.market.marketCap != null);

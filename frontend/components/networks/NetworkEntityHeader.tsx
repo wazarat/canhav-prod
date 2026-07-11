@@ -51,9 +51,16 @@ interface NetworkEntityHeaderProps {
   profile: NetworkProfile;
   snapshot: NetworkSnapshot;
   coinCount: number;
+  /** Hide the top-right headline (TVL/price) block — the Overview tab already shows it in stat cards. */
+  hideHeadline?: boolean;
 }
 
-export function NetworkEntityHeader({ profile, snapshot, coinCount }: NetworkEntityHeaderProps) {
+export function NetworkEntityHeader({
+  profile,
+  snapshot,
+  coinCount,
+  hideHeadline = false,
+}: NetworkEntityHeaderProps) {
   const taxonomy = getNetworkTaxonomyBadges(profile);
   const universal = profile.universalMetrics ?? null;
   const scale = profile.currentScale;
@@ -145,22 +152,24 @@ export function NetworkEntityHeader({ profile, snapshot, coinCount }: NetworkEnt
           </div>
 
           <div className="flex shrink-0 flex-col items-start gap-3 lg:items-end">
-            <div className="text-left lg:text-right">
-              <p className="text-xs uppercase tracking-wide text-ink-500">{headlineLabel}</p>
-              <p className="font-display text-3xl font-semibold tracking-tight text-ink-50">
-                {headlineValue}
-              </p>
-              {priceChange24h != null && (
-                <p
-                  className={
-                    priceChange24h >= 0 ? "text-sm text-emerald-400" : "text-sm text-rose-400"
-                  }
-                >
-                  {formatPct(priceChange24h)} 24h
+            {!hideHeadline && (
+              <div className="text-left lg:text-right">
+                <p className="text-xs uppercase tracking-wide text-ink-500">{headlineLabel}</p>
+                <p className="font-display text-3xl font-semibold tracking-tight text-ink-50">
+                  {headlineValue}
                 </p>
-              )}
-              <p className="mt-1 text-[10px] text-ink-500">Latest data · 15 min delay</p>
-            </div>
+                {priceChange24h != null && (
+                  <p
+                    className={
+                      priceChange24h >= 0 ? "text-sm text-emerald-400" : "text-sm text-rose-400"
+                    }
+                  >
+                    {formatPct(priceChange24h)} 24h
+                  </p>
+                )}
+                <p className="mt-1 text-[10px] text-ink-500">Latest data · 15 min delay</p>
+              </div>
+            )}
             <div className="flex flex-wrap gap-2">
               {profile.officialDocs && (
                 <a

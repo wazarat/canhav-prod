@@ -115,6 +115,7 @@ export default async function NetworkProfilePage({ params, searchParams }: PageP
         profile={profile}
         snapshot={dashboardPreview.snapshot}
         coinCount={resolvedCoinCount}
+        hideHeadline={activeTab === "overview"}
       />
 
       <NetworkTabBar slug={profile.slug} activeTab={activeTab} tabs={tabs} />

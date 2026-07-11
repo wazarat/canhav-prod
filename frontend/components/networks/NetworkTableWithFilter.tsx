@@ -40,9 +40,6 @@ export function NetworkTableWithFilter({
   const [category, setCategory] = useState<MemberCoinCategory | "all">("all");
   const [sector, setSector] = useState<string | "all">("all");
   const [tagFilter, setTagFilter] = useState<string | "all">("all");
-  // Non-EVM RWA entities (e.g. Lofty on Algorand) are hidden from default views;
-  // the toggle below reveals them so the data stays reachable.
-  const [includeNonEvm, setIncludeNonEvm] = useState(false);
 
   // Sectors present in the data (e.g. "Credit"), for the taxonomy filter row.
   // Includes secondary (cross-tagged) sectors so multi-sector entities surface
@@ -75,12 +72,6 @@ export function NetworkTableWithFilter({
     return isNonEvmRwa(p);
   }
 
-  // Whether any RWA entity in scope is non-EVM (controls toggle visibility).
-  const hasNonEvmRwa = useMemo(
-    () => profiles.some((p) => matchesSectorFilter(p, "RWA") && matchesNonEvmRwa(p)),
-    [profiles],
-  );
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return profiles.filter((p) => {
@@ -99,11 +90,12 @@ export function NetworkTableWithFilter({
       const matchesTag =
         tagFilter === "all" ||
         (sector !== "all" && filterTagsForSector(p, sector).includes(tagFilter));
-      // Hide non-EVM RWA entities from default views unless explicitly included.
-      const matchesEvm = includeNonEvm || !matchesNonEvmRwa(p);
+      // Non-EVM RWA entities (e.g. Lofty on Algorand) are always hidden from
+      // the list; their profiles stay reachable by direct URL.
+      const matchesEvm = !matchesNonEvmRwa(p);
       return matchesQuery && matchesCategory && matchesSector && matchesTag && matchesEvm;
     });
-  }, [profiles, query, category, sector, tagFilter, includeNonEvm]);
+  }, [profiles, query, category, sector, tagFilter]);
 
   const activeSectorAggregate = useMemo(() => {
     if (sector === "all") return null;
@@ -267,18 +259,6 @@ export function NetworkTableWithFilter({
             />
           )}
         </section>
-      )}
-
-      {hasNonEvmRwa && (sector === "all" || sector === "RWA") && (
-        <label className="flex items-center gap-2 pl-1 text-xs text-ink-400">
-          <input
-            type="checkbox"
-            checked={includeNonEvm}
-            onChange={(e) => setIncludeNonEvm(e.target.checked)}
-            className="h-3.5 w-3.5 rounded border-ink-700/60 bg-ink-900/40 text-electric-500 focus:ring-1 focus:ring-electric-500/30"
-          />
-          Include non-EVM RWAs (e.g. Lofty on Algorand)
-        </label>
       )}
 
       <NetworkTable

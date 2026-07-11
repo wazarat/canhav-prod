@@ -74,7 +74,7 @@ export function ProvisioningCard() {
       ready: status.upstash,
       readyHint: "Agents persist learned facts and runs across sessions.",
       pendingHint:
-        "No Upstash credentials — memory falls back to a local JSON file for offline dev.",
+        "No Upstash credentials. Memory falls back to a local JSON file for offline dev.",
     },
     {
       key: "identity",
@@ -94,8 +94,8 @@ export function ProvisioningCard() {
       readyHint: "Starting credits can be minted to treasuries and rewards paid out.",
       pendingHint: status.tcnhv
         ? status.factoryDeployerKeySet && !status.factoryDeployerKeyValid
-          ? "FACTORY_DEPLOYER_PRIVATE_KEY is set but invalid — use the deployer wallet private key (0x + 64 hex chars, no quotes), then redeploy."
-          : "Token is set but the owner key is missing — set FACTORY_DEPLOYER_PRIVATE_KEY on Vercel, then redeploy."
+          ? "FACTORY_DEPLOYER_PRIVATE_KEY is set but invalid. Use the deployer wallet private key (0x + 64 hex chars, no quotes), then redeploy."
+          : "Token is set but the owner key is missing. Set FACTORY_DEPLOYER_PRIVATE_KEY on Vercel, then redeploy."
         : "Set TCNHV_TOKEN_ADDRESS and FACTORY_DEPLOYER_PRIVATE_KEY on Vercel to enable minting starting credits.",
     },
   ];

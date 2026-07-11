@@ -14,7 +14,7 @@ export function Footer() {
         <div className="text-xs text-ink-500">
           <p>Data: Arbitrum Portal · Alchemy · Dune (free tier).</p>
           <p className="mt-1">
-            © {new Date().getFullYear()} CanHav. Research preview — not financial advice.
+            © {new Date().getFullYear()} CanHav. Research preview, not financial advice.
           </p>
         </div>
       </div>

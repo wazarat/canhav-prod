@@ -65,7 +65,7 @@ export default async function DashboardPage() {
         </h1>
         <p className="text-lg text-ink-300">
           Research-grade taxonomy and datasets across stablecoins, RWAs, networks, tokens, credit,
-          perpetuals and more — published as soon as data is ingested and synced.
+          perpetuals and more, published as soon as data is ingested and synced.
         </p>
         <div className="flex flex-wrap gap-3">
           <Button asChild>

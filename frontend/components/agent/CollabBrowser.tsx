@@ -474,7 +474,7 @@ export function CollabBrowser({
       }
       if (!pf.payerAddress) {
         throw new Error(
-          "Your Privy wallet address isn't ready yet — wait for the embedded wallet to load, then try again.",
+          "Your Privy wallet address isn't ready yet. Wait for the embedded wallet to load, then try again.",
         );
       }
       if (pf.proof) setProofLinks(pf.proof);
@@ -493,7 +493,7 @@ export function CollabBrowser({
 
       const wallet = resolveActiveWallet(wallets);
       if (!wallet) {
-        throw new Error("No wallet connected yet — sign in and wait for your embedded wallet to load.");
+        throw new Error("No wallet connected yet. Sign in and wait for your embedded wallet to load.");
       }
 
       // Signer for the optional on-chain writes (agreement anchor / collab
@@ -605,7 +605,7 @@ export function CollabBrowser({
       } else if (reqData.record) {
         setNotice("Exchange complete and added to your agent.");
       } else {
-        setNotice("Exchange complete — the strategy was added to your agent's memory.");
+        setNotice("Exchange complete. The strategy was added to your agent's memory.");
       }
       setPhase("done");
       void loadAgreements();
@@ -700,7 +700,7 @@ export function CollabBrowser({
         const rewardNote = data.reward
           ? ` ${data.reward.amount} ${data.reward.asset} rewarded to the agent for the great review.`
           : "";
-        setNotice(`Thanks — rated ${stars}/5.${rewardNote}`);
+        setNotice(`Thanks, rated ${stars}/5.${rewardNote}`);
         if (data.onChain) {
           try {
             const signer = await buildAgentSigner(wallets, credits?.signerAddress);
@@ -797,7 +797,7 @@ export function CollabBrowser({
           <div className="mt-3 space-y-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3">
             <p className="text-xs text-ink-400">
               {credits.error ??
-                "Agent credits unavailable — fund this agent from your treasury above once tCNHV is provisioned."}
+                "Agent credits unavailable. Fund this agent from your treasury above once tCNHV is provisioned."}
             </p>
             {credits.error === "That agent isn't yours." ? (
               <button
@@ -1112,7 +1112,7 @@ export function CollabBrowser({
       {phase === "done" && paymentTx && (
         <div className="space-y-3 rounded-xl border border-signal-400/20 bg-signal-400/5 p-4 text-xs">
           <p className="flex items-center gap-1.5 font-medium text-signal-300">
-            <CheckCircle2 className="h-3.5 w-3.5" /> Transaction complete — here&apos;s exactly what
+            <CheckCircle2 className="h-3.5 w-3.5" /> Transaction complete. Here&apos;s exactly what
             happened, on-chain.
           </p>
           <div className="flex flex-wrap gap-2">
@@ -1156,7 +1156,7 @@ export function CollabBrowser({
             Installment {packet.drip.installmentIndex + 1} of {packet.drip.totalInstallments}
           </p>
           <p className="mt-1 text-ink-400">
-            Drip disclosure: {packet.drip.label}. The seller reveals only this slice per interaction —
+            Drip disclosure: {packet.drip.label}. The seller reveals only this slice per interaction;
             the rest stays gated until the next approved installment.
           </p>
         </div>
@@ -1195,7 +1195,7 @@ export function CollabBrowser({
               onChange={(e) => setReviewComment(e.target.value)}
               rows={2}
               maxLength={600}
-              placeholder="Leave a review (optional) — visible to other buyers."
+              placeholder="Leave a review (optional), visible to other buyers."
               className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-xs text-ink-100 outline-none focus:border-electric-500/60"
             />
             <div className="flex items-center gap-2">
@@ -1230,7 +1230,7 @@ export function CollabBrowser({
           onPropose={async (input) => {
             const r = await proposeAgreement({ sellerAgentId: detailFor, ...input });
             if (r.ok) {
-              setNotice("Agreement proposed — waiting for the seller to approve.");
+              setNotice("Agreement proposed. Waiting for the seller to approve.");
               setDetailFor(null);
               setDetail(null);
             }
@@ -1592,7 +1592,7 @@ function SellerDetailModal({
               </p>
               {detail.reviews.length === 0 ? (
                 <p className="mt-1 text-xs text-ink-500">
-                  No reviews yet — read the description above and check the creator&apos;s history to
+                  No reviews yet. Read the description above and check the creator&apos;s history to
                   judge legitimacy.
                 </p>
               ) : (

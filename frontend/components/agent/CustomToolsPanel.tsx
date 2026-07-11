@@ -222,7 +222,7 @@ export function CustomToolsPanel({
 
       {/* Builder */}
       {tools.length >= max ? (
-        <p className="text-xs text-ink-500">Tool limit reached — delete one to add another.</p>
+        <p className="text-xs text-ink-500">Tool limit reached. Delete one to add another.</p>
       ) : (
         <div className="space-y-3 border-t border-ink-800/60 pt-3">
           <select
@@ -235,7 +235,7 @@ export function CustomToolsPanel({
             <option value="duneQuery">Dune saved-query results</option>
             <option value="alchemyTokenSupply">On-chain token supply (Alchemy)</option>
             <option value="httpJson" disabled={!httpEnabled}>
-              JSON endpoint (allowlisted){httpEnabled ? "" : " — disabled"}
+              JSON endpoint (allowlisted){httpEnabled ? "" : " (disabled)"}
             </option>
           </select>
 

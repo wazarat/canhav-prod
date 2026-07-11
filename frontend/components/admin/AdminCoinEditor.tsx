@@ -192,7 +192,7 @@ export function AdminCoinEditor({
         }
         setBaseline((prev) => ({ ...prev, ...patch }));
         setLoaded((prev) => (prev ? { ...prev, updatedAt: data.updatedAt ?? prev.updatedAt } : prev));
-        const rej = data.rejected?.length ? ` — rejected ${data.rejected.join(", ")}` : "";
+        const rej = data.rejected?.length ? ` (rejected ${data.rejected.join(", ")})` : "";
         setNotice(`Saved ${data.applied?.join(", ") ?? ""}${rej}.`);
         return true;
       } catch (e) {
@@ -225,7 +225,7 @@ export function AdminCoinEditor({
 
       <p className="rounded-md border border-ink-800 bg-ink-900/40 px-3 py-2 text-xs text-ink-300">
         Editable = seeded or curated. Live market / peg / receipt metrics are written by the data
-        pipeline (read-only) — see the Data diagnostics tab. Slug and category are locked (renames
+        pipeline (read-only); see the Data diagnostics tab. Slug and category are locked (renames
         are done via seed scripts).
       </p>
 
@@ -320,10 +320,10 @@ export function AdminCoinEditor({
               checked={draft.HasNativeToken !== false && type !== "NoToken"}
               onChange={(e) => setField("HasNativeToken", e.target.checked)}
             />
-            Has a native token (uncheck for No-Token entities — suppresses market diagnostics)
+            Has a native token (unchecking it suppresses market diagnostics for No-Token entities)
           </label>
           {isNoToken && (
-            <p className="text-xs text-ink-500">No native token — metrics roll up to the network.</p>
+            <p className="text-xs text-ink-500">No native token: metrics roll up to the network.</p>
           )}
         </Section>
       )}
@@ -391,7 +391,7 @@ function CoinGeckoSection({
         )}
       </div>
       <p className="mb-2 text-xs text-ink-500">
-        Curate one exact id (no fuzzy match). Verify to eyeball the token, then save — the next cron
+        Curate one exact id (no fuzzy match). Verify to eyeball the token, then save. The next cron
         run populates the Market block.
       </p>
       <div className="flex items-center gap-2">

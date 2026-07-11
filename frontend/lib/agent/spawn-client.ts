@@ -59,7 +59,7 @@ function formatMintError(e: unknown): Error {
   const raw = e instanceof Error ? e.message : String(e ?? "Mint failed.");
   if (/insufficient funds|exceeds the balance|gas required exceeds/i.test(raw)) {
     return new Error(
-      "Your wallet needs a small amount of Arbitrum Sepolia ETH to pay gas for the mint. Fund it from an Arbitrum Sepolia faucet, then retry.",
+      "Your wallet needs a small amount of ETH on Arbitrum to pay gas for the mint. Top it up, then retry.",
     );
   }
   return e instanceof Error ? e : new Error(raw);

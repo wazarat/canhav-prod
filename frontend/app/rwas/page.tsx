@@ -36,7 +36,7 @@ export default async function RwasPage() {
           Real World Assets
         </h1>
         <p className="max-w-2xl text-sm text-ink-300">
-          Tokenized off-chain assets on Arbitrum — private credit, tokenized equities, real estate,
+          Tokenized off-chain assets on Arbitrum: private credit, tokenized equities, real estate,
           treasuries, and more.{" "}
           <span className="font-medium text-ink-100">{profiles.length}</span> protocols tracked.
         </p>

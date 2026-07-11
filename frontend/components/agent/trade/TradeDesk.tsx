@@ -94,10 +94,10 @@ export async function TradeDesk({
         <i className="term-dot" />
         <span className="flex-1" />
         <Badge tone="signal" className="px-2 py-0 font-mono text-[10px] uppercase">
-          testnet
+          perps
         </Badge>
         <span className="font-mono text-[10px] tracking-wide text-ink-500">
-          gmx · arbitrum-sepolia
+          gmx · arbitrum
         </span>
       </div>
 
@@ -119,7 +119,7 @@ export async function TradeDesk({
           <p className="text-xs leading-relaxed text-ink-500">
             The agent researches a coin; a fresh positive verdict opens the gate; the agent files a
             proposal; you approve it (or your caps auto-approve it); you sign in your wallet, and
-            GMX fills on Arbitrum Sepolia testnet.
+            GMX fills on Arbitrum.
           </p>
         </div>
 
@@ -193,7 +193,7 @@ export async function TradeDesk({
               </div>
               {allowlist == null ? (
                 <p className="mt-1 text-xs text-amber-400">
-                  Allowlist unreadable (RPC) — it is re-checked server-side at trade time.
+                  Allowlist unreadable (RPC); it is re-checked server-side at trade time.
                 </p>
               ) : !allowlist.routerAllowed || !allowlist.vaultAllowed ? (
                 <p className="mt-1 text-xs text-ink-400">
@@ -203,7 +203,7 @@ export async function TradeDesk({
                   ]
                     .filter(Boolean)
                     .join(" and ")}{" "}
-                  not on the SecurityRegistry allowlist — every trade is blocked until re-verified.
+                  not on the SecurityRegistry allowlist, so every trade is blocked until re-verified.
                 </p>
               ) : null}
             </div>
@@ -237,18 +237,18 @@ export async function TradeDesk({
                 </div>
                 {funding.usdcSgRaw === 0n ? (
                   <p className="mt-1.5 text-xs text-amber-400">
-                    No USDC.SG collateral — GMX orders will fail.
+                    No USDC.SG collateral: GMX orders will fail.
                     {collabEnabled() && " tCNHV credits are marketplace-only and can't back trades."}
                   </p>
                 ) : funding.ethRaw === 0n ? (
                   <p className="mt-1.5 text-xs text-amber-400">
-                    No Sepolia ETH — the wallet can&apos;t pay gas or the GMX execution fee.
+                    No ETH: the wallet can&apos;t pay gas or the GMX execution fee.
                   </p>
                 ) : (
                   <p className="mt-1.5 text-xs text-ink-500">
                     GMX collateral is USDC.SG
                     {collabEnabled() && "; tCNHV credits are marketplace-only"}. Execution fee is
-                    paid in Sepolia ETH.
+                    paid in ETH.
                   </p>
                 )}
               </div>
@@ -280,7 +280,7 @@ export async function TradeDesk({
                 </div>
                 <p className="mt-1.5 text-xs text-ink-500">
                   {caps.perTradeCapUsd == null && caps.cumulativeCapUsd == null
-                    ? "No caps set — in Auto within limits, every proposal auto-approves."
+                    ? "No caps set: in Auto within limits, every proposal auto-approves."
                     : "Proposals inside these caps auto-approve; you still sign each trade."}
                 </p>
               </div>

@@ -81,7 +81,7 @@ export async function POST(req: Request, { params }: { params: { agentId: string
     return NextResponse.json(
       {
         ok: false,
-        error: `This agent already has ${CUSTOM_TOOL_LIMITS.toolsMax} custom tools — delete one first.`,
+        error: `This agent already has ${CUSTOM_TOOL_LIMITS.toolsMax} custom tools. Delete one first.`,
       },
       { status: 400 },
     );

@@ -112,7 +112,7 @@ export function TradeModeSelector({
 
       {selected === "spending_cap" && !hasCaps && (
         <p className="text-xs text-amber-400">
-          No caps set — every proposal auto-approves (you still sign each one). Set caps in{" "}
+          No caps set: every proposal auto-approves (you still sign each one). Set caps in{" "}
           <Link
             href={`/agents/${encodeURIComponent(agentId)}?tab=train#panel-framework`}
             className="font-medium underline underline-offset-2 hover:text-amber-300"

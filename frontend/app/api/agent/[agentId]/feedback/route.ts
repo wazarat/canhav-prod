@@ -51,7 +51,7 @@ export async function POST(req: Request, { params }: { params: { agentId: string
 
   const question =
     typeof body.question === "string" ? body.question.trim().slice(0, QUESTION_MAX_CHARS) : "";
-  const text = question ? `Re: "${question}" — ${correction}` : correction;
+  const text = question ? `Re: "${question}": ${correction}` : correction;
   const fact = await appendMemory(agentId, { text, source: OWNER_CORRECTION_SOURCE });
 
   return NextResponse.json({ ok: true, stored: Boolean(fact) });

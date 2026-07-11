@@ -2176,7 +2176,7 @@ export function CompetitorsSection({
         title="Competitors"
         subtitle={
           networkName
-            ? `Ranked top→bottom — who competes with ${networkName} and how they differ.`
+            ? `Ranked top→bottom: who competes with ${networkName} and how they differ.`
             : "Ranked top→bottom by how directly they compete."
         }
       />

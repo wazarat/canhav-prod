@@ -12,11 +12,11 @@ export function formatUserOpError(err: unknown): string {
   }
 
   if (raw.includes("TransferRestricted") || raw.includes("0xcede7487")) {
-    return "This payment is blocked by the tCNHV transfer rules. The platform is preparing on-chain allowlists — refresh and try again in a moment.";
+    return "This payment is blocked by the tCNHV transfer rules. The platform is preparing on-chain allowlists. Refresh and try again in a moment.";
   }
 
   if (/insufficient funds|exceeds the balance|gas required exceeds/i.test(raw)) {
-    return "Your wallet needs a small amount of Arbitrum Sepolia ETH to pay gas. Fund it from an Arbitrum Sepolia faucet, then try again.";
+    return "Your wallet needs a small amount of ETH on Arbitrum to pay gas. Top it up, then try again.";
   }
 
   if (raw.includes("reverted")) {

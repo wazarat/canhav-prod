@@ -58,7 +58,7 @@ export function SkillCatalogCard({ skills }: { skills: PlatformSkill[] }) {
           <Badge tone="neutral">{skills.length} available</Badge>
         </div>
         {skills.length === 0 ? (
-          <p className="text-sm text-ink-400">No skills yet — seed entities into the store.</p>
+          <p className="text-sm text-ink-400">No skills yet. Seed entities into the store.</p>
         ) : (
           <div className="space-y-5">
             {SKILL_GROUPS.map((group) => {

@@ -793,7 +793,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         "name": "Aave",
         "symbol": "AAVE",
         "csv_slug": "aave",
-        "tagline": "Savings for Everyone — open-source non-custodial liquidity protocol.",
+        "tagline": "Savings for Everyone: open-source non-custodial liquidity protocol.",
         "description": (
             "Aave is a multichain non-custodial lending protocol for supplying, borrowing, "
             "and earning interest. The Aave DAO governs parameters, listings, and emissions; "
@@ -811,11 +811,11 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         "github": "https://github.com/aave/aave-protocol",
         "sources": [
             {"label": "Aave documentation", "url": "https://aave.com/docs"},
-            {"label": "Aave Docs — Security & Audits", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
+            {"label": "Aave Docs: Security & Audits", "url": "https://docs.aave.com/developers/deployed-contracts/security-and-audits"},
             {"label": "Aave Governance forum", "url": "https://governance.aave.com"},
             {"label": "Aave V3 Origin (protocol source)", "url": "https://github.com/aave-dao/aave-v3-origin"},
-            {"label": "Immunefi — Aave bug bounty", "url": "https://immunefi.com/bug-bounty/aave/"},
-            {"label": "DeFiLlama — Aave", "url": "https://defillama.com/protocol/aave"},
+            {"label": "Immunefi: Aave bug bounty", "url": "https://immunefi.com/bug-bounty/aave/"},
+            {"label": "DeFiLlama: Aave", "url": "https://defillama.com/protocol/aave"},
             {"label": "Token Terminal: Aave metrics", "url": "https://x.com/tokenterminal/status/2030984957393359050"},
             {"label": "Aave 2025 Year in Review", "url": "https://aave.com/blog/aave-2025-recap"},
             {"label": "ACI Full Transparency Report", "url": "https://governance.aave.com/t/aci-full-transparency-report/24085"},
@@ -836,14 +836,14 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "name": "Lending markets",
                 "description": (
                     "Core/Prime/Plus/Horizon markets: supply assets to pools, borrow against "
-                    "collateral, earn real-time interest. Not a token — the protocol product."
+                    "collateral, earn real-time interest. Not a token, the protocol product."
                 ),
             },
             {
                 "name": "aTokens",
                 "description": (
-                    "Interest-bearing deposit receipts (e.g. aUSDC) minted on supply — "
-                    "accrue yield, redeemable for underlying + interest."
+                    "Interest-bearing deposit receipts (e.g. aUSDC) minted on supply. They "
+                    "accrue yield and are redeemable for underlying + interest."
                 ),
             },
             {
@@ -855,7 +855,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
             {
                 "name": "sGHO / StkGHO",
                 "description": (
-                    "GHO savings product — yield-bearing, not the stablecoin itself. "
+                    "GHO savings product: yield-bearing, not the stablecoin itself. "
                     "New sGHO experience live May 2026."
                 ),
             },
@@ -872,7 +872,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "question": "What is the GHO / sGHO distinction?",
                 "answer": (
                     "GHO is the overcollateralized stablecoin. sGHO is the yield-bearing "
-                    "savings wrapper — same pattern as USDe/sUSDe or USDS/sUSDS."
+                    "savings wrapper, the same pattern as USDe/sUSDe or USDS/sUSDS."
                 ),
                 "pinned": True,
             },
@@ -1415,8 +1415,8 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "similarities": "Both are major EVM money markets for supplying and borrowing.",
                 "differences": (
                     "Morpho Blue creates isolated markets (collateral, loan asset, oracle, "
-                    "liquidation settings) with MetaMorpho vaults allocated by curators — more "
-                    "modular and risk-specific than Aave's broad pooled markets."
+                    "liquidation settings) with MetaMorpho vaults allocated by curators, which is "
+                    "more modular and risk-specific than Aave's broad pooled markets."
                 ),
             },
             {
@@ -1426,7 +1426,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "positioning": "Stablecoin-native lending stack.",
                 "similarities": "SparkLend started from Aave V3 architecture.",
                 "differences": (
-                    "Edge is the Sky/Maker stablecoin ecosystem — focused on USDS/DAI liquidity, "
+                    "Edge is the Sky/Maker stablecoin ecosystem, focused on USDS/DAI liquidity, "
                     "savings products, and stablecoin borrowing at scale."
                 ),
             },
@@ -1438,7 +1438,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "similarities": "Classic pooled money-market model; one of the most trusted DeFi lending brands.",
                 "differences": (
                     "Compound III uses one base borrowable asset per market with other assets as "
-                    "collateral — simpler to reason about but less flexible than Aave's multi-asset pools."
+                    "collateral: simpler to reason about but less flexible than Aave's multi-asset pools."
                 ),
             },
             {
@@ -1448,7 +1448,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "positioning": "Capital-efficient lending + DEX hybrid.",
                 "similarities": "Lending/borrowing money market live across EVM chains.",
                 "differences": (
-                    "Combines lending, vaults, and DEX liquidity through a shared liquidity layer — "
+                    "Combines lending, vaults, and DEX liquidity through a shared liquidity layer: "
                     "more capital-efficient but more complex to analyze."
                 ),
             },
@@ -1483,7 +1483,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "positioning": "Institutional credit, not just overcollateralized DeFi.",
                 "similarities": "A venue matching borrowers and lenders.",
                 "differences": (
-                    "Institutional / private-credit model — vetted borrowers, loan terms, repayment "
+                    "Institutional / private-credit model: vetted borrowers, loan terms, repayment "
                     "history and pool managers rather than open overcollateralized lending."
                 ),
             },
@@ -1506,7 +1506,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "shortfalls."
             ),
             "governanceActivity": (
-                "Active Aave DAO — risk-parameter updates, new listings, Aavenomics buybacks, and "
+                "Active Aave DAO: risk-parameter updates, new listings, Aavenomics buybacks, and "
                 "the Aave V4 direction."
             ),
             "auditHistory": (
@@ -1520,7 +1520,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 ],
                 "evmCompatible": "yes",
                 "notes": (
-                    "Mainly EVM/multi-chain; has also explored Aptos/Move deployments — check the "
+                    "Mainly EVM/multi-chain; has also explored Aptos/Move deployments, so check the "
                     "specific market."
                 ),
             },
@@ -1534,7 +1534,7 @@ BATCH_2_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
                 "proposals": None,
                 "voterTurnoutPct": None,
                 "treasuryUsd": None,
-                "notes": "Active Aave DAO — risk updates, listings, Aavenomics buybacks, Aave V4.",
+                "notes": "Active Aave DAO: risk updates, listings, Aavenomics buybacks, Aave V4.",
             },
         },
         # Legacy moneyMarkets tag-metric block dropped during the Credit

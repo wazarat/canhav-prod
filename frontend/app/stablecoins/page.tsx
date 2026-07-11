@@ -45,7 +45,7 @@ export default async function StablecoinsPage() {
           Stablecoins
         </h1>
         <p className="max-w-2xl text-sm text-ink-300">
-          Pegged dollar and euro assets on Arbitrum — peg health, circulating supply, and protocol
+          Pegged dollar and euro assets on Arbitrum: peg health, circulating supply, and protocol
           metadata. <span className="font-medium text-ink-100">{profiles.length}</span> protocols
           tracked.
         </p>

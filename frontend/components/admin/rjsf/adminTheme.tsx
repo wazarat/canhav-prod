@@ -264,7 +264,7 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
     <div className="space-y-3">
       {title && <h3 className="text-sm font-medium text-ink-100">{title}</h3>}
       {items.length === 0 && (
-        <p className="text-xs italic text-ink-500">None yet — add one below.</p>
+        <p className="text-xs italic text-ink-500">None yet. Add one below.</p>
       )}
       <div className="space-y-3">
         {items.map(({ key, ...itemProps }) => (

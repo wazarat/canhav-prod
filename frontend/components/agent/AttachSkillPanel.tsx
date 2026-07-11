@@ -59,7 +59,7 @@ export function AttachSkillPanel({ agentId, onChain }: { agentId: string; onChai
             : undefined;
           setPick(preselected?.id ?? list[0]?.id ?? "");
           if (preselected) {
-            setNotice(`"${preselected.title}" is ready — click Attach to train this agent on it.`);
+            setNotice(`"${preselected.title}" is ready. Click Attach to train this agent on it.`);
           }
         }
       } catch {
@@ -107,7 +107,7 @@ export function AttachSkillPanel({ agentId, onChain }: { agentId: string; onChai
           }
         }
       } else {
-        setNotice("Skill attached — your agent is now trained on it.");
+        setNotice("Skill attached. Your agent is now trained on it.");
       }
       router.refresh();
     } catch (e) {
@@ -176,7 +176,7 @@ export function AttachSkillPanel({ agentId, onChain }: { agentId: string; onChai
 
       {onChain && (
         <p className="text-[10px] text-ink-500">
-          On-chain agent — attaching also advertises the skill via ERC-8004 metadata so other agents
+          On-chain agent: attaching also advertises the skill via ERC-8004 metadata so other agents
           can discover it.
         </p>
       )}

@@ -97,7 +97,7 @@ def base_item(slug: str, name: str, symbol: str, category: str) -> dict:
         "Name": name,
         "Symbol": symbol,
         "Status": "APPROVED",
-        "Description": f"{name} — tracked via compiled coin integration.",
+        "Description": f"{name}, tracked via compiled coin integration.",
         "Website": None,
         "Twitter": None,
         "Discord": None,

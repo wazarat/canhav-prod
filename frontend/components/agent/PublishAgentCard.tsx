@@ -102,7 +102,7 @@ export function PublishAgentCard({
       done: minted,
       label: "Minted on-chain (ERC-8004)",
       help: minted ? (
-        "Its identity, skills, and ledger are verifiable on Arbitrum Sepolia."
+        "Its identity, skills, and ledger are verifiable on Arbitrum."
       ) : (
         <Link
           href="/agents#create"
@@ -117,7 +117,7 @@ export function PublishAgentCard({
       label: `Price set (${settlementAsset} per request)`,
       help: hasPrice
         ? "Buyers pay this each period via x402; recorded on-chain."
-        : "Optional — a default price applies until you set one.",
+        : "Optional. A default price applies until you set one.",
     },
     {
       done: isDiscoverable,

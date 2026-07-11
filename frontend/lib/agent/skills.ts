@@ -264,7 +264,7 @@ export function buildSkillFromEntity(profile: NetworkProfile): PlatformSkill {
   return {
     id: entitySkillId(profile.slug),
     group: "entity",
-    title: `${profile.name} — Research Skill`,
+    title: `${profile.name} · Research Skill`,
     summary: profile.tagline || profile.description,
     facts: buildFacts(profile),
     sections: buildSections(profile),
@@ -379,7 +379,7 @@ export function buildSkillFromStablecoin(profile: StablecoinProfile): PlatformSk
   return {
     id: productSkillId("stablecoin", profile.slug),
     group: "stablecoin",
-    title: `${profile.name} (${profile.symbol}) — Stablecoin Skill`,
+    title: `${profile.name} (${profile.symbol}) · Stablecoin Skill`,
     summary: profile.description.slice(0, 200),
     facts,
     sections,
@@ -418,7 +418,7 @@ export function buildSkillFromRwa(profile: RwaProfile): PlatformSkill {
   return {
     id: productSkillId("rwa", profile.slug),
     group: "rwa",
-    title: `${profile.name} — RWA Skill`,
+    title: `${profile.name} · RWA Skill`,
     summary: profile.description.slice(0, 200),
     facts,
     sections,
@@ -458,7 +458,7 @@ export function buildSkillFromToken(profile: TokenProfile): PlatformSkill {
   return {
     id: productSkillId("token", profile.slug),
     group: "token",
-    title: `${profile.name} (${profile.symbol}) — Token Skill`,
+    title: `${profile.name} (${profile.symbol}) · Token Skill`,
     summary: profile.description.slice(0, 200),
     facts,
     sections,

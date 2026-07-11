@@ -929,7 +929,7 @@ export function AdminContentEditor({
 
       <p className="rounded-md border border-ink-800 bg-ink-900/40 px-3 py-2 text-xs text-ink-300">
         Only curated fields are editable here. API-managed fields (TVL, market cap, fees, volume,
-        sector metrics) are written by the data pipeline — see the Data diagnostics tab.
+        sector metrics) are written by the data pipeline; see the Data diagnostics tab.
       </p>
 
       {error && <p className="text-sm text-rose-400">{error}</p>}
@@ -1025,7 +1025,7 @@ function SectionForm({
       );
       return;
     }
-    const rejected = result.rejected?.length ? ` — rejected ${result.rejected.join(", ")}` : "";
+    const rejected = result.rejected?.length ? ` (rejected ${result.rejected.join(", ")})` : "";
     setNotice(`Saved${rejected}.${hint ? " " + hint : ""}`);
   }
 

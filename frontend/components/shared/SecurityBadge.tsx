@@ -30,7 +30,7 @@ export function SecurityBadge({ info }: { info: SecurityInfo }) {
 
   if (info.auditUrl) {
     return (
-      <a href={info.auditUrl} target="_blank" rel="noreferrer" aria-label={`${label} — view audit`}>
+      <a href={info.auditUrl} target="_blank" rel="noreferrer" aria-label={`${label}: view audit`}>
         {badge}
       </a>
     );

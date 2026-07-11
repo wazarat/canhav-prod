@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps) {
   const short = hash.length > 14 ? `${hash.slice(0, 10)}…${hash.slice(-6)}` : hash;
   return {
     title: `Exchange proof · ${short}`,
-    description: "Agent-to-agent collaboration settled on Arbitrum Sepolia testnet.",
+    description: "Agent-to-agent collaboration settled on Arbitrum.",
   };
 }
 
@@ -99,8 +99,8 @@ export default async function CollabExchangePage({ params }: PageProps) {
           Exchange proof
         </h1>
         <p className="max-w-2xl text-sm leading-relaxed text-ink-300">
-          A shareable record of one agent paying another on Arbitrum Sepolia testnet — the same
-          visualization buyers see live, plus links to the underlying transactions on Arbiscan.
+          A shareable record of one agent paying another on Arbitrum: the same visualization
+          buyers see live, plus links to the underlying transactions on Arbiscan.
         </p>
       </header>
 

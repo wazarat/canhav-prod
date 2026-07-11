@@ -194,10 +194,10 @@ export function DataFramesPanel({
       {/* Builder */}
       {options.length === 0 ? (
         <p className="text-xs text-ink-500">
-          No frame metrics available — this agent has no tracked member products.
+          No frame metrics available: this agent has no tracked member products.
         </p>
       ) : frames.length >= max ? (
-        <p className="text-xs text-ink-500">Frame limit reached — delete one to pin another.</p>
+        <p className="text-xs text-ink-500">Frame limit reached. Delete one to pin another.</p>
       ) : (
         <div className="space-y-3 border-t border-ink-800/60 pt-3">
           <div className="flex gap-2">

@@ -194,7 +194,7 @@ export default async function AgentHomePage({
           <Badge tone="neon">
             <Sparkles className="h-3 w-3" /> Level {level}
           </Badge>
-          <Badge tone="signal">Arbitrum Sepolia · Testnet</Badge>
+          <Badge tone="signal">Arbitrum</Badge>
           {verifiedOnChain ? (
             <Badge tone="positive">
               <CircleDot className="h-3 w-3 animate-pulse-soft" /> verified
@@ -216,7 +216,7 @@ export default async function AgentHomePage({
               href={`/networks/${profile.entitySlug}`}
               className="font-medium text-electric-400 hover:text-electric-300"
             >
-              {profile.name.replace(/ — Research Skill$/, "")}
+              {profile.name.replace(/ [—·] Research Skill$/, "")}
             </Link>
             {profile.associatedProducts.length > 0 && (
               <span className="text-ink-400">
@@ -230,7 +230,7 @@ export default async function AgentHomePage({
           <div className="flex flex-wrap items-start gap-3 rounded-xl border border-ink-700/80 bg-ink-900/40 px-4 py-3">
             <Rocket className="mt-0.5 h-4 w-4 shrink-0 text-electric-400" />
             <p className="text-sm text-ink-300">
-              This agent is <span className="font-medium text-ink-100">local only</span> — it has
+              This agent is <span className="font-medium text-ink-100">local only</span>. It has
               no ERC-8004 token yet, so there is nothing to scan on Arbiscan.{" "}
               <Link
                 href="/agents#create"
@@ -238,7 +238,7 @@ export default async function AgentHomePage({
               >
                 Launch a new agent on the Agents tab
               </Link>{" "}
-              to mint a wallet-owned ERC-8004 token on Arbitrum Sepolia.
+              to mint a wallet-owned ERC-8004 token on Arbitrum.
             </p>
           </div>
         )}
@@ -342,7 +342,7 @@ export default async function AgentHomePage({
               <AgentToolPanel
                 agentId={agentId}
                 entitySlug={profile.entitySlug}
-                entityName={profile.name.replace(/ — Research Skill$/, "")}
+                entityName={profile.name.replace(/ [—·] Research Skill$/, "")}
                 associatedProducts={profile.associatedProducts}
                 frames={frames.map((f) => ({ id: f.id, title: f.title }))}
               />

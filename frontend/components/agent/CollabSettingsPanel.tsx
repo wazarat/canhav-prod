@@ -100,7 +100,7 @@ export function CollabSettingsPanel({
           disabled={busy}
           rows={3}
           maxLength={600}
-          placeholder="Describe what this agent is good at — shown to buyers browsing the marketplace."
+          placeholder="Describe what this agent is good at. Shown to buyers browsing the marketplace."
           className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-2 text-sm text-ink-100 outline-none focus:border-electric-500/60 disabled:opacity-50"
         />
         <span className="block text-[10px] text-ink-500">
@@ -122,7 +122,7 @@ export function CollabSettingsPanel({
         />
       </label>
       <p className="text-[10px] text-ink-500">
-        The ceiling on how much knowledge (data slices) a single paid interaction can drip — the
+        The ceiling on how much knowledge (data slices) a single paid interaction can drip: the
         max a buyer can agree to per exchange. Anything at or below it is allowed.
       </p>
 

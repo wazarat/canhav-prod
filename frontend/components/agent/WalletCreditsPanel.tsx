@@ -48,11 +48,11 @@ interface BootstrapStatus {
 function bootstrapReasonMessage(reason?: BootstrapReason): string {
   switch (reason) {
     case "mint_unconfigured":
-      return "Minting isn't enabled on the server — set FACTORY_DEPLOYER_PRIVATE_KEY (and TCNHV_TOKEN_ADDRESS) on Vercel, then redeploy.";
+      return "Minting isn't enabled on the server. Set FACTORY_DEPLOYER_PRIVATE_KEY (and TCNHV_TOKEN_ADDRESS) on Vercel, then redeploy.";
     case "identity_unconfigured":
-      return "Wallet login isn't configured — set NEXT_PUBLIC_PRIVY_APP_ID and PRIVY_APP_SECRET on Vercel.";
+      return "Wallet login isn't configured. Set NEXT_PUBLIC_PRIVY_APP_ID and PRIVY_APP_SECRET on Vercel.";
     case "no_profile":
-      return "Your profile isn't ready yet — sign out and back in, then try again.";
+      return "Your profile isn't ready yet. Sign out and back in, then try again.";
     default:
       return "Starting credits are not available in this environment.";
   }
@@ -146,7 +146,7 @@ function CreditsNotConfigured() {
         <a href="/api/agent/status" className="text-electric-400 hover:text-electric-300">
           /api/agent/status
         </a>{" "}
-        — check <code className="font-mono">tcnhv</code> and <code className="font-mono">canMintTcnhv</code>.
+        and check <code className="font-mono">tcnhv</code> and <code className="font-mono">canMintTcnhv</code>.
       </p>
     </div>
   );
@@ -321,7 +321,7 @@ export function WalletCreditsPanel({
           result.reason === "not_configured"
             ? "tCNHV mint is not configured on the server."
             : result.reason === "mint_failed"
-              ? "On-chain mint failed — check FACTORY_DEPLOYER_PRIVATE_KEY."
+              ? "On-chain mint failed. Check FACTORY_DEPLOYER_PRIVATE_KEY."
               : "Could not mint starting credits.",
         );
       }
@@ -530,7 +530,7 @@ export function WalletCreditsPanel({
                 {!agentCredits.configured
                   ? (agentCredits.error ??
                     "Mint this agent on-chain to enable the faucet.")
-                  : "Faucet is on cooldown — try again later."}
+                  : "Faucet is on cooldown. Try again later."}
               </span>
             )}
           {!bootstrap?.needsGrant && bootstrap?.granted && (
@@ -544,7 +544,7 @@ export function WalletCreditsPanel({
       {buyerAgents.length > 0 && (
         <p className="text-xs leading-relaxed text-ink-500">
           Spendable credits for buying strategies live on your <strong className="text-ink-400">paying agent</strong>{" "}
-          smart account below — fund it from this treasury before requesting sellers.
+          smart account below. Fund it from this treasury before requesting sellers.
         </p>
       )}
 

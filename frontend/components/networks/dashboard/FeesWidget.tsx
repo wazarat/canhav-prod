@@ -14,7 +14,7 @@ export function FeesWidget({ fees }: { fees: FeesSummary }) {
       <Card className="flex h-full flex-col gap-2 p-5">
         <Header category={null} updatedAt={null} />
         <p className="mt-2 text-sm text-ink-400">
-          No fee or volume data — this network isn&apos;t mapped to a DeFi Llama protocol
+          No fee or volume data: this network isn&apos;t mapped to a DeFi Llama protocol
           yet.
         </p>
       </Card>

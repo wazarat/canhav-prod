@@ -2857,7 +2857,7 @@ STAKING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         ],
         name="EigenLayer",
         symbol="EIGEN",
-        tagline="Restaking — reuse staked ETH to secure new services.",
+        tagline="Restaking: reuse staked ETH to secure new services.",
         description=(
             "EigenLayer (EigenCloud) is the pioneering restaking protocol: ETH stakers "
             "and LST holders restake to extend cryptoeconomic security to Actively "

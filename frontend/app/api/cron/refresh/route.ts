@@ -610,7 +610,7 @@ async function refreshUniversalMetrics(
   const holderCount: Sourced<number | null> =
     prior.holderCount && prior.holderCount.value != null
       ? prior.holderCount
-      : sourced<number | null>(null, "Deferred — no turnkey API", "derived");
+      : sourced<number | null>(null, "Deferred (no turnkey API)", "derived");
 
   const hasLiveData =
     llamaLive ||
@@ -903,7 +903,7 @@ async function refreshLlamaDimensions(
         currentApyPct: pool.apyPct,
         ...(pool.apyMean30dPct !== null ? { apy30dPct: pool.apyMean30dPct } : {}),
         feeShareToHoldersPct: 0,
-        yieldSource: `DeFi Llama pool — ${pool.project} ${pool.symbol} on ${pool.chain}`,
+        yieldSource: `DeFi Llama pool: ${pool.project} ${pool.symbol} on ${pool.chain}`,
         isAutoCompounding: true,
         emissionsBased: (pool.apyRewardPct ?? 0) > 0,
         payoutAsset: "Accrues into the pool position (base APY; rewards where applicable)",

@@ -29,7 +29,7 @@ export function SkillShelf({
 
   const titleFor = (id: string) => {
     const title = allSkills.find((s) => s.id === id)?.title ?? id;
-    return title.replace(/\s+—\s+(Research|Stablecoin|RWA|Token) Skill$/, "");
+    return title.replace(/\s+[—·]\s+(Research|Stablecoin|RWA|Token) Skill$/, "");
   };
 
   function togglePick(id: string) {
@@ -69,7 +69,7 @@ export function SkillShelf({
       </div>
 
       {studied.length === 0 ? (
-        <p className="text-sm text-ink-500">No skills studied yet — pick some below.</p>
+        <p className="text-sm text-ink-500">No skills studied yet. Pick some below.</p>
       ) : (
         <div className="flex flex-wrap gap-2">
           {studied.map((id) => (

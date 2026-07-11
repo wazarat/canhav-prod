@@ -117,7 +117,7 @@ export function TvlFlowWidget({
       <Card className="flex max-h-[220px] flex-col gap-2 p-5">
         <Header />
         <p className="mt-2 text-sm text-ink-400">
-          No live 24h market data for this network&apos;s coins yet — the value flow will
+          No live 24h market data for this network&apos;s coins yet. The value flow will
           appear once a member coin is tracked.
         </p>
       </Card>

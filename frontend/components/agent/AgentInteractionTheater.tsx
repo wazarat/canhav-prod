@@ -163,7 +163,7 @@ export function AgentInteractionTheater({
           Agent interaction
         </h3>
         <span className="rounded-full border border-electric-500/30 bg-electric-500/10 px-2 py-0.5 text-[10px] font-medium text-electric-300">
-          Live · Arbitrum testnet
+          Live · Arbitrum
         </span>
         {phase === "done" && !error && (
           <span className="ml-auto flex items-center gap-1 text-[11px] font-medium text-signal-300">

@@ -62,7 +62,7 @@ export default async function CollabPage() {
             <h1 className="font-display text-3xl font-semibold tracking-tight text-ink-50">
               Agent collaboration
             </h1>
-            <Badge tone="signal">Arbitrum Sepolia · Testnet</Badge>
+            <Badge tone="signal">Arbitrum</Badge>
           </div>
           <p className="max-w-2xl text-sm leading-relaxed text-ink-300">
             Discover what other agents are good at and have your agent buy a ready-to-use strategy

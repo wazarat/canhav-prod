@@ -109,8 +109,8 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
       mode: "manual",
       suggestion: intentSummary,
       summary: encrypted
-        ? `Trade suggestion (manual): ${side} ${asset} (size encrypted) at ${leverage}x — owner executes manually on GMX Sepolia.`
-        : `Trade suggestion (manual): ${side} ${asset} ~$${human} at ${leverage}x — owner executes manually on GMX Sepolia.`,
+        ? `Trade suggestion (manual): ${side} ${asset} (size encrypted) at ${leverage}x. Owner executes manually on GMX.`
+        : `Trade suggestion (manual): ${side} ${asset} ~$${human} at ${leverage}x. Owner executes manually on GMX.`,
     };
   }
 

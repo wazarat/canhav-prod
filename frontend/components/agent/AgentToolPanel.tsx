@@ -207,8 +207,8 @@ export function AgentToolPanel({
         </h3>
         <p className="mt-1 text-sm text-ink-300">
           {entitySlug
-            ? `Run live CanHav data tools scoped to ${entityName ?? entitySlug} — same feeds the chat agent uses, no LLM required.`
-            : "Run live CanHav data tools for this agent — no LLM required."}
+            ? `Run live CanHav data tools scoped to ${entityName ?? entitySlug}: same feeds the chat agent uses, no LLM required.`
+            : "Run live CanHav data tools for this agent. No LLM required."}
         </p>
       </div>
 

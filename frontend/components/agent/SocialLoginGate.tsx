@@ -26,7 +26,7 @@ export function SocialLoginGate({
     onError: (code) => {
       setPhase("idle");
       setError(
-        `Privy sign-in failed (${code}). Check the Privy dashboard: allowed origins include this site, Wallet + Google + email login are enabled, embedded wallets are on for social users, and Arbitrum Sepolia (421614) is added.`,
+        `Privy sign-in failed (${code}). Check the Privy dashboard: allowed origins include this site, Wallet + Google + email login are enabled, embedded wallets are on for social users, and chain 421614 is added.`,
       );
     },
   });
@@ -97,9 +97,9 @@ export function SocialLoginGate({
             Sign in to Agent Lab
           </h1>
           <p className="text-sm leading-relaxed text-ink-300">
-            Connect MetaMask for a wallet you control on Arbitrum Sepolia, or sign in with Google
+            Connect MetaMask for a wallet you control on Arbitrum, or sign in with Google
             or email for a self-custodial embedded wallet. Your signer becomes the treasury root for
-            test credits and on-chain agents.
+            credits and on-chain agents.
           </p>
         </div>
 
@@ -145,7 +145,7 @@ export function SocialLoginGate({
 
           <p className="flex items-center justify-center gap-1.5 text-[10px] text-ink-500">
             <Wallet className="h-3 w-3" />
-            MetaMask login uses your extension on Arbitrum Sepolia · Privy embedded wallet for social
+            MetaMask login uses your extension on Arbitrum · Privy embedded wallet for social
           </p>
 
           {error && (
@@ -162,7 +162,7 @@ export function SocialLoginGate({
         {error && <p className="text-center text-xs text-rose-300">{error}</p>}
 
         <p className="text-center text-[10px] text-ink-500">
-          Self-custodial Privy wallets · tCNHV test credits · Arbitrum Sepolia testnet only
+          Self-custodial Privy wallets · tCNHV credits · Arbitrum
         </p>
       </div>
     </div>

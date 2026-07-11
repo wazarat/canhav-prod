@@ -106,7 +106,7 @@ export function AgentFrameworkPanel({
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error ?? `Save failed (${res.status}).`);
-      setNotice("Framework saved — the next answer will reflect it.");
+      setNotice("Framework saved. The next answer will reflect it.");
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Save failed.");
@@ -376,10 +376,10 @@ export function AgentFrameworkPanel({
             {TRADE_HITL_METHODS.map((m) => (
               <option key={m} value={m}>
                 {m === "manual"
-                  ? "Manual — suggestion only"
+                  ? "Manual (suggestion only)"
                   : m === "propose_approve"
                     ? "Propose → Approve (default)"
-                    : "Spending caps — auto within limits"}
+                    : "Spending caps (auto within limits)"}
               </option>
             ))}
           </select>

@@ -94,7 +94,7 @@ export function CollabExchangeProof({
         settlement={{
           txHash: paymentRef,
           network: "eip155:421614",
-          networkName: "Arbitrum Sepolia",
+          networkName: "Arbitrum",
           humanAmount: amount ?? undefined,
           asset: assetLabel,
         }}

@@ -174,13 +174,13 @@ export function ProposedTradeCard({
         fheEnabled()
       ) {
         try {
-          setSpendNote("Recording encrypted spend on-chain — confirm in your wallet…");
+          setSpendNote("Recording encrypted spend on-chain. Confirm in your wallet…");
           const { recordSpendOnchain } = await import("@/lib/agent/fhe/client");
           await recordSpendOnchain(wallet, agentId, parsed.sizeUsd.ctHash);
           setSpendNote("Encrypted 24h spend counter updated.");
         } catch {
           setSpendNote(
-            "Trade executed, but the encrypted spend counter was not updated — future ciphertext cap checks won't count this trade.",
+            "Trade executed, but the encrypted spend counter was not updated. Future ciphertext cap checks won't count this trade.",
           );
         }
       }
@@ -251,8 +251,8 @@ export function ProposedTradeCard({
           ? `~$${sizeHuman} USD`
           : fheEnabled()
             ? "Size encrypted · reveal to view"
-            : "Size encrypted — enable FHE to reveal"}{" "}
-        · {parsed.leverage}x leverage · Arbitrum Sepolia
+            : "Size encrypted (enable FHE to reveal)"}{" "}
+        · {parsed.leverage}x leverage · Arbitrum
       </p>
       <p className="mt-1 font-mono text-[10px] text-ink-500">verdict: {parsed.verdictRef}</p>
 
@@ -306,19 +306,19 @@ export function ProposedTradeCard({
           </button>
           {autoApproved && (
             <p className="w-full text-[11px] text-ink-500">
-              No unattended signer — your wallet signature is what executes this trade.
+              No unattended signer: your wallet signature is what executes this trade.
             </p>
           )}
           {revealing && (
             <p className="w-full text-[11px] text-ink-500">
-              Decrypting via the CoFHE threshold network — first reveal also asks your
+              Decrypting via the CoFHE threshold network. The first reveal also asks your
               wallet for a one-time permit signature.
             </p>
           )}
           {isEncrypted && revealedUsd30 === null && !revealing && (
             <p className="w-full text-[11px] text-ink-500">
               {fheEnabled()
-                ? "The size is encrypted at rest — reveal it to approve. Caps and the research gate re-run when you sign."
+                ? "The size is encrypted at rest. Reveal it to approve. Caps and the research gate re-run when you sign."
                 : "Filed while FHE was enabled; re-enable NEXT_PUBLIC_FHE_ENABLED to reveal or approve. Reject works without revealing."}
             </p>
           )}

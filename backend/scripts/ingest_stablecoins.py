@@ -270,7 +270,7 @@ BATCH_ENTITY_COINS: Dict[str, Dict[str, Dict[str, str]]] = {
             "coingecko": None,
             "contractAddress": None,
             "description": (
-                "GHO savings product — yield-bearing wrapper, not the stablecoin itself. "
+                "GHO savings product: yield-bearing wrapper, not the stablecoin itself. "
                 "New sGHO experience live May 2026; legacy savings rebranded StkGHO."
             ),
         },

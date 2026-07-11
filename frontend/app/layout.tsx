@@ -28,9 +28,9 @@ const mono = JetBrains_Mono({
 });
 
 const DESCRIPTION =
-  "CanHav Research is a financial intelligence terminal for the Arbitrum ecosystem — taxonomy, datasets, and on-chain metrics for stablecoins and beyond.";
+  "CanHav Research is a financial intelligence terminal for the Arbitrum ecosystem: taxonomy, datasets, and on-chain metrics for stablecoins and beyond.";
 
-const SHARE_TITLE = `${SITE.name} — ${SITE.tagline}`;
+const SHARE_TITLE = `${SITE.name} · ${SITE.tagline}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),

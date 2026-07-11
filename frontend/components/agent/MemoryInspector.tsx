@@ -82,7 +82,7 @@ export function MemoryInspector({ agentId = DEFAULT_AGENT_ID }: { agentId?: stri
             Memory inspector
           </h3>
           <p className="mt-1 text-sm text-ink-300">
-            Learned facts persist across sessions — seed one and reload to prove it.
+            Learned facts persist across sessions. Seed one and reload to prove it.
           </p>
         </div>
         <Badge tone={data?.persistent ? "positive" : "neutral"}>

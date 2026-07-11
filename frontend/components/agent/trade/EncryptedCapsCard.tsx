@@ -138,7 +138,7 @@ export function EncryptedCapsCard({
       </div>
 
       <p className="mt-1.5 text-xs text-ink-500">
-        Caps are stored as ciphertext on Arbitrum Sepolia — encrypted proposals are compared
+        Caps are stored as ciphertext on Arbitrum. Encrypted proposals are compared
         to them without decrypting, and only you can read the numbers. Setting caps restarts
         the 24h window. The plaintext caps above still apply when you sign.
       </p>

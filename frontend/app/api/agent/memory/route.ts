@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     const text =
       typeof body.fact === "string" && body.fact.trim()
         ? body.fact.trim()
-        : `Checkpoint ${new Date().toISOString()} — CanHav agent memory persists across sessions.`;
+        : `Checkpoint ${new Date().toISOString()}: CanHav agent memory persists across sessions.`;
     seededFact = await appendMemory(agentId, { text, source: "seed" });
   }
 

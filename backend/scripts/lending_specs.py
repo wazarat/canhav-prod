@@ -383,7 +383,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
         name="Morpho",
         symbol="MORPHO",
         csv_slug="morpho",
-        tagline="Customizable lending infrastructure — isolated markets + curated vaults.",
+        tagline="Customizable lending infrastructure: isolated markets + curated vaults.",
         description=(
             "Morpho is a lending protocol built around Morpho Blue, a minimal primitive "
             "for creating isolated markets, with MetaMorpho vaults that allocate deposits "
@@ -3819,7 +3819,7 @@ LENDING_ENTITY_SPECS: Dict[str, Dict[str, Any]] = {
     "pendle": _net(
         name="Pendle Finance",
         symbol="PENDLE",
-        tagline="Tokenized yield — split principal and yield (PT/YT).",
+        tagline="Tokenized yield: split principal and yield (PT/YT).",
         logo_url="https://icons.llamao.fi/icons/protocols/pendle",
         description=(
             "Pendle tokenizes yield-bearing assets into Principal Tokens (PT) and Yield "

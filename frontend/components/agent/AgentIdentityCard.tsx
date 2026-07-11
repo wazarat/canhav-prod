@@ -60,7 +60,7 @@ export function AgentIdentityCard({
     ? {
         status: "verified",
         auditUrl: null,
-        source: "On-chain ERC-8004 identity (Arbitrum Sepolia)",
+        source: "On-chain ERC-8004 identity (Arbitrum)",
       }
     : {
         status: "unverified",
@@ -92,7 +92,7 @@ export function AgentIdentityCard({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge tone="signal">Arbitrum Sepolia</Badge>
+          <Badge tone="signal">Arbitrum</Badge>
           {verification?.verified ? (
             <Badge tone="positive">
               <ShieldCheck className="h-3 w-3" /> Verified

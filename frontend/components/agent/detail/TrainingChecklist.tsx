@@ -75,7 +75,7 @@ export function TrainingChecklist({
           <span className="kicker">Train your agent</span>
           <CardTitle className="mt-1 text-base">Training progress</CardTitle>
           <CardDescription className="mt-1">
-            Work down the list — each step levels the agent up and sharpens its research.
+            Work down the list. Each step levels the agent up and sharpens its research.
           </CardDescription>
         </div>
         <span className="tabular font-mono text-xs text-ink-400">

@@ -20,7 +20,7 @@ export function AumGauge({ composition }: AumGaugeProps) {
         <div>
           <CardTitle>AUM utilization</CardTitle>
           <CardDescription className="mt-1">
-            Pool size vs soft cap — minting disables at cap
+            Pool size vs soft cap. Minting disables at cap.
           </CardDescription>
         </div>
         <DataSourceDot dataSource={composition.dataSource} />
@@ -45,7 +45,7 @@ export function AumGauge({ composition }: AumGaugeProps) {
       </div>
 
       <Badge tone={atCap ? "danger" : nearCap ? "warning" : "positive"}>
-        {atCap ? "At cap — minting disabled" : nearCap ? "Near cap" : "Minting open"}
+        {atCap ? "At cap, minting disabled" : nearCap ? "Near cap" : "Minting open"}
       </Badge>
     </Card>
   );

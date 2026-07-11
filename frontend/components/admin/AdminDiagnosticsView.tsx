@@ -101,7 +101,7 @@ export function AdminDiagnosticsView({
       {linkageBroken && (
         <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
           This {category === "receipts" ? "receipt" : "coin"} won&apos;t appear under any network&apos;s
-          &ldquo;View all coins&rdquo; — fix the Entity link / MemberCoins in the Content editor tab.
+          &ldquo;View all coins&rdquo;. Fix the Entity link / MemberCoins in the Content editor tab.
         </p>
       )}
       <div className="overflow-x-auto rounded-md border border-ink-800">

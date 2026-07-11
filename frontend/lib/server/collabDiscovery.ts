@@ -148,7 +148,7 @@ async function buildAgentEntry(
   return {
     agentId,
     agentName: profile.name,
-    ownerHandle: profile.name.replace(/ — Research Skill$/, ""),
+    ownerHandle: profile.name.replace(/ [—·] Research Skill$/, ""),
     description: profile.description,
     creator,
     agentWallet: payWallet,

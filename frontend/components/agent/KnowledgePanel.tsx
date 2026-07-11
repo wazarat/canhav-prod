@@ -184,7 +184,7 @@ export function KnowledgePanel({
 
       {/* Add */}
       {docs.length >= max ? (
-        <p className="text-xs text-ink-500">Document limit reached — delete one to add another.</p>
+        <p className="text-xs text-ink-500">Document limit reached. Delete one to add another.</p>
       ) : (
         <div className="space-y-3 border-t border-ink-800/60 pt-3">
           <div className="flex items-center gap-1">
@@ -256,7 +256,7 @@ export function KnowledgePanel({
               />
               {!urlIngestionEnabled && (
                 <p className="text-[11px] text-ink-500">
-                  URL ingestion is disabled — set KNOWLEDGE_URL_ALLOWLIST to enable it.
+                  URL ingestion is disabled. Set KNOWLEDGE_URL_ALLOWLIST to enable it.
                 </p>
               )}
             </div>

@@ -35,7 +35,7 @@ export function UnlistedMarketNotice({
         <p className="mt-0.5 text-ink-300">
           {profile.name} is not listed on public market aggregators (CoinGecko, DeFi Llama) and
           has no public on-chain contract mapped, so live supply, price, and TVL metrics can&apos;t
-          be sourced. The qualitative research below — issuer facts, links, and classification —
+          be sourced. The qualitative research below (issuer facts, links, and classification)
           is curated and current.
         </p>
       </div>

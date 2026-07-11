@@ -121,7 +121,7 @@ export default async function AgentsPage({
           <h1 className="font-display text-4xl font-semibold tracking-tight text-ink-50">
             Agent <span className="text-gradient-brand">Lab</span>
           </h1>
-          <Badge tone="signal">Arbitrum Sepolia · Testnet</Badge>
+          <Badge tone="signal">Arbitrum</Badge>
           {session && collabEnabled() && <WalletBalanceChip />}
         </div>
         <p className="max-w-2xl text-sm leading-relaxed text-ink-300">
@@ -129,7 +129,7 @@ export default async function AgentsPage({
           pick the skills it should study, and mint its own on-chain{" "}
           <span className="font-medium text-ink-100">ERC-8004</span> identity through a
           self-custodial smart account. Chat with any of your agents from the floating assistant on
-          every data page. All agent activity is testnet-only.
+          every data page.
         </p>
       </header>
 
@@ -165,8 +165,8 @@ export default async function AgentsPage({
           <Card className="space-y-2">
             <CardTitle className="text-base">Inspect live data</CardTitle>
             <CardDescription>
-              Open one of your agents to run entity-scoped research tools against live CanHav data
-              — no LLM required.
+              Open one of your agents to run entity-scoped research tools against live CanHav data.
+              No LLM required.
             </CardDescription>
           </Card>
         </>
@@ -243,7 +243,7 @@ async function AgentsTab({
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-ink-300">
               Name it, tag it with a research category, and choose the skills it studies. Minting
-              creates a wallet-owned ERC-8004 token on Arbitrum Sepolia, scannable on Arbiscan.
+              creates a wallet-owned ERC-8004 token on Arbitrum, scannable on Arbiscan.
             </p>
           </div>
           <Badge tone="neutral">on-chain identity</Badge>

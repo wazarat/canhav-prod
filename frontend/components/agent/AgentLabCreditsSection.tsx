@@ -23,7 +23,7 @@ export function AgentLabCreditsSection({
             can pay sellers on the collaboration marketplace.
           </p>
         </div>
-        <Badge tone="signal">testnet only</Badge>
+        <Badge tone="signal">tCNHV</Badge>
       </div>
       <WalletCreditsPanel buyerAgents={buyerAgents} showMintActions />
     </section>

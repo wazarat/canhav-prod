@@ -35,7 +35,7 @@ export default async function ReceiptsPage() {
           Receipt Tokens
         </h1>
         <p className="max-w-2xl text-sm text-ink-300">
-          LSTs, lending receipts, yield vault shares, and staked wrappers — separate from primary
+          LSTs, lending receipts, yield vault shares, and staked wrappers, kept separate from primary
           governance and stablecoin listings.{" "}
           <span className="font-medium text-ink-100">{profiles.length}</span> families tracked.
         </p>

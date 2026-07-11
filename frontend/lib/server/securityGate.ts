@@ -56,6 +56,6 @@ export async function isTargetAllowed(target: Address): Promise<boolean> {
 /** Arbitrum Sepolia-only guard for trade paths. */
 export function assertArbitrumSepoliaChain(chainId = ARBITRUM_SEPOLIA_CHAIN_ID): void {
   if (chainId !== ARBITRUM_SEPOLIA_CHAIN_ID) {
-    throw new Error(`Trades are Arbitrum Sepolia (${ARBITRUM_SEPOLIA_CHAIN_ID}) only.`);
+    throw new Error(`Trades are restricted to chain ${ARBITRUM_SEPOLIA_CHAIN_ID}.`);
   }
 }

@@ -94,7 +94,7 @@ export async function POST(req: Request) {
   const rate = await checkRateLimit("request", fromAgentId, RATE_LIMIT, RATE_WINDOW_SECONDS);
   if (!rate.ok) {
     return NextResponse.json(
-      { ok: false, error: "Too many requests — slow down.", retryAfter: rate.retryAfter },
+      { ok: false, error: "Too many requests. Slow down.", retryAfter: rate.retryAfter },
       { status: 429, headers: { "Retry-After": String(rate.retryAfter ?? RATE_WINDOW_SECONDS) } },
     );
   }

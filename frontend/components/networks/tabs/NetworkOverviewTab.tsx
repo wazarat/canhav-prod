@@ -53,7 +53,7 @@ async function OverviewDashboard({ profile, labels }: { profile: NetworkProfile;
       <div className="flex justify-end">
         <Link
           href={`/admin?create=token&entity=${profile.slug}`}
-          className="text-xs text-ink-500 underline-offset-2 transition-colors hover:text-ink-300 hover:underline"
+          className="inline-flex items-center gap-1 rounded-lg border border-ink-700/60 bg-ink-900/40 px-2 py-1 text-xs text-ink-300 transition-colors hover:border-ink-600 hover:text-ink-100"
         >
           Create token (admin)
         </Link>

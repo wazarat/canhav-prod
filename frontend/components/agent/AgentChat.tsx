@@ -265,7 +265,7 @@ export function AgentChat({
                       <div className="flex items-center gap-2 pl-1">
                         {verdict === "saved" ? (
                           <span className="inline-flex items-center gap-1 text-[11px] text-signal-300">
-                            <Check className="h-3 w-3" /> Correction saved — the agent will
+                            <Check className="h-3 w-3" /> Correction saved. The agent will
                             remember.
                           </span>
                         ) : (
@@ -286,7 +286,7 @@ export function AgentChat({
                             </button>
                             <button
                               type="button"
-                              aria-label="Bad answer — correct it"
+                              aria-label="Bad answer, correct it"
                               onClick={() => {
                                 setFeedbackState((s) => ({ ...s, [m.id]: "down" }));
                                 setCorrectingId(m.id);

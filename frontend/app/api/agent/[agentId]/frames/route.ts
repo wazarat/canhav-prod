@@ -70,7 +70,7 @@ export async function POST(req: Request, { params }: { params: { agentId: string
   const saved = await saveDataFrame(agentId, frame);
   if (!saved) {
     return NextResponse.json(
-      { ok: false, error: `This agent already has ${MAX_DATA_FRAMES} frames — delete one first.` },
+      { ok: false, error: `This agent already has ${MAX_DATA_FRAMES} frames. Delete one first.` },
       { status: 400 },
     );
   }

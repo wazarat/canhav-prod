@@ -11,7 +11,7 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const profile = await getReceiptBySlug(params.slug);
-  return { title: profile ? `${profile.symbol} — Receipt` : "Receipt not found" };
+  return { title: profile ? `${profile.symbol} · Receipt` : "Receipt not found" };
 }
 
 export default async function ReceiptDetailPage({ params }: { params: { slug: string } }) {

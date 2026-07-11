@@ -318,17 +318,17 @@ export function TradeProposalForm({
 
       <p className="text-[11px] text-ink-500">
         {hitlMethod === "manual"
-          ? "Research only: you'll get a suggestion to place yourself on GMX — nothing is filed."
+          ? "Research only: you'll get a suggestion to place yourself on GMX; nothing is filed."
           : hitlMethod === "spending_cap"
             ? fheEnabled()
               ? "Auto within limits: with encrypted caps set on-chain, the cap check runs on ciphertext (nobody sees the numbers); otherwise caps are checked when you sign. Every trade still needs your wallet signature."
-              : "Auto within limits: proposals inside your caps skip the approval click — you still sign every trade in your wallet."
-            : "The proposal appears in the feed on the left — nothing trades until you approve it and sign."}
+              : "Auto within limits: proposals inside your caps skip the approval click, but you still sign every trade in your wallet."
+            : "The proposal appears in the feed on the left; nothing trades until you approve it and sign."}
         {fheEnabled() && hitlMethod !== "manual" && (
           <>
             {" "}
             Encrypted filing: your size is encrypted in this browser and registered on-chain
-            (one wallet signature + testnet gas) before it&apos;s stored — the server only
+            (one wallet signature + gas) before it&apos;s stored; the server only
             ever sees ciphertext until you sign the trade.
           </>
         )}
@@ -348,13 +348,13 @@ export function TradeProposalForm({
             <p className="text-xs text-ink-400">
               {result.capCheck === "onchain"
                 ? result.autoExecute
-                  ? "Within your encrypted caps — verified on ciphertext, auto-approved. Open it in the feed and sign to execute; no unattended signer exists."
-                  : "Over your encrypted caps — verified on ciphertext without revealing the size. It needs your explicit approval in the feed."
+                  ? "Within your encrypted caps: verified on ciphertext, auto-approved. Open it in the feed and sign to execute; no unattended signer exists."
+                  : "Over your encrypted caps: verified on ciphertext without revealing the size. It needs your explicit approval in the feed."
                 : result.capCheck === "deferred"
-                  ? "Size encrypted — caps are checked when you reveal and sign in the feed."
+                  ? "Size encrypted: caps are checked when you reveal and sign in the feed."
                   : result.autoExecute
-                    ? "Within caps — auto-approved. Open it in the feed and sign to execute; no unattended signer exists."
-                    : "Over your caps — it needs your explicit approval in the feed."}
+                    ? "Within caps: auto-approved. Open it in the feed and sign to execute; no unattended signer exists."
+                    : "Over your caps: it needs your explicit approval in the feed."}
             </p>
           )}
           {result.ok && result.suggestion && (

@@ -39,7 +39,7 @@ const GROUP_META: {
 
 /** Strip the boilerplate suffix so chips and rows stay compact. */
 function shortTitle(title: string): string {
-  return title.replace(/\s+—\s+(Research|Stablecoin|RWA|Token) Skill$/, "");
+  return title.replace(/\s+[—·]\s+(Research|Stablecoin|RWA|Token) Skill$/, "");
 }
 
 /**

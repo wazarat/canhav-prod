@@ -252,7 +252,7 @@ export function LaunchAgentButton({
       const activeWallet = resolveActiveWallet(wallets);
       if (!activeWallet) {
         throw new Error(
-          "No wallet connected yet — sign in with MetaMask or wait for your embedded wallet to finish loading.",
+          "No wallet connected yet. Sign in with MetaMask or wait for your embedded wallet to finish loading.",
         );
       }
       const signerAddress = activeWallet.address;
@@ -374,7 +374,7 @@ export function LaunchAgentButton({
           </h3>
           <p className="mt-1 text-sm text-ink-300">
             Mint an on-chain ERC-8004 identity owned by your self-custodial wallet. Your
-            wallet signs the mint and pays a small amount of Arbitrum Sepolia ETH gas.
+            wallet signs the mint and pays a small amount of ETH gas on Arbitrum.
           </p>
         </div>
         {!configured && (
@@ -623,7 +623,7 @@ export function LaunchAgentButton({
             Agent minted.{" "}
             {created.pending && (
               <span className="text-ink-300">
-                On-chain confirmation is still settling — open the agent to verify.{" "}
+                On-chain confirmation is still settling. Open the agent to verify.{" "}
               </span>
             )}
             <Link

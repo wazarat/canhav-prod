@@ -48,7 +48,7 @@ export function AgentMemoryPanel({
 
       {memory.length === 0 ? (
         <p className="text-sm text-ink-500">
-          Nothing learned yet — chat with the agent and it will remember durable facts here.
+          Nothing learned yet. Chat with the agent and it will remember durable facts here.
         </p>
       ) : (
         <ul className="space-y-2">

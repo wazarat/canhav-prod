@@ -32,7 +32,7 @@ export default function NewSkillPage({
         </h1>
         <p className="max-w-2xl text-sm leading-relaxed text-ink-300">
           Author custom research knowledge and attach it to your agent to train it. Skills are
-          read-only — they teach the agent, they never trade or transact.
+          read-only: they teach the agent, they never trade or transact.
           {returnAgentId && (
             <span className="mt-1 block text-electric-400">
               After saving, you&apos;ll return to your agent with this skill ready to attach.

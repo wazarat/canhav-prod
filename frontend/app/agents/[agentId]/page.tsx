@@ -10,6 +10,7 @@ import { AgentIdentityCard } from "@/components/agent/AgentIdentityCard";
 import { AgentMemoryPanel } from "@/components/agent/AgentMemoryPanel";
 import { AgentPerformanceCard } from "@/components/agent/AgentPerformanceCard";
 import { VerdictFeed } from "@/components/agent/VerdictFeed";
+import { ProposalNotifier } from "@/components/agent/ProposalNotifier";
 import { ProposedTradesPanel } from "@/components/agent/ProposedTradesPanel";
 import { AttachSkillPanel } from "@/components/agent/AttachSkillPanel";
 import { CollabSettingsPanel } from "@/components/agent/CollabSettingsPanel";
@@ -33,7 +34,7 @@ import { CustomToolsPanel } from "@/components/agent/CustomToolsPanel";
 import { DataFramesPanel } from "@/components/agent/DataFramesPanel";
 import { KnowledgePanel } from "@/components/agent/KnowledgePanel";
 import { agentConfigStatus, hasEmbeddings } from "@/lib/agent/config";
-import { hasMeaningfulConfig } from "@/lib/agent/agentConfig";
+import { hasMeaningfulConfig, sanitizeAgentConfig } from "@/lib/agent/agentConfig";
 import { collabEnabled } from "@/lib/collab-flag";
 import {
   CUSTOM_TOOL_LIMITS,
@@ -48,6 +49,7 @@ import {
   getAgentSnapshot,
   getAttachedSkillIds,
   listDataFrames,
+  listTradeProposals,
   MAX_DATA_FRAMES,
 } from "@/lib/agent/memory";
 import { OWNER_CORRECTION_SOURCE } from "@/lib/agent/prompt";
@@ -88,8 +90,18 @@ export default async function AgentHomePage({
     : false;
 
   const activeTab = resolveAgentTab(searchParams.tab, { isOwner });
-  const tabs = buildAgentTabs({ isOwner });
   const basePath = `/agents/${encodeURIComponent(agentId)}`;
+
+  // Pending-proposal count badges the Trade tab on every tab, so it is
+  // computed here rather than in ProposedTradesPanel (trade tab only).
+  // ProposalNotifier keeps it fresh via router.refresh().
+  const agentCfg = sanitizeAgentConfig(profile.config ?? {});
+  const pendingProposals = isOwner
+    ? (await listTradeProposals(agentId)).filter((p) => p.status === "proposed").length
+    : 0;
+  const tabs = buildAgentTabs({ isOwner }).map((tab) =>
+    tab.id === "trade" && pendingProposals > 0 ? { ...tab, badge: pendingProposals } : tab,
+  );
 
   // Enrichment counts feed the level badge for everyone (and the Train tab's
   // checklist), so they stay unconditional. Heavier editing data is fetched
@@ -248,6 +260,14 @@ export default async function AgentHomePage({
           ) : undefined
         }
       />
+
+      {isOwner && (
+        <ProposalNotifier
+          agentId={agentId}
+          hitlMethod={agentCfg.tradeHitlMethod}
+          basePath={basePath}
+        />
+      )}
 
       {isOwner && suggestions.length > 0 && (
         <AgentSuggestions agentId={agentId} suggestions={suggestions} />

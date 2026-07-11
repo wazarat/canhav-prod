@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 export interface TabBarTab {
   id: string;
   label: string;
+  /** Optional attention count rendered as a small pill after the label. */
+  badge?: number;
 }
 
 interface TabBarProps {
@@ -49,13 +51,19 @@ export function TabBar({ basePath, activeTab, tabs, defaultTab, trailing, classN
               role="tab"
               aria-selected={isActive}
               className={cn(
-                "whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
                 isActive
                   ? "border-electric-500/50 bg-electric-500/10 text-electric-300"
                   : "border-ink-700/60 bg-ink-900/40 text-ink-300 hover:border-ink-600 hover:text-ink-100",
               )}
             >
               {tab.label}
+              {typeof tab.badge === "number" && tab.badge > 0 ? (
+                <span className="rounded-full bg-neon-500/20 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-neon-300">
+                  {tab.badge}
+                  <span className="sr-only"> pending</span>
+                </span>
+              ) : null}
             </Link>
           );
         })}

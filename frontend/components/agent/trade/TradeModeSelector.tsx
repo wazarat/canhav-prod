@@ -8,27 +8,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import type { AgentConfig, TradeHitlMethod } from "@/lib/agent/agentConfig";
 import { cn } from "@/lib/utils";
-
-const MODES: { value: TradeHitlMethod; name: string; description: string }[] = [
-  {
-    value: "manual",
-    name: "Research only",
-    description:
-      "The agent researches and suggests. Nothing is filed or executed — you place any trade yourself.",
-  },
-  {
-    value: "propose_approve",
-    name: "Propose & approve",
-    description:
-      "The agent files a proposal. Nothing executes until you approve it and sign with your wallet.",
-  },
-  {
-    value: "spending_cap",
-    name: "Auto within limits",
-    description:
-      "Proposals inside your spending caps skip the approval click. No unattended signer exists — every trade still requires your wallet signature. Auto replaces the approval step, not the signature.",
-  },
-];
+import { TRADE_MODES } from "./tradeModes";
 
 /**
  * The three HITL methods as an explicit, named choice on the Trade Desk.
@@ -89,7 +69,7 @@ export function TradeModeSelector({
       </div>
 
       <div className="grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="Approval method">
-        {MODES.map((mode) => {
+        {TRADE_MODES.map((mode) => {
           const active = mode.value === selected;
           return (
             <button

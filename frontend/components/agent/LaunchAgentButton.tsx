@@ -4,12 +4,23 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { AlertTriangle, CheckCircle2, Loader2, LogIn, Rocket, Wallet } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ChevronDown,
+  Loader2,
+  LogIn,
+  Rocket,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
+import type { TradeHitlMethod } from "@/lib/agent/agentConfig";
 import { AGENT_CATEGORIES, type AgentCategory } from "@/lib/agent/categories";
 import { resolveActiveWallet } from "@/lib/agent/privy-signer";
 import { mintAgentOnClient, type SpawnPreflightResponse } from "@/lib/agent/spawn-client";
+import { MAX_LEVERAGE, MAX_SIZE_USD } from "@/lib/agent/trade/gmx";
 import { cn } from "@/lib/utils";
 import type { AgentProductRef } from "canhav-agent-service/src/types";
 import {
@@ -17,6 +28,7 @@ import {
   openResearchChat,
 } from "./research-chat-context";
 import { SkillPicker, type SkillPickerOption } from "./SkillPicker";
+import { TRADE_MODES } from "./trade/tradeModes";
 
 interface SkillOption {
   id: string;
@@ -42,6 +54,9 @@ interface SpawnResponse {
   error?: string;
   code?: string;
 }
+
+/** Platform hard cap, rendered in the guardrails honesty note. */
+const MAX_SIZE_USD_HUMAN = Number(MAX_SIZE_USD / 10n ** 30n);
 
 function newNonce(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -83,6 +98,13 @@ export function LaunchAgentButton({
   // own many agents; the nonce is held stable across retries and rotated after a
   // successful mint so the next launch is a distinct agent.
   const [createNonce, setCreateNonce] = useState<string>(() => newNonce());
+  // Launch-time GMX trading guardrails: optional HITL method + spending caps
+  // persisted with the spawn. Left untouched (propose_approve, no caps), the
+  // spawn body carries no config and the new agent keeps config: null.
+  const [guardrailsOpen, setGuardrailsOpen] = useState(false);
+  const [hitlMethod, setHitlMethod] = useState<TradeHitlMethod>("propose_approve");
+  const [spendingCapUsd, setSpendingCapUsd] = useState("");
+  const [cumulativeCapUsd, setCumulativeCapUsd] = useState("");
 
   const { ready, authenticated, login } = usePrivy();
   const { wallets } = useWallets();
@@ -281,6 +303,23 @@ export function LaunchAgentButton({
       );
       const platformExtraIds = extraSkillIds.filter((id) => !userSkillIdSet.has(id));
       const userSkillIds = extraSkillIds.filter((id) => userSkillIdSet.has(id));
+      // Guardrails ride along only when they differ from the default; caps are
+      // USD-30d decimal strings, same conversion as AgentFrameworkPanel. Caps
+      // only apply under spending_cap (the only method the inputs show for).
+      const launchConfig =
+        hitlMethod !== "propose_approve"
+          ? {
+              tradeHitlMethod: hitlMethod,
+              tradeSpendingCapUsd:
+                hitlMethod === "spending_cap" && spendingCapUsd.trim()
+                  ? (BigInt(spendingCapUsd.trim()) * 10n ** 30n).toString()
+                  : null,
+              tradeCumulativeCapUsd:
+                hitlMethod === "spending_cap" && cumulativeCapUsd.trim()
+                  ? (BigInt(cumulativeCapUsd.trim()) * 10n ** 30n).toString()
+                  : null,
+            }
+          : undefined;
       const res = await fetch("/api/agent/spawn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -293,6 +332,7 @@ export function LaunchAgentButton({
           category: category ?? undefined,
           extraSkillIds: platformExtraIds,
           userSkillIds,
+          ...(launchConfig ? { config: launchConfig } : {}),
         }),
       });
       const data = (await res.json()) as SpawnResponse;
@@ -309,6 +349,10 @@ export function LaunchAgentButton({
         setCategory(null);
         setExtraSkillIds([]);
         autoAddedRef.current = new Set();
+        setGuardrailsOpen(false);
+        setHitlMethod("propose_approve");
+        setSpendingCapUsd("");
+        setCumulativeCapUsd("");
         router.refresh();
       } else {
         openResearchChat();
@@ -433,6 +477,120 @@ export function LaunchAgentButton({
               />
             </div>
           )}
+
+          <div className="rounded-xl border border-ink-800/60 bg-ink-950/40">
+            <button
+              type="button"
+              onClick={() => setGuardrailsOpen((v) => !v)}
+              disabled={busy}
+              aria-expanded={guardrailsOpen}
+              className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left disabled:opacity-50"
+            >
+              <span className="flex flex-wrap items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-electric-400" />
+                <span className="text-xs font-medium uppercase tracking-wider text-ink-400">
+                  GMX trading guardrails
+                </span>
+                {hitlMethod !== "propose_approve" && (
+                  <Badge tone="electric" className="px-1.5 py-0 text-[9px] uppercase">
+                    {TRADE_MODES.find((m) => m.value === hitlMethod)?.name}
+                  </Badge>
+                )}
+              </span>
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 shrink-0 text-ink-500 transition-transform",
+                  guardrailsOpen && "rotate-180",
+                )}
+              />
+            </button>
+
+            {guardrailsOpen && (
+              <div className="space-y-3 border-t border-ink-800/60 p-3">
+                <p className="text-xs text-ink-500">
+                  Choose how this agent&apos;s GMX trades execute. You can change this any
+                  time on the agent&apos;s trade desk.
+                </p>
+                <div className="grid gap-2" role="radiogroup" aria-label="Trade approval method">
+                  {TRADE_MODES.map((mode) => {
+                    const active = mode.value === hitlMethod;
+                    return (
+                      <button
+                        key={mode.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        onClick={() => setHitlMethod(mode.value)}
+                        disabled={busy}
+                        className={cn(
+                          "rounded-lg border px-3 py-2 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+                          active
+                            ? "border-electric-500/40 bg-electric-500/10"
+                            : "border-ink-800/60 bg-ink-950/40 hover:border-ink-700",
+                        )}
+                      >
+                        <span className="flex flex-wrap items-center gap-1.5">
+                          <span
+                            className={cn(
+                              "text-sm font-semibold",
+                              active ? "text-electric-300" : "text-ink-100",
+                            )}
+                          >
+                            {mode.name}
+                          </span>
+                          {active && (
+                            <CheckCircle2 className="h-3.5 w-3.5 text-electric-400" />
+                          )}
+                          {mode.value === "propose_approve" && (
+                            <Badge tone="electric" className="px-1.5 py-0 text-[9px] uppercase">
+                              default
+                            </Badge>
+                          )}
+                        </span>
+                        <span className="mt-1 block text-[11px] leading-relaxed text-ink-400">
+                          {mode.description}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {hitlMethod === "spending_cap" && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="block space-y-1.5">
+                      <span className="text-xs text-ink-400">Per-trade cap (USD)</span>
+                      <input
+                        value={spendingCapUsd}
+                        onChange={(e) =>
+                          setSpendingCapUsd(e.target.value.replace(/[^\d]/g, ""))
+                        }
+                        disabled={busy}
+                        placeholder="e.g. 15"
+                        className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-1.5 text-sm text-ink-100 placeholder:text-ink-500 outline-none focus:border-electric-500/60 disabled:opacity-50"
+                      />
+                    </label>
+                    <label className="block space-y-1.5">
+                      <span className="text-xs text-ink-400">Daily cumulative cap (USD)</span>
+                      <input
+                        value={cumulativeCapUsd}
+                        onChange={(e) =>
+                          setCumulativeCapUsd(e.target.value.replace(/[^\d]/g, ""))
+                        }
+                        disabled={busy}
+                        placeholder="optional"
+                        className="w-full rounded-lg border border-ink-700 bg-ink-900/60 px-3 py-1.5 text-sm text-ink-100 placeholder:text-ink-500 outline-none focus:border-electric-500/60 disabled:opacity-50"
+                      />
+                    </label>
+                  </div>
+                )}
+
+                <p className="text-[11px] text-ink-500">
+                  Platform hard caps always apply: ${MAX_SIZE_USD_HUMAN} max per trade,{" "}
+                  {MAX_LEVERAGE}x max leverage.
+                </p>
+              </div>
+            )}
+          </div>
 
           <button
             type="button"

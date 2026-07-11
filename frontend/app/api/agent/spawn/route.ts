@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { hasMeaningfulConfig, sanitizeAgentConfig } from "@/lib/agent/agentConfig";
 import { hasOnchainIdentity } from "@/lib/agent/config";
 import { creationSlotKey, deriveAccountIndex } from "@/lib/agent/account-index";
 import { resolveEntityBinding } from "@/lib/agent/entity-binding";
@@ -85,6 +86,7 @@ export async function POST(req: Request) {
     extraSkillIds?: unknown;
     userSkillIds?: unknown;
     signerAddress?: unknown;
+    config?: unknown;
   } = {};
   try {
     body = (await req.json()) as typeof body;
@@ -197,6 +199,12 @@ export async function POST(req: Request) {
       ? body.signerAddress.trim()
       : null;
 
+  // Launch-time guardrails: an optional owner-supplied framework config (HITL
+  // method + spending caps from the launch card). Sanitized like the PATCH
+  // route; a default/untouched config is dropped so the profile keeps
+  // config: null and no guardrail row exists until the owner sets one.
+  const launchConfig = sanitizeAgentConfig(body.config);
+
   await seedAgentProfile({
     agentId,
     name: customName ?? skill.title,
@@ -212,6 +220,7 @@ export async function POST(req: Request) {
     agentWallet,
     onChain: confirmedOnChain,
     pendingVerification: !confirmedOnChain,
+    config: hasMeaningfulConfig(launchConfig) ? launchConfig : undefined,
   });
   await markSkillStudied(agentId, skillId);
 

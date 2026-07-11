@@ -86,7 +86,7 @@ async function loadOwnedAgents(userId: string | null, defaultAgentId: string) {
 export default async function AgentsPage({
   searchParams,
 }: {
-  searchParams: { tab?: string };
+  searchParams: { tab?: string; skill?: string };
 }) {
   const status = agentConfigStatus();
   const session = getSession();
@@ -156,7 +156,7 @@ export default async function AgentsPage({
         }
       />
 
-      {activeTab === "agents" && <AgentsTab session={session} defaultAgentId={defaultAgentId} mintConfigured={status.onchainIdentity} />}
+      {activeTab === "agents" && <AgentsTab session={session} defaultAgentId={defaultAgentId} mintConfigured={status.onchainIdentity} initialSkillId={searchParams.skill} />}
 
       {activeTab === "credits" && session && (
         <CreditsTab userId={session.userId} defaultAgentId={defaultAgentId} />
@@ -188,10 +188,12 @@ async function AgentsTab({
   session,
   defaultAgentId,
   mintConfigured,
+  initialSkillId,
 }: {
   session: { userId: string } | null;
   defaultAgentId: string;
   mintConfigured: boolean;
+  initialSkillId?: string;
 }) {
   const [skills, { agents, agentChain }] = await Promise.all([
     getAgentSkills(),
@@ -257,6 +259,7 @@ async function AgentsTab({
         <LaunchAgentButton
           skills={skills.map((s: PlatformSkill) => ({ id: s.id, title: s.title }))}
           mintConfigured={mintConfigured}
+          initialSkillId={initialSkillId}
         />
       </div>
     </>

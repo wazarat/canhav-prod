@@ -52,7 +52,7 @@ async function OverviewDashboard({ profile, labels }: { profile: NetworkProfile;
       <MemberCoinsLauncher coins={data.coins} networkName={profile.name} />
       <div className="flex justify-end">
         <Link
-          href="/agents"
+          href={`/agents?tab=agents&skill=${encodeURIComponent(profile.slug)}#create`}
           className="inline-flex items-center gap-1 rounded-lg border border-ink-700/60 bg-ink-900/40 px-2 py-1 text-xs text-ink-300 transition-colors hover:border-ink-600 hover:text-ink-100"
         >
           Create agent

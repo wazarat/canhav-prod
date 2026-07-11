@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, BookOpen, ChevronRight } from "lucide-react";
+import { ArrowUpRight, BookOpen, Bot, ChevronRight } from "lucide-react";
 
 import { SecurityBadge } from "@/components/shared/SecurityBadge";
 import { Badge } from "@/components/ui/Badge";
@@ -196,6 +196,13 @@ export function NetworkEntityHeader({
                 </a>
               )}
             </div>
+            <Link
+              href={`/agents?tab=agents&skill=${encodeURIComponent(profile.slug)}#create`}
+              className={ctaPrimary}
+            >
+              <Bot className="h-4 w-4" />
+              Create agent with {profile.name}
+            </Link>
           </div>
         </div>
       </div>

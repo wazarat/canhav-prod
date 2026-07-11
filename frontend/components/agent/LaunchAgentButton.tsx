@@ -69,6 +69,7 @@ export function LaunchAgentButton({
   skills,
   mintConfigured,
   entitySlug,
+  initialSkillId,
 }: {
   skills: SkillOption[];
   mintConfigured: boolean;
@@ -77,9 +78,18 @@ export function LaunchAgentButton({
    * Omitted on the Agents tab, where agents are general (no entity binding).
    */
   entitySlug?: string;
+  /**
+   * Preselects the core skill (e.g. a network page's "Create agent" CTA passes
+   * its entity skill). Ignored when it doesn't match a known skill.
+   */
+  initialSkillId?: string;
 }) {
   const router = useRouter();
-  const [skillId, setSkillId] = useState(skills[0]?.id ?? "");
+  const [skillId, setSkillId] = useState(() =>
+    initialSkillId && skills.some((s) => s.id === initialSkillId)
+      ? initialSkillId
+      : (skills[0]?.id ?? ""),
+  );
   const [agentName, setAgentName] = useState("");
   const [category, setCategory] = useState<AgentCategory | null>(null);
   const [catalog, setCatalog] = useState<SkillPickerOption[]>([]);

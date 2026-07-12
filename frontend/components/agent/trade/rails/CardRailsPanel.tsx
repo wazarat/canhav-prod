@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import {
   countCaught,
-  RAIL_BACKTEST_EVENTS,
+  eventsForAsset,
   runBacktest,
   type EventResult,
   type RailFire,
@@ -16,6 +16,7 @@ import {
   defaultRailState,
   FAMILY_LABELS,
   RAILS,
+  type RailAsset,
   type RailDef,
   type RailFamily,
   type RailSeverity,
@@ -37,7 +38,10 @@ const SEVERITY_TONE: Record<RailSeverity, "danger" | "warning" | "neutral"> = {
 };
 
 /** Results at factory defaults, the fixed baseline the delta chips compare against. */
-const DEFAULT_RESULTS = runBacktest(RAILS, defaultRailState(RAILS), RAIL_BACKTEST_EVENTS);
+const DEFAULT_RESULTS: Record<RailAsset, EventResult[]> = {
+  AAVE: runBacktest(RAILS, defaultRailState(RAILS), eventsForAsset("AAVE")),
+  ETH: runBacktest(RAILS, defaultRailState(RAILS), eventsForAsset("ETH")),
+};
 
 function formatValue(value: number, unit: string): string {
   return `${value}${unit}`;
@@ -53,6 +57,7 @@ function tripLabel(rail: RailDef, value: number): string {
 function liveReading(
   rail: RailDef,
   live: RailLiveInputs | null,
+  asset: RailAsset,
 ): { label: string; value: number; trips: boolean } | null {
   if (!live || !rail.threshold) return null;
   const { key } = rail.threshold;
@@ -65,7 +70,7 @@ function liveReading(
   }
   if (key === "change24hPct" && live.change24hPct != null) {
     return {
-      label: `AAVE 24h ${live.change24hPct >= 0 ? "+" : ""}${live.change24hPct.toFixed(1)}%`,
+      label: `${asset} 24h ${live.change24hPct >= 0 ? "+" : ""}${live.change24hPct.toFixed(1)}%`,
       value: live.change24hPct,
       trips: false,
     };
@@ -79,14 +84,16 @@ function RailCard({
   onToggle,
   onValue,
   live,
+  asset,
 }: {
   rail: RailDef;
   state: { enabled: boolean; value: number };
   onToggle: () => void;
   onValue: (value: number) => void;
   live: RailLiveInputs | null;
+  asset: RailAsset;
 }) {
-  const reading = liveReading(rail, live);
+  const reading = liveReading(rail, live, asset);
   const readingTrips =
     reading != null &&
     state.enabled &&
@@ -294,16 +301,23 @@ function EventRow({
 }
 
 /**
- * Card rails for the AAVE desk: toggleable trigger rules the agent watches,
- * with editable thresholds and a live backtest showing how each setting
- * would have fired on real Aave history. Settings live in this session only
- * (nothing persists); rails only ever propose through the existing
- * research gate and approval pipeline.
+ * Card rails for the AAVE and ETH desks: toggleable trigger rules the agent
+ * watches, with editable thresholds and a live backtest showing how each
+ * setting would have fired on real market history. Settings live in this
+ * session only (nothing persists); rails only ever propose through the
+ * existing research gate and approval pipeline.
  */
-export function CardRailsPanel({ live }: { live: RailLiveInputs | null }) {
+export function CardRailsPanel({
+  asset,
+  live,
+}: {
+  asset: RailAsset;
+  live: RailLiveInputs | null;
+}) {
   const [state, setState] = useState<RailState>(() => defaultRailState(RAILS));
 
-  const results = useMemo(() => runBacktest(RAILS, state, RAIL_BACKTEST_EVENTS), [state]);
+  const events = useMemo(() => eventsForAsset(asset), [asset]);
+  const results = useMemo(() => runBacktest(RAILS, state, events), [state, events]);
   const { caught, total } = countCaught(results);
   const isDefault = useMemo(
     () => JSON.stringify(state) === JSON.stringify(defaultRailState(RAILS)),
@@ -343,7 +357,7 @@ export function CardRailsPanel({ live }: { live: RailLiveInputs | null }) {
       <p className="text-xs leading-relaxed text-ink-500">
         Each rail watches an input, trips a threshold, and suggests an action. Rails only ever
         propose; the research gate stays first and every fire needs your approval. Move a
-        threshold to see how the call would have changed on real Aave history below. Settings
+        threshold to see how the call would have changed on real market history below. Settings
         here are session-only.
       </p>
 
@@ -363,6 +377,7 @@ export function CardRailsPanel({ live }: { live: RailLiveInputs | null }) {
                     onToggle={() => toggle(rail.id)}
                     onValue={(v) => setValue(rail.id, v)}
                     live={live}
+                    asset={asset}
                   />
                 ))}
               </div>
@@ -409,7 +424,7 @@ export function CardRailsPanel({ live }: { live: RailLiveInputs | null }) {
               <EventRow
                 key={result.event.id}
                 result={result}
-                defaultResult={DEFAULT_RESULTS[i]}
+                defaultResult={DEFAULT_RESULTS[asset][i]}
               />
             ))}
           </div>
@@ -418,7 +433,10 @@ export function CardRailsPanel({ live }: { live: RailLiveInputs | null }) {
 
       <p className="text-[11px] leading-relaxed text-ink-500">
         A fired rail only files a proposal through the same propose, then approve path as every
-        other call. Nothing executes without your approval, and AAVE stays recommendation-only.
+        other call.{" "}
+        {asset === "AAVE"
+          ? "Nothing executes without your approval, and AAVE stays recommendation-only."
+          : "Nothing executes until you approve the proposal and sign it in your wallet; only then does a GMX order go out."}
       </p>
     </div>
   );

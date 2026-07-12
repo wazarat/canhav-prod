@@ -8,6 +8,7 @@
 import {
   DEPEG_HARD_PCT,
   type MetricKey,
+  type RailAsset,
   type RailDef,
   type RailSeverity,
   type RailState,
@@ -31,6 +32,13 @@ export interface BacktestEvent {
   wouldHaveSaid: string;
   /** What actually happened, for the honesty line under each row. */
   outcome: string;
+  /** Desks the event applies to; absent = every rails desk. */
+  assets?: RailAsset[];
+}
+
+/** The backtest events that apply to a desk's asset. */
+export function eventsForAsset(asset: RailAsset): BacktestEvent[] {
+  return RAIL_BACKTEST_EVENTS.filter((e) => !e.assets || e.assets.includes(asset));
 }
 
 export interface RailFire {
@@ -118,7 +126,9 @@ export function countCaught(results: EventResult[]): { caught: number; total: nu
 }
 
 /**
- * Five real events from the Aave dependency research (the Risks-tab work).
+ * Five real events from the Aave/ETH dependency research (the Risks-tab
+ * work). Four are ETH/LST/LRT dependency shocks that apply to both desks;
+ * the CRV bad-debt event is Aave-solvency only (see its `assets` tag).
  * Each metric is the early-window reading a live rail would have seen:
  *  - stETH 2022: ~2.5% below ETH in early June, before Celsius froze
  *    withdrawals and the discount deepened toward 5%+.
@@ -149,6 +159,8 @@ export const RAIL_BACKTEST_EVENTS: BacktestEvent[] = [
       "The Mango attacker's CRV short left Aave with about 2.7M CRV of bad debt and a frozen market.",
     severity: "high",
     metrics: { frozenMarket: 1 },
+    // Aave-protocol solvency event, not an ETH dependency story.
+    assets: ["AAVE"],
     wouldHaveSaid: "SELL: held-coin market frozen, protocol carrying bad debt.",
     outcome: "The debt lingered until mid-2025, a long and correct de-risk window.",
   },
@@ -184,6 +196,6 @@ export const RAIL_BACKTEST_EVENTS: BacktestEvent[] = [
     severity: "high",
     metrics: { depegPct: 4, issuerTvlDropPct: 18, frozenMarket: 1 },
     wouldHaveSaid: "SELL: core dependency rsETH triggered a governance risk response.",
-    outcome: "The exact scenario the rails exist for: a dependency event becomes an AAVE call.",
+    outcome: "The exact scenario the rails exist for: a dependency event becomes a sell call.",
   },
 ];

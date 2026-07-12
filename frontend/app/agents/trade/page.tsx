@@ -4,13 +4,14 @@ import { ChevronRight } from "lucide-react";
 import { ProposalNotifier } from "@/components/agent/ProposalNotifier";
 import { ProposedTradesPanel } from "@/components/agent/ProposedTradesPanel";
 import { CardRailsSection } from "@/components/agent/trade/rails/CardRailsSection";
+import { railAssetForSkill } from "@/components/agent/trade/rails/railDefs";
 import { TradeDesk } from "@/components/agent/trade/TradeDesk";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { sanitizeAgentConfig } from "@/lib/agent/agentConfig";
 import { getAgentProfile, listTradeProposals, type AgentProfile } from "@/lib/agent/memory";
 import { listOwnedAgentIds } from "@/lib/agent/ownership";
-import { getTradeCoin, getTradeCoinsForAgent } from "@/lib/agent/trade/coins";
+import { getTradeCoin } from "@/lib/agent/trade/coins";
 import { getSession } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
@@ -157,9 +158,10 @@ export default async function TradePage({
             </div>
           </div>
 
-          {getTradeCoinsForAgent(agent.skillId).some((c) => c.symbol === "AAVE") && (
-            <CardRailsSection />
-          )}
+          {(() => {
+            const railAsset = railAssetForSkill(agent.skillId);
+            return railAsset && <CardRailsSection asset={railAsset} />;
+          })()}
         </>
       )}
     </div>

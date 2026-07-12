@@ -19,8 +19,8 @@ import { PublishAgentCard } from "@/components/agent/PublishAgentCard";
 import { SkillShelf } from "@/components/agent/SkillShelf";
 import { TrainingChecklist } from "@/components/agent/detail/TrainingChecklist";
 import { CardRailsSection } from "@/components/agent/trade/rails/CardRailsSection";
+import { railAssetForSkill } from "@/components/agent/trade/rails/railDefs";
 import { TradeDesk } from "@/components/agent/trade/TradeDesk";
-import { getTradeCoinsForAgent } from "@/lib/agent/trade/coins";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { SectionNav, type SectionNavItem } from "@/components/ui/SectionNav";
@@ -316,9 +316,10 @@ export default async function AgentHomePage({
               </div>
             )}
           </div>
-          {getTradeCoinsForAgent(profile.skillId).some((c) => c.symbol === "AAVE") && (
-            <CardRailsSection />
-          )}
+          {(() => {
+            const railAsset = railAssetForSkill(profile.skillId);
+            return railAsset && <CardRailsSection asset={railAsset} />;
+          })()}
         </div>
       )}
 

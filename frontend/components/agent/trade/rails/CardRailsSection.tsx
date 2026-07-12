@@ -1,19 +1,22 @@
 import { fetchReserveRatesForSlug } from "@/lib/server/aave";
 import { resolveCoin } from "@/lib/server/coingecko";
+import type { RailAsset } from "./railDefs";
 import { CardRailsPanel, type RailLiveInputs } from "./CardRailsPanel";
 
 /**
- * Full-width Card Rails section for AAVE desks, rendered below the desk grid
- * so the guardrail cards and the historical backtest sit side by side. Owns
- * the live desk readings (max-utilization Aave reserve + AAVE market data);
- * every read fails soft to null so the rails and backtest work fully offline.
+ * Full-width Card Rails section for AAVE and ETH desks, rendered below the
+ * desk grid so the guardrail cards and the historical backtest sit side by
+ * side. Owns the live desk readings: the max-utilization Aave reserve (those
+ * reserves are the ETH dependency markets, so they apply to both desks) and
+ * the desk token's market data. Every read fails soft to null so the rails
+ * and backtest work fully offline.
  */
-export async function CardRailsSection() {
+export async function CardRailsSection({ asset }: { asset: RailAsset }) {
   const [reserves, market] = await Promise.all([
     Promise.all(["aweth", "ausdc", "ausdt", "gho"].map(fetchReserveRatesForSlug)).catch(
       () => null,
     ),
-    resolveCoin("aave", 60).catch(() => null),
+    resolveCoin(asset === "ETH" ? "ethereum" : "aave", 60).catch(() => null),
   ]);
 
   const hottest = (reserves ?? [])
@@ -32,7 +35,7 @@ export async function CardRailsSection() {
 
   return (
     <div className="card-surface glow-ring rounded-2xl border border-ink-800/60 p-5">
-      <CardRailsPanel live={live} />
+      <CardRailsPanel asset={asset} live={live} />
     </div>
   );
 }

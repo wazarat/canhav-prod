@@ -1,5 +1,6 @@
 import {
   countCaught,
+  eventsForAsset,
   RAIL_BACKTEST_EVENTS,
   runBacktest,
 } from "@/components/agent/trade/rails/backtest";
@@ -60,5 +61,17 @@ describe("card-rails backtest engine", () => {
     state.lrt_depeg_guard.value = 1.5;
     results = runBacktest(RAILS, state, RAIL_BACKTEST_EVENTS);
     expect(resultFor(results, "unwind-2024-08-05").fired).toBe(false);
+  });
+
+  it("AAVE desk keeps all 5 events; ETH desk drops the Aave-solvency CRV event", () => {
+    expect(eventsForAsset("AAVE")).toHaveLength(5);
+    const ethEvents = eventsForAsset("ETH");
+    expect(ethEvents).toHaveLength(4);
+    expect(ethEvents.map((e) => e.id)).not.toContain("crv-bad-debt-2022");
+  });
+
+  it("ETH desk catches all 4 of its events at factory defaults", () => {
+    const results = runBacktest(RAILS, defaultRailState(RAILS), eventsForAsset("ETH"));
+    expect(countCaught(results)).toEqual({ caught: 4, total: 4 });
   });
 });

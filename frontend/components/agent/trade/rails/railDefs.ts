@@ -1,14 +1,30 @@
 /**
- * Card rail definitions for the AAVE Trade Desk, from the Aave card-rails
- * guideline. A rail is a declarative rule: WATCH an input, WHEN a threshold
- * trips, SUGGEST an action with a severity, and emit the mapped verdict
- * signal. Rails only ever propose; the research gate and HITL approval stay
+ * Card rail definitions for the AAVE and ETH Trade Desks, from the Aave
+ * card-rails guideline. A rail is a declarative rule: WATCH an input, WHEN a
+ * threshold trips, SUGGEST an action with a severity, and emit the mapped
+ * verdict signal. Rails only ever propose; the research gate and HITL approval stay
  * in front of anything that moves money. This module is pure data so the
  * client panel and the backtest engine can both import it.
  */
 
 export type RailFamily = "dependency" | "protocol" | "market" | "governance";
 export type RailSeverity = "low" | "medium" | "high";
+
+/** Desks that carry the card-rails section. */
+export type RailAsset = "AAVE" | "ETH";
+
+/**
+ * Which rails asset a desk gets from its skill, mirroring the slug parsing
+ * in getTradeCoinsForAgent: entity skills use the bare slug, product skills
+ * are namespaced `token:{slug}`. Majors/unmapped desks get no rails.
+ */
+export function railAssetForSkill(skillId: string | null | undefined): RailAsset | null {
+  const raw = skillId?.trim().toLowerCase() ?? "";
+  const slug = raw.includes(":") ? raw.slice(raw.indexOf(":") + 1) : raw;
+  if (slug === "aave") return "AAVE";
+  if (slug === "ethereum") return "ETH";
+  return null;
+}
 
 /** Metric keys shared between rail thresholds and backtest event fixtures. */
 export type MetricKey =
@@ -21,8 +37,8 @@ export type MetricKey =
   | "supplyApyDropWowPct" // supply APY drop week over week, %
   | "revenueDropMomPct" // protocol revenue drop month over month, %
   | "tvlDrop7dPct" // protocol TVL drop over 7d, %
-  | "change24hPct" // AAVE 24h price change, signed %
-  | "change7dPct" // AAVE 7d price change, signed %
+  | "change24hPct" // token 24h price change, signed %
+  | "change7dPct" // token 7d price change, signed %
   | "volumeVs30dAvgX" // 24h volume as a multiple of the 30d average
   | "gainPct" // unrealized gain vs entry, %
   | "governanceEvent" // 1 = flagged high-impact governance proposal
@@ -109,7 +125,7 @@ export const RAILS: RailDef[] = [
       step: 0.25,
       direction: "gte",
     },
-    suggests: { action: "SELL", detail: "de-risk AAVE exposure, freeze new LRT longs" },
+    suggests: { action: "SELL", detail: "de-risk exposure, freeze new LRT longs" },
     severity: "medium",
     emits: "peg_risk",
     interactive: true,
@@ -283,12 +299,12 @@ export const RAILS: RailDef[] = [
     defaultEnabled: true,
   },
 
-  // C. AAVE token market rails: price and momentum on the token itself.
+  // C. Token market rails: price and momentum on the desk's token itself.
   {
     id: "momentum_flip",
     family: "market",
     name: "Momentum flip",
-    watch: "AAVE 24h change with the 7d trend",
+    watch: "token 24h change with the 7d trend",
     threshold: {
       key: "change24hPct",
       label: "24h change",
@@ -378,7 +394,7 @@ export const RAILS: RailDef[] = [
     id: "governance_risk",
     family: "governance",
     name: "Governance risk",
-    watch: "AAVE governance proposals (emissions, listings)",
+    watch: "protocol governance proposals (emissions, listings)",
     threshold: null,
     eventKey: "governanceEvent",
     suggests: { action: "HOLD", detail: "review before acting" },

@@ -11,7 +11,16 @@ import { CardRailsPanel, type RailLiveInputs } from "./CardRailsPanel";
  * the desk token's market data. Every read fails soft to null so the rails
  * and backtest work fully offline.
  */
-export async function CardRailsSection({ asset }: { asset: RailAsset }) {
+export async function CardRailsSection({
+  asset,
+  agentId,
+  isOwner = false,
+}: {
+  asset: RailAsset;
+  /** When set with isOwner, tripping rails can file real trade proposals. */
+  agentId?: string;
+  isOwner?: boolean;
+}) {
   const [reserves, market] = await Promise.all([
     Promise.all(["aweth", "ausdc", "ausdt", "gho"].map(fetchReserveRatesForSlug)).catch(
       () => null,
@@ -35,7 +44,7 @@ export async function CardRailsSection({ asset }: { asset: RailAsset }) {
 
   return (
     <div className="card-surface glow-ring rounded-2xl border border-ink-800/60 p-5">
-      <CardRailsPanel asset={asset} live={live} />
+      <CardRailsPanel asset={asset} live={live} agentId={isOwner ? agentId : undefined} />
     </div>
   );
 }

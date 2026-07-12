@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { History, SlidersHorizontal } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
@@ -36,6 +37,18 @@ const SEVERITY_TONE: Record<RailSeverity, "danger" | "warning" | "neutral"> = {
   medium: "warning",
   low: "neutral",
 };
+
+/** Notional a rail files when it trips; well inside the $50 desk hard cap. */
+const RAIL_PROPOSE_SIZE_USD = 8;
+
+/** The trade side a rail's suggested action maps to; null = never proposes. */
+function railProposeSide(action: RailDef["suggests"]["action"]): "long" | "short" | null {
+  if (action === "SELL" || action === "REDUCE" || action === "TRIM") return "short";
+  if (action === "BUY") return "long";
+  return null;
+}
+
+type RailProposeStatus = { busy?: boolean; ok?: boolean; error?: string };
 
 /** Results at factory defaults, the fixed baseline the delta chips compare against. */
 const DEFAULT_RESULTS: Record<RailAsset, EventResult[]> = {
@@ -85,6 +98,8 @@ function RailCard({
   onValue,
   live,
   asset,
+  onPropose,
+  proposeStatus,
 }: {
   rail: RailDef;
   state: { enabled: boolean; value: number };
@@ -92,6 +107,9 @@ function RailCard({
   onValue: (value: number) => void;
   live: RailLiveInputs | null;
   asset: RailAsset;
+  /** Set when the owner desk can file proposals from tripping rails. */
+  onPropose?: (rail: RailDef, side: "long" | "short") => void;
+  proposeStatus?: RailProposeStatus;
 }) {
   const reading = liveReading(rail, live, asset);
   const readingTrips =
@@ -202,6 +220,42 @@ function RailCard({
       <p className="mt-1.5 text-[11px] leading-relaxed text-ink-500">
         suggests <span className="text-ink-300">{rail.suggests.detail}</span>
       </p>
+
+      {(() => {
+        // A rail that is tripping on the live reading can file a real
+        // proposal into the same propose -> approve -> sign pipeline.
+        const side = railProposeSide(rail.suggests.action);
+        if (!onPropose || !side || !readingTrips) return null;
+        return (
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onPropose(rail, side)}
+              disabled={proposeStatus?.busy || proposeStatus?.ok}
+              className={cn(
+                "rounded-lg border px-2.5 py-1 font-mono text-[10px] transition-colors",
+                proposeStatus?.ok
+                  ? "cursor-default border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                  : "border-electric-500/40 bg-electric-500/10 text-electric-400 hover:bg-electric-500/20 disabled:opacity-60",
+              )}
+            >
+              {proposeStatus?.busy
+                ? "filing proposal..."
+                : proposeStatus?.ok
+                  ? "proposal filed"
+                  : `rail tripping: file ${side === "short" ? "sell" : "buy"} proposal · $${RAIL_PROPOSE_SIZE_USD} · 1x`}
+            </button>
+            {proposeStatus?.ok && (
+              <span className="text-[10px] text-ink-400">
+                review it under Proposed trades; nothing executes until you approve and sign.
+              </span>
+            )}
+            {proposeStatus?.error && (
+              <span className="text-[10px] text-rose-400">{proposeStatus.error}</span>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -310,14 +364,49 @@ function EventRow({
 export function CardRailsPanel({
   asset,
   live,
+  agentId,
 }: {
   asset: RailAsset;
   live: RailLiveInputs | null;
+  /** Owner's agent id; when set, tripping rails can file real proposals. */
+  agentId?: string;
 }) {
+  const router = useRouter();
   const [state, setState] = useState<RailState>(() => defaultRailState(RAILS));
+  const [proposeStatus, setProposeStatus] = useState<Record<string, RailProposeStatus>>({});
 
   const events = useMemo(() => eventsForAsset(asset), [asset]);
   const results = useMemo(() => runBacktest(RAILS, state, events), [state, events]);
+
+  async function proposeFromRail(rail: RailDef, side: "long" | "short") {
+    if (!agentId) return;
+    setProposeStatus((s) => ({ ...s, [rail.id]: { busy: true } }));
+    try {
+      const res = await fetch(
+        `/api/agent/${encodeURIComponent(agentId)}/trade-proposals`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            asset,
+            side,
+            sizeUsdHuman: RAIL_PROPOSE_SIZE_USD,
+            leverage: 1,
+          }),
+        },
+      );
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) throw new Error(data.error ?? `Filing failed (${res.status}).`);
+      setProposeStatus((s) => ({ ...s, [rail.id]: { ok: true } }));
+      // Surface the new card in the Proposed trades panel (an RSC).
+      router.refresh();
+    } catch (e) {
+      setProposeStatus((s) => ({
+        ...s,
+        [rail.id]: { error: e instanceof Error ? e.message : "Filing failed." },
+      }));
+    }
+  }
   const { caught, total } = countCaught(results);
   const isDefault = useMemo(
     () => JSON.stringify(state) === JSON.stringify(defaultRailState(RAILS)),
@@ -378,6 +467,8 @@ export function CardRailsPanel({
                     onValue={(v) => setValue(rail.id, v)}
                     live={live}
                     asset={asset}
+                    onPropose={agentId ? proposeFromRail : undefined}
+                    proposeStatus={proposeStatus[rail.id]}
                   />
                 ))}
               </div>

@@ -160,7 +160,11 @@ export default async function TradePage({
 
           {(() => {
             const railAsset = railAssetForSkill(agent.skillId);
-            return railAsset && <CardRailsSection asset={railAsset} />;
+            return (
+              railAsset && (
+                <CardRailsSection asset={railAsset} agentId={agent.agentId} isOwner />
+              )
+            );
           })()}
         </>
       )}

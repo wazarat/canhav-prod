@@ -318,7 +318,11 @@ export default async function AgentHomePage({
           </div>
           {(() => {
             const railAsset = railAssetForSkill(profile.skillId);
-            return railAsset && <CardRailsSection asset={railAsset} />;
+            return (
+              railAsset && (
+                <CardRailsSection asset={railAsset} agentId={agentId} isOwner={isOwner} />
+              )
+            );
           })()}
         </div>
       )}

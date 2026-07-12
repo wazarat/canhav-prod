@@ -38,8 +38,10 @@ const SEVERITY_TONE: Record<RailSeverity, "danger" | "warning" | "neutral"> = {
   low: "neutral",
 };
 
-/** Notional a rail files when it trips; well inside the $50 desk hard cap. */
-const RAIL_PROPOSE_SIZE_USD = 8;
+/** Sizing bounds for guardrail-filed proposals; inside the $50 / 2x desk hard caps. */
+const SIZE_MIN_USD = 5;
+const SIZE_MAX_BUY_USD = 30;
+const SIZE_MAX_SELL_USD = 40;
 
 /** The trade side a rail's suggested action maps to; null = never proposes. */
 function railProposeSide(action: RailDef["suggests"]["action"]): "long" | "short" | null {
@@ -88,6 +90,80 @@ function trippingRails(
     }
   }
   return out.sort((a, b) => SEVERITY_RANK[b.rail.severity] - SEVERITY_RANK[a.rail.severity]);
+}
+
+interface ProposalSizing {
+  sizeUsd: number;
+  leverage: number;
+  /** One-line sizing rationale, appended to the proposal reason. */
+  note: string;
+}
+
+/**
+ * Derive size and leverage from the guardrail configuration so the numbers
+ * move with the settings. Tripping: scales with the top rail's severity and
+ * how far past the threshold the live reading sits. All clear: scales with
+ * the headroom the thresholds leave over live readings and how many rails
+ * are armed. Bounded well inside the $50 / 2x desk hard caps either way.
+ */
+function proposalSizing(
+  state: RailState,
+  live: RailLiveInputs | null,
+  asset: RailAsset,
+  tripping: TrippingRail[],
+): ProposalSizing {
+  const armed = RAILS.filter((r) => state[r.id]?.enabled).length;
+  const coverage = armed / RAILS.length;
+
+  const top = tripping[0];
+  if (top && top.rail.threshold) {
+    const t = top.rail.threshold;
+    const range = t.max - t.min || 1;
+    const raw =
+      t.direction === "gte"
+        ? top.reading.value - state[top.rail.id].value
+        : state[top.rail.id].value - top.reading.value;
+    const overshoot = Math.min(1, Math.max(0, raw / range));
+    const severityWeight =
+      top.rail.severity === "high" ? 1 : top.rail.severity === "medium" ? 0.7 : 0.4;
+    const urgency = Math.min(
+      1,
+      severityWeight * (0.6 + 0.8 * overshoot) + 0.1 * (tripping.length - 1),
+    );
+    return {
+      sizeUsd: Math.min(SIZE_MAX_SELL_USD, Math.max(10, Math.round(10 + 30 * urgency))),
+      leverage: urgency >= 0.75 ? 2 : 1,
+      note: `Sized by trip urgency ${(urgency * 100).toFixed(0)}% (${top.rail.severity} severity, ${tripping.length} tripping, ${armed} rails armed)`,
+    };
+  }
+
+  // All clear: average how far each live reading sits inside its threshold,
+  // as a share of that slider's range.
+  const headrooms: number[] = [];
+  for (const rail of RAILS) {
+    const st = state[rail.id];
+    if (!st?.enabled || !rail.threshold) continue;
+    const reading = liveReading(rail, live, asset);
+    if (!reading) continue;
+    const range = rail.threshold.max - rail.threshold.min || 1;
+    const dist =
+      rail.threshold.direction === "gte"
+        ? st.value - reading.value
+        : reading.value - st.value;
+    headrooms.push(Math.min(1, Math.max(0, dist / range)));
+  }
+  const headroom = headrooms.length
+    ? headrooms.reduce((a, b) => a + b, 0) / headrooms.length
+    : 0.5;
+  const conviction = headroom * (0.5 + 0.5 * coverage);
+  return {
+    sizeUsd: Math.min(
+      SIZE_MAX_BUY_USD,
+      Math.max(SIZE_MIN_USD, Math.round(SIZE_MIN_USD + 25 * conviction)),
+    ),
+    leverage: conviction >= 0.6 ? 2 : 1,
+    note: `Sized by guardrail headroom ${(headroom * 100).toFixed(0)}% across ${headrooms.length} live checks with ${armed}/${RAILS.length} rails armed`,
+  };
 }
 
 /** Results at factory defaults, the fixed baseline the delta chips compare against. */
@@ -283,7 +359,7 @@ function RailCard({
                 ? "filing proposal..."
                 : proposeStatus?.ok
                   ? "proposal filed"
-                  : `rail tripping: file ${side === "short" ? "sell" : "buy"} proposal · $${RAIL_PROPOSE_SIZE_USD} · 1x`}
+                  : `rail tripping: file ${side === "short" ? "sell" : "buy"} proposal`}
             </button>
             {proposeStatus?.ok && (
               <span className="text-[10px] text-ink-400">
@@ -418,7 +494,12 @@ export function CardRailsPanel({
   const events = useMemo(() => eventsForAsset(asset), [asset]);
   const results = useMemo(() => runBacktest(RAILS, state, events), [state, events]);
 
-  async function fileProposal(statusKey: string, side: "long" | "short", reason: string) {
+  async function fileProposal(
+    statusKey: string,
+    side: "long" | "short",
+    reason: string,
+    sizing: ProposalSizing,
+  ) {
     if (!agentId) return;
     setProposeStatus((s) => ({ ...s, [statusKey]: { busy: true } }));
     try {
@@ -430,9 +511,9 @@ export function CardRailsPanel({
           body: JSON.stringify({
             asset,
             side,
-            sizeUsdHuman: RAIL_PROPOSE_SIZE_USD,
-            leverage: 1,
-            reason,
+            sizeUsdHuman: sizing.sizeUsd,
+            leverage: sizing.leverage,
+            reason: `${reason} ${sizing.note}.`,
           }),
         },
       );
@@ -454,17 +535,19 @@ export function CardRailsPanel({
     const reason = trip
       ? `Guardrail "${rail.name}" tripped on live data: ${trip.reading.label} against threshold ${trip.threshold}. ${rail.suggests.detail}.`
       : `Guardrail "${rail.name}" tripped on live data. ${rail.suggests.detail}.`;
-    void fileProposal(rail.id, side, reason);
+    const sizing = proposalSizing(state, live, asset, trip ? [trip] : []);
+    void fileProposal(rail.id, side, reason, sizing);
   }
 
   function finalizeRails(tripping: TrippingRail[], armed: number) {
+    const sizing = proposalSizing(state, live, asset, tripping);
     const top = tripping[0];
     if (top) {
       const others = tripping.slice(1).map((t) => t.rail.name);
       const reason =
         `Guardrails finalized: "${top.rail.name}" tripping on live data (${top.reading.label} against threshold ${top.threshold}). ${top.rail.suggests.detail}.` +
         (others.length ? ` Also tripping: ${others.join(", ")}.` : "");
-      void fileProposal("finalize", top.side, reason);
+      void fileProposal("finalize", top.side, reason, sizing);
       return;
     }
     // All rails clear: finalizing still files a trade so the configuration
@@ -474,6 +557,7 @@ export function CardRailsPanel({
       "finalize",
       "long",
       `Guardrails finalized: all ${armed} armed rails clear on live data with a fresh positive research verdict. Filing a starter buy per the momentum-positive add policy.`,
+      sizing,
     );
   }
   const { caught, total } = countCaught(results);
@@ -604,6 +688,7 @@ export function CardRailsPanel({
           const armed = RAILS.filter((r) => state[r.id]?.enabled).length;
           const status = proposeStatus.finalize;
           const top = tripping[0];
+          const sizing = proposalSizing(state, live, asset, tripping);
           return (
             <div className="rounded-xl border border-ink-800/60 bg-ink-950/40 px-4 py-3">
               <div className="flex flex-wrap items-center gap-2">
@@ -643,7 +728,7 @@ export function CardRailsPanel({
                     ? "filing proposal..."
                     : status?.ok
                       ? "proposal filed"
-                      : `finalize guardrails: file ${top && top.side === "short" ? "sell" : "buy"} proposal · $${RAIL_PROPOSE_SIZE_USD} · 1x`}
+                      : `finalize guardrails: file ${top && top.side === "short" ? "sell" : "buy"} proposal · $${sizing.sizeUsd} · ${sizing.leverage}x`}
                 </button>
                 {status?.ok && (
                   <span className="text-[10px] text-ink-400">
@@ -656,8 +741,9 @@ export function CardRailsPanel({
               </div>
               <p className="mt-1.5 text-[11px] leading-relaxed text-ink-500">
                 {top
-                  ? "A tripping guardrail files its de-risk side."
-                  : "All armed guardrails are clear on live data, so finalizing files the research-gated starter buy; a tripping guardrail files its de-risk side instead."}
+                  ? "A tripping guardrail files its de-risk side. "
+                  : "All armed guardrails are clear on live data, so finalizing files the research-gated starter buy; a tripping guardrail files its de-risk side instead. "}
+                <span className="font-mono text-[10px] text-ink-400">{sizing.note.toLowerCase()}.</span>
               </p>
             </div>
           );

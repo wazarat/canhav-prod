@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { History, SlidersHorizontal } from "lucide-react";
 
@@ -566,6 +566,28 @@ export function CardRailsPanel({
     [state],
   );
 
+  // Floating finalize bar: shown once the settings differ from defaults and
+  // while any part of the guardrails section is on screen.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => setInView(entries.some((e) => e.isIntersecting)),
+      { threshold: 0 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const tripping = agentId ? trippingRails(state, live, asset) : [];
+  const armed = RAILS.filter((r) => state[r.id]?.enabled).length;
+  const finalizeSizing = proposalSizing(state, live, asset, tripping);
+  const finalizeStatus = proposeStatus.finalize;
+  const finalizeTop = tripping[0];
+  const showFloatingBar = Boolean(agentId) && !isDefault && inView;
+
   function clearFinalizeStatus() {
     // Any settings change re-arms the finalize button so a fresh
     // configuration can always be filed as a new proposal.
@@ -585,7 +607,7 @@ export function CardRailsPanel({
   const openFamilies = new Set<RailFamily>(["dependency", "market"]);
 
   return (
-    <div className="space-y-3">
+    <div ref={rootRef} className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-400">
           <SlidersHorizontal className="h-3.5 w-3.5" /> Guardrails
@@ -682,72 +704,66 @@ export function CardRailsPanel({
         </div>
       </div>
 
-      {agentId &&
-        (() => {
-          const tripping = trippingRails(state, live, asset);
-          const armed = RAILS.filter((r) => state[r.id]?.enabled).length;
-          const status = proposeStatus.finalize;
-          const top = tripping[0];
-          const sizing = proposalSizing(state, live, asset, tripping);
-          return (
-            <div className="rounded-xl border border-ink-800/60 bg-ink-950/40 px-4 py-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-ink-400">
-                  Finalize guardrails
-                </p>
-                <span className="tabular font-mono text-[10px] text-ink-400">
-                  {armed} armed <span className="text-ink-600">·</span> {tripping.length}{" "}
-                  tripping on live data
-                </span>
-              </div>
-              {tripping.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {tripping.map((t) => (
-                    <span
-                      key={t.rail.id}
-                      className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 font-mono text-[10px] text-amber-200"
-                    >
-                      {t.rail.name.toLowerCase()}: {t.reading.label} vs {t.threshold}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => finalizeRails(tripping, armed)}
-                  disabled={status?.busy || status?.ok}
-                  className={cn(
-                    "rounded-lg border px-3 py-1.5 font-mono text-[11px] transition-colors",
-                    status?.ok
-                      ? "cursor-default border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-                      : "border-electric-500/40 bg-electric-500/10 text-electric-400 hover:bg-electric-500/20 disabled:opacity-60",
-                  )}
+      {agentId && (
+        <div className="rounded-xl border border-ink-800/60 bg-ink-950/40 px-4 py-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-ink-400">
+              Finalize guardrails
+            </p>
+            <span className="tabular font-mono text-[10px] text-ink-400">
+              {armed} armed <span className="text-ink-600">·</span> {tripping.length} tripping
+              on live data
+            </span>
+          </div>
+          {tripping.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {tripping.map((t) => (
+                <span
+                  key={t.rail.id}
+                  className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 font-mono text-[10px] text-amber-200"
                 >
-                  {status?.busy
-                    ? "filing proposal..."
-                    : status?.ok
-                      ? "proposal filed"
-                      : `finalize guardrails: file ${top && top.side === "short" ? "sell" : "buy"} proposal · $${sizing.sizeUsd} · ${sizing.leverage}x`}
-                </button>
-                {status?.ok && (
-                  <span className="text-[10px] text-ink-400">
-                    review it under Proposed trades; nothing executes until you approve and sign.
-                  </span>
-                )}
-                {status?.error && (
-                  <span className="text-[10px] text-rose-400">{status.error}</span>
-                )}
-              </div>
-              <p className="mt-1.5 text-[11px] leading-relaxed text-ink-500">
-                {top
-                  ? "A tripping guardrail files its de-risk side. "
-                  : "All armed guardrails are clear on live data, so finalizing files the research-gated starter buy; a tripping guardrail files its de-risk side instead. "}
-                <span className="font-mono text-[10px] text-ink-400">{sizing.note.toLowerCase()}.</span>
-              </p>
+                  {t.rail.name.toLowerCase()}: {t.reading.label} vs {t.threshold}
+                </span>
+              ))}
             </div>
-          );
-        })()}
+          )}
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => finalizeRails(tripping, armed)}
+              disabled={finalizeStatus?.busy || finalizeStatus?.ok}
+              className={cn(
+                "rounded-lg border px-3 py-1.5 font-mono text-[11px] transition-colors",
+                finalizeStatus?.ok
+                  ? "cursor-default border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                  : "border-electric-500/40 bg-electric-500/10 text-electric-400 hover:bg-electric-500/20 disabled:opacity-60",
+              )}
+            >
+              {finalizeStatus?.busy
+                ? "filing proposal..."
+                : finalizeStatus?.ok
+                  ? "proposal filed"
+                  : `finalize guardrails: file ${finalizeTop && finalizeTop.side === "short" ? "sell" : "buy"} proposal · $${finalizeSizing.sizeUsd} · ${finalizeSizing.leverage}x`}
+            </button>
+            {finalizeStatus?.ok && (
+              <span className="text-[10px] text-ink-400">
+                review it under Proposed trades; nothing executes until you approve and sign.
+              </span>
+            )}
+            {finalizeStatus?.error && (
+              <span className="text-[10px] text-rose-400">{finalizeStatus.error}</span>
+            )}
+          </div>
+          <p className="mt-1.5 text-[11px] leading-relaxed text-ink-500">
+            {finalizeTop
+              ? "A tripping guardrail files its de-risk side. "
+              : "All armed guardrails are clear on live data, so finalizing files the research-gated starter buy; a tripping guardrail files its de-risk side instead. "}
+            <span className="font-mono text-[10px] text-ink-400">
+              {finalizeSizing.note.toLowerCase()}.
+            </span>
+          </p>
+        </div>
+      )}
 
       <p className="text-[11px] leading-relaxed text-ink-500">
         A fired rail only files a proposal through the same propose, then approve path as every
@@ -756,6 +772,46 @@ export function CardRailsPanel({
           ? "Nothing executes without your approval, and AAVE stays recommendation-only."
           : "Nothing executes until you approve the proposal and sign it in your wallet; only then does a GMX order go out."}
       </p>
+
+      {/* Floating finalize bar: follows the presenter while the guardrails
+          are on screen once any setting has been changed. Deliberately the
+          only gradient-glow element on the platform so the next step is
+          unmissable mid-scroll. */}
+      {showFloatingBar && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4">
+          <style>{`@keyframes railbar-pop { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+          <div className="pointer-events-auto flex max-w-2xl flex-wrap items-center justify-center gap-x-3 gap-y-1.5 rounded-2xl border border-electric-400/50 bg-ink-900/90 px-4 py-3 shadow-[0_12px_48px_rgba(61,123,255,0.35)] backdrop-blur-md animate-[railbar-pop_0.25s_ease-out]">
+            <span className="tabular font-mono text-[11px] text-ink-300">
+              guardrails changed <span className="text-ink-600">·</span> {tripping.length}{" "}
+              tripping
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                finalizeStatus?.ok
+                  ? window.scrollTo({ top: 0, behavior: "smooth" })
+                  : finalizeRails(tripping, armed)
+              }
+              disabled={finalizeStatus?.busy}
+              className={cn(
+                "rounded-full px-5 py-2 text-sm font-semibold text-white transition-all disabled:opacity-70",
+                finalizeStatus?.ok
+                  ? "bg-emerald-500 shadow-[0_4px_24px_rgba(16,185,129,0.5)] hover:brightness-110"
+                  : "bg-gradient-to-r from-electric-500 to-neon-500 shadow-[0_4px_24px_rgba(139,92,246,0.5)] hover:brightness-110",
+              )}
+            >
+              {finalizeStatus?.busy
+                ? "filing proposal..."
+                : finalizeStatus?.ok
+                  ? "proposal filed · review it"
+                  : `finalize guardrails: ${finalizeTop && finalizeTop.side === "short" ? "sell" : "buy"} $${finalizeSizing.sizeUsd} · ${finalizeSizing.leverage}x`}
+            </button>
+            {finalizeStatus?.error && (
+              <span className="text-[11px] text-rose-400">{finalizeStatus.error}</span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

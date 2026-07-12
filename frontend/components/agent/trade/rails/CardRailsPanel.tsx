@@ -452,19 +452,29 @@ export function CardRailsPanel({
   function proposeFromRail(rail: RailDef, side: "long" | "short") {
     const trip = trippingRails(state, live, asset).find((t) => t.rail.id === rail.id);
     const reason = trip
-      ? `Card rail "${rail.name}" tripped on live data: ${trip.reading.label} against threshold ${trip.threshold}. ${rail.suggests.detail}.`
-      : `Card rail "${rail.name}" tripped on live data. ${rail.suggests.detail}.`;
+      ? `Guardrail "${rail.name}" tripped on live data: ${trip.reading.label} against threshold ${trip.threshold}. ${rail.suggests.detail}.`
+      : `Guardrail "${rail.name}" tripped on live data. ${rail.suggests.detail}.`;
     void fileProposal(rail.id, side, reason);
   }
 
-  function finalizeRails(tripping: TrippingRail[]) {
+  function finalizeRails(tripping: TrippingRail[], armed: number) {
     const top = tripping[0];
-    if (!top) return;
-    const others = tripping.slice(1).map((t) => t.rail.name);
-    const reason =
-      `Rails finalized: "${top.rail.name}" tripping on live data (${top.reading.label} against threshold ${top.threshold}). ${top.rail.suggests.detail}.` +
-      (others.length ? ` Also tripping: ${others.join(", ")}.` : "");
-    void fileProposal("finalize", top.side, reason);
+    if (top) {
+      const others = tripping.slice(1).map((t) => t.rail.name);
+      const reason =
+        `Guardrails finalized: "${top.rail.name}" tripping on live data (${top.reading.label} against threshold ${top.threshold}). ${top.rail.suggests.detail}.` +
+        (others.length ? ` Also tripping: ${others.join(", ")}.` : "");
+      void fileProposal("finalize", top.side, reason);
+      return;
+    }
+    // All rails clear: finalizing still files a trade so the configuration
+    // always ends in a proposal — a starter buy, per the momentum-positive
+    // add policy. The research gate re-checks server-side either way.
+    void fileProposal(
+      "finalize",
+      "long",
+      `Guardrails finalized: all ${armed} armed rails clear on live data with a fresh positive research verdict. Filing a starter buy per the momentum-positive add policy.`,
+    );
   }
   const { caught, total } = countCaught(results);
   const isDefault = useMemo(
@@ -472,11 +482,18 @@ export function CardRailsPanel({
     [state],
   );
 
+  function clearFinalizeStatus() {
+    // Any settings change re-arms the finalize button so a fresh
+    // configuration can always be filed as a new proposal.
+    setProposeStatus((s) => (s.finalize ? { ...s, finalize: {} } : s));
+  }
   function toggle(id: string) {
     setState((s) => ({ ...s, [id]: { ...s[id], enabled: !s[id].enabled } }));
+    clearFinalizeStatus();
   }
   function setValue(id: string, value: number) {
     setState((s) => ({ ...s, [id]: { ...s[id], value } }));
+    clearFinalizeStatus();
   }
 
   const families: RailFamily[] = ["dependency", "protocol", "market", "governance"];
@@ -487,7 +504,7 @@ export function CardRailsPanel({
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-400">
-          <SlidersHorizontal className="h-3.5 w-3.5" /> Card rails
+          <SlidersHorizontal className="h-3.5 w-3.5" /> Guardrails
         </p>
         <Badge tone="signal" className="px-1.5 py-0 font-mono text-[9px] uppercase">
           propose only
@@ -591,7 +608,7 @@ export function CardRailsPanel({
             <div className="rounded-xl border border-ink-800/60 bg-ink-950/40 px-4 py-3">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-xs font-semibold uppercase tracking-wider text-ink-400">
-                  Finalize rails
+                  Finalize guardrails
                 </p>
                 <span className="tabular font-mono text-[10px] text-ink-400">
                   {armed} armed <span className="text-ink-600">·</span> {tripping.length}{" "}
@@ -611,31 +628,23 @@ export function CardRailsPanel({
                 </div>
               )}
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                {top ? (
-                  <button
-                    type="button"
-                    onClick={() => finalizeRails(tripping)}
-                    disabled={status?.busy || status?.ok}
-                    className={cn(
-                      "rounded-lg border px-3 py-1.5 font-mono text-[11px] transition-colors",
-                      status?.ok
-                        ? "cursor-default border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-                        : "border-electric-500/40 bg-electric-500/10 text-electric-400 hover:bg-electric-500/20 disabled:opacity-60",
-                    )}
-                  >
-                    {status?.busy
-                      ? "filing proposal..."
-                      : status?.ok
-                        ? "proposal filed"
-                        : `finalize rails: file ${top.side === "short" ? "sell" : "buy"} proposal · $${RAIL_PROPOSE_SIZE_USD} · 1x`}
-                  </button>
-                ) : (
-                  <p className="text-[11px] leading-relaxed text-ink-500">
-                    No rail is tripping on live data at these settings. Tighten a threshold past
-                    its live reading (for example, drag utilization below the current value) and
-                    the finalize button arms.
-                  </p>
-                )}
+                <button
+                  type="button"
+                  onClick={() => finalizeRails(tripping, armed)}
+                  disabled={status?.busy || status?.ok}
+                  className={cn(
+                    "rounded-lg border px-3 py-1.5 font-mono text-[11px] transition-colors",
+                    status?.ok
+                      ? "cursor-default border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                      : "border-electric-500/40 bg-electric-500/10 text-electric-400 hover:bg-electric-500/20 disabled:opacity-60",
+                  )}
+                >
+                  {status?.busy
+                    ? "filing proposal..."
+                    : status?.ok
+                      ? "proposal filed"
+                      : `finalize guardrails: file ${top && top.side === "short" ? "sell" : "buy"} proposal · $${RAIL_PROPOSE_SIZE_USD} · 1x`}
+                </button>
                 {status?.ok && (
                   <span className="text-[10px] text-ink-400">
                     review it under Proposed trades; nothing executes until you approve and sign.
@@ -645,6 +654,11 @@ export function CardRailsPanel({
                   <span className="text-[10px] text-rose-400">{status.error}</span>
                 )}
               </div>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-ink-500">
+                {top
+                  ? "A tripping guardrail files its de-risk side."
+                  : "All armed guardrails are clear on live data, so finalizing files the research-gated starter buy; a tripping guardrail files its de-risk side instead."}
+              </p>
             </div>
           );
         })()}

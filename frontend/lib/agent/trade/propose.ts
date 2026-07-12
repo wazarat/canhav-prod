@@ -40,6 +40,8 @@ export interface TradeProposeArgs {
    * (verifyCapCheckClaim) — this module trusts it, mirroring sizeUsdEnc.
    */
   capCheckOnchain?: { within: boolean };
+  /** Optional filing context shown on the proposal card (e.g. which card rail tripped). */
+  reason?: string;
 }
 
 export async function execTradePropose(agentId: string, args: TradeProposeArgs) {
@@ -123,6 +125,10 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
 
   const id = `tp_${randomUUID().replace(/-/g, "").slice(0, 16)}`;
   const now = new Date().toISOString();
+  const reason =
+    typeof args.reason === "string" && args.reason.trim()
+      ? args.reason.trim().slice(0, 240)
+      : undefined;
 
   // Phase 2: only spending_cap mode carries a cap verdict — other modes
   // approve by click, so a stray claim is dropped rather than persisted.
@@ -144,6 +150,7 @@ export async function execTradePropose(agentId: string, args: TradeProposeArgs) 
     gmxTarget: EXCHANGE_ROUTER,
     executionMode: coin.executable ? undefined : "recommendation",
     capCheckOnchain: onchainCap ? (onchainCap.within ? "within" : "over") : undefined,
+    reason,
   });
 
   if (!coin.executable) {

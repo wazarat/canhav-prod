@@ -50,6 +50,46 @@ function railProposeSide(action: RailDef["suggests"]["action"]): "long" | "short
 
 type RailProposeStatus = { busy?: boolean; ok?: boolean; error?: string };
 
+const SEVERITY_RANK: Record<RailSeverity, number> = { high: 2, medium: 1, low: 0 };
+
+/** A rail currently tripping on live data with a proposable side. */
+interface TrippingRail {
+  rail: RailDef;
+  side: "long" | "short";
+  reading: { label: string; value: number };
+  threshold: string;
+}
+
+/** Enabled rails whose live reading crosses their current threshold. */
+function trippingRails(
+  state: RailState,
+  live: RailLiveInputs | null,
+  asset: RailAsset,
+): TrippingRail[] {
+  const out: TrippingRail[] = [];
+  for (const rail of RAILS) {
+    const st = state[rail.id];
+    if (!st?.enabled || !rail.threshold) continue;
+    const side = railProposeSide(rail.suggests.action);
+    if (!side) continue;
+    const reading = liveReading(rail, live, asset);
+    if (!reading) continue;
+    const trips =
+      rail.threshold.direction === "gte"
+        ? reading.value >= st.value
+        : reading.value <= st.value;
+    if (trips) {
+      out.push({
+        rail,
+        side,
+        reading,
+        threshold: formatValue(st.value, rail.threshold.unit),
+      });
+    }
+  }
+  return out.sort((a, b) => SEVERITY_RANK[b.rail.severity] - SEVERITY_RANK[a.rail.severity]);
+}
+
 /** Results at factory defaults, the fixed baseline the delta chips compare against. */
 const DEFAULT_RESULTS: Record<RailAsset, EventResult[]> = {
   AAVE: runBacktest(RAILS, defaultRailState(RAILS), eventsForAsset("AAVE")),
@@ -378,9 +418,9 @@ export function CardRailsPanel({
   const events = useMemo(() => eventsForAsset(asset), [asset]);
   const results = useMemo(() => runBacktest(RAILS, state, events), [state, events]);
 
-  async function proposeFromRail(rail: RailDef, side: "long" | "short") {
+  async function fileProposal(statusKey: string, side: "long" | "short", reason: string) {
     if (!agentId) return;
-    setProposeStatus((s) => ({ ...s, [rail.id]: { busy: true } }));
+    setProposeStatus((s) => ({ ...s, [statusKey]: { busy: true } }));
     try {
       const res = await fetch(
         `/api/agent/${encodeURIComponent(agentId)}/trade-proposals`,
@@ -392,20 +432,39 @@ export function CardRailsPanel({
             side,
             sizeUsdHuman: RAIL_PROPOSE_SIZE_USD,
             leverage: 1,
+            reason,
           }),
         },
       );
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error ?? `Filing failed (${res.status}).`);
-      setProposeStatus((s) => ({ ...s, [rail.id]: { ok: true } }));
+      setProposeStatus((s) => ({ ...s, [statusKey]: { ok: true } }));
       // Surface the new card in the Proposed trades panel (an RSC).
       router.refresh();
     } catch (e) {
       setProposeStatus((s) => ({
         ...s,
-        [rail.id]: { error: e instanceof Error ? e.message : "Filing failed." },
+        [statusKey]: { error: e instanceof Error ? e.message : "Filing failed." },
       }));
     }
+  }
+
+  function proposeFromRail(rail: RailDef, side: "long" | "short") {
+    const trip = trippingRails(state, live, asset).find((t) => t.rail.id === rail.id);
+    const reason = trip
+      ? `Card rail "${rail.name}" tripped on live data: ${trip.reading.label} against threshold ${trip.threshold}. ${rail.suggests.detail}.`
+      : `Card rail "${rail.name}" tripped on live data. ${rail.suggests.detail}.`;
+    void fileProposal(rail.id, side, reason);
+  }
+
+  function finalizeRails(tripping: TrippingRail[]) {
+    const top = tripping[0];
+    if (!top) return;
+    const others = tripping.slice(1).map((t) => t.rail.name);
+    const reason =
+      `Rails finalized: "${top.rail.name}" tripping on live data (${top.reading.label} against threshold ${top.threshold}). ${top.rail.suggests.detail}.` +
+      (others.length ? ` Also tripping: ${others.join(", ")}.` : "");
+    void fileProposal("finalize", top.side, reason);
   }
   const { caught, total } = countCaught(results);
   const isDefault = useMemo(
@@ -521,6 +580,74 @@ export function CardRailsPanel({
           </div>
         </div>
       </div>
+
+      {agentId &&
+        (() => {
+          const tripping = trippingRails(state, live, asset);
+          const armed = RAILS.filter((r) => state[r.id]?.enabled).length;
+          const status = proposeStatus.finalize;
+          const top = tripping[0];
+          return (
+            <div className="rounded-xl border border-ink-800/60 bg-ink-950/40 px-4 py-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-ink-400">
+                  Finalize rails
+                </p>
+                <span className="tabular font-mono text-[10px] text-ink-400">
+                  {armed} armed <span className="text-ink-600">·</span> {tripping.length}{" "}
+                  tripping on live data
+                </span>
+              </div>
+              {tripping.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {tripping.map((t) => (
+                    <span
+                      key={t.rail.id}
+                      className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 font-mono text-[10px] text-amber-200"
+                    >
+                      {t.rail.name.toLowerCase()}: {t.reading.label} vs {t.threshold}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                {top ? (
+                  <button
+                    type="button"
+                    onClick={() => finalizeRails(tripping)}
+                    disabled={status?.busy || status?.ok}
+                    className={cn(
+                      "rounded-lg border px-3 py-1.5 font-mono text-[11px] transition-colors",
+                      status?.ok
+                        ? "cursor-default border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                        : "border-electric-500/40 bg-electric-500/10 text-electric-400 hover:bg-electric-500/20 disabled:opacity-60",
+                    )}
+                  >
+                    {status?.busy
+                      ? "filing proposal..."
+                      : status?.ok
+                        ? "proposal filed"
+                        : `finalize rails: file ${top.side === "short" ? "sell" : "buy"} proposal · $${RAIL_PROPOSE_SIZE_USD} · 1x`}
+                  </button>
+                ) : (
+                  <p className="text-[11px] leading-relaxed text-ink-500">
+                    No rail is tripping on live data at these settings. Tighten a threshold past
+                    its live reading (for example, drag utilization below the current value) and
+                    the finalize button arms.
+                  </p>
+                )}
+                {status?.ok && (
+                  <span className="text-[10px] text-ink-400">
+                    review it under Proposed trades; nothing executes until you approve and sign.
+                  </span>
+                )}
+                {status?.error && (
+                  <span className="text-[10px] text-rose-400">{status.error}</span>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
       <p className="text-[11px] leading-relaxed text-ink-500">
         A fired rail only files a proposal through the same propose, then approve path as every

@@ -43,6 +43,7 @@ export async function POST(req: Request, { params }: { params: { agentId: string
     leverage?: unknown;
     sizeUsdEnc?: unknown;
     capClaim?: unknown;
+    reason?: unknown;
   };
   try {
     body = await req.json();
@@ -110,6 +111,7 @@ export async function POST(req: Request, { params }: { params: { agentId: string
     leverage,
     sizeUsdEnc,
     capCheckOnchain,
+    reason: typeof body.reason === "string" ? body.reason : undefined,
   });
   return NextResponse.json(result, { status: result.ok ? 200 : 422 });
 }

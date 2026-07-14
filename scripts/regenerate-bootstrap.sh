@@ -37,4 +37,12 @@ echo ">>> refresh_live.py (live TVL overlay)"
 echo ">>> export_bootstrap.py"
 "${PYTHON_BIN}" scripts/export_bootstrap.py
 
+# Re-apply the network MemberCoins forward-links (compiled coins/receipts linked
+# from their EntitySlug). The Python specs don't emit these, so a fresh ingest
+# drops them — this makes the regen self-healing. Idempotent + dedupes symbol
+# collisions. Patches both the committed bundle and the local disk store.
+echo ">>> backfill-member-coins.py (network MemberCoins forward-links)"
+"${PYTHON_BIN}" "${REPO_ROOT}/frontend/scripts/backfill-member-coins.py" "${BACKEND_DIR}/data/store.json"
+"${PYTHON_BIN}" "${REPO_ROOT}/frontend/scripts/backfill-member-coins.py" "${REPO_ROOT}/frontend/data/bootstrap-store.json"
+
 echo "Done. Commit frontend/data/bootstrap-store.json after review."

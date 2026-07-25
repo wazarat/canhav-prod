@@ -28,6 +28,8 @@ interface NetworkTableWithFilterProps {
   sectorAggregates?: SectorAggregate[];
   showStatus?: boolean;
   emptyHint?: string;
+  /** Preselect a sector (e.g. from a `/networks?sector=Credit` deep link). */
+  initialSector?: string;
 }
 
 export function NetworkTableWithFilter({
@@ -35,10 +37,11 @@ export function NetworkTableWithFilter({
   sectorAggregates = [],
   showStatus = false,
   emptyHint,
+  initialSector,
 }: NetworkTableWithFilterProps) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<MemberCoinCategory | "all">("all");
-  const [sector, setSector] = useState<string | "all">("all");
+  const [sector, setSector] = useState<string | "all">(initialSector ?? "all");
   const [tagFilter, setTagFilter] = useState<string | "all">("all");
 
   // Sectors present in the data (e.g. "Credit"), for the taxonomy filter row.

@@ -12,7 +12,26 @@ export const metadata = {
 
 export const revalidate = 300;
 
-export default async function NetworksPage() {
+// Sectors the homepage showcase (and anyone else) may deep-link to.
+const LINKABLE_SECTORS = [
+  "Credit",
+  "Staking",
+  "Derivatives",
+  "RWA",
+  "Liquidity",
+  "Other",
+  "DEX",
+  "Stablecoin",
+];
+
+export default async function NetworksPage({
+  searchParams,
+}: {
+  searchParams?: { sector?: string };
+}) {
+  const sectorParam = searchParams?.sector;
+  const initialSector =
+    sectorParam && LINKABLE_SECTORS.includes(sectorParam) ? sectorParam : undefined;
   const [profiles, sectorAggregates] = await Promise.all([
     getApprovedNetworks(),
     getSectorAggregates(),
@@ -59,8 +78,10 @@ export default async function NetworksPage() {
       </section>
 
       <NetworkTableWithFilter
+        key={initialSector ?? "all"}
         profiles={profiles}
         sectorAggregates={sectorAggregates}
+        initialSector={initialSector}
         emptyHint="No networks in the store yet."
       />
 

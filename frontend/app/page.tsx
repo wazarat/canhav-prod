@@ -1,51 +1,48 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { CategoryGrid } from "@/components/CategoryGrid";
+import { BuiltForBuilders } from "@/components/home/BuiltForBuilders";
+import { ContactCta } from "@/components/home/ContactCta";
 import { HeroVideo } from "@/components/home/HeroVideo";
+import { SectorShowcase, type SectorShowcaseItem } from "@/components/home/SectorShowcase";
 import { Button } from "@/components/ui/Button";
 import { StatCard } from "@/components/ui/StatCard";
+import { getApprovedNetworks, networkHeadlineTvlUsd } from "@/lib/data";
 import {
-  CATEGORIES,
-  getAllNetworks,
-  getAllRwas,
-  getAllStablecoins,
-  getAllTokens,
-  getApprovedStablecoins,
-  pegDeviationBps,
-} from "@/lib/data";
+  filterTagsForSector,
+  isNonEvmRwa,
+  matchesSectorFilter,
+  sectorFilterTagOptions,
+} from "@/lib/networkTaxonomy";
 import { formatUsdCompact } from "@/lib/utils";
 
 export const revalidate = 300;
 
-export default async function DashboardPage() {
-  const [approved, allStablecoins, allRwas, allNetworks, allTokens] = await Promise.all([
-    getApprovedStablecoins(),
-    getAllStablecoins(),
-    getAllRwas(),
-    getAllNetworks(),
-    getAllTokens(),
-  ]);
-  const activeCategories = CATEGORIES.filter((c) => c.status === "active").length;
+// The six live network sectors, in showcase order ("Other" renders as
+// Governance & Underwriting).
+const SHOWCASE_SECTORS = ["Credit", "Staking", "Derivatives", "RWA", "Liquidity", "Other"];
 
-  const trackedBySlug: Record<string, number> = {
-    networks: allNetworks.length,
-    stablecoins: allStablecoins.length,
-    rwas: allRwas.length,
-    tokens: allTokens.length,
-  };
-  const categories = CATEGORIES.map((c) =>
-    c.slug in trackedBySlug ? { ...c, trackedCount: trackedBySlug[c.slug] } : c,
+export default async function DashboardPage() {
+  const networks = await getApprovedNetworks();
+  // The networks table always hides non-EVM RWA entities; keep dashboard
+  // counts consistent with what a click-through will show.
+  const visible = networks.filter((p) => !isNonEvmRwa(p));
+
+  const aggregateTvl = visible.reduce(
+    (sum, p) => sum + (networkHeadlineTvlUsd(p) ?? 0),
+    0,
   );
 
-  const aggregateSupply = approved.reduce((sum, p) => sum + (p.totalSupply.value ?? 0), 0);
-  const deviations = approved
-    .map((p) => pegDeviationBps(p))
-    .filter((d): d is number => d !== null);
-  const avgDeviation =
-    deviations.length > 0
-      ? Math.round(deviations.reduce((a, b) => a + b, 0) / deviations.length)
-      : null;
+  const sectorMeta: SectorShowcaseItem[] = SHOWCASE_SECTORS.map((sector) => {
+    const members = visible.filter((p) => matchesSectorFilter(p, sector));
+    const present = new Set(members.flatMap((p) => filterTagsForSector(p, sector)));
+    const vocab = sectorFilterTagOptions(sector);
+    const tags = vocab ? vocab.filter((t) => present.has(t)) : [...present].sort();
+    return { sector, count: members.length, tags };
+  });
+
+  const sectorsLive = sectorMeta.filter((m) => m.count > 0).length;
+  const subSectorsCovered = sectorMeta.reduce((sum, m) => sum + m.tags.length, 0);
 
   return (
     <div>
@@ -111,44 +108,41 @@ export default async function DashboardPage() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild variant="secondary">
-                <Link href="/stablecoins">
-                  Explore stablecoins
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
+              <ContactCta variant="secondary" sourcePage="home-hero" />
             </div>
           </div>
         </div>
       </section>
 
       <div className="container space-y-16 py-14 md:py-20">
-      {/* Summary stats */}
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Active categories" value={`${activeCategories} / ${CATEGORIES.length}`} hint="Stablecoins live; more in progress" />
-        <StatCard label="Stablecoins tracked" value={`${approved.length}`} hint="In the live store" />
-        <StatCard label="Aggregate supply" value={formatUsdCompact(aggregateSupply)} hint="Live via Alchemy" />
-        <StatCard
-          label="Avg peg deviation"
-          value={avgDeviation === null ? "—" : `${avgDeviation} bps`}
-          hint="Across tracked stablecoins"
-        />
-      </section>
+        {/* Summary stats */}
+        <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <StatCard
+            label="Networks tracked"
+            value={`${visible.length}`}
+            hint="In the live store"
+          />
+          <StatCard
+            label="Sectors live"
+            value={`${sectorsLive} / ${SHOWCASE_SECTORS.length}`}
+            hint="Credit → Governance & Underwriting"
+          />
+          <StatCard
+            label="Aggregate network TVL"
+            value={formatUsdCompact(aggregateTvl)}
+            hint="Across tracked networks"
+          />
+          <StatCard
+            label="Sub-sectors covered"
+            value={`${subSectorsCovered}`}
+            hint="Filterable taxonomy tags"
+          />
+        </section>
 
-      {/* Category taxonomy */}
-      <section className="space-y-6">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <h2 className="font-display text-2xl font-semibold tracking-tight text-ink-50">
-              Ecosystem taxonomy
-            </h2>
-            <p className="mt-1 text-sm text-ink-300">
-              The schema expands category-by-category. Stablecoins is the active module.
-            </p>
-          </div>
-        </div>
-        <CategoryGrid categories={categories} />
-      </section>
+        {/* Sector taxonomy showcase */}
+        <SectorShowcase items={sectorMeta} />
+
+        <BuiltForBuilders />
       </div>
     </div>
   );

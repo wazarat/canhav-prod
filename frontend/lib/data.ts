@@ -12,7 +12,6 @@ import {
 import { readLiveStore } from "@/lib/server/store";
 import { enrichNetworkWithLiveSectorMetrics } from "@/lib/server/liveNetworkMetrics";
 import type {
-  CategoryDef,
   NetworkProfile,
   ReceiptProfile,
   RwaProfile,
@@ -516,70 +515,3 @@ export async function getNetworkMemberCoins(
   });
 }
 
-/* -------------------------------------------------------------------------- */
-/* Category taxonomy                                                          */
-/* -------------------------------------------------------------------------- */
-
-export const CATEGORIES: CategoryDef[] = [
-  {
-    slug: "networks",
-    label: "Networks",
-    description:
-      "Umbrella protocols that group stablecoins, RWAs, and tokens under one issuer.",
-    status: "active",
-  },
-  {
-    slug: "stablecoins",
-    label: "Stablecoins",
-    description: "Pegged dollar & euro assets, peg health, and circulating supply.",
-    status: "active",
-  },
-  {
-    slug: "rwas",
-    label: "Real World Assets",
-    description: "Tokenized treasuries, credit, equities, and off-chain collateral.",
-    status: "active",
-  },
-  {
-    slug: "tokens",
-    label: "Tokens",
-    description: "Governance & utility tokens powering protocol ecosystems.",
-    status: "active",
-  },
-  {
-    slug: "receipts",
-    label: "Receipt Tokens",
-    description: "LSTs, lending receipts, yield vault shares, and staked wrappers.",
-    status: "active",
-  },
-  {
-    slug: "lending",
-    label: "Credit",
-    description: "Lending money markets, leveraged yield, and fixed income.",
-    status: "coming_soon",
-  },
-  {
-    slug: "perpetuals",
-    label: "Perpetuals",
-    description: "Perp DEX volume, open interest, and funding.",
-    status: "coming_soon",
-  },
-  {
-    slug: "yield",
-    label: "Yield Optimization",
-    description: "Vaults, auto-compounders, and strategy yields.",
-    status: "coming_soon",
-  },
-  {
-    slug: "dex",
-    label: "DEX",
-    description: "Spot AMMs, order books, and aggregators.",
-    status: "coming_soon",
-  },
-  {
-    slug: "options",
-    label: "Options",
-    description: "On-chain options, structured products, and vol.",
-    status: "coming_soon",
-  },
-];

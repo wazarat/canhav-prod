@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
  * accepted-but-dropped (logged) so dev/preview stays fully clickable.
  */
 
-const DEFAULT_CAMPAIGN_ID = "f6fbbf5c-b4fe-4249-aeaa-8fffdcfea3dd";
+const DEFAULT_CAMPAIGN_ID = "4587a403-7b91-47a9-b223-7928a519d92d";
 const INSTANTLY_LEADS_URL = "https://api.instantly.ai/api/v2/leads";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
   }
 
   const [firstName, ...rest] = fullName.split(/\s+/);
-  const campaign = process.env.INSTANTLY_CAMPAIGN_ID ?? DEFAULT_CAMPAIGN_ID;
+  const campaign = process.env.INSTANTLY_CAMPAIGN_ID || DEFAULT_CAMPAIGN_ID;
 
   try {
     const res = await fetch(INSTANTLY_LEADS_URL, {

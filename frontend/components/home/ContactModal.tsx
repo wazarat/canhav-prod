@@ -100,7 +100,7 @@ export function ContactModal({
                   Message sent
                 </h3>
                 <p className="max-w-xs text-sm leading-relaxed text-ink-300">
-                  Thanks for reaching out — we&apos;ll get back to you shortly.
+                  Thanks for reaching out. We&apos;ll get back to you shortly.
                 </p>
                 <Button variant="secondary" size="sm" onClick={onClose}>
                   Close
@@ -123,7 +123,7 @@ export function ContactModal({
                   <div className="grid gap-4 sm:grid-cols-2">
                     <label className="block space-y-1.5">
                       <span className="text-xs font-medium text-ink-200">
-                        Full name <span className="text-rose-400">*</span>
+                        Name <span className="text-rose-400">*</span>
                       </span>
                       <input
                         type="text"
@@ -231,7 +231,7 @@ export function ContactModal({
               alt=""
               fill
               sizes="240px"
-              className="object-contain object-bottom p-3"
+              className="object-cover object-top"
             />
           </div>
         </div>

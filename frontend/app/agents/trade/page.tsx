@@ -86,6 +86,12 @@ export default async function TradePage({
           tradable only while it carries a fresh, positive CanHav verdict. Proposals your agent
           files on its own show up here too.
         </p>
+        <Link
+          href="/trade"
+          className="inline-block text-xs text-ink-400 transition-colors hover:text-ink-200"
+        >
+          How the desk works →
+        </Link>
       </header>
 
       {!agent ? (

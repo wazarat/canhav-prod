@@ -6,7 +6,7 @@ const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
   { href: "/networks", label: "Networks" },
   { href: "/agents", label: "Agents" },
-  { href: "/agents/trade", label: "Trade" },
+  { href: "/trade", label: "Trade" },
 ];
 
 export function Nav() {

@@ -3,22 +3,9 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { SEVERITY_DOT, SEVERITY_TONE } from "@/components/shared/riskTone";
 import type { IncidentEvent, NetworkDependency, RiskSeverity } from "@/lib/types";
 import { cn } from "@/lib/utils";
-
-const SEVERITY_DOT: Record<RiskSeverity, string> = {
-  critical: "bg-rose-400",
-  high: "bg-rose-400",
-  medium: "bg-amber-300",
-  low: "bg-ink-400",
-};
-
-const SEVERITY_TONE = {
-  critical: "danger",
-  high: "danger",
-  medium: "warning",
-  low: "neutral",
-} as const;
 
 /** "collateral-issuer" -> "Collateral issuer" (kind/via are free strings). */
 function humanizeKind(kind: string): string {

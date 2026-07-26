@@ -1444,7 +1444,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.170Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://aave.com",
       "TradFiAnalogue": "a secured overnight repo desk at a broker-dealer, financing a standardised haircut book against liquid collateral with mark-to-market margining.",
       "OrgIntro": "Legal entity: Avara (formerly Aave Companies), with Aave Labs as the core development firm and the Aave DAO as the on-chain governing body. 2026 has been dominated by the separation of the DAO's service-provider layer from Aave Labs.",
@@ -2360,7 +2360,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: Bridged assets on Harmony, CRV, GHO on Ethereum, Multichain-served deployments. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Aave's risk profile has shifted decisively from smart contract risk toward collateral issuer and counterparty risk. The core lending logic has held up, but the protocol's willingness to list high-LTV liquid restaking collateral means that a failure anywhere in a partner's minting or bridging stack becomes an Aave solvency event, which is exactly what happened with Kelp and LayerZero in April 2026 ([LlamaRisk](https://governance.aave.com/t/rseth-incident-2026-04-18/24481)). The protocol's crisis machinery works: Guardian freezes were executed within hours and roughly 54 percent of the shortfall was recovered ([TokenLogic](https://governance.aave.com/t/arfc-rseth-incident-funding-update/24740)). What is weak is loss absorption. Umbrella was calibrated against historical deficits measured in millionths of a percent of borrows ([Aave docs](https://aave.com/help/umbrella/umbrella)), the treasury is over half AAVE and buybacks are paused ([Aave governance](https://governance.aave.com/t/arfc-pause-aave-buybacks/24686)), and the residual gap is being closed by a voluntary coalition rather than by protocol capital. Layered on top is a freshly activated V4 hub and spoke architecture with cross-hub credit lines and model-based oracle adapters ([Aave governance](https://governance.aave.com/t/arfc-aave-v4-activation-on-ethereum-mainnet/24293)), which raises technological risk during the hardening period. Net posture: high severity, issuer-driven, with mitigation depending on discretionary emergency powers and external goodwill."
     },
     "CATEGORY#Entity|PROTOCOL#aerodrome": {
       "AgentSkill": null,
@@ -10868,7 +10869,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.171Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://compound.finance",
       "TradFiAnalogue": "a single-currency secured lending facility at a clearing bank, where the bank funds one currency against a defined pledge list and the pledged assets sit idle as security.",
       "FundingNote": "No further equity rounds appear in the fetched sources; ByteTree states Compound had carried out two funding rounds since inception as of its 2021 review ([ByteTree](https://www.bytetree.com/research/2021/07/global-credit-markets-benefit-all/)).",
@@ -11873,7 +11874,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: All listed collateral, Assets on Unichain, BAT, DAI, MKR, Ronin comets, USDT comets, YFI, ZRX, cETH, deUSD, n.a, rsETH, sdeUSD. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Compound's history is dominated by oracle and governance failures rather than direct contract exploits, and the pattern is remarkably consistent across six years. The November 2020 DAI liquidations, the 2022 cETH feed freeze and the November 2025 Elixir sdeUSD gap are all the same failure class: the protocol's internal price diverged from the tradeable price and the system acted on the wrong number ([Compound forum](https://www.comp.xyz/t/proposal-distribute-dai-to-users-affected-by-dai-liquidations/2110), [OpenZeppelin post-mortem](https://www.comp.xyz/t/ceth-price-feed-incident-post-mortem/3578), [Gauntlet](https://www.comp.xyz/t/gauntlet-pausing-ethereum-usdc-usds-and-usdt-comets/7326)). On the governance side, both the 2021 reward distribution bug and the 2024 Humpy treasury proposal show that executable code can reach production with insufficient review or insufficient community control ([CryptoSlate](https://cryptoslate.com/how-the-tiniest-of-errors-resulted-in-an-80-million-loss-for-compound-finance/), [The Block](https://www.theblock.co/post/308215/compound-reaches-truce-with-crypto-whale-humpy-after-controversial-vote-to-move-24-million-in-tokens)). The offsetting strength is that core solvency has been robust: the October 2025 crash produced 438 liquidations and under 1,600 USD of bad debt ([Gauntlet](https://www.comp.xyz/t/gauntlet-compound-market-downturn-analysis-10-10-2025/7297)). The team itself has named the structural weakness, that v3 forces all-or-nothing pauses, and the v4 roadmap is an explicit response with isolated margin assets, asset-level pauses and a new oracle design ([Compound v4 roadmap](https://www.comp.xyz/t/recreating-compound-v4-platform-roadmap/7529)). Net posture: medium severity, oracle and governance driven, with credible remediation in flight but not yet shipped."
     },
     "CATEGORY#Entity|PROTOCOL#convex-finance": {
       "AgentSkill": null,
@@ -19099,7 +19101,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.171Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://extrafi.io",
       "TradFiAnalogue": "a non recourse warehouse line against an LP position, the DeFi equivalent of a repo facility funding a structured note.",
       "OrgIntro": "All named contributors are pseudonyms disclosed in the protocol's own FAQ.",
@@ -20125,7 +20127,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: Aerodrome, EXA, EXTRA, FAI listed in Feb 2025, LP pairs in newly listed or low-liquidity pools, Long-tail Base, Optimism, Optimism pair tokens such as VVV, USDT, VELO LP pairs on Aerodrome, Velodrome, Velodrome LP tokens for smaller pairs, WETH lending pools on Base, n.a. (protocol-wide on LYF), n.a. (protocol-wide), veEXTRA. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Extra Finance is a small and shrinking leveraged farming protocol whose risk is concentrated rather than systemic. The design is conservative in places: partial liquidation at 30% of a position, an 8% fee on only the liquidated slice, per-asset caps in XLend, no admin withdrawal function and a self-imposed rule to disable leverage when its own liquidity share of a farmed pool exceeds about 30%. Against that, the protocol depends on a team-operated liquidation bot for the farming product, on a 30-minute on-chain TWAP that is manipulable in shallow markets, and on two OP Stack chains for essentially all of its book. The February 2025 EXA bad debt event shows the failure mode is real, and the collapse in TVL from roughly $117m in August 2024 to about $24m today means both revenue and the liquidity cushion that keeps liquidations orderly are much thinner than when the parameters were designed."
     },
     "CATEGORY#Entity|PROTOCOL#falcon": {
       "AgentSkill": null,
@@ -22014,7 +22017,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.171Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://fluid.io",
       "TradFiAnalogue": "a universal banking balance sheet with an internal market maker, where the same deposit base funds lending and market making rather than sitting in segregated books. A narrower analogy for Smart Debt is a repo funded market making book, where the funding leg itself earns bid ask spread.",
       "FundingNote": "Fluid itself has not raised; the funding history belongs to Instadapp, its builder.",
@@ -22988,7 +22991,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: BTC-denominated assets on Sui testnet, ETH, Ethena assets in the Bitwise market, FLUID, FLUID rewards, GHO, JUP-market collateral, REUSD, SOL, SUSDAI, Smart collateral, USDC, USDT, USDT0, USR, WBTC, WEETH, WSTETH, all vaults), correlated pairs, fGHO, iETHv2, n.a. (protocol-wide, n.a. (protocol-wide), rsETH, smart debt LP positions, stablecoin, weETH, wstETH, wstUSR. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Fluid is the most technically sophisticated protocol in this set and also the one with the most recent damage. Its shared Liquidity Layer and tick-based liquidation engine allow 80% to 95% LTVs with penalties as low as 0.1%, which is genuinely best in class, and Yearn's curation team scored it 1.4 out of 5.0, \"Minimal Risk\". The problem is not the engine, it is what gets plugged into it: Fluid repeatedly ends up holding almost the entire float of a third-party yield-bearing wrapper inside 6x loops, so an issuer failure at Resolv in March 2026 turned into $10m to $21m of Fluid bad debt and a 30% TVL fall in a day. Bad debt was made whole, but by discretionary loans and a team multisig drawing a credit line before the governance vote, which is a governance answer rather than a structural one, and the one-day timelock leaves lenders little room to act on such decisions. Today's book still shows top-five collateral at 69% and several markets above 90% utilization, so the same shape is in place, and the Jupiter Lend and Venus deployments extend that shape to venues Fluid does not run."
     },
     "CATEGORY#Entity|PROTOCOL#franklin-templeton": {
       "AgentSkill": null,
@@ -25532,7 +25536,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.171Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://gearbox.fi",
       "TradFiAnalogue": "a prime brokerage margin account funded by a syndicated revolving credit facility. The lender side resembles a senior secured revolver; the borrower side resembs a prime broker margin account where the broker holds the client assets in a segregated account and can liquidate them.",
       "OrgIntro": "Gearbox publishes no CEO or executive team. Named individuals are visible mainly through the multisig signer lists.",
@@ -26467,7 +26471,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: Curve LP, Diesel LP tokens (dUSDC, Ethena sUSDe, LRT collateral generally, LST, LSTs priced at exchange rate, Mellow Finance vault tokens, Pendle PT, Pool underlying assets: USDC, Sky sUSDS, Stablecoins priced at aliased 1.00, all pool assets), equivalents), mBASIS, mRe7YIELD, mTBILL, n.a. (per-market, n.a. (per-market), n.a. (protocol-wide), sUSDS. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Gearbox has the strongest loss record of the four, with no bad debt since 2021 including through the April 2024 ezETH cascade where it was the single most affected venue with $33m liquidated and still turned a profit. Its protections are unusually concrete: a dual-oracle Main and Reserve feed, a Loss Policy that halts liquidation when a position is only underwater at a dislocated market price, partial liquidation via a Deleverage Bot at a reduced premium, per-asset quotas that cap how much debt any collateral can secure, formal verification of the math libraries and a $1,000,000 Immunefi bounty. The risk has instead moved to the counterparty layer. Since GIP-264, risk parameters are set by commercial curators such as K3 Capital, Re7 Labs, kpk and Chaos Labs, and Gearbox's own auditor notes the Configurator role is fully trusted; a 24-hour timelock is the only structural brake, and an Emergency Admin can bypass even that. Combine that with credit accounts reaching up to 40x across adapters into Mellow, Pendle, Ethena and Sky, and 27 chains to police, and the plausible failure mode is not a contract bug but one curator parameterising one exotic collateral badly."
     },
     "CATEGORY#Entity|PROTOCOL#gmo-trust": {
       "AgentSkill": null,
@@ -34254,7 +34259,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.171Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://maple.finance",
       "TradFiAnalogue": "a private credit fund with a secured institutional loan book, wrapped in a transferable share (syrupUSDC), plus a money market fund for the Cash Management product.",
       "FundingNote": "Total raised per DefiLlama: $17.7m ([DefiLlama Maple](https://defillama.com/protocol/maple-finance)).",
@@ -35070,7 +35075,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: BTC collateral, BTC collateral posted against syrupUSDC, HYPE (1.05%), Maple cash management pool, USDC, USTB, XRP collateral marks, all Maple pool contracts, syrupUSDC on non Ethereum chains, syrupUSDT loans, weETH (1.06%). These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Maple is the most credit heavy protocol in this set, and its risk is fundamentally about who is borrowing rather than about code. It has never suffered a smart contract exploit, but it has suffered real credit losses: lenders took a 3.2% haircut on the Babel liquidation in July 2022 and a roughly 36 million USD default from Orthogonal Trading in December 2022, both traceable to a borrower misstating its position. Maple's answer since then has been to move underwriting in house, require overcollateralisation, and lean on regulated custodians and a Reg D exemption to serve institutional and accredited money, which is a genuine improvement but shifts the exposure rather than removing it. What remains is a concentrated book, more than three quarters of collateral in BTC and XRP, a single externally owned Pool Delegate key, an impairment switch that can cut depositor value without a vote, and secondary liquidity too thin to absorb a large exit. Depositors should treat syrupUSDC as a credit fund with a token wrapper, not as a money market position."
     },
     "CATEGORY#Entity|PROTOCOL#maverick": {
       "AgentSkill": null,
@@ -36902,7 +36908,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.171Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://morpho.org",
       "TradFiAnalogue": "a securitisation platform plus the fund managers who buy its tranches. Morpho Blue is the standardised, immutable issuance rail; MetaMorpho and Vaults V2 curators are the asset managers making the actual credit selection on behalf of end investors.",
       "BullBearCase": {
@@ -37807,7 +37813,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: Aerodrome LP, All market collateral, Any market collateral, PT-USD0++, RLP, USD0++, USDC, USDO, USR, USUAL, User-approved ERC-20 tokens, Vault V1.0 share tokens, Vault share tokens, cUSDO, deUSD, wstUSR, xUSD. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Morpho has almost no protocol-level risk and almost all of its risk in the layer above it. The immutable core is formally verified by Certora with a 2.5 million USD Cantina bounty ([Morpho docs](https://docs.morpho.org/learn/resources/risks/)), and in three documented loss events the core behaved exactly as specified. The damage came from curators: who they listed, what oracles they accepted and how fast they reacted. Every major loss traces to a collateral issuer failing while an oracle told the market nothing was wrong, in the Aerodrome LP case ([ClearstarLabs](https://forum.morpho.org/t/post-mortem-aerodrome-cusdo-usdc-amm-lp-oracle-manipulation-on-morpho-lending-market/1794)), in Stream's hardcoded xUSD price ([TokenIntel](https://tokenintel.org/reports/stream-finance-post-mortem-2026-05-21.html)) and in Resolv's hardcoded USR oracle exploited through the Public Allocator ([Oak Research](https://oakresearch.io/en/analyses/investigations/the-resolv-usr-hack-curators-face-their-responsibilities)). Morpho's own documentation is unusually candid about the residual hazards, including donation attacks that supply caps do not stop and the last-depositor bank run in Vaults V1.1 ([Morpho security considerations](https://docs.morpho.org/curate/concepts/security-considerations/)). The structural problem is that curator TVL grew 2,200 percent to 7 billion USD with no licensing and heavy concentration in five firms ([Chorus One](https://chorus.one/reports-research/defi-curators-in-2025-navigating-chaos-building-resilience)). Net posture: low technological risk in the base layer, critical and recurring counterparty and governance risk in the curated layer, with loss magnitude driven almost entirely by curator judgement."
     },
     "CATEGORY#Entity|PROTOCOL#mountain-protocol": {
       "AgentSkill": null,
@@ -40151,7 +40158,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.171Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://notional.finance",
       "TradFiAnalogue": "the fixed-rate term loan and the zero-coupon discount note, priced off a term structure. fCash is the discount note.",
       "FundingNote": "Total raised per DefiLlama: $10m ([DefiLlama Notional](https://defillama.com/protocol/notional)).",
@@ -41026,7 +41033,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: All V3 markets on mainnet, All collateral currencies, All listed currencies, Arbitrum, Core protocol contracts, ETH lending markets on Ethereum mainnet, Leveraged vault positions, WETH vault shares, WETH vaults on Arbitrum, WETH vaults on mainnet, all vault strategy contracts, fCash, fCash across all listed maturities, mAPOLLO, mHYPER, mHYPER USDC vaults, non ETH reserve assets, other nTokens, vaults. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Notional's failure mode was composability, not its own code. Its lending and fCash machinery worked as designed, but its leveraged vaults had deposited user capital into Balancer V2, and when Balancer was exploited in November 2025 the loss travelled straight through: vault holders lost everything, the protocol's reserves proved to be a rounding error against the damage, and mainnet ETH lenders were haircut more than 56%. That is the important lesson, because it shows that in Notional's design the lenders, not an insurance fund, are the ultimate backstop. Rather than recapitalise, the team wound V3 down on both chains and migrated borrowers out to Aave. The successor, Notional Exponent, launched in January 2026 with Sherlock and MixBytes audits, a 250 thousand USD Immunefi bounty and Hypernative monitoring, but it is a new codebase with thin launch liquidity that again depends on external curators and strategy providers. Anyone underwriting Exponent is underwriting the same composability question with better monitoring and no track record yet."
     },
     "CATEGORY#Entity|PROTOCOL#ondo-finance": {
       "AgentSkill": null,
@@ -43699,7 +43707,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.171Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://www.pendle.finance",
       "TradFiAnalogue": "Closest instruments: the zero-coupon bond and the interest rate strip for PT and YT, and the interest rate swap for Boros.",
       "BullBearCase": {
@@ -44489,7 +44497,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: All PT, All PT markets, All PT tokens, All Pendle V2 contracts, All YT, Arbitrum 128.82 million USD, Ethereum 594.57 million USD, Fake market 0x0ab305033592E16dB7D8e77d613F8d172a76ddc9, Hyperliquid L1 21.25 million USD, Monad 49.79 million USD, PENDLE, PNP, PT collateral listings on Aave, PT collateralised Morpho, PT positions, PT-ENA, PT-USD0++, PT-USD0++-27MAR2025, PT-WBTC, PT-sUSDe, PT-sUSDe markets, PT-sUSDe-29MAY2025, PT-sUSDe-29MAY2025 (max lnImpliedRate change 17.09%), PT-weETH, PT-weETH-27JUN2024, Plasma 128.49 million USD, SY contracts, Spark vaults, USD0++, YT, other listed PTs, structurally similar markets. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Pendle's own core contracts have never been drained, and PendleMarketV3 is immutable apart from pausing, which is a real strength. The risk lives everywhere else. Governance is concentrated in a 2 of 4 multisig and a single guardian key with no timelock, which was useful in September 2024 when Pendle paused everything within a day of the Penpie exploit and protected around 105 million USD, but the same power could be turned the other way. The bigger systemic issue is that PTs became collateral across Spark, Morpho, Aave and others, priced by a discount oracle that Chaos Labs showed can drift far enough for borrowers to walk away with debt, on markets running liquidation LTVs above 91%. Add underlying concentration in sUSDe and USD0++, issuers who can change redemption terms overnight, liquidity that exists only on Pendle's own AMM, and TVL that has fallen to under 1 billion USD from a 6.5 billion USD peak, and the profile is a technically sound protocol carrying other people's risks. Treat Pendle exposure as exposure to the specific underlying and to the lending market accepting the PT, not to Pendle in the abstract."
     },
     "CATEGORY#Entity|PROTOCOL#pleasing-market": {
       "AgentSkill": null,
@@ -46235,7 +46244,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.171Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://radiant.capital/",
       "TradFiAnalogue": "a failed non-bank lender in members' voluntary liquidation, where the operating business is closed, the loan book is being run off, and a claims administrator distributes recoveries in tranches.",
       "FundingNote": "No venture funding round is documented in the fetched sources. Radiant's capital came from its RDNT token and protocol revenue rather than an identified equity raise, and the remediation multisig is funded from protocol revenue, DAO treasury, adjusted emissions, reserves, new investments and new partner contributions ([Radiant docs](https://docs.radiant.capital/radiant/remediation/remediation-plan)).",
@@ -47137,7 +47146,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: All Core, Any ERC-20 approved to Radiant contracts, Assets across Arbitrum, Assets lost in the October 2024 exploit, Assets on Arbitrum, BSC, Base, Base deployments, DLP, Ethereum, RDNT, RIZv1 market assets, n.a, rTokens, rizUSDT. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Radiant is no longer a going concern and its risk profile should be read as exit risk, not lending risk. Two exploits inside ten months, a roughly 720 ETH shortfall from a flash loan against an empty new market in January 2024 ([Radiant post-mortem](https://medium.com/@RadiantCapital/post-mortem-report-radiant-capital-aea46cb985ae)) and about 50 million USD from a device-malware multisig compromise in October 2024 ([Radiant post-mortem](https://medium.com/@RadiantCapital/radiant-post-mortem-fecd6cd38081)), destroyed the protocol's capital base and its trust. Neither loss was recovered, and after eighteen months with no external investment and no grants the DAO began an orderly wind-down on 1 June 2026 ([WuBlockchain](https://www.wublockchain.xyz/news/radiant-capital-wind-down-after-50m-exploit-failure-19380)). The dominant risks now are operational rather than financial: borrowing is disabled with caps at 1, RDNT emissions have stopped, support is best-effort, the front-end only survives through end of year, and the DAO explicitly warns that no further upgrades, patches or interventions should be assumed ([Sunsetting Radiant Capital DAO](https://medium.com/@RadiantCapital/sunsetting-radiant-capital-dao-entering-recovery-phase-and-lessons-for-the-future-of-defi-c47837ffa499)). Some RIZ vault losses were declared permanently irrecoverable ([RIZ post-mortem](https://community.radiant.capital/t/post-mortem-october-16-2024-exploit-impact-on-riz-vaults/2220)). Net posture: critical, terminal, and the only rational user action is capital withdrawal, which is exactly what the DAO itself advises."
     },
     "CATEGORY#Entity|PROTOCOL#rage-trade": {
       "AgentSkill": null,
@@ -51082,7 +51092,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.171Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://sense.finance",
       "TradFiAnalogue": "Sense named it itself, the zero-coupon bond paired with a floating rate note.",
       "OrgIntro": "Note: no other named officers or a Jonathan Wu role could be confirmed from a fetched source, so those are `n.a.`",
@@ -51190,7 +51200,8 @@
           "url": "https://defillama.com/protocol/sense",
           "takeaway": "$42,168 residual TVL on Ethereum and the $5.2m total raised"
         }
-      ]
+      ],
+      "RiskPosture": "Sense is a discontinued protocol, and that is the dominant fact about its risk profile. It never suffered a documented exploit, it was audited eight times by credible firms including Spearbit and Sherlock, and it was noncustodial throughout, so the technical foundation was sound. What killed it was demand: the team concluded in October 2023 that DeFi simply did not want fixed rates consistently enough to sustain the product, wound it down, and open sourced the interface. Anyone still holding a Sense position is now dealing with unmaintained contracts, a hosted frontend that was switched off on 1 December 2023, and a 2 of 3 multisig that retains real powers including pausing the Divider and backfilling the Scale value that determines how much Target each PT and YT holder receives. Layered on top are the dependencies Sense always had, on Balancer V2 for the Space AMM and on Compound or Aave for converting Target back to Underlying. The residual risk is not that Sense will be hacked, it is that no one is left to respond if something goes wrong."
     },
     "CATEGORY#Entity|PROTOCOL#sherlock": {
       "AgentSkill": null,
@@ -53173,7 +53184,7 @@
           "sourceUrl": "https://www.streetbrief.co/article/spark-protocol-captures-1-4b-inflow-kelp-dao-exploit-triggers-aave-liquidity-crisis-2604/"
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.172Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://spark.fi",
       "TradFiAnalogue": "a wholesale-funded specialist lender inside a banking group, drawing on a parent credit line at concessional cost and deploying it across a mandated asset list, with the parent's board retaining risk-limit authority.",
       "OrgIntro": "Where Spark's mandate ends and Sky's begins. This distinction matters more for Spark than for any other entity in the set, so it is set out explicitly.\n\n- Sky owns the balance sheet. Spark borrows from Sky's stablecoin reserves and is described as the distribution layer within the SKY ecosystem, with SKY as the parent protocol; the Spark treasury acts as junior capital required by SKY to fulfil the risk-required capital needs for accessing the SKY credit line ([Spark docs](https://docs.spark.fi/faq), [Spark Q1 2026 report](https://paragraph.com/@spark-11/spark-q1-2026-financial-report)).\n- Sky Governance sets SparkLend's risk parameters. Per-market supply and borrow caps are configured by Sky Governance, transparent rates change based on Sky Governance, and Sky Governance can reduce borrowing power of any asset to 0% without impacting existing borrowers ([Spark docs](https://docs.spark.fi/products/sparklend)).\n- Sky controls SPK supply and distribution. 65% of the 10 billion genesis supply sits with Sky for a 10-year farming campaign following rules set in the Sky Atlas, and Sky retains the ability to mint additional SPK under extreme circumstances ([Spark docs](https://docs.spark.fi/governance/spk-token)).\n- Spark governs itself through Atlas edits, not independent sovereignty. The Spark governance process centres on updating the Spark Agent artifact in the Sky Atlas, which controls budgets, risk settings, asset onboarding, SLL integrations and new chain deployments; proposals are filed in the Spark Prime section of the Sky forum and voted on Snapshot with SPK ([Spark governance docs](https://docs.spark.fi/governance)).\n- Historically the ownership was even more direct. All products created by Phoenix Labs were to belong to MakerDAO, inheriting Maker's governance system, and Phoenix Labs committed 10% of DAI-market profits to Aave DAO for the first two years as a fork licence ([Binance Square](https://www.binance.com/en/square/post/213372), [CoinDesk](https://www.coindesk.com/markets/2023/02/08/makerdao-contributors-propose-first-native-liquidity-market-focused-on-dai-stablecoin)).",
@@ -54144,7 +54155,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: All SparkLend collateral, PT-sUSDe, SKY, USDe, USTB, all Gnosis market assets, sUSDe, spETH, spUSDG. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Spark's posture is deliberately conservative on the lending side and aggressive on the balance sheet side, and the two must be assessed separately. SparkLend itself is a hardened Aave v3 fork with a three-oracle median across RedStone, Chainlink and Chronicle, a killswitch peg-ratio oracle, rate-limited caps and a tight collateral set that excludes BTC e-mode entirely ([SparkLend docs](https://docs.spark.fi/products/sparklend)). That conservatism paid off when the January 2026 deprecation spell froze rsETH three months before the Kelp exploit, leaving Spark with no direct exposure and attracting 1.4 billion USD of fleeing Aave deposits ([Sky executive vote](https://raw.githubusercontent.com/sky-ecosystem/executive-votes/main/2026/executive-vote-2026-01-29-msc-pattern-and-skybase-onboarding.md), [Streetbrief](https://www.streetbrief.co/article/spark-protocol-captures-1-4b-inflow-kelp-dao-exploit-triggers-aave-liquidity-crisis-2604/)). The real risk sits in the Spark Liquidity Layer, which allocates up to 1.1 billion USD directly to Ethena's USDe and sUSDe plus 200 million DAI to Pendle PT markets ([Spark mirror post](https://mirror.xyz/0xF99d0E4E3435cc9C9868D1C6274DfaB3e2721341/LjBAybIk6-waSxwOBWp5mg_37jNvrWF_UdzqqXoEl6U)) and routes capital across CCTP, LayerZero, Maple and Superstate via a relayer whose own threat model assumes it can be fully compromised ([SLL docs](https://docs.spark.fi/products/spark-liquidity-layer)). Loss absorption is unusually deep, six layers ending in SKY token issuance and equal socialisation across USDS holders ([Spark Savings docs](https://docs.spark.fi/products/spark-savings)), but that final layer means Spark depositors are ultimately Sky creditors. Net posture: low protocol risk, concentrated issuer and operational risk on the treasury side, with the strongest incident record of the five."
     },
     "CATEGORY#Entity|PROTOCOL#spectra": {
       "AgentSkill": null,
@@ -55086,7 +55098,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.172Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://www.spectra.finance",
       "TradFiAnalogue": "the zero-coupon bond stripped from a floating rate note, issued through what is effectively a self-service issuance platform.",
       "BullBearCase": {
@@ -55906,7 +55918,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: 110 USD, 539 USD, All Principal Tokens, All Spectra pools, All Spectra pools on Hemi, Avalanche 1.15 million USD, Base 588, ETH held in user wallets that approved the router, Ethereum 966, Flare, Flare 11.23 million USD, Hemi 13.1 million USD, Katana 1.23 million USD, MetaVaults V1, PT, PT-wstUSR, Principal Tokens, Spectra core contracts, USR, YT pools on Curve, YT tokens, app.spectra.finance, other AMMs, other listed ERC-4626 assets, sFLR, scUSD, stS, stXRP, their ERC-4626 underlyings, user wallet approvals, wstUSR. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Spectra is a small, permissionless protocol whose core contracts have held up well and whose risk sits almost entirely at the edges. Three independent audit engagements, Code4rena, Pashov and Sherlock, produced no high severity findings, and the one exploit it suffered in July 2024 hit a peripheral router contract and four wallets rather than the protocol itself, costing around 168 ETH and being contained within six hours. The structural exposures are different in kind. Anyone can list any ERC-4626 token as a market with no vetting, and Spectra's own documentation says it has no control over what users contribute, so the protocol's real credit quality is whatever its underlyings happen to be. That became concrete on 22 March 2026 when Resolv, a major source of Spectra collateral, was exploited for 80 million USR of unbacked mint and saw USR trade below three cents. On top of that, TVL has fallen to about 28 million USD spread thinly across twelve chains, with more than 85% sitting on Hemi and Flare rather than Ethereum. Spectra should be judged one market at a time, because the protocol offers no protection at all against a bad underlying.\n\nReport compiled 26 July 2026. Every value above is drawn from a page fetched during the research session and linked inline. Where a figure could not be confirmed from a fetched source it is marked n.a."
     },
     "CATEGORY#Entity|PROTOCOL#stably": {
       "AgentSkill": null,
@@ -58404,7 +58417,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-26T18:45:15.172Z",
+      "UpdatedAt": "2026-07-26T20:32:23.609Z",
       "Website": "https://stellaxyz.io",
       "TradFiAnalogue": "a profit participating margin loan, or a total return swap with no financing leg and a performance fee. The lender is paid only out of realised gains rather than a contractual coupon.",
       "FundingNote": "No venture round has been disclosed since 2020 on any page reviewed in this session.",
@@ -59342,7 +59355,8 @@
         "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: ALPHA, ALPHA (as collateral), All leveraged LP positions, All listed LP strategies, Camelot, DAI, GNS, Penpie eETH, Perpetual, STG, Trader Joe V2, Trader Joe V2 JOE, USDT balances, USDT held via Iron Bank, USDT owed to Iron Bank, Uniswap V3 LPs, Uniswap V3 WETH, frozen ETH, n.a. (protocol-wide), spot pairs supported on Stella Trade, wstETH PT, wstETH PT positions, ysToken lending receipts on USDC.e. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
-      }
+      },
+      "RiskPosture": "Stella is best understood as a small residual protocol carrying a very large unresolved liability from a previous life. The 2021 Alpha Homora V2 exploit left $32.429m owed to Iron Bank, the pledged 50m ALPHA collateral lost more than 90% of its value, repayment ran at about $5,000 a month, and the counterparty responded by freezing roughly $41m of user funds and then walking away from the project entirely in February 2024. That history is not closed and it defines the entity. The current product has some sensible design features, published Collateral Factors of 0.92 to 0.95 per LP, a 2-day lender withdrawal delay against sandwiching, and a documented oracle contingency, but the oracle is off-chain and depends on centralised exchange prices, leverage parameters are set at the research team's discretion rather than on chain, no current audit report was located, positions carry a hard 30-day expiry liquidation, and TVL of $442,829 on Arbitrum alone is far below the liquidity depth any leveraged farming design needs to liquidate cleanly. Successive exchange delistings through 2025 and into 2026 point the same direction. Treat this as a wind-down profile rather than a going-concern leverage venue."
     },
     "CATEGORY#Entity|PROTOCOL#sushiswap": {
       "AgentSkill": null,

@@ -2792,6 +2792,12 @@ export interface NetworkProfile {
   priceHistory?: PriceHistory;
   tokenomics?: Tokenomics;
   typedRisks?: TypedRisk[];
+  /**
+   * Sourced risk-posture prose (M6/M7 dataset "Risk posture" paragraph, inline
+   * md links) — the M7 Risks-tab narrative. Network-level only; pushed by
+   * scripts/push-credit-m7-risk-posture.mjs.
+   */
+  riskPosture?: string | null;
   /** M6 Asset coverage block (typed asset rows + oracles + flagged assets). */
   assetCoverage?: AssetCoverage | null;
   /** External dependencies (oracles, collateral issuers, bridges) — Risks tab. */

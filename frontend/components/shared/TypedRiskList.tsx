@@ -1,13 +1,7 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { SEVERITY_TONE } from "@/components/shared/riskTone";
 import type { TypedRisk } from "@/lib/types";
-
-const SEVERITY_TONE = {
-  critical: "danger",
-  high: "danger",
-  medium: "warning",
-  low: "neutral",
-} as const;
 
 interface TypedRiskListProps {
   risks: TypedRisk[];

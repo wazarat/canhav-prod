@@ -17,10 +17,17 @@ const PARAMS_CAVEATS: Record<string, string> = {
     "No per-asset collateral factor, borrow factor, cap or liquidation discount was ever published, so listed assets render without a parameter grid.",
 };
 
-export function EntityStateBanner({ slug }: { slug: string }) {
+export function EntityStateBanner({
+  slug,
+  showParamsCaveat = true,
+}: {
+  slug: string;
+  /** The parameter caveats are asset-grid wording — the Risks tab passes false. */
+  showParamsCaveat?: boolean;
+}) {
   const status = ENTITY_STATUS_OVERRIDES[slug];
   if (!status) return null;
-  const caveat = PARAMS_CAVEATS[slug];
+  const caveat = showParamsCaveat ? PARAMS_CAVEATS[slug] : undefined;
   return (
     <Card className="space-y-2 border-l-2 border-l-amber-500/60">
       <div className="flex flex-wrap items-center gap-2">

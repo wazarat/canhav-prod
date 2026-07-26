@@ -26,7 +26,7 @@ import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
 
 interface PageProps {
   params: { slug: string };
-  searchParams: { tab?: string; m?: string; range?: string; seg?: string };
+  searchParams: { tab?: string; m?: string; range?: string; seg?: string; view?: string };
 }
 
 export const revalidate = 300;
@@ -141,7 +141,7 @@ export default async function NetworkProfilePage({ params, searchParams }: PageP
       {activeTab === "asset-coverage" && (
         <NetworkAssetCoverageTab profile={profile} seg={searchParams.seg} />
       )}
-      {activeTab === "risks" && <NetworkRisksTab profile={profile} />}
+      {activeTab === "risks" && <NetworkRisksTab profile={profile} view={searchParams.view} />}
       {activeTab === "competitors" && <NetworkCompetitorsTab profile={profile} />}
       {activeTab === "partnerships" && <NetworkPartnershipsTab profile={profile} />}
       {activeTab === "agent-skills" && (

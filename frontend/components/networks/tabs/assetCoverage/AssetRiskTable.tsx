@@ -5,7 +5,8 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 import { AssetRiskDrawer } from "@/components/networks/tabs/assetCoverage/AssetRiskDrawer";
-import { Badge, type BadgeTone } from "@/components/ui/Badge";
+import { SEVERITY_BAR, SEVERITY_TONE } from "@/components/shared/riskTone";
+import { Badge } from "@/components/ui/Badge";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import { Tooltip } from "@/components/ui/Tooltip";
 import type { AssetRiskRowModel, AssetRiskTableModel } from "@/lib/networks/assetRisk";
@@ -13,20 +14,6 @@ import { assetEntityHref } from "@/lib/networks/assetRisk";
 import type { RiskSeverity } from "@/lib/types";
 
 const VISIBLE_ROWS = 8;
-
-const SEVERITY_BAR: Record<RiskSeverity, string> = {
-  critical: "bg-rose-500",
-  high: "bg-amber-400",
-  medium: "bg-yellow-600/80",
-  low: "bg-ink-500",
-};
-
-const SEVERITY_TONE: Record<RiskSeverity, BadgeTone> = {
-  critical: "danger",
-  high: "danger",
-  medium: "warning",
-  low: "neutral",
-};
 
 export type AssetRoleFilter = "collateral" | "loan" | "instruments" | "all";
 

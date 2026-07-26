@@ -214,11 +214,20 @@ export async function getApprovedNetworks(): Promise<NetworkProfile[]> {
   return loadEnrichedNetworks();
 }
 
+// react `cache()`: `generateMetadata` and the page body both resolve the same
+// slug per request; dedup so the DefiLlama live-sector enrichment runs once
+// (and both callers share the identical profile object reference).
+const loadNetworkWithSectorMetrics = cache(
+  async (slug: string): Promise<NetworkProfile | null> => {
+    const networks = await loadEnrichedNetworks();
+    const profile = networks.find((p) => p.slug === slug) ?? null;
+    if (!profile) return null;
+    return enrichNetworkWithLiveSectorMetrics(profile);
+  },
+);
+
 export async function getApprovedNetworkBySlug(slug: string): Promise<NetworkProfile | null> {
-  const networks = await loadEnrichedNetworks();
-  const profile = networks.find((p) => p.slug === slug) ?? null;
-  if (!profile) return null;
-  return enrichNetworkWithLiveSectorMetrics(profile);
+  return loadNetworkWithSectorMetrics(slug);
 }
 
 /**
@@ -502,7 +511,7 @@ export async function getNetworkMemberCoins(
     getAllRwas(),
     getAllReceipts(),
   ]);
-  return network.memberCoins.map((ref) => {
+  const resolved = network.memberCoins.map((ref) => {
     const profile =
       ref.category === "Stablecoin"
         ? (stablecoins.find((p) => p.slug === ref.slug) ?? null)
@@ -512,6 +521,22 @@ export async function getNetworkMemberCoins(
             ? (receipts.find((p) => p.slug === ref.slug) ?? null)
             : (tokens.find((p) => p.slug === ref.slug) ?? null);
     return { ref, profile };
+  });
+  // Defensive: live-store drift has produced duplicate member refs before
+  // (window-1 duplicate-SYRUP incident); the render path has no other dedupe.
+  // Keep the first ref per category:slug, then per category:SYMBOL.
+  const seen = new Set<string>();
+  return resolved.filter(({ ref, profile }) => {
+    const slugKey = `${ref.category}:${ref.slug}`;
+    if (seen.has(slugKey)) return false;
+    seen.add(slugKey);
+    const symbol = profile?.symbol?.trim().toUpperCase();
+    if (symbol) {
+      const symbolKey = `${ref.category}:sym:${symbol}`;
+      if (seen.has(symbolKey)) return false;
+      seen.add(symbolKey);
+    }
+    return true;
   });
 }
 

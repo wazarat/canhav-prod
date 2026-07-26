@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Check, X } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
+import { useModalBehavior } from "@/components/ui/useModalBehavior";
 import { cn } from "@/lib/utils";
 
 type LeadType = "individual" | "team";
@@ -29,6 +30,7 @@ export function ContactModal({
   const [comments, setComments] = useState("");
   const [website, setWebsite] = useState(""); // honeypot — humans never see it
   const [status, setStatus] = useState<Status>("idle");
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -39,18 +41,9 @@ export function ContactModal({
     setComments("");
     setWebsite("");
     setStatus("idle");
+  }, [open]);
 
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [open, onClose]);
+  useModalBehavior({ onClose, containerRef, active: open });
 
   if (!open) return null;
 
@@ -79,7 +72,11 @@ export function ContactModal({
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
       <div className="absolute inset-0 bg-ink-950/80 backdrop-blur-sm" onClick={onClose} />
-      <div className="glass relative z-10 max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-ink-700/70 animate-fade-in-up">
+      <div
+        ref={containerRef}
+        tabIndex={-1}
+        className="glass relative z-10 max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-ink-700/70 animate-fade-in-up"
+      >
         <button
           type="button"
           onClick={onClose}

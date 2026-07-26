@@ -11,7 +11,7 @@ import { DataPanel, DataRow, LinkRow } from "@/components/ui/DataPanel";
 import { StatCard } from "@/components/ui/StatCard";
 import { loadNetworkDashboardData } from "@/lib/networks/dashboard-data";
 import type { NetworkProfile } from "@/lib/types";
-import { formatUsdCompact } from "@/lib/utils";
+import { cn, formatUsdCompact } from "@/lib/utils";
 
 export interface NetworkStatCard {
   label: string;
@@ -81,7 +81,12 @@ export function NetworkOverviewTab({
 
   return (
     <div className="space-y-8 pt-6">
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section
+        className={cn(
+          "grid grid-cols-2 gap-4",
+          statCards.length >= 5 ? "sm:grid-cols-3 lg:grid-cols-5" : "lg:grid-cols-4",
+        )}
+      >
         {statCards.map((s) => (
           <StatCard key={s.label} label={s.label} value={s.value} hint={s.hint} />
         ))}
@@ -101,7 +106,9 @@ export function NetworkOverviewTab({
                 </h2>
               </div>
               <Card className="text-sm leading-relaxed text-ink-300">
-                {profile.longDescription}
+                {/* All current longDescriptions are ~500-670 chars; add a
+                    collapse only if editorial entries grow past ~1200 chars. */}
+                <p className="max-w-prose">{profile.longDescription}</p>
               </Card>
             </section>
           )}

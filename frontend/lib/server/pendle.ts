@@ -152,6 +152,72 @@ export async function fetchPendleLiveMetrics(
   };
 }
 
+interface PendleListedTokenRow {
+  symbol?: string;
+  price?: { usd?: number | string | null } | null;
+}
+
+interface PendleListedMarketRow {
+  name?: string;
+  symbol?: string;
+  isActive?: boolean;
+  liquidity?: { usd?: number | string | null } | null;
+  pt?: PendleListedTokenRow | null;
+  yt?: PendleListedTokenRow | null;
+}
+
+interface PendleListedMarketsResponse {
+  results?: PendleListedMarketRow[];
+}
+
+export interface PendlePtYtPrices {
+  ptPriceUsd: number | null;
+  ytPriceUsd: number | null;
+  /** Market the prices were read from (e.g. "PT-stETH-26DEC2026"). */
+  marketName: string | null;
+}
+
+/**
+ * Representative PT/YT unit prices for the Credit member-coin placeholders
+ * (`pendle-ptyt` / `pendle-ptyt-family`, symbols "PT-stETH" / "YT-stETH").
+ * Uses the paginated /v1/1/markets list (the only endpoint that carries
+ * pt.price.usd / yt.price.usd); prefers the deepest active stETH market,
+ * falling back to the deepest active market overall. Returns null on any
+ * failure; callers degrade to placeholder dashes.
+ */
+export async function fetchPendleRepresentativePtYtPrices(
+  revalidate?: number,
+): Promise<PendlePtYtPrices | null> {
+  const { status, data } = await fetchJson(`${PENDLE_BASE}/v1/1/markets?limit=100`, {
+    revalidate,
+  });
+  if (status !== 200) return null;
+  const results = (data as PendleListedMarketsResponse | null)?.results;
+  if (!Array.isArray(results)) return null;
+
+  const active = results.filter((m) => m?.isActive !== false);
+  const bySize = (rows: PendleListedMarketRow[]) =>
+    rows.reduce<PendleListedMarketRow | null>((best, m) => {
+      const tvl = num(m.liquidity?.usd) ?? 0;
+      return tvl > (num(best?.liquidity?.usd) ?? 0) ? m : best;
+    }, null);
+
+  const isSteth = (m: PendleListedMarketRow) =>
+    `${m.name ?? ""} ${m.symbol ?? ""} ${m.pt?.symbol ?? ""}`.toLowerCase().includes("steth");
+  const market = bySize(active.filter(isSteth)) ?? bySize(active);
+  if (!market) return null;
+
+  const ptPriceUsd = num(market.pt?.price?.usd);
+  const ytPriceUsd = num(market.yt?.price?.usd);
+  if (ptPriceUsd == null && ytPriceUsd == null) return null;
+
+  return {
+    ptPriceUsd,
+    ytPriceUsd,
+    marketName: market.pt?.symbol ?? market.name ?? null,
+  };
+}
+
 /**
  * Map Pendle live metrics onto the Credit sector's `fixedIncome` tag block
  * (CreditTagMetrics.fixedIncome → FixedIncomeMetrics). Returns a plain inferred

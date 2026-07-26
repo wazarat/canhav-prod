@@ -1,20 +1,36 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, ChevronRight, Eye, X } from "lucide-react";
 
 import { CoinModal } from "@/components/networks/CoinModal";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { useModalBehavior } from "@/components/ui/useModalBehavior";
 import { categoryBadgeTone } from "@/lib/categoryTone";
 import type { CoinLiveData } from "@/lib/server/coin";
 import { cn, formatPct, formatUsdCompact } from "@/lib/utils";
 
 const PREVIEW_ROWS = 3;
 
+// A column that would be >70% dashes is hidden for the panel instead of
+// rendering placeholder noise (CAN-55 DoD: no column more than 30% placeholder
+// without a documented reason; hiding is the documented reason).
+const COLUMN_MIN_COVERAGE = 0.3;
+
+interface ColumnVisibility {
+  price: boolean;
+  change: boolean;
+  mcap: boolean;
+}
+
 function hasMarketData(coin: CoinLiveData): boolean {
   return coin.market != null && (coin.market.currentPrice != null || coin.market.marketCap != null);
+}
+
+function coinPrice(coin: CoinLiveData): number | null {
+  return coin.market?.currentPrice ?? coin.referencePrice ?? null;
 }
 
 function changeTone(value: number | null | undefined): "positive" | "danger" | "neutral" {
@@ -25,8 +41,49 @@ function changeTone(value: number | null | undefined): "positive" | "danger" | "
 }
 
 function sortByMcap(coins: CoinLiveData[]): CoinLiveData[] {
-  return [...coins].sort(
-    (a, b) => (b.market?.marketCap ?? -1) - (a.market?.marketCap ?? -1),
+  return [...coins].sort((a, b) => {
+    const mcapDelta = (b.market?.marketCap ?? -1) - (a.market?.marketCap ?? -1);
+    if (mcapDelta !== 0) return mcapDelta;
+    // Tiebreak: coins with any price signal above fully blank rows.
+    return (coinPrice(b) != null ? 1 : 0) - (coinPrice(a) != null ? 1 : 0);
+  });
+}
+
+function columnVisibility(coins: CoinLiveData[]): ColumnVisibility {
+  const frac = (has: (coin: CoinLiveData) => boolean) =>
+    coins.length === 0 ? 0 : coins.filter(has).length / coins.length;
+  return {
+    price: frac((c) => coinPrice(c) != null) >= COLUMN_MIN_COVERAGE,
+    change: frac((c) => c.market?.priceChange24h != null) >= COLUMN_MIN_COVERAGE,
+    mcap: frac((c) => c.market?.marketCap != null) >= COLUMN_MIN_COVERAGE,
+  };
+}
+
+function PriceCell({ coin }: { coin: CoinLiveData }) {
+  if (hasMarketData(coin) && coin.market?.currentPrice != null) {
+    return (
+      <>{`$${coin.market.currentPrice.toLocaleString(undefined, { maximumFractionDigits: 4 })}`}</>
+    );
+  }
+  if (coin.referencePrice != null) {
+    return (
+      <span title={coin.referencePriceLabel ?? "Underlying reference price"}>
+        {`$${coin.referencePrice.toLocaleString(undefined, { maximumFractionDigits: 4 })}`}
+        <span className="ml-1 text-[10px] text-ink-500">underlying</span>
+      </span>
+    );
+  }
+  return <>—</>;
+}
+
+function ChangeCell({ coin }: { coin: CoinLiveData }) {
+  const change24h = coin.market?.priceChange24h;
+  return change24h != null ? (
+    <Badge tone={changeTone(change24h)} className="text-[10px]">
+      {formatPct(change24h)}
+    </Badge>
+  ) : (
+    <span className="text-ink-500">—</span>
   );
 }
 
@@ -39,8 +96,8 @@ export function MemberCoinsLauncher({ coins, networkName }: MemberCoinsLauncherP
   const [listOpen, setListOpen] = useState(false);
   const [active, setActive] = useState<CoinLiveData | null>(null);
   const sorted = useMemo(() => sortByMcap(coins), [coins]);
+  const cols = useMemo(() => columnVisibility(coins), [coins]);
   const preview = sorted.slice(0, PREVIEW_ROWS);
-  const remaining = sorted.length - preview.length;
 
   if (coins.length === 0) {
     return (
@@ -72,26 +129,29 @@ export function MemberCoinsLauncher({ coins, networkName }: MemberCoinsLauncherP
               <tr className="border-b border-ink-800/40 text-xs text-ink-400">
                 <th className="px-5 py-2 font-medium">Symbol</th>
                 <th className="px-3 py-2 font-medium">Category</th>
-                <th className="px-3 py-2 text-right font-medium">Price</th>
-                <th className="px-3 py-2 text-right font-medium">24h</th>
-                <th className="px-3 py-2 text-right font-medium">Mkt cap</th>
+                {cols.price && <th className="px-3 py-2 text-right font-medium">Price</th>}
+                {cols.change && <th className="px-3 py-2 text-right font-medium">24h</th>}
+                {cols.mcap && <th className="px-3 py-2 text-right font-medium">Mkt cap</th>}
                 <th className="w-10 px-3 py-2" />
               </tr>
             </thead>
             <tbody>
               {preview.map((coin) => (
-                <CoinRow key={coin.slug} coin={coin} onQuickView={() => setActive(coin)} />
+                <CoinRow
+                  key={coin.slug}
+                  coin={coin}
+                  cols={cols}
+                  onQuickView={() => setActive(coin)}
+                />
               ))}
             </tbody>
           </table>
         </div>
 
         <div className="flex items-center justify-between gap-3 border-t border-ink-800/60 px-5 py-3">
-          {remaining > 0 ? (
-            <p className="text-xs text-ink-400">+{remaining} more in full list</p>
-          ) : (
-            <span />
-          )}
+          <p className="text-xs text-ink-400">
+            Showing {preview.length} of {sorted.length} coins
+          </p>
           <button
             type="button"
             onClick={() => setListOpen(true)}
@@ -106,6 +166,7 @@ export function MemberCoinsLauncher({ coins, networkName }: MemberCoinsLauncherP
       {listOpen && (
         <CoinsListModal
           coins={sorted}
+          cols={cols}
           networkName={networkName}
           onClose={() => setListOpen(false)}
           onSelect={(coin) => {
@@ -122,14 +183,13 @@ export function MemberCoinsLauncher({ coins, networkName }: MemberCoinsLauncherP
 
 function CoinRow({
   coin,
+  cols,
   onQuickView,
 }: {
   coin: CoinLiveData;
+  cols: ColumnVisibility;
   onQuickView: () => void;
 }) {
-  const change24h = coin.market?.priceChange24h;
-  const marketDataPresent = hasMarketData(coin);
-
   return (
     <tr className="group border-b border-ink-800/30 last:border-0 hover:bg-ink-900/40">
       <td className="px-5 py-2.5">
@@ -146,23 +206,21 @@ function CoinRow({
           {coin.category}
         </Badge>
       </td>
-      <td className="px-3 py-2.5 text-right font-mono text-ink-200">
-        {marketDataPresent && coin.market?.currentPrice != null
-          ? `$${coin.market.currentPrice.toLocaleString(undefined, { maximumFractionDigits: 4 })}`
-          : "—"}
-      </td>
-      <td className="px-3 py-2.5 text-right">
-        {change24h != null ? (
-          <Badge tone={changeTone(change24h)} className="text-[10px]">
-            {formatPct(change24h)}
-          </Badge>
-        ) : (
-          <span className="text-ink-500">—</span>
-        )}
-      </td>
-      <td className="px-3 py-2.5 text-right font-mono text-ink-200">
-        {formatUsdCompact(coin.market?.marketCap ?? null)}
-      </td>
+      {cols.price && (
+        <td className="px-3 py-2.5 text-right font-mono text-ink-200">
+          <PriceCell coin={coin} />
+        </td>
+      )}
+      {cols.change && (
+        <td className="px-3 py-2.5 text-right">
+          <ChangeCell coin={coin} />
+        </td>
+      )}
+      {cols.mcap && (
+        <td className="px-3 py-2.5 text-right font-mono text-ink-200">
+          {formatUsdCompact(coin.market?.marketCap ?? null)}
+        </td>
+      )}
       <td className="px-3 py-2.5">
         <button
           type="button"
@@ -179,32 +237,46 @@ function CoinRow({
 
 function CoinsListModal({
   coins,
+  cols,
   networkName,
   onClose,
   onSelect,
 }: {
   coins: CoinLiveData[];
+  cols: ColumnVisibility;
   networkName: string;
   onClose: () => void;
   onSelect: (coin: CoinLiveData) => void;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  useModalBehavior({ onClose, containerRef, initialFocusRef: closeButtonRef });
+
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`All coins under ${networkName}`}
+      aria-labelledby="coins-list-modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
       <div className="absolute inset-0 bg-ink-950/80 backdrop-blur-sm" onClick={onClose} />
-      <div className="glass relative z-10 flex max-h-[85vh] w-full max-w-2xl flex-col rounded-2xl border border-ink-700/70 animate-fade-in-up">
+      <div
+        ref={containerRef}
+        tabIndex={-1}
+        className="glass relative z-10 flex max-h-[85vh] w-full max-w-2xl flex-col rounded-2xl border border-ink-700/70 animate-fade-in-up"
+      >
         <div className="flex items-center justify-between gap-4 border-b border-ink-800/60 px-6 py-4">
           <div>
-            <h3 className="font-display text-lg font-semibold text-ink-50">
+            <h3
+              id="coins-list-modal-title"
+              className="font-display text-lg font-semibold text-ink-50"
+            >
               Coins under {networkName}
             </h3>
             <p className="text-xs text-ink-400">{coins.length} member products</p>
           </div>
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={onClose}
             aria-label="Close"
@@ -220,8 +292,10 @@ function CoinsListModal({
               <tr className="text-xs text-ink-400">
                 <th className="px-4 py-2 font-medium">Symbol</th>
                 <th className="px-3 py-2 font-medium">Name</th>
-                <th className="px-3 py-2 text-right font-medium">Mkt cap</th>
-                <th className="px-3 py-2 text-right font-medium">24h</th>
+                <th className="px-3 py-2 font-medium">Category</th>
+                {cols.price && <th className="px-3 py-2 text-right font-medium">Price</th>}
+                {cols.change && <th className="px-3 py-2 text-right font-medium">24h</th>}
+                {cols.mcap && <th className="px-3 py-2 text-right font-medium">Mkt cap</th>}
                 <th className="w-10 px-3 py-2" />
               </tr>
             </thead>
@@ -239,20 +313,38 @@ function CoinsListModal({
                     {coin.symbol}
                   </td>
                   <td className="px-3 py-2.5 text-ink-300">{coin.name}</td>
-                  <td className="px-3 py-2.5 text-right font-mono text-ink-200">
-                    {formatUsdCompact(coin.market?.marketCap ?? null)}
-                  </td>
-                  <td className="px-3 py-2.5 text-right">
-                    {coin.market?.priceChange24h != null ? (
-                      <Badge tone={changeTone(coin.market.priceChange24h)} className="text-[10px]">
-                        {formatPct(coin.market.priceChange24h)}
-                      </Badge>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
                   <td className="px-3 py-2.5">
-                    <Eye className="h-3.5 w-3.5 text-ink-400" />
+                    <Badge tone={categoryBadgeTone(coin.category)} className="text-[10px]">
+                      {coin.category}
+                    </Badge>
+                  </td>
+                  {cols.price && (
+                    <td className="px-3 py-2.5 text-right font-mono text-ink-200">
+                      <PriceCell coin={coin} />
+                    </td>
+                  )}
+                  {cols.change && (
+                    <td className="px-3 py-2.5 text-right">
+                      <ChangeCell coin={coin} />
+                    </td>
+                  )}
+                  {cols.mcap && (
+                    <td className="px-3 py-2.5 text-right font-mono text-ink-200">
+                      {formatUsdCompact(coin.market?.marketCap ?? null)}
+                    </td>
+                  )}
+                  <td className="px-3 py-2.5">
+                    <button
+                      type="button"
+                      aria-label={`View ${coin.symbol} details`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelect(coin);
+                      }}
+                      className="rounded-md border border-ink-700/60 p-1 text-ink-400 transition-colors hover:border-ink-600 hover:text-ink-100"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                    </button>
                   </td>
                 </tr>
               ))}

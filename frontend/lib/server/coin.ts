@@ -7,6 +7,7 @@ import {
   type MetricResult,
 } from "@/lib/server/alchemy";
 import { coinIdForSlug, fetchMarketData, type MarketData } from "@/lib/server/coingecko";
+import { fetchPendleRepresentativePtYtPrices } from "@/lib/server/pendle";
 import { resolveEntityToken } from "@/lib/server/resolve";
 import type {
   AssetSubtype,
@@ -40,12 +41,17 @@ const ATOKEN_UNDERLYING_COIN_ID: Record<string, string> = {
   ausdc: "usd-coin",
   ausdt: "tether",
   aweth: "weth",
+  // 1:1 GHO wrappers with no own CoinGecko listing.
+  sgho: "gho",
+  stkgho: "gho",
 };
 
 const ATOKEN_REF_LABEL: Record<string, string> = {
   ausdc: "USDC ref.",
   ausdt: "USDT ref.",
   aweth: "WETH ref.",
+  sgho: "GHO ref.",
+  stkgho: "GHO ref.",
 };
 
 /** Yield-bearing receipt slugs -> underlying CoinGecko id for reference price. */
@@ -392,16 +398,40 @@ export async function getCoinLiveData(
   };
 }
 
+/**
+ * Pendle PT/YT family placeholders in the Credit member coins. The Pendle API's
+ * market list is the only price source for these (no CoinGecko listing); both
+ * are FixedIncomeTranche so the price flows into the coins table and popup.
+ */
+const PENDLE_PTYT_SLUGS: Record<string, "pt" | "yt"> = {
+  "pendle-ptyt": "pt",
+  "pendle-ptyt-family": "yt",
+};
+
 async function getReceiptLiveData(
   profile: ReceiptProfile,
   role: string,
 ): Promise<CoinLiveData> {
   const coinId = coinIdForSlug(profile.slug);
-  const [liveMarket] = await Promise.all([
+  const pendleSide = PENDLE_PTYT_SLUGS[profile.slug];
+  const [liveMarket, pendlePrices] = await Promise.all([
     coinId ? fetchMarketData(coinId, LIVE_REVALIDATE) : Promise.resolve(null),
+    pendleSide
+      ? fetchPendleRepresentativePtYtPrices(LIVE_REVALIDATE)
+      : Promise.resolve(null),
   ]);
+  const pendlePriceUsd =
+    pendleSide === "pt"
+      ? (pendlePrices?.ptPriceUsd ?? null)
+      : pendleSide === "yt"
+        ? (pendlePrices?.ytPriceUsd ?? null)
+        : null;
   const storedMarket = profile.market;
-  const market = mergeMarketData(liveMarket, storedMarket, profile.priceUsd ?? null);
+  const market = mergeMarketData(
+    liveMarket,
+    storedMarket,
+    pendlePriceUsd ?? profile.priceUsd ?? null,
+  );
   const meta = profile.arbitrumPortalMetadata ?? {
     portalUrl: null,
     logoUrl: null,

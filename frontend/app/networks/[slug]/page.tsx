@@ -66,8 +66,11 @@ export default async function NetworkProfilePage({ params, searchParams }: PageP
   const tvlLabel = labels.tvl ?? "Total deposits / TVL";
   const usersLabel = labels.users ?? "Users";
   const aprLabel = labels.apr ?? "APR";
-  const mcapLabel = labels.apr === "Market Cap" ? "Market Cap" : "Market cap";
   const coinsLabel = labels.coins ?? `Coins under ${profile.name}`;
+  // Legacy data quirk: some entities repurposed scaleLabels.apr to display
+  // market cap; treat that as "no APR card" rather than rendering aprPct under
+  // a "Market Cap" label (which also produced duplicate React keys).
+  const aprIsMcapProxy = labels.apr === "Market Cap";
 
   const statCards: NetworkStatCard[] = [];
   if (headlineTvl != null) {
@@ -80,22 +83,17 @@ export default async function NetworkProfilePage({ params, searchParams }: PageP
       hint: labels.users ? undefined : "Depositors",
     });
   }
-  if (scale.aprPct != null) {
+  if (scale.aprPct != null && !aprIsMcapProxy) {
     statCards.push({
       label: aprLabel,
       value: `${scale.aprPct.toFixed(2)}%`,
       hint: scale.targetAprPct != null ? `Target ${scale.targetAprPct.toFixed(2)}%` : undefined,
     });
   }
-  if (headlineMcap != null && scale.aprPct == null) {
+  // APR and market cap are independent facts; both render when present.
+  if (headlineMcap != null) {
     statCards.push({
-      label: mcapLabel,
-      value: formatUsdCompact(headlineMcap),
-      hint: "Latest data",
-    });
-  } else if (headlineMcap != null && labels.apr === "Market Cap") {
-    statCards.push({
-      label: mcapLabel,
+      label: "Market cap",
       value: formatUsdCompact(headlineMcap),
       hint: "Latest data",
     });

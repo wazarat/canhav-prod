@@ -129,7 +129,10 @@ import type {
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 300;
+// The full daily refresh outgrew 300s (Runtime Timeout 504s every 06:00 run
+// since 2026-07-14, leaving UniversalMetrics stale). 800s needs Fluid Compute
+// (default-on for this project); the `?only=universal` fast path stays ~4 min.
+export const maxDuration = 800;
 
 const CATEGORY_STABLECOIN = "Stablecoin";
 const CATEGORY_RWA = "RWA";

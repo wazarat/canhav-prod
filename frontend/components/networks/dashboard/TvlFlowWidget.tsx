@@ -2,11 +2,11 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { DonutChart, DONUT_COLORS } from "@/components/ui/DonutChart";
 import { Sparkline } from "@/components/ui/Sparkline";
 import type { TvlFlow } from "@/lib/networks/metrics";
 import { formatPct, formatUsdCompact } from "@/lib/utils";
 
-const DONUT_COLORS = ["#5C92FF", "#34D399", "#A78BFA", "#FBBF24", "#64748B"];
 const TOP_SEGMENTS = 4;
 
 interface DonutSegment {
@@ -36,55 +36,6 @@ function buildDonutSegments(flow: TvlFlow): DonutSegment[] {
   }
 
   return segments;
-}
-
-function DonutChart({ segments }: { segments: DonutSegment[] }) {
-  if (segments.length === 0) return null;
-
-  const size = 88;
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = 34;
-  const stroke = 14;
-  const circumference = 2 * Math.PI * r;
-  let offset = 0;
-
-  return (
-    <svg
-      role="img"
-      aria-label="Member coin composition"
-      viewBox={`0 0 ${size} ${size}`}
-      className="h-[88px] w-[88px] shrink-0"
-    >
-      <circle
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill="none"
-        stroke="rgba(30,41,59,0.8)"
-        strokeWidth={stroke}
-      />
-      {segments.map((seg, i) => {
-        const dash = (seg.pct / 100) * circumference;
-        const el = (
-          <circle
-            key={seg.symbol}
-            cx={cx}
-            cy={cy}
-            r={r}
-            fill="none"
-            stroke={DONUT_COLORS[i % DONUT_COLORS.length]}
-            strokeWidth={stroke}
-            strokeDasharray={`${dash} ${circumference - dash}`}
-            strokeDashoffset={-offset}
-            transform={`rotate(-90 ${cx} ${cy})`}
-          />
-        );
-        offset += dash;
-        return el;
-      })}
-    </svg>
-  );
 }
 
 function sparklineValues(
@@ -146,7 +97,12 @@ export function TvlFlowWidget({
       </div>
 
       <div className="flex items-center gap-4">
-        <DonutChart segments={segments} />
+        <DonutChart
+          segments={segments.map((s) => ({ label: s.symbol, value: s.valueUsd }))}
+          total={flow.totalUsd || 1}
+          className="h-[88px] w-[88px] shrink-0"
+          ariaLabel="Member coin composition"
+        />
         <div className="min-w-0 flex-1 space-y-2">
           {sparkValues.length >= 2 && (
             <div className="space-y-1">

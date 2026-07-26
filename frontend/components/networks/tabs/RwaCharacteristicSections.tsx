@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { MetricCard } from "@/components/networks/tabs/MetricCard";
+import { MetricCard } from "@/components/ui/MetricCard";
 import { RwaTagMetricsSection } from "@/components/networks/NetworkSections";
 import { Badge } from "@/components/ui/Badge";
 import { DataPanel } from "@/components/ui/DataPanel";

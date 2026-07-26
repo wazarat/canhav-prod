@@ -8,6 +8,7 @@ import { TvlFlowWidget } from "@/components/networks/dashboard/TvlFlowWidget";
 import { FeesWidget } from "@/components/networks/dashboard/FeesWidget";
 import { Card } from "@/components/ui/Card";
 import { DataPanel, DataRow, LinkRow } from "@/components/ui/DataPanel";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { StatCard } from "@/components/ui/StatCard";
 import { loadNetworkDashboardData } from "@/lib/networks/dashboard-data";
 import type { NetworkProfile } from "@/lib/types";
@@ -100,11 +101,7 @@ export function NetworkOverviewTab({
           <NetworkOverviewMetricsBlock profile={profile} />
           {profile.longDescription && (
             <section className="space-y-2">
-              <div className="border-b border-ink-800/60 pb-2">
-                <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
-                  About
-                </h2>
-              </div>
+              <SectionHeading title="About" />
               <Card className="text-sm leading-relaxed text-ink-300">
                 {/* All current longDescriptions are ~500-670 chars; add a
                     collapse only if editorial entries grow past ~1200 chars. */}

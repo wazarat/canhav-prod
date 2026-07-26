@@ -54,6 +54,16 @@ export const RWA_SECONDARY_TAGS: RwaSecondaryTag[] = [
   "Multi-Chain",
 ];
 
+/** Credit tag label → CreditTagMetrics object key. */
+export const CREDIT_TAG_METRICS_KEY: Record<
+  CreditTag,
+  "lending" | "leveragedYield" | "fixedIncome"
+> = {
+  Lending: "lending",
+  "Leveraged Yield": "leveragedYield",
+  "Fixed Income": "fixedIncome",
+};
+
 /** Staking tag label → StakingTagMetrics object key. */
 export const STAKING_TAG_METRICS_KEY: Record<
   StakingSubSector,
@@ -205,7 +215,7 @@ export function isNonEvmRwa(profile: NetworkProfile): boolean {
   return profile.rwa?.deployment?.evmCompatible === "no";
 }
 
-/** Tags for a profile under a given sector (primary + secondary — used for entity badges). */
+/** Tags for a profile under a given sector (primary + secondary: used for entity badges). */
 export function tagsForSector(profile: NetworkProfile, sector: string): string[] {
   if (sector === "DEX") {
     return [profile.dexSubSector, ...(profile.dexSecondaryTags ?? [])].filter(Boolean) as string[];

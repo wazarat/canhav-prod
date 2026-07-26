@@ -149,8 +149,8 @@ export async function resolveTvlSeries(profile: RwaProfile): Promise<TvlSeries> 
 }
 
 /** Protocol TVL time series for a network slug (DeFi Llama). */
-export async function resolveNetworkTvlSeries(slug: string): Promise<TvlSeries> {
-  const llama = await fetchLlamaProtocolTvl(slug, DAYS, LIVE_REVALIDATE);
+export async function resolveNetworkTvlSeries(slug: string, days: number = DAYS): Promise<TvlSeries> {
+  const llama = await fetchLlamaProtocolTvl(slug, days, LIVE_REVALIDATE);
   if (llama && llama.points.length >= 2) {
     return { points: llama.points, source: "defillama" };
   }

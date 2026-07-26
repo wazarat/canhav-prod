@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import {
   CreditTagMetricsSection,
@@ -11,7 +11,8 @@ import {
   StablecoinMetricsSection,
 } from "@/components/networks/NetworkSections";
 import { NetworkMarketCard } from "@/components/networks/NetworkMarketCard";
-import { MetricCard } from "@/components/networks/tabs/MetricCard";
+import { MetricCard } from "@/components/ui/MetricCard";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import {
   MetricsTabView,
   type MetricsSubTab,
@@ -23,7 +24,15 @@ import {
 } from "@/components/networks/tabs/RwaCharacteristicSections";
 import { Card } from "@/components/ui/Card";
 import { DataPanel } from "@/components/ui/DataPanel";
-import { affiliatedTagMetricSectors, primaryMetricTagsForSector } from "@/lib/networkTaxonomy";
+import { MetricCardGrid } from "@/components/ui/MetricCardGrid";
+import { StatGridSkeleton } from "@/components/ui/Skeletons";
+import { buildCreditRollup } from "@/lib/networks/creditRollup";
+import { DEFAULT_TIME_RANGE, type TimeRange } from "@/lib/networks/timeRange";
+import {
+  affiliatedTagMetricSectors,
+  CREDIT_TAG_METRICS_KEY,
+  primaryMetricTagsForSector,
+} from "@/lib/networkTaxonomy";
 import {
   DERIVATIVES_TAG_TO_KEY,
   LIQUIDITY_TAG_TO_KEY,
@@ -32,37 +41,11 @@ import {
 } from "@/lib/server/tagMetricsOverlay";
 import type { CreditTag, NetworkProfile, RwaSecondaryTag } from "@/lib/types";
 
-function SectionShell({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="space-y-4">
-      <div className="border-b border-ink-800/60 pb-2">
-        <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">{title}</h2>
-        {subtitle && <p className="mt-1 text-sm text-ink-300">{subtitle}</p>}
-      </div>
-      {children}
-    </section>
-  );
-}
-
-const CREDIT_TAG_TO_KEY: Record<string, "lending" | "leveragedYield" | "fixedIncome"> = {
-  Lending: "lending",
-  "Leveraged Yield": "leveragedYield",
-  "Fixed Income": "fixedIncome",
-};
-
 /** Whether a given sector/tag actually has a populated metrics block. */
 function tagHasBlock(profile: NetworkProfile, sector: string, tag: string): boolean {
   switch (sector) {
     case "Credit": {
-      const key = CREDIT_TAG_TO_KEY[tag];
+      const key = (CREDIT_TAG_METRICS_KEY as Record<string, "lending" | "leveragedYield" | "fixedIncome">)[tag];
       return Boolean(key && profile.creditTagMetrics?.[key]);
     }
     case "Staking": {
@@ -104,28 +87,22 @@ function renderSectorTag(profile: NetworkProfile, sector: string, tag: string): 
   }
 }
 
-/** Credit sector-rollup KPIs (the "Credit" sub-tab header block). */
-function CreditRollupPanel({ profile }: { profile: NetworkProfile }) {
-  const c = profile.creditMetrics;
-  if (!c) return null;
+/**
+ * Credit sector-rollup KPIs: spec rows C0.1-C0.8 plus the universal rollup
+ * subset (CAN-59), assembled live in lib/networks/creditRollup.ts. Renders
+ * for EVERY Credit-affiliated entity; missing values are honest empties.
+ */
+async function CreditRollupPanel({ profile, range }: { profile: NetworkProfile; range: TimeRange }) {
+  const cards = await buildCreditRollup(profile, range);
   return (
     <DataPanel title="Credit rollup">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <MetricCard label="Total supplied" sourced={c.totalSuppliedUsd} kind="usd" />
-        <MetricCard label="Total borrows" sourced={c.totalBorrowsUsd} kind="usd" />
-        <MetricCard label="Utilization" sourced={c.utilizationPct} kind="pct" />
-        <MetricCard label="Available liquidity" sourced={c.availableLiquidityUsd} kind="usd" />
-        <MetricCard label="Supply APY" sourced={c.supplyApyPct} kind="pct" />
-        <MetricCard label="Borrow APY" sourced={c.borrowApyPct} kind="pct" />
-        <MetricCard label="Net interest margin" sourced={c.netInterestMarginPct} kind="pct" />
-        <MetricCard label="Active tags" value={c.activeTagCount ?? null} kind="count" source="Derived" />
-      </div>
+      <MetricCardGrid cards={cards} />
     </DataPanel>
   );
 }
 
 /**
- * Staking sector rollup (spec §8.1) — the entity's headline KPIs plus the
+ * Staking sector rollup (spec §8.1): the entity's headline KPIs plus the
  * network-wide Ethereum-consensus context (beaconcha.in / ultrasound.money)
  * when available. Rendered as the first "Staking" sub-tab for every Staking
  * entity so the sector rollup is always present, per spec §1.1.
@@ -185,7 +162,7 @@ function activeRwaCharacteristics(profile: NetworkProfile): RwaSecondaryTag[] {
   });
 }
 
-function buildMetricsTabs(profile: NetworkProfile): MetricsSubTab[] {
+function buildMetricsTabs(profile: NetworkProfile, range: TimeRange): MetricsSubTab[] {
   const sectors = affiliatedTagMetricSectors(profile);
   const primary =
     profile.sector && sectors.includes(profile.sector) ? profile.sector : (sectors[0] ?? profile.sector ?? null);
@@ -194,7 +171,7 @@ function buildMetricsTabs(profile: NetworkProfile): MetricsSubTab[] {
 
   const tabs: MetricsSubTab[] = [];
 
-  // Generic market + off-chain identity panels — attach to the first non-RWA
+  // Generic market + off-chain identity panels: attach to the first non-RWA
   // rollup tab, else fold into the "General RWA" tab below.
   const marketNode = profile.market ? (
     <NetworkMarketCard market={profile.market} symbol={profile.symbol} />
@@ -205,16 +182,25 @@ function buildMetricsTabs(profile: NetworkProfile): MetricsSubTab[] {
   const overviewNodes: ReactNode[] = [];
   if (profile.lending) {
     overviewNodes.push(
-      <SectionShell
-        key="lending"
-        title="Lending metrics"
-        subtitle="Live supply/borrow data (DeFi Llama)."
-      >
+      <section key="lending" className="space-y-4">
+        <SectionHeading title="Lending metrics" subtitle="Live supply/borrow data (DeFi Llama)." />
         <LendingMetricTiles lending={profile.lending} syncedAt={profile.universalMetrics?.syncedAt} />
-      </SectionShell>,
+      </section>,
     );
   }
-  if (profile.creditMetrics) overviewNodes.push(<CreditRollupPanel key="credit-rollup" profile={profile} />);
+  const creditRollupNode = sectors.includes("Credit") ? (
+    <Suspense
+      key="credit-rollup"
+      fallback={
+        <DataPanel title="Credit rollup">
+          <StatGridSkeleton count={8} />
+        </DataPanel>
+      }
+    >
+      <CreditRollupPanel profile={profile} range={range} />
+    </Suspense>
+  ) : null;
+  if (creditRollupNode && !primaryIsRwa) overviewNodes.push(creditRollupNode);
   if (sectors.includes("Staking") && profile.staking) {
     overviewNodes.push(<StakingRollupPanel key="staking-rollup" profile={profile} />);
   }
@@ -236,6 +222,17 @@ function buildMetricsTabs(profile: NetworkProfile): MetricsSubTab[] {
           {offchainNode}
         </div>
       ),
+    });
+  }
+
+  // 1b. RWA-primary Credit affiliates (centrifuge, clearpool, goldfinch) skip
+  // the overview tab, so the Credit rollup gets its own sub-tab (CAN-59:
+  // every Credit entity renders the rollup).
+  if (creditRollupNode && primaryIsRwa) {
+    tabs.push({
+      id: "credit-rollup",
+      label: "Credit",
+      content: <div className="space-y-8">{creditRollupNode}</div>,
     });
   }
 
@@ -278,7 +275,7 @@ function buildMetricsTabs(profile: NetworkProfile): MetricsSubTab[] {
   }
 
   // 4. Fallback: no sector tabs at all but generic market/off-chain content
-  // exists — surface it in a single "Overview" tab so the tab still renders.
+  // exists: surface it in a single "Overview" tab so the tab still renders.
   if (tabs.length === 0 && (marketNode || profile.universalMetrics)) {
     tabs.push({
       id: "rollup",
@@ -295,8 +292,17 @@ function buildMetricsTabs(profile: NetworkProfile): MetricsSubTab[] {
   return tabs;
 }
 
-export function NetworkMetricsTab({ profile }: { profile: NetworkProfile }) {
-  const tabs = buildMetricsTabs(profile);
+export function NetworkMetricsTab({
+  profile,
+  range = DEFAULT_TIME_RANGE,
+  subTab,
+}: {
+  profile: NetworkProfile;
+  range?: TimeRange;
+  /** Raw ?m= search param; validated against built tab ids client-side. */
+  subTab?: string;
+}) {
+  const tabs = buildMetricsTabs(profile, range);
 
   if (tabs.length === 0) {
     return (
@@ -309,5 +315,5 @@ export function NetworkMetricsTab({ profile }: { profile: NetworkProfile }) {
     );
   }
 
-  return <MetricsTabView tabs={tabs} />;
+  return <MetricsTabView tabs={tabs} initialTabId={subTab} range={range} />;
 }

@@ -7,6 +7,7 @@ import { NetworkAgentSkillsTab } from "@/components/networks/tabs/NetworkAgentSk
 import { NetworkAssetCoverageTab } from "@/components/networks/tabs/NetworkAssetCoverageTab";
 import { NetworkCompetitorsTab } from "@/components/networks/tabs/NetworkCompetitorsTab";
 import { NetworkMetricsTab } from "@/components/networks/tabs/NetworkMetricsTab";
+import { resolveTimeRange } from "@/lib/networks/timeRange";
 import { NetworkOverviewTab } from "@/components/networks/tabs/NetworkOverviewTab";
 import { NetworkPartnershipsTab } from "@/components/networks/tabs/NetworkPartnershipsTab";
 import { NetworkResearchTab } from "@/components/networks/tabs/NetworkResearchTab";
@@ -25,7 +26,7 @@ import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
 
 interface PageProps {
   params: { slug: string };
-  searchParams: { tab?: string };
+  searchParams: { tab?: string; m?: string; range?: string };
 }
 
 export const revalidate = 300;
@@ -129,7 +130,13 @@ export default async function NetworkProfilePage({ params, searchParams }: PageP
           resolvedCoinCount={resolvedCoinCount}
         />
       )}
-      {activeTab === "metrics" && <NetworkMetricsTab profile={profile} />}
+      {activeTab === "metrics" && (
+        <NetworkMetricsTab
+          profile={profile}
+          range={resolveTimeRange(searchParams.range)}
+          subTab={searchParams.m}
+        />
+      )}
       {activeTab === "research" && <NetworkResearchTab profile={profile} />}
       {activeTab === "asset-coverage" && <NetworkAssetCoverageTab profile={profile} />}
       {activeTab === "risks" && <NetworkRisksTab profile={profile} />}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { History, SlidersHorizontal } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
+import { RailCard } from "@/components/ui/RailCard";
 import { cn } from "@/lib/utils";
 import {
   countCaught,
@@ -207,7 +208,7 @@ function liveReading(
   return null;
 }
 
-function RailCard({
+function DeskRailCard({
   rail,
   state,
   onToggle,
@@ -237,142 +238,97 @@ function RailCard({
       : reading.value <= state.value);
   const changed = rail.threshold != null && state.value !== rail.threshold.defaultValue;
 
-  return (
-    <div
-      className={cn(
-        "rounded-xl border px-4 py-3 transition-colors",
-        state.enabled
-          ? "border-ink-800/60 bg-ink-950/40"
-          : "border-ink-800/40 bg-ink-950/20 opacity-60",
-      )}
-    >
-      <div className="flex flex-wrap items-center gap-2">
+  const proposeFooter = (() => {
+    // A rail that is tripping on the live reading can file a real
+    // proposal into the same propose -> approve -> sign pipeline.
+    const side = railProposeSide(rail.suggests.action);
+    if (!onPropose || !side || !readingTrips) return null;
+    return (
+      <div className="mt-2 flex flex-wrap items-center gap-2">
         <button
           type="button"
-          role="switch"
-          aria-checked={state.enabled}
-          aria-label={`${rail.name} rail`}
-          onClick={onToggle}
+          onClick={() => onPropose(rail, side)}
+          disabled={proposeStatus?.busy || proposeStatus?.ok}
           className={cn(
-            "relative h-4 w-7 shrink-0 rounded-full border transition-colors",
-            state.enabled
-              ? "border-electric-500/40 bg-electric-500/30"
-              : "border-ink-700 bg-ink-900",
+            "rounded-lg border px-2.5 py-1 font-mono text-[10px] transition-colors",
+            proposeStatus?.ok
+              ? "cursor-default border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+              : "border-electric-500/40 bg-electric-500/10 text-electric-400 hover:bg-electric-500/20 disabled:opacity-60",
           )}
         >
-          <span
-            className={cn(
-              "absolute top-0.5 h-2.5 w-2.5 rounded-full transition-all",
-              state.enabled ? "left-3.5 bg-electric-400" : "left-0.5 bg-ink-500",
-            )}
-          />
+          {proposeStatus?.busy
+            ? "filing proposal..."
+            : proposeStatus?.ok
+              ? "proposal filed"
+              : `rail tripping: file ${side === "short" ? "sell" : "buy"} proposal`}
         </button>
-        <span className="text-sm font-semibold text-ink-100">{rail.name}</span>
-        <Badge tone={SEVERITY_TONE[rail.severity]} className="px-1.5 py-0 font-mono text-[9px]">
-          {rail.suggests.action.toLowerCase()}
-        </Badge>
-        {reading && (
-          <span
-            className={cn(
-              "ml-auto rounded-full border px-2 py-0.5 font-mono text-[10px]",
-              readingTrips
-                ? "border-amber-400/40 bg-amber-400/10 text-amber-200"
-                : "border-ink-700/80 bg-ink-900/60 text-ink-400",
-            )}
-          >
-            {reading.label}
-            {readingTrips && " · tripping"}
+        {proposeStatus?.ok && (
+          <span className="text-[10px] text-ink-400">
+            review it under Proposed trades; nothing executes until you approve and sign.
           </span>
+        )}
+        {proposeStatus?.error && (
+          <span className="text-[10px] text-rose-400">{proposeStatus.error}</span>
         )}
       </div>
+    );
+  })();
 
-      <p className="mt-1.5 font-mono text-[10px] text-ink-400">
-        watch {rail.watch} <span className="text-ink-600">·</span> {tripLabel(rail, state.value)}
-        {rail.note && (
-          <>
-            {" "}
-            <span className="text-ink-600">·</span> {rail.note}
-          </>
-        )}
-        {rail.secondary && (
-          <>
-            {" "}
-            <span className="text-ink-600">·</span> {rail.secondary.label}
-          </>
-        )}
-        {rail.emits && (
-          <>
-            {" "}
-            <span className="text-ink-600">·</span> emits{" "}
-            <span className="text-ink-200">{rail.emits}</span>
-          </>
-        )}
-      </p>
-
-      {rail.interactive && rail.threshold && (
-        <div className="mt-2 flex items-center gap-3">
-          <input
-            type="range"
-            min={rail.threshold.min}
-            max={rail.threshold.max}
-            step={rail.threshold.step}
-            value={state.value}
-            disabled={!state.enabled}
-            onChange={(e) => onValue(Number(e.target.value))}
-            aria-label={`${rail.name} threshold`}
-            className="h-1 flex-1 cursor-pointer accent-electric-500 disabled:cursor-not-allowed"
-          />
-          <span className="tabular w-14 text-right font-mono text-xs text-ink-100">
-            {formatValue(state.value, rail.threshold.unit)}
-          </span>
-          {changed && (
-            <span className="font-mono text-[10px] text-ink-500">
-              default {formatValue(rail.threshold.defaultValue, rail.threshold.unit)}
-            </span>
+  return (
+    <RailCard
+      title={rail.name}
+      switchAriaLabel={`${rail.name} rail`}
+      enabled={state.enabled}
+      onToggle={onToggle}
+      badge={{ label: rail.suggests.action.toLowerCase(), tone: SEVERITY_TONE[rail.severity] }}
+      reading={reading ? { label: reading.label, trips: readingTrips } : null}
+      descriptionLine={
+        <>
+          watch {rail.watch} <span className="text-ink-600">·</span> {tripLabel(rail, state.value)}
+          {rail.note && (
+            <>
+              {" "}
+              <span className="text-ink-600">·</span> {rail.note}
+            </>
           )}
-        </div>
-      )}
-
-      <p className="mt-1.5 text-[11px] leading-relaxed text-ink-500">
-        suggests <span className="text-ink-300">{rail.suggests.detail}</span>
-      </p>
-
-      {(() => {
-        // A rail that is tripping on the live reading can file a real
-        // proposal into the same propose -> approve -> sign pipeline.
-        const side = railProposeSide(rail.suggests.action);
-        if (!onPropose || !side || !readingTrips) return null;
-        return (
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => onPropose(rail, side)}
-              disabled={proposeStatus?.busy || proposeStatus?.ok}
-              className={cn(
-                "rounded-lg border px-2.5 py-1 font-mono text-[10px] transition-colors",
-                proposeStatus?.ok
-                  ? "cursor-default border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-                  : "border-electric-500/40 bg-electric-500/10 text-electric-400 hover:bg-electric-500/20 disabled:opacity-60",
-              )}
-            >
-              {proposeStatus?.busy
-                ? "filing proposal..."
-                : proposeStatus?.ok
-                  ? "proposal filed"
-                  : `rail tripping: file ${side === "short" ? "sell" : "buy"} proposal`}
-            </button>
-            {proposeStatus?.ok && (
-              <span className="text-[10px] text-ink-400">
-                review it under Proposed trades; nothing executes until you approve and sign.
-              </span>
-            )}
-            {proposeStatus?.error && (
-              <span className="text-[10px] text-rose-400">{proposeStatus.error}</span>
-            )}
-          </div>
-        );
-      })()}
-    </div>
+          {rail.secondary && (
+            <>
+              {" "}
+              <span className="text-ink-600">·</span> {rail.secondary.label}
+            </>
+          )}
+          {rail.emits && (
+            <>
+              {" "}
+              <span className="text-ink-600">·</span> emits{" "}
+              <span className="text-ink-200">{rail.emits}</span>
+            </>
+          )}
+        </>
+      }
+      slider={
+        rail.interactive && rail.threshold
+          ? {
+              min: rail.threshold.min,
+              max: rail.threshold.max,
+              step: rail.threshold.step,
+              value: state.value,
+              onChange: onValue,
+              ariaLabel: `${rail.name} threshold`,
+              formattedValue: formatValue(state.value, rail.threshold.unit),
+              formattedDefault: changed
+                ? formatValue(rail.threshold.defaultValue, rail.threshold.unit)
+                : null,
+            }
+          : null
+      }
+      suggestionLine={
+        <>
+          suggests <span className="text-ink-300">{rail.suggests.detail}</span>
+        </>
+      }
+      footer={proposeFooter}
+    />
   );
 }
 
@@ -641,7 +597,7 @@ export function CardRailsPanel({
             const body = (
               <div className="space-y-2">
                 {familyRails.map((rail) => (
-                  <RailCard
+                  <DeskRailCard
                     key={rail.id}
                     rail={rail}
                     state={state[rail.id]}

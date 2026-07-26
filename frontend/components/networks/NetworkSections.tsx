@@ -47,6 +47,7 @@ import type {
   UniversalMetrics,
 } from "@/lib/types";
 import {
+  CREDIT_TAG_METRICS_KEY,
   DERIVATIVES_TAG_METRICS_KEY,
   LIQUIDITY_TAG_METRICS_KEY,
   OTHER_TAG_METRICS_KEY,
@@ -54,24 +55,9 @@ import {
   STAKING_TAG_METRICS_KEY,
 } from "@/lib/networkTaxonomy";
 import type { BadgeTone } from "@/components/ui/Badge";
+import { MetricCard } from "@/components/ui/MetricCard";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { cn, formatUsdCompact } from "@/lib/utils";
-
-function SectionHeading({
-  title,
-  subtitle,
-  id,
-}: {
-  title: string;
-  subtitle?: string;
-  id?: string;
-}) {
-  return (
-    <div id={id} className="scroll-mt-24 space-y-1 border-b border-ink-800/60 pb-2">
-      <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">{title}</h2>
-      {subtitle && <p className="text-sm text-ink-300">{subtitle}</p>}
-    </div>
-  );
-}
 
 export function ComponentsSection({
   components,
@@ -519,36 +505,6 @@ function fmtUsd(v: number | null | undefined): string {
   return formatUsdCompact(v);
 }
 
-/** A live (Sourced) metric tile: value + provenance label. */
-function MetricTile({
-  label,
-  sourced,
-  kind,
-}: {
-  label: string;
-  sourced?: Sourced<number | null>;
-  kind: "usd" | "pct" | "count";
-}) {
-  const value = sourced?.value ?? null;
-  const text =
-    kind === "usd"
-      ? fmtUsd(value)
-      : kind === "pct"
-        ? fmtPct(value)
-        : value != null
-          ? value.toLocaleString()
-          : "—";
-  return (
-    <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
-      <p className="text-xs uppercase tracking-wide text-ink-500">{label}</p>
-      <p className="mt-1 font-mono text-lg text-ink-50">{text}</p>
-      <p className="mt-1 text-[10px] text-ink-500">
-        {sourced?.sourceLabel ?? "Pending live refresh"}
-      </p>
-    </div>
-  );
-}
-
 /** A curated (static research) row: label + free text or chips. */
 function CuratedRow({
   label,
@@ -596,19 +552,19 @@ export function LendingMetricTiles({
   return (
     <>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <MetricTile label="TVL / deposits" sourced={lending.tvlUsd} kind="usd" />
-        <MetricTile label="Total borrows" sourced={lending.totalBorrowsUsd} kind="usd" />
-        <MetricTile label="Utilization" sourced={lending.utilizationPct} kind="pct" />
-        <MetricTile label="Available liquidity" sourced={lending.availableLiquidityUsd} kind="usd" />
-        <MetricTile label="Supply APY" sourced={lending.supplyApyPct} kind="pct" />
-        <MetricTile label="Borrow APY" sourced={lending.borrowApyPct} kind="pct" />
-        <MetricTile label="Net interest margin" sourced={lending.netInterestMarginPct} kind="pct" />
-        <MetricTile label="Revenue (30d)" sourced={lending.revenue30dUsd} kind="usd" />
-        <MetricTile label="Fees (30d)" sourced={lending.fees30dUsd} kind="usd" />
-        <MetricTile label="Revenue (annualized)" sourced={lending.revenueAnnualizedUsd} kind="usd" />
-        <MetricTile label="Fees (annualized)" sourced={lending.feesAnnualizedUsd} kind="usd" />
-        <MetricTile label="Active users (30d)" sourced={lending.activeUsers} kind="count" />
-        <MetricTile label="Unique borrowers (30d)" sourced={lending.uniqueBorrowers30d} kind="count" />
+        <MetricCard label="TVL / deposits" sourced={lending.tvlUsd} kind="usd" />
+        <MetricCard label="Total borrows" sourced={lending.totalBorrowsUsd} kind="usd" />
+        <MetricCard label="Utilization" sourced={lending.utilizationPct} kind="pct" />
+        <MetricCard label="Available liquidity" sourced={lending.availableLiquidityUsd} kind="usd" />
+        <MetricCard label="Supply APY" sourced={lending.supplyApyPct} kind="pct" />
+        <MetricCard label="Borrow APY" sourced={lending.borrowApyPct} kind="pct" />
+        <MetricCard label="Net interest margin" sourced={lending.netInterestMarginPct} kind="pct" />
+        <MetricCard label="Revenue (30d)" sourced={lending.revenue30dUsd} kind="usd" />
+        <MetricCard label="Fees (30d)" sourced={lending.fees30dUsd} kind="usd" />
+        <MetricCard label="Revenue (annualized)" sourced={lending.revenueAnnualizedUsd} kind="usd" />
+        <MetricCard label="Fees (annualized)" sourced={lending.feesAnnualizedUsd} kind="usd" />
+        <MetricCard label="Active users (30d)" sourced={lending.activeUsers} kind="count" />
+        <MetricCard label="Unique borrowers (30d)" sourced={lending.uniqueBorrowers30d} kind="count" />
       </div>
       {!hasLive && (
         <p className="text-xs text-ink-500">
@@ -701,12 +657,6 @@ export function LendingMetricsSection({ lending }: { lending?: LendingMetrics | 
   );
 }
 
-const TAG_TO_METRICS_KEY: Record<CreditTag, keyof CreditTagMetrics> = {
-  Lending: "lending",
-  "Leveraged Yield": "leveragedYield",
-  "Fixed Income": "fixedIncome",
-};
-
 function TagMetricRow({ label, value }: { label: string; value: string | number | null | undefined }) {
   if (value == null || value === "") return null;
   const text = typeof value === "number" ? value.toLocaleString() : value;
@@ -729,7 +679,7 @@ export function CreditTagMetricsSection({
 
   const panels = tags
     .map((tag) => {
-      const key = TAG_TO_METRICS_KEY[tag];
+      const key = CREDIT_TAG_METRICS_KEY[tag];
       const block = metrics[key];
       if (!block) return null;
 
@@ -738,12 +688,12 @@ export function CreditTagMetricsSection({
         return (
           <DataPanel key={tag} title={tag}>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              <MetricTile label="Total supplied" sourced={m.totalSuppliedUsd} kind="usd" />
-              <MetricTile label="Total borrows" sourced={m.totalBorrowsUsd} kind="usd" />
-              <MetricTile label="Utilization" sourced={m.utilizationPct} kind="pct" />
-              <MetricTile label="Available liquidity" sourced={m.availableLiquidityUsd} kind="usd" />
-              <MetricTile label="Supply APY" sourced={m.supplyApyPct} kind="pct" />
-              <MetricTile label="Borrow APY" sourced={m.borrowApyPct} kind="pct" />
+              <MetricCard label="Total supplied" sourced={m.totalSuppliedUsd} kind="usd" />
+              <MetricCard label="Total borrows" sourced={m.totalBorrowsUsd} kind="usd" />
+              <MetricCard label="Utilization" sourced={m.utilizationPct} kind="pct" />
+              <MetricCard label="Available liquidity" sourced={m.availableLiquidityUsd} kind="usd" />
+              <MetricCard label="Supply APY" sourced={m.supplyApyPct} kind="pct" />
+              <MetricCard label="Borrow APY" sourced={m.borrowApyPct} kind="pct" />
             </div>
             <div className="mt-3 divide-y divide-ink-800/60">
               <TagMetricRow label="Isolated markets" value={m.isolatedMarketCount} />
@@ -759,8 +709,8 @@ export function CreditTagMetricsSection({
         return (
           <DataPanel key={tag} title={tag}>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              <MetricTile label="TVL" sourced={m.tvlUsd} kind="usd" />
-              <MetricTile label="Borrow APY" sourced={m.borrowApyPct} kind="pct" />
+              <MetricCard label="TVL" sourced={m.tvlUsd} kind="usd" />
+              <MetricCard label="Borrow APY" sourced={m.borrowApyPct} kind="pct" />
             </div>
             <div className="mt-3 divide-y divide-ink-800/60">
               <TagMetricRow label="Max leverage" value={m.maxLeverageX != null ? `${m.maxLeverageX}x` : null} />
@@ -777,9 +727,9 @@ export function CreditTagMetricsSection({
         return (
           <DataPanel key={tag} title={tag}>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              <MetricTile label="TVL" sourced={m.tvlUsd} kind="usd" />
-              <MetricTile label="Fixed APY" sourced={m.fixedApyPct} kind="pct" />
-              <MetricTile label="Implied yield" sourced={m.impliedYieldPct} kind="pct" />
+              <MetricCard label="TVL" sourced={m.tvlUsd} kind="usd" />
+              <MetricCard label="Fixed APY" sourced={m.fixedApyPct} kind="pct" />
+              <MetricCard label="Implied yield" sourced={m.impliedYieldPct} kind="pct" />
             </div>
             <div className="mt-3 divide-y divide-ink-800/60">
               <TagMetricRow label="Active markets" value={m.markets} />
@@ -864,10 +814,10 @@ export function StakingTagMetricsSection({
       return (
         <DataPanel key={tag} title={tag}>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            <MetricTile label="Total staked" sourced={block.totalStakedUsd} kind="usd" />
-            <MetricTile label="Token price" sourced={block.tokenPriceUsd} kind="usd" />
-            <MetricTile label="Market cap" sourced={block.marketCapUsd} kind="usd" />
-            <MetricTile label="Staking APR" sourced={block.stakingAprPct} kind="pct" />
+            <MetricCard label="Total staked" sourced={block.totalStakedUsd} kind="usd" />
+            <MetricCard label="Token price" sourced={block.tokenPriceUsd} kind="usd" />
+            <MetricCard label="Market cap" sourced={block.marketCapUsd} kind="usd" />
+            <MetricCard label="Staking APR" sourced={block.stakingAprPct} kind="pct" />
             {"baseAssetExchangeRate" in block && (
               <PlainTile
                 label="Exchange rate"
@@ -880,13 +830,13 @@ export function StakingTagMetricsSection({
               />
             )}
             {"pegDeviationPct" in block && (
-              <MetricTile label="Peg deviation" sourced={block.pegDeviationPct} kind="pct" />
+              <MetricCard label="Peg deviation" sourced={block.pegDeviationPct} kind="pct" />
             )}
             <TvlChangeTile tvlChange={block.tvlChangePct} />
           </div>
           <div className="mt-3 divide-y divide-ink-800/60">
             {"validatorCount" in block && (
-              <MetricTile label="Validators" sourced={block.validatorCount} kind="count" />
+              <MetricCard label="Validators" sourced={block.validatorCount} kind="count" />
             )}
             {"avsData" in block && block.avsData && block.avsData.length > 0 && (
               <CuratedRow
@@ -936,12 +886,12 @@ export function LiquidityTagMetricsSection({
       return (
         <DataPanel key={tag} title={tag}>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            <MetricTile label="Protocol TVL" sourced={block.tvlUsd} kind="usd" />
+            <MetricCard label="Protocol TVL" sourced={block.tvlUsd} kind="usd" />
             {"volume24hUsd" in block && (
-              <MetricTile label="24h volume" sourced={block.volume24hUsd} kind="usd" />
+              <MetricCard label="24h volume" sourced={block.volume24hUsd} kind="usd" />
             )}
             {"feeAprPct" in block && (
-              <MetricTile label="Fee APR" sourced={block.feeAprPct} kind="pct" />
+              <MetricCard label="Fee APR" sourced={block.feeAprPct} kind="pct" />
             )}
             <PlainTile
               label="Fees (24h)"
@@ -949,13 +899,13 @@ export function LiquidityTagMetricsSection({
               hint="DeFi Llama"
             />
             {"poolCount" in block && (
-              <MetricTile label="Pool count" sourced={block.poolCount} kind="count" />
+              <MetricCard label="Pool count" sourced={block.poolCount} kind="count" />
             )}
             {"vaultCount" in block && (
-              <MetricTile label="Vault count" sourced={block.vaultCount} kind="count" />
+              <MetricCard label="Vault count" sourced={block.vaultCount} kind="count" />
             )}
             {"avgVaultApyPct" in block && (
-              <MetricTile label="Avg vault APY" sourced={block.avgVaultApyPct} kind="pct" />
+              <MetricCard label="Avg vault APY" sourced={block.avgVaultApyPct} kind="pct" />
             )}
             <TvlChangeTile tvlChange={block.tvlChangePct} />
           </div>
@@ -993,18 +943,18 @@ export function DerivativesTagMetricsSection({
       return (
         <DataPanel key={tag} title={tag}>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            <MetricTile label="Protocol TVL" sourced={block.tvlUsd} kind="usd" />
+            <MetricCard label="Protocol TVL" sourced={block.tvlUsd} kind="usd" />
             {"openInterestUsd" in block && (
-              <MetricTile label="Open interest" sourced={block.openInterestUsd} kind="usd" />
+              <MetricCard label="Open interest" sourced={block.openInterestUsd} kind="usd" />
             )}
             {"longOpenInterestUsd" in block && (
-              <MetricTile label="Long OI" sourced={block.longOpenInterestUsd} kind="usd" />
+              <MetricCard label="Long OI" sourced={block.longOpenInterestUsd} kind="usd" />
             )}
             {"shortOpenInterestUsd" in block && (
-              <MetricTile label="Short OI" sourced={block.shortOpenInterestUsd} kind="usd" />
+              <MetricCard label="Short OI" sourced={block.shortOpenInterestUsd} kind="usd" />
             )}
             {"volume24hUsd" in block && (
-              <MetricTile label="24h volume" sourced={block.volume24hUsd} kind="usd" />
+              <MetricCard label="24h volume" sourced={block.volume24hUsd} kind="usd" />
             )}
             <PlainTile
               label="Fees (24h)"
@@ -1015,13 +965,13 @@ export function DerivativesTagMetricsSection({
               <PlainTile label="Max leverage" value={`${block.maxLeverageX}x`} hint="Curated" />
             )}
             {"insuranceFundUsd" in block && (
-              <MetricTile label="Insurance fund" sourced={block.insuranceFundUsd} kind="usd" />
+              <MetricCard label="Insurance fund" sourced={block.insuranceFundUsd} kind="usd" />
             )}
             {"vaultApyPct" in block && (
-              <MetricTile label="Vault APY" sourced={block.vaultApyPct} kind="pct" />
+              <MetricCard label="Vault APY" sourced={block.vaultApyPct} kind="pct" />
             )}
             {"fundingRatePct" in block && (
-              <MetricTile label="Funding rate" sourced={block.fundingRatePct} kind="pct" />
+              <MetricCard label="Funding rate" sourced={block.fundingRatePct} kind="pct" />
             )}
             <TvlChangeTile tvlChange={block.tvlChangePct} />
           </div>
@@ -1069,42 +1019,42 @@ export function OtherTagMetricsSection({
       return (
         <DataPanel key={tag} title={tag}>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            <MetricTile label="Protocol TVL" sourced={block.tvlUsd} kind="usd" />
+            <MetricCard label="Protocol TVL" sourced={block.tvlUsd} kind="usd" />
             {"treasuryUsd" in block && (
-              <MetricTile label="Treasury" sourced={block.treasuryUsd} kind="usd" />
+              <MetricCard label="Treasury" sourced={block.treasuryUsd} kind="usd" />
             )}
             {"activeCoverUsd" in block && (
-              <MetricTile label="Active cover" sourced={block.activeCoverUsd} kind="usd" />
+              <MetricCard label="Active cover" sourced={block.activeCoverUsd} kind="usd" />
             )}
             {"capitalPoolUsd" in block && (
-              <MetricTile label="Capital pool" sourced={block.capitalPoolUsd} kind="usd" />
+              <MetricCard label="Capital pool" sourced={block.capitalPoolUsd} kind="usd" />
             )}
             {"claimsPaidUsd" in block && (
-              <MetricTile label="Claims paid" sourced={block.claimsPaidUsd} kind="usd" />
+              <MetricCard label="Claims paid" sourced={block.claimsPaidUsd} kind="usd" />
             )}
             {"bribeVolumeUsd" in block && (
-              <MetricTile label="Bribe volume" sourced={block.bribeVolumeUsd} kind="usd" />
+              <MetricCard label="Bribe volume" sourced={block.bribeVolumeUsd} kind="usd" />
             )}
             {"crvEmissionsWeekly" in block && (
-              <MetricTile label="CRV emissions (weekly)" sourced={block.crvEmissionsWeekly} kind="count" />
+              <MetricCard label="CRV emissions (weekly)" sourced={block.crvEmissionsWeekly} kind="count" />
             )}
             {"activeGaugeCount" in block && (
-              <MetricTile label="Active gauges" sourced={block.activeGaugeCount} kind="count" />
+              <MetricCard label="Active gauges" sourced={block.activeGaugeCount} kind="count" />
             )}
             {"totalProposals" in block && (
-              <MetricTile label="Proposals (Snapshot)" sourced={block.totalProposals} kind="count" />
+              <MetricCard label="Proposals (Snapshot)" sourced={block.totalProposals} kind="count" />
             )}
             {"activeProposals" in block && (
-              <MetricTile label="Active proposals" sourced={block.activeProposals} kind="count" />
+              <MetricCard label="Active proposals" sourced={block.activeProposals} kind="count" />
             )}
             {"uniqueVoters" in block && (
-              <MetricTile label="Unique voters" sourced={block.uniqueVoters} kind="count" />
+              <MetricCard label="Unique voters" sourced={block.uniqueVoters} kind="count" />
             )}
             {"avgVotesPerProposal" in block && (
-              <MetricTile label="Avg votes / proposal" sourced={block.avgVotesPerProposal} kind="count" />
+              <MetricCard label="Avg votes / proposal" sourced={block.avgVotesPerProposal} kind="count" />
             )}
             {"snapshotFollowers" in block && (
-              <MetricTile label="Snapshot followers" sourced={block.snapshotFollowers} kind="count" />
+              <MetricCard label="Snapshot followers" sourced={block.snapshotFollowers} kind="count" />
             )}
             <PlainTile
               label="Fees (24h)"
@@ -1161,7 +1111,7 @@ export function RwaTagMetricsSection({
 
       return (
         <DataPanel key={tag} title={tag}>
-          {aumUsd && <MetricTile label="AUM / TVL" sourced={aumUsd} kind="usd" />}
+          {aumUsd && <MetricCard label="AUM / TVL" sourced={aumUsd} kind="usd" />}
           {"kind" in block && block.kind ? (
             <div className="mt-3">
               <RwaSubSectorPanel m={block as RwaSubSectorMetrics} />
@@ -1193,10 +1143,10 @@ export function EntityOffchainSection({ universal }: { universal?: UniversalMetr
       />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {hasTreasury && universal.treasuryUsd && (
-          <MetricTile label="Treasury" sourced={universal.treasuryUsd} kind="usd" />
+          <MetricCard label="Treasury" sourced={universal.treasuryUsd} kind="usd" />
         )}
         {universal.treasuryExOwnTokensUsd?.value != null && (
-          <MetricTile label="Treasury (ex own tokens)" sourced={universal.treasuryExOwnTokensUsd} kind="usd" />
+          <MetricCard label="Treasury (ex own tokens)" sourced={universal.treasuryExOwnTokensUsd} kind="usd" />
         )}
       </div>
       {hasRaises && identity.raises && (
@@ -1332,7 +1282,7 @@ export function StablecoinMetricsSection({
         subtitle="Live circulating supply (DeFi Llama) plus curated reserves, peg mechanism, and risk facts."
       />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <MetricTile label="Circulating supply" sourced={stablecoin.currentSupplyUsd} kind="usd" />
+        <MetricCard label="Circulating supply" sourced={stablecoin.currentSupplyUsd} kind="usd" />
         <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
           <p className="text-xs uppercase tracking-wide text-ink-500"># Chains</p>
           <p className="mt-1 font-mono text-lg text-ink-50">{chainCount ?? "—"}</p>
@@ -1544,8 +1494,8 @@ export function DexMetricsSection({ dex }: { dex?: DexMetrics | null }) {
         subtitle="Live TVL and trading volume (DeFi Llama) plus curated deployment and audit facts."
       />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <MetricTile label="TVL" sourced={dex.tvlUsd} kind="usd" />
-        <MetricTile label="Volume (30d)" sourced={dex.volume30dUsd} kind="usd" />
+        <MetricCard label="TVL" sourced={dex.tvlUsd} kind="usd" />
+        <MetricCard label="Volume (30d)" sourced={dex.volume30dUsd} kind="usd" />
         <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
           <p className="text-xs uppercase tracking-wide text-ink-500">Governance token</p>
           <p className="mt-1 font-mono text-lg text-ink-50">{dex.governanceToken ?? "—"}</p>
@@ -1788,7 +1738,7 @@ export function RwaMetricsSection({ rwa }: { rwa?: RwaMetrics | null }) {
         subtitle="Live assets-under-management (DeFi Llama) plus curated regulatory and custody facts."
       />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <MetricTile label="AUM / TVL" sourced={rwa.aumUsd} kind="usd" />
+        <MetricCard label="AUM / TVL" sourced={rwa.aumUsd} kind="usd" />
         <div className="rounded-xl border border-ink-800/60 bg-ink-900/30 p-4">
           <p className="text-xs uppercase tracking-wide text-ink-500"># Chains</p>
           <p className="mt-1 font-mono text-lg text-ink-50">{chainCount ?? "—"}</p>
@@ -1857,10 +1807,10 @@ export function StakingMetricsSection({ staking }: { staking?: StakingMetrics | 
         subtitle="Live total-staked, token, and yield data (DeFi Llama + CoinGecko) plus curated operator and restaking facts."
       />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <MetricTile label="Total staked" sourced={staking.totalStakedUsd} kind="usd" />
-        <MetricTile label="Token price" sourced={staking.tokenPriceUsd} kind="usd" />
-        <MetricTile label="Market cap" sourced={staking.marketCapUsd} kind="usd" />
-        <MetricTile label="Staking APR" sourced={staking.stakingAprPct} kind="pct" />
+        <MetricCard label="Total staked" sourced={staking.totalStakedUsd} kind="usd" />
+        <MetricCard label="Token price" sourced={staking.tokenPriceUsd} kind="usd" />
+        <MetricCard label="Market cap" sourced={staking.marketCapUsd} kind="usd" />
+        <MetricCard label="Staking APR" sourced={staking.stakingAprPct} kind="pct" />
         <PlainTile
           label="Exchange rate"
           value={exchangeRate != null ? `${exchangeRate.toFixed(4)} ${staking.underlyingAsset ?? "ETH"}` : "—"}
@@ -1972,8 +1922,8 @@ export function LiquidityMetricsSection({ liquidity }: { liquidity?: LiquidityMe
         subtitle="Live pool/vault TVL, DEX volume, and fees (DeFi Llama) plus curated pool facts."
       />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <MetricTile label="Protocol TVL" sourced={liquidity.tvlUsd} kind="usd" />
-        <MetricTile label="24h volume" sourced={liquidity.volume24hUsd} kind="usd" />
+        <MetricCard label="Protocol TVL" sourced={liquidity.tvlUsd} kind="usd" />
+        <MetricCard label="24h volume" sourced={liquidity.volume24hUsd} kind="usd" />
         <PlainTile
           label="Fees (24h)"
           value={fees?.fees24hUsd != null ? fmtUsd(fees.fees24hUsd) : "—"}
@@ -1984,9 +1934,9 @@ export function LiquidityMetricsSection({ liquidity }: { liquidity?: LiquidityMe
           value={fees?.revenue24hUsd != null ? fmtUsd(fees.revenue24hUsd) : "—"}
           hint="DeFi Llama"
         />
-        <MetricTile label="Fee APR" sourced={liquidity.feeAprPct} kind="pct" />
-        <MetricTile label="Token price" sourced={liquidity.tokenPriceUsd} kind="usd" />
-        <MetricTile label="Market cap" sourced={liquidity.marketCapUsd} kind="usd" />
+        <MetricCard label="Fee APR" sourced={liquidity.feeAprPct} kind="pct" />
+        <MetricCard label="Token price" sourced={liquidity.tokenPriceUsd} kind="usd" />
+        <MetricCard label="Market cap" sourced={liquidity.marketCapUsd} kind="usd" />
         <PlainTile
           label="Market share"
           value={liquidity.marketSharePct != null ? fmtPct(liquidity.marketSharePct) : "—"}
@@ -2001,9 +1951,9 @@ export function LiquidityMetricsSection({ liquidity }: { liquidity?: LiquidityMe
           }
           hint="DeFi Llama"
         />
-        <MetricTile label="Pool count" sourced={liquidity.poolCount} kind="count" />
-        <MetricTile label="Vault count" sourced={liquidity.vaultCount} kind="count" />
-        <MetricTile label="Avg vault APY" sourced={liquidity.avgVaultApyPct} kind="pct" />
+        <MetricCard label="Pool count" sourced={liquidity.poolCount} kind="count" />
+        <MetricCard label="Vault count" sourced={liquidity.vaultCount} kind="count" />
+        <MetricCard label="Avg vault APY" sourced={liquidity.avgVaultApyPct} kind="pct" />
       </div>
       {!hasLive && (
         <p className="text-xs text-ink-500">
@@ -2053,16 +2003,16 @@ export function DerivativesMetricsSection({
         subtitle="Live open interest, volume, and fees (DeFi Llama) plus curated perp/vault facts."
       />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <MetricTile label="Protocol TVL" sourced={derivatives.tvlUsd} kind="usd" />
-        <MetricTile label="Open interest" sourced={derivatives.openInterestUsd} kind="usd" />
-        <MetricTile label="24h volume" sourced={derivatives.volume24hUsd} kind="usd" />
+        <MetricCard label="Protocol TVL" sourced={derivatives.tvlUsd} kind="usd" />
+        <MetricCard label="Open interest" sourced={derivatives.openInterestUsd} kind="usd" />
+        <MetricCard label="24h volume" sourced={derivatives.volume24hUsd} kind="usd" />
         <PlainTile
           label="Fees (24h)"
           value={fees?.fees24hUsd != null ? fmtUsd(fees.fees24hUsd) : "—"}
           hint="DeFi Llama"
         />
-        <MetricTile label="Token price" sourced={derivatives.tokenPriceUsd} kind="usd" />
-        <MetricTile label="Market cap" sourced={derivatives.marketCapUsd} kind="usd" />
+        <MetricCard label="Token price" sourced={derivatives.tokenPriceUsd} kind="usd" />
+        <MetricCard label="Market cap" sourced={derivatives.marketCapUsd} kind="usd" />
         <PlainTile
           label="TVL change (1d / 7d)"
           value={
@@ -2075,8 +2025,8 @@ export function DerivativesMetricsSection({
         {derivatives.maxLeverageX != null && (
           <PlainTile label="Max leverage" value={`${derivatives.maxLeverageX}x`} hint="Curated" />
         )}
-        <MetricTile label="Vault APY" sourced={derivatives.vaultApyPct} kind="pct" />
-        <MetricTile label="Funding rate" sourced={derivatives.fundingRatePct} kind="pct" />
+        <MetricCard label="Vault APY" sourced={derivatives.vaultApyPct} kind="pct" />
+        <MetricCard label="Funding rate" sourced={derivatives.fundingRatePct} kind="pct" />
       </div>
       <DataPanel title="Markets & deployment">
         <div className="divide-y divide-ink-800/60">
@@ -2115,19 +2065,19 @@ export function OtherMetricsSection({ other }: { other?: OtherMetrics | null }) 
         subtitle="Live capital pool / treasury data (DeFi Llama) plus curated underwriting and governance facts."
       />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <MetricTile label="Protocol TVL" sourced={other.tvlUsd} kind="usd" />
-        <MetricTile label="Treasury" sourced={other.treasuryUsd} kind="usd" />
+        <MetricCard label="Protocol TVL" sourced={other.tvlUsd} kind="usd" />
+        <MetricCard label="Treasury" sourced={other.treasuryUsd} kind="usd" />
         <PlainTile
           label="Fees (24h)"
           value={fees?.fees24hUsd != null ? fmtUsd(fees.fees24hUsd) : "—"}
           hint="DeFi Llama"
         />
-        <MetricTile label="Token price" sourced={other.tokenPriceUsd} kind="usd" />
-        <MetricTile label="Market cap" sourced={other.marketCapUsd} kind="usd" />
-        <MetricTile label="Active cover" sourced={other.activeCoverUsd} kind="usd" />
-        <MetricTile label="Capital pool" sourced={other.capitalPoolUsd} kind="usd" />
-        <MetricTile label="Claims paid" sourced={other.claimsPaidUsd} kind="usd" />
-        <MetricTile label="Bribe volume" sourced={other.bribeVolumeUsd} kind="usd" />
+        <MetricCard label="Token price" sourced={other.tokenPriceUsd} kind="usd" />
+        <MetricCard label="Market cap" sourced={other.marketCapUsd} kind="usd" />
+        <MetricCard label="Active cover" sourced={other.activeCoverUsd} kind="usd" />
+        <MetricCard label="Capital pool" sourced={other.capitalPoolUsd} kind="usd" />
+        <MetricCard label="Claims paid" sourced={other.claimsPaidUsd} kind="usd" />
+        <MetricCard label="Bribe volume" sourced={other.bribeVolumeUsd} kind="usd" />
         <PlainTile
           label="TVL change (1d / 7d)"
           value={

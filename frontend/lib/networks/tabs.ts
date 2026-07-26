@@ -50,7 +50,10 @@ function hasResearchContent(profile: NetworkProfile): boolean {
 
 function hasMetricsContent(profile: NetworkProfile): boolean {
   return Boolean(
-    profile.lending ||
+    // Credit-affiliated entities always have the live Credit rollup (CAN-59).
+    profile.sector === "Credit" ||
+      profile.secondarySectors?.includes("Credit") ||
+      profile.lending ||
       profile.stablecoin ||
       profile.dex ||
       profile.rwa ||

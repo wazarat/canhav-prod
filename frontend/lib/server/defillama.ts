@@ -3,7 +3,7 @@ import "server-only";
 import { fetchJson } from "@/lib/server/http";
 
 /**
- * DeFi Llama overlay — circulating supply / peg history (stablecoins) and
+ * DeFi Llama overlay: circulating supply / peg history (stablecoins) and
  * protocol TVL history (RWAs), plus fees/revenue, DEX volume, yield APY, a
  * contract-address price fallback, and stablecoin peg-price history. Free,
  * keyless endpoints across four subdomains:
@@ -21,7 +21,7 @@ import { fetchJson } from "@/lib/server/http";
  *     revenue / holders-revenue summary + methodology.
  *   - https://api.llama.fi/summary/dexs/{slug}                 DEX volume.
  *   - https://api.llama.fi/overview/options[/{chain}], /summary/options/{slug}
- *     options notional / premium volume (deferred — wired but not yet called).
+ *     options notional / premium volume (deferred: wired but not yet called).
  *   - https://api.llama.fi/overview/open-interest              perp OI (deferred).
  *   - https://yields.llama.fi/pools, https://yields.llama.fi/chart/{pool}
  *     pool APY (apyBase/apyReward) + historical APY series.
@@ -53,7 +53,7 @@ export const LLAMA_STABLECOIN_IDS: Record<string, number | null> = {
   dai: 5, // Dai
   trueusd: 7, // TrueUSD
   "inverse-finance": 15, // Dola
-  monerium: 101, // Monerium EUR emoney (EURe) — peggedEUR
+  monerium: 101, // Monerium EUR emoney (EURe): peggedEUR
   gho: 118, // Aave GHO
   usdy: 129, // Ondo US Dollar Yield
   ethena: 146, // Ethena USDe
@@ -97,7 +97,7 @@ export const LLAMA_STABLECOIN_IDS: Record<string, number | null> = {
   usdz: 202, // Anzen USDz
   // Still unmapped (no clean Llama match; cron falls back to CoinGecko +
   // Alchemy totalSupply): scrvusd, sfrax, stusr, rlp, susdf, sdeusd, susdz,
-  // bgusd (Bitget, exchange-native), usdm (Mountain — name collides with
+  // bgusd (Bitget, exchange-native), usdm (Mountain: name collides with
   // several other USDM entries on Llama).
 };
 
@@ -109,12 +109,12 @@ export const LLAMA_STABLECOIN_IDS: Record<string, number | null> = {
  * https://api.llama.fi/protocols on 2026-06-12 (arrays re-verified 2026-07-04).
  */
 export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
-  // Lending networks (PDF Week 7+8) — protocol TVL series (verified 2026-06-18).
+  // Lending networks (PDF Week 7+8): protocol TVL series (verified 2026-06-18).
   // Aave/Compound span v3 (primary) + legacy v2; the parent "aave"/"compound"
   // slugs 404, so both products must be summed for a complete TVL.
   aave: ["aave-v3", "aave-v2"],
   morpho: "morpho-blue",
-  // TODO: revisit — sparklend (lending ~$3.6B) vs spark (ecosystem ~$4.65B).
+  // TODO: revisit: sparklend (lending ~$3.6B) vs spark (ecosystem ~$4.65B).
   // Keeping the "spark" parent (resolves live) for now.
   spark: "spark",
   compound: ["compound-v3", "compound-v2"],
@@ -123,7 +123,7 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
   justlend: "justlend",
   kamino: ["kamino-lend", "kamino-liquidity"], // parent total = lend + liquidity vaults
   maple: "maple",
-  // Credit sector expansion — Leveraged Yield + Fixed Income (verified 2026-06-25).
+  // Credit sector expansion: Leveraged Yield + Fixed Income (verified 2026-06-25).
   gearbox: "gearbox",
   stella: "stella",
   "extra-finance": ["extra-finance-leverage-farming", "extra-finance-xlend"],
@@ -134,6 +134,11 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
   spectra: "spectra-v2",
   sense: "sense",
   radiant: "radiant-v2",
+  // Credit secondary entities (M3 rollup; verified live 2026-07-26).
+  // "sky" parent aggregates the whole ecosystem; sky-lending is the
+  // MakerDAO-successor lending protocol the Credit view describes.
+  sky: "sky-lending",
+  "usd-ai": "usd-ai",
   // Staking sector (Liquid Staking / Restaking / Liquid Restaking; verified 2026-06-25).
   lido: "lido",
   "rocket-pool": "rocket-pool",
@@ -147,7 +152,7 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
   ankr: "ankr",
   eigenlayer: "eigencloud",
   symbiotic: "symbiotic",
-  karak: null, // no DeFiLlama adapter as of 2026-06-25 — curated-only
+  karak: null, // no DeFiLlama adapter as of 2026-06-25: curated-only
   "ether-fi": "ether.fi-stake",
   renzo: "renzo",
   "kelp-dao": "kelp",
@@ -169,8 +174,8 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
   "estate-protocol": "estate-protocol",
   "chateau-capital": "chateau", // chateau.capital
   "florence-finance": "florence-finance",
-  pgold: "pleasing-gold", // listed but adapter reports 0 — CoinGecko mcap covers it
-  // DEX networks (sector expansion) — parent-protocol TVL (verified 2026-06-18).
+  pgold: "pleasing-gold", // listed but adapter reports 0: CoinGecko mcap covers it
+  // DEX networks (sector expansion): parent-protocol TVL (verified 2026-06-18).
   // Parent "uniswap"/"aerodrome" slugs 404; sum the live per-version products.
   uniswap: ["uniswap-v3", "uniswap-v2"],
   "curve-finance": "curve-finance",
@@ -211,7 +216,7 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
   "hidden-hand": "hidden-hand",
   paladin: "paladin-vote",
   "stake-dao": "stake-dao",
-  // RWA networks (sector expansion) — issuer/protocol TVL (verified 2026-06-18).
+  // RWA networks (sector expansion): issuer/protocol TVL (verified 2026-06-18).
   "ondo-finance": "ondo-finance",
   "pleasing-market": "pleasing-gold",
   securitize: "securitize",
@@ -226,7 +231,7 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
   aryze: null,
   dualmint: null,
   "franklin-templeton": null, // BENJI tracked via on-chain supply x $1 NAV instead
-  ousg: null, // folded into ondo-yield-assets (mixed with USDY) — use CoinGecko
+  ousg: null, // folded into ondo-yield-assets (mixed with USDY): use CoinGecko
   "ondo-gm": null,
   "stably-gold": null,
 };
@@ -240,7 +245,7 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
  */
 export const LLAMA_FEES_SLUGS: Record<string, string | string[] | null> = {
   aave: ["aave-v3", "aave-v2"], // Aave V3 + legacy V2 fees/revenue (summed)
-  // Lending networks (PDF Week 7+8) — fees/revenue adapters (verified 2026-06-18).
+  // Lending networks (PDF Week 7+8): fees/revenue adapters (verified 2026-06-18).
   morpho: "morpho-blue",
   spark: "spark",
   compound: ["compound-v3", "compound-v2"],
@@ -260,7 +265,7 @@ export const LLAMA_FEES_SLUGS: Record<string, string | string[] | null> = {
   // Verified absent / no fees adapter:
   monerium: null,
   centrifuge: null,
-  aevo: null, // aevo-perps has no fees adapter — diagnostics reports no-api-coverage
+  aevo: null, // aevo-perps has no fees adapter: diagnostics reports no-api-coverage
 };
 
 /**
@@ -271,7 +276,7 @@ export const LLAMA_DEX_SLUGS: Record<string, string | string[] | null> = {
   jupiter: null, // Jupiter aggregator - no working volume adapter on DeFi Llama
   uniswap: "uniswap", // verify
   camelot: "camelot", // Arbitrum-native DEX // verify
-  // Spot / AMM DEX networks (sector expansion) — trading volume. summary/dexs
+  // Spot / AMM DEX networks (sector expansion): trading volume. summary/dexs
   // fails soft, so unverified slugs simply yield no live volume. // verify
   "curve-finance": "curve-dex",
   balancer: "balancer",
@@ -490,7 +495,7 @@ export interface LlamaStablecoinCharts {
   supply: LlamaSeriesPoint[];
   /**
    * Daily peg price (USD value / circulating units). Only emitted for
-   * `peggedUSD` assets — for other pegs the ratio conflates the FX rate with
+   * `peggedUSD` assets: for other pegs the ratio conflates the FX rate with
    * peg deviation, so callers should chart via CoinGecko `vs_currency` instead.
    */
   pegPrice: LlamaSeriesPoint[];
@@ -556,7 +561,7 @@ export interface LlamaProtocolTvl {
 }
 
 /**
- * Daily protocol-wide TVL history for a slug (all chains — headline numbers
+ * Daily protocol-wide TVL history for a slug (all chains: headline numbers
  * must match DeFi Llama's protocol totals, not a single-chain slice).
  */
 export async function fetchLlamaProtocolTvl(
@@ -643,10 +648,10 @@ async function fetchOneLlamaProtocolTvl(
 
   const points = parseSeries(data.tvl);
   if (points.length === 0) return null;
-  // A dead adapter reports a flat-zero series — treat as no data.
+  // A dead adapter reports a flat-zero series: treat as no data.
   if (points[points.length - 1].value <= 0 && points.every((p) => p.value <= 0)) return null;
 
-  // Full (unsliced) series — the caller slices after combining products.
+  // Full (unsliced) series: the caller slices after combining products.
   return {
     points,
     scope: "all",
@@ -655,7 +660,7 @@ async function fetchOneLlamaProtocolTvl(
 }
 
 /* -------------------------------------------------------------------------- */
-/* Protocol metadata (Tier 1 universal) — one /protocol/{slug} call           */
+/* Protocol metadata (Tier 1 universal): one /protocol/{slug} call           */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -677,9 +682,9 @@ export interface LlamaProtocolMeta {
   auditLinks: string[];
   logo: string | null;
   mcapUsd: number | null;
-  /** Latest total TVL (USD) — last point of `tvl[]`. */
+  /** Latest total TVL (USD): last point of `tvl[]`. */
   tvlUsdLatest: number | null;
-  /** Latest TVL per chain (USD), largest first — `currentChainTvls` filtered. */
+  /** Latest TVL per chain (USD), largest first: `currentChainTvls` filtered. */
   currentChainTvls: LlamaChainTvl[];
   /** TVL change vs −1 / −7 daily points, in %. */
   tvlChangePct: { d1: number | null; d7: number | null };
@@ -809,7 +814,7 @@ function parseProtocolMetaPayload(data: any): LlamaProtocolMeta | null {
     return ((tvlUsdLatest - prev) / prev) * 100;
   };
 
-  // currentChainTvls: { chain: latestUsd } — drop synthetic suffixed keys.
+  // currentChainTvls: { chain: latestUsd }: drop synthetic suffixed keys.
   const currentChainTvls: LlamaChainTvl[] = [];
   if (data.currentChainTvls && typeof data.currentChainTvls === "object") {
     for (const [chain, value] of Object.entries(data.currentChainTvls as Record<string, unknown>)) {
@@ -898,7 +903,7 @@ export interface LlamaProtocolRow {
   chains: string[];
 }
 
-/** Full /protocols roster (Tier 1). Cache hard — one call powers all sectors. */
+/** Full /protocols roster (Tier 1). Cache hard: one call powers all sectors. */
 export async function fetchAllProtocols(revalidate?: number): Promise<LlamaProtocolRow[]> {
   const data = await getJson(`${PROTOCOLS_BASE}/protocols`, revalidate);
   if (!Array.isArray(data)) return [];
@@ -1096,6 +1101,81 @@ async function fetchOneFeesRevenue(
   };
 }
 
+export interface LlamaFeesSeriesPoint {
+  /** ISO date (YYYY-MM-DD, UTC). */
+  date: string;
+  value: number;
+}
+
+export interface LlamaFeesSeries {
+  feesDaily: LlamaFeesSeriesPoint[];
+  revenueDaily: LlamaFeesSeriesPoint[];
+}
+
+/** totalDataChart rows ([unixSeconds, usd][]) -> ISO daily points, summed by date. */
+function chartToDailySeries(chart: unknown, into: Map<string, number>): void {
+  if (!Array.isArray(chart)) return;
+  for (const row of chart) {
+    if (!Array.isArray(row) || row.length < 2) continue;
+    const ts = num(row[0]);
+    const v = num(row[1]);
+    if (ts === null || v === null) continue;
+    const date = new Date(ts * 1000).toISOString().slice(0, 10);
+    into.set(date, (into.get(date) ?? 0) + v);
+  }
+}
+
+function mapToSortedSeries(map: Map<string, number>, days: number): LlamaFeesSeriesPoint[] {
+  return [...map.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : 1))
+    .slice(-days)
+    .map(([date, value]) => ({ date, value }));
+}
+
+/**
+ * Daily fees + revenue series for a slug from the same /summary/fees
+ * endpoints fetchLlamaFeesRevenue already hits: this just keeps the
+ * `totalDataChart` payload instead of discarding it (CAN-59 sparklines).
+ * Multi-product slugs are summed per date. Daily data: long revalidate.
+ */
+export async function fetchLlamaFeesSeries(
+  slug: string,
+  days = 90,
+  revalidate: number = 21_600,
+): Promise<LlamaFeesSeries | null> {
+  const protocols = llamaFeesProtocolsForSlug(slug);
+  if (protocols.length === 0) return null;
+
+  const fees = new Map<string, number>();
+  const revenue = new Map<string, number>();
+  let any = false;
+
+  await Promise.all(
+    protocols.map(async (protocol) => {
+      const [feesSummary, revenueSummary] = await Promise.all([
+        fetchFeesSummary(protocol, "dailyFees", revalidate).catch(() => null),
+        fetchFeesSummary(protocol, "dailyRevenue", revalidate).catch(() => null),
+      ]);
+      if (feesSummary && typeof feesSummary === "object") {
+        chartToDailySeries((feesSummary as { totalDataChart?: unknown }).totalDataChart, fees);
+        any = true;
+      }
+      if (revenueSummary && typeof revenueSummary === "object") {
+        chartToDailySeries(
+          (revenueSummary as { totalDataChart?: unknown }).totalDataChart,
+          revenue,
+        );
+      }
+    }),
+  );
+
+  if (!any) return null;
+  return {
+    feesDaily: mapToSortedSeries(fees, days),
+    revenueDaily: mapToSortedSeries(revenue, days),
+  };
+}
+
 /* -------------------------------------------------------------------------- */
 /* DEX volume                                                                 */
 /* -------------------------------------------------------------------------- */
@@ -1275,6 +1355,39 @@ export async function fetchLlamaBorrowPools(revalidate?: number): Promise<LlamaB
   }
   if (pools.length > 0) _borrowCache = { at: Date.now(), pools };
   return pools;
+}
+
+/**
+ * Supply-side weighted average base APY for a lending project from the free
+ * /pools endpoint (spec row C0.6). The borrow-side sibling lives on
+ * /poolsBorrow, which moved behind the DeFi Llama paid plan (HTTP 402 as of
+ * 2026-07-26), so this is the only yields aggregate still Tier 1.
+ */
+export function aggregateSupplySideYield(
+  slug: string,
+  pools: LlamaPool[],
+): { weightedSupplyApyPct: number | null; totalPoolTvlUsd: number | null } | null {
+  const project = llamaLendingProjectForSlug(slug);
+  if (!project) return null;
+  const proj = project.toLowerCase();
+  const rows = pools.filter((p) => p.project.toLowerCase() === proj);
+  if (rows.length === 0) return null;
+
+  let tvl = 0;
+  let weighted = 0;
+  let weight = 0;
+  for (const r of rows) {
+    const t = r.tvlUsd ?? 0;
+    tvl += t;
+    if (r.apyBase != null && t > 0) {
+      weighted += r.apyBase * t;
+      weight += t;
+    }
+  }
+  return {
+    weightedSupplyApyPct: weight > 0 ? weighted / weight : null,
+    totalPoolTvlUsd: tvl > 0 ? tvl : null,
+  };
 }
 
 export interface LlamaLendingBorrow {

@@ -2,6 +2,7 @@ import { LendingAssetCoveragePanel } from "@/components/networks/NetworkSections
 import { Badge } from "@/components/ui/Badge";
 import { DataPanel } from "@/components/ui/DataPanel";
 import { Card } from "@/components/ui/Card";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import type { NetworkProfile } from "@/lib/types";
 
 function TagLendingCoveragePanel({
@@ -95,14 +96,10 @@ export function NetworkAssetCoverageTab({ profile }: { profile: NetworkProfile }
 
   return (
     <div className="space-y-6 pt-6">
-      <div className="border-b border-ink-800/60 pb-2">
-        <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
-          Asset coverage
-        </h2>
-        <p className="mt-1 text-sm text-ink-300">
-          Collateral, oracles, risk parameters, and deployment facts.
-        </p>
-      </div>
+      <SectionHeading
+        title="Asset coverage"
+        subtitle="Collateral, oracles, risk parameters, and deployment facts."
+      />
       {profile.lending && <LendingAssetCoveragePanel lending={profile.lending} />}
       {tagLending && hasTagLending && <TagLendingCoveragePanel metrics={tagLending} />}
       {hasMemberCoins && <MemberCoinsCoveragePanel coins={profile.memberCoins} />}

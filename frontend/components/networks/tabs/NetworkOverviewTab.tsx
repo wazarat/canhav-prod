@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { InlineLinkText } from "@/components/shared/InlineLinkText";
 import { MemberCoinsLauncher } from "@/components/networks/MemberCoinsLauncher";
 import { NetworkOverviewMetricsBlock } from "@/components/networks/NetworkOverviewMetricsBlock";
 import { NetworkPulsePanel } from "@/components/networks/NetworkPulsePanel";
@@ -103,9 +104,7 @@ export function NetworkOverviewTab({
             <section className="space-y-2">
               <SectionHeading title="About" />
               <Card className="text-sm leading-relaxed text-ink-300">
-                {/* All current longDescriptions are ~500-670 chars; add a
-                    collapse only if editorial entries grow past ~1200 chars. */}
-                <p className="max-w-prose">{profile.longDescription}</p>
+                <AboutCollapse text={profile.longDescription} />
               </Card>
             </section>
           )}
@@ -165,5 +164,40 @@ async function OverviewRail({ profile }: { profile: NetworkProfile }) {
       <TvlFlowWidget flow={data.flow} tvlSeries={data.tvlValues} />
       <FeesWidget fees={data.fees} />
     </div>
+  );
+}
+
+/**
+ * M5: theses are now single dense paragraphs of 1.1-1.7k chars with inline
+ * source links, so About collapses to a 3-line preview with a native
+ * <details> expand (no client JS). Short legacy descriptions render plain.
+ */
+function AboutCollapse({ text }: { text: string }) {
+  if (text.length < 400) {
+    return (
+      <p className="max-w-prose">
+        <InlineLinkText text={text} />
+      </p>
+    );
+  }
+  return (
+    <details className="group/about max-w-prose">
+      <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+        <span className="line-clamp-3 group-open/about:hidden">
+          <InlineLinkText text={text} />
+        </span>
+        <span className="mt-1 inline-block text-xs text-electric-400 hover:underline">
+          <span className="group-open/about:hidden">Read full thesis</span>
+          <span className="hidden group-open/about:inline">Collapse</span>
+        </span>
+      </summary>
+      <div className="space-y-3">
+        {text.split(/\n\s*\n/).map((p, i) => (
+          <p key={i}>
+            <InlineLinkText text={p} />
+          </p>
+        ))}
+      </div>
+    </details>
   );
 }

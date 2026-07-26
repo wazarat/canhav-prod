@@ -7,8 +7,6 @@ import { cn } from "@/lib/utils";
 export interface SectionNavItem {
   id: string;
   label: string;
-  /** When set, scrolls to #research-hub and switches to this tab. */
-  researchTab?: string;
 }
 
 interface SectionNavProps {
@@ -65,16 +63,11 @@ export function SectionNav({
 
   if (items.length === 0) return null;
 
-  function scrollTo(id: string, researchTab?: string) {
+  function scrollTo(id: string) {
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
       setActiveId(id);
-    }
-    if (researchTab) {
-      window.dispatchEvent(
-        new CustomEvent("network-research-tab", { detail: researchTab }),
-      );
     }
   }
 
@@ -82,7 +75,7 @@ export function SectionNav({
     <button
       key={item.id}
       type="button"
-      onClick={() => scrollTo(item.id, item.researchTab)}
+      onClick={() => scrollTo(item.id)}
       className={cn(
         "whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
         activeId === item.id
@@ -127,7 +120,7 @@ export function SectionNav({
           <button
             key={item.id}
             type="button"
-            onClick={() => scrollTo(item.id, item.researchTab)}
+            onClick={() => scrollTo(item.id)}
             className={cn(
               "block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors",
               activeId === item.id

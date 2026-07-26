@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 import { TRADE_MODES } from "@/components/agent/trade/tradeModes";
 import { ContactCta } from "@/components/home/ContactCta";
 import { AgentEconomyGraphic } from "@/components/trade/AgentEconomyGraphic";
 import { HitlFlowGraphic } from "@/components/trade/HitlFlowGraphic";
 import { SecurityRails } from "@/components/trade/SecurityRails";
+import { TechTag } from "@/components/trade/TechTag";
 import { TradeMascotBand } from "@/components/trade/TradeMascotBand";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
   title: "Trade",
@@ -29,40 +27,41 @@ export default function TradePage() {
   return (
     <div className="container space-y-16 py-14 md:py-20">
       {/* Hero */}
-      <section className="space-y-6">
-        <div className="max-w-3xl space-y-4">
-          <p className="kicker">Human-in-the-loop trading</p>
-          <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-ink-50 md:text-6xl">
-            Research-gated trading,{" "}
-            <span className="text-gradient-brand">with you in the loop</span>.
-          </h1>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge tone="signal">Arbitrum</Badge>
-            <Badge tone="electric">GMX perps</Badge>
-            <Badge tone="neon">ERC-8004 agents</Badge>
-            <Badge tone="neon">FHE-encrypted</Badge>
+      <section className="grid items-start gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="space-y-6">
+          <div className="max-w-3xl space-y-4">
+            <p className="kicker">Human-in-the-loop trading</p>
+            <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-ink-50 md:text-6xl">
+              Research-gated trading,{" "}
+              <span className="text-gradient-brand">with you in the loop</span>.
+            </h1>
+            <p className="max-w-2xl text-lg leading-relaxed text-ink-300">
+              Put your DeFi research to work. Your agent digs into an asset, a
+              fresh verdict opens the trade gate, and the trade executes through
+              a DEX, but nothing moves without your approval and your wallet
+              signature.
+            </p>
+            <p className="font-mono text-[11px] text-ink-400">
+              research <span className="text-ink-600">→</span> verdict{" "}
+              <span className="text-ink-600">→</span> proposal{" "}
+              <span className="text-ink-600">→</span> your approval{" "}
+              <span className="text-ink-600">→</span> your signature{" "}
+              <span className="text-ink-600">→</span> transactions completed
+            </p>
           </div>
-          <p className="max-w-2xl text-lg leading-relaxed text-ink-300">
-            Put your DeFi research to work. Your agent digs into an asset, a
-            fresh verdict opens the trade gate, and the trade executes through a
-            DEX — but nothing moves without your approval and your wallet
-            signature.
-          </p>
-          <p className="font-mono text-[11px] text-ink-400">
-            research <span className="text-ink-600">→</span> verdict{" "}
-            <span className="text-ink-600">→</span> proposal{" "}
-            <span className="text-ink-600">→</span> your approval{" "}
-            <span className="text-ink-600">→</span> your signature{" "}
-            <span className="text-ink-600">→</span> GMX fill
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <ContactCta label="Learn more" sourcePage="trade-hero" />
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button asChild>
-            <Link href="/agents/trade">
-              Launch the desk <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-          <ContactCta variant="secondary" sourcePage="trade-hero" />
+        <div className="hidden lg:block">
+          <Image
+            src="/mascot-methodology.png"
+            alt="CanHav mascot celebrating at a laptop"
+            width={1520}
+            height={1222}
+            priority
+            className="ml-auto h-auto w-full max-w-[380px] drop-shadow-[0_30px_60px_rgba(4,10,20,0.55)]"
+          />
         </div>
       </section>
 
@@ -105,7 +104,7 @@ export default function TradePage() {
                   {mode.name}
                 </h3>
                 {mode.value === "spending_cap" && (
-                  <Badge tone="neon">caps auto-approve</Badge>
+                  <TechTag tone="neon">caps auto-approve</TechTag>
                 )}
               </div>
               <p className="mt-2 text-sm leading-relaxed text-ink-300">
@@ -137,7 +136,7 @@ export default function TradePage() {
             <h2 className="font-display text-3xl font-semibold tracking-tight text-ink-50">
               An <span className="text-gradient-brand">agent-to-agent</span> research economy.
             </h2>
-            <Badge tone="warning">Planned</Badge>
+            <TechTag tone="warning">Planned</TechTag>
           </div>
           <p className="max-w-xl text-sm leading-relaxed text-ink-300 md:text-base">
             Research shouldn&apos;t stop at your own agent. We&apos;re building
@@ -153,7 +152,7 @@ export default function TradePage() {
                 <h3 className="font-display text-lg font-semibold tracking-tight text-ink-50">
                   Consume
                 </h3>
-                <Badge tone="warning" className="text-[10px]">planned</Badge>
+                <TechTag tone="warning">planned</TechTag>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-ink-300">
                 Your agent buys fresh verdicts, theses and data feeds from other
@@ -166,7 +165,7 @@ export default function TradePage() {
                 <h3 className="font-display text-lg font-semibold tracking-tight text-ink-50">
                   Publish &amp; monetize
                 </h3>
-                <Badge tone="warning" className="text-[10px]">planned</Badge>
+                <TechTag tone="warning">planned</TechTag>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-ink-300">
                 Sell the research your agent has already done — verdicts,
@@ -178,7 +177,7 @@ export default function TradePage() {
                 <h3 className="font-display text-lg font-semibold tracking-tight text-ink-50">
                   Settle agent-to-agent
                 </h3>
-                <Badge tone="warning" className="text-[10px]">planned</Badge>
+                <TechTag tone="warning">planned</TechTag>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-ink-300">
                 Discovery, reputation and payment run between ERC-8004

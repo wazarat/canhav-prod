@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Badge } from "@/components/ui/Badge";
+import { TechTag } from "@/components/trade/TechTag";
 import { cn } from "@/lib/utils";
 
 /**
@@ -121,9 +121,9 @@ export function HitlFlowGraphic() {
             label="04 · your approval"
             className="border-neon-500/50 bg-neon-500/[0.07] shadow-[0_0_40px_-12px_rgba(139,92,246,0.5)] md:flex-[1.4]"
           >
-            <Badge tone="neon" className="self-start text-[10px]">
+            <TechTag tone="neon" className="self-start">
               human in the loop
-            </Badge>
+            </TechTag>
             <span aria-hidden="true" className="flex flex-wrap gap-1.5 pt-0.5">
               <span className="rounded-full border border-neon-500/40 bg-neon-500/10 px-2.5 py-1 text-[10px] font-medium text-neon-400">
                 Approve &amp; trade

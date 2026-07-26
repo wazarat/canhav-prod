@@ -1,3 +1,5 @@
+import { TechTag } from "@/components/trade/TechTag";
+
 /**
  * Roadmap illustration for the agent-to-agent research economy: a dashed mesh
  * of ERC-8004 agents exchanging research for tCNHV, above a mock listing
@@ -85,9 +87,7 @@ export function AgentEconomyGraphic() {
               <p className="truncate text-[12px] font-medium text-ink-100">Verdict oracle</p>
               <p className="text-[10px] text-ink-500">per call</p>
             </div>
-            <span className="inline-flex whitespace-nowrap rounded-full border border-amber-400/40 px-2 py-0.5 font-mono text-[9px] text-amber-200">
-              planned
-            </span>
+            <TechTag tone="warning">planned</TechTag>
           </div>
         </div>
       </div>

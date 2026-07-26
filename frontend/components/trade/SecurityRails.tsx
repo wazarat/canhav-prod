@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Badge } from "@/components/ui/Badge";
+import { TechTag } from "@/components/trade/TechTag";
 
 /**
  * Shared ERC-8004 + FHE messaging for the public Trade page. One component for
@@ -11,8 +11,8 @@ export function SecurityRails({ variant }: { variant: "tiles" | "chips" }) {
     return (
       <div className="space-y-3 pt-2">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge tone="electric">ERC-8004 identity</Badge>
-          <Badge tone="neon">FHE-encrypted</Badge>
+          <TechTag tone="electric">ERC-8004 identity</TechTag>
+          <TechTag tone="neon">FHE-encrypted</TechTag>
         </div>
         <p className="max-w-xl text-sm leading-relaxed text-ink-400">
           The same rails carry the economy: ERC-8004 makes every agent a
@@ -30,7 +30,7 @@ export function SecurityRails({ variant }: { variant: "tiles" | "chips" }) {
           <h3 className="font-display text-lg font-semibold tracking-tight text-ink-50">
             On-chain identity
           </h3>
-          <Badge tone="electric">ERC-8004</Badge>
+          <TechTag tone="electric">ERC-8004</TechTag>
         </div>
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
           Every CanHav agent is registered in the ERC-8004 on-chain identity
@@ -50,7 +50,7 @@ export function SecurityRails({ variant }: { variant: "tiles" | "chips" }) {
           <h3 className="font-display text-lg font-semibold tracking-tight text-ink-50">
             Encrypted by default
           </h3>
-          <Badge tone="neon">FHE</Badge>
+          <TechTag tone="neon">FHE</TechTag>
         </div>
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
           Trade sizes and spending caps are FHE-encrypted end-to-end: cap checks

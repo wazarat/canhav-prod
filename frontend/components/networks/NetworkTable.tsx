@@ -3,6 +3,7 @@ import { BookOpen, Globe } from "lucide-react";
 
 import { NetworkAvatar } from "@/components/networks/NetworkEntityHeader";
 import { Badge } from "@/components/ui/Badge";
+import { Sparkline } from "@/components/ui/Sparkline";
 import { StatusPill } from "@/components/stablecoins/StatusPill";
 import { Table, TableShell, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import { categoryBadgeTone } from "@/lib/categoryTone";
@@ -19,7 +20,7 @@ import {
   subSectorBadgeTone,
 } from "@/lib/networkTaxonomy";
 import type { MemberCoinCategory, NetworkProfile } from "@/lib/types";
-import { formatUsdCompact } from "@/lib/utils";
+import { cn, formatUsdCompact } from "@/lib/utils";
 
 interface NetworkTableProps {
   profiles: NetworkProfile[];
@@ -27,6 +28,44 @@ interface NetworkTableProps {
   emptyHint?: string;
   /** When set, dim coin badges that don't match the active category filter. */
   coinCategoryFilter?: MemberCoinCategory | "all";
+  /** CAN-47: Credit-sector column set (Supplied / Borrowed / Util / TVL 7d). */
+  creditColumns?: boolean;
+  /** slug -> 8d TVL values + week-over-week change for the row sparkline. */
+  creditSparklines?: Record<string, { values: number[]; wowPct: number | null }>;
+}
+
+/** Token Terminal style inline trend cell: sparkline + WoW direction (CAN-47). */
+function TrendCell({
+  slug,
+  series,
+}: {
+  slug: string;
+  series?: { values: number[]; wowPct: number | null };
+}) {
+  if (!series || series.values.length < 2) {
+    return <span className="text-xs text-ink-500">—</span>;
+  }
+  const up = (series.wowPct ?? 0) >= 0;
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <Sparkline
+        id={`row-tvl-${slug}`}
+        values={series.values}
+        width={96}
+        height={28}
+        color={up ? "#34D399" : "#F87171"}
+        className="h-7 w-24"
+      />
+      {series.wowPct != null && (
+        <span
+          className={cn("font-mono text-xs tabular-nums", up ? "text-emerald-400" : "text-red-400")}
+        >
+          {up ? "+" : ""}
+          {series.wowPct.toFixed(1)}%
+        </span>
+      )}
+    </div>
+  );
 }
 
 export function NetworkTable({
@@ -34,6 +73,8 @@ export function NetworkTable({
   showStatus = false,
   emptyHint,
   coinCategoryFilter = "all",
+  creditColumns = false,
+  creditSparklines,
 }: NetworkTableProps) {
   if (profiles.length === 0) {
     return (
@@ -51,6 +92,14 @@ export function NetworkTable({
             <TH>Network</TH>
             <TH>Coins</TH>
             <TH className="text-right">TVL</TH>
+            {creditColumns && (
+              <>
+                <TH className="text-right">Supplied</TH>
+                <TH className="text-right">Borrowed</TH>
+                <TH className="text-right">Util</TH>
+                <TH className="text-right">TVL 7d</TH>
+              </>
+            )}
             <TH className="text-right">Mkt cap</TH>
             <TH className="text-right">Vol 24h</TH>
             {showStatus && <TH>Status</TH>}
@@ -125,6 +174,28 @@ export function NetworkTable({
                 <TD className="text-right font-mono text-ink-50">
                   {formatUsdCompact(tvlUsd)}
                 </TD>
+                {creditColumns && (
+                  <>
+                    <TD className="text-right font-mono text-ink-200">
+                      {formatUsdCompact(
+                        p.creditTagMetrics?.lending?.totalSuppliedUsd?.value ?? null,
+                      )}
+                    </TD>
+                    <TD className="text-right font-mono text-ink-200">
+                      {formatUsdCompact(
+                        p.creditTagMetrics?.lending?.totalBorrowsUsd?.value ?? null,
+                      )}
+                    </TD>
+                    <TD className="text-right font-mono text-ink-200">
+                      {p.creditTagMetrics?.lending?.utilizationPct?.value != null
+                        ? `${p.creditTagMetrics.lending.utilizationPct.value.toFixed(1)}%`
+                        : "—"}
+                    </TD>
+                    <TD className="text-right">
+                      <TrendCell slug={p.slug} series={creditSparklines?.[p.slug]} />
+                    </TD>
+                  </>
+                )}
                 <TD className="text-right font-mono text-ink-200">
                   {formatUsdCompact(mcapUsd)}
                 </TD>

@@ -8,7 +8,6 @@ import { collectDerivativesMetrics } from "@/lib/server/derivatives";
 import {
   aggregateLendingBorrow,
   fetchLlamaBorrowPools,
-  fetchLlamaFeesRevenue,
   fetchLlamaOpenInterest,
   fetchLlamaProtocolTvl,
   fetchLlamaTreasury,
@@ -35,7 +34,7 @@ import { affiliatedTagMetricSectors } from "@/lib/networkTaxonomy";
 import type {
   CreditTagMetrics,
   DerivativesTagMetrics,
-  LendingMetrics,
+  LendingMarketMetrics,
   LiquidityMetrics,
   LiquidityTagMetrics,
   NetworkProfile,
@@ -75,19 +74,25 @@ function isCreditNetwork(profile: NetworkProfile): boolean {
   );
 }
 
-async function fetchLiveLendingMetrics(slug: string): Promise<Partial<LendingMetrics>> {
+/**
+ * Live lending metrics shaped for `creditTagMetrics.lending` — the single
+ * lending representation since M4.1 (CAN-70). The legacy `profile.lending`
+ * block is editorial-only and no longer written here. The /poolsBorrow call
+ * fails soft (HTTP 402 since 2026-07); the TVL-backed supplied value still
+ * populates from the free protocol endpoint.
+ */
+async function fetchLiveLendingMetrics(slug: string): Promise<Partial<LendingMarketMetrics>> {
   const borrowPools = await fetchLlamaBorrowPools(LIVE_REVALIDATE);
   const borrow = aggregateLendingBorrow(slug, borrowPools);
   const tvl = await fetchLlamaProtocolTvl(slug, 1, LIVE_REVALIDATE);
   const tvlUsd = tvl?.points.at(-1)?.value ?? null;
-  const feesRev = await fetchLlamaFeesRevenue(slug, LIVE_REVALIDATE);
 
   const supplyApy = borrow?.supplyApyPct ?? null;
   const borrowApy = borrow?.borrowApyPct ?? null;
   const nim = supplyApy != null && borrowApy != null ? borrowApy - supplyApy : null;
 
-  const live: Partial<LendingMetrics> = {};
-  if (tvlUsd != null) live.tvlUsd = sourced(tvlUsd);
+  const live: Partial<LendingMarketMetrics> = {};
+  if (tvlUsd != null) live.totalSuppliedUsd = sourced(tvlUsd);
   if (borrow?.totalBorrowUsd != null) live.totalBorrowsUsd = sourced(borrow.totalBorrowUsd);
   if (borrow?.utilizationPct != null) live.utilizationPct = sourced(borrow.utilizationPct);
   if (tvlUsd != null && borrow?.totalBorrowUsd != null) {
@@ -97,34 +102,21 @@ async function fetchLiveLendingMetrics(slug: string): Promise<Partial<LendingMet
   if (supplyApy != null) live.supplyApyPct = sourced(supplyApy);
   if (borrowApy != null) live.borrowApyPct = sourced(borrowApy);
   if (nim != null) live.netInterestMarginPct = sourced(nim);
-  if (feesRev?.revenue30dUsd != null) live.revenue30dUsd = sourced(feesRev.revenue30dUsd);
-  if (feesRev?.fees30dUsd != null) live.fees30dUsd = sourced(feesRev.fees30dUsd);
-  if (feesRev?.revenue30dUsd != null) live.revenueAnnualizedUsd = sourced(feesRev.revenue30dUsd * 12);
-  if (feesRev?.fees30dUsd != null) live.feesAnnualizedUsd = sourced(feesRev.fees30dUsd * 12);
   return live;
 }
 
 function mergeCreditTagLending(
   existing: CreditTagMetrics | null | undefined,
-  lendingLive: Partial<LendingMetrics>,
+  lendingLive: Partial<LendingMarketMetrics>,
 ): CreditTagMetrics {
   const prior = existing ?? {};
-  const lendingBlock = { ...(prior.lending ?? {}) };
-  if (lendingLive.tvlUsd) lendingBlock.totalSuppliedUsd = lendingLive.tvlUsd;
-  if (lendingLive.totalBorrowsUsd) lendingBlock.totalBorrowsUsd = lendingLive.totalBorrowsUsd;
-  if (lendingLive.utilizationPct) lendingBlock.utilizationPct = lendingLive.utilizationPct;
-  if (lendingLive.availableLiquidityUsd) {
-    lendingBlock.availableLiquidityUsd = lendingLive.availableLiquidityUsd;
-  }
-  if (lendingLive.supplyApyPct) lendingBlock.supplyApyPct = lendingLive.supplyApyPct;
-  if (lendingLive.borrowApyPct) lendingBlock.borrowApyPct = lendingLive.borrowApyPct;
-  return { ...prior, lending: lendingBlock };
+  return { ...prior, lending: { ...(prior.lending ?? {}), ...lendingLive } };
 }
 
 /** True when sector/tag metrics are missing live Tier-1 values. */
 export function networkNeedsLiveSectorMetrics(profile: NetworkProfile): boolean {
   if (isCreditNetwork(profile) && llamaLendingProjectForSlug(profile.slug)) {
-    if (!hasLiveValue(profile.lending?.tvlUsd)) return true;
+    if (!hasLiveValue(profile.creditTagMetrics?.lending?.totalSuppliedUsd)) return true;
   }
   if (profile.sector === "Staking" || profile.secondarySectors?.includes("Staking")) {
     if (!hasLiveValue(profile.staking?.totalStakedUsd)) return true;
@@ -179,28 +171,31 @@ export async function enrichNetworkWithLiveSectorMetrics(
 
   const sectors = affiliatedTagMetricSectors(profile);
 
-  if (isCreditNetwork(profile) && llamaLendingProjectForSlug(profile.slug) && !hasLiveValue(profile.lending?.tvlUsd)) {
+  if (
+    isCreditNetwork(profile) &&
+    llamaLendingProjectForSlug(profile.slug) &&
+    !hasLiveValue(profile.creditTagMetrics?.lending?.totalSuppliedUsd)
+  ) {
     const lendingLive = await fetchLiveLendingMetrics(profile.slug);
     if (Object.keys(lendingLive).length > 0) {
       next = {
         ...next,
-        lending: mergeMetrics(next.lending, lendingLive),
         creditTagMetrics: mergeCreditTagLending(next.creditTagMetrics, lendingLive),
       };
       const tags = profile.tags ?? [];
-      if (tags.includes("Leveraged Yield") && lendingLive.tvlUsd) {
+      if (tags.includes("Leveraged Yield") && lendingLive.totalSuppliedUsd) {
         next.creditTagMetrics = {
           ...(next.creditTagMetrics ?? {}),
           leveragedYield: mergeMetrics(next.creditTagMetrics?.leveragedYield, {
-            tvlUsd: lendingLive.tvlUsd,
+            tvlUsd: lendingLive.totalSuppliedUsd,
           }),
         };
       }
-      if (tags.includes("Fixed Income") && lendingLive.tvlUsd) {
+      if (tags.includes("Fixed Income") && lendingLive.totalSuppliedUsd) {
         next.creditTagMetrics = {
           ...(next.creditTagMetrics ?? {}),
           fixedIncome: mergeMetrics(next.creditTagMetrics?.fixedIncome, {
-            tvlUsd: lendingLive.tvlUsd,
+            tvlUsd: lendingLive.totalSuppliedUsd,
           }),
         };
       }

@@ -13,7 +13,7 @@ export function Footer() {
             Arbitrum Portal and refreshed daily.
           </p>
         </div>
-        <div className="text-xs text-ink-500">
+        <div className="text-xs text-ink-400">
           <p>
             <Link href="/contracts" className="transition-colors hover:text-ink-200">
               Contracts &amp; stack

@@ -100,8 +100,12 @@ function hasAssetCoverageContent(profile: NetworkProfile): boolean {
   if (
     tagLending &&
     (tagLending.collateralAssets?.length ||
+      tagLending.loanAssets?.length ||
       tagLending.oracles?.length ||
-      tagLending.isolatedMarketCount != null)
+      tagLending.isolatedMarketCount != null ||
+      tagLending.liquidations30d ||
+      tagLending.governanceDetail ||
+      tagLending.eModeCategories?.length)
   ) {
     return true;
   }

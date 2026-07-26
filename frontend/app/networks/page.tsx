@@ -1,8 +1,13 @@
 import { ResearchChatScope } from "@/components/agent/research-chat-context";
-import { NetworkTableWithFilter } from "@/components/networks/NetworkTableWithFilter";
+import {
+  NetworkTableWithFilter,
+  type CreditRowSeries,
+} from "@/components/networks/NetworkTableWithFilter";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { getApprovedNetworks, networkHeadlineTvlUsd } from "@/lib/data";
+import { matchesSectorFilter } from "@/lib/networkTaxonomy";
+import { resolveNetworkTvlSeries } from "@/lib/server/series";
 import { formatUsdCompact } from "@/lib/utils";
 
 export const metadata = {
@@ -32,6 +37,26 @@ export default async function NetworksPage({
   const initialSector =
     sectorParam && LINKABLE_SECTORS.includes(sectorParam) ? sectorParam : undefined;
   const profiles = await getApprovedNetworks();
+
+  // CAN-47 (M1.4, landed with M4.1): 8-day TVL series for the Credit rows'
+  // Token Terminal style sparkline + week-over-week direction. Fetched here
+  // (server) so the client table stays data-free; each series is Next-cached.
+  const creditProfiles = profiles.filter((p) => matchesSectorFilter(p, "Credit"));
+  const sparkEntries = await Promise.all(
+    creditProfiles.map(async (p) => {
+      const series = await resolveNetworkTvlSeries(p.slug, 8).catch(() => null);
+      const points = series?.points ?? [];
+      if (points.length < 2) return null;
+      const values = points.map((pt) => pt.value);
+      const first = values[0];
+      const wowPct = first !== 0 ? ((values[values.length - 1] - first) / first) * 100 : null;
+      return [p.slug, { values, wowPct }] as const;
+    }),
+  );
+  const creditSparklines: Record<string, CreditRowSeries> = Object.fromEntries(
+    sparkEntries.filter((e): e is NonNullable<typeof e> => e != null),
+  );
+
   const aggregateTvl = profiles.reduce(
     (sum, p) => sum + (networkHeadlineTvlUsd(p) ?? 0),
     0,
@@ -77,6 +102,7 @@ export default async function NetworksPage({
         key={initialSector ?? "all"}
         profiles={profiles}
         initialSector={initialSector}
+        creditSparklines={creditSparklines}
         emptyHint="No networks in the store yet."
       />
 

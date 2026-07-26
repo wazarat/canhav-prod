@@ -154,7 +154,7 @@ export function NetworkEntityHeader({
           <div className="flex shrink-0 flex-col items-start gap-3 lg:items-end">
             {!hideHeadline && (
               <div className="text-left lg:text-right">
-                <p className="text-xs uppercase tracking-wide text-ink-500">{headlineLabel}</p>
+                <p className="text-xs uppercase tracking-wide text-ink-400">{headlineLabel}</p>
                 <p className="font-display text-3xl font-semibold tracking-tight text-ink-50">
                   {headlineValue}
                 </p>
@@ -167,7 +167,7 @@ export function NetworkEntityHeader({
                     {formatPct(priceChange24h)} 24h
                   </p>
                 )}
-                <p className="mt-1 text-[10px] text-ink-500">Latest data · 15 min delay</p>
+                <p className="mt-1 text-[10px] text-ink-400">Latest data · 15 min delay</p>
               </div>
             )}
             <div className="flex flex-wrap gap-2">

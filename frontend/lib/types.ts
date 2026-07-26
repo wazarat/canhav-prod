@@ -1904,38 +1904,107 @@ export interface CreditTagMetrics {
   fixedIncome?: FixedIncomeMetrics | null;
 }
 
+/** Curated interest-rate-model params (flagship market) for the kink chart. */
+export interface LendingRateModel {
+  /** Optimal utilization / kink point (0-100). */
+  optimalUsagePct: number;
+  /** Base variable borrow rate at 0% utilization (%). */
+  baseRatePct: number;
+  /** Rate slope up to the kink (%). */
+  slope1Pct: number;
+  /** Rate slope beyond the kink (%). */
+  slope2Pct: number;
+  /** Reserve factor applied to the supply curve (%). */
+  reserveFactorPct?: number | null;
+  /** Which market these params describe (e.g. "USDC, Ethereum core"). */
+  marketLabel?: string | null;
+}
+
 /** "Lending" tag metrics (Tier 1 live where mapped, else curated). */
 export interface LendingMarketMetrics {
-  totalSuppliedUsd?: Sourced<number | null>; // DefiLlama TVL
-  totalBorrowsUsd?: Sourced<number | null>;
-  utilizationPct?: Sourced<number | null>;
+  totalSuppliedUsd?: Sourced<number | null>; // DefiLlama TVL (spec L1)
+  totalBorrowsUsd?: Sourced<number | null>; // spec L2
+  utilizationPct?: Sourced<number | null>; // spec L4
   /** Supplied minus borrowed (USD) — derived. */
   availableLiquidityUsd?: Sourced<number | null>;
-  supplyApyPct?: Sourced<number | null>;
-  borrowApyPct?: Sourced<number | null>;
-  collateralAssets?: string[]; // curated
-  isolatedMarketCount?: number | null; // curated (Morpho-style)
-  oracles?: string[]; // curated
+  supplyApyPct?: Sourced<number | null>; // blended supply APY (spec L5+L6)
+  borrowApyPct?: Sourced<number | null>; // blended borrow APY (spec L7)
+  supplyApyBasePct?: Sourced<number | null>; // spec L5
+  supplyApyRewardPct?: Sourced<number | null>; // spec L6
+  borrowApyVariablePct?: Sourced<number | null>; // spec L7
+  borrowApyStablePct?: Sourced<number | null>; // spec L8 (legacy stable rate)
+  netInterestMarginPct?: Sourced<number | null>; // spec L9, derived (L5-L7)
+  maxLtvPct?: Sourced<number | null>; // spec L10, size-weighted max LTV
+  collateralAssets?: string[]; // curated (spec L10)
+  loanAssets?: string[]; // spec L11
+  isolatedMarketCount?: number | null; // curated (Morpho-style, spec L12)
+  oracles?: string[]; // curated (spec L13)
+  badDebtUsd?: Sourced<number | null>; // spec L14, Tier 2 (Chaos Labs)
+  liquidations30d?: Liquidations30d | null; // spec L15
+  liquidationThresholdPct?: Sourced<number | null>; // spec L16
+  liquidationBonusPct?: Sourced<number | null>; // spec L17
+  reserveFactorPct?: Sourced<number | null>; // spec L18
+  supplyCapUsd?: Sourced<number | null>; // spec L19
+  borrowCapUsd?: Sourced<number | null>; // spec L19
+  eModeCategories?: string[]; // spec L20
+  healthFactorNote?: string | null; // spec L21, Tier 2 curated summary
+  governanceDetail?: GovernanceActivityDetail | null; // spec L22
+  /** Curated interest-rate-model params for the utilization kink chart. */
+  rateModel?: LendingRateModel | null;
+  priceToSalesRatio?: Sourced<number | null>; // spec L24, Tier 2
+  activeUsers?: Sourced<number | null>; // spec L25, Tier 2 (DAU/MAU)
 }
 
 /** "Leveraged Yield" tag metrics. */
 export interface LeveragedYieldMetrics {
-  tvlUsd?: Sourced<number | null>; // DefiLlama
-  maxLeverageX?: number | null; // curated (e.g. 10x Gearbox, 7x Extra)
-  borrowApyPct?: Sourced<number | null>;
-  supportedStrategies?: string[]; // curated (Curve, Convex, Velodrome…)
-  borrowModel?: string | null; // curated ("Credit Accounts", "pay-as-you-earn")
-  integratedProtocols?: string[]; // curated
+  tvlUsd?: Sourced<number | null>; // DefiLlama (spec LY1)
+  maxLeverageX?: number | null; // curated (e.g. 10x Gearbox, 7x Extra; spec LY2)
+  borrowApyPct?: Sourced<number | null>; // spec LY3, Tier 2 (poolsBorrow)
+  loopingApyNetPct?: Sourced<number | null>; // spec LY4, derived
+  supportedStrategies?: string[]; // curated (Curve, Convex, Velodrome…; spec LY5)
+  borrowModel?: string | null; // curated ("Credit Accounts", "pay-as-you-earn"; spec LY7)
+  integratedProtocols?: string[]; // curated (spec LY6)
+  liquidationThresholdPct?: Sourced<number | null>; // spec LY8
+  activePositions?: Sourced<number | null>; // spec LY9, Tier 2 (Dune)
+  outstandingDebtUsd?: Sourced<number | null>; // spec LY10, Tier 2
+  liquidations30d?: Liquidations30d | null; // spec LY11
+}
+
+/** A single live fixed-income market row (feeds the yield curve). */
+export interface FixedIncomeMarketRow {
+  name: string;
+  address: string;
+  chainId: number;
+  /** ISO date of market expiry. */
+  expiry: string;
+  impliedApyPct: number | null;
+  underlyingApyPct: number | null;
+  liquidityUsd: number | null;
+  ptPriceInUnderlying: number | null;
+  ytPriceInUnderlying: number | null;
 }
 
 /** "Fixed Income" tag metrics. */
 export interface FixedIncomeMetrics {
-  tvlUsd?: Sourced<number | null>; // DefiLlama
-  fixedApyPct?: Sourced<number | null>; // curated/derived (PT implied APY)
+  tvlUsd?: Sourced<number | null>; // DefiLlama (spec FI1)
+  fixedApyPct?: Sourced<number | null>; // curated/derived (PT implied APY; spec FI3)
   impliedYieldPct?: Sourced<number | null>; // curated (YT)
-  maturities?: string[]; // curated (3m, 6m, …)
-  mechanism?: string | null; // curated ("PT/YT split", "fCash", "zero-coupon")
-  markets?: number | null; // curated count of active markets
+  underlyingApyPct?: Sourced<number | null>; // spec FI4
+  impliedVsUnderlyingSpreadPct?: Sourced<number | null>; // spec FI5, derived
+  ytApyPct?: Sourced<number | null>; // spec FI6
+  ptPriceInUnderlying?: Sourced<number | null>; // spec FI7 (representative market)
+  ytPriceInUnderlying?: Sourced<number | null>; // spec FI8 (representative market)
+  maturities?: string[]; // curated (3m, 6m, …; spec FI9)
+  daysToMaturity?: number[] | null; // spec FI10, derived
+  notionalOutstandingUsd?: Sourced<number | null>; // spec FI11, derived
+  poolLiquidityUsd?: Sourced<number | null>; // spec FI12 (largest market)
+  volume24hUsd?: Sourced<number | null>; // spec FI13
+  mechanism?: string | null; // curated ("PT/YT split", "fCash", "zero-coupon"; spec FI14)
+  underlyingYieldSource?: string | null; // spec FI15, curated
+  fcashImpliedRatePct?: Sourced<number | null>; // spec FI17, Notional only
+  markets?: number | null; // curated count of active markets (spec FI2)
+  /** Live per-market rows for the yield curve (Pendle-mechanism entities). */
+  perMarket?: FixedIncomeMarketRow[] | null;
 }
 
 /* -------------------------------------------------------------------------- */

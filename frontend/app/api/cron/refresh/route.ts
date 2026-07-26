@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 import { fetchReserveRatesForSlug, hasAave, isAaveReserveSlug, aTokenAddressForSlug } from "@/lib/server/aave";
+import { fetchAaveMarketOverview } from "@/lib/server/aaveMainnet";
 import { fetchTotalSupply, fetchTotalValueLocked, hasAlchemy, probeErc20Standard } from "@/lib/server/alchemy";
 import {
   coinIdForSlug,
@@ -11,8 +12,10 @@ import {
   CoinGeckoCronCache,
   type TokenResolution,
 } from "@/lib/server/coingecko";
+import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
 import {
   aggregateLendingBorrow,
+  aggregateSupplySideYield,
   fetchLlamaBorrowPools,
   fetchLlamaCoinChart,
   fetchLlamaCoinPercentage,
@@ -1576,98 +1579,16 @@ export async function GET(req: Request): Promise<NextResponse> {
   touchedSlugs.push(...aaveOverlay.touched);
   const aaveResults = aaveOverlay.results;
 
-  // --- Credit networks: DeFi Llama live metrics ----------------------------
-  // For each network tagged sector "Credit", overlay live supply/borrow/APY/
-  // utilization (yields /poolsBorrow), protocol TVL, and fees/revenue onto the
-  // curated `Lending` block (field name retained per migration). Curated
-  // string/array fields (risk params, oracles, bad debt, audit) are preserved.
-  const lendingItems = items.filter(
-    (it) =>
-      isNetworkCategory(String(it.Category ?? "")) &&
-      String(it.Sector ?? "") === "Credit" &&
-      llamaLendingProjectForSlug(String(it.Slug ?? "")) !== null,
-  );
-  const lendingResults: { slug: string; tvlUsd: number | null; utilizationPct: number | null }[] =
-    [];
-  if (lendingItems.length > 0) {
-    const sourced = (value: number | null) => ({
-      value,
-      dataSource: "live" as const,
-      sourceLabel: "DeFi Llama",
-      updatedAt: nowIso(),
-    });
-    const borrowPools = await fetchLlamaBorrowPools();
-    for (const item of lendingItems) {
-      const slug = String(item.Slug ?? "");
-      const borrow = aggregateLendingBorrow(slug, borrowPools);
-      const tvl = await fetchLlamaProtocolTvl(slug, 1);
-      const tvlUsd = tvl && tvl.points.length > 0 ? tvl.points[tvl.points.length - 1].value : null;
-      const feesRev = item.ProtocolFeesRevenue ?? null;
-
-      const supplyApy = borrow?.supplyApyPct ?? null;
-      const borrowApy = borrow?.borrowApyPct ?? null;
-      const nim =
-        supplyApy != null && borrowApy != null ? borrowApy - supplyApy : null;
-
-      const live: Record<string, unknown> = {
-        ...(tvlUsd != null ? { tvlUsd: sourced(tvlUsd) } : {}),
-        ...(borrow?.totalBorrowUsd != null
-          ? { totalBorrowsUsd: sourced(borrow.totalBorrowUsd) }
-          : {}),
-        ...(borrow?.utilizationPct != null
-          ? { utilizationPct: sourced(borrow.utilizationPct) }
-          : {}),
-        ...(tvlUsd != null && borrow?.totalBorrowUsd != null
-          ? {
-              availableLiquidityUsd: {
-                value: Math.max(0, tvlUsd - borrow.totalBorrowUsd),
-                dataSource: "derived" as const,
-                sourceLabel: "Derived",
-                updatedAt: nowIso(),
-              },
-            }
-          : {}),
-        ...(supplyApy != null ? { supplyApyPct: sourced(supplyApy) } : {}),
-        ...(borrowApy != null ? { borrowApyPct: sourced(borrowApy) } : {}),
-        ...(nim != null ? { netInterestMarginPct: sourced(nim) } : {}),
-        ...(feesRev?.revenue30dUsd != null
-          ? { revenue30dUsd: sourced(feesRev.revenue30dUsd) }
-          : {}),
-        ...(feesRev?.fees30dUsd != null ? { fees30dUsd: sourced(feesRev.fees30dUsd) } : {}),
-        ...(feesRev?.revenue30dUsd != null
-          ? { revenueAnnualizedUsd: sourced(feesRev.revenue30dUsd * 12) }
-          : {}),
-        ...(feesRev?.fees30dUsd != null
-          ? { feesAnnualizedUsd: sourced(feesRev.fees30dUsd * 12) }
-          : {}),
-      };
-
-      if (Object.keys(live).length > 0) {
-        // Preserve curated fields; overlay live (Sourced) fields.
-        item.Lending = { ...(item.Lending ?? {}), ...live };
-        // Headline TVL on the network card mirrors the lending TVL when present.
-        if (tvlUsd != null) {
-          item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
-        }
-        // Promote headline supply APY to overview (except Aave — GHO supply APY handled above).
-        if (slug !== "aave" && supplyApy != null) {
-          item.CurrentScale = { ...(item.CurrentScale ?? {}), aprPct: supplyApy };
-          item.ScaleLabels = { ...(item.ScaleLabels ?? {}), apr: "Supply APY" };
-        }
-        item.UpdatedAt = nowIso();
-        await persist(item);
-        updated += 1;
-        lendingResults.push({ slug, tvlUsd, utilizationPct: borrow?.utilizationPct ?? null });
-      }
-    }
-  }
-
   // --- Credit tag-metrics overlay: per-tag live blocks (creditTagMetrics) ---
   // For every Credit network (primary or secondary), populate the tag-keyed
-  // `CreditTagMetrics` block from its `Tags`: Lending (supply/borrow/util/APY via
-  // /poolsBorrow + protocol TVL), Leveraged Yield (TVL), Fixed Income (TVL).
-  // Curated fields are preserved; the Morpho-specific overlay below spreads
-  // richer tag data on top (this pass runs first).
+  // `CreditTagMetrics` block: Lending (supplied via protocol TVL, supply APY via
+  // the free /pools endpoint, borrow-side via /poolsBorrow when the Pro key
+  // lands), Leveraged Yield (TVL), Fixed Income (TVL). Since M4.1 (CAN-70) this
+  // is the ONLY lending metrics writer; the legacy `Lending` numeric overlay is
+  // retired and `Lending` keeps editorial fields only. Tags resolve through the
+  // canonical-lender fallback so canonical entities with empty KV Tags cannot
+  // silently skip (the pre-M4 aave gap). Curated fields are preserved; the
+  // Morpho/Kamino chain-native overlays below spread richer data on top.
   const creditItems = items.filter(
     (it) =>
       isNetworkCategory(String(it.Category ?? "")) &&
@@ -1683,9 +1604,16 @@ export async function GET(req: Request): Promise<NextResponse> {
       updatedAt: nowIso(),
     });
     const borrowPools = await fetchLlamaBorrowPools();
+    const supplyPools = await fetchLlamaPools();
     for (const item of creditItems) {
       const slug = String(item.Slug ?? "");
-      const tags: string[] = Array.isArray(item.Tags) ? item.Tags : [];
+      const rawTags: string[] = Array.isArray(item.Tags) ? item.Tags : [];
+      const tags =
+        rawTags.length > 0
+          ? rawTags
+          : CANONICAL_LENDING_SLUGS.includes(slug as (typeof CANONICAL_LENDING_SLUGS)[number])
+            ? ["Lending"]
+            : [];
       if (tags.length === 0) continue;
 
       const tvl = await fetchLlamaProtocolTvl(slug, 1);
@@ -1697,18 +1625,26 @@ export async function GET(req: Request): Promise<NextResponse> {
 
       if (tags.includes("Lending")) {
         const borrow = aggregateLendingBorrow(slug, borrowPools);
+        const supplySide = aggregateSupplySideYield(slug, supplyPools);
+        const supplyApy = borrow?.supplyApyPct ?? supplySide?.weightedSupplyApyPct ?? null;
+        const borrowApy = borrow?.borrowApyPct ?? null;
         const lendingBlock: Record<string, unknown> = { ...(ctm.lending ?? {}) };
         if (tvlUsd != null) lendingBlock.totalSuppliedUsd = sourced(tvlUsd);
         if (borrow?.totalBorrowUsd != null)
           lendingBlock.totalBorrowsUsd = sourced(borrow.totalBorrowUsd);
         if (borrow?.utilizationPct != null)
           lendingBlock.utilizationPct = sourced(borrow.utilizationPct);
-        if (borrow?.supplyApyPct != null) lendingBlock.supplyApyPct = sourced(borrow.supplyApyPct);
-        if (borrow?.borrowApyPct != null) lendingBlock.borrowApyPct = sourced(borrow.borrowApyPct);
-        if (
-          tvlUsd != null &&
-          borrow?.totalBorrowUsd != null
-        ) {
+        if (supplyApy != null) lendingBlock.supplyApyPct = sourced(supplyApy);
+        if (borrowApy != null) lendingBlock.borrowApyPct = sourced(borrowApy);
+        if (supplyApy != null && borrowApy != null) {
+          lendingBlock.netInterestMarginPct = {
+            value: borrowApy - supplyApy,
+            dataSource: "derived",
+            sourceLabel: "Derived",
+            updatedAt: nowIso(),
+          };
+        }
+        if (tvlUsd != null && borrow?.totalBorrowUsd != null) {
           lendingBlock.availableLiquidityUsd = {
             value: Math.max(0, tvlUsd - borrow.totalBorrowUsd),
             dataSource: "derived",
@@ -1716,9 +1652,69 @@ export async function GET(req: Request): Promise<NextResponse> {
             updatedAt: nowIso(),
           };
         }
+        // Flagship entity: overlay the Aave V3 Ethereum core on-chain overview
+        // (M4/CAN-69) so the L-rows persist in KV between renders.
+        if (slug === "aave") {
+          const overview = await fetchAaveMarketOverview().catch(() => null);
+          if (overview) {
+            const onchain = (value: number | null, kind: "live" | "derived" = "live") => ({
+              value,
+              dataSource: kind,
+              sourceLabel: "Aave V3 Ethereum core (on-chain)",
+              updatedAt: overview.updatedAt,
+            });
+            lendingBlock.totalSuppliedUsd = onchain(overview.totalSuppliedUsd);
+            lendingBlock.totalBorrowsUsd = onchain(overview.totalBorrowedUsd);
+            lendingBlock.utilizationPct = onchain(overview.utilizationPct, "derived");
+            if (overview.weightedSupplyApyPct != null)
+              lendingBlock.supplyApyPct = onchain(overview.weightedSupplyApyPct, "derived");
+            if (overview.weightedVariableBorrowApyPct != null) {
+              lendingBlock.borrowApyPct = onchain(overview.weightedVariableBorrowApyPct, "derived");
+              lendingBlock.borrowApyVariablePct = onchain(
+                overview.weightedVariableBorrowApyPct,
+                "derived",
+              );
+            }
+            if (overview.weightedStableBorrowApyPct != null)
+              lendingBlock.borrowApyStablePct = onchain(overview.weightedStableBorrowApyPct, "derived");
+            if (overview.maxLtvPct != null)
+              lendingBlock.maxLtvPct = onchain(overview.maxLtvPct, "derived");
+            if (overview.weightedLiquidationThresholdPct != null)
+              lendingBlock.liquidationThresholdPct = onchain(
+                overview.weightedLiquidationThresholdPct,
+                "derived",
+              );
+            if (overview.weightedLiquidationBonusPct != null)
+              lendingBlock.liquidationBonusPct = onchain(
+                overview.weightedLiquidationBonusPct,
+                "derived",
+              );
+            if (overview.weightedReserveFactorPct != null)
+              lendingBlock.reserveFactorPct = onchain(overview.weightedReserveFactorPct, "derived");
+            if (overview.supplyCapUsd != null)
+              lendingBlock.supplyCapUsd = onchain(overview.supplyCapUsd, "derived");
+            if (overview.borrowCapUsd != null)
+              lendingBlock.borrowCapUsd = onchain(overview.borrowCapUsd, "derived");
+            if (overview.collateralAssets.length > 0)
+              lendingBlock.collateralAssets = overview.collateralAssets;
+            if (overview.loanAssets.length > 0) lendingBlock.loanAssets = overview.loanAssets;
+            lendingBlock.isolatedMarketCount = overview.isolatedMarketsCount;
+          }
+        }
         if (Object.keys(lendingBlock).length > 0) {
           ctm.lending = lendingBlock;
           wrote = true;
+        }
+        // Headline promotions previously done by the legacy Lending pass.
+        if (llamaLendingProjectForSlug(slug) !== null) {
+          if (tvlUsd != null) {
+            item.CurrentScale = { ...(item.CurrentScale ?? {}), tvlUsd };
+          }
+          // Except Aave: its headline APR is the GHO supply APY (on-chain pass).
+          if (slug !== "aave" && supplyApy != null) {
+            item.CurrentScale = { ...(item.CurrentScale ?? {}), aprPct: supplyApy };
+            item.ScaleLabels = { ...(item.ScaleLabels ?? {}), apr: "Supply APY" };
+          }
         }
       }
       if (tags.includes("Leveraged Yield") && tvlUsd != null) {
@@ -2300,7 +2296,6 @@ export async function GET(req: Request): Promise<NextResponse> {
     updated,
     results,
     aave: aaveResults,
-    lending: lendingResults,
     creditTags: creditTagResults,
     staking: stakingResults,
     liquidity: liquidityResults,

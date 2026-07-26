@@ -218,6 +218,153 @@ export async function fetchPendleRepresentativePtYtPrices(
   };
 }
 
+/* ------------------------- M4 (CAN-64) additions -------------------------- */
+
+/** One active market with everything the FI rows + yield curve need. */
+export interface PendleMarketDetail {
+  name: string;
+  address: string;
+  chainId: number;
+  /** ISO expiry date. */
+  expiry: string;
+  liquidityUsd: number | null;
+  /** Implied fixed APY, percent. */
+  impliedApyPct: number | null;
+  /** Underlying (variable) APY, percent. */
+  underlyingApyPct: number | null;
+  ptPriceUsd: number | null;
+  ytPriceUsd: number | null;
+  /** Underlying asset symbol (e.g. "sUSDS", "stETH"). */
+  underlyingSymbol: string | null;
+  volume24hUsd: number | null;
+  /** YT floating (long-yield) APY, percent. */
+  ytFloatingApyPct: number | null;
+  /** PT discount to the underlying (0..1); PT-in-underlying = 1 - discount. */
+  ptDiscount: number | null;
+  /** Total PT outstanding, in PT units (notional = totalPt * ptPriceUsd). */
+  totalPt: number | null;
+}
+
+interface PendleDetailedMarketRow extends PendleListedMarketRow {
+  address?: string;
+  chainId?: number;
+  expiry?: string | null;
+  proName?: string;
+  impliedApy?: number | string | null;
+  underlyingApy?: number | string | null;
+  ytFloatingApy?: number | string | null;
+  ptDiscount?: number | string | null;
+  totalPt?: number | string | null;
+  underlyingAsset?: { symbol?: string } | null;
+  tradingVolume?: { usd?: number | string | null } | null;
+  pt?: (PendleListedTokenRow & { price?: { usd?: number | string | null } | null }) | null;
+  yt?: (PendleListedTokenRow & { price?: { usd?: number | string | null } | null }) | null;
+}
+
+/**
+ * All ACTIVE markets across the covered chains with per-market detail
+ * (expiry, USD liquidity, implied + underlying APY, PT/YT unit prices).
+ * This is the yield-curve dataset (spec FI3/FI4/FI7-FI10/FI12); the paginated
+ * /v1/{chainId}/markets list is the only endpoint carrying pt/yt prices.
+ */
+export async function fetchPendleMarketsDetailed(
+  revalidate?: number,
+): Promise<PendleMarketDetail[] | null> {
+  const responses = await Promise.all(
+    PENDLE_CHAIN_IDS.map((chainId) =>
+      fetchJson(`${PENDLE_BASE}/v1/${chainId}/markets?limit=100`, { revalidate }).then(
+        (r) => ({ chainId, ...r }),
+      ),
+    ),
+  );
+
+  const out: PendleMarketDetail[] = [];
+  let anyOk = false;
+  for (const { chainId, status, data } of responses) {
+    if (status !== 200) continue;
+    const results = (data as PendleListedMarketsResponse | null)?.results as
+      | PendleDetailedMarketRow[]
+      | undefined;
+    if (!Array.isArray(results)) continue;
+    anyOk = true;
+    for (const m of results) {
+      if (m?.isActive === false) continue;
+      if (!m?.address || !m?.expiry) continue;
+      const implied = num(m.impliedApy);
+      const underlying = num(m.underlyingApy);
+      out.push({
+        // The market's own name/symbol is the generic LP token ("PENDLE-LPT");
+        // the PT symbol ("PT-sUSDS-26NOV2026") is the human-meaningful label.
+        name: m.pt?.symbol ?? m.proName ?? m.symbol ?? m.address,
+        address: m.address,
+        chainId: m.chainId ?? chainId,
+        expiry: m.expiry,
+        liquidityUsd: num(m.liquidity?.usd),
+        impliedApyPct: implied != null ? implied * 100 : null,
+        underlyingApyPct: underlying != null ? underlying * 100 : null,
+        ptPriceUsd: num(m.pt?.price?.usd),
+        ytPriceUsd: num(m.yt?.price?.usd),
+        underlyingSymbol: m.underlyingAsset?.symbol ?? null,
+        volume24hUsd: num(m.tradingVolume?.usd),
+        ytFloatingApyPct: num(m.ytFloatingApy) != null ? (num(m.ytFloatingApy) as number) * 100 : null,
+        ptDiscount: num(m.ptDiscount),
+        totalPt: num(m.totalPt),
+      });
+    }
+  }
+  return anyOk ? out : null;
+}
+
+export interface PendleMarketHistoryPoint {
+  /** ISO date. */
+  date: string;
+  impliedApyPct: number | null;
+  underlyingApyPct: number | null;
+  tvlUsd: number | null;
+}
+
+interface PendleHistoryResponse {
+  results?: {
+    timestamp?: string;
+    impliedApy?: number | string | null;
+    underlyingApy?: number | string | null;
+    tvl?: number | string | null;
+  }[];
+}
+
+/**
+ * Daily implied/underlying APY history for one market (v2 historical-data,
+ * shape verified live 2026-07-26). Feeds the implied-vs-underlying spread
+ * chart; PT price history is NOT exposed, so price-convergence series are
+ * derived from implied APY + days-to-maturity by the caller.
+ */
+export async function fetchPendleMarketHistory(
+  chainId: number,
+  address: string,
+  revalidate?: number,
+): Promise<PendleMarketHistoryPoint[] | null> {
+  const { status, data } = await fetchJson(
+    `${PENDLE_BASE}/v2/${chainId}/markets/${address}/historical-data?time_frame=day`,
+    { revalidate },
+  );
+  if (status !== 200) return null;
+  const results = (data as PendleHistoryResponse | null)?.results;
+  if (!Array.isArray(results)) return null;
+  const out: PendleMarketHistoryPoint[] = [];
+  for (const r of results) {
+    if (!r?.timestamp) continue;
+    const implied = num(r.impliedApy);
+    const underlying = num(r.underlyingApy);
+    out.push({
+      date: r.timestamp.slice(0, 10),
+      impliedApyPct: implied != null ? implied * 100 : null,
+      underlyingApyPct: underlying != null ? underlying * 100 : null,
+      tvlUsd: num(r.tvl),
+    });
+  }
+  return out.length > 0 ? out : null;
+}
+
 /**
  * Map Pendle live metrics onto the Credit sector's `fixedIncome` tag block
  * (CreditTagMetrics.fixedIncome → FixedIncomeMetrics). Returns a plain inferred

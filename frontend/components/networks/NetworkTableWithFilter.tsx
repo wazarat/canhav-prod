@@ -37,12 +37,20 @@ const CATEGORY_FILTERS: { label: string; value: MemberCoinCategory | "all" }[] =
   { label: "RWAs", value: "RWA" },
 ];
 
+/** Server-fetched per-slug series for the Credit rows (CAN-47). */
+export interface CreditRowSeries {
+  values: number[];
+  wowPct: number | null;
+}
+
 interface NetworkTableWithFilterProps {
   profiles: NetworkProfile[];
   showStatus?: boolean;
   emptyHint?: string;
   /** Preselect a sector (e.g. from a `/networks?sector=Credit` deep link). */
   initialSector?: string;
+  /** slug -> 8d TVL series; enables the Credit column set when that sector is active. */
+  creditSparklines?: Record<string, CreditRowSeries>;
 }
 
 export function NetworkTableWithFilter({
@@ -50,6 +58,7 @@ export function NetworkTableWithFilter({
   showStatus = false,
   emptyHint,
   initialSector,
+  creditSparklines,
 }: NetworkTableWithFilterProps) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<MemberCoinCategory | "all">("all");
@@ -232,6 +241,8 @@ export function NetworkTableWithFilter({
         profiles={filtered}
         showStatus={showStatus}
         coinCategoryFilter={category}
+        creditColumns={sector === "Credit"}
+        creditSparklines={creditSparklines}
         emptyHint={
           filtered.length === 0 && profiles.length > 0
             ? "No networks match your search."

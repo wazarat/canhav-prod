@@ -534,48 +534,6 @@ function CuratedRow({
   );
 }
 
-export function LendingMetricTiles({
-  lending,
-  syncedAt,
-}: {
-  lending: LendingMetrics;
-  syncedAt?: string | null;
-}) {
-  const hasLive =
-    lending.tvlUsd ||
-    lending.totalBorrowsUsd ||
-    lending.utilizationPct ||
-    lending.supplyApyPct ||
-    lending.borrowApyPct ||
-    lending.activeUsers;
-
-  return (
-    <>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <MetricCard label="TVL / deposits" sourced={lending.tvlUsd} kind="usd" />
-        <MetricCard label="Total borrows" sourced={lending.totalBorrowsUsd} kind="usd" />
-        <MetricCard label="Utilization" sourced={lending.utilizationPct} kind="pct" />
-        <MetricCard label="Available liquidity" sourced={lending.availableLiquidityUsd} kind="usd" />
-        <MetricCard label="Supply APY" sourced={lending.supplyApyPct} kind="pct" />
-        <MetricCard label="Borrow APY" sourced={lending.borrowApyPct} kind="pct" />
-        <MetricCard label="Net interest margin" sourced={lending.netInterestMarginPct} kind="pct" />
-        <MetricCard label="Revenue (30d)" sourced={lending.revenue30dUsd} kind="usd" />
-        <MetricCard label="Fees (30d)" sourced={lending.fees30dUsd} kind="usd" />
-        <MetricCard label="Revenue (annualized)" sourced={lending.revenueAnnualizedUsd} kind="usd" />
-        <MetricCard label="Fees (annualized)" sourced={lending.feesAnnualizedUsd} kind="usd" />
-        <MetricCard label="Active users (30d)" sourced={lending.activeUsers} kind="count" />
-        <MetricCard label="Unique borrowers (30d)" sourced={lending.uniqueBorrowers30d} kind="count" />
-      </div>
-      {!hasLive && (
-        <p className="text-xs text-ink-500">
-          Live supply/borrow metrics populate on the next DeFi Llama refresh
-          {syncedAt ? ` (last sync ${new Date(syncedAt).toLocaleString()})` : ""}.
-        </p>
-      )}
-    </>
-  );
-}
-
 export function LendingAssetCoveragePanel({ lending }: { lending: LendingMetrics }) {
   const dep = lending.deployment;
 
@@ -642,21 +600,6 @@ export function LendingAssetCoveragePanel({ lending }: { lending: LendingMetrics
   );
 }
 
-export function LendingMetricsSection({ lending }: { lending?: LendingMetrics | null }) {
-  if (!lending) return null;
-
-  return (
-    <section id="lending" className="scroll-mt-24 space-y-4">
-      <SectionHeading
-        title="Lending metrics"
-        subtitle="Live supply/borrow data (DeFi Llama) plus curated risk and deployment facts."
-      />
-      <LendingMetricTiles lending={lending} />
-      <LendingAssetCoveragePanel lending={lending} />
-    </section>
-  );
-}
-
 function TagMetricRow({ label, value }: { label: string; value: string | number | null | undefined }) {
   if (value == null || value === "") return null;
   const text = typeof value === "number" ? value.toLocaleString() : value;
@@ -665,95 +608,6 @@ function TagMetricRow({ label, value }: { label: string; value: string | number 
       <p className="text-xs font-medium uppercase tracking-wide text-ink-500">{label}</p>
       <p className="mt-1 text-sm leading-relaxed text-ink-300">{text}</p>
     </div>
-  );
-}
-
-export function CreditTagMetricsSection({
-  tags,
-  metrics,
-}: {
-  tags?: CreditTag[];
-  metrics?: CreditTagMetrics | null;
-}) {
-  if (!metrics || !tags?.length) return null;
-
-  const panels = tags
-    .map((tag) => {
-      const key = CREDIT_TAG_METRICS_KEY[tag];
-      const block = metrics[key];
-      if (!block) return null;
-
-      if (key === "lending") {
-        const m = block as NonNullable<CreditTagMetrics["lending"]>;
-        return (
-          <DataPanel key={tag} title={tag}>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              <MetricCard label="Total supplied" sourced={m.totalSuppliedUsd} kind="usd" />
-              <MetricCard label="Total borrows" sourced={m.totalBorrowsUsd} kind="usd" />
-              <MetricCard label="Utilization" sourced={m.utilizationPct} kind="pct" />
-              <MetricCard label="Available liquidity" sourced={m.availableLiquidityUsd} kind="usd" />
-              <MetricCard label="Supply APY" sourced={m.supplyApyPct} kind="pct" />
-              <MetricCard label="Borrow APY" sourced={m.borrowApyPct} kind="pct" />
-            </div>
-            <div className="mt-3 divide-y divide-ink-800/60">
-              <TagMetricRow label="Isolated markets" value={m.isolatedMarketCount} />
-              <CuratedRow label="Collateral assets" chips={m.collateralAssets} />
-              <CuratedRow label="Oracles" chips={m.oracles} />
-            </div>
-          </DataPanel>
-        );
-      }
-
-      if (key === "leveragedYield") {
-        const m = block as NonNullable<CreditTagMetrics["leveragedYield"]>;
-        return (
-          <DataPanel key={tag} title={tag}>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              <MetricCard label="TVL" sourced={m.tvlUsd} kind="usd" />
-              <MetricCard label="Borrow APY" sourced={m.borrowApyPct} kind="pct" />
-            </div>
-            <div className="mt-3 divide-y divide-ink-800/60">
-              <TagMetricRow label="Max leverage" value={m.maxLeverageX != null ? `${m.maxLeverageX}x` : null} />
-              <TagMetricRow label="Borrow model" value={m.borrowModel} />
-              <CuratedRow label="Supported strategies" chips={m.supportedStrategies} />
-              <CuratedRow label="Integrated protocols" chips={m.integratedProtocols} />
-            </div>
-          </DataPanel>
-        );
-      }
-
-      if (key === "fixedIncome") {
-        const m = block as NonNullable<CreditTagMetrics["fixedIncome"]>;
-        return (
-          <DataPanel key={tag} title={tag}>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              <MetricCard label="TVL" sourced={m.tvlUsd} kind="usd" />
-              <MetricCard label="Fixed APY" sourced={m.fixedApyPct} kind="pct" />
-              <MetricCard label="Implied yield" sourced={m.impliedYieldPct} kind="pct" />
-            </div>
-            <div className="mt-3 divide-y divide-ink-800/60">
-              <TagMetricRow label="Active markets" value={m.markets} />
-              <TagMetricRow label="Mechanism" value={m.mechanism} />
-              <CuratedRow label="Maturities" chips={m.maturities} />
-            </div>
-          </DataPanel>
-        );
-      }
-
-      return null;
-    })
-    .filter(Boolean);
-
-  if (panels.length === 0) return null;
-
-  return (
-    <section id="credit-tags" className="scroll-mt-24 space-y-4">
-      <SectionHeading
-        title="Tag-specific metrics"
-        subtitle="Curated metrics for each credit tag on this network."
-      />
-      <div className="space-y-4">{panels}</div>
-    </section>
   );
 }
 

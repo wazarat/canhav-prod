@@ -288,8 +288,9 @@ export function filterTagsForSector(profile: NetworkProfile, sector: string): st
     if (CANONICAL_LENDING_SLUG_SET.has(slug)) {
       return ["Lending"];
     }
-    const tags = profile.tags ?? (profile.subSector ? [profile.subSector] : []);
-    return tags.filter((t) => t !== "Lending");
+    // M4.1 (CAN-70): "Lending" is a legitimate filter tag for any Credit
+    // entity (store normalization already scopes the stale-tag guard).
+    return profile.tags ?? (profile.subSector ? [profile.subSector] : []);
   }
   if (sector === "DEX") {
     return profile.dexSubSector ? [profile.dexSubSector] : [];

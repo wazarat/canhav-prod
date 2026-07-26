@@ -349,7 +349,11 @@ function normalizeNetworkTaxonomy(item: Record<string, unknown>): {
     : item.SubSector
       ? [String(item.SubSector)]
       : [];
-  tags = tags.filter((t) => t !== "Lending");
+  // M4.1 (CAN-70): "Lending" is a legitimate tag for ANY Credit-affiliated
+  // entity (justlend, venus, maple, kamino, fluid...), not just the canonical
+  // five. The stale-tag guard now applies only outside the Credit sector.
+  const creditAffiliated = sector === "Credit" || rawSecondary?.includes("Credit") === true;
+  if (!creditAffiliated) tags = tags.filter((t) => t !== "Lending");
 
   return {
     sector,

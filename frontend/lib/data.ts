@@ -277,7 +277,8 @@ function enrichNetworksWithTvl(
   return networks.map((network) => {
     if (network.currentScale.tvlUsd != null) return network;
 
-    const lendingTvl = network.lending?.tvlUsd?.value;
+    const lendingTvl =
+      network.creditTagMetrics?.lending?.totalSuppliedUsd?.value ?? network.lending?.tvlUsd?.value;
     if (lendingTvl != null && lendingTvl > 0) {
       return { ...network, currentScale: { ...network.currentScale, tvlUsd: lendingTvl } };
     }

@@ -60,7 +60,7 @@ export function EmptyState({
         <p className="text-sm font-medium text-ink-300">{title}</p>
         {chipEl}
       </div>
-      {note ? <p className="max-w-prose text-xs text-ink-500">{note}</p> : null}
+      {note ? <p className="max-w-prose text-xs text-ink-400">{note}</p> : null}
     </div>
   );
 }

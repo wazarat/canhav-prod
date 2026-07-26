@@ -150,7 +150,7 @@ export function MetricCard({
   const body = (
     <>
       <div className="flex items-start justify-between gap-2">
-        <p className="flex items-center gap-1 text-xs uppercase tracking-wide text-ink-500">
+        <p className="flex items-center gap-1 text-xs uppercase tracking-wide text-ink-400">
           {label}
           {info ? (
             <Tooltip content={info} className="pointer-events-auto">
@@ -186,11 +186,11 @@ export function MetricCard({
             {change.pct >= 0 ? "+" : ""}
             {change.pct.toFixed(2)}%
           </span>
-          <span className="text-[10px] text-ink-500">{change.label ?? "7d"}</span>
+          <span className="text-[10px] text-ink-400">{change.label ?? "7d"}</span>
         </div>
       ) : null}
 
-      <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-ink-500">
+      <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-ink-400">
         <span>{footer}</span>
         {asOfIso ? (
           <span className={cn(stale ? "font-medium text-amber-400" : "text-ink-600")}>

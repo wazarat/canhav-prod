@@ -1,18 +1,20 @@
 import { Suspense, type ReactNode } from "react";
 
 import {
-  CreditTagMetricsSection,
   DerivativesTagMetricsSection,
   EntityOffchainSection,
-  LendingMetricTiles,
   LiquidityTagMetricsSection,
   OtherTagMetricsSection,
   StakingTagMetricsSection,
   StablecoinMetricsSection,
 } from "@/components/networks/NetworkSections";
+import {
+  CreditFixedIncomePanel,
+  CreditLendingPanel,
+  CreditLeveragedYieldPanel,
+} from "@/components/networks/tabs/CreditTagPanels";
 import { NetworkMarketCard } from "@/components/networks/NetworkMarketCard";
 import { MetricCard } from "@/components/ui/MetricCard";
-import { SectionHeading } from "@/components/ui/SectionHeading";
 import {
   MetricsTabView,
   type MetricsSubTab,
@@ -39,14 +41,17 @@ import {
   OTHER_TAG_TO_KEY,
   STAKING_TAG_TO_KEY,
 } from "@/lib/server/tagMetricsOverlay";
-import type { CreditTag, NetworkProfile, RwaSecondaryTag } from "@/lib/types";
+import type { NetworkProfile, RwaSecondaryTag } from "@/lib/types";
 
 /** Whether a given sector/tag actually has a populated metrics block. */
 function tagHasBlock(profile: NetworkProfile, sector: string, tag: string): boolean {
   switch (sector) {
     case "Credit": {
+      // M4.1 (CAN-70): gate on the tag VOCABULARY, not block presence. Every
+      // tagged Credit entity renders its tag sub-tab; the builders emit honest
+      // empty cards when data has not landed (CAN-59 precedent).
       const key = (CREDIT_TAG_METRICS_KEY as Record<string, "lending" | "leveragedYield" | "fixedIncome">)[tag];
-      return Boolean(key && profile.creditTagMetrics?.[key]);
+      return Boolean(key);
     }
     case "Staking": {
       const key = (STAKING_TAG_TO_KEY as Record<string, keyof NonNullable<NetworkProfile["stakingTagMetrics"]>>)[tag];
@@ -70,10 +75,42 @@ function tagHasBlock(profile: NetworkProfile, sector: string, tag: string): bool
 }
 
 /** Render a single sector/tag's metrics panel (reuses the sector sections). */
-function renderSectorTag(profile: NetworkProfile, sector: string, tag: string): ReactNode {
+function renderSectorTag(
+  profile: NetworkProfile,
+  sector: string,
+  tag: string,
+  range: TimeRange,
+): ReactNode {
   switch (sector) {
-    case "Credit":
-      return <CreditTagMetricsSection tags={[tag as CreditTag]} metrics={profile.creditTagMetrics} />;
+    case "Credit": {
+      const fallback = (
+        <DataPanel title={tag}>
+          <StatGridSkeleton count={8} />
+        </DataPanel>
+      );
+      if (tag === "Lending") {
+        return (
+          <Suspense fallback={fallback}>
+            <CreditLendingPanel profile={profile} range={range} />
+          </Suspense>
+        );
+      }
+      if (tag === "Leveraged Yield") {
+        return (
+          <Suspense fallback={fallback}>
+            <CreditLeveragedYieldPanel profile={profile} range={range} />
+          </Suspense>
+        );
+      }
+      if (tag === "Fixed Income") {
+        return (
+          <Suspense fallback={fallback}>
+            <CreditFixedIncomePanel profile={profile} range={range} />
+          </Suspense>
+        );
+      }
+      return null;
+    }
     case "Staking":
       return <StakingTagMetricsSection tags={[tag]} metrics={profile.stakingTagMetrics} />;
     case "Liquidity":
@@ -179,15 +216,9 @@ function buildMetricsTabs(profile: NetworkProfile, range: TimeRange): MetricsSub
   const offchainNode = <EntityOffchainSection universal={profile.universalMetrics} />;
 
   // 1. Sector rollup / "Overview" tab (skipped for RWA-primary and Other-only).
+  // M4.1 (CAN-70): the legacy LendingMetricTiles block is retired; the Lending
+  // tag sub-tab is the single lending metrics representation.
   const overviewNodes: ReactNode[] = [];
-  if (profile.lending) {
-    overviewNodes.push(
-      <section key="lending" className="space-y-4">
-        <SectionHeading title="Lending metrics" subtitle="Live supply/borrow data (DeFi Llama)." />
-        <LendingMetricTiles lending={profile.lending} syncedAt={profile.universalMetrics?.syncedAt} />
-      </section>,
-    );
-  }
   const creditRollupNode = sectors.includes("Credit") ? (
     <Suspense
       key="credit-rollup"
@@ -241,13 +272,11 @@ function buildMetricsTabs(profile: NetworkProfile, range: TimeRange): MetricsSub
     if (sector === "RWA") continue;
     const tags = primaryMetricTagsForSector(profile, sector);
     for (const tag of tags) {
-      // Skip Credit "Lending" when the lending rollup already shows it.
-      if (sector === "Credit" && tag === "Lending" && profile.lending) continue;
       if (!tagHasBlock(profile, sector, tag)) continue;
       tabs.push({
         id: `${sector}:${tag}`,
         label: tag,
-        content: renderSectorTag(profile, sector, tag),
+        content: renderSectorTag(profile, sector, tag, range),
       });
     }
   }

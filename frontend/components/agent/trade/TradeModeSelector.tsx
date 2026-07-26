@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import type { AgentConfig, TradeHitlMethod } from "@/lib/agent/agentConfig";
 import { cn } from "@/lib/utils";
 import { TRADE_MODES } from "./tradeModes";
@@ -68,47 +69,50 @@ export function TradeModeSelector({
         {busy && <Loader2 className="h-3 w-3 animate-spin text-ink-500" />}
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="Approval method">
-        {TRADE_MODES.map((mode) => {
+      <SegmentedControl
+        ariaLabel="Approval method"
+        value={selected}
+        onChange={select}
+        disabled={busy}
+        className="grid gap-2 sm:grid-cols-3"
+        getOptionClassName={(active) =>
+          cn(
+            "rounded-xl border px-3 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+            active
+              ? "border-electric-500/40 bg-electric-500/10"
+              : "border-ink-800/60 bg-ink-950/40 hover:border-ink-700",
+          )
+        }
+        options={TRADE_MODES.map((mode) => {
           const active = mode.value === selected;
-          return (
-            <button
-              key={mode.value}
-              type="button"
-              role="radio"
-              aria-checked={active}
-              onClick={() => select(mode.value)}
-              disabled={busy}
-              className={cn(
-                "rounded-xl border px-3 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60",
-                active
-                  ? "border-electric-500/40 bg-electric-500/10"
-                  : "border-ink-800/60 bg-ink-950/40 hover:border-ink-700",
-              )}
-            >
-              <span className="flex flex-wrap items-center gap-1.5">
-                <span
-                  className={cn(
-                    "text-sm font-semibold",
-                    active ? "text-electric-300" : "text-ink-100",
+          return {
+            value: mode.value,
+            label: (
+              <span className="block">
+                <span className="flex flex-wrap items-center gap-1.5">
+                  <span
+                    className={cn(
+                      "text-sm font-semibold",
+                      active ? "text-electric-300" : "text-ink-100",
+                    )}
+                  >
+                    {mode.name}
+                  </span>
+                  {active && <CheckCircle2 className="h-3.5 w-3.5 text-electric-400" />}
+                  {mode.value === "propose_approve" && (
+                    <Badge tone="electric" className="px-1.5 py-0 text-[9px] uppercase">
+                      default
+                    </Badge>
                   )}
-                >
-                  {mode.name}
                 </span>
-                {active && <CheckCircle2 className="h-3.5 w-3.5 text-electric-400" />}
-                {mode.value === "propose_approve" && (
-                  <Badge tone="electric" className="px-1.5 py-0 text-[9px] uppercase">
-                    default
-                  </Badge>
-                )}
+                <span className="mt-1 block text-[11px] leading-relaxed text-ink-400">
+                  {mode.description}
+                </span>
               </span>
-              <span className="mt-1 block text-[11px] leading-relaxed text-ink-400">
-                {mode.description}
-              </span>
-            </button>
-          );
+            ),
+          };
         })}
-      </div>
+      />
 
       {selected === "spending_cap" && !hasCaps && (
         <p className="text-xs text-amber-400">

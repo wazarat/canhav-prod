@@ -23,6 +23,20 @@ export const CREDIT_GLOSSARY: Record<string, string> = {
     "Borrowers must post collateral worth more than the loan, so the loan is backed even through moderate price moves.",
   rehypothecation:
     "Re-lending of posted collateral by the platform holding it. Increases capital efficiency and chains counterparty risk.",
+  "max LTV":
+    "Maximum loan-to-value: the most you can borrow against collateral at deposit time, as a share of its value.",
+  "liquidation threshold":
+    "The LTV level at which a position becomes liquidatable. Sits above max LTV to leave a buffer before liquidation.",
+  "liquidation bonus":
+    "Discount a liquidator receives on seized collateral as the incentive to repay under-water debt.",
+  "supply cap":
+    "Ceiling on total deposits of an asset, limiting how much protocol exposure a single collateral can build.",
+  "borrow cap":
+    "Ceiling on total borrows of an asset. A cap of 1 is a convention meaning borrowing is disabled outright.",
+  "E-Mode":
+    "Efficiency mode: higher LTV and threshold allowed when collateral and debt are tightly correlated (e.g. ETH liquid staking pairs).",
+  "isolation mode":
+    "Risk containment for a newly listed or risky asset: capped debt, restricted pairs, no mixing with other collateral.",
 };
 
 const ACRONYM = /^[A-Z][A-Za-z]*$/;

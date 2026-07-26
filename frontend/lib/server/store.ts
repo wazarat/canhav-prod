@@ -745,6 +745,7 @@ export const readLiveStore = cache(async (): Promise<LiveStore> => {
         priceHistory: item.PriceHistory ?? undefined,
         tokenomics: item.Tokenomics ?? undefined,
         typedRisks: item.TypedRisks ?? undefined,
+        assetCoverage: item.AssetCoverage ?? null,
         dependencies: item.Dependencies ?? undefined,
         incidents: item.Incidents ?? undefined,
         audits: item.Audits ?? undefined,

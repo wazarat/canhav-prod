@@ -97,24 +97,22 @@ function lendingHasAssetCoverage(lending: NonNullable<NetworkProfile["lending"]>
 }
 
 function hasAssetCoverageContent(profile: NetworkProfile): boolean {
-  if (profile.lending && lendingHasAssetCoverage(profile.lending)) return true;
-  const tagLending = profile.creditTagMetrics?.lending;
-  if (
-    tagLending &&
-    (tagLending.collateralAssets?.length ||
-      tagLending.loanAssets?.length ||
-      tagLending.oracles?.length ||
-      tagLending.isolatedMarketCount != null ||
-      tagLending.liquidations30d ||
-      tagLending.governanceDetail ||
-      tagLending.eModeCategories?.length)
-  ) {
+  // M6 (CAN-75): the typed AssetCoverage block is the tab's source of truth.
+  // sense deliberately has none (sunset Oct 2023) so its tab stays hidden.
+  if (profile.assetCoverage?.assets.length || profile.assetCoverage?.oracles.length) {
     return true;
   }
-  // Non-lending networks surface their supported assets via member coins (the
-  // network's own token(s) + supported assets/markets). This lets the Asset
-  // Coverage tab appear for Staking/Liquidity/Derivatives/RWA/Other/Fixed-Income
-  // networks that have no lending block.
+  const creditAffiliated =
+    profile.sector === "Credit" || profile.secondarySectors?.includes("Credit");
+  if (creditAffiliated) {
+    // Credit entities need GENUINE coverage data: a member-coin list is not
+    // asset coverage (CAN-75), and creditTagMetrics.lending was the duplicate
+    // source retired with the M6 rebuild. Parked entities keep their curated
+    // legacy lending panel.
+    return Boolean(profile.lending && lendingHasAssetCoverage(profile.lending));
+  }
+  // Non-Credit networks surface their supported assets via member coins (the
+  // network's own token(s) + supported assets/markets) — unchanged by M6.
   return profile.memberCoins.length > 0;
 }
 

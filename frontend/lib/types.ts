@@ -445,6 +445,16 @@ export interface TypedRisk {
   linkedAssets?: string[];
   /** Partner/counterparty names this risk attaches to. */
   linkedPartners?: string[];
+  /**
+   * Raw risk-linked asset names with no row in the entity's curated asset
+   * table ("Protocol-wide", bridged deployments, ...). Rendered as text in
+   * drill-downs — never as clickable asset rows (dataset rule).
+   */
+  linkedAssetsUnmatched?: string[];
+  /** Counterparty names not matched against the M9 partnership dataset. */
+  linkedPartnersUnmatched?: string[];
+  /** FlaggedAsset.asset keys this risk relates to (pre-joined). */
+  linkedFlaggedAssets?: string[];
   sourceLabel?: string | null;
   sourceUrl?: string | null;
 }
@@ -481,11 +491,108 @@ export interface IncidentEvent {
   /** Transmission channel: "oracle", "collateral depeg", ... (free string). */
   via?: string;
   link?: string | null;
+  /** M6/M7 dataset event type ("bad debt", "exploit", "default", ...). */
+  eventType?: string | null;
+  /** Parsed loss/amount in USD when published; null when "n.a.". */
+  amountUsd?: number | null;
+  /** Original amount display (e.g. "about 50m USD"). */
+  amountUsdDisplay?: string | null;
+  /** Resolution ("repaid in full", "written off", ...) — a key credit fact. */
+  outcome?: string | null;
 }
 
 export interface SourceRef {
   label: string;
   url: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Asset coverage (M6 — Credits completion CAN-75/72/77)                       */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Normalized role bucket derived at parse time from the dataset's free-text
+ * role column ("collateral in cUSDCv3", "Principal token, IBT is sUSDp", ...).
+ * "other" covers fixed-income instruments that are neither side of a lending
+ * market (PT/YT/SY, pool targets).
+ */
+export type CoverageRoleKind = "collateral" | "loan" | "both" | "other";
+
+/**
+ * One curated asset row from the M6/M7 Asset Coverage and Risk dataset.
+ * Two shapes share this type: lending rows (LTV/threshold/caps populated) and
+ * fixed-income rows (maturity/implied-APY populated). Numeric fields are
+ * parsed at load time; when the source cell is prose (Gearbox ranges,
+ * Compound per-market values) the number is null and the display text carries
+ * the value. Components must never re-parse.
+ */
+export interface CoverageAsset {
+  /** Exact dataset asset name — also the `TypedRisk.linkedAssets` join key. */
+  asset: string;
+  /** Raw dataset role text (rendered verbatim). */
+  role: string;
+  roleKind: CoverageRoleKind;
+  chain: string | null;
+  /* Lending-shape parameters (null on fixed-income rows). */
+  maxLtvPct: number | null;
+  maxLtvText: string | null;
+  liqThresholdPct: number | null;
+  liqThresholdText: string | null;
+  liqBonusPct: number | null;
+  liqBonusText: string | null;
+  supplyCapValue: number | null;
+  supplyCapDisplay: string | null;
+  borrowCapValue: number | null;
+  borrowCapDisplay: string | null;
+  /** Borrow cap sentinel `1` — render "Borrowing disabled", never a cap of one. */
+  borrowingDisabled: boolean;
+  /** LTV 0 with a live liquidation threshold — withdrawn LTV, grandfathered positions. */
+  ltvWithdrawn: boolean;
+  isolationEmode: string | null;
+  /* Fixed-income-shape parameters (null on lending rows). */
+  underlyingYieldSource: string | null;
+  maturityOrTerm: string | null;
+  fixedImpliedApy: string | null;
+  collateralOrCapParameters: string | null;
+  /* Shared */
+  oracle: string | null;
+  notes: string | null;
+  sources: SourceRef[];
+}
+
+export interface OracleCoverage {
+  provider: string;
+  assetsCovered: string[];
+  feedType: string | null;
+  sources: SourceRef[];
+}
+
+/** Frozen / LTV-0 / deprecated asset with the sourced reason. */
+export interface FlaggedAsset {
+  asset: string;
+  flag: string;
+  reason: string | null;
+  sources: SourceRef[];
+}
+
+/**
+ * The M6 Asset coverage block (one per Credit entity, replaces the flat
+ * `lending` chip lists as the tab's source of truth; `lending` stays
+ * editorial-only for Governance/Deployment prose per the M4.1 decision).
+ */
+export interface AssetCoverage {
+  /** "lending" rows carry LTV/caps; "fixedIncome" rows carry maturity/APY. */
+  shape: "lending" | "fixedIncome";
+  /** Sourced prose intro (dataset "Asset strategy" paragraph, inline links). */
+  assetStrategy: string | null;
+  assets: CoverageAsset[];
+  oracles: OracleCoverage[];
+  flaggedAssets: FlaggedAsset[];
+  /** Dataset caveat: lists are curated and ranked, not exhaustive. */
+  curatedNote?: string | null;
+  /** Risk-linked assets with no asset row — drill-down text, never rows. */
+  riskLinkNote?: string | null;
+  asOf: string | null;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -2685,6 +2792,8 @@ export interface NetworkProfile {
   priceHistory?: PriceHistory;
   tokenomics?: Tokenomics;
   typedRisks?: TypedRisk[];
+  /** M6 Asset coverage block (typed asset rows + oracles + flagged assets). */
+  assetCoverage?: AssetCoverage | null;
   /** External dependencies (oracles, collateral issuers, bridges) — Risks tab. */
   dependencies?: NetworkDependency[];
   /** Dated contagion/incident history — Risks tab. */

@@ -752,6 +752,11 @@ export const readLiveStore = cache(async (): Promise<LiveStore> => {
         offchainFacts: item.OffchainFacts ?? undefined,
         timeline: item.Timeline ?? undefined,
         agentSkill: item.AgentSkill ?? undefined,
+        bullBearCase: item.BullBearCase ?? undefined,
+        researchPublications: item.ResearchPublications ?? undefined,
+        tradFiAnalogue: item.TradFiAnalogue ?? undefined,
+        orgIntro: item.OrgIntro ?? undefined,
+        fundingNote: item.FundingNote ?? undefined,
         createdAt: String(item.CreatedAt ?? ""),
         updatedAt: String(item.UpdatedAt ?? ""),
       } as NetworkProfile);

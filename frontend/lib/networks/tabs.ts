@@ -44,7 +44,9 @@ function hasResearchContent(profile: NetworkProfile): boolean {
     Boolean(profile.tokenomics) ||
     profile.orgStructure.length > 0 ||
     profile.investmentRounds.length > 0 ||
-    profile.tradFiComparison.length > 0
+    profile.tradFiComparison.length > 0 ||
+    Boolean(profile.bullBearCase) ||
+    (profile.researchPublications?.length ?? 0) > 0
   );
 }
 

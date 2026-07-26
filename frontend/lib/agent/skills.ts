@@ -11,6 +11,7 @@ import {
   getApprovedTokens,
 } from "@/lib/data";
 import { deriveSecurityStatus } from "@/lib/security";
+import { stripInlineLinks } from "@/lib/text";
 import type {
   AgentSkill,
   AgentSkillAction,
@@ -168,7 +169,10 @@ function buildFacts(profile: NetworkProfile): AgentSkillFact[] {
 function buildSections(profile: NetworkProfile): AgentSkillSection[] {
   const sections: AgentSkillSection[] = [];
 
-  const overview = [profile.description, profile.longDescription].filter(Boolean).join("\n\n");
+  const overview = [profile.description, profile.longDescription]
+    .filter((s): s is string => Boolean(s))
+    .map(stripInlineLinks)
+    .join("\n\n");
   if (overview) sections.push({ heading: "Overview", body: overview });
 
   if (profile.differentiator) {
@@ -446,7 +450,10 @@ export function buildSkillFromToken(profile: TokenProfile): PlatformSkill {
   if (profile.entitySlug) facts.push({ key: "parentEntity", value: profile.entitySlug });
 
   const sections: AgentSkillSection[] = [];
-  const overview = [profile.description, profile.longDescription].filter(Boolean).join("\n\n");
+  const overview = [profile.description, profile.longDescription]
+    .filter((s): s is string => Boolean(s))
+    .map(stripInlineLinks)
+    .join("\n\n");
   if (overview) sections.push({ heading: "Overview", body: overview });
   if (profile.typedRisks?.length) {
     sections.push({
@@ -536,7 +543,7 @@ export interface SkillSuggestion {
   reason: SkillSuggestionReason;
 }
 
-const SEVERITY_RANK: Record<RiskSeverity, number> = { high: 0, medium: 1, low: 2 };
+const SEVERITY_RANK: Record<RiskSeverity, number> = { critical: 0, high: 1, medium: 2, low: 3 };
 
 const MEMBER_COIN_GROUP: Partial<Record<MemberCoinCategory, Exclude<SkillGroup, "entity">>> = {
   Stablecoin: "stablecoin",

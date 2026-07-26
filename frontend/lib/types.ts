@@ -427,12 +427,26 @@ export interface LendingMarket {
   updatedAt: string | null;
 }
 
-export type RiskSeverity = "low" | "medium" | "high";
+export type RiskSeverity = "low" | "medium" | "high" | "critical";
 
 export interface TypedRisk {
   category: string;
   severity: RiskSeverity;
   description: string;
+  /** Short display name of the risk (M6/M7 dataset "Risk" column). */
+  name?: string;
+  likelihood?: "low" | "medium" | "high" | null;
+  impact?: "low" | "medium" | "high" | null;
+  /** When the risk was assessed (e.g. "Apr 2026"). */
+  asOf?: string | null;
+  mitigation?: string | null;
+  monitoringSignal?: string | null;
+  /** Asset symbols this risk attaches to (pre-joined in the M6/M7 dataset). */
+  linkedAssets?: string[];
+  /** Partner/counterparty names this risk attaches to. */
+  linkedPartners?: string[];
+  sourceLabel?: string | null;
+  sourceUrl?: string | null;
 }
 
 /**
@@ -917,12 +931,22 @@ export interface OrgUnit {
   name: string;
   role: string;
   description: string;
+  /** Source URL for the row (M5 dataset "Source" column). */
+  link?: string | null;
 }
 
 export interface TradFiRow {
   product: string;
   similarity: string;
   differences: string;
+  /** M5 card layout: the compared dimension (e.g. "Underwriting"). */
+  dimension?: string;
+  /** M5 card layout: how the protocol handles this dimension. */
+  protocolSide?: string;
+  /** M5 card layout: how the TradFi analogue handles this dimension. */
+  tradFiSide?: string;
+  sourceLabel?: string | null;
+  sourceUrl?: string | null;
 }
 
 export interface InvestmentRound {
@@ -932,6 +956,41 @@ export interface InvestmentRound {
   amountLabel: string | null;
   investors: string[];
   link: string | null;
+  /** Lead investors, rendered as highlighted chips; `investors` holds the rest. */
+  leadInvestors?: string[];
+}
+
+/** One sourced bull- or bear-case claim (M5 Research dataset section 8). */
+export interface BullBearPoint {
+  claim: string;
+  sourceLabel: string;
+  sourceUrl: string;
+}
+
+/** Feeds the Morningstar-style bull/bear callout pair on the Research tab. */
+export interface BullBearCase {
+  bull: BullBearPoint[];
+  bear: BullBearPoint[];
+}
+
+export type ResearchPublicationType =
+  | "risk assessment"
+  | "analyst report"
+  | "academic paper"
+  | "audit"
+  | "governance analysis"
+  | "incident post mortem"
+  | "data dashboard";
+
+/** External research/analyst coverage row (M5 Research dataset section 9). */
+export interface ResearchPublication {
+  publisher: string;
+  title: string;
+  /** ISO date, null where the source is undated. */
+  date: string | null;
+  type: ResearchPublicationType;
+  url: string;
+  takeaway: string;
 }
 
 export interface Partnership {
@@ -2637,4 +2696,17 @@ export interface NetworkProfile {
   /** Sourced milestone timeline; supersedes `events` when present (playbook §5). */
   timeline?: TimelineEntry[];
   agentSkill?: AgentSkill;
+  /** Morningstar-style bull/bear callout pair (M5 Research dataset section 8). */
+  bullBearCase?: BullBearCase;
+  /** External research and analyst coverage (M5 Research dataset section 9). */
+  researchPublications?: ResearchPublication[];
+  /** "Closest analogue" headline for the TradFi comparison cards. */
+  tradFiAnalogue?: string;
+  /** Intro paragraph for the Organisation section (may carry inline md links). */
+  orgIntro?: string;
+  /**
+   * Funding-history caveat prose (conflicting reports, grants-only funding,
+   * stated absence of venture rounds). Renders under the funding rail.
+   */
+  fundingNote?: string;
 }

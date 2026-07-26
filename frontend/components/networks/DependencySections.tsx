@@ -7,12 +7,14 @@ import type { IncidentEvent, NetworkDependency, RiskSeverity } from "@/lib/types
 import { cn } from "@/lib/utils";
 
 const SEVERITY_DOT: Record<RiskSeverity, string> = {
+  critical: "bg-rose-400",
   high: "bg-rose-400",
   medium: "bg-amber-300",
   low: "bg-ink-400",
 };
 
 const SEVERITY_TONE = {
+  critical: "danger",
   high: "danger",
   medium: "warning",
   low: "neutral",

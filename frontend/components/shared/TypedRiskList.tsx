@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/Card";
 import type { TypedRisk } from "@/lib/types";
 
 const SEVERITY_TONE = {
+  critical: "danger",
   high: "danger",
   medium: "warning",
   low: "neutral",
@@ -28,10 +29,13 @@ export function TypedRiskList({
         </h2>
       </div>
       <div className="space-y-3">
-        {risks.map((risk) => (
-          <Card key={risk.category} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:justify-between">
+        {risks.map((risk, i) => (
+          <Card key={`${risk.category}-${i}`} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0 flex-1 space-y-1">
-              <p className="text-sm font-medium text-ink-100">{risk.category}</p>
+              <p className="text-sm font-medium text-ink-100">{risk.name ?? risk.category}</p>
+              {risk.name ? (
+                <p className="text-xs uppercase tracking-wide text-ink-400">{risk.category}</p>
+              ) : null}
               <p className="text-sm leading-relaxed text-ink-300">{risk.description}</p>
             </div>
             <Badge tone={SEVERITY_TONE[risk.severity]} className="shrink-0 self-start capitalize">

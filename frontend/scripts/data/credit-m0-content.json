@@ -1,0 +1,70 @@
+{
+  "aave": {
+    "LongDescription": "Aave is a non-custodial liquidity protocol where users supply assets to pooled markets to earn interest and borrow against collateral in real time. Launched as ETHLend in 2017 and rebranded in 2020, it has grown into the largest DeFi lending network, deployed across Ethereum and more than a dozen other chains. Beyond core lending, the protocol issues GHO, its native overcollateralized stablecoin, operates staking and backstop mechanics through stkAAVE and Umbrella, and is extending into institutional and RWA lending via Horizon. The Aave DAO governs risk parameters, asset listings and emissions, with Aave Labs as the primary development company."
+  },
+  "compound": {
+    "LongDescription": "Compound is one of the original DeFi lending protocols and helped define the pooled money-market model with algorithmic, utilization-driven interest rates. Its current generation, Compound III (Comet), deliberately simplifies each market to a single borrowable base asset, with all other assets posted purely as collateral that earns no supply yield. This design makes market risk easier to reason about than multi-asset pools, at the cost of flexibility. COMP tokenholders govern the protocol, approving new markets and parameter changes."
+  },
+  "morpho": {
+    "LongDescription": "Morpho is a lending network built around Morpho Blue, a minimal, immutable primitive where each market fixes exactly one collateral asset, one loan asset, an oracle and a liquidation LTV. On top of these isolated markets, MetaMorpho vaults run by third-party risk curators allocate depositor funds across markets, letting suppliers choose a curator and risk profile rather than a single pooled risk committee. This modular design contains bad debt to individual markets instead of socializing it. Morpho has become one of the largest lending protocols on Ethereum and Base, and its infrastructure powers embedded lending products for exchanges and fintechs."
+  },
+  "spark": {
+    "LongDescription": "Spark is the flagship lending arm of the Sky (formerly MakerDAO) ecosystem and its first 'Star' SubDAO under the Endgame plan. SparkLend, built from Aave V3 architecture, centers on deep stablecoin liquidity: it routes USDS/DAI from Sky's balance sheet into lending markets at protocol-set rates. Spark Savings offers sUSDS/sDAI yield, and the Spark Liquidity Layer deploys stablecoin liquidity across other protocols and chains. Its scale and rates are therefore tied closely to Sky governance decisions rather than pure market utilization."
+  },
+  "radiant": {
+    "LongDescription": "Radiant Capital set out to be an omnichain money market: deposits on one chain could collateralize borrows on another, with LayerZero messaging unifying liquidity across deployments. RDNT emissions and dynamic liquidity provisioning drove rapid growth on Arbitrum and BSC. In October 2024 attackers compromised core-contributor devices and drained roughly $50M, a blow the protocol never recovered from. Radiant is winding down in 2026, and any remaining positions carry elevated residual and withdrawal risk."
+  },
+  "justlend": {
+    "LongDescription": "JustLend DAO is the dominant pooled money market on Tron and part of Justin Sun's broader JUST ecosystem. It follows the classic supply-and-borrow model, with USDT lending accounting for much of its multi-billion-dollar TVL, alongside TRX staking and energy-rental products specific to Tron. Because it runs on the TVM rather than the EVM, its on-chain metrics come from Tron indexers (TronGrid/TronScan) rather than Ethereum tooling. It competes by dominating its home ecosystem rather than contesting Ethereum lending share."
+  },
+  "kamino": {
+    "LongDescription": "Kamino is Solana's leading lending and liquidity protocol, combining K-Lend money markets with automated liquidity vault strategies. Markets are isolated and curated by asset, risk profile and strategy, and the protocol's Scope oracle layer aggregates price feeds such as Pyth and Switchboard. Kamino Multiply and Lend products support leveraged staking and structured borrowing on Solana-native collateral, including LP and liquid-staking tokens. It is a major cross-ecosystem competitor to EVM lenders, with metrics sourced from Solana programs rather than EVM contracts."
+  },
+  "venus": {
+    "LongDescription": "Venus is the leading pooled money market on BNB Chain, offering supply, borrow and isolated-pool markets across a broad set of assets. Alongside lending it issues VAI, a decentralized stablecoin minted against collateral, and coordinates governance and cross-chain expansion through the XVS token. Isolated pools introduced in Venus V4 contain risk per asset group rather than socializing it across the whole protocol. Venus competes primarily within the BNB Chain ecosystem, playing a role similar to JustLend on Tron."
+  },
+  "maple": {
+    "LongDescription": "Maple Finance operates onchain credit pools that lend to vetted institutional borrowers such as trading firms, funds and businesses, making it closer to a blockchain-based credit marketplace than to open overcollateralized DeFi lending. Pool delegates underwrite borrowers, set loan terms and manage repayment, so borrower quality, collateral ratios and default history are the metrics that matter most. Its syrupUSDC/syrupUSDT products package institutional lending yield for permissionless DeFi depositors, and SYRUP (formerly MPL) is the governance and staking token. Maple straddles the line between DeFi credit and real-world private credit."
+  },
+  "usd-ai": {
+    "LongDescription": "USD.AI is a credit protocol that finances AI and compute infrastructure through a synthetic dollar. Users mint USDai against stablecoin deposits, and capital is deployed into asset-backed loans collateralized by GPUs and related hardware via its CALIBER securitization framework, with T-bill-style backing during ramp-up. Staked USDai (sUSDai) captures the loan yield, while staked CHIP acts as first-loss insurance capital. It behaves less like a stablecoin company and more like an RWA private-credit protocol whose underlying collateral is AI compute.",
+    "CurrentScale": { "marketCapUsd": 156480798, "volume24hUsd": 4017001 }
+  },
+  "extra-finance": {
+    "LongDescription": "Extra Finance is a leveraged yield-farming protocol on the Optimism and Base Superchain ecosystem. It pairs a lending market with leveraged LP farming, letting users borrow to lever liquidity positions on integrated DEXes up to roughly 7x. Lenders earn yield from farmers' borrow demand, while farmers manage amplified LP exposure, including impermanent-loss risk that leverage magnifies. The EXTRA token (1B hard cap, mint authority destroyed) coordinates incentives across the protocol.",
+    "CurrentScale": { "marketCapUsd": 1981454, "volume24hUsd": 230 }
+  },
+  "fluid": {
+    "LongDescription": "Fluid, built by the Instadapp team, merges lending, collateralized vaults and DEX liquidity on a single shared liquidity layer, so the same capital can simultaneously back lending and trading. Its smart-collateral and smart-debt design lets positions earn trading fees that offset borrow costs, pushing capital efficiency beyond conventional money markets. Liquidations are granular and gas-efficient, reducing penalty sizes relative to classic designs. The trade-off is complexity: risk in one layer can propagate through the shared liquidity system."
+  },
+  "gearbox": {
+    "LongDescription": "Gearbox is a generalized leverage protocol built on Credit Accounts: isolated smart-contract accounts that combine a user's collateral with borrowed pool liquidity, supporting leverage up to roughly 10x. Borrowers deploy that leveraged capital across whitelisted integrations such as Curve, Convex, Lido and Pendle through adapter contracts, making the leverage composable rather than confined to one farm. Passive lenders fund the pools and earn borrow interest without managing positions. Health-factor-based liquidations keep each Credit Account's risk isolated from the rest of the protocol."
+  },
+  "stella": {
+    "LongDescription": "Stella, the successor to Alpha Homora, offers leveraged yield strategies with a pay-as-you-earn model: borrowers pay 0% interest and instead share a portion of realized strategy profit with lenders. This aligns lenders with strategy performance rather than fixed borrow rates, an unusual design among leverage protocols. Alpha Homora pioneered leveraged yield farming and suffered a major exploit in 2021 under its previous architecture, history relevant to assessing the team's risk record. The ALPHA token underpins the ecosystem."
+  },
+  "pendle": {
+    "LongDescription": "Pendle is DeFi's dominant yield-tokenization protocol: it splits yield-bearing assets into Principal Tokens (PT), which lock in a fixed rate when bought at a discount, and Yield Tokens (YT), which give leveraged exposure to the variable yield until maturity. Its V2 AMM is purpose-built for maturity-dated assets, and vePENDLE governance directs incentives across dozens of markets. Ethena's USDe/sUSDe markets became its largest category, at times approaching 70% of TVL, making Pendle a key venue for stablecoin fixed income. Boros extends the model to funding-rate trading, broadening it toward a general interest-rate derivatives platform."
+  },
+  "notional": {
+    "LongDescription": "Notional provides fixed-rate, fixed-term lending and borrowing through fCash: transferable tokens representing a claim on a fixed amount of an asset at a specific future maturity, traded on a purpose-built AMM. Lenders buy fCash at a discount to lock a known return; borrowers sell it to lock a known cost of capital. Notional V3 added leveraged vault strategies and variable-rate markets that complement the fixed-term books. It is one of the longest-running attempts to build a true fixed-income market structure in DeFi, governed by the NOTE token."
+  },
+  "spectra": {
+    "LongDescription": "Spectra, formerly APWine, is a permissionless interest-rate derivatives protocol: anyone can create a market that splits a yield-bearing asset into principal and yield tokens, without gatekeeping by the core team. Users trade fixed versus variable rate exposure through its AMM, hedge or speculate on yields, and provide liquidity to rate markets. Permissionless listing differentiates it from curated competitors like Pendle, trading breadth of long-tail assets against concentrated liquidity. APW migrated to the SPECTRA token as part of the rebrand."
+  },
+  "sense": {
+    "LongDescription": "Sense Finance was an early yield-stripping protocol that decomposed yield-bearing assets into zero-coupon Principal Tokens and Yield Tokens, traded on its custom Space AMM. The core team ceased contributions in October 2023 and front-end hosting ended that December, leaving the immutable contracts on-chain but unmaintained. Any residual positions must be managed directly on-chain, with no team support, UI or meaningful liquidity. It remains listed here as a historical reference for the fixed-income category it helped pioneer."
+  },
+  "centrifuge": {
+    "LongDescription": "Centrifuge is a real-world-asset financing protocol that tokenizes illiquid business assets such as invoices, mortgages and trade-finance receivables through bankruptcy-remote SPV structures. Each pool issues senior DROP and junior TIN tranche tokens, recreating a structured-credit waterfall in which TIN absorbs first losses for higher yield. Centrifuge pools were among the first RWA collateral backing MakerDAO's DAI, and its newer products (JAAA, JTRSY) extend into tokenized CLOs and Treasuries with institutional partners like Janus Henderson. It appears in the Credit sector through its private-credit financing role while remaining primarily an RWA platform."
+  },
+  "clearpool": {
+    "LongDescription": "Clearpool is an institutional uncollateralized lending marketplace: KYC-vetted institutional borrowers open dynamic-rate pools that permissionless lenders can fund, with utilization setting the interest rate. Credit Vaults extend the model to permissioned single-borrower exposure with negotiated terms, and cpUSD packages Credit Vault yield. Lenders take real borrower credit risk rather than liquidating overcollateralized positions, so borrower transparency and repayment history are central. CPOOL coordinates governance and incentives."
+  },
+  "goldfinch": {
+    "LongDescription": "Goldfinch pioneered uncollateralized crypto lending to real-world businesses, using a 'trust through consensus' model in which human backers assess borrower creditworthiness instead of requiring crypto collateral. Its early books financed fintech lenders in emerging markets; after credit losses in that portfolio, it pivoted in 2024 to Goldfinch Prime, which channels on-chain capital into institutional private-credit funds from managers like Ares and Apollo. FIDU represents senior-pool LP positions, and GFI governs the protocol. It appears in the Credit sector through this private-credit role while sitting primarily in RWA."
+  },
+  "sky": {
+    "LongDescription": "Sky, formerly MakerDAO, is the largest decentralized stablecoin issuer, managing USDS and legacy DAI alongside the sUSDS savings token and SKY governance token. Its credit-sector relevance comes from how it deploys its balance sheet: the protocol-set Sky Savings Rate, collateralized vault borrowing, and allocations of USDS liquidity into lending markets through Stars such as Spark. The Endgame restructuring splits the ecosystem into semi-autonomous SubDAOs, with Sky Core setting monetary policy. Sky is listed here for its lending-adjacent liquidity role while remaining primarily a stablecoin protocol."
+  }
+}

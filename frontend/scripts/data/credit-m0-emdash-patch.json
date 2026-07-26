@@ -1,0 +1,1423 @@
+[
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Competitors[3].differences",
+  "old": "Ondo concentrates on tokenized Treasury/money-market products, whereas Centrifuge is broader — a full asset-financing and securitization protocol spanning private credit, receivables and funds.",
+  "new": "Ondo concentrates on tokenized Treasury/money-market products, whereas Centrifuge is broader, a full asset-financing and securitization protocol spanning private credit, receivables and funds."
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Components[2].description",
+  "old": "Asset originators (Issuers) create pools of tokenized RWAs; investors fund senior (DROP) and junior (TIN) tranches. TIN absorbs first losses and earns higher yield, DROP has payout priority — mirroring traditional structured-credit waterfalls.",
+  "new": "Asset originators (Issuers) create pools of tokenized RWAs; investors fund senior (DROP) and junior (TIN) tranches. TIN absorbs first losses and earns higher yield, DROP has payout priority, mirroring traditional structured-credit waterfalls."
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Events[0].description",
+  "old": "New Silver, a fix-and-flip real-estate loan pool on Centrifuge Tinlake, became the first RWA to back DAI, tapping a MakerDAO vault credit line — a landmark for onchain private credit.",
+  "new": "New Silver, a fix-and-flip real-estate loan pool on Centrifuge Tinlake, became the first RWA to back DAI, tapping a MakerDAO vault credit line, a landmark for onchain private credit."
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Events[2].description",
+  "old": "Janus Henderson announced a partnership with Anemoy and Centrifuge to sub-advise the Liquid Treasury Fund — its first tokenized fund — managing the portfolio via subsidiary Tabula.",
+  "new": "Janus Henderson announced a partnership with Anemoy and Centrifuge to sub-advise the Liquid Treasury Fund, its first tokenized fund, managing the portfolio via subsidiary Tabula."
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Events[4].description",
+  "old": "Centrifuge and New York Life Investment Management announced a partnership to tokenize a US high-yield corporate bond strategy — NYLIM's first tokenization move.",
+  "new": "Centrifuge and New York Life Investment Management announced a partnership to tokenize a US high-yield corporate bond strategy, NYLIM's first tokenization move."
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Faq[0].answer",
+  "old": "Centrifuge is a decentralized asset-financing protocol and real-world-asset (RWA) tokenization platform. It lets asset originators bring off-chain assets — private credit, trade-finance receivables, mortgages and tokenized treasury funds — onchain and finance them from DeFi liquidity.",
+  "new": "Centrifuge is a decentralized asset-financing protocol and real-world-asset (RWA) tokenization platform. It lets asset originators bring off-chain assets (private credit, trade-finance receivables, mortgages and tokenized treasury funds) onchain and finance them from DeFi liquidity."
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Faq[2].answer",
+  "old": "Each Centrifuge pool is split into two tranches. DROP is the senior tranche with priority on repayments and a lower, more stable yield; TIN is the junior tranche that absorbs first losses and earns a higher variable return — analogous to senior/equity tranches in traditional securitization.",
+  "new": "Each Centrifuge pool is split into two tranches. DROP is the senior tranche with priority on repayments and a lower, more stable yield; TIN is the junior tranche that absorbs first losses and earns a higher variable return, analogous to senior/equity tranches in traditional securitization."
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Faq[3].answer",
+  "old": "Centrifuge pools were among the first RWA collateral used to back DAI. In 2021 New Silver — a fix-and-flip real-estate loan pool on Centrifuge Tinlake — became the first real-world asset financed via MakerDAO, tapping a Maker vault credit line to mint DAI against real-estate-backed collateral.",
+  "new": "Centrifuge pools were among the first RWA collateral used to back DAI. In 2021 New Silver, a fix-and-flip real-estate loan pool on Centrifuge Tinlake, became the first real-world asset financed via MakerDAO, tapping a Maker vault credit line to mint DAI against real-estate-backed collateral."
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".OffchainFacts[1].source.label",
+  "old": "Centrifuge — Onchain Asset Management",
+  "new": "Centrifuge: Onchain Asset Management"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".OffchainFacts[3].source.label",
+  "old": "The CFG Token — Centrifuge Docs",
+  "new": "The CFG Token: Centrifuge Docs"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Partnerships[0].name",
+  "old": "MakerDAO — New Silver RWA pool",
+  "new": "MakerDAO: New Silver RWA pool"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Partnerships[1].name",
+  "old": "Janus Henderson & Anemoy — Liquid Treasury Fund",
+  "new": "Janus Henderson & Anemoy: Liquid Treasury Fund"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Partnerships[2].name",
+  "old": "New York Life Investment Management — tokenized high-yield bond strategy",
+  "new": "New York Life Investment Management: tokenized high-yield bond strategy"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Risks[0].description",
+  "old": "Pools finance off-chain private credit and receivables; if underlying borrowers or asset originators default or fail to remit repayments, investors — especially junior (TIN) tranche holders — can lose principal. Repayment depends on off-chain legal enforcement of loan agreements and SPV structures.",
+  "new": "Pools finance off-chain private credit and receivables; if underlying borrowers or asset originators default or fail to remit repayments, investors, especially junior (TIN) tranche holders, can lose principal. Repayment depends on off-chain legal enforcement of loan agreements and SPV structures."
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Sources[0].label",
+  "old": "Centrifuge — official site",
+  "new": "Centrifuge: official site"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Sources[1].label",
+  "old": "Centrifuge Docs — DAO summary",
+  "new": "Centrifuge Docs: DAO summary"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Sources[2].label",
+  "old": "Centrifuge Docs — The CFG Token",
+  "new": "Centrifuge Docs: The CFG Token"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Sources[3].label",
+  "old": "Centrifuge blog — DeFi 2.0: First Real-World Loan Financed on Maker",
+  "new": "Centrifuge blog: DeFi 2.0: First Real-World Loan Financed on Maker"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Sources[4].label",
+  "old": "Janus Henderson press release — Anemoy/Centrifuge partnership",
+  "new": "Janus Henderson press release: Anemoy/Centrifuge partnership"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Sources[5].label",
+  "old": "Businesswire — Centrifuge & New York Life Investment Management",
+  "new": "Businesswire: Centrifuge & New York Life Investment Management"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".Sources[6].label",
+  "old": "Centrifuge Governance Forum — CP171 restructuring",
+  "new": "Centrifuge Governance Forum: CP171 restructuring"
+ },
+ {
+  "slug": "centrifuge",
+  "key": "CATEGORY#Entity|PROTOCOL#centrifuge",
+  "path": ".TradFiComparison[0].similarity",
+  "old": "Centrifuge pools bundle income-producing assets (invoices, mortgages, receivables) and issue tranched claims (DROP senior / TIN junior) with a payment waterfall — the same senior/subordinated structure used in asset-backed securities.",
+  "new": "Centrifuge pools bundle income-producing assets (invoices, mortgages, receivables) and issue tranched claims (DROP senior / TIN junior) with a payment waterfall, the same senior/subordinated structure used in asset-backed securities."
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".Description",
+  "old": "Clearpool runs institutional uncollateralized lending — whitelisted institutional borrowers access dynamic-rate pools where utilization sets interest. It introduced 'Credit Vaults' for permissioned single-borrower exposure; cpUSD is tied to Credit Vault yields.",
+  "new": "Clearpool runs institutional uncollateralized lending: whitelisted institutional borrowers access dynamic-rate pools where utilization sets interest. It introduced 'Credit Vaults' for permissioned single-borrower exposure; cpUSD is tied to Credit Vault yields."
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".OffchainFacts[1].source.label",
+  "old": "crypto-fundraising.info — Clearpool",
+  "new": "crypto-fundraising.info: Clearpool"
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".OffchainFacts[2].source.label",
+  "old": "Clearpool blog — Launches on Base",
+  "new": "Clearpool blog: Launches on Base"
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".OffchainFacts[3].source.label",
+  "old": "CoinMarketCap — Clearpool",
+  "new": "CoinMarketCap: Clearpool"
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".Sources[0].label",
+  "old": "Clearpool docs — What Is Clearpool (products)",
+  "new": "Clearpool docs: What Is Clearpool (products)"
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".Sources[1].label",
+  "old": "Clearpool docs — Prime",
+  "new": "Clearpool docs: Prime"
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".Sources[2].label",
+  "old": "crypto-fundraising.info — Clearpool funding",
+  "new": "crypto-fundraising.info: Clearpool funding"
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".Sources[3].label",
+  "old": "Clearpool blog — Introduces Ozean",
+  "new": "Clearpool blog: Introduces Ozean"
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".Sources[4].label",
+  "old": "Clearpool blog — Launches on Base",
+  "new": "Clearpool blog: Launches on Base"
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".Sources[5].label",
+  "old": "Smart Liquidity — CertiK & Pessimistic audits",
+  "new": "Smart Liquidity: CertiK & Pessimistic audits"
+ },
+ {
+  "slug": "clearpool",
+  "key": "CATEGORY#Entity|PROTOCOL#clearpool",
+  "path": ".Sources[6].label",
+  "old": "CoinMarketCap — Clearpool (CPOOL)",
+  "new": "CoinMarketCap: Clearpool (CPOOL)"
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".Competitors[1].differences",
+  "old": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+  "new": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling."
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".Differentiator",
+  "old": "Solana-native isolated/curated lending — a major cross-chain competitor, but metrics come from Solana programs/accounts rather than EVM contracts.",
+  "new": "Solana-native isolated/curated lending, a major cross-chain competitor, but metrics come from Solana programs/accounts rather than EVM contracts."
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".OffchainFacts[0].source.label",
+  "old": "SolanaFloor — KMNO TGE & tokenomics",
+  "new": "SolanaFloor: KMNO TGE & tokenomics"
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".OffchainFacts[1].source.label",
+  "old": "Kamino Docs — Security Audits",
+  "new": "Kamino Docs: Security Audits"
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".Risks[1].description",
+  "old": "K-Lend relies on Kamino's Scope oracle aggregation layer and underlying price feeds (e.g. Pyth/Switchboard). Stale, manipulated or mispriced feeds — especially for thinner Solana collateral or LP/liquid-staking tokens — could cause faulty liquidations or allow bad debt to accrue.",
+  "new": "K-Lend relies on Kamino's Scope oracle aggregation layer and underlying price feeds (e.g. Pyth/Switchboard). Stale, manipulated or mispriced feeds, especially for thinner Solana collateral or LP/liquid-staking tokens, could cause faulty liquidations or allow bad debt to accrue."
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".Sources[0].label",
+  "old": "Solana Compass — Kamino Finance project review",
+  "new": "Solana Compass: Kamino Finance project review"
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".Sources[1].label",
+  "old": "Kamino Docs — Security Audits",
+  "new": "Kamino Docs: Security Audits"
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".Sources[3].label",
+  "old": "CoinDesk — Kamino sets KMNO token airdrop (2024-03-07)",
+  "new": "CoinDesk: Kamino sets KMNO token airdrop (2024-03-07)"
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".Sources[4].label",
+  "old": "SolanaFloor — KMNO TGE & tokenomics (April 30, 2024)",
+  "new": "SolanaFloor: KMNO TGE & tokenomics (April 30, 2024)"
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".Sources[5].label",
+  "old": "RockawayX — Kamino launches V2 modular credit infrastructure",
+  "new": "RockawayX: Kamino launches V2 modular credit infrastructure"
+ },
+ {
+  "slug": "kamino",
+  "key": "CATEGORY#Entity|PROTOCOL#kamino",
+  "path": ".Sources[6].label",
+  "old": "CoinDesk — Apollo ACRED tokenized credit fund on Solana (2025-05-20)",
+  "new": "CoinDesk: Apollo ACRED tokenized credit fund on Solana (2025-05-20)"
+ },
+ {
+  "slug": "extra-finance",
+  "key": "CATEGORY#Entity|PROTOCOL#extra-finance",
+  "path": ".OffchainFacts[1].value",
+  "old": "1,000,000,000 (hard cap; mint authority destroyed) — 60% community, 26% ecosystem, 10% team, 3% airdrop, 1% initial liquidity",
+  "new": "1,000,000,000 (hard cap; mint authority destroyed): 60% community, 26% ecosystem, 10% team, 3% airdrop, 1% initial liquidity"
+ },
+ {
+  "slug": "extra-finance",
+  "key": "CATEGORY#Entity|PROTOCOL#extra-finance",
+  "path": ".Sources[0].label",
+  "old": "Extra Finance official docs — Welcome",
+  "new": "Extra Finance official docs: Welcome"
+ },
+ {
+  "slug": "extra-finance",
+  "key": "CATEGORY#Entity|PROTOCOL#extra-finance",
+  "path": ".Sources[1].label",
+  "old": "Extra Finance docs — Audits & Security",
+  "new": "Extra Finance docs: Audits & Security"
+ },
+ {
+  "slug": "extra-finance",
+  "key": "CATEGORY#Entity|PROTOCOL#extra-finance",
+  "path": ".Sources[2].label",
+  "old": "Extra Finance docs — Allocation & Emission (tokenomics)",
+  "new": "Extra Finance docs: Allocation & Emission (tokenomics)"
+ },
+ {
+  "slug": "extra-finance",
+  "key": "CATEGORY#Entity|PROTOCOL#extra-finance",
+  "path": ".Sources[3].label",
+  "old": "Immunefi — Extra Finance bug bounty",
+  "new": "Immunefi: Extra Finance bug bounty"
+ },
+ {
+  "slug": "extra-finance",
+  "key": "CATEGORY#Entity|PROTOCOL#extra-finance",
+  "path": ".Sources[4].label",
+  "old": "Nansen — What Is Extra Finance?",
+  "new": "Nansen: What Is Extra Finance?"
+ },
+ {
+  "slug": "extra-finance",
+  "key": "CATEGORY#Entity|PROTOCOL#extra-finance",
+  "path": ".Sources[5].label",
+  "old": "Extra Finance Monthly Review — January 2025 (XLend, TVL, PancakeSwap)",
+  "new": "Extra Finance Monthly Review: January 2025 (XLend, TVL, PancakeSwap)"
+ },
+ {
+  "slug": "extra-finance",
+  "key": "CATEGORY#Entity|PROTOCOL#extra-finance",
+  "path": ".Sources[6].label",
+  "old": "DefiLlama — Extra Finance",
+  "new": "DefiLlama: Extra Finance"
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".Competitors[0].differences",
+  "old": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+  "new": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling."
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".Differentiator",
+  "old": "Not just general lending — its edge is the Sky/Maker connection (DAI/USDS): how it creates, routes, lends and manages stablecoin liquidity.",
+  "new": "Not just general lending, its edge is the Sky/Maker connection (DAI/USDS): how it creates, routes, lends and manages stablecoin liquidity."
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".Faq[0].answer",
+  "old": "Spark routes and lends stablecoin liquidity from the Sky (formerly Maker) ecosystem — USDS/DAI are the core rails. It is the first 'Star' (SubDAO) under Sky's Endgame plan.",
+  "new": "Spark routes and lends stablecoin liquidity from the Sky (formerly Maker) ecosystem; USDS/DAI are the core rails. It is the first 'Star' (SubDAO) under Sky's Endgame plan."
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".Lending.riskParameters",
+  "old": "SparkLend started from Aave V3 architecture — per-asset LTV, liquidation threshold/penalty and caps, tuned for stablecoin liquidity.",
+  "new": "SparkLend started from Aave V3 architecture: per-asset LTV, liquidation threshold/penalty and caps, tuned for stablecoin liquidity."
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".OffchainFacts[1].source.label",
+  "old": "Messari — Understanding Spark",
+  "new": "Messari: Understanding Spark"
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".OffchainFacts[2].source.label",
+  "old": "Messari — Understanding Spark",
+  "new": "Messari: Understanding Spark"
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".OffchainFacts[2].value",
+  "old": "May 2023 by Phoenix Labs (Sam MacPherson) — first Star/SubDAO in the Sky Endgame.",
+  "new": "May 2023 by Phoenix Labs (Sam MacPherson), first Star/SubDAO in the Sky Endgame."
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".Sources[1].label",
+  "old": "Spark Docs — Security & Audits",
+  "new": "Spark Docs: Security & Audits"
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".Sources[2].label",
+  "old": "Messari — Understanding Spark",
+  "new": "Messari: Understanding Spark"
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".Sources[3].label",
+  "old": "Messari — Spark (Sky) project profile",
+  "new": "Messari: Spark (Sky) project profile"
+ },
+ {
+  "slug": "spark",
+  "key": "CATEGORY#Entity|PROTOCOL#spark",
+  "path": ".Sources[4].label",
+  "old": "ChainSecurity — SparkLend audit",
+  "new": "ChainSecurity: SparkLend audit"
+ },
+ {
+  "slug": "morpho",
+  "key": "CATEGORY#Entity|PROTOCOL#morpho",
+  "path": ".Competitors[0].differences",
+  "old": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+  "new": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling."
+ },
+ {
+  "slug": "morpho",
+  "key": "CATEGORY#Entity|PROTOCOL#morpho",
+  "path": ".Components[0].description",
+  "old": "Minimal immutable lending primitive — each market fixes collateral, loan asset, oracle, and LLTV.",
+  "new": "Minimal immutable lending primitive: each market fixes collateral, loan asset, oracle, and LLTV."
+ },
+ {
+  "slug": "morpho",
+  "key": "CATEGORY#Entity|PROTOCOL#morpho",
+  "path": ".Differentiator",
+  "old": "Instead of one big pool, Morpho Blue markets each fix a collateral, loan asset, oracle and liquidation setting; curators build vaults on top — more modular and risk-specific than Aave.",
+  "new": "Instead of one big pool, Morpho Blue markets each fix a collateral, loan asset, oracle and liquidation setting; curators build vaults on top, more modular and risk-specific than Aave."
+ },
+ {
+  "slug": "morpho",
+  "key": "CATEGORY#Entity|PROTOCOL#morpho",
+  "path": ".Lending.badDebt",
+  "old": "Isolated by design — bad debt is contained to a single market/vault rather than socialized.",
+  "new": "Isolated by design; bad debt is contained to a single market/vault rather than socialized."
+ },
+ {
+  "slug": "morpho",
+  "key": "CATEGORY#Entity|PROTOCOL#morpho",
+  "path": ".OffchainFacts[0].value",
+  "old": "Risk curators operate MetaMorpho vaults — suppliers pick curators rather than a single pooled risk committee.",
+  "new": "Risk curators operate MetaMorpho vaults; suppliers pick curators rather than a single pooled risk committee."
+ },
+ {
+  "slug": "morpho",
+  "key": "CATEGORY#Entity|PROTOCOL#morpho",
+  "path": ".OffchainFacts[2].source.label",
+  "old": "Morpho Docs — Audits",
+  "new": "Morpho Docs: Audits"
+ },
+ {
+  "slug": "morpho",
+  "key": "CATEGORY#Entity|PROTOCOL#morpho",
+  "path": ".Sources[1].label",
+  "old": "Fortune — Morpho raises $175M (a16z, Paradigm, Ribbit)",
+  "new": "Fortune: Morpho raises $175M (a16z, Paradigm, Ribbit)"
+ },
+ {
+  "slug": "morpho",
+  "key": "CATEGORY#Entity|PROTOCOL#morpho",
+  "path": ".Sources[2].label",
+  "old": "The Block — Morpho $175M open credit network",
+  "new": "The Block: Morpho $175M open credit network"
+ },
+ {
+  "slug": "morpho",
+  "key": "CATEGORY#Entity|PROTOCOL#morpho",
+  "path": ".Sources[3].label",
+  "old": "Morpho Docs — Audits / Security Reviews",
+  "new": "Morpho Docs: Audits / Security Reviews"
+ },
+ {
+  "slug": "morpho",
+  "key": "CATEGORY#Entity|PROTOCOL#morpho",
+  "path": ".Tagline",
+  "old": "Customizable lending infrastructure — isolated markets + curated vaults.",
+  "new": "Customizable lending infrastructure: isolated markets + curated vaults."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".MemberCoins[3].role",
+  "old": "Staked CHIP — first-loss insurance capital",
+  "new": "Staked CHIP: first-loss insurance capital"
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".OrgStructure[0].description",
+  "old": "A Cayman Islands foundation company that serves as the legal/off-chain steward of the USD.AI DAO. It handles governance execution, treasury management, legal/regulatory matters, and ecosystem development on behalf of CHIP tokenholders — but does not custody assets or run the core protocol (which is on-chain and permissionless).",
+  "new": "A Cayman Islands foundation company that serves as the legal/off-chain steward of the USD.AI DAO. It handles governance execution, treasury management, legal/regulatory matters, and ecosystem development on behalf of CHIP tokenholders, but does not custody assets or run the core protocol (which is on-chain and permissionless)."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Risks[0].description",
+  "old": "Rapid Obsolescence & Depreciation — GPUs lose value quickly (new generations every 18-24 months). If AI demand slows or better chips arrive, collateral value can crash, leading to under-collateralization.",
+  "new": "Rapid Obsolescence & Depreciation: GPUs lose value quickly (new generations every 18-24 months). If AI demand slows or better chips arrive, collateral value can crash, leading to under-collateralization."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Risks[1].description",
+  "old": "Double Default Risk — Collateral value and revenue (compute rentals) can drop simultaneously in a downturn.",
+  "new": "Double Default Risk: collateral value and revenue (compute rentals) can drop simultaneously in a downturn."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Risks[2].description",
+  "old": "Liquidation Challenges — Oversupply during forced sales could tank the secondary market for used GPUs.",
+  "new": "Liquidation Challenges: oversupply during forced sales could tank the secondary market for used GPUs."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Risks[3].description",
+  "old": "Concentration & Cyclical Risk — Heavily tied to the AI boom; vulnerable to hype cycles (similar to dot-com vendor financing issues).",
+  "new": "Concentration & Cyclical Risk: heavily tied to the AI boom; vulnerable to hype cycles (similar to dot-com vendor financing issues)."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Risks[4].description",
+  "old": "Higher Costs — Often more expensive than plain corporate debt due to complexity and risk premiums.",
+  "new": "Higher Costs: often more expensive than plain corporate debt due to complexity and risk premiums."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Risks[5].description",
+  "old": "Regulatory & Structural Risks — In TradFi: heavy capital requirements for banks. In DeFi: smart contract, governance, or custody risks (though mitigated in USD.AI).",
+  "new": "Regulatory & Structural Risks: in TradFi, heavy capital requirements for banks. In DeFi: smart contract, governance, or custody risks (though mitigated in USD.AI)."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Risks[6].description",
+  "old": "Systemic Concerns — Some compare aggressive GPU financing to pre-2008 financial engineering (hidden leverage via SPVs).",
+  "new": "Systemic Concerns: some compare aggressive GPU financing to pre-2008 financial engineering (hidden leverage via SPVs)."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Sources[1].label",
+  "old": "CoinDesk — USD.AI raises $13M for GPU-backed lending (Aug 2025)",
+  "new": "CoinDesk: USD.AI raises $13M for GPU-backed lending (Aug 2025)"
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Sources[2].label",
+  "old": "Delphi Digital — USD.AI: Financing the Future of AI Infra",
+  "new": "Delphi Digital: USD.AI: Financing the Future of AI Infra"
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Sources[3].label",
+  "old": "MEXC — USDai, sUSDai, CHIP, Allo Points explained",
+  "new": "MEXC: USDai, sUSDai, CHIP, Allo Points explained"
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Sources[4].label",
+  "old": "M^0 Research — USDai composable synthetic dollar",
+  "new": "M^0 Research: USDai composable synthetic dollar"
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Timeline[11].description",
+  "old": "Delphi's terminal backing phase; depends on loan demand scaling — not reached (backing is still mixed T-bills + early loans).",
+  "new": "Delphi's terminal backing phase; depends on loan demand scaling, not reached (backing is still mixed T-bills + early loans)."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Timeline[12].description",
+  "old": "Designed mechanism that 'becomes more relevant as USDai becomes more hardware-backed in stage 3' — not the live primary path yet.",
+  "new": "Designed mechanism that 'becomes more relevant as USDai becomes more hardware-backed in stage 3', not the live primary path yet."
+ },
+ {
+  "slug": "usd-ai",
+  "key": "CATEGORY#Entity|PROTOCOL#usd-ai",
+  "path": ".Timeline[14].description",
+  "old": "Inferred step closing the gap between >$1.2B approved facilities and $225M originated. USD.AI does not publish a per-facility drawdown schedule — this is CanHav's estimate, not a USD.AI commitment.",
+  "new": "Inferred step closing the gap between >$1.2B approved facilities and $225M originated. USD.AI does not publish a per-facility drawdown schedule; this is CanHav's estimate, not a USD.AI commitment."
+ },
+ {
+  "slug": "venus",
+  "key": "CATEGORY#Entity|PROTOCOL#venus",
+  "path": ".Competitors[1].differences",
+  "old": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+  "new": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling."
+ },
+ {
+  "slug": "venus",
+  "key": "CATEGORY#Entity|PROTOCOL#venus",
+  "path": ".Lending.governanceActivity",
+  "old": "Active XVS governance — isolated pools, parameters, VAI module.",
+  "new": "Active XVS governance: isolated pools, parameters, VAI module."
+ },
+ {
+  "slug": "venus",
+  "key": "CATEGORY#Entity|PROTOCOL#venus",
+  "path": ".Sources[2].label",
+  "old": "IQ.wiki — Venus Protocol (history/launch)",
+  "new": "IQ.wiki: Venus Protocol (history/launch)"
+ },
+ {
+  "slug": "venus",
+  "key": "CATEGORY#Entity|PROTOCOL#venus",
+  "path": ".Sources[3].label",
+  "old": "The Defiant — 2021 liquidation/bad-debt event",
+  "new": "The Defiant: 2021 liquidation/bad-debt event"
+ },
+ {
+  "slug": "venus",
+  "key": "CATEGORY#Entity|PROTOCOL#venus",
+  "path": ".Sources[4].label",
+  "old": "CoinDesk — 2023 BNB bridge exploiter $30M liquidation",
+  "new": "CoinDesk: 2023 BNB bridge exploiter $30M liquidation"
+ },
+ {
+  "slug": "venus",
+  "key": "CATEGORY#Entity|PROTOCOL#venus",
+  "path": ".Sources[5].label",
+  "old": "DL News — Sept 2025 $13M phishing recovery / DAO liquidation vote",
+  "new": "DL News: Sept 2025 $13M phishing recovery / DAO liquidation vote"
+ },
+ {
+  "slug": "venus",
+  "key": "CATEGORY#Entity|PROTOCOL#venus",
+  "path": ".Sources[6].label",
+  "old": "CoinDesk — March 2026 THE-token exploit / bad debt",
+  "new": "CoinDesk: March 2026 THE-token exploit / bad debt"
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Competitors[0].differences",
+  "old": "Morpho Blue creates isolated markets (collateral, loan asset, oracle, liquidation settings) with MetaMorpho vaults allocated by curators — more modular and risk-specific than Aave's broad pooled markets.",
+  "new": "Morpho Blue creates isolated markets (collateral, loan asset, oracle, liquidation settings) with MetaMorpho vaults allocated by curators, more modular and risk-specific than Aave's broad pooled markets."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Competitors[1].differences",
+  "old": "Edge is the Sky/Maker stablecoin ecosystem — focused on USDS/DAI liquidity, savings products, and stablecoin borrowing at scale.",
+  "new": "Edge is the Sky/Maker stablecoin ecosystem: focused on USDS/DAI liquidity, savings products, and stablecoin borrowing at scale."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Competitors[2].differences",
+  "old": "Compound III uses one base borrowable asset per market with other assets as collateral — simpler to reason about but less flexible than Aave's multi-asset pools.",
+  "new": "Compound III uses one base borrowable asset per market with other assets as collateral, simpler to reason about but less flexible than Aave's multi-asset pools."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Competitors[3].differences",
+  "old": "Combines lending, vaults, and DEX liquidity through a shared liquidity layer — more capital-efficient but more complex to analyze.",
+  "new": "Combines lending, vaults, and DEX liquidity through a shared liquidity layer, more capital-efficient but more complex to analyze."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Competitors[7].differences",
+  "old": "Institutional / private-credit model — vetted borrowers, loan terms, repayment history and pool managers rather than open overcollateralized lending.",
+  "new": "Institutional / private-credit model: vetted borrowers, loan terms, repayment history and pool managers rather than open overcollateralized lending."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Components[0].description",
+  "old": "Core/Prime/Plus/Horizon markets: supply assets to pools, borrow against collateral, earn real-time interest. Not a token — the protocol product.",
+  "new": "Core/Prime/Plus/Horizon markets: supply assets to pools, borrow against collateral, earn real-time interest. Not a token: the protocol product."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Components[1].description",
+  "old": "Interest-bearing deposit receipts (e.g. aUSDC) minted on supply — accrue yield, redeemable for underlying + interest.",
+  "new": "Interest-bearing deposit receipts (e.g. aUSDC) minted on supply; they accrue yield and are redeemable for underlying + interest."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Components[3].description",
+  "old": "GHO savings product — yield-bearing, not the stablecoin itself. New sGHO experience live May 2026.",
+  "new": "GHO savings product: yield-bearing, not the stablecoin itself. New sGHO experience live May 2026."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Faq[0].answer",
+  "old": "GHO is the overcollateralized stablecoin. sGHO is the yield-bearing savings wrapper — same pattern as USDe/sUSDe or USDS/sUSDS.",
+  "new": "GHO is the overcollateralized stablecoin. sGHO is the yield-bearing savings wrapper, following the same pattern as USDe/sUSDe or USDS/sUSDS."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Lending.deployment.notes",
+  "old": "Mainly EVM/multi-chain; has also explored Aptos/Move deployments — check the specific market.",
+  "new": "Mainly EVM/multi-chain; has also explored Aptos/Move deployments. Check the specific market."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Lending.governanceActivity",
+  "old": "Active Aave DAO — risk-parameter updates, new listings, Aavenomics buybacks, and the Aave V4 direction.",
+  "new": "Active Aave DAO: risk-parameter updates, new listings, Aavenomics buybacks, and the Aave V4 direction."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Lending.governanceDetail.notes",
+  "old": "Active Aave DAO — risk updates, listings, Aavenomics buybacks, Aave V4.",
+  "new": "Active Aave DAO: risk updates, listings, Aavenomics buybacks, Aave V4."
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Sources[1].label",
+  "old": "Aave Docs — Security & Audits",
+  "new": "Aave Docs: Security & Audits"
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Sources[4].label",
+  "old": "Immunefi — Aave bug bounty",
+  "new": "Immunefi: Aave bug bounty"
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Sources[5].label",
+  "old": "DeFiLlama — Aave",
+  "new": "DeFiLlama: Aave"
+ },
+ {
+  "slug": "aave",
+  "key": "CATEGORY#Entity|PROTOCOL#aave",
+  "path": ".Tagline",
+  "old": "Savings for Everyone — open-source non-custodial liquidity protocol.",
+  "new": "Savings for Everyone: open-source non-custodial liquidity protocol."
+ },
+ {
+  "slug": "goldfinch",
+  "key": "CATEGORY#Entity|PROTOCOL#goldfinch",
+  "path": ".Description",
+  "old": "Goldfinch provides uncollateralized crypto loans to real-world businesses in emerging markets via 'trust through consensus' — human backers assess borrower creditworthiness instead of crypto over-collateralization. It pivoted to institutional-grade 'Goldfinch Prime' private-credit funds in 2024. FIDU is the senior-pool LP token.",
+  "new": "Goldfinch provides uncollateralized crypto loans to real-world businesses in emerging markets via 'trust through consensus': human backers assess borrower creditworthiness instead of crypto over-collateralization. It pivoted to institutional-grade 'Goldfinch Prime' private-credit funds in 2024. FIDU is the senior-pool LP token."
+ },
+ {
+  "slug": "stella",
+  "key": "CATEGORY#Entity|PROTOCOL#stella",
+  "path": ".Differentiator",
+  "old": "0% borrow APR — lenders are compensated from strategy profit share rather than interest, aligning incentives between borrowers and lenders.",
+  "new": "0% borrow APR: lenders are compensated from strategy profit share rather than interest, aligning incentives between borrowers and lenders."
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".Competitors[0].differences",
+  "old": "Aave deploys the same protocol per chain with deep liquidity and brand trust; Radiant's differentiator was unified omnichain liquidity via LayerZero — now undermined by the 2024 exploit and wind-down.",
+  "new": "Aave deploys the same protocol per chain with deep liquidity and brand trust; Radiant's differentiator was unified omnichain liquidity via LayerZero, now undermined by the 2024 exploit and wind-down."
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".Differentiator",
+  "old": "Omnichain lending — deposits and borrows are bridged across chains via LayerZero rather than confined to a single network's liquidity.",
+  "new": "Omnichain lending: deposits and borrows are bridged across chains via LayerZero rather than confined to a single network's liquidity."
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".Lending.auditHistory",
+  "old": "Audited; suffered a 2024 exploit — review post-incident hardening before relying.",
+  "new": "Audited; suffered a 2024 exploit. Review post-incident hardening before relying."
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".OffchainFacts[0].value",
+  "old": "LayerZero messaging connects Radiant deployments — cross-chain borrow relies on bridge/oracle integrity.",
+  "new": "LayerZero messaging connects Radiant deployments; cross-chain borrow relies on bridge/oracle integrity."
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".OffchainFacts[2].value",
+  "old": "Winding down (2026) — did not recover from the 2024 exploit.",
+  "new": "Winding down (2026); did not recover from the 2024 exploit."
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".OrgStructure[0].description",
+  "old": "RDNT token (1.5B total supply) governs the protocol and incentivizes cross-chain liquidity. Day-to-day operations ran through a core-contributor multisig — the same signer set whose devices were compromised in the October 2024 exploit.",
+  "new": "RDNT token (1.5B total supply) governs the protocol and incentivizes cross-chain liquidity. Day-to-day operations ran through a core-contributor multisig, the same signer set whose devices were compromised in the October 2024 exploit."
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".Risks[3].description",
+  "old": "The protocol is winding down (2026) after failing to recover from the exploit — elevated residual/withdrawal risk for any remaining positions.",
+  "new": "The protocol is winding down (2026) after failing to recover from the exploit, elevated residual/withdrawal risk for any remaining positions."
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".Sources[0].label",
+  "old": "Radiant Capital — Post-Mortem (Medium)",
+  "new": "Radiant Capital: Post-Mortem (Medium)"
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".Sources[1].label",
+  "old": "CoinDesk — Radiant loses $50M to exploit (Oct 2024)",
+  "new": "CoinDesk: Radiant loses $50M to exploit (Oct 2024)"
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".Sources[2].label",
+  "old": "The Block — Radiant winding down",
+  "new": "The Block: Radiant winding down"
+ },
+ {
+  "slug": "radiant",
+  "key": "CATEGORY#Entity|PROTOCOL#radiant",
+  "path": ".Sources[3].label",
+  "old": "Radiant Capital — Incident Update (Dec 2024)",
+  "new": "Radiant Capital: Incident Update (Dec 2024)"
+ },
+ {
+  "slug": "fluid",
+  "key": "CATEGORY#Entity|PROTOCOL#fluid",
+  "path": ".Competitors[0].differences",
+  "old": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+  "new": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling."
+ },
+ {
+  "slug": "fluid",
+  "key": "CATEGORY#Entity|PROTOCOL#fluid",
+  "path": ".Differentiator",
+  "old": "Capital efficiency: a shared liquidity layer lets collateral, debt, lending liquidity and trading liquidity work together — more efficient but more complex.",
+  "new": "Capital efficiency: a shared liquidity layer lets collateral, debt, lending liquidity and trading liquidity work together, making it more efficient but more complex."
+ },
+ {
+  "slug": "justlend",
+  "key": "CATEGORY#Entity|PROTOCOL#justlend",
+  "path": ".Competitors[1].differences",
+  "old": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+  "new": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling."
+ },
+ {
+  "slug": "justlend",
+  "key": "CATEGORY#Entity|PROTOCOL#justlend",
+  "path": ".Differentiator",
+  "old": "Big by lending TVL on Tron (notably USDT); not an Ethereum/L2 competitor — its data pipeline is Tron/TVM rather than EVM.",
+  "new": "Big by lending TVL on Tron (notably USDT); not an Ethereum/L2 competitor, since its data pipeline is Tron/TVM rather than EVM."
+ },
+ {
+  "slug": "justlend",
+  "key": "CATEGORY#Entity|PROTOCOL#justlend",
+  "path": ".Lending.deployment.notes",
+  "old": "Tron/TVM ecosystem — live metrics require TronGrid/TronScan indexer, not EVM event logs (docs.justlend.org).",
+  "new": "Tron/TVM ecosystem: live metrics require TronGrid/TronScan indexer, not EVM event logs (docs.justlend.org)."
+ },
+ {
+  "slug": "justlend",
+  "key": "CATEGORY#Entity|PROTOCOL#justlend",
+  "path": ".Sources[1].label",
+  "old": "JUST Foundation — JustLend launch announcement (Dec 2020)",
+  "new": "JUST Foundation: JustLend launch announcement (Dec 2020)"
+ },
+ {
+  "slug": "justlend",
+  "key": "CATEGORY#Entity|PROTOCOL#justlend",
+  "path": ".Sources[3].label",
+  "old": "Chainwire — sTRX & Energy Rental launch (Apr 2023)",
+  "new": "Chainwire: sTRX & Energy Rental launch (Apr 2023)"
+ },
+ {
+  "slug": "justlend",
+  "key": "CATEGORY#Entity|PROTOCOL#justlend",
+  "path": ".Sources[4].label",
+  "old": "CryptoSlate — first JST buyback-and-burn (Oct 2025)",
+  "new": "CryptoSlate: first JST buyback-and-burn (Oct 2025)"
+ },
+ {
+  "slug": "justlend",
+  "key": "CATEGORY#Entity|PROTOCOL#justlend",
+  "path": ".Sources[5].label",
+  "old": "crypto.news — SBM V2 isolated-lending launch (Jun 2026)",
+  "new": "crypto.news: SBM V2 isolated-lending launch (Jun 2026)"
+ },
+ {
+  "slug": "justlend",
+  "key": "CATEGORY#Entity|PROTOCOL#justlend",
+  "path": ".Sources[6].label",
+  "old": "Immunefi — JustLend DAO bug bounty ($50k max)",
+  "new": "Immunefi: JustLend DAO bug bounty ($50k max)"
+ },
+ {
+  "slug": "justlend",
+  "key": "CATEGORY#Entity|PROTOCOL#justlend",
+  "path": ".Timeline[3].title",
+  "old": "SBM V2 — isolated collateral markets",
+  "new": "SBM V2: isolated collateral markets"
+ },
+ {
+  "slug": "compound",
+  "key": "CATEGORY#Entity|PROTOCOL#compound",
+  "path": ".Competitors[0].differences",
+  "old": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+  "new": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling."
+ },
+ {
+  "slug": "compound",
+  "key": "CATEGORY#Entity|PROTOCOL#compound",
+  "path": ".Differentiator",
+  "old": "Compound III is simpler than Aave — one base borrowable asset per market makes risk easier to understand, at the cost of multi-asset flexibility.",
+  "new": "Compound III is simpler than Aave: one base borrowable asset per market makes risk easier to understand, at the cost of multi-asset flexibility."
+ },
+ {
+  "slug": "compound",
+  "key": "CATEGORY#Entity|PROTOCOL#compound",
+  "path": ".Faq[1].answer",
+  "old": "No — users interact with non-custodial smart contracts; assets remain in protocol-controlled pools until withdrawn.",
+  "new": "No. Users interact with non-custodial smart contracts; assets remain in protocol-controlled pools until withdrawn."
+ },
+ {
+  "slug": "compound",
+  "key": "CATEGORY#Entity|PROTOCOL#compound",
+  "path": ".Lending.governanceActivity",
+  "old": "Active COMP governance — new markets and parameter proposals.",
+  "new": "Active COMP governance: new markets and parameter proposals."
+ },
+ {
+  "slug": "compound",
+  "key": "CATEGORY#Entity|PROTOCOL#compound",
+  "path": ".OffchainFacts[0].value",
+  "old": "Compound III uses one borrowable base asset per market — collateral assets do not earn supply yield.",
+  "new": "Compound III uses one borrowable base asset per market; collateral assets do not earn supply yield."
+ },
+ {
+  "slug": "compound",
+  "key": "CATEGORY#Entity|PROTOCOL#compound",
+  "path": ".Sources[1].label",
+  "old": "CoinDesk — Compound $25M Series A led by a16z (Nov 2019)",
+  "new": "CoinDesk: Compound $25M Series A led by a16z (Nov 2019)"
+ },
+ {
+  "slug": "compound",
+  "key": "CATEGORY#Entity|PROTOCOL#compound",
+  "path": ".Sources[3].label",
+  "old": "OpenZeppelin — Compound III audit",
+  "new": "OpenZeppelin: Compound III audit"
+ },
+ {
+  "slug": "compound",
+  "key": "CATEGORY#Entity|PROTOCOL#compound",
+  "path": ".Sources[4].label",
+  "old": "ChainSecurity — Compound Comet audit (May 2022)",
+  "new": "ChainSecurity: Compound Comet audit (May 2022)"
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".Differentiator",
+  "old": "Permissionless market creation for yield tokenization — anyone can list a new PT/YT market for an interest-bearing asset.",
+  "new": "Permissionless market creation for yield tokenization: anyone can list a new PT/YT market for an interest-bearing asset."
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".OffchainFacts[0].source.label",
+  "old": "Tech.eu — APWine raises $2.6M",
+  "new": "Tech.eu: APWine raises $2.6M"
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".OffchainFacts[1].source.label",
+  "old": "IQ.wiki — Spectra (prev. APWine Finance)",
+  "new": "IQ.wiki: Spectra (prev. APWine Finance)"
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".OffchainFacts[2].source.label",
+  "old": "Spectra docs — Audits",
+  "new": "Spectra docs: Audits"
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".Sources[0].label",
+  "old": "Spectra official docs — Overview",
+  "new": "Spectra official docs: Overview"
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".Sources[1].label",
+  "old": "Spectra docs — SPECTRA tokenomics / migration",
+  "new": "Spectra docs: SPECTRA tokenomics / migration"
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".Sources[2].label",
+  "old": "Spectra docs — Audits",
+  "new": "Spectra docs: Audits"
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".Sources[4].label",
+  "old": "IQ.wiki — Spectra (prev. APWine Finance) history",
+  "new": "IQ.wiki: Spectra (prev. APWine Finance) history"
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".Sources[5].label",
+  "old": "Tech.eu — APWine raises $2.6M (Greenfield)",
+  "new": "Tech.eu: APWine raises $2.6M (Greenfield)"
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".Sources[6].label",
+  "old": "Code4rena — 2024-02 Spectra audit report",
+  "new": "Code4rena: 2024-02 Spectra audit report"
+ },
+ {
+  "slug": "spectra",
+  "key": "CATEGORY#Entity|PROTOCOL#spectra",
+  "path": ".TradFiComparison[1].similarity",
+  "old": "By choosing PT (fixed) versus YT (floating), a user effectively takes one side of a fixed-vs-floating interest-rate trade, letting them hedge or speculate on the direction of a yield rate — the core function of an interest-rate swap market.",
+  "new": "By choosing PT (fixed) versus YT (floating), a user effectively takes one side of a fixed-vs-floating interest-rate trade, letting them hedge or speculate on the direction of a yield rate, the core function of an interest-rate swap market."
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Components[2].description",
+  "old": "Vote-escrowed PENDLE (lock up to 2 years) — directs incentive emissions across pools, boosts LP rewards, and earns a share of protocol swap fees and YT yield.",
+  "new": "Vote-escrowed PENDLE (lock up to 2 years): directs incentive emissions across pools, boosts LP rewards, and earns a share of protocol swap fees and YT yield."
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Differentiator",
+  "old": "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT buyers go long yield — a true fixed-income primitive for DeFi, with the deepest liquidity and asset coverage in the category.",
+  "new": "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT buyers go long yield, a true fixed-income primitive for DeFi, with the deepest liquidity and asset coverage in the category."
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Faq[0].answer",
+  "old": "PT (Principal Token) is redeemable 1:1 for the underlying at maturity — buying it at a discount locks a fixed yield. YT (Yield Token) captures all yield from the underlying until maturity, so buying YT is a leveraged long on that yield.",
+  "new": "PT (Principal Token) is redeemable 1:1 for the underlying at maturity; buying it at a discount locks a fixed yield. YT (Yield Token) captures all yield from the underlying until maturity, so buying YT is a leveraged long on that yield."
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".OffchainFacts[0].source.label",
+  "old": "Messari — Pendle profile",
+  "new": "Messari: Pendle profile"
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".OffchainFacts[0].value",
+  "old": "2021 — mainnet June 2021 (originally launched as 'Benchmark').",
+  "new": "2021; mainnet June 2021 (originally launched as 'Benchmark')."
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".OffchainFacts[2].source.label",
+  "old": "Crunchbase — Pendle seed round",
+  "new": "Crunchbase: Pendle seed round"
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Partnerships[0].description",
+  "old": "USDe and sUSDe fixed-yield markets became Pendle's largest, with Ethena collateral growing to roughly 70% of Pendle TVL — making stablecoin yield Pendle's flagship category.",
+  "new": "USDe and sUSDe fixed-yield markets became Pendle's largest, with Ethena collateral growing to roughly 70% of Pendle TVL, making stablecoin yield Pendle's flagship category."
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Risks[1].description",
+  "old": "Every market inherits its underlying yield source — a depeg, exploit or yield collapse of assets like Ethena sUSDe, Lido stETH or Ether.fi weETH directly hits PT/YT holders.",
+  "new": "Every market inherits its underlying yield source: a depeg, exploit or yield collapse of assets like Ethena sUSDe, Lido stETH or Ether.fi weETH directly hits PT/YT holders."
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Risks[3].description",
+  "old": "TVL is highly concentrated in Ethena USDe/sUSDe markets (~70%); an Ethena-specific shock would disproportionately impact Pendle. Markets are also time-bound — liquidity thins and YT decays toward maturity.",
+  "new": "TVL is highly concentrated in Ethena USDe/sUSDe markets (~70%); an Ethena-specific shock would disproportionately impact Pendle. Markets are also time-bound: liquidity thins and YT decays toward maturity."
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Sources[2].label",
+  "old": "Messari — Pendle profile",
+  "new": "Messari: Pendle profile"
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Sources[3].label",
+  "old": "Pendle V2 launch — tokenomics",
+  "new": "Pendle V2 launch: tokenomics"
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Sources[4].label",
+  "old": "Boros by Pendle — announcement",
+  "new": "Boros by Pendle: announcement"
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Sources[5].label",
+  "old": "RedStone — Pendle & Ethena (golden protocol of 2024)",
+  "new": "RedStone: Pendle & Ethena (golden protocol of 2024)"
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Sources[6].label",
+  "old": "Crunchbase — Pendle seed round",
+  "new": "Crunchbase: Pendle seed round"
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".Tagline",
+  "old": "Tokenized yield — split principal and yield (PT/YT).",
+  "new": "Tokenized yield: split principal and yield (PT/YT)."
+ },
+ {
+  "slug": "pendle",
+  "key": "CATEGORY#Entity|PROTOCOL#pendle",
+  "path": ".TradFiComparison[0].similarity",
+  "old": "A PT bought at a discount and redeemed at par at maturity behaves like a zero-coupon bond — a known fixed return over a fixed term.",
+  "new": "A PT bought at a discount and redeemed at par at maturity behaves like a zero-coupon bond, a known fixed return over a fixed term."
+ },
+ {
+  "slug": "notional",
+  "key": "CATEGORY#Entity|PROTOCOL#notional",
+  "path": ".Description",
+  "old": "Notional provides fixed-rate, fixed-term lending and borrowing via fCash — tokenized claims on a fixed amount of an asset at a future maturity, traded on an on-chain AMM.",
+  "new": "Notional provides fixed-rate, fixed-term lending and borrowing via fCash: tokenized claims on a fixed amount of an asset at a future maturity, traded on an on-chain AMM."
+ },
+ {
+  "slug": "notional",
+  "key": "CATEGORY#Entity|PROTOCOL#notional",
+  "path": ".Differentiator",
+  "old": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates — predictable cost of capital for borrowers and lenders.",
+  "new": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates, giving predictable cost of capital for borrowers and lenders."
+ },
+ {
+  "slug": "notional",
+  "key": "CATEGORY#Entity|PROTOCOL#notional",
+  "path": ".OffchainFacts[1].source.label",
+  "old": "Notional blog — V3 live on Arbitrum",
+  "new": "Notional blog: V3 live on Arbitrum"
+ },
+ {
+  "slug": "notional",
+  "key": "CATEGORY#Entity|PROTOCOL#notional",
+  "path": ".OffchainFacts[2].source.label",
+  "old": "Notional V3 docs — Audits",
+  "new": "Notional V3 docs: Audits"
+ },
+ {
+  "slug": "notional",
+  "key": "CATEGORY#Entity|PROTOCOL#notional",
+  "path": ".Sources[2].label",
+  "old": "Notional V3 docs — Using fCash",
+  "new": "Notional V3 docs: Using fCash"
+ },
+ {
+  "slug": "notional",
+  "key": "CATEGORY#Entity|PROTOCOL#notional",
+  "path": ".Sources[3].label",
+  "old": "Notional V3 docs — Audits",
+  "new": "Notional V3 docs: Audits"
+ },
+ {
+  "slug": "notional",
+  "key": "CATEGORY#Entity|PROTOCOL#notional",
+  "path": ".Sources[4].label",
+  "old": "CoinDesk — Series A $10M raise",
+  "new": "CoinDesk: Series A $10M raise"
+ },
+ {
+  "slug": "notional",
+  "key": "CATEGORY#Entity|PROTOCOL#notional",
+  "path": ".Sources[5].label",
+  "old": "CoinDesk — launch out of stealth / seed round",
+  "new": "CoinDesk: launch out of stealth / seed round"
+ },
+ {
+  "slug": "notional",
+  "key": "CATEGORY#Entity|PROTOCOL#notional",
+  "path": ".Sources[6].label",
+  "old": "CoinDesk — V2 upgrade",
+  "new": "CoinDesk: V2 upgrade"
+ },
+ {
+  "slug": "sense",
+  "key": "CATEGORY#Entity|PROTOCOL#sense",
+  "path": ".Competitors[0].similarities",
+  "old": "Splits yield-bearing assets into principal and yield tokens (PT/YT) and provides a custom AMM for fixed-rate and yield trading — the same core mechanic Sense pioneered.",
+  "new": "Splits yield-bearing assets into principal and yield tokens (PT/YT) and provides a custom AMM for fixed-rate and yield trading, the same core mechanic Sense pioneered."
+ },
+ {
+  "slug": "sense",
+  "key": "CATEGORY#Entity|PROTOCOL#sense",
+  "path": ".Competitors[2].similarities",
+  "old": "Targets the same DeFi fixed-income market — letting users lock in fixed rates over defined maturities.",
+  "new": "Targets the same DeFi fixed-income market, letting users lock in fixed rates over defined maturities."
+ },
+ {
+  "slug": "sense",
+  "key": "CATEGORY#Entity|PROTOCOL#sense",
+  "path": ".OffchainFacts[0].value",
+  "old": "Deprecated — protocol sunset announced Oct 26, 2023; UI hosting ended Dec 1, 2023 (contracts remain on-chain, unmaintained)",
+  "new": "Deprecated: protocol sunset announced Oct 26, 2023; UI hosting ended Dec 1, 2023 (contracts remain on-chain, unmaintained)"
+ },
+ {
+  "slug": "sense",
+  "key": "CATEGORY#Entity|PROTOCOL#sense",
+  "path": ".Risks[0].description",
+  "old": "The protocol is deprecated: the Sense Core team ceased all contributions in October 2023 and stopped hosting the front-end on December 1, 2023. Remaining PTs/YTs and Space LP positions rely on immutable, unmaintained contracts with no team support, no active UI, and effectively no liquidity — any residual value must be interacted with directly on-chain.",
+  "new": "The protocol is deprecated: the Sense Core team ceased all contributions in October 2023 and stopped hosting the front-end on December 1, 2023. Remaining PTs/YTs and Space LP positions rely on immutable, unmaintained contracts with no team support, no active UI, and effectively no liquidity; any residual value must be interacted with directly on-chain."
+ },
+ {
+  "slug": "sense",
+  "key": "CATEGORY#Entity|PROTOCOL#sense",
+  "path": ".Sources[1].label",
+  "old": "Sense docs — Security & audits",
+  "new": "Sense docs: Security & audits"
+ },
+ {
+  "slug": "sense",
+  "key": "CATEGORY#Entity|PROTOCOL#sense",
+  "path": ".Sources[4].label",
+  "old": "CoinDesk — Sense raises $5.2M (Aug 2021)",
+  "new": "CoinDesk: Sense raises $5.2M (Aug 2021)"
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".Competitors[1].differences",
+  "old": "Morpho provides isolated lending markets and vaults; Gearbox specializes in leverage — combining collateral and debt in Credit Accounts that actively farm/trade across whitelisted protocols.",
+  "new": "Morpho provides isolated lending markets and vaults; Gearbox specializes in leverage, combining collateral and debt in Credit Accounts that actively farm/trade across whitelisted protocols."
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".Components[3].description",
+  "old": "Whitelisted adapter contracts that let Credit Accounts route leveraged capital into external DeFi protocols (e.g. Uniswap, Curve, Convex, Balancer, Pendle, Lido/staking). Adapters are what make Gearbox leverage 'composable' — the same borrowed liquidity can be deployed across many integrated strategies.",
+  "new": "Whitelisted adapter contracts that let Credit Accounts route leveraged capital into external DeFi protocols (e.g. Uniswap, Curve, Convex, Balancer, Pendle, Lido/staking). Adapters are what make Gearbox leverage 'composable': the same borrowed liquidity can be deployed across many integrated strategies."
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".Differentiator",
+  "old": "Credit Accounts compose leverage across protocols rather than a single isolated farm — up to ~10x with a unified margin position.",
+  "new": "Credit Accounts compose leverage across protocols rather than a single isolated farm: up to ~10x with a unified margin position."
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".Faq[0].answer",
+  "old": "Gearbox has two sides. Passive lenders deposit a single asset into a lending pool and earn APY. Borrowers open a Credit Account — an isolated smart contract that combines their own collateral with borrowed pool liquidity — and use that leverage (up to ~10x) across integrated DeFi protocols like Curve, Convex or Pendle through whitelisted adapters.",
+  "new": "Gearbox has two sides. Passive lenders deposit a single asset into a lending pool and earn APY. Borrowers open a Credit Account, an isolated smart contract that combines their own collateral with borrowed pool liquidity, and use that leverage (up to ~10x) across integrated DeFi protocols like Curve, Convex or Pendle through whitelisted adapters."
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".OffchainFacts[0].source.label",
+  "old": "ICO Drops — Gearbox Protocol",
+  "new": "ICO Drops: Gearbox Protocol"
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".OffchainFacts[1].source.label",
+  "old": "Gearbox docs — Supply Information",
+  "new": "Gearbox docs: Supply Information"
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".Sources[0].label",
+  "old": "Gearbox docs — How it works",
+  "new": "Gearbox docs: How it works"
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".Sources[1].label",
+  "old": "Gearbox docs — GEAR supply information",
+  "new": "Gearbox docs: GEAR supply information"
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".Sources[2].label",
+  "old": "Gearbox blog — V3: The Onchain Credit Layer",
+  "new": "Gearbox blog: V3: The Onchain Credit Layer"
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".Sources[4].label",
+  "old": "Blockworks — Gearbox shifts into V2 with $4M funding",
+  "new": "Blockworks: Gearbox shifts into V2 with $4M funding"
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".Sources[5].label",
+  "old": "ICO Drops — Gearbox Protocol funding rounds & tokenomics",
+  "new": "ICO Drops: Gearbox Protocol funding rounds & tokenomics"
+ },
+ {
+  "slug": "gearbox",
+  "key": "CATEGORY#Entity|PROTOCOL#gearbox",
+  "path": ".Sources[6].label",
+  "old": "Immunefi — Gearbox bug bounty",
+  "new": "Immunefi: Gearbox bug bounty"
+ },
+ {
+  "slug": "maple",
+  "key": "CATEGORY#Entity|PROTOCOL#maple",
+  "path": ".Competitors[0].differences",
+  "old": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+  "new": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling."
+ },
+ {
+  "slug": "maple",
+  "key": "CATEGORY#Entity|PROTOCOL#maple",
+  "path": ".Description",
+  "old": "Maple Finance runs onchain lending pools to vetted borrowers — institutions, funds and businesses — closer to a blockchain-based credit marketplace than open overcollateralized DeFi lending.",
+  "new": "Maple Finance runs onchain lending pools to vetted borrowers (institutions, funds and businesses), closer to a blockchain-based credit marketplace than open overcollateralized DeFi lending."
+ },
+ {
+  "slug": "maple",
+  "key": "CATEGORY#Entity|PROTOCOL#maple",
+  "path": ".Lending.badDebt",
+  "old": "Most important metric here — tracked via defaults and loan-loss history per pool.",
+  "new": "Most important metric here; tracked via defaults and loan-loss history per pool."
+ },
+ {
+  "slug": "maple",
+  "key": "CATEGORY#Entity|PROTOCOL#maple",
+  "path": ".Lending.deployment.notes",
+  "old": "EVM deployments plus Solana exposure — treat as cross-ecosystem (Support - Eco).",
+  "new": "EVM deployments plus Solana exposure; treat as cross-ecosystem (Support - Eco)."
+ },
+ {
+  "slug": "maple",
+  "key": "CATEGORY#Entity|PROTOCOL#maple",
+  "path": ".Lending.riskParameters",
+  "old": "Borrower quality, repayment history, collateral ratio, defaults, pool managers and loan terms — credit-market metrics, not pure overcollateralization.",
+  "new": "Borrower quality, repayment history, collateral ratio, defaults, pool managers and loan terms: credit-market metrics, not pure overcollateralization."
+ }
+]

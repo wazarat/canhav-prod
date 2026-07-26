@@ -150,7 +150,7 @@
         "loanPipelineUsd": null,
         "partnerships": 2,
         "targetAprPct": null,
-        "tvlUsd": 13264803877.0,
+        "tvlUsd": 13264803877,
         "users": 1200000
       },
       "Dependencies": [
@@ -513,13 +513,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:08Z",
-          "value": 13264803877.0
+          "value": 13264803877
         }
       },
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Aave is a non-custodial liquidity protocol where users supply assets to pooled markets to earn interest and borrow against collateral in real time. Launched as ETHLend in 2017 and rebranded in 2020, it has grown into the largest DeFi lending network, deployed across Ethereum and more than a dozen other chains. Beyond core lending, the protocol issues GHO, its native overcollateralized stablecoin, operates staking and backstop mechanics through stkAAVE and Umbrella, and is extending into institutional and RWA lending via Horizon. The Aave DAO governs risk parameters, asset listings and emissions, with Aave Labs as the primary development company.",
       "Market": null,
       "MemberCoins": [
         {
@@ -1813,7 +1813,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 100608.0,
+        "tvlUsd": 100608,
         "users": null
       },
       "Dependencies": null,
@@ -1912,7 +1912,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:40Z",
-          "value": 100608.0
+          "value": 100608
         },
         "deployment": {
           "chains": [
@@ -6469,7 +6469,7 @@
           "slug": null
         },
         {
-          "differences": "Ondo concentrates on tokenized Treasury/money-market products, whereas Centrifuge is broader — a full asset-financing and securitization protocol spanning private credit, receivables and funds.",
+          "differences": "Ondo concentrates on tokenized Treasury/money-market products, whereas Centrifuge is broader, a full asset-financing and securitization protocol spanning private credit, receivables and funds.",
           "name": "Ondo Finance",
           "positioning": "RWA platform focused on tokenized US Treasuries and yield-bearing cash-equivalent products for onchain investors.",
           "rank": 4,
@@ -6487,7 +6487,7 @@
           "name": "Tinlake"
         },
         {
-          "description": "Asset originators (Issuers) create pools of tokenized RWAs; investors fund senior (DROP) and junior (TIN) tranches. TIN absorbs first losses and earns higher yield, DROP has payout priority — mirroring traditional structured-credit waterfalls.",
+          "description": "Asset originators (Issuers) create pools of tokenized RWAs; investors fund senior (DROP) and junior (TIN) tranches. TIN absorbs first losses and earns higher yield, DROP has payout priority, mirroring traditional structured-credit waterfalls.",
           "name": "Pools & Tranches (DROP / TIN)"
         },
         {
@@ -6507,7 +6507,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 1639082925.0,
+        "tvlUsd": 1639082925,
         "users": null
       },
       "Dependencies": null,
@@ -6523,7 +6523,7 @@
       "Events": [
         {
           "date": "2021-04-20",
-          "description": "New Silver, a fix-and-flip real-estate loan pool on Centrifuge Tinlake, became the first RWA to back DAI, tapping a MakerDAO vault credit line — a landmark for onchain private credit.",
+          "description": "New Silver, a fix-and-flip real-estate loan pool on Centrifuge Tinlake, became the first RWA to back DAI, tapping a MakerDAO vault credit line, a landmark for onchain private credit.",
           "link": "https://medium.com/centrifuge/defi-2-0-first-real-world-loan-is-financed-on-maker-fbe24675428f",
           "title": "First real-world asset financed via MakerDAO"
         },
@@ -6535,7 +6535,7 @@
         },
         {
           "date": "2024-09-13",
-          "description": "Janus Henderson announced a partnership with Anemoy and Centrifuge to sub-advise the Liquid Treasury Fund — its first tokenized fund — managing the portfolio via subsidiary Tabula.",
+          "description": "Janus Henderson announced a partnership with Anemoy and Centrifuge to sub-advise the Liquid Treasury Fund, its first tokenized fund, managing the portfolio via subsidiary Tabula.",
           "link": "https://www.janushenderson.com/corporate/press-releases/janus-henderson-to-partner-with-anemoy-and-centrifuge-on-its-first-tokenized-fund/",
           "title": "Janus Henderson partners on tokenized Treasury fund"
         },
@@ -6547,14 +6547,14 @@
         },
         {
           "date": "2026-06-30",
-          "description": "Centrifuge and New York Life Investment Management announced a partnership to tokenize a US high-yield corporate bond strategy — NYLIM's first tokenization move.",
+          "description": "Centrifuge and New York Life Investment Management announced a partnership to tokenize a US high-yield corporate bond strategy, NYLIM's first tokenization move.",
           "link": "https://www.businesswire.com/news/home/20260630051099/en/Centrifuge-and-New-York-Life-Investment-Management-Partner-to-Tokenize-U.S.-High-Yield-Corporate-Bond-Strategy",
           "title": "New York Life Investment Management tokenizes high-yield bond strategy"
         }
       ],
       "Faq": [
         {
-          "answer": "Centrifuge is a decentralized asset-financing protocol and real-world-asset (RWA) tokenization platform. It lets asset originators bring off-chain assets — private credit, trade-finance receivables, mortgages and tokenized treasury funds — onchain and finance them from DeFi liquidity.",
+          "answer": "Centrifuge is a decentralized asset-financing protocol and real-world-asset (RWA) tokenization platform. It lets asset originators bring off-chain assets (private credit, trade-finance receivables, mortgages and tokenized treasury funds) onchain and finance them from DeFi liquidity.",
           "pinned": true,
           "question": "What is Centrifuge?"
         },
@@ -6564,12 +6564,12 @@
           "question": "What is the difference between Tinlake and Centrifuge V3?"
         },
         {
-          "answer": "Each Centrifuge pool is split into two tranches. DROP is the senior tranche with priority on repayments and a lower, more stable yield; TIN is the junior tranche that absorbs first losses and earns a higher variable return — analogous to senior/equity tranches in traditional securitization.",
+          "answer": "Each Centrifuge pool is split into two tranches. DROP is the senior tranche with priority on repayments and a lower, more stable yield; TIN is the junior tranche that absorbs first losses and earns a higher variable return, analogous to senior/equity tranches in traditional securitization.",
           "pinned": false,
           "question": "What are DROP and TIN tokens?"
         },
         {
-          "answer": "Centrifuge pools were among the first RWA collateral used to back DAI. In 2021 New Silver — a fix-and-flip real-estate loan pool on Centrifuge Tinlake — became the first real-world asset financed via MakerDAO, tapping a Maker vault credit line to mint DAI against real-estate-backed collateral.",
+          "answer": "Centrifuge pools were among the first RWA collateral used to back DAI. In 2021 New Silver, a fix-and-flip real-estate loan pool on Centrifuge Tinlake, became the first real-world asset financed via MakerDAO, tapping a Maker vault credit line to mint DAI against real-estate-backed collateral.",
           "pinned": false,
           "question": "What was Centrifuge's role with MakerDAO?"
         },
@@ -6615,7 +6615,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Centrifuge is a real-world-asset financing protocol that tokenizes illiquid business assets such as invoices, mortgages and trade-finance receivables through bankruptcy-remote SPV structures. Each pool issues senior DROP and junior TIN tranche tokens, recreating a structured-credit waterfall in which TIN absorbs first losses for higher yield. Centrifuge pools were among the first RWA collateral backing MakerDAO's DAI, and its newer products (JAAA, JTRSY) extend into tokenized CLOs and Treasuries with institutional partners like Janus Henderson. It appears in the Credit sector through its private-credit financing role while remaining primarily an RWA platform.",
       "Market": null,
       "MemberCoins": [
         {
@@ -6652,7 +6652,7 @@
           "freshness": "static",
           "key": "V3 multi-chain deployment",
           "source": {
-            "label": "Centrifuge — Onchain Asset Management",
+            "label": "Centrifuge: Onchain Asset Management",
             "url": "https://centrifuge.io/"
           },
           "value": "After migrating off its Polkadot-based chain in March 2025, Centrifuge V3 operates across 10+ Ethereum-compatible networks including Ethereum, Base and Arbitrum, with a unified fund-administration interface."
@@ -6672,7 +6672,7 @@
           "freshness": "static",
           "key": "CFG token consolidation date",
           "source": {
-            "label": "The CFG Token — Centrifuge Docs",
+            "label": "The CFG Token: Centrifuge Docs",
             "url": "https://docs.centrifuge.io/getting-started/token-summary/"
           },
           "value": "On 20 March 2025 governance proposal CP149 passed, consolidating legacy token versions into a single Ethereum-native ERC-20 CFG governance token."
@@ -6700,26 +6700,26 @@
           "amountLabel": null,
           "date": "2021-04-20",
           "description": "New Silver's fix-and-flip real-estate loan pool on Centrifuge Tinlake became the first RWA to back DAI via a MakerDAO vault credit line, pioneering onchain RWA collateral.",
-          "name": "MakerDAO — New Silver RWA pool"
+          "name": "MakerDAO: New Silver RWA pool"
         },
         {
           "amountLabel": null,
           "date": "2024-09-13",
           "description": "Janus Henderson partnered with Anemoy and Centrifuge to sub-advise the fully onchain Liquid Treasury Fund (short-term US Treasury exposure), managing the portfolio via subsidiary Tabula.",
-          "name": "Janus Henderson & Anemoy — Liquid Treasury Fund"
+          "name": "Janus Henderson & Anemoy: Liquid Treasury Fund"
         },
         {
           "amountLabel": null,
           "date": "2026-06-30",
           "description": "Centrifuge and New York Life Investment Management announced a partnership to tokenize a US high-yield corporate bond strategy, marking NYLIM's tokenization debut.",
-          "name": "New York Life Investment Management — tokenized high-yield bond strategy"
+          "name": "New York Life Investment Management: tokenized high-yield bond strategy"
         }
       ],
       "PriceHistory": null,
       "Risks": [
         {
           "category": "Counterparty",
-          "description": "Pools finance off-chain private credit and receivables; if underlying borrowers or asset originators default or fail to remit repayments, investors — especially junior (TIN) tranche holders — can lose principal. Repayment depends on off-chain legal enforcement of loan agreements and SPV structures."
+          "description": "Pools finance off-chain private credit and receivables; if underlying borrowers or asset originators default or fail to remit repayments, investors, especially junior (TIN) tranche holders, can lose principal. Repayment depends on off-chain legal enforcement of loan agreements and SPV structures."
         },
         {
           "category": "Collateral",
@@ -6744,7 +6744,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:31Z",
-          "value": 1639082925.0
+          "value": 1639082925
         },
         "deployment": {
           "chains": [
@@ -6844,31 +6844,31 @@
       "Slug": "centrifuge",
       "Sources": [
         {
-          "label": "Centrifuge — official site",
+          "label": "Centrifuge: official site",
           "url": "https://centrifuge.io/"
         },
         {
-          "label": "Centrifuge Docs — DAO summary",
+          "label": "Centrifuge Docs: DAO summary",
           "url": "https://docs.centrifuge.io/getting-started/dao-summary/"
         },
         {
-          "label": "Centrifuge Docs — The CFG Token",
+          "label": "Centrifuge Docs: The CFG Token",
           "url": "https://docs.centrifuge.io/getting-started/token-summary/"
         },
         {
-          "label": "Centrifuge blog — DeFi 2.0: First Real-World Loan Financed on Maker",
+          "label": "Centrifuge blog: DeFi 2.0: First Real-World Loan Financed on Maker",
           "url": "https://medium.com/centrifuge/defi-2-0-first-real-world-loan-is-financed-on-maker-fbe24675428f"
         },
         {
-          "label": "Janus Henderson press release — Anemoy/Centrifuge partnership",
+          "label": "Janus Henderson press release: Anemoy/Centrifuge partnership",
           "url": "https://www.janushenderson.com/corporate/press-releases/janus-henderson-to-partner-with-anemoy-and-centrifuge-on-its-first-tokenized-fund/"
         },
         {
-          "label": "Businesswire — Centrifuge & New York Life Investment Management",
+          "label": "Businesswire: Centrifuge & New York Life Investment Management",
           "url": "https://www.businesswire.com/news/home/20260630051099/en/Centrifuge-and-New-York-Life-Investment-Management-Partner-to-Tokenize-U.S.-High-Yield-Corporate-Bond-Strategy"
         },
         {
-          "label": "Centrifuge Governance Forum — CP171 restructuring",
+          "label": "Centrifuge Governance Forum: CP171 restructuring",
           "url": "https://gov.centrifuge.io/t/cp171-aligning-for-execution-transparency-and-cfg-value-accrual-through-centrifuge-network-foundation/7132/1"
         }
       ],
@@ -6905,7 +6905,7 @@
         {
           "differences": "Issuance, subscriptions, redemptions and the cap table are handled onchain via smart contracts and stablecoins rather than through banks, custodians and clearing houses, enabling smaller ticket sizes, near-real-time settlement and transparent onchain accounting.",
           "product": "Securitization / structured credit (ABS)",
-          "similarity": "Centrifuge pools bundle income-producing assets (invoices, mortgages, receivables) and issue tranched claims (DROP senior / TIN junior) with a payment waterfall — the same senior/subordinated structure used in asset-backed securities."
+          "similarity": "Centrifuge pools bundle income-producing assets (invoices, mortgages, receivables) and issue tranched claims (DROP senior / TIN junior) with a payment waterfall, the same senior/subordinated structure used in asset-backed securities."
         },
         {
           "differences": "The fund is issued as a transferable onchain token that settles 24/7, can be used as DeFi collateral, and is administered across multiple public blockchains instead of via a traditional transfer agent.",
@@ -7004,7 +7004,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 1029848.0,
+        "tvlUsd": 1029848,
         "users": null
       },
       "Dependencies": null,
@@ -7183,7 +7183,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:31Z",
-          "value": 1029848.0
+          "value": 1029848
         },
         "deployment": {
           "chains": [],
@@ -7634,14 +7634,14 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 21569236.0,
+        "tvlUsd": 21569236,
         "users": null
       },
       "Dependencies": null,
       "Derivatives": null,
       "DerivativesSecondaryTags": null,
       "DerivativesSubSector": null,
-      "Description": "Clearpool runs institutional uncollateralized lending — whitelisted institutional borrowers access dynamic-rate pools where utilization sets interest. It introduced 'Credit Vaults' for permissioned single-borrower exposure; cpUSD is tied to Credit Vault yields.",
+      "Description": "Clearpool runs institutional uncollateralized lending: whitelisted institutional borrowers access dynamic-rate pools where utilization sets interest. It introduced 'Credit Vaults' for permissioned single-borrower exposure; cpUSD is tied to Credit Vault yields.",
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
@@ -7738,7 +7738,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Clearpool is an institutional uncollateralized lending marketplace: KYC-vetted institutional borrowers open dynamic-rate pools that permissionless lenders can fund, with utilization setting the interest rate. Credit Vaults extend the model to permissioned single-borrower exposure with negotiated terms, and cpUSD packages Credit Vault yield. Lenders take real borrower credit risk rather than liquidating overcollateralized positions, so borrower transparency and repayment history are central. CPOOL coordinates governance and incentives.",
       "Market": null,
       "MemberCoins": [
         {
@@ -7775,7 +7775,7 @@
           "freshness": "static",
           "key": "Seed funding raised",
           "source": {
-            "label": "crypto-fundraising.info — Clearpool",
+            "label": "crypto-fundraising.info: Clearpool",
             "url": "https://crypto-fundraising.info/projects/clearpool/"
           },
           "value": "$3M seed round (Sept 2021) led by investors including Arrington Capital, HashKey Capital, Hex Trust, Sequoia Capital India, Wintermute and GBV Capital"
@@ -7785,7 +7785,7 @@
           "freshness": "static",
           "key": "Loans originated",
           "source": {
-            "label": "Clearpool blog — Launches on Base",
+            "label": "Clearpool blog: Launches on Base",
             "url": "https://medium.com/clearpool-finance/clearpool-launches-on-base-enabling-institutional-access-to-onchain-credit-2ec15d098742"
           },
           "value": "Over $530M in loans originated as of the July 2024 Base launch (originations have grown further since)"
@@ -7795,7 +7795,7 @@
           "freshness": "static",
           "key": "CPOOL token supply",
           "source": {
-            "label": "CoinMarketCap — Clearpool",
+            "label": "CoinMarketCap: Clearpool",
             "url": "https://coinmarketcap.com/currencies/clearpool/"
           },
           "value": "Fixed maximum supply of 1,000,000,000 (1 billion) CPOOL tokens"
@@ -7873,7 +7873,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:32Z",
-          "value": 21569236.0
+          "value": 21569236
         },
         "deployment": {
           "chains": [
@@ -7977,31 +7977,31 @@
       "Slug": "clearpool",
       "Sources": [
         {
-          "label": "Clearpool docs — What Is Clearpool (products)",
+          "label": "Clearpool docs: What Is Clearpool (products)",
           "url": "https://docs.clearpool.finance/clearpool"
         },
         {
-          "label": "Clearpool docs — Prime",
+          "label": "Clearpool docs: Prime",
           "url": "https://docs.clearpool.finance/clearpool/products/lending/prime"
         },
         {
-          "label": "crypto-fundraising.info — Clearpool funding",
+          "label": "crypto-fundraising.info: Clearpool funding",
           "url": "https://crypto-fundraising.info/projects/clearpool/"
         },
         {
-          "label": "Clearpool blog — Introduces Ozean",
+          "label": "Clearpool blog: Introduces Ozean",
           "url": "https://clearpool.medium.com/clearpool-introduces-ozean-the-blockchain-for-real-world-asset-rwa-yield-8669a70f8ef4"
         },
         {
-          "label": "Clearpool blog — Launches on Base",
+          "label": "Clearpool blog: Launches on Base",
           "url": "https://medium.com/clearpool-finance/clearpool-launches-on-base-enabling-institutional-access-to-onchain-credit-2ec15d098742"
         },
         {
-          "label": "Smart Liquidity — CertiK & Pessimistic audits",
+          "label": "Smart Liquidity: CertiK & Pessimistic audits",
           "url": "https://smartliquidity.info/2022/03/27/clearpool-successfully-completes-audits-with-certik-and-pessimistic/"
         },
         {
-          "label": "CoinMarketCap — Clearpool (CPOOL)",
+          "label": "CoinMarketCap: Clearpool (CPOOL)",
           "url": "https://coinmarketcap.com/currencies/clearpool/"
         }
       ],
@@ -8437,7 +8437,7 @@
       "ChildEntities": null,
       "Competitors": [
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -8485,7 +8485,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 1154786202.0,
+        "tvlUsd": 1154786202,
         "users": 450000
       },
       "Dependencies": null,
@@ -8496,7 +8496,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "Compound III is simpler than Aave — one base borrowable asset per market makes risk easier to understand, at the cost of multi-asset flexibility.",
+      "Differentiator": "Compound III is simpler than Aave: one base borrowable asset per market makes risk easier to understand, at the cost of multi-asset flexibility.",
       "Discord": "https://discord.gg/compound",
       "Events": [
         {
@@ -8512,7 +8512,7 @@
           "question": "What changed in Compound III?"
         },
         {
-          "answer": "No — users interact with non-custodial smart contracts; assets remain in protocol-controlled pools until withdrawn.",
+          "answer": "No. Users interact with non-custodial smart contracts; assets remain in protocol-controlled pools until withdrawn.",
           "pinned": true,
           "question": "Is Compound custodial?"
         },
@@ -8569,7 +8569,7 @@
           "evmCompatible": "yes",
           "notes": "Compound III is built for EVM-compatible deployments (docs.compound.finance)."
         },
-        "governanceActivity": "Active COMP governance — new markets and parameter proposals.",
+        "governanceActivity": "Active COMP governance: new markets and parameter proposals.",
         "governanceDetail": {
           "notes": "Active COMP governance for new markets and parameter updates.",
           "proposals": null,
@@ -8600,13 +8600,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:09Z",
-          "value": 1154786202.0
+          "value": 1154786202
         }
       },
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Compound is one of the original DeFi lending protocols and helped define the pooled money-market model with algorithmic, utilization-driven interest rates. Its current generation, Compound III (Comet), deliberately simplifies each market to a single borrowable base asset, with all other assets posted purely as collateral that earns no supply yield. This design makes market risk easier to reason about than multi-asset pools, at the cost of flexibility. COMP tokenholders govern the protocol, approving new markets and parameter changes.",
       "Market": null,
       "MemberCoins": [
         {
@@ -8636,7 +8636,7 @@
             "label": "Compound docs",
             "url": "https://docs.compound.finance"
           },
-          "value": "Compound III uses one borrowable base asset per market — collateral assets do not earn supply yield."
+          "value": "Compound III uses one borrowable base asset per market; collateral assets do not earn supply yield."
         },
         {
           "capturedAt": "2026-07-02",
@@ -8728,7 +8728,7 @@
           "url": "https://docs.compound.finance/"
         },
         {
-          "label": "CoinDesk — Compound $25M Series A led by a16z (Nov 2019)",
+          "label": "CoinDesk: Compound $25M Series A led by a16z (Nov 2019)",
           "url": "https://www.coindesk.com/tech/2019/11/14/defi-startup-compound-finance-raises-25-million-series-a-led-by-a16z"
         },
         {
@@ -8736,11 +8736,11 @@
           "url": "https://medium.com/compound-finance/compound-governance-decentralized-b18659f811e0"
         },
         {
-          "label": "OpenZeppelin — Compound III audit",
+          "label": "OpenZeppelin: Compound III audit",
           "url": "https://www.openzeppelin.com/news/compound-iii-audit"
         },
         {
-          "label": "ChainSecurity — Compound Comet audit (May 2022)",
+          "label": "ChainSecurity: Compound Comet audit (May 2022)",
           "url": "https://reports.chainsecurity.com/Compound/ChainSecurity_Compound_Comet_Audit.pdf"
         }
       ],
@@ -13822,7 +13822,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 13948971.0,
+        "tvlUsd": 13948971,
         "users": null
       },
       "Dependencies": null,
@@ -13973,7 +13973,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:33Z",
-          "value": 13948971.0
+          "value": 13948971
         },
         "deployment": {
           "chains": [],
@@ -15163,11 +15163,12 @@
       "CurrentScale": {
         "aprPct": null,
         "loanPipelineUsd": null,
-        "marketCapUsd": null,
+        "marketCapUsd": 1981454,
         "partnerships": null,
         "targetAprPct": null,
         "tvlUsd": null,
-        "users": null
+        "users": null,
+        "volume24hUsd": 230
       },
       "Dependencies": null,
       "Derivatives": null,
@@ -15239,7 +15240,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Extra Finance is a leveraged yield-farming protocol on the Optimism and Base Superchain ecosystem. It pairs a lending market with leveraged LP farming, letting users borrow to lever liquidity positions on integrated DEXes up to roughly 7x. Lenders earn yield from farmers' borrow demand, while farmers manage amplified LP exposure, including impermanent-loss risk that leverage magnifies. The EXTRA token (1B hard cap, mint authority destroyed) coordinates incentives across the protocol.",
       "Market": null,
       "MemberCoins": [
         {
@@ -15271,7 +15272,7 @@
             "label": "Extra Finance Allocation & Emission docs",
             "url": "https://docs.extrafi.io/extra_finance/tokenomics/tokenomics-v1/allocation-and-emission"
           },
-          "value": "1,000,000,000 (hard cap; mint authority destroyed) — 60% community, 26% ecosystem, 10% team, 3% airdrop, 1% initial liquidity"
+          "value": "1,000,000,000 (hard cap; mint authority destroyed): 60% community, 26% ecosystem, 10% team, 3% airdrop, 1% initial liquidity"
         },
         {
           "capturedAt": "2026-07-02",
@@ -15346,31 +15347,31 @@
       "Slug": "extra-finance",
       "Sources": [
         {
-          "label": "Extra Finance official docs — Welcome",
+          "label": "Extra Finance official docs: Welcome",
           "url": "https://docs.extrafi.io/extra_finance"
         },
         {
-          "label": "Extra Finance docs — Audits & Security",
+          "label": "Extra Finance docs: Audits & Security",
           "url": "https://docs.extrafi.io/extra_finance/audits-and-security"
         },
         {
-          "label": "Extra Finance docs — Allocation & Emission (tokenomics)",
+          "label": "Extra Finance docs: Allocation & Emission (tokenomics)",
           "url": "https://docs.extrafi.io/extra_finance/tokenomics/tokenomics-v1/allocation-and-emission"
         },
         {
-          "label": "Immunefi — Extra Finance bug bounty",
+          "label": "Immunefi: Extra Finance bug bounty",
           "url": "https://immunefi.com/bug-bounty/extrafinance/information/"
         },
         {
-          "label": "Nansen — What Is Extra Finance?",
+          "label": "Nansen: What Is Extra Finance?",
           "url": "https://nansen.ai/post/what-is-extra-finance"
         },
         {
-          "label": "Extra Finance Monthly Review — January 2025 (XLend, TVL, PancakeSwap)",
+          "label": "Extra Finance Monthly Review: January 2025 (XLend, TVL, PancakeSwap)",
           "url": "https://medium.com/@ExtraFinance/extra-finance-monthly-review-january-2025-4338fc3079a0"
         },
         {
-          "label": "DefiLlama — Extra Finance",
+          "label": "DefiLlama: Extra Finance",
           "url": "https://defillama.com/protocol/extra-finance"
         }
       ],
@@ -16273,7 +16274,7 @@
       "ChildEntities": null,
       "Competitors": [
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -16316,7 +16317,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 766381207.0,
+        "tvlUsd": 766381207,
         "users": 45000
       },
       "Dependencies": null,
@@ -16327,7 +16328,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "Capital efficiency: a shared liquidity layer lets collateral, debt, lending liquidity and trading liquidity work together — more efficient but more complex.",
+      "Differentiator": "Capital efficiency: a shared liquidity layer lets collateral, debt, lending liquidity and trading liquidity work together, making it more efficient but more complex.",
       "Discord": null,
       "Events": [
         {
@@ -16474,13 +16475,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:10Z",
-          "value": 766381207.0
+          "value": 766381207
         }
       },
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Fluid, built by the Instadapp team, merges lending, collateralized vaults and DEX liquidity on a single shared liquidity layer, so the same capital can simultaneously back lending and trading. Its smart-collateral and smart-debt design lets positions earn trading fees that offset borrow costs, pushing capital efficiency beyond conventional money markets. Liquidations are granular and gas-efficient, reducing penalty sizes relative to classic designs. The trade-off is complexity: risk in one layer can propagate through the shared liquidity system.",
       "Market": null,
       "MemberCoins": [
         {
@@ -18162,7 +18163,7 @@
           "slug": "aave"
         },
         {
-          "differences": "Morpho provides isolated lending markets and vaults; Gearbox specializes in leverage — combining collateral and debt in Credit Accounts that actively farm/trade across whitelisted protocols.",
+          "differences": "Morpho provides isolated lending markets and vaults; Gearbox specializes in leverage, combining collateral and debt in Credit Accounts that actively farm/trade across whitelisted protocols.",
           "name": "Morpho",
           "positioning": "Modular, permissionless lending stack with isolated markets; competes for the 'credit layer' narrative and lender deposits.",
           "rank": 2,
@@ -18200,7 +18201,7 @@
           "name": "GEAR token"
         },
         {
-          "description": "Whitelisted adapter contracts that let Credit Accounts route leveraged capital into external DeFi protocols (e.g. Uniswap, Curve, Convex, Balancer, Pendle, Lido/staking). Adapters are what make Gearbox leverage 'composable' — the same borrowed liquidity can be deployed across many integrated strategies.",
+          "description": "Whitelisted adapter contracts that let Credit Accounts route leveraged capital into external DeFi protocols (e.g. Uniswap, Curve, Convex, Balancer, Pendle, Lido/staking). Adapters are what make Gearbox leverage 'composable': the same borrowed liquidity can be deployed across many integrated strategies.",
           "name": "Adapters & integrations"
         }
       ],
@@ -18241,7 +18242,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "Credit Accounts compose leverage across protocols rather than a single isolated farm — up to ~10x with a unified margin position.",
+      "Differentiator": "Credit Accounts compose leverage across protocols rather than a single isolated farm: up to ~10x with a unified margin position.",
       "Discord": null,
       "Events": [
         {
@@ -18277,7 +18278,7 @@
       ],
       "Faq": [
         {
-          "answer": "Gearbox has two sides. Passive lenders deposit a single asset into a lending pool and earn APY. Borrowers open a Credit Account — an isolated smart contract that combines their own collateral with borrowed pool liquidity — and use that leverage (up to ~10x) across integrated DeFi protocols like Curve, Convex or Pendle through whitelisted adapters.",
+          "answer": "Gearbox has two sides. Passive lenders deposit a single asset into a lending pool and earn APY. Borrowers open a Credit Account, an isolated smart contract that combines their own collateral with borrowed pool liquidity, and use that leverage (up to ~10x) across integrated DeFi protocols like Curve, Convex or Pendle through whitelisted adapters.",
           "pinned": true,
           "question": "How does Gearbox work?"
         },
@@ -18347,7 +18348,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Gearbox is a generalized leverage protocol built on Credit Accounts: isolated smart-contract accounts that combine a user's collateral with borrowed pool liquidity, supporting leverage up to roughly 10x. Borrowers deploy that leveraged capital across whitelisted integrations such as Curve, Convex, Lido and Pendle through adapter contracts, making the leverage composable rather than confined to one farm. Passive lenders fund the pools and earn borrow interest without managing positions. Health-factor-based liquidations keep each Credit Account's risk isolated from the rest of the protocol.",
       "Market": null,
       "MemberCoins": [
         {
@@ -18366,7 +18367,7 @@
           "freshness": "static",
           "key": "Total raised across 3 rounds",
           "source": {
-            "label": "ICO Drops — Gearbox Protocol",
+            "label": "ICO Drops: Gearbox Protocol",
             "url": "https://icodrops.com/gearbox-protocol/"
           },
           "value": "~$8.04M (seed ~$2.3M 2021, DAO round ~$4.15M + ~$1.585M 2022)"
@@ -18376,7 +18377,7 @@
           "freshness": "static",
           "key": "GEAR total supply",
           "source": {
-            "label": "Gearbox docs — Supply Information",
+            "label": "Gearbox docs: Supply Information",
             "url": "https://docs.gearbox.finance/gear-token/supply-information"
           },
           "value": "10,000,000,000 GEAR"
@@ -18447,15 +18448,15 @@
       "Slug": "gearbox",
       "Sources": [
         {
-          "label": "Gearbox docs — How it works",
+          "label": "Gearbox docs: How it works",
           "url": "https://docs.gearbox.finance/"
         },
         {
-          "label": "Gearbox docs — GEAR supply information",
+          "label": "Gearbox docs: GEAR supply information",
           "url": "https://docs.gearbox.finance/gear-token/supply-information"
         },
         {
-          "label": "Gearbox blog — V3: The Onchain Credit Layer",
+          "label": "Gearbox blog: V3: The Onchain Credit Layer",
           "url": "https://blog.gearbox.finance/gearbox-protocol-v3-the-onchain-credit-layer/"
         },
         {
@@ -18463,15 +18464,15 @@
           "url": "https://github.com/Gearbox-protocol/security"
         },
         {
-          "label": "Blockworks — Gearbox shifts into V2 with $4M funding",
+          "label": "Blockworks: Gearbox shifts into V2 with $4M funding",
           "url": "https://blockworks.co/news/gearbox-shifts-into-v2-with-4m-funding-boost"
         },
         {
-          "label": "ICO Drops — Gearbox Protocol funding rounds & tokenomics",
+          "label": "ICO Drops: Gearbox Protocol funding rounds & tokenomics",
           "url": "https://icodrops.com/gearbox-protocol/"
         },
         {
-          "label": "Immunefi — Gearbox bug bounty",
+          "label": "Immunefi: Gearbox bug bounty",
           "url": "https://immunefi.com/bug-bounty/gearbox/"
         }
       ],
@@ -19198,14 +19199,14 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 1441894.0,
+        "tvlUsd": 1441894,
         "users": null
       },
       "Dependencies": null,
       "Derivatives": null,
       "DerivativesSecondaryTags": null,
       "DerivativesSubSector": null,
-      "Description": "Goldfinch provides uncollateralized crypto loans to real-world businesses in emerging markets via 'trust through consensus' — human backers assess borrower creditworthiness instead of crypto over-collateralization. It pivoted to institutional-grade 'Goldfinch Prime' private-credit funds in 2024. FIDU is the senior-pool LP token.",
+      "Description": "Goldfinch provides uncollateralized crypto loans to real-world businesses in emerging markets via 'trust through consensus': human backers assess borrower creditworthiness instead of crypto over-collateralization. It pivoted to institutional-grade 'Goldfinch Prime' private-credit funds in 2024. FIDU is the senior-pool LP token.",
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
@@ -19316,7 +19317,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Goldfinch pioneered uncollateralized crypto lending to real-world businesses, using a 'trust through consensus' model in which human backers assess borrower creditworthiness instead of requiring crypto collateral. Its early books financed fintech lenders in emerging markets; after credit losses in that portfolio, it pivoted in 2024 to Goldfinch Prime, which channels on-chain capital into institutional private-credit funds from managers like Ares and Apollo. FIDU represents senior-pool LP positions, and GFI governs the protocol. It appears in the Credit sector through this private-credit role while sitting primarily in RWA.",
       "Market": null,
       "MemberCoins": [
         {
@@ -19439,7 +19440,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:34Z",
-          "value": 1441894.0
+          "value": 1441894
         },
         "deployment": {
           "chains": [
@@ -21861,7 +21862,7 @@
           "slug": "venus"
         },
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -21895,7 +21896,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 3308145204.0,
+        "tvlUsd": 3308145204,
         "users": 520000
       },
       "Dependencies": null,
@@ -21906,7 +21907,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "Big by lending TVL on Tron (notably USDT); not an Ethereum/L2 competitor — its data pipeline is Tron/TVM rather than EVM.",
+      "Differentiator": "Big by lending TVL on Tron (notably USDT); not an Ethereum/L2 competitor, since its data pipeline is Tron/TVM rather than EVM.",
       "Discord": null,
       "Events": [
         {
@@ -21989,7 +21990,7 @@
             "Tron"
           ],
           "evmCompatible": "no",
-          "notes": "Tron/TVM ecosystem — live metrics require TronGrid/TronScan indexer, not EVM event logs (docs.justlend.org)."
+          "notes": "Tron/TVM ecosystem: live metrics require TronGrid/TronScan indexer, not EVM event logs (docs.justlend.org)."
         },
         "governanceActivity": "Governed by the JUST ecosystem / JST holders.",
         "governanceDetail": {
@@ -22022,13 +22023,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:11Z",
-          "value": 3308145204.0
+          "value": 3308145204
         }
       },
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "JustLend DAO is the dominant pooled money market on Tron and part of Justin Sun's broader JUST ecosystem. It follows the classic supply-and-borrow model, with USDT lending accounting for much of its multi-billion-dollar TVL, alongside TRX staking and energy-rental products specific to Tron. Because it runs on the TVM rather than the EVM, its on-chain metrics come from Tron indexers (TronGrid/TronScan) rather than Ethereum tooling. It competes by dominating its home ecosystem rather than contesting Ethereum lending share.",
       "Market": null,
       "MemberCoins": [
         {
@@ -22136,7 +22137,7 @@
           "url": "https://docs.justlend.org/"
         },
         {
-          "label": "JUST Foundation — JustLend launch announcement (Dec 2020)",
+          "label": "JUST Foundation: JustLend launch announcement (Dec 2020)",
           "url": "https://justfoundation.medium.com/justlend-now-live-trons-first-official-lending-platform-to-redefine-the-decentralized-lending-7ab1835444e8"
         },
         {
@@ -22144,19 +22145,19 @@
           "url": "https://justlend.org/docs/justlend_audit_en.pdf"
         },
         {
-          "label": "Chainwire — sTRX & Energy Rental launch (Apr 2023)",
+          "label": "Chainwire: sTRX & Energy Rental launch (Apr 2023)",
           "url": "https://chainwire.org/2023/04/19/defi-platform-justlend-dao-unveils-staked-trx-and-energy-rental-features/"
         },
         {
-          "label": "CryptoSlate — first JST buyback-and-burn (Oct 2025)",
+          "label": "CryptoSlate: first JST buyback-and-burn (Oct 2025)",
           "url": "https://cryptoslate.com/justlend-dao-completes-first-jst-buyback-and-burn-ushering-in-a-revenue-driven-deflation-cycle/"
         },
         {
-          "label": "crypto.news — SBM V2 isolated-lending launch (Jun 2026)",
+          "label": "crypto.news: SBM V2 isolated-lending launch (Jun 2026)",
           "url": "https://crypto.news/justlend-dao-launches-supply-and-borrow-market-v2-with-isolated-lending-architecture/"
         },
         {
-          "label": "Immunefi — JustLend DAO bug bounty ($50k max)",
+          "label": "Immunefi: JustLend DAO bug bounty ($50k max)",
           "url": "https://immunefi.com/bug-bounty/justlenddao/information/"
         }
       ],
@@ -22199,7 +22200,7 @@
           "description": "Money Market Protocol Version 2.0: isolated Vaults/Markets architecture with Adaptive Curve interest-rate model.",
           "link": "https://justlend.org/docs/justlend_whitepaper_en.pdf",
           "status": "executed",
-          "title": "SBM V2 — isolated collateral markets"
+          "title": "SBM V2: isolated collateral markets"
         }
       ],
       "Tokenomics": null,
@@ -22269,7 +22270,7 @@
           "slug": "morpho"
         },
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -22319,7 +22320,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 1020399855.0,
+        "tvlUsd": 1020399855,
         "users": 190000
       },
       "Dependencies": null,
@@ -22330,7 +22331,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "Solana-native isolated/curated lending — a major cross-chain competitor, but metrics come from Solana programs/accounts rather than EVM contracts.",
+      "Differentiator": "Solana-native isolated/curated lending, a major cross-chain competitor, but metrics come from Solana programs/accounts rather than EVM contracts.",
       "Discord": null,
       "Events": [
         {
@@ -22450,13 +22451,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:12Z",
-          "value": 1020399855.0
+          "value": 1020399855
         }
       },
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Kamino is Solana's leading lending and liquidity protocol, combining K-Lend money markets with automated liquidity vault strategies. Markets are isolated and curated by asset, risk profile and strategy, and the protocol's Scope oracle layer aggregates price feeds such as Pyth and Switchboard. Kamino Multiply and Lend products support leveraged staking and structured borrowing on Solana-native collateral, including LP and liquid-staking tokens. It is a major cross-ecosystem competitor to EVM lenders, with metrics sourced from Solana programs rather than EVM contracts.",
       "Market": null,
       "MemberCoins": [
         {
@@ -22475,7 +22476,7 @@
           "freshness": "static",
           "key": "KMNO max supply",
           "source": {
-            "label": "SolanaFloor — KMNO TGE & tokenomics",
+            "label": "SolanaFloor: KMNO TGE & tokenomics",
             "url": "https://solanafloor.com/news/kamino-foundation-unveils-kmno-token-tge-for-april-30th-reveals-comprehensive-tokenomics-and-utility"
           },
           "value": "10,000,000,000 KMNO (fixed), token launched 2024-04-30"
@@ -22485,7 +22486,7 @@
           "freshness": "static",
           "key": "Security reviews",
           "source": {
-            "label": "Kamino Docs — Security Audits",
+            "label": "Kamino Docs: Security Audits",
             "url": "https://kamino.com/docs/security/audits"
           },
           "value": "~20 external security reviews across all major components; auditors include OtterSec, Sec3, Offside Labs, Certora, Ackee Blockchain, RX Security; zero critical vulnerabilities reported to date"
@@ -22534,7 +22535,7 @@
         },
         {
           "category": "Oracle",
-          "description": "K-Lend relies on Kamino's Scope oracle aggregation layer and underlying price feeds (e.g. Pyth/Switchboard). Stale, manipulated or mispriced feeds — especially for thinner Solana collateral or LP/liquid-staking tokens — could cause faulty liquidations or allow bad debt to accrue."
+          "description": "K-Lend relies on Kamino's Scope oracle aggregation layer and underlying price feeds (e.g. Pyth/Switchboard). Stale, manipulated or mispriced feeds, especially for thinner Solana collateral or LP/liquid-staking tokens, could cause faulty liquidations or allow bad debt to accrue."
         },
         {
           "category": "Collateral",
@@ -22563,11 +22564,11 @@
       "Slug": "kamino",
       "Sources": [
         {
-          "label": "Solana Compass — Kamino Finance project review",
+          "label": "Solana Compass: Kamino Finance project review",
           "url": "https://solanacompass.com/projects/Kamino_Finance"
         },
         {
-          "label": "Kamino Docs — Security Audits",
+          "label": "Kamino Docs: Security Audits",
           "url": "https://kamino.com/docs/security/audits"
         },
         {
@@ -22575,19 +22576,19 @@
           "url": "https://github.com/Kamino-Finance/audits"
         },
         {
-          "label": "CoinDesk — Kamino sets KMNO token airdrop (2024-03-07)",
+          "label": "CoinDesk: Kamino sets KMNO token airdrop (2024-03-07)",
           "url": "https://www.coindesk.com/business/2024/03/07/solana-defi-protocol-kamino-sets-kmno-token-airdrop-for-april"
         },
         {
-          "label": "SolanaFloor — KMNO TGE & tokenomics (April 30, 2024)",
+          "label": "SolanaFloor: KMNO TGE & tokenomics (April 30, 2024)",
           "url": "https://solanafloor.com/news/kamino-foundation-unveils-kmno-token-tge-for-april-30th-reveals-comprehensive-tokenomics-and-utility"
         },
         {
-          "label": "RockawayX — Kamino launches V2 modular credit infrastructure",
+          "label": "RockawayX: Kamino launches V2 modular credit infrastructure",
           "url": "https://www.rockawayx.com/insights/kamino-launches-v2-ushering-in-a-new-era-of-modular-credit-infrastructure-on-solana"
         },
         {
-          "label": "CoinDesk — Apollo ACRED tokenized credit fund on Solana (2025-05-20)",
+          "label": "CoinDesk: Apollo ACRED tokenized credit fund on Solana (2025-05-20)",
           "url": "https://www.coindesk.com/business/2025/05/20/apollos-tokenized-credit-fund-set-for-solana-defi-debut-as-rwa-trend-expands"
         }
       ],
@@ -24304,7 +24305,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 100058047.0,
+        "tvlUsd": 100058047,
         "users": null
       },
       "Dependencies": null,
@@ -24484,7 +24485,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:35Z",
-          "value": 100058047.0
+          "value": 100058047
         },
         "deployment": {
           "chains": [
@@ -25261,7 +25262,7 @@
       "ChildEntities": null,
       "Competitors": [
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -25303,14 +25304,14 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 2279623211.0,
+        "tvlUsd": 2279623211,
         "users": 18000
       },
       "Dependencies": null,
       "Derivatives": null,
       "DerivativesSecondaryTags": null,
       "DerivativesSubSector": null,
-      "Description": "Maple Finance runs onchain lending pools to vetted borrowers — institutions, funds and businesses — closer to a blockchain-based credit marketplace than open overcollateralized DeFi lending.",
+      "Description": "Maple Finance runs onchain lending pools to vetted borrowers (institutions, funds and businesses), closer to a blockchain-based credit marketplace than open overcollateralized DeFi lending.",
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
@@ -25404,7 +25405,7 @@
       ],
       "Lending": {
         "auditHistory": "Audited; has experienced and worked out borrower defaults historically.",
-        "badDebt": "Most important metric here — tracked via defaults and loan-loss history per pool.",
+        "badDebt": "Most important metric here; tracked via defaults and loan-loss history per pool.",
         "collateralAssets": [
           "BTC",
           "ETH",
@@ -25419,7 +25420,7 @@
             "Arbitrum"
           ],
           "evmCompatible": "mixed",
-          "notes": "EVM deployments plus Solana exposure — treat as cross-ecosystem (Support - Eco)."
+          "notes": "EVM deployments plus Solana exposure; treat as cross-ecosystem (Support - Eco)."
         },
         "governanceActivity": "SYRUP governance + Maple pool delegates / managers.",
         "governanceDetail": {
@@ -25441,7 +25442,7 @@
         "oracles": [
           "Off-chain underwriting + Chainlink for onchain collateral"
         ],
-        "riskParameters": "Borrower quality, repayment history, collateral ratio, defaults, pool managers and loan terms — credit-market metrics, not pure overcollateralization.",
+        "riskParameters": "Borrower quality, repayment history, collateral ratio, defaults, pool managers and loan terms: credit-market metrics, not pure overcollateralization.",
         "stablecoinExposure": [
           "USDC",
           "USDT"
@@ -25451,13 +25452,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:13Z",
-          "value": 2279623211.0
+          "value": 2279623211
         }
       },
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Maple Finance operates onchain credit pools that lend to vetted institutional borrowers such as trading firms, funds and businesses, making it closer to a blockchain-based credit marketplace than to open overcollateralized DeFi lending. Pool delegates underwrite borrowers, set loan terms and manage repayment, so borrower quality, collateral ratios and default history are the metrics that matter most. Its syrupUSDC/syrupUSDT products package institutional lending yield for permissionless DeFi depositors, and SYRUP (formerly MPL) is the governance and staking token. Maple straddles the line between DeFi credit and real-world private credit.",
       "Market": null,
       "MemberCoins": [
         {
@@ -26396,7 +26397,7 @@
       "ChildEntities": null,
       "Competitors": [
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -26422,7 +26423,7 @@
       ],
       "Components": [
         {
-          "description": "Minimal immutable lending primitive — each market fixes collateral, loan asset, oracle, and LLTV.",
+          "description": "Minimal immutable lending primitive: each market fixes collateral, loan asset, oracle, and LLTV.",
           "name": "Morpho Blue"
         },
         {
@@ -26459,7 +26460,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 7202682943.0,
+        "tvlUsd": 7202682943,
         "users": 180000
       },
       "Dependencies": null,
@@ -26470,7 +26471,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "Instead of one big pool, Morpho Blue markets each fix a collateral, loan asset, oracle and liquidation setting; curators build vaults on top — more modular and risk-specific than Aave.",
+      "Differentiator": "Instead of one big pool, Morpho Blue markets each fix a collateral, loan asset, oracle and liquidation setting; curators build vaults on top, more modular and risk-specific than Aave.",
       "Discord": "https://discord.com/invite/BWXbJMHMdz/",
       "Events": [
         {
@@ -26524,7 +26525,7 @@
       ],
       "Lending": {
         "auditHistory": "Morpho Blue is audited and formally verified; minimal immutable core reduces attack surface.",
-        "badDebt": "Isolated by design — bad debt is contained to a single market/vault rather than socialized.",
+        "badDebt": "Isolated by design; bad debt is contained to a single market/vault rather than socialized.",
         "collateralAssets": [
           "ETH",
           "wstETH",
@@ -26578,13 +26579,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:13Z",
-          "value": 7202682943.0
+          "value": 7202682943
         }
       },
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Morpho is a lending network built around Morpho Blue, a minimal, immutable primitive where each market fixes exactly one collateral asset, one loan asset, an oracle and a liquidation LTV. On top of these isolated markets, MetaMorpho vaults run by third-party risk curators allocate depositor funds across markets, letting suppliers choose a curator and risk profile rather than a single pooled risk committee. This modular design contains bad debt to individual markets instead of socializing it. Morpho has become one of the largest lending protocols on Ethereum and Base, and its infrastructure powers embedded lending products for exchanges and fintechs.",
       "Market": null,
       "MemberCoins": [
         {
@@ -26614,7 +26615,7 @@
             "label": "Morpho docs",
             "url": "https://docs.morpho.org"
           },
-          "value": "Risk curators operate MetaMorpho vaults — suppliers pick curators rather than a single pooled risk committee."
+          "value": "Risk curators operate MetaMorpho vaults; suppliers pick curators rather than a single pooled risk committee."
         },
         {
           "capturedAt": "2026-07-02",
@@ -26631,7 +26632,7 @@
           "freshness": "static",
           "key": "securityReviews",
           "source": {
-            "label": "Morpho Docs — Audits",
+            "label": "Morpho Docs: Audits",
             "url": "https://docs.morpho.org/get-started/resources/audits/"
           },
           "value": "Morpho Blue: 25+ audits plus formal verification (Certora Prover); reviewers include Spearbit and OpenZeppelin."
@@ -26706,15 +26707,15 @@
           "url": "https://docs.morpho.org"
         },
         {
-          "label": "Fortune — Morpho raises $175M (a16z, Paradigm, Ribbit)",
+          "label": "Fortune: Morpho raises $175M (a16z, Paradigm, Ribbit)",
           "url": "https://fortune.com/2026/06/09/morpho-fundraise-a16z-crypto-paradigm-ribbit-capital-175-million/"
         },
         {
-          "label": "The Block — Morpho $175M open credit network",
+          "label": "The Block: Morpho $175M open credit network",
           "url": "https://www.theblock.co/post/404111/morpho-raises-175m-paradigm-a16z-crypto-ribbit-capital"
         },
         {
-          "label": "Morpho Docs — Audits / Security Reviews",
+          "label": "Morpho Docs: Audits / Security Reviews",
           "url": "https://docs.morpho.org/get-started/resources/audits/"
         },
         {
@@ -28265,11 +28266,11 @@
       "Derivatives": null,
       "DerivativesSecondaryTags": null,
       "DerivativesSubSector": null,
-      "Description": "Notional provides fixed-rate, fixed-term lending and borrowing via fCash — tokenized claims on a fixed amount of an asset at a future maturity, traded on an on-chain AMM.",
+      "Description": "Notional provides fixed-rate, fixed-term lending and borrowing via fCash: tokenized claims on a fixed amount of an asset at a future maturity, traded on an on-chain AMM.",
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates — predictable cost of capital for borrowers and lenders.",
+      "Differentiator": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates, giving predictable cost of capital for borrowers and lenders.",
       "Discord": null,
       "Events": [
         {
@@ -28359,7 +28360,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Notional provides fixed-rate, fixed-term lending and borrowing through fCash: transferable tokens representing a claim on a fixed amount of an asset at a specific future maturity, traded on a purpose-built AMM. Lenders buy fCash at a discount to lock a known return; borrowers sell it to lock a known cost of capital. Notional V3 added leveraged vault strategies and variable-rate markets that complement the fixed-term books. It is one of the longest-running attempts to build a true fixed-income market structure in DeFi, governed by the NOTE token.",
       "Market": null,
       "MemberCoins": [
         {
@@ -28396,7 +28397,7 @@
           "freshness": "static",
           "key": "Chains supported",
           "source": {
-            "label": "Notional blog — V3 live on Arbitrum",
+            "label": "Notional blog: V3 live on Arbitrum",
             "url": "https://blog.notional.finance/notional-v3-is-live-on-arbitrum/"
           },
           "value": "Ethereum and Arbitrum (Notional V3)"
@@ -28406,7 +28407,7 @@
           "freshness": "static",
           "key": "Audits",
           "source": {
-            "label": "Notional V3 docs — Audits",
+            "label": "Notional V3 docs: Audits",
             "url": "https://docs.notional.finance/notional-v3/smart-contracts/audits.md"
           },
           "value": "17+ audits by OpenZeppelin, Certora, ABDK, Consensys Diligence, Code4rena and Sherlock (2020-2024)"
@@ -28475,23 +28476,23 @@
           "url": "https://blog.notional.finance/notional-v3-is-live-on-arbitrum/"
         },
         {
-          "label": "Notional V3 docs — Using fCash",
+          "label": "Notional V3 docs: Using fCash",
           "url": "https://docs.notional.finance/notional-v3/fcash/using-fcash"
         },
         {
-          "label": "Notional V3 docs — Audits",
+          "label": "Notional V3 docs: Audits",
           "url": "https://docs.notional.finance/notional-v3/smart-contracts/audits.md"
         },
         {
-          "label": "CoinDesk — Series A $10M raise",
+          "label": "CoinDesk: Series A $10M raise",
           "url": "https://www.coindesk.com/business/2021/04/29/notional-raises-10m-to-grow-defi-lending-protocol-with-real-world-potential"
         },
         {
-          "label": "CoinDesk — launch out of stealth / seed round",
+          "label": "CoinDesk: launch out of stealth / seed round",
           "url": "https://www.coindesk.com/business/2020/10/26/notional-launches-out-of-stealth-to-bring-fixed-rate-lending-to-defi"
         },
         {
-          "label": "CoinDesk — V2 upgrade",
+          "label": "CoinDesk: V2 upgrade",
           "url": "https://www.coindesk.com/business/2021/11/01/defi-startup-notional-expands-fixed-rate-lending-presence-with-v2-upgrade"
         }
       ],
@@ -28677,7 +28678,7 @@
         "loanPipelineUsd": null,
         "partnerships": 3,
         "targetAprPct": null,
-        "tvlUsd": 3517095577.0,
+        "tvlUsd": 3517095577,
         "users": 52000
       },
       "Dependencies": null,
@@ -28918,7 +28919,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:37Z",
-          "value": 3517095577.0
+          "value": 3517095577
         }
       },
       "RwaCharacteristics": {
@@ -30239,7 +30240,7 @@
           "name": "Pendle AMM"
         },
         {
-          "description": "Vote-escrowed PENDLE (lock up to 2 years) — directs incentive emissions across pools, boosts LP rewards, and earns a share of protocol swap fees and YT yield.",
+          "description": "Vote-escrowed PENDLE (lock up to 2 years): directs incentive emissions across pools, boosts LP rewards, and earns a share of protocol swap fees and YT yield.",
           "name": "vePENDLE"
         },
         {
@@ -30273,7 +30274,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT buyers go long yield — a true fixed-income primitive for DeFi, with the deepest liquidity and asset coverage in the category.",
+      "Differentiator": "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT buyers go long yield, a true fixed-income primitive for DeFi, with the deepest liquidity and asset coverage in the category.",
       "Discord": null,
       "Events": [
         {
@@ -30309,7 +30310,7 @@
       ],
       "Faq": [
         {
-          "answer": "PT (Principal Token) is redeemable 1:1 for the underlying at maturity — buying it at a discount locks a fixed yield. YT (Yield Token) captures all yield from the underlying until maturity, so buying YT is a leveraged long on that yield.",
+          "answer": "PT (Principal Token) is redeemable 1:1 for the underlying at maturity; buying it at a discount locks a fixed yield. YT (Yield Token) captures all yield from the underlying until maturity, so buying YT is a leveraged long on that yield.",
           "pinned": true,
           "question": "What are PT and YT?"
         },
@@ -30356,7 +30357,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Pendle is DeFi's dominant yield-tokenization protocol: it splits yield-bearing assets into Principal Tokens (PT), which lock in a fixed rate when bought at a discount, and Yield Tokens (YT), which give leveraged exposure to the variable yield until maturity. Its V2 AMM is purpose-built for maturity-dated assets, and vePENDLE governance directs incentives across dozens of markets. Ethena's USDe/sUSDe markets became its largest category, at times approaching 70% of TVL, making Pendle a key venue for stablecoin fixed income. Boros extends the model to funding-rate trading, broadening it toward a general interest-rate derivatives platform.",
       "Market": null,
       "MemberCoins": [
         {
@@ -30389,10 +30390,10 @@
           "freshness": "static",
           "key": "Founded",
           "source": {
-            "label": "Messari — Pendle profile",
+            "label": "Messari: Pendle profile",
             "url": "https://messari.io/project/pendle"
           },
-          "value": "2021 — mainnet June 2021 (originally launched as 'Benchmark')."
+          "value": "2021; mainnet June 2021 (originally launched as 'Benchmark')."
         },
         {
           "capturedAt": "2026-07-02",
@@ -30409,7 +30410,7 @@
           "freshness": "static",
           "key": "Seed round",
           "source": {
-            "label": "Crunchbase — Pendle seed round",
+            "label": "Crunchbase: Pendle seed round",
             "url": "https://www.crunchbase.com/funding_round/pendle-finance-seed--1fafcfe8"
           },
           "value": "$3.7M seed (Apr 2021) led by Mechanism Capital."
@@ -30436,7 +30437,7 @@
         {
           "amountLabel": null,
           "date": "2024",
-          "description": "USDe and sUSDe fixed-yield markets became Pendle's largest, with Ethena collateral growing to roughly 70% of Pendle TVL — making stablecoin yield Pendle's flagship category.",
+          "description": "USDe and sUSDe fixed-yield markets became Pendle's largest, with Ethena collateral growing to roughly 70% of Pendle TVL, making stablecoin yield Pendle's flagship category.",
           "name": "Ethena"
         },
         {
@@ -30460,7 +30461,7 @@
         },
         {
           "category": "Counterparty",
-          "description": "Every market inherits its underlying yield source — a depeg, exploit or yield collapse of assets like Ethena sUSDe, Lido stETH or Ether.fi weETH directly hits PT/YT holders."
+          "description": "Every market inherits its underlying yield source: a depeg, exploit or yield collapse of assets like Ethena sUSDe, Lido stETH or Ether.fi weETH directly hits PT/YT holders."
         },
         {
           "category": "Oracle",
@@ -30468,7 +30469,7 @@
         },
         {
           "category": "Systemic",
-          "description": "TVL is highly concentrated in Ethena USDe/sUSDe markets (~70%); an Ethena-specific shock would disproportionately impact Pendle. Markets are also time-bound — liquidity thins and YT decays toward maturity."
+          "description": "TVL is highly concentrated in Ethena USDe/sUSDe markets (~70%); an Ethena-specific shock would disproportionately impact Pendle. Markets are also time-bound: liquidity thins and YT decays toward maturity."
         },
         {
           "category": "Governance",
@@ -30501,23 +30502,23 @@
           "url": "https://docs.pendle.finance/Security"
         },
         {
-          "label": "Messari — Pendle profile",
+          "label": "Messari: Pendle profile",
           "url": "https://messari.io/project/pendle"
         },
         {
-          "label": "Pendle V2 launch — tokenomics",
+          "label": "Pendle V2 launch: tokenomics",
           "url": "https://medium.com/pendle/pendle-v2-launch-part-3-3-updated-tokenomics-b6c6501b8286"
         },
         {
-          "label": "Boros by Pendle — announcement",
+          "label": "Boros by Pendle: announcement",
           "url": "https://medium.com/boros-fi/boros-by-pendle-yield-trading-with-margin-63d026dc7399"
         },
         {
-          "label": "RedStone — Pendle & Ethena (golden protocol of 2024)",
+          "label": "RedStone: Pendle & Ethena (golden protocol of 2024)",
           "url": "https://blog.redstone.finance/2024/05/03/pendle-the-golden-defi-protocol-of-2024-why-what-and-how-part-1/"
         },
         {
-          "label": "Crunchbase — Pendle seed round",
+          "label": "Crunchbase: Pendle seed round",
           "url": "https://www.crunchbase.com/funding_round/pendle-finance-seed--1fafcfe8"
         }
       ],
@@ -30584,7 +30585,7 @@
         {
           "differences": "Fully collateralized, permissionless on-chain markets with no issuer credit; the 'coupon' comes from a DeFi yield source carrying smart-contract and oracle risk rather than a sovereign/corporate issuer.",
           "product": "Zero-coupon bond / Treasury STRIPS",
-          "similarity": "A PT bought at a discount and redeemed at par at maturity behaves like a zero-coupon bond — a known fixed return over a fixed term."
+          "similarity": "A PT bought at a discount and redeemed at par at maturity behaves like a zero-coupon bond, a known fixed return over a fixed term."
         },
         {
           "differences": "Exchange-style, over-collateralized on-chain markets rather than bilateral OTC swaps with counterparty credit exposure.",
@@ -31361,7 +31362,7 @@
       "ChildEntities": null,
       "Competitors": [
         {
-          "differences": "Aave deploys the same protocol per chain with deep liquidity and brand trust; Radiant's differentiator was unified omnichain liquidity via LayerZero — now undermined by the 2024 exploit and wind-down.",
+          "differences": "Aave deploys the same protocol per chain with deep liquidity and brand trust; Radiant's differentiator was unified omnichain liquidity via LayerZero, now undermined by the 2024 exploit and wind-down.",
           "name": "Aave",
           "positioning": "Broadest multichain money market.",
           "rank": 1,
@@ -31427,7 +31428,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "Omnichain lending — deposits and borrows are bridged across chains via LayerZero rather than confined to a single network's liquidity.",
+      "Differentiator": "Omnichain lending: deposits and borrows are bridged across chains via LayerZero rather than confined to a single network's liquidity.",
       "Discord": "https://discord.com/invite/2vJ5pGXkEs",
       "Events": [
         {
@@ -31464,7 +31465,7 @@
       "Incidents": null,
       "InvestmentRounds": [],
       "Lending": {
-        "auditHistory": "Audited; suffered a 2024 exploit — review post-incident hardening before relying.",
+        "auditHistory": "Audited; suffered a 2024 exploit. Review post-incident hardening before relying.",
         "collateralAssets": [
           "ETH",
           "WBTC",
@@ -31500,7 +31501,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Radiant Capital set out to be an omnichain money market: deposits on one chain could collateralize borrows on another, with LayerZero messaging unifying liquidity across deployments. RDNT emissions and dynamic liquidity provisioning drove rapid growth on Arbitrum and BSC. In October 2024 attackers compromised core-contributor devices and drained roughly $50M, a blow the protocol never recovered from. Radiant is winding down in 2026, and any remaining positions carry elevated residual and withdrawal risk.",
       "Market": null,
       "MemberCoins": [
         {
@@ -31530,7 +31531,7 @@
             "label": "Radiant docs",
             "url": "https://docs.radiant.capital"
           },
-          "value": "LayerZero messaging connects Radiant deployments — cross-chain borrow relies on bridge/oracle integrity."
+          "value": "LayerZero messaging connects Radiant deployments; cross-chain borrow relies on bridge/oracle integrity."
         },
         {
           "capturedAt": "2026-07-02",
@@ -31550,13 +31551,13 @@
             "label": "The Block",
             "url": "https://www.theblock.co/post/403254/unable-to-recover-from-roughly-50-million-hack-radiant-capital-is-winding-down"
           },
-          "value": "Winding down (2026) — did not recover from the 2024 exploit."
+          "value": "Winding down (2026); did not recover from the 2024 exploit."
         }
       ],
       "OfficialDocs": "https://docs.radiant.capital",
       "OrgStructure": [
         {
-          "description": "RDNT token (1.5B total supply) governs the protocol and incentivizes cross-chain liquidity. Day-to-day operations ran through a core-contributor multisig — the same signer set whose devices were compromised in the October 2024 exploit.",
+          "description": "RDNT token (1.5B total supply) governs the protocol and incentivizes cross-chain liquidity. Day-to-day operations ran through a core-contributor multisig, the same signer set whose devices were compromised in the October 2024 exploit.",
           "name": "Radiant DAO",
           "role": "Governance"
         }
@@ -31588,7 +31589,7 @@
         },
         {
           "category": "Systemic",
-          "description": "The protocol is winding down (2026) after failing to recover from the exploit — elevated residual/withdrawal risk for any remaining positions."
+          "description": "The protocol is winding down (2026) after failing to recover from the exploit, elevated residual/withdrawal risk for any remaining positions."
         }
       ],
       "Rwa": null,
@@ -31605,19 +31606,19 @@
       "Slug": "radiant",
       "Sources": [
         {
-          "label": "Radiant Capital — Post-Mortem (Medium)",
+          "label": "Radiant Capital: Post-Mortem (Medium)",
           "url": "https://medium.com/@RadiantCapital/radiant-post-mortem-fecd6cd38081"
         },
         {
-          "label": "CoinDesk — Radiant loses $50M to exploit (Oct 2024)",
+          "label": "CoinDesk: Radiant loses $50M to exploit (Oct 2024)",
           "url": "https://www.coindesk.com/tech/2024/10/16/radiant-capital-loses-50m-to-blockchain-exploit"
         },
         {
-          "label": "The Block — Radiant winding down",
+          "label": "The Block: Radiant winding down",
           "url": "https://www.theblock.co/post/403254/unable-to-recover-from-roughly-50-million-hack-radiant-capital-is-winding-down"
         },
         {
-          "label": "Radiant Capital — Incident Update (Dec 2024)",
+          "label": "Radiant Capital: Incident Update (Dec 2024)",
           "url": "https://medium.com/@RadiantCapital/radiant-capital-incident-update-e56d8c23829e"
         }
       ],
@@ -32046,7 +32047,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 885678701.0,
+        "tvlUsd": 885678701,
         "users": 720000
       },
       "Dependencies": null,
@@ -32078,13 +32079,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:16Z",
-          "value": 885678701.0
+          "value": 885678701
         },
         "volume30dUsd": {
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:16Z",
-          "value": 3708991911.0
+          "value": 3708991911
         }
       },
       "DexSecondaryTags": [
@@ -32269,7 +32270,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 187596433.0,
+        "tvlUsd": 187596433,
         "users": null
       },
       "Dependencies": null,
@@ -32440,7 +32441,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:39Z",
-          "value": 187596433.0
+          "value": 187596433
         },
         "deployment": {
           "chains": [
@@ -34327,7 +34328,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 5190785955.0,
+        "tvlUsd": 5190785955,
         "users": null
       },
       "Dependencies": null,
@@ -34555,7 +34556,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:40Z",
-          "value": 5190785955.0
+          "value": 5190785955
         },
         "deployment": {
           "chains": [
@@ -34799,7 +34800,7 @@
           "name": "Pendle",
           "positioning": "The dominant yield-tokenization protocol and the closest analogue to Sense's model.",
           "rank": 1,
-          "similarities": "Splits yield-bearing assets into principal and yield tokens (PT/YT) and provides a custom AMM for fixed-rate and yield trading — the same core mechanic Sense pioneered.",
+          "similarities": "Splits yield-bearing assets into principal and yield tokens (PT/YT) and provides a custom AMM for fixed-rate and yield trading, the same core mechanic Sense pioneered.",
           "slug": "pendle"
         },
         {
@@ -34815,7 +34816,7 @@
           "name": "Notional Finance",
           "positioning": "Fixed-rate lending/borrowing protocol using fCash rather than yield stripping.",
           "rank": 3,
-          "similarities": "Targets the same DeFi fixed-income market — letting users lock in fixed rates over defined maturities.",
+          "similarities": "Targets the same DeFi fixed-income market, letting users lock in fixed rates over defined maturities.",
           "slug": "notional"
         }
       ],
@@ -34943,7 +34944,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Sense Finance was an early yield-stripping protocol that decomposed yield-bearing assets into zero-coupon Principal Tokens and Yield Tokens, traded on its custom Space AMM. The core team ceased contributions in October 2023 and front-end hosting ended that December, leaving the immutable contracts on-chain but unmaintained. Any residual positions must be managed directly on-chain, with no team support, UI or meaningful liquidity. It remains listed here as a historical reference for the fixed-income category it helped pioneer.",
       "Market": null,
       "MemberCoins": [],
       "Name": "Sense Finance",
@@ -34956,7 +34957,7 @@
             "label": "Sunsetting Sense (Medium, 2023)",
             "url": "https://medium.com/sensefinance/sunsetting-sense-and-releasing-it-into-the-ether-cd8c8e1731ad"
           },
-          "value": "Deprecated — protocol sunset announced Oct 26, 2023; UI hosting ended Dec 1, 2023 (contracts remain on-chain, unmaintained)"
+          "value": "Deprecated: protocol sunset announced Oct 26, 2023; UI hosting ended Dec 1, 2023 (contracts remain on-chain, unmaintained)"
         },
         {
           "capturedAt": "2026-07-02",
@@ -35003,7 +35004,7 @@
       "Risks": [
         {
           "category": "Systemic",
-          "description": "The protocol is deprecated: the Sense Core team ceased all contributions in October 2023 and stopped hosting the front-end on December 1, 2023. Remaining PTs/YTs and Space LP positions rely on immutable, unmaintained contracts with no team support, no active UI, and effectively no liquidity — any residual value must be interacted with directly on-chain."
+          "description": "The protocol is deprecated: the Sense Core team ceased all contributions in October 2023 and stopped hosting the front-end on December 1, 2023. Remaining PTs/YTs and Space LP positions rely on immutable, unmaintained contracts with no team support, no active UI, and effectively no liquidity; any residual value must be interacted with directly on-chain."
         },
         {
           "category": "Smart Contract",
@@ -35040,7 +35041,7 @@
           "url": "https://docs.sense.finance/docs/faq"
         },
         {
-          "label": "Sense docs — Security & audits",
+          "label": "Sense docs: Security & audits",
           "url": "https://docs.sense.finance/developers/security/"
         },
         {
@@ -35052,7 +35053,7 @@
           "url": "https://medium.com/sensefinance/sense-protocol-guarded-launch-a9628fdf29ec"
         },
         {
-          "label": "CoinDesk — Sense raises $5.2M (Aug 2021)",
+          "label": "CoinDesk: Sense raises $5.2M (Aug 2021)",
           "url": "https://www.coindesk.com/markets/2021/08/03/sense-finance-raises-52m-to-bring-yield-trading-to-defi"
         },
         {
@@ -35667,7 +35668,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Sky, formerly MakerDAO, is the largest decentralized stablecoin issuer, managing USDS and legacy DAI alongside the sUSDS savings token and SKY governance token. Its credit-sector relevance comes from how it deploys its balance sheet: the protocol-set Sky Savings Rate, collateralized vault borrowing, and allocations of USDS liquidity into lending markets through Stars such as Spark. The Endgame restructuring splits the ecosystem into semi-autonomous SubDAOs, with Sky Core setting monetary policy. Sky is listed here for its lending-adjacent liquidity role while remaining primarily a stablecoin protocol.",
       "Market": null,
       "MemberCoins": [
         {
@@ -35959,7 +35960,7 @@
       "ChildEntities": null,
       "Competitors": [
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -36031,7 +36032,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "Not just general lending — its edge is the Sky/Maker connection (DAI/USDS): how it creates, routes, lends and manages stablecoin liquidity.",
+      "Differentiator": "Not just general lending, its edge is the Sky/Maker connection (DAI/USDS): how it creates, routes, lends and manages stablecoin liquidity.",
       "Discord": null,
       "Events": [
         {
@@ -36048,7 +36049,7 @@
       ],
       "Faq": [
         {
-          "answer": "Spark routes and lends stablecoin liquidity from the Sky (formerly Maker) ecosystem — USDS/DAI are the core rails. It is the first 'Star' (SubDAO) under Sky's Endgame plan.",
+          "answer": "Spark routes and lends stablecoin liquidity from the Sky (formerly Maker) ecosystem; USDS/DAI are the core rails. It is the first 'Star' (SubDAO) under Sky's Endgame plan.",
           "pinned": true,
           "question": "How is Spark related to Sky/Maker?"
         },
@@ -36112,7 +36113,7 @@
         "oracles": [
           "Chainlink"
         ],
-        "riskParameters": "SparkLend started from Aave V3 architecture — per-asset LTV, liquidation threshold/penalty and caps, tuned for stablecoin liquidity.",
+        "riskParameters": "SparkLend started from Aave V3 architecture: per-asset LTV, liquidation threshold/penalty and caps, tuned for stablecoin liquidity.",
         "stablecoinExposure": [
           "USDS",
           "DAI",
@@ -36129,7 +36130,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Spark is the flagship lending arm of the Sky (formerly MakerDAO) ecosystem and its first 'Star' SubDAO under the Endgame plan. SparkLend, built from Aave V3 architecture, centers on deep stablecoin liquidity: it routes USDS/DAI from Sky's balance sheet into lending markets at protocol-set rates. Spark Savings offers sUSDS/sDAI yield, and the Spark Liquidity Layer deploys stablecoin liquidity across other protocols and chains. Its scale and rates are therefore tied closely to Sky governance decisions rather than pure market utilization.",
       "Market": null,
       "MemberCoins": [
         {
@@ -36190,7 +36191,7 @@
           "freshness": "static",
           "key": "liquidityLayerScale",
           "source": {
-            "label": "Messari — Understanding Spark",
+            "label": "Messari: Understanding Spark",
             "url": "https://messari.io/report/understanding-spark-a-comprehensive-overview"
           },
           "value": "~$3.6B allocated via the Spark Liquidity Layer as of June 30 2025 (+175% YoY)."
@@ -36200,10 +36201,10 @@
           "freshness": "static",
           "key": "founded",
           "source": {
-            "label": "Messari — Understanding Spark",
+            "label": "Messari: Understanding Spark",
             "url": "https://messari.io/report/understanding-spark-a-comprehensive-overview"
           },
-          "value": "May 2023 by Phoenix Labs (Sam MacPherson) — first Star/SubDAO in the Sky Endgame."
+          "value": "May 2023 by Phoenix Labs (Sam MacPherson), first Star/SubDAO in the Sky Endgame."
         }
       ],
       "OfficialDocs": "https://docs.spark.fi",
@@ -36280,19 +36281,19 @@
           "url": "https://docs.spark.fi"
         },
         {
-          "label": "Spark Docs — Security & Audits",
+          "label": "Spark Docs: Security & Audits",
           "url": "https://docs.spark.fi/dev/security/security-and-audits"
         },
         {
-          "label": "Messari — Understanding Spark",
+          "label": "Messari: Understanding Spark",
           "url": "https://messari.io/report/understanding-spark-a-comprehensive-overview"
         },
         {
-          "label": "Messari — Spark (Sky) project profile",
+          "label": "Messari: Spark (Sky) project profile",
           "url": "https://messari.io/project/spark-sky-protocol"
         },
         {
-          "label": "ChainSecurity — SparkLend audit",
+          "label": "ChainSecurity: SparkLend audit",
           "url": "https://www.chainsecurity.com/security-audit/makerdao-sparklend-advanced"
         }
       ],
@@ -36444,7 +36445,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "Permissionless market creation for yield tokenization — anyone can list a new PT/YT market for an interest-bearing asset.",
+      "Differentiator": "Permissionless market creation for yield tokenization: anyone can list a new PT/YT market for an interest-bearing asset.",
       "Discord": null,
       "Events": [
         {
@@ -36540,7 +36541,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Spectra, formerly APWine, is a permissionless interest-rate derivatives protocol: anyone can create a market that splits a yield-bearing asset into principal and yield tokens, without gatekeeping by the core team. Users trade fixed versus variable rate exposure through its AMM, hedge or speculate on yields, and provide liquidity to rate markets. Permissionless listing differentiates it from curated competitors like Pendle, trading breadth of long-tail assets against concentrated liquidity. APW migrated to the SPECTRA token as part of the rebrand.",
       "Market": null,
       "MemberCoins": [
         {
@@ -36559,7 +36560,7 @@
           "freshness": "static",
           "key": "Total raised",
           "source": {
-            "label": "Tech.eu — APWine raises $2.6M",
+            "label": "Tech.eu: APWine raises $2.6M",
             "url": "https://tech.eu/2022/11/10/apwine-raises-2-6-million-as-it-builds-a-modular-interest-market-in-defi/"
           },
           "value": "$3.6M across two rounds ($1M seed 2021, $2.6M seed extension 2022)"
@@ -36569,7 +36570,7 @@
           "freshness": "static",
           "key": "Founded",
           "source": {
-            "label": "IQ.wiki — Spectra (prev. APWine Finance)",
+            "label": "IQ.wiki: Spectra (prev. APWine Finance)",
             "url": "https://iq.wiki/wiki/apwine-finance"
           },
           "value": "August 2020 as APWine Finance; rebranded to Spectra July 2023"
@@ -36579,7 +36580,7 @@
           "freshness": "static",
           "key": "Audited by",
           "source": {
-            "label": "Spectra docs — Audits",
+            "label": "Spectra docs: Audits",
             "url": "https://docs.spectra.finance/security/audits"
           },
           "value": "Code4rena (Feb–Mar 2024, 0 high / 2 medium), Pashov Audit Group (Mar 2024), Sherlock (Sep 2025)"
@@ -36640,15 +36641,15 @@
       "Slug": "spectra",
       "Sources": [
         {
-          "label": "Spectra official docs — Overview",
+          "label": "Spectra official docs: Overview",
           "url": "https://docs.spectra.finance/"
         },
         {
-          "label": "Spectra docs — SPECTRA tokenomics / migration",
+          "label": "Spectra docs: SPECTRA tokenomics / migration",
           "url": "https://docs.spectra.finance/tokenomics/spectra"
         },
         {
-          "label": "Spectra docs — Audits",
+          "label": "Spectra docs: Audits",
           "url": "https://docs.spectra.finance/security/audits"
         },
         {
@@ -36656,15 +36657,15 @@
           "url": "https://mirror.xyz/spectraprotocol.eth/n168TYwI25kXjAOavf77zWROZvhT8SA3ab2DPu9MAwA"
         },
         {
-          "label": "IQ.wiki — Spectra (prev. APWine Finance) history",
+          "label": "IQ.wiki: Spectra (prev. APWine Finance) history",
           "url": "https://iq.wiki/wiki/apwine-finance"
         },
         {
-          "label": "Tech.eu — APWine raises $2.6M (Greenfield)",
+          "label": "Tech.eu: APWine raises $2.6M (Greenfield)",
           "url": "https://tech.eu/2022/11/10/apwine-raises-2-6-million-as-it-builds-a-modular-interest-market-in-defi/"
         },
         {
-          "label": "Code4rena — 2024-02 Spectra audit report",
+          "label": "Code4rena: 2024-02 Spectra audit report",
           "url": "https://code4rena.com/reports/2024-02-spectra"
         }
       ],
@@ -36729,7 +36730,7 @@
         {
           "differences": "Spectra is fully collateralized, non-custodial, and permissionless with no ISDA/dealer intermediary; positions are tokenized and exit is via an AMM rather than a bilateral swap contract.",
           "product": "Interest-rate swap / fixed-vs-floating rate market",
-          "similarity": "By choosing PT (fixed) versus YT (floating), a user effectively takes one side of a fixed-vs-floating interest-rate trade, letting them hedge or speculate on the direction of a yield rate — the core function of an interest-rate swap market."
+          "similarity": "By choosing PT (fixed) versus YT (floating), a user effectively takes one side of a fixed-vs-floating interest-rate trade, letting them hedge or speculate on the direction of a yield rate, the core function of an interest-rate swap market."
         }
       ],
       "Twitter": "https://x.com/spectra_finance",
@@ -38283,7 +38284,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "0% borrow APR — lenders are compensated from strategy profit share rather than interest, aligning incentives between borrowers and lenders.",
+      "Differentiator": "0% borrow APR: lenders are compensated from strategy profit share rather than interest, aligning incentives between borrowers and lenders.",
       "Discord": null,
       "Events": [
         {
@@ -38356,7 +38357,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Stella, the successor to Alpha Homora, offers leveraged yield strategies with a pay-as-you-earn model: borrowers pay 0% interest and instead share a portion of realized strategy profit with lenders. This aligns lenders with strategy performance rather than fixed borrow rates, an unusual design among leverage protocols. Alpha Homora pioneered leveraged yield farming and suffered a major exploit in 2021 under its previous architecture, history relevant to assessing the team's risk record. The ALPHA token underpins the ecosystem.",
       "Market": null,
       "MemberCoins": [
         {
@@ -38596,7 +38597,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 32864932.0,
+        "tvlUsd": 32864932,
         "users": 650000
       },
       "Dependencies": null,
@@ -38633,13 +38634,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:20Z",
-          "value": 32864932.0
+          "value": 32864932
         },
         "volume30dUsd": {
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:20Z",
-          "value": 26927042.0
+          "value": 26927042
         }
       },
       "DexSecondaryTags": [
@@ -40154,7 +40155,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 53160144.0,
+        "tvlUsd": 53160144,
         "users": 95000
       },
       "Dependencies": null,
@@ -40200,13 +40201,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:23Z",
-          "value": 53160144.0
+          "value": 53160144
         },
         "volume30dUsd": {
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:24Z",
-          "value": 321960558.0
+          "value": 321960558
         }
       },
       "DexSecondaryTags": [
@@ -40399,7 +40400,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 488743.0,
+        "tvlUsd": 488743,
         "users": null
       },
       "Dependencies": null,
@@ -40631,7 +40632,7 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:40Z",
-          "value": 488743.0
+          "value": 488743
         },
         "deployment": {
           "chains": [
@@ -40840,7 +40841,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 18204617.0,
+        "tvlUsd": 18204617,
         "users": null
       },
       "Dependencies": null,
@@ -40874,13 +40875,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:31Z",
-          "value": 18204617.0
+          "value": 18204617
         },
         "volume30dUsd": {
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:31Z",
-          "value": 227812127.0
+          "value": 227812127
         }
       },
       "DexSecondaryTags": [
@@ -41831,7 +41832,9 @@
         "partnerships": 80,
         "targetAprPct": 12.31,
         "tvlUsd": 398000000,
-        "users": 75000
+        "users": 75000,
+        "marketCapUsd": 156480798,
+        "volume24hUsd": 4017001
       },
       "Dependencies": null,
       "Derivatives": null,
@@ -41909,7 +41912,7 @@
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "USD.AI is a credit protocol that finances AI and compute infrastructure through a synthetic dollar. Users mint USDai against stablecoin deposits, and capital is deployed into asset-backed loans collateralized by GPUs and related hardware via its CALIBER securitization framework, with T-bill-style backing during ramp-up. Staked USDai (sUSDai) captures the loan yield, while staked CHIP acts as first-loss insurance capital. It behaves less like a stablecoin company and more like an RWA private-credit protocol whose underlying collateral is AI compute.",
       "Market": null,
       "MemberCoins": [
         {
@@ -41939,7 +41942,7 @@
         {
           "category": "Token",
           "name": "sCHIP",
-          "role": "Staked CHIP — first-loss insurance capital",
+          "role": "Staked CHIP: first-loss insurance capital",
           "slug": "schip",
           "subCategory": "Yield-generating Token",
           "symbol": "sCHIP"
@@ -41982,7 +41985,7 @@
       "OfficialDocs": "https://docs.usd.ai/",
       "OrgStructure": [
         {
-          "description": "A Cayman Islands foundation company that serves as the legal/off-chain steward of the USD.AI DAO. It handles governance execution, treasury management, legal/regulatory matters, and ecosystem development on behalf of CHIP tokenholders — but does not custody assets or run the core protocol (which is on-chain and permissionless).",
+          "description": "A Cayman Islands foundation company that serves as the legal/off-chain steward of the USD.AI DAO. It handles governance execution, treasury management, legal/regulatory matters, and ecosystem development on behalf of CHIP tokenholders, but does not custody assets or run the core protocol (which is on-chain and permissionless).",
           "name": "USD.AI Foundation",
           "role": "Legal / off-chain steward"
         },
@@ -42050,31 +42053,31 @@
       "Risks": [
         {
           "category": "Collateral",
-          "description": "Rapid Obsolescence & Depreciation — GPUs lose value quickly (new generations every 18-24 months). If AI demand slows or better chips arrive, collateral value can crash, leading to under-collateralization."
+          "description": "Rapid Obsolescence & Depreciation: GPUs lose value quickly (new generations every 18-24 months). If AI demand slows or better chips arrive, collateral value can crash, leading to under-collateralization."
         },
         {
           "category": "Collateral",
-          "description": "Double Default Risk — Collateral value and revenue (compute rentals) can drop simultaneously in a downturn."
+          "description": "Double Default Risk: collateral value and revenue (compute rentals) can drop simultaneously in a downturn."
         },
         {
           "category": "Collateral",
-          "description": "Liquidation Challenges — Oversupply during forced sales could tank the secondary market for used GPUs."
+          "description": "Liquidation Challenges: oversupply during forced sales could tank the secondary market for used GPUs."
         },
         {
           "category": "Systemic",
-          "description": "Concentration & Cyclical Risk — Heavily tied to the AI boom; vulnerable to hype cycles (similar to dot-com vendor financing issues)."
+          "description": "Concentration & Cyclical Risk: heavily tied to the AI boom; vulnerable to hype cycles (similar to dot-com vendor financing issues)."
         },
         {
           "category": "Counterparty",
-          "description": "Higher Costs — Often more expensive than plain corporate debt due to complexity and risk premiums."
+          "description": "Higher Costs: often more expensive than plain corporate debt due to complexity and risk premiums."
         },
         {
           "category": "Regulatory",
-          "description": "Regulatory & Structural Risks — In TradFi: heavy capital requirements for banks. In DeFi: smart contract, governance, or custody risks (though mitigated in USD.AI)."
+          "description": "Regulatory & Structural Risks: in TradFi, heavy capital requirements for banks. In DeFi: smart contract, governance, or custody risks (though mitigated in USD.AI)."
         },
         {
           "category": "Systemic",
-          "description": "Systemic Concerns — Some compare aggressive GPU financing to pre-2008 financial engineering (hidden leverage via SPVs)."
+          "description": "Systemic Concerns: some compare aggressive GPU financing to pre-2008 financial engineering (hidden leverage via SPVs)."
         }
       ],
       "Rwa": null,
@@ -42096,19 +42099,19 @@
           "url": "https://docs.usd.ai/"
         },
         {
-          "label": "CoinDesk — USD.AI raises $13M for GPU-backed lending (Aug 2025)",
+          "label": "CoinDesk: USD.AI raises $13M for GPU-backed lending (Aug 2025)",
           "url": "https://www.coindesk.com/business/2025/08/13/usd-ai-raises-usd13m-to-expand-gpu-backed-stablecoin-lending"
         },
         {
-          "label": "Delphi Digital — USD.AI: Financing the Future of AI Infra",
+          "label": "Delphi Digital: USD.AI: Financing the Future of AI Infra",
           "url": "https://members.delphidigital.io/reports/usd-ai-financing-the-future-of-ai-infra"
         },
         {
-          "label": "MEXC — USDai, sUSDai, CHIP, Allo Points explained",
+          "label": "MEXC: USDai, sUSDai, CHIP, Allo Points explained",
           "url": "https://www.mexc.com/learn/article/what-is-usd-ai-crypto-usdai-susdai-chip-token-and-allo-points-explained/1"
         },
         {
-          "label": "M^0 Research — USDai composable synthetic dollar",
+          "label": "M^0 Research: USDai composable synthetic dollar",
           "url": "https://research.m0.org/research/usdai-uses-m0s-stablecoin-platform-to-launch-composable-synthetic-dollar"
         }
       ],
@@ -42206,14 +42209,14 @@
         },
         {
           "date": "Phase 3 (design-stage)",
-          "description": "Delphi's terminal backing phase; depends on loan demand scaling — not reached (backing is still mixed T-bills + early loans).",
+          "description": "Delphi's terminal backing phase; depends on loan demand scaling, not reached (backing is still mixed T-bills + early loans).",
           "link": "https://members.delphidigital.io/reports/usd-ai-financing-the-future-of-ai-infra",
           "status": "theoretical",
           "title": "~100% hardware backing, ~20% APY"
         },
         {
           "date": "design-stage",
-          "description": "Designed mechanism that 'becomes more relevant as USDai becomes more hardware-backed in stage 3' — not the live primary path yet.",
+          "description": "Designed mechanism that 'becomes more relevant as USDai becomes more hardware-backed in stage 3', not the live primary path yet.",
           "link": "https://research.m0.org/research/usdai-uses-m0s-stablecoin-platform-to-launch-composable-synthetic-dollar",
           "status": "theoretical",
           "title": "QEV as primary redemption path"
@@ -42227,7 +42230,7 @@
         },
         {
           "date": "2026-Q3 (estimate)",
-          "description": "Inferred step closing the gap between >$1.2B approved facilities and $225M originated. USD.AI does not publish a per-facility drawdown schedule — this is CanHav's estimate, not a USD.AI commitment.",
+          "description": "Inferred step closing the gap between >$1.2B approved facilities and $225M originated. USD.AI does not publish a per-facility drawdown schedule; this is CanHav's estimate, not a USD.AI commitment.",
           "link": null,
           "status": "canhav-inferred",
           "title": "[CanHav-inferred] Pipeline -> origination ramp"
@@ -42525,7 +42528,7 @@
           "slug": "justlend"
         },
         {
-          "differences": "Aave is the broadest general-purpose pooled money market — brand, liquidity depth, multi-chain reach and risk tooling.",
+          "differences": "Aave is the broadest general-purpose pooled money market: brand, liquidity depth, multi-chain reach and risk tooling.",
           "name": "Aave",
           "positioning": "Safest broad money-market brand.",
           "rank": 1,
@@ -42559,7 +42562,7 @@
         "marketCapUsd": null,
         "partnerships": null,
         "targetAprPct": null,
-        "tvlUsd": 1044711130.0,
+        "tvlUsd": 1044711130,
         "users": 410000
       },
       "Dependencies": null,
@@ -42668,7 +42671,7 @@
           "evmCompatible": "yes",
           "notes": "Core lending is BNB-Chain-centric (EVM-compatible); XVS bridges cross-chain (github.com)."
         },
-        "governanceActivity": "Active XVS governance — isolated pools, parameters, VAI module.",
+        "governanceActivity": "Active XVS governance: isolated pools, parameters, VAI module.",
         "governanceDetail": {
           "notes": "Active XVS governance for isolated pools, parameters, and VAI module.",
           "proposals": null,
@@ -42703,13 +42706,13 @@
           "dataSource": "live",
           "sourceLabel": "DeFi Llama",
           "updatedAt": "2026-07-11T16:34:16Z",
-          "value": 1044711130.0
+          "value": 1044711130
         }
       },
       "Liquidity": null,
       "LiquiditySecondaryTags": null,
       "LiquiditySubSector": null,
-      "LongDescription": null,
+      "LongDescription": "Venus is the leading pooled money market on BNB Chain, offering supply, borrow and isolated-pool markets across a broad set of assets. Alongside lending it issues VAI, a decentralized stablecoin minted against collateral, and coordinates governance and cross-chain expansion through the XVS token. Isolated pools introduced in Venus V4 contain risk per asset group rather than socializing it across the whole protocol. Venus competes primarily within the BNB Chain ecosystem, playing a role similar to JustLend on Tron.",
       "Market": null,
       "MemberCoins": [
         {
@@ -42817,23 +42820,23 @@
           "url": "https://docs-v4.venus.io/links/security-and-audits"
         },
         {
-          "label": "IQ.wiki — Venus Protocol (history/launch)",
+          "label": "IQ.wiki: Venus Protocol (history/launch)",
           "url": "https://iq.wiki/wiki/venus-protocol"
         },
         {
-          "label": "The Defiant — 2021 liquidation/bad-debt event",
+          "label": "The Defiant: 2021 liquidation/bad-debt event",
           "url": "https://thedefiant.io/bscs-venus-protocol-left-with-bad-debt-after-liquidations"
         },
         {
-          "label": "CoinDesk — 2023 BNB bridge exploiter $30M liquidation",
+          "label": "CoinDesk: 2023 BNB bridge exploiter $30M liquidation",
           "url": "https://www.coindesk.com/tech/2023/08/21/bnb-chain-exploiter-liquidated-for-30m-on-venus-protocol"
         },
         {
-          "label": "DL News — Sept 2025 $13M phishing recovery / DAO liquidation vote",
+          "label": "DL News: Sept 2025 $13M phishing recovery / DAO liquidation vote",
           "url": "https://www.dlnews.com/articles/defi/venus-protocol-votes-to-liquidate-attacker-behind-13m-hack/"
         },
         {
-          "label": "CoinDesk — March 2026 THE-token exploit / bad debt",
+          "label": "CoinDesk: March 2026 THE-token exploit / bad debt",
           "url": "https://www.coindesk.com/markets/2026/03/19/venus-xvs-token-plunges-9-as-exploit-leaves-protocol-with-bad-debt"
         }
       ],
@@ -46713,7 +46716,7 @@
       "TotalSupply": {
         "source": "alchemy",
         "updatedAt": "2026-07-11T16:30:54Z",
-        "value": 100608.0
+        "value": 100608
       },
       "Twitter": null,
       "UpdatedAt": "2026-07-11T16:30:54Z",
@@ -48341,7 +48344,7 @@
           "dataSource": "live",
           "sourceLabel": "CoinGecko",
           "updatedAt": "2026-07-11T16:31:24Z",
-          "value": 1.0
+          "value": 1
         },
         "totalSupply": {
           "dataSource": "live",
@@ -51665,7 +51668,7 @@
           "dataSource": "live",
           "sourceLabel": "CoinGecko",
           "updatedAt": "2026-07-11T16:32:14Z",
-          "value": 1.0
+          "value": 1
         },
         "totalSupply": {
           "dataSource": "live",
@@ -53214,7 +53217,7 @@
           "dataSource": "live",
           "sourceLabel": "CoinGecko",
           "updatedAt": "2026-07-11T16:32:38Z",
-          "value": 64173.0
+          "value": 64173
         },
         "totalSupply": {
           "dataSource": "live",
@@ -54526,7 +54529,7 @@
           "dataSource": "live",
           "sourceLabel": "CoinGecko",
           "updatedAt": "2026-07-11T16:32:51Z",
-          "value": 1819.0
+          "value": 1819
         },
         "totalSupply": {
           "dataSource": "live",
@@ -55658,7 +55661,7 @@
       "UpdatedAt": "2026-07-11T16:33:03Z",
       "Website": "https://jup.ag/perps",
       "YieldMechanics": {
-        "currentApyPct": 20.0,
+        "currentApyPct": 20,
         "dataSource": "demo",
         "emissionsBased": false,
         "feeShareToHoldersPct": 75,
@@ -55803,7 +55806,7 @@
       "TotalSupply": {
         "source": "alchemy",
         "updatedAt": "2026-07-11T16:33:10Z",
-        "value": 10000000.0
+        "value": 10000000
       },
       "Twitter": "https://x.com/DAOJonesOptions",
       "UpdatedAt": "2026-07-11T16:34:03Z",
@@ -57692,7 +57695,7 @@
       "UpdatedAt": "2026-07-11T16:30:00Z",
       "Website": "https://usd.ai",
       "YieldMechanics": {
-        "currentApyPct": 10.0,
+        "currentApyPct": 10,
         "dataSource": "demo",
         "emissionsBased": true,
         "feeShareToHoldersPct": 0,
@@ -58387,7 +58390,7 @@
       "UpdatedAt": "2026-07-11T16:33:50Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
       "YieldMechanics": {
-        "currentApyPct": 5.0,
+        "currentApyPct": 5,
         "dataSource": "demo",
         "emissionsBased": true,
         "feeShareToHoldersPct": 0,
@@ -58450,7 +58453,7 @@
       "UpdatedAt": "2026-07-11T16:33:51Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3",
       "YieldMechanics": {
-        "currentApyPct": 5.0,
+        "currentApyPct": 5,
         "dataSource": "demo",
         "emissionsBased": true,
         "feeShareToHoldersPct": 0,
@@ -59262,7 +59265,7 @@
       "UpdatedAt": "2026-07-11T16:33:41Z",
       "Website": "https://ondo.finance/usdy",
       "YieldMechanics": {
-        "currentApyPct": 5.0,
+        "currentApyPct": 5,
         "dataSource": "demo",
         "emissionsBased": false,
         "feeShareToHoldersPct": 0,

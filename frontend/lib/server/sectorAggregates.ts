@@ -1,6 +1,6 @@
 import "server-only";
 
-import { CANONICAL_LENDING_SLUGS, CREDIT_SEED } from "@/data/credit-seed";
+import { CANONICAL_LENDING_SLUGS } from "@/data/credit-seed";
 import { CANONICAL_PERP_DEX_SLUGS, DERIVATIVES_SEED } from "@/data/derivatives-seed";
 import { LIQUIDITY_SEED } from "@/data/liquidity-seed";
 import { OTHER_SEED } from "@/data/other-seed";
@@ -31,11 +31,20 @@ function sectorSlugSets(items: Record<string, unknown>[]): Record<NetworkSector,
     .map((it) => String(it.Slug ?? ""))
     .filter(Boolean);
 
+  // Same membership rule as matchesSectorFilter(): primary sector, secondary
+  // sector, or canonical lending slug — so the aggregate covers exactly the
+  // entities the /networks Credit filter displays.
+  const creditSlugs = items
+    .filter(
+      (it) =>
+        String(it.Sector ?? "") === "Credit" ||
+        (Array.isArray(it.SecondarySectors) && it.SecondarySectors.includes("Credit")),
+    )
+    .map((it) => String(it.Slug ?? ""))
+    .filter(Boolean);
+
   return {
-    Credit: uniqueSlugs(
-      CREDIT_SEED.map((s) => s.slug),
-      [...CANONICAL_LENDING_SLUGS],
-    ),
+    Credit: uniqueSlugs(creditSlugs, [...CANONICAL_LENDING_SLUGS]),
     Derivatives: uniqueSlugs(
       DERIVATIVES_SEED.map((s) => s.slug),
       [...CANONICAL_PERP_DEX_SLUGS],

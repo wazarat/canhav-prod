@@ -14,6 +14,21 @@ import {
 } from "@/lib/networkTaxonomy";
 import { cn } from "@/lib/utils";
 
+// Canonical chip order: the six tag-metrics sectors first, then the remaining
+// primary sectors. Perpetuals (merged into Derivatives) and Yield are
+// deprecated secondary-only sectors and never get their own chip.
+const SECTOR_CHIP_ORDER = [
+  "Credit",
+  "Staking",
+  "Liquidity",
+  "Derivatives",
+  "RWA",
+  "Other",
+  "DEX",
+  "Stablecoin",
+];
+const DEPRECATED_SECTOR_CHIPS = new Set(["Perpetuals", "Yield"]);
+
 const CATEGORY_FILTERS: { label: string; value: MemberCoinCategory | "all" }[] = [
   { label: "All", value: "all" },
   { label: "Stablecoins", value: "Stablecoin" },
@@ -50,7 +65,13 @@ export function NetworkTableWithFilter({
       if (p.sector) set.add(p.sector);
       for (const s of p.secondarySectors ?? []) set.add(s);
     }
-    return [...set].sort();
+    for (const s of DEPRECATED_SECTOR_CHIPS) set.delete(s);
+    return [...set].sort((a, b) => {
+      const ia = SECTOR_CHIP_ORDER.indexOf(a);
+      const ib = SECTOR_CHIP_ORDER.indexOf(b);
+      if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+      return a.localeCompare(b);
+    });
   }, [profiles]);
 
   // Sub-sector / tags for the selected sector. Credit, Staking, and RWA use fixed

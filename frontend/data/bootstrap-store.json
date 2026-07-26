@@ -3,7 +3,7 @@
     "backend": "local",
     "count": 377,
     "table": "canhav-research",
-    "updatedAt": "2026-07-13T00:00:00Z"
+    "updatedAt": "2026-07-26T05:45:46Z"
   },
   "items": {
     "CATEGORY#Entity|PROTOCOL#aave": {
@@ -593,22 +593,6 @@
           "slug": "stkabpt",
           "subCategory": "Yield-generating Token",
           "symbol": "stkABPT"
-        },
-        {
-          "slug": "aave-atokens",
-          "name": "aUSDC, aUSDT, aWETH (and other aTokens)",
-          "symbol": "aUSDC",
-          "category": "Receipt",
-          "role": "Lending Receipt Token",
-          "receiptType": "LendingReceipt"
-        },
-        {
-          "slug": "aave-staked",
-          "name": "stkAAVE, stkGHO, stkABPT",
-          "symbol": "stkAAVE",
-          "category": "Receipt",
-          "role": "Locked / Vote-Escrow Receipt",
-          "receiptType": "LockedEscrowReceipt"
         }
       ],
       "Name": "Aave",
@@ -1015,8 +999,8 @@
           "severity": "high"
         }
       ],
-      "UpdatedAt": "2026-07-13T00:00:00Z",
-      "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
+      "UpdatedAt": "2026-07-26T05:45:46Z",
+      "Website": "https://aave.com"
     },
     "CATEGORY#Entity|PROTOCOL#aerodrome": {
       "AgentSkill": null,
@@ -14290,14 +14274,6 @@
           "slug": "iusde",
           "subCategory": "Yield-generating Token",
           "symbol": "iUSDe"
-        },
-        {
-          "slug": "ethena-susde",
-          "name": "sUSDe",
-          "symbol": "sUSDe",
-          "category": "Receipt",
-          "role": "Staked Stablecoin",
-          "receiptType": "StakedStablecoin"
         }
       ],
       "Name": "Ethena",
@@ -14517,7 +14493,7 @@
       ],
       "Twitter": "https://x.com/ethena_labs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-13T00:00:00Z",
+      "UpdatedAt": "2026-07-26T05:45:46Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Entity|PROTOCOL#ether-fi": {
@@ -16860,14 +16836,6 @@
           "slug": "benji",
           "subCategory": "Treasuries & Funds",
           "symbol": "BENJI"
-        },
-        {
-          "slug": "franklin-benji",
-          "name": "BENJI",
-          "symbol": "BENJI",
-          "category": "Receipt",
-          "role": "Tokenized RWA Token",
-          "receiptType": "TokenizedRWA"
         }
       ],
       "Name": "Franklin Templeton",
@@ -17163,7 +17131,7 @@
       ],
       "Twitter": "https://x.com/FTI_US",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-13T00:00:00Z",
+      "UpdatedAt": "2026-07-26T05:45:46Z",
       "Website": "https://www.franklintempleton.com"
     },
     "CATEGORY#Entity|PROTOCOL#frax": {
@@ -17267,14 +17235,6 @@
           "slug": "sfrax",
           "subCategory": "Staked Stablecoin",
           "symbol": "sFRAX"
-        },
-        {
-          "slug": "frax-sfrxusd",
-          "name": "sFRAX / sfrxUSD",
-          "symbol": "sFRAX",
-          "category": "Receipt",
-          "role": "Staked Stablecoin",
-          "receiptType": "StakedStablecoin"
         },
         {
           "slug": "fxs",
@@ -17413,7 +17373,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/fraxfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-13T00:00:00Z",
+      "UpdatedAt": "2026-07-26T05:45:46Z",
       "Website": "https://frax.finance"
     },
     "CATEGORY#Entity|PROTOCOL#gains-network": {
@@ -25510,14 +25470,6 @@
         },
         {
           "category": "Token",
-          "name": "SYRUP (OFT)",
-          "role": "OFT bridge token on Base",
-          "slug": "syrup-oft",
-          "subCategory": "Governance Token",
-          "symbol": "SYRUP"
-        },
-        {
-          "category": "Token",
           "name": "stSYRUP",
           "role": "Staked SYRUP receipt",
           "slug": "stsyrup",
@@ -25539,22 +25491,6 @@
           "slug": "syrup-usdt-pool",
           "subCategory": "Yield-generating Token",
           "symbol": "syrupUSDT"
-        },
-        {
-          "slug": "maple-credit-pool-tokens",
-          "name": "Credit Pool Tokens (various)",
-          "symbol": "Credit Pool Tokens",
-          "category": "Receipt",
-          "role": "Fixed-Income / Tranche Token",
-          "receiptType": "FixedIncomeTranche"
-        },
-        {
-          "slug": "mpl-syrup",
-          "name": "MPL/SYRUP",
-          "symbol": "MPL/SYRUP",
-          "category": "Token",
-          "role": "Governance Token",
-          "subCategory": "Governance Token"
         }
       ],
       "Name": "Maple Finance",
@@ -25737,7 +25673,7 @@
       ],
       "Twitter": "https://x.com/maplefinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-13T00:00:00Z",
+      "UpdatedAt": "2026-07-26T05:45:46Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Entity|PROTOCOL#maverick": {
@@ -26830,7 +26766,7 @@
       "Twitter": "https://x.com/MorphoLabs",
       "TypedRisks": null,
       "UpdatedAt": "2026-07-13T00:00:00Z",
-      "Website": "https://app.morpho.org/arbitrum/earn"
+      "Website": "https://morpho.org"
     },
     "CATEGORY#Entity|PROTOCOL#mountain-protocol": {
       "AgentSkill": null,
@@ -28859,22 +28795,6 @@
           "slug": "ondo-gov",
           "subCategory": "Governance Token",
           "symbol": "ONDO"
-        },
-        {
-          "slug": "ondo-ousg",
-          "name": "OUSG",
-          "symbol": "OUSG",
-          "category": "Receipt",
-          "role": "Tokenized RWA Token",
-          "receiptType": "TokenizedRWA"
-        },
-        {
-          "slug": "ondo-usdy",
-          "name": "USDY",
-          "symbol": "USDY",
-          "category": "Receipt",
-          "role": "Staked Stablecoin",
-          "receiptType": "StakedStablecoin"
         }
       ],
       "Name": "Ondo Finance",
@@ -29176,7 +29096,7 @@
       ],
       "Twitter": "https://x.com/OndoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-13T00:00:00Z",
+      "UpdatedAt": "2026-07-26T05:45:46Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#Entity|PROTOCOL#paladin": {
@@ -35797,14 +35717,6 @@
           "slug": "mkr",
           "subCategory": "Governance Token",
           "symbol": "MKR"
-        },
-        {
-          "slug": "sky-susds",
-          "name": "sUSDS",
-          "symbol": "sUSDS",
-          "category": "Receipt",
-          "role": "Staked Stablecoin",
-          "receiptType": "StakedStablecoin"
         }
       ],
       "Name": "Sky",
@@ -36013,7 +35925,7 @@
       ],
       "Twitter": "https://x.com/SkyEcosystem",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-13T00:00:00Z",
+      "UpdatedAt": "2026-07-26T05:45:46Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Entity|PROTOCOL#spark": {
@@ -36633,8 +36545,8 @@
       "MemberCoins": [
         {
           "slug": "apw",
-          "name": "APW",
-          "symbol": "APW",
+          "name": "Spectra",
+          "symbol": "SPECTRA",
           "category": "Token",
           "role": "Governance Token",
           "subCategory": "Governance Token"
@@ -42031,22 +41943,6 @@
           "slug": "schip",
           "subCategory": "Yield-generating Token",
           "symbol": "sCHIP"
-        },
-        {
-          "slug": "usd-ai-schip",
-          "name": "sCHIP",
-          "symbol": "sCHIP",
-          "category": "Receipt",
-          "role": "Locked / Vote-Escrow Receipt",
-          "receiptType": "LockedEscrowReceipt"
-        },
-        {
-          "slug": "usd-ai-susdai",
-          "name": "sUSDai",
-          "symbol": "sUSDai",
-          "category": "Receipt",
-          "role": "Staked Stablecoin",
-          "receiptType": "StakedStablecoin"
         }
       ],
       "Name": "USD.AI",
@@ -42374,7 +42270,7 @@
       ],
       "Twitter": "https://x.com/USDai_Official",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-13T00:00:00Z",
+      "UpdatedAt": "2026-07-26T05:45:46Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Entity|PROTOCOL#usdt0": {
@@ -52694,19 +52590,19 @@
       "CoinType": "Governance",
       "ContractAddress": null,
       "CreatedAt": "2026-06-29T17:38:33Z",
-      "Description": "APW — tracked via compiled coin integration.",
+      "Description": "SPECTRA (ex-APW, 1:1 APWine migration) — tracked via compiled coin integration.",
       "Discord": null,
       "EntitySlug": "spectra",
       "GitHub": null,
       "IsStablecoin": false,
-      "Name": "APW",
+      "Name": "Spectra",
       "PK": "CATEGORY#Token",
       "SK": "PROTOCOL#apw",
       "Sector": "Credit",
       "Slug": "apw",
       "Status": "APPROVED",
       "SubCategory": "Governance Token",
-      "Symbol": "APW",
+      "Symbol": "SPECTRA",
       "Tag": "Fixed Income",
       "TokenType": "Governance",
       "TotalSupply": {

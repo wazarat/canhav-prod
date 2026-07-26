@@ -298,11 +298,11 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   // Credit sector expansion — Leveraged Yield + Fixed Income gov tokens (verified 2026-06-25).
   gearbox: "gearbox",
   stella: "alpha-finance", // ex-Alpha Homora (ALPHA token)
-  "extra-finance": null, // EXTRA not listed on CoinGecko
+  "extra-finance": "extra-finance", // EXTRA (listed since the 2026-06-25 audit; verified 2026-07-26)
   pendle: "pendle",
   notional: "notional-finance",
   spectra: "spectra-finance", // Spectra (SPECTRA); "spectra-2" is a tiny impostor
-  sense: null,
+  sense: null, // tokenless — protocol wound down 2023; CoinGecko has no listing (mcap/vol "—" is correct)
   radiant: "radiant-capital",
   // Staking sector — LST/LRT or governance token for the universal pass (verified 2026-06-25).
   lido: "staked-ether",
@@ -366,20 +366,22 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   stably: null,
   "gmo-trust": null,
   // AUSD itself — surfaces issuer market cap / volume on the networks listing.
+  // Where the issuer has no governance token, the flagship product token fills
+  // mcap/vol on the listing (agora precedent). Verified live 2026-07-26.
   agora: "agora-dollar",
-  cap: null,
+  cap: null, // not listed with market data
   anzen: null,
-  falcon: null,
-  elixir: null,
-  "mountain-protocol": null,
-  resolv: null,
-  reserve: null,
+  falcon: "falcon-finance", // USDF
+  elixir: null, // deUSD delisted after wind-down
+  "mountain-protocol": "mountain-protocol-usdm", // USDM
+  resolv: "resolv", // RESOLV governance token
+  reserve: null, // store entity is Reservoir (rUSD/srUSD) — RSR would be the wrong protocol
   "m-zero": null,
-  "usd-ai": null,
-  usdt0: null,
-  "trueusd": null,
-  "inverse-finance": null,
-  "curve-stablecoin": null,
+  "usd-ai": "usdai", // USDai itself (agora precedent) — surfaces issuer mcap/vol; verified 2026-07-26
+  usdt0: "usdt0",
+  "trueusd": "true-usd", // TUSD
+  "inverse-finance": "inverse-finance", // INV
+  "curve-stablecoin": "crvusd",
   // RWAs / early-stage — defer to Llama gecko_id when present.
   arcton: null,
   aryze: null,

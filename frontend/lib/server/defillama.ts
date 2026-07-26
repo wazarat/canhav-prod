@@ -121,12 +121,12 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
   fluid: "fluid",
   venus: "venus-core-pool",
   justlend: "justlend",
-  kamino: "kamino-lend",
+  kamino: ["kamino-lend", "kamino-liquidity"], // parent total = lend + liquidity vaults
   maple: "maple",
   // Credit sector expansion — Leveraged Yield + Fixed Income (verified 2026-06-25).
   gearbox: "gearbox",
   stella: "stella",
-  "extra-finance": "extra-finance-leverage-farming",
+  "extra-finance": ["extra-finance-leverage-farming", "extra-finance-xlend"],
   pendle: "pendle",
   // notional-v3 is effectively dead (~$800 TVL); the live TVL/token is v2.
   // v2 primary so identity/mcap resolve from the active product.
@@ -549,15 +549,15 @@ export interface LlamaChainTvl {
 export interface LlamaProtocolTvl {
   /** Daily TVL series, USD. */
   points: LlamaSeriesPoint[];
-  /** Which slice the series is: "Arbitrum" when available, else "all". */
+  /** Which slice the series is; always "all" (protocol-wide, every chain). */
   scope: string;
   /** Latest TVL per chain (USD), largest first. */
   chainTvls: LlamaChainTvl[];
 }
 
 /**
- * Daily TVL history for an RWA slug. Prefers the Arbitrum slice (this is an
- * Arbitrum research platform); falls back to the protocol-wide series.
+ * Daily protocol-wide TVL history for a slug (all chains — headline numbers
+ * must match DeFi Llama's protocol totals, not a single-chain slice).
  */
 export async function fetchLlamaProtocolTvl(
   slug: string,
@@ -629,7 +629,6 @@ async function fetchOneLlamaProtocolTvl(
   };
 
   const chainTvls: LlamaChainTvl[] = [];
-  let arbSeries: LlamaSeriesPoint[] = [];
   const chains = data.chainTvls;
   if (chains && typeof chains === "object") {
     for (const [chain, entry] of Object.entries(chains as Record<string, any>)) {
@@ -638,13 +637,11 @@ async function fetchOneLlamaProtocolTvl(
       if (series.length === 0) continue;
       const latest = series[series.length - 1].value;
       if (latest > 0) chainTvls.push({ chain, tvlUsd: latest });
-      if (chain === "Arbitrum") arbSeries = series;
     }
   }
   chainTvls.sort((a, b) => b.tvlUsd - a.tvlUsd);
 
-  const total = parseSeries(data.tvl);
-  const points = arbSeries.length >= 2 ? arbSeries : total;
+  const points = parseSeries(data.tvl);
   if (points.length === 0) return null;
   // A dead adapter reports a flat-zero series — treat as no data.
   if (points[points.length - 1].value <= 0 && points.every((p) => p.value <= 0)) return null;
@@ -652,7 +649,7 @@ async function fetchOneLlamaProtocolTvl(
   // Full (unsliced) series — the caller slices after combining products.
   return {
     points,
-    scope: arbSeries.length >= 2 ? "Arbitrum" : "all",
+    scope: "all",
     chainTvls,
   };
 }

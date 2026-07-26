@@ -223,7 +223,12 @@ function mergeSourced<T>(
   return fresh;
 }
 
-/** Sync universal TVL from an authoritative CurrentScale write (integration / supply pass). */
+/**
+ * Fill universal TVL from CurrentScale when the universal pass produced none.
+ * Fill-only: a live protocol-wide DeFi Llama total in UniversalMetrics is
+ * authoritative for the headline and must not be clobbered by sector or
+ * native-integration passes (those can be product- or chain-scoped subsets).
+ */
 function syncUniversalTvlFromCurrentScale(
   item: Record<string, any>,
   sourceLabel: string,
@@ -232,7 +237,7 @@ function syncUniversalTvlFromCurrentScale(
   if (scaleTvl == null || typeof scaleTvl !== "number") return false;
   const u = item.UniversalMetrics as UniversalMetrics | undefined;
   if (!u?.tvl) return false;
-  if (u.tvl.tvlUsd.value === scaleTvl) return false;
+  if (u.tvl.tvlUsd.value != null) return false;
   const now = nowIso();
   u.tvl = {
     ...u.tvl,
@@ -2237,12 +2242,13 @@ export async function GET(req: Request): Promise<NextResponse> {
     updated += 1;
   }
 
-  // Reconcile universal TVL with headline CurrentScale when sector passes ran before universal.
+  // Backfill universal TVL from headline CurrentScale where the universal pass
+  // produced none (fill-only — a live universal total is never overwritten).
   for (const item of networkItems) {
     const scaleTvl = item.CurrentScale?.tvlUsd;
     if (scaleTvl == null || typeof scaleTvl !== "number") continue;
     const uTvl = (item.UniversalMetrics as UniversalMetrics | undefined)?.tvl?.tvlUsd?.value;
-    if (uTvl === scaleTvl) continue;
+    if (uTvl != null) continue;
     const slug = String(item.Slug ?? "");
     let label = "Headline TVL";
     if (slug === "morpho") label = "Morpho API";

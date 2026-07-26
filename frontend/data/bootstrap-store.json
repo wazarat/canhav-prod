@@ -3,7 +3,7 @@
     "backend": "local",
     "count": 377,
     "table": "canhav-research",
-    "updatedAt": "2026-07-11T19:52:32Z"
+    "updatedAt": "2026-07-13T00:00:00Z"
   },
   "items": {
     "CATEGORY#Entity|PROTOCOL#aave": {
@@ -593,6 +593,22 @@
           "slug": "stkabpt",
           "subCategory": "Yield-generating Token",
           "symbol": "stkABPT"
+        },
+        {
+          "slug": "aave-atokens",
+          "name": "aUSDC, aUSDT, aWETH (and other aTokens)",
+          "symbol": "aUSDC",
+          "category": "Receipt",
+          "role": "Lending Receipt Token",
+          "receiptType": "LendingReceipt"
+        },
+        {
+          "slug": "aave-staked",
+          "name": "stkAAVE, stkGHO, stkABPT",
+          "symbol": "stkAAVE",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
         }
       ],
       "Name": "Aave",
@@ -999,7 +1015,7 @@
           "severity": "high"
         }
       ],
-      "UpdatedAt": "2026-07-11T16:34:08Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://app.aave.com/?marketName=proto_arbitrum_v3"
     },
     "CATEGORY#Entity|PROTOCOL#aerodrome": {
@@ -2161,7 +2177,32 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "ankr-aethc",
+          "name": "aETHc",
+          "symbol": "aETHc",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "ankr-ankreth",
+          "name": "ankrETH",
+          "symbol": "ankrETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "ankr-token",
+          "name": "ANKR",
+          "symbol": "ANKR",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Ankr",
       "OffchainFacts": [
         {
@@ -2335,7 +2376,7 @@
       ],
       "Twitter": "https://x.com/ankr",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.ankr.com"
     },
     "CATEGORY#Entity|PROTOCOL#anzen": {
@@ -2427,6 +2468,14 @@
           "slug": "susdz",
           "subCategory": "Staked Stablecoin",
           "symbol": "sUSDz"
+        },
+        {
+          "slug": "anz",
+          "name": "ANZ",
+          "symbol": "ANZ",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
         }
       ],
       "Name": "Anzen Finance",
@@ -2540,7 +2589,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/AnzenFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:40Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.anzen.finance"
     },
     "CATEGORY#Entity|PROTOCOL#arcton": {
@@ -4161,6 +4210,14 @@
           "slug": "aura-gov",
           "subCategory": "Governance Token",
           "symbol": "AURA"
+        },
+        {
+          "slug": "aura-aurabal",
+          "name": "auraBAL",
+          "symbol": "auraBAL",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
         }
       ],
       "Name": "Aura",
@@ -4347,7 +4404,7 @@
       ],
       "Twitter": "https://x.com/aurafinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://aura.finance"
     },
     "CATEGORY#Entity|PROTOCOL#balancer": {
@@ -4947,7 +5004,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "bedrock-unieth",
+          "name": "uniETH",
+          "symbol": "uniETH",
+          "category": "Receipt",
+          "role": "Liquid Restaking Token (LRT)",
+          "receiptType": "LiquidRestaking"
+        }
+      ],
       "Name": "Bedrock",
       "OffchainFacts": [
         {
@@ -5117,7 +5183,7 @@
       ],
       "Twitter": "https://x.com/Bedrock_DeFi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.bedrock.technology"
     },
     "CATEGORY#Entity|PROTOCOL#beefy": {
@@ -5343,6 +5409,14 @@
           "slug": "bifi",
           "subCategory": "Governance Token",
           "symbol": "BIFI"
+        },
+        {
+          "slug": "beefy-mootokens",
+          "name": "mooTokens",
+          "symbol": "mooTokens",
+          "category": "Receipt",
+          "role": "Yield-Bearing Vault Token",
+          "receiptType": "YieldVault"
         }
       ],
       "Name": "Beefy",
@@ -5513,7 +5587,7 @@
       ],
       "Twitter": "https://x.com/beefyfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://beefy.com"
     },
     "CATEGORY#Entity|PROTOCOL#binance-wbeth": {
@@ -5644,7 +5718,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "binance-wbeth",
+          "name": "WBETH",
+          "symbol": "WBETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        }
+      ],
       "Name": "Binance",
       "OffchainFacts": [
         {
@@ -5809,7 +5892,7 @@
       ],
       "Twitter": "https://x.com/binance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:54Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.binance.com/en/wbeth"
     },
     "CATEGORY#Entity|PROTOCOL#bitcoin": {
@@ -6558,6 +6641,14 @@
           "slug": "cfg",
           "subCategory": "Governance Token",
           "symbol": "CFG"
+        },
+        {
+          "slug": "centrifuge-pool-tokens",
+          "name": "Pool Tokens (various)",
+          "symbol": "Pool Tokens",
+          "category": "Receipt",
+          "role": "Fixed-Income / Tranche Token",
+          "receiptType": "FixedIncomeTranche"
         }
       ],
       "Name": "Centrifuge",
@@ -6840,7 +6931,7 @@
       ],
       "Twitter": "https://x.com/centrifuge",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:31Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://centrifuge.io"
     },
     "CATEGORY#Entity|PROTOCOL#chateau-capital": {
@@ -7673,6 +7764,14 @@
           "slug": "cpool",
           "subCategory": "Governance Token",
           "symbol": "CPOOL"
+        },
+        {
+          "slug": "clearpool-credit-vault-tokens",
+          "name": "Credit Vault Tokens (various)",
+          "symbol": "Credit Vault Tokens",
+          "category": "Receipt",
+          "role": "Fixed-Income / Tranche Token",
+          "receiptType": "FixedIncomeTranche"
         }
       ],
       "Name": "Clearpool",
@@ -7979,7 +8078,7 @@
       ],
       "Twitter": "https://x.com/ClearpoolFin",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:32Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://clearpool.finance"
     },
     "CATEGORY#Entity|PROTOCOL#coinbase-cbeth": {
@@ -8142,7 +8241,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "coinbase-cbeth",
+          "name": "cbETH",
+          "symbol": "cbETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        }
+      ],
       "Name": "Coinbase",
       "OffchainFacts": [
         {
@@ -8311,7 +8419,7 @@
       ],
       "Twitter": "https://x.com/coinbase",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:54Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.coinbase.com/cbeth"
     },
     "CATEGORY#Entity|PROTOCOL#compound": {
@@ -8524,6 +8632,14 @@
           "slug": "comp",
           "subCategory": "Governance Token",
           "symbol": "COMP"
+        },
+        {
+          "slug": "compound-ctokens",
+          "name": "cUSDC, cETH, cDAI (and other cTokens)",
+          "symbol": "cUSDC",
+          "category": "Receipt",
+          "role": "Lending Receipt Token",
+          "receiptType": "LendingReceipt"
         }
       ],
       "Name": "Compound",
@@ -8690,7 +8806,7 @@
       ],
       "Twitter": "https://twitter.com/compoundfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:09Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://compound.finance"
     },
     "CATEGORY#Entity|PROTOCOL#convex-finance": {
@@ -8888,6 +9004,22 @@
           "slug": "cvx",
           "subCategory": "Governance Token",
           "symbol": "CVX"
+        },
+        {
+          "slug": "convex-cvxcrv",
+          "name": "cvxCRV",
+          "symbol": "cvxCRV",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
+        },
+        {
+          "slug": "convex-vlcvx",
+          "name": "vlCVX",
+          "symbol": "vlCVX",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
         }
       ],
       "Name": "Convex Finance",
@@ -9077,7 +9209,7 @@
       ],
       "Twitter": "https://x.com/ConvexFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.convexfinance.com"
     },
     "CATEGORY#Entity|PROTOCOL#cozy-finance": {
@@ -10786,7 +10918,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "dinari-dshares",
+          "name": "dShares (various)",
+          "symbol": "dShares",
+          "category": "Receipt",
+          "role": "Tokenized RWA Token",
+          "receiptType": "TokenizedRWA"
+        }
+      ],
       "Name": "Dinari",
       "OffchainFacts": [
         {
@@ -11038,7 +11179,7 @@
       ],
       "Twitter": null,
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:54Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://dinari.com"
     },
     "CATEGORY#Entity|PROTOCOL#dopex": {
@@ -11217,7 +11358,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "dopex-rdpx",
+          "name": "rDPX",
+          "symbol": "rDPX",
+          "category": "Receipt",
+          "role": "Yield-Bearing Vault Token",
+          "receiptType": "YieldVault"
+        }
+      ],
       "Name": "Dopex",
       "OffchainFacts": [
         {
@@ -11376,7 +11526,7 @@
       ],
       "Twitter": "https://x.com/dopex_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:56Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.dopex.io"
     },
     "CATEGORY#Entity|PROTOCOL#drift-protocol": {
@@ -13229,7 +13379,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "eigen",
+          "name": "EigenLayer",
+          "symbol": "EIGEN",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "EigenLayer",
       "OffchainFacts": [
         {
@@ -13389,7 +13548,7 @@
       ],
       "Twitter": "https://x.com/eigenlayer",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.eigencloud.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#elixir": {
@@ -14088,7 +14247,7 @@
           "category": "Stablecoin",
           "name": "USDe",
           "role": "Synthetic dollar (delta-hedged, not fiat-backed)",
-          "slug": "ethena",
+          "slug": "usde",
           "subCategory": "Stablecoin",
           "symbol": "USDe"
         },
@@ -14131,6 +14290,14 @@
           "slug": "iusde",
           "subCategory": "Yield-generating Token",
           "symbol": "iUSDe"
+        },
+        {
+          "slug": "ethena-susde",
+          "name": "sUSDe",
+          "symbol": "sUSDe",
+          "category": "Receipt",
+          "role": "Staked Stablecoin",
+          "receiptType": "StakedStablecoin"
         }
       ],
       "Name": "Ethena",
@@ -14350,7 +14517,7 @@
       ],
       "Twitter": "https://x.com/ethena_labs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:41Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://ethena.fi/"
     },
     "CATEGORY#Entity|PROTOCOL#ether-fi": {
@@ -14585,7 +14752,32 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "ether-fi-weeth",
+          "name": "weETH",
+          "symbol": "weETH",
+          "category": "Receipt",
+          "role": "Liquid Restaking Token (LRT)",
+          "receiptType": "LiquidRestaking"
+        },
+        {
+          "slug": "ether-fi-weeth-family",
+          "name": "eETH",
+          "symbol": "eETH",
+          "category": "Receipt",
+          "role": "Liquid Restaking Token (LRT)",
+          "receiptType": "LiquidRestaking"
+        },
+        {
+          "slug": "ethfi",
+          "name": "ETHFI",
+          "symbol": "ETHFI",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Ether.fi",
       "OffchainFacts": [
         {
@@ -14752,7 +14944,7 @@
       ],
       "Twitter": "https://x.com/ether_fi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.ether.fi"
     },
     "CATEGORY#Entity|PROTOCOL#ethereum": {
@@ -15073,7 +15265,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "extra",
+          "name": "EXTRA",
+          "symbol": "EXTRA",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Extra Finance",
       "OffchainFacts": [
         {
@@ -15256,7 +15457,7 @@
       ],
       "Twitter": "https://x.com/extrafi_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:52Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://extrafi.io"
     },
     "CATEGORY#Entity|PROTOCOL#falcon": {
@@ -16313,6 +16514,14 @@
           "slug": "fluid",
           "subCategory": "Governance Token",
           "symbol": "FLUID"
+        },
+        {
+          "slug": "fluid-fusdc",
+          "name": "fUSDC, fETH (fTokens)",
+          "symbol": "fUSDC",
+          "category": "Receipt",
+          "role": "Lending Receipt Token",
+          "receiptType": "LendingReceipt"
         }
       ],
       "Name": "Fluid",
@@ -16492,7 +16701,7 @@
       ],
       "Twitter": "https://x.com/0xfluid",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:10Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://fluid.io"
     },
     "CATEGORY#Entity|PROTOCOL#franklin-templeton": {
@@ -16651,6 +16860,14 @@
           "slug": "benji",
           "subCategory": "Treasuries & Funds",
           "symbol": "BENJI"
+        },
+        {
+          "slug": "franklin-benji",
+          "name": "BENJI",
+          "symbol": "BENJI",
+          "category": "Receipt",
+          "role": "Tokenized RWA Token",
+          "receiptType": "TokenizedRWA"
         }
       ],
       "Name": "Franklin Templeton",
@@ -16946,7 +17163,7 @@
       ],
       "Twitter": "https://x.com/FTI_US",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:30:33Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.franklintempleton.com"
     },
     "CATEGORY#Entity|PROTOCOL#frax": {
@@ -17050,6 +17267,30 @@
           "slug": "sfrax",
           "subCategory": "Staked Stablecoin",
           "symbol": "sFRAX"
+        },
+        {
+          "slug": "frax-sfrxusd",
+          "name": "sFRAX / sfrxUSD",
+          "symbol": "sFRAX",
+          "category": "Receipt",
+          "role": "Staked Stablecoin",
+          "receiptType": "StakedStablecoin"
+        },
+        {
+          "slug": "fxs",
+          "name": "FXS",
+          "symbol": "FXS",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
+        },
+        {
+          "slug": "sfrxeth",
+          "name": "Staked Frax ETH",
+          "symbol": "sfrxETH",
+          "category": "Token",
+          "role": "LST",
+          "subCategory": "LST"
         }
       ],
       "Name": "Frax Finance",
@@ -17172,7 +17413,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/fraxfinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:41Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://frax.finance"
     },
     "CATEGORY#Entity|PROTOCOL#gains-network": {
@@ -18148,7 +18389,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "gear",
+          "name": "Gearbox Protocol",
+          "symbol": "GEAR",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Gearbox",
       "OffchainFacts": [
         {
@@ -18319,7 +18569,7 @@
       ],
       "Twitter": "https://x.com/GearboxProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:52Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://gearbox.fi"
     },
     "CATEGORY#Entity|PROTOCOL#gmo-trust": {
@@ -18708,6 +18958,22 @@
           "slug": "gmx-gov",
           "subCategory": "Governance Token",
           "symbol": "GMX"
+        },
+        {
+          "slug": "gmx-glp",
+          "name": "GLP",
+          "symbol": "GLP",
+          "category": "Receipt",
+          "role": "Yield-Bearing Vault Token",
+          "receiptType": "YieldVault"
+        },
+        {
+          "slug": "gmx-gm",
+          "name": "GM (GMX Market tokens)",
+          "symbol": "GM",
+          "category": "Receipt",
+          "role": "Yield-Bearing Vault Token",
+          "receiptType": "YieldVault"
         }
       ],
       "Name": "GMX",
@@ -18861,7 +19127,7 @@
       ],
       "Twitter": "https://x.com/GMX_IO",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:56Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://gmx.io"
     },
     "CATEGORY#Entity|PROTOCOL#goldfinch": {
@@ -19100,6 +19366,14 @@
           "slug": "gfi",
           "subCategory": "Governance Token",
           "symbol": "GFI"
+        },
+        {
+          "slug": "goldfinch-senior-pool",
+          "name": "Senior Pool / Junior Tranche tokens",
+          "symbol": "Senior Pool",
+          "category": "Receipt",
+          "role": "Fixed-Income / Tranche Token",
+          "receiptType": "FixedIncomeTranche"
         }
       ],
       "Name": "Goldfinch",
@@ -19375,7 +19649,7 @@
       ],
       "Twitter": "https://x.com/goldfinch_fi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:34Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://goldfinch.finance"
     },
     "CATEGORY#Entity|PROTOCOL#hidden-hand": {
@@ -19531,7 +19805,32 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "redacted-apxeth",
+          "name": "apxETH",
+          "symbol": "apxETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "redacted-pxeth",
+          "name": "pxETH",
+          "symbol": "pxETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "redacted-rlbtrfly",
+          "name": "rlBTRFLY",
+          "symbol": "rlBTRFLY",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
+        }
+      ],
       "Name": "Redacted (Hidden Hand)",
       "OffchainFacts": [
         {
@@ -19758,7 +20057,7 @@
       ],
       "Twitter": "https://x.com/redactedcartel",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:56Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://redacted.finance"
     },
     "CATEGORY#Entity|PROTOCOL#hyperliquid": {
@@ -22545,7 +22844,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "kar",
+          "name": "KAR",
+          "symbol": "KAR",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Karak",
       "OffchainFacts": [
         {
@@ -22694,7 +23002,7 @@
       ],
       "Twitter": "https://x.com/Karak_Network",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://karak.network"
     },
     "CATEGORY#Entity|PROTOCOL#kelp-dao": {
@@ -22885,7 +23193,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "kelp-rseth",
+          "name": "rsETH",
+          "symbol": "rsETH",
+          "category": "Receipt",
+          "role": "Liquid Restaking Token (LRT)",
+          "receiptType": "LiquidRestaking"
+        }
+      ],
       "Name": "Kelp DAO",
       "OffchainFacts": [
         {
@@ -23055,7 +23372,7 @@
       ],
       "Twitter": "https://x.com/KelpDAO",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.kelpdao.xyz"
     },
     "CATEGORY#Entity|PROTOCOL#lido": {
@@ -23305,7 +23622,32 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "lido-steth",
+          "name": "stETH",
+          "symbol": "stETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "lido-steth-family",
+          "name": "wstETH",
+          "symbol": "wstETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "ldo",
+          "name": "LDO",
+          "symbol": "LDO",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Lido",
       "OffchainFacts": [
         {
@@ -23492,7 +23834,7 @@
       ],
       "Twitter": "https://x.com/LidoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:54Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://lido.fi"
     },
     "CATEGORY#Entity|PROTOCOL#liquity": {
@@ -24704,7 +25046,24 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "mantle-meth",
+          "name": "mETH",
+          "symbol": "mETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "mnt",
+          "name": "MNT",
+          "symbol": "MNT",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Mantle",
       "OffchainFacts": [
         {
@@ -24890,7 +25249,7 @@
       ],
       "Twitter": "https://x.com/0xMantle",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:54Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.mantle.xyz/meth"
     },
     "CATEGORY#Entity|PROTOCOL#maple": {
@@ -25180,6 +25539,22 @@
           "slug": "syrup-usdt-pool",
           "subCategory": "Yield-generating Token",
           "symbol": "syrupUSDT"
+        },
+        {
+          "slug": "maple-credit-pool-tokens",
+          "name": "Credit Pool Tokens (various)",
+          "symbol": "Credit Pool Tokens",
+          "category": "Receipt",
+          "role": "Fixed-Income / Tranche Token",
+          "receiptType": "FixedIncomeTranche"
+        },
+        {
+          "slug": "mpl-syrup",
+          "name": "MPL/SYRUP",
+          "symbol": "MPL/SYRUP",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
         }
       ],
       "Name": "Maple Finance",
@@ -25362,7 +25737,7 @@
       ],
       "Twitter": "https://x.com/maplefinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:13Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://maple.finance"
     },
     "CATEGORY#Entity|PROTOCOL#maverick": {
@@ -26283,6 +26658,14 @@
           "slug": "morpho",
           "subCategory": "Governance Token",
           "symbol": "MORPHO"
+        },
+        {
+          "slug": "morpho-metamorpho",
+          "name": "maUSDC, mcUSDC (and other Optimizer wrappers)",
+          "symbol": "maUSDC",
+          "category": "Receipt",
+          "role": "Lending Receipt Token",
+          "receiptType": "LendingReceipt"
         }
       ],
       "Name": "Morpho",
@@ -26446,7 +26829,7 @@
       ],
       "Twitter": "https://x.com/MorphoLabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:13Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://app.morpho.org/arbitrum/earn"
     },
     "CATEGORY#Entity|PROTOCOL#mountain-protocol": {
@@ -27606,6 +27989,14 @@
           "slug": "wnxm",
           "subCategory": "Governance Token",
           "symbol": "wNXM"
+        },
+        {
+          "slug": "nexus-nxm",
+          "name": "NXM",
+          "symbol": "NXM",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
         }
       ],
       "Name": "Nexus Mutual",
@@ -27790,7 +28181,7 @@
       ],
       "Twitter": "https://x.com/NexusMutual",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:56Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://nexusmutual.io"
     },
     "CATEGORY#Entity|PROTOCOL#notional": {
@@ -28034,7 +28425,24 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "notional-fcash",
+          "name": "fCash / nTokens",
+          "symbol": "fCash",
+          "category": "Receipt",
+          "role": "Lending Receipt Token",
+          "receiptType": "LendingReceipt"
+        },
+        {
+          "slug": "note",
+          "name": "Notional Finance",
+          "symbol": "NOTE",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Notional Finance",
       "OffchainFacts": [
         {
@@ -28203,7 +28611,7 @@
       ],
       "Twitter": "https://x.com/NotionalFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:53Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://notional.finance"
     },
     "CATEGORY#Entity|PROTOCOL#ondo-finance": {
@@ -28451,6 +28859,22 @@
           "slug": "ondo-gov",
           "subCategory": "Governance Token",
           "symbol": "ONDO"
+        },
+        {
+          "slug": "ondo-ousg",
+          "name": "OUSG",
+          "symbol": "OUSG",
+          "category": "Receipt",
+          "role": "Tokenized RWA Token",
+          "receiptType": "TokenizedRWA"
+        },
+        {
+          "slug": "ondo-usdy",
+          "name": "USDY",
+          "symbol": "USDY",
+          "category": "Receipt",
+          "role": "Staked Stablecoin",
+          "receiptType": "StakedStablecoin"
         }
       ],
       "Name": "Ondo Finance",
@@ -28752,7 +29176,7 @@
       ],
       "Twitter": "https://x.com/OndoFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:37Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://ondo.finance"
     },
     "CATEGORY#Entity|PROTOCOL#paladin": {
@@ -28940,7 +29364,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "paladin-hpal",
+          "name": "hPAL",
+          "symbol": "hPAL",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
+        }
+      ],
       "Name": "Paladin",
       "OffchainFacts": [
         {
@@ -29164,7 +29597,7 @@
       ],
       "Twitter": "https://x.com/PaladinVote",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:56Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://paladin.vote"
     },
     "CATEGORY#Entity|PROTOCOL#pancakeswap": {
@@ -30803,7 +31236,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "puffer-pufeth",
+          "name": "pufETH",
+          "symbol": "pufETH",
+          "category": "Receipt",
+          "role": "Liquid Restaking Token (LRT)",
+          "receiptType": "LiquidRestaking"
+        }
+      ],
       "Name": "Puffer Finance",
       "OffchainFacts": [
         {
@@ -30976,7 +31418,7 @@
       ],
       "Twitter": "https://x.com/puffer_finance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.puffer.fi"
     },
     "CATEGORY#Entity|PROTOCOL#radiant": {
@@ -31140,7 +31582,24 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "radiant-rtokens",
+          "name": "rUSDC, rWETH, rUSDT (and other rTokens)",
+          "symbol": "rUSDC",
+          "category": "Receipt",
+          "role": "Lending Receipt Token",
+          "receiptType": "LendingReceipt"
+        },
+        {
+          "slug": "rdnt",
+          "name": "Radiant Capital",
+          "symbol": "RDNT",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Radiant Capital",
       "OffchainFacts": [
         {
@@ -31274,7 +31733,7 @@
       ],
       "Twitter": "https://twitter.com/RDNTCapital",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:52Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://radiant.capital/"
     },
     "CATEGORY#Entity|PROTOCOL#rage-trade": {
@@ -31961,6 +32420,14 @@
           "slug": "reg",
           "subCategory": "Governance Token",
           "symbol": "REG"
+        },
+        {
+          "slug": "realt-realtokens",
+          "name": "RealTokens (various)",
+          "symbol": "RealTokens",
+          "category": "Receipt",
+          "role": "Tokenized RWA Token",
+          "receiptType": "TokenizedRWA"
         }
       ],
       "Name": "RealT",
@@ -32224,7 +32691,7 @@
       ],
       "Twitter": "https://x.com/RealTPlatform",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:39Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://realt.co"
     },
     "CATEGORY#Entity|PROTOCOL#renzo": {
@@ -32418,7 +32885,24 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "renzo-ezeth",
+          "name": "ezETH",
+          "symbol": "ezETH",
+          "category": "Receipt",
+          "role": "Liquid Restaking Token (LRT)",
+          "receiptType": "LiquidRestaking"
+        },
+        {
+          "slug": "rez",
+          "name": "REZ",
+          "symbol": "REZ",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Renzo",
       "OffchainFacts": [
         {
@@ -32583,7 +33067,7 @@
       ],
       "Twitter": "https://x.com/RenzoProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.renzoprotocol.com"
     },
     "CATEGORY#Entity|PROTOCOL#reserve": {
@@ -32684,6 +33168,22 @@
           "slug": "rgusd",
           "subCategory": "Stablecoin",
           "symbol": "rgUSD"
+        },
+        {
+          "slug": "reservoir-srusd",
+          "name": "srUSD",
+          "symbol": "srUSD",
+          "category": "Receipt",
+          "role": "Staked Stablecoin",
+          "receiptType": "StakedStablecoin"
+        },
+        {
+          "slug": "rusd",
+          "name": "rUSD",
+          "symbol": "rUSD",
+          "category": "Stablecoin",
+          "role": "Native Stablecoin",
+          "subCategory": "Stablecoin"
         }
       ],
       "Name": "Reserve Protocol",
@@ -32808,7 +33308,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/reserveprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:41Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://reserve.org"
     },
     "CATEGORY#Entity|PROTOCOL#resolv": {
@@ -33607,7 +34107,24 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "rocket-pool-reth",
+          "name": "rETH",
+          "symbol": "rETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "rpl",
+          "name": "RPL",
+          "symbol": "RPL",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Rocket Pool",
       "OffchainFacts": [
         {
@@ -33795,7 +34312,7 @@
       ],
       "Twitter": "https://x.com/Rocket_Pool",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:54Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://rocketpool.net"
     },
     "CATEGORY#Entity|PROTOCOL#securitize": {
@@ -33999,7 +34516,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "securitize-buidl",
+          "name": "BUIDL",
+          "symbol": "BUIDL",
+          "category": "Receipt",
+          "role": "Tokenized RWA Token",
+          "receiptType": "TokenizedRWA"
+        }
+      ],
       "Name": "Securitize",
       "OffchainFacts": [
         {
@@ -34300,7 +34826,7 @@
       ],
       "Twitter": "https://x.com/Securitize",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:40Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://securitize.io"
     },
     "CATEGORY#Entity|PROTOCOL#sense": {
@@ -35271,6 +35797,14 @@
           "slug": "mkr",
           "subCategory": "Governance Token",
           "symbol": "MKR"
+        },
+        {
+          "slug": "sky-susds",
+          "name": "sUSDS",
+          "symbol": "sUSDS",
+          "category": "Receipt",
+          "role": "Staked Stablecoin",
+          "receiptType": "StakedStablecoin"
         }
       ],
       "Name": "Sky",
@@ -35479,7 +36013,7 @@
       ],
       "Twitter": "https://x.com/SkyEcosystem",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:41Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://sky.money"
     },
     "CATEGORY#Entity|PROTOCOL#spark": {
@@ -35709,6 +36243,22 @@
           "slug": "sky",
           "subCategory": "Stablecoin",
           "symbol": "USDS"
+        },
+        {
+          "slug": "spark-sdai",
+          "name": "sDAI (Savings DAI)",
+          "symbol": "sDAI",
+          "category": "Receipt",
+          "role": "Staked Stablecoin",
+          "receiptType": "StakedStablecoin"
+        },
+        {
+          "slug": "spark-sptokens",
+          "name": "spUSDC, spWETH (and other spTokens)",
+          "symbol": "spUSDC",
+          "category": "Receipt",
+          "role": "Lending Receipt Token",
+          "receiptType": "LendingReceipt"
         }
       ],
       "Name": "Spark Protocol",
@@ -35873,7 +36423,7 @@
       ],
       "Twitter": "https://x.com/sparkdotfi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:14Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://spark.fi"
     },
     "CATEGORY#Entity|PROTOCOL#spectra": {
@@ -36080,7 +36630,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "apw",
+          "name": "APW",
+          "symbol": "APW",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Spectra",
       "OffchainFacts": [
         {
@@ -36263,7 +36822,7 @@
       ],
       "Twitter": "https://x.com/spectra_finance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:53Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.spectra.finance"
     },
     "CATEGORY#Entity|PROTOCOL#stably": {
@@ -36728,7 +37287,24 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "stader-ethx",
+          "name": "ETHx",
+          "symbol": "ETHx",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "sd",
+          "name": "SD",
+          "symbol": "SD",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Stader Labs",
       "OffchainFacts": [
         {
@@ -36881,7 +37457,7 @@
       ],
       "Twitter": "https://x.com/staderlabs",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:54Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.staderlabs.com"
     },
     "CATEGORY#Entity|PROTOCOL#stake-dao": {
@@ -37073,6 +37649,46 @@
           "slug": "sdt",
           "subCategory": "Governance Token",
           "symbol": "SDT"
+        },
+        {
+          "slug": "stake-sdangle",
+          "name": "sdANGLE",
+          "symbol": "sdANGLE",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
+        },
+        {
+          "slug": "stake-sdbal",
+          "name": "sdBAL",
+          "symbol": "sdBAL",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
+        },
+        {
+          "slug": "stake-sdcrv",
+          "name": "sdCRV",
+          "symbol": "sdCRV",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
+        },
+        {
+          "slug": "stake-sdfxs",
+          "name": "sdFXS",
+          "symbol": "sdFXS",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
+        },
+        {
+          "slug": "stake-sdpendle",
+          "name": "sdPENDLE",
+          "symbol": "sdPENDLE",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
         }
       ],
       "Name": "Stake DAO",
@@ -37322,7 +37938,7 @@
       ],
       "Twitter": "https://x.com/StakeDAOHQ",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:56Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://stakedao.org"
     },
     "CATEGORY#Entity|PROTOCOL#stakewise": {
@@ -37492,7 +38108,24 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "stakewise-oseth",
+          "name": "osETH",
+          "symbol": "osETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "swise",
+          "name": "SWISE",
+          "symbol": "SWISE",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "StakeWise",
       "OffchainFacts": [
         {
@@ -37632,7 +38265,7 @@
       ],
       "Twitter": "https://x.com/stakewise_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.stakewise.io"
     },
     "CATEGORY#Entity|PROTOCOL#stella": {
@@ -37813,7 +38446,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "alpha",
+          "name": "ALPHA",
+          "symbol": "ALPHA",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Stella",
       "OffchainFacts": [
         {
@@ -37986,7 +38628,7 @@
       ],
       "Twitter": "https://x.com/Stella_xyz_",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:52Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://stellaxyz.io"
     },
     "CATEGORY#Entity|PROTOCOL#sushiswap": {
@@ -38367,7 +39009,24 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "swell-sweth",
+          "name": "swETH",
+          "symbol": "swETH",
+          "category": "Receipt",
+          "role": "Liquid Staking Token (LST)",
+          "receiptType": "LiquidStaking"
+        },
+        {
+          "slug": "swell-token",
+          "name": "SWELL",
+          "symbol": "SWELL",
+          "category": "Token",
+          "role": "Governance Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Swell",
       "OffchainFacts": [
         {
@@ -38553,7 +39212,7 @@
       ],
       "Twitter": "https://x.com/swellnetworkio",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:54Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.swellnetwork.io"
     },
     "CATEGORY#Entity|PROTOCOL#symbiotic": {
@@ -39151,6 +39810,14 @@
           "slug": "snx",
           "subCategory": "Governance Token",
           "symbol": "SNX"
+        },
+        {
+          "slug": "susd",
+          "name": "sUSD",
+          "symbol": "sUSD",
+          "category": "Stablecoin",
+          "role": "Native Stablecoin",
+          "subCategory": "Stablecoin"
         }
       ],
       "Name": "Synthetix",
@@ -39326,7 +39993,7 @@
       ],
       "Twitter": "https://x.com/synthetix_io",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://synthetix.io"
     },
     "CATEGORY#Entity|PROTOCOL#tether": {
@@ -39924,7 +40591,24 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "toucan-carbon-credit-tokens",
+          "name": "Carbon Credit Tokens (e.g. NCT)",
+          "symbol": "Carbon Credit Tokens",
+          "category": "Receipt",
+          "role": "Tokenized RWA Token",
+          "receiptType": "TokenizedRWA"
+        },
+        {
+          "slug": "bct",
+          "name": "BCT",
+          "symbol": "BCT",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
       "Name": "Toucan Protocol",
       "OffchainFacts": [
         {
@@ -40197,7 +40881,7 @@
       ],
       "Twitter": "https://x.com/toucanprotocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:34:40Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://toucan.earth"
     },
     "CATEGORY#Entity|PROTOCOL#trader-joe": {
@@ -41347,6 +42031,22 @@
           "slug": "schip",
           "subCategory": "Yield-generating Token",
           "symbol": "sCHIP"
+        },
+        {
+          "slug": "usd-ai-schip",
+          "name": "sCHIP",
+          "symbol": "sCHIP",
+          "category": "Receipt",
+          "role": "Locked / Vote-Escrow Receipt",
+          "receiptType": "LockedEscrowReceipt"
+        },
+        {
+          "slug": "usd-ai-susdai",
+          "name": "sUSDai",
+          "symbol": "sUSDai",
+          "category": "Receipt",
+          "role": "Staked Stablecoin",
+          "receiptType": "StakedStablecoin"
         }
       ],
       "Name": "USD.AI",
@@ -41674,7 +42374,7 @@
       ],
       "Twitter": "https://x.com/USDai_Official",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:52Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://usd.ai"
     },
     "CATEGORY#Entity|PROTOCOL#usdt0": {
@@ -42896,6 +43596,14 @@
           "slug": "yfi",
           "subCategory": "Governance Token",
           "symbol": "YFI"
+        },
+        {
+          "slug": "yearn-yvusdc",
+          "name": "yvUSDC, yvETH (yVaults)",
+          "symbol": "yvUSDC",
+          "category": "Receipt",
+          "role": "Yield-Bearing Vault Token",
+          "receiptType": "YieldVault"
         }
       ],
       "Name": "Yearn Finance",
@@ -43056,7 +43764,7 @@
       ],
       "Twitter": "https://x.com/yearnfi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://yearn.fi"
     },
     "CATEGORY#Entity|PROTOCOL#yieldnest": {
@@ -43265,7 +43973,16 @@
       "LiquiditySubSector": null,
       "LongDescription": null,
       "Market": null,
-      "MemberCoins": [],
+      "MemberCoins": [
+        {
+          "slug": "yieldnest-yneth",
+          "name": "ynETH",
+          "symbol": "ynETH",
+          "category": "Receipt",
+          "role": "Liquid Restaking Token (LRT)",
+          "receiptType": "LiquidRestaking"
+        }
+      ],
       "Name": "YieldNest",
       "OffchainFacts": [
         {
@@ -43462,7 +44179,7 @@
       ],
       "Twitter": "https://x.com/YieldNestFi",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-11T16:29:55Z",
+      "UpdatedAt": "2026-07-13T00:00:00Z",
       "Website": "https://www.yieldnest.finance"
     },
     "CATEGORY#RWA|PROTOCOL#benji": {

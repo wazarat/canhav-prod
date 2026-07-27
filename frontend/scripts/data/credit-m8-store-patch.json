@@ -1,0 +1,3065 @@
+{
+  "compiledAt": "2026-07-26",
+  "source": "scripts/data/credit-competitors-m8.{json,md}",
+  "decisions": {
+    "listaDao": "parked to M11 by user decision 2026-07-27 (99.9% BNB Chain)",
+    "boros": "distinct entity with ParentSlug pendle (user decision 2026-07-27)"
+  },
+  "manifest": {
+    "newEntities": 15,
+    "migrations": 3,
+    "competitorAdditionRecords": 21,
+    "edges": 88,
+    "tierB": 15
+  },
+  "newEntities": {
+    "steakhouse-financial": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#steakhouse-financial",
+      "Category": "Entity",
+      "SubCategory": "Risk Curator",
+      "Slug": "steakhouse-financial",
+      "Name": "Steakhouse Financial",
+      "Symbol": null,
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Lending",
+      "Tags": [
+        "Lending"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Largest risk curator in DeFi lending.",
+      "Description": "Steakhouse is a risk curator: it underwrites collateral, sets loan-to-value parameters and allocates depositor stablecoins across overcollateralised lending markets, which is the economic core of a money market even though the matching engine belongs to Morpho and Euler. DefiLlama classifies it under \"Risk Curators\" per the DefiLlama API, but the product a depositor buys is a variable-rate overcollateralised lending position. It is the single most important non-Morpho credit actor on Robinhood Chain because it curates the vaults behind Robinhood Earn per Morpho's announcement.",
+      "LongDescription": "Steakhouse is a risk curator: it underwrites collateral, sets loan-to-value parameters and allocates depositor stablecoins across overcollateralised lending markets, which is the economic core of a money market even though the matching engine belongs to Morpho and Euler. DefiLlama classifies it under \"Risk Curators\" per the DefiLlama API, but the product a depositor buys is a variable-rate overcollateralised lending position. It is the single most important non-Morpho credit actor on Robinhood Chain because it curates the vaults behind Robinhood Earn per Morpho's announcement. It is the largest curator in DeFi lending, curating roughly $1.5bn across 51 Morpho vaults and about 53% of Morpho's stablecoin TVL against Gauntlet's roughly $0.7bn across 63 vaults, per Steakhouse's DeFi Markets Update of 2 July 2026. Total supplied $2.402bn as of 26 July 2026 (DefiLlama API). Morpho deposits grew from $1.55bn on 1 January to $1.70bn on 1 July 2026 (Steakhouse, 14 July 2026). Bad debt: the curator reports zero bad debt across the first half of 2026, and less than $0.1 of bad debt across Q1 (Steakhouse, 15 May 2026); a third-party tracker shows $0.23 cumulative bad debt (CuratorWatch curator profile). Borrowed, utilisation, supply APY and borrow APY are not published at the curator level: `n.a.`",
+      "Differentiator": "Largest curator in DeFi lending, roughly $1.5bn across 51 Morpho vaults and about 53% of Morpho stablecoin TVL.",
+      "Website": "https://www.steakhouse.financial/",
+      "OfficialDocs": "https://kitchen.steakhouse.financial/",
+      "GitHub": null,
+      "Audits": [],
+      "AuditsNote": "No audits by design: Steakhouse is a risk curator and deploys no contracts of its own. Smart-contract risk sits with the venues it allocates to (Morpho, Euler, Kamino).",
+      "Risks": [
+        {
+          "category": "Operational",
+          "description": "DNS hijack April 2026 via OVH 2FA social engineering."
+        },
+        {
+          "category": "Counterparty",
+          "description": "principal-agent concentration across roughly $1.8bn allocated."
+        }
+      ],
+      "Incidents": [
+        {
+          "date": "Apr 2026",
+          "title": "DNS hijack via registrar 2FA",
+          "description": "Attackers social-engineered OVH Cloud's phone-based 2FA, modified DNS records for the main site and app subdomains and attempted a five-day domain transfer, freezing front-end deposits and withdrawals.",
+          "eventType": "infrastructure",
+          "amountUsd": null,
+          "amountUsdDisplay": null,
+          "outcome": "Vaults remained reachable directly through Morpho; no vault losses reported.",
+          "link": "https://www.ainvest.com/news/steakhouse-dns-hijack-flow-driven-analysis-incident-financial-impact-2604/"
+        }
+      ],
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Morpho",
+          "slug": "morpho",
+          "positioning": "Customizable lending infrastructure: isolated markets + curated vaults.",
+          "similarities": "Steakhouse sits directly on top of it, so it competes for the depositor relationship rather than the matching layer.",
+          "differences": "Instead of one big pool, Morpho Blue markets each fix a collateral, loan asset, oracle and liquidation setting; curators build vaults on top, more modular and risk-specific than Aave."
+        },
+        {
+          "rank": 2,
+          "name": "Spark Protocol",
+          "slug": "spark",
+          "positioning": "Stablecoin-native credit stack tied to the Sky/Maker ecosystem.",
+          "similarities": "Both are curated stablecoin yield front-ends, and both are live on Robinhood Chain.",
+          "differences": "Not just general lending, its edge is the Sky/Maker connection (DAI/USDS): how it creates, routes, lends and manages stablecoin liquidity."
+        },
+        {
+          "rank": 3,
+          "name": "Maple Finance",
+          "slug": "maple",
+          "positioning": "Onchain institutional / private credit.",
+          "similarities": "Both are institutional-facing credit underwriters, Maple on the CeFi/undercollateralised side.",
+          "differences": "Institutional / private-credit model: borrower quality, repayment history, collateral ratios, defaults, pool managers and loan terms matter most."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 2402000000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Robinhood Chain",
+          "Base",
+          "Ethereum",
+          "Arbitrum",
+          "Solana",
+          "Monad",
+          "Katana",
+          "Polygon"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: steakhouse-financial",
+          "url": "https://api.llama.fi/protocol/steakhouse-financial"
+        },
+        {
+          "label": "Official docs",
+          "url": "https://kitchen.steakhouse.financial/"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z",
+      "EntityTypeNote": "Steakhouse Financial is a risk curator, not a protocol: it curates vaults on Morpho, Euler and Kamino, and its TVL books inside those venues (Robinhood Earn USDG vaults included)."
+    },
+    "native-credit-pool": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#native-credit-pool",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "native-credit-pool",
+      "Name": "Native",
+      "Symbol": null,
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Lending",
+      "Tags": [
+        "Lending"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Credit pool funding market-maker inventory.",
+      "Description": "Native Credit Pool is a lending venue where liquidity providers supply capital and market makers borrow against it, which makes it an undercollateralised or partially collateralised institutional lending desk rather than a spot venue. DefiLlama classifies it as Lending with an explicit borrowed figure of $18,380,177 (DefiLlama API, 26 Jul 2026). It is one of only two non-excluded credit protocols with live TVL on Robinhood Chain.",
+      "LongDescription": "Native Credit Pool is a lending venue where liquidity providers supply capital and market makers borrow against it, which makes it an undercollateralised or partially collateralised institutional lending desk rather than a spot venue. DefiLlama classifies it as Lending with an explicit borrowed figure of $18,380,177 (DefiLlama API, 26 Jul 2026). It is one of only two non-excluded credit protocols with live TVL on Robinhood Chain. It is a credit pool purpose-built to fund market makers' inventory rather than retail leverage, documented at docs.native.org. Total supplied $37.06m, total borrowed $18,380,177, implying roughly 50% utilisation at the protocol level, as of 26 July 2026 (DefiLlama API). Robinhood Chain slice: $52,570 supplied against $36,930 borrowed. Supply APY, borrow APY and bad debt are not published on any page fetched here: `n.a.`",
+      "Differentiator": "Credit pool purpose-built to fund market maker inventory rather than retail leverage.",
+      "Website": "https://native.org",
+      "OfficialDocs": "https://docs.native.org/native-dev/legacy-v2/native-credit-pool",
+      "GitHub": null,
+      "Audits": [],
+      "AuditsNote": "DefiLlama records zero audits for this entry (DefiLlama API); no audit firm, date or report link could be confirmed from a fetched page: `n.a.`",
+      "Risks": null,
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Maple Finance",
+          "slug": "maple",
+          "positioning": "Onchain institutional / private credit.",
+          "similarities": "Both run credit lines to professional trading counterparties.",
+          "differences": "Institutional / private-credit model: borrower quality, repayment history, collateral ratios, defaults, pool managers and loan terms matter most."
+        },
+        {
+          "rank": 2,
+          "name": "Clearpool",
+          "slug": "clearpool",
+          "positioning": "Institutional uncollateralized lending pools.",
+          "similarities": "Both operate permissioned borrower pools funded by open LP capital.",
+          "differences": "Permissionless lender side over KYC'd institutional borrowers; utilization-driven rates and single-borrower Credit Vaults."
+        },
+        {
+          "rank": 3,
+          "name": "Morpho",
+          "slug": "morpho",
+          "positioning": "Customizable lending infrastructure: isolated markets + curated vaults.",
+          "similarities": "Both are present on Robinhood Chain and compete for the same USDG-denominated deposit.",
+          "differences": "Instead of one big pool, Morpho Blue markets each fix a collateral, loan asset, oracle and liquidation setting; curators build vaults on top, more modular and risk-specific than Aave."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 37060000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Robinhood Chain",
+          "Arbitrum",
+          "Base",
+          "Ethereum",
+          "Binance",
+          "Morph"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: native-credit-pool",
+          "url": "https://api.llama.fi/protocol/native-credit-pool"
+        },
+        {
+          "label": "Official docs",
+          "url": "https://docs.native.org/native-dev/legacy-v2/native-credit-pool"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "dolomite": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#dolomite",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "dolomite",
+      "Name": "Dolomite",
+      "Symbol": "DOLO",
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Lending",
+      "Tags": [
+        "Lending"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Money market where collateral keeps its native rights.",
+      "Description": "Dolomite is a variable-rate overcollateralised money market whose distinguishing feature is that collateral keeps its native rights (staking, vesting, governance) while pledged, so users borrow against assets that continue to earn. DefiLlama classifies it as Lending with $274,263,180 borrowed against $247.92m supplied (DefiLlama API, 26 Jul 2026).",
+      "LongDescription": "Dolomite is a variable-rate overcollateralised money market whose distinguishing feature is that collateral keeps its native rights (staking, vesting, governance) while pledged, so users borrow against assets that continue to earn. DefiLlama classifies it as Lending with $274,263,180 borrowed against $247.92m supplied (DefiLlama API, 26 Jul 2026). It supports a far wider long tail of collateral types than a pooled money market, including assets that remain productive while collateralised. Total supplied $247.92m; total borrowed $274,263,180, of which Ethereum $262,596,162, Arbitrum $8,862,277 and Berachain $2,796,205, as of 26 July 2026 (DefiLlama API). Note the borrowed figure exceeds the supplied figure in DefiLlama's accounting because supplied TVL nets out borrowed collateral. Utilisation, supply APY and borrow APY per market: `n.a.`",
+      "Differentiator": "Collateral keeps its native staking, vesting and governance rights while pledged.",
+      "Website": "https://dolomite.io",
+      "OfficialDocs": null,
+      "GitHub": "https://github.com/dolomite-exchange",
+      "Audits": [
+        {
+          "firm": "Cyfrin",
+          "date": "2023-08-23",
+          "url": "https://dolomite.io"
+        },
+        {
+          "firm": "SECBIT",
+          "date": "2021-08-02",
+          "url": "https://dolomite.io"
+        }
+      ],
+      "AuditsNote": null,
+      "Risks": [
+        {
+          "category": "Collateral",
+          "description": "WLFI collateral concentration, USD1 pool past 100% utilisation April 2026, supply cap raised 635m to 5.1bn."
+        }
+      ],
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Aave",
+          "slug": "aave",
+          "positioning": "Savings for Everyone: open-source non-custodial liquidity protocol.",
+          "similarities": "Both are multi-asset variable-rate money markets, Dolomite competing on collateral breadth.",
+          "differences": "Scale and breadth: large multichain lending network plus native overcollateralized stablecoin (GHO), staking/backstop mechanics (stkAAVE → Umbrella), and institutional/RWA lending (Horizon) under DAO governance."
+        },
+        {
+          "rank": 2,
+          "name": "Radiant Capital",
+          "slug": "radiant",
+          "positioning": "Omnichain money market via LayerZero.",
+          "similarities": "Both are Arbitrum-native lenders competing for the same Arbitrum deposit base.",
+          "differences": "Omnichain lending: deposits and borrows are bridged across chains via LayerZero rather than confined to a single network's liquidity."
+        },
+        {
+          "rank": 3,
+          "name": "Fluid",
+          "slug": "fluid",
+          "positioning": "Capital-efficient lending + DEX hybrid on a shared liquidity layer.",
+          "similarities": "Both compete on capital efficiency of collateral.",
+          "differences": "Capital efficiency: a shared liquidity layer lets collateral, debt, lending liquidity and trading liquidity work together, making it more efficient but more complex."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 247920000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Arbitrum",
+          "Ethereum",
+          "Berachain",
+          "Mantle"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": true
+      },
+      "MemberCoins": [
+        {
+          "slug": "dolomite",
+          "name": "Dolomite",
+          "symbol": "DOLO",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
+      "Sources": [
+        {
+          "label": "DefiLlama API: dolomite",
+          "url": "https://api.llama.fi/protocol/dolomite"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "euler": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#euler",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "euler",
+      "Name": "Euler V2",
+      "Symbol": "EUL",
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Lending",
+      "Tags": [
+        "Lending"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Permissionless modular lending vaults.",
+      "Description": "Euler V2 is a modular lending kernel: anyone can deploy an isolated vault with its own oracle, LTV and interest-rate model, and link vaults into borrowable clusters. It is a money market in the strict sense, with $602,588,217 borrowed as of 26 July 2026 (DefiLlama API).",
+      "LongDescription": "Euler V2 is a modular lending kernel: anyone can deploy an isolated vault with its own oracle, LTV and interest-rate model, and link vaults into borrowable clusters. It is a money market in the strict sense, with $602,588,217 borrowed as of 26 July 2026 (DefiLlama API). Permissionless vault creation with cross-vault borrowing means Euler competes as lending infrastructure that third parties build markets on, not as a single curated market. Total supplied $325.03m; total borrowed $602,588,217, of which Ethereum $313,151,621, Plasma $110,283,049, Monad $94,690,755, Avalanche $38,330,016 and Sonic $20,821,132, as of 26 July 2026 (DefiLlama API). Utilisation, supply APY, borrow APY and current bad debt: `n.a.`",
+      "Differentiator": "Permissionless vault creation with cross-vault borrowing, lending infrastructure rather than a single curated market.",
+      "Website": "https://www.euler.finance",
+      "OfficialDocs": "https://docs.euler.finance/",
+      "GitHub": null,
+      "Audits": [],
+      "AuditsNote": "Euler maintains a consolidated security page listing its audit set at euler.finance/#security, the link recorded in the DefiLlama API record. Individual firm names and report dates were not resolvable from a fetched page: `n.a.`",
+      "Risks": [
+        {
+          "category": "Smart Contract",
+          "description": "$197m flash loan attack 13 March 2023 on V1, funds substantially returned; V2 is a full rewrite."
+        }
+      ],
+      "Incidents": [
+        {
+          "date": "13 Mar 2023",
+          "title": "V1 flash-loan attack",
+          "description": "A $197m flash-loan attack exploited a missing health check in Euler V1's donation function.",
+          "eventType": "exploit",
+          "amountUsd": 197000000,
+          "amountUsdDisplay": "$197m",
+          "outcome": "The attacker returned substantially all funds. Euler V2 is a full rewrite deployed after the incident; no V2-specific exploit found as of 26 July 2026.",
+          "link": "https://www.chainalysis.com/blog/euler-finance-flash-loan-attack/"
+        }
+      ],
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Morpho",
+          "slug": "morpho",
+          "positioning": "Customizable lending infrastructure: isolated markets + curated vaults.",
+          "similarities": "Both are permissionless isolated-market kernels with a curator layer on top.",
+          "differences": "Instead of one big pool, Morpho Blue markets each fix a collateral, loan asset, oracle and liquidation setting; curators build vaults on top, more modular and risk-specific than Aave."
+        },
+        {
+          "rank": 2,
+          "name": "Aave",
+          "slug": "aave",
+          "positioning": "Savings for Everyone: open-source non-custodial liquidity protocol.",
+          "similarities": "Both are the reference variable-rate lenders on Ethereum.",
+          "differences": "Scale and breadth: large multichain lending network plus native overcollateralized stablecoin (GHO), staking/backstop mechanics (stkAAVE → Umbrella), and institutional/RWA lending (Horizon) under DAO governance."
+        },
+        {
+          "rank": 3,
+          "name": "Compound",
+          "slug": "compound",
+          "positioning": "Simple, battle-tested money markets (Compound III).",
+          "similarities": "same category, Euler differentiating on modularity.",
+          "differences": "Compound III is simpler than Aave: one base borrowable asset per market makes risk easier to understand, at the cost of multi-asset flexibility."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 325030000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Arbitrum",
+          "Base",
+          "Ethereum",
+          "Monad",
+          "Plasma",
+          "Avalanche",
+          "Sonic"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: euler-v2",
+          "url": "https://api.llama.fi/protocol/euler-v2"
+        },
+        {
+          "label": "Official docs",
+          "url": "https://docs.euler.finance/"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "csigma-finance": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#csigma-finance",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "csigma-finance",
+      "Name": "cSigma Finance",
+      "Symbol": "SIGMA",
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Lending",
+      "Tags": [
+        "Lending"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Institutional credit desk concentrated on Arbitrum.",
+      "Description": "cSigma runs permissioned institutional credit pools where verified borrowers draw against LP capital, which the brief's Lending definition explicitly covers under \"permissioned/undercollateralised desks\". DefiLlama classifies it as RWA Lending (DefiLlama API, 26 Jul 2026).",
+      "LongDescription": "cSigma runs permissioned institutional credit pools where verified borrowers draw against LP capital, which the brief's Lending definition explicitly covers under \"permissioned/undercollateralised desks\". DefiLlama classifies it as RWA Lending (DefiLlama API, 26 Jul 2026). It is one of the few institutional credit desks whose TVL is concentrated on Arbitrum rather than Ethereum, at $12,190,104 of its $12.66m total. Total supplied $12.66m as of 26 July 2026: Arbitrum $12,190,104, Ethereum $465,356, Hedera $2,025, Base $11 (DefiLlama API). Borrowed, utilisation, supply APY, borrow APY and bad debt are not exposed by DefiLlama for this entry: `n.a.`",
+      "Differentiator": "Institutional credit desk with TVL concentrated on Arbitrum rather than Ethereum.",
+      "Website": "https://csigma.finance",
+      "OfficialDocs": null,
+      "GitHub": "https://github.com/csigma-labs",
+      "Audits": [
+        {
+          "firm": "QuillAudits",
+          "date": null,
+          "url": "https://csigma.finance"
+        },
+        {
+          "firm": "Immunebytes",
+          "date": null,
+          "url": "https://csigma.finance"
+        }
+      ],
+      "AuditsNote": null,
+      "Risks": null,
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Goldfinch",
+          "slug": "goldfinch",
+          "positioning": "Uncollateralized crypto loans to real-world businesses.",
+          "similarities": "Both underwrite off-chain borrowers with on-chain LP capital.",
+          "differences": "Uncollateralized lending underwritten by human backers; Goldfinch Prime brings institutional private-credit funds on-chain."
+        },
+        {
+          "rank": 2,
+          "name": "Clearpool",
+          "slug": "clearpool",
+          "positioning": "Institutional uncollateralized lending pools.",
+          "similarities": "Both run permissioned borrower pools.",
+          "differences": "Permissionless lender side over KYC'd institutional borrowers; utilization-driven rates and single-borrower Credit Vaults."
+        },
+        {
+          "rank": 3,
+          "name": "Maple Finance",
+          "slug": "maple",
+          "positioning": "Onchain institutional / private credit.",
+          "similarities": "Both are institutional credit desks competing for the same allocator.",
+          "differences": "Institutional / private-credit model: borrower quality, repayment history, collateral ratios, defaults, pool managers and loan terms matter most."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 12660000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Arbitrum",
+          "Ethereum",
+          "Base",
+          "Hedera"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": true
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: csigma-finance",
+          "url": "https://api.llama.fi/protocol/csigma-finance"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "t3tris-finance": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#t3tris-finance",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "t3tris-finance",
+      "Name": "T3tris Finance",
+      "Symbol": null,
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Leveraged Yield",
+      "Tags": [
+        "Leveraged Yield"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Permissionless vault infrastructure on Robinhood Chain and Arbitrum.",
+      "Description": "T3tris is permissionless asynchronous ERC-4626 vault infrastructure on which strategies, including levered ones, are deployed, and DefiLlama classifies it as an \"Onchain Capital Allocator\" rather than a lender (DefiLlama API, 26 Jul 2026). Tag fit is partial and should be treated as provisional: it is included here because it is the only non-excluded protocol with meaningful live Robinhood Chain TVL that sits in the levered-strategy stack, not because a leverage mechanism was confirmed from a fetched page. No page fetched in this session states a maximum leverage figure for T3tris.",
+      "LongDescription": "T3tris is permissionless asynchronous ERC-4626 vault infrastructure on which strategies, including levered ones, are deployed, and DefiLlama classifies it as an \"Onchain Capital Allocator\" rather than a lender (DefiLlama API, 26 Jul 2026). Tag fit is partial and should be treated as provisional: it is included here because it is the only non-excluded protocol with meaningful live Robinhood Chain TVL that sits in the levered-strategy stack, not because a leverage mechanism was confirmed from a fetched page. No page fetched in this session states a maximum leverage figure for T3tris. Zero-fee permissionless vault infrastructure with a high-water-mark performance fee design documented in LFG Labs' research note on the T3tris high-water-mark performance fee. TVL $11.81m as of 26 July 2026, of which Arbitrum $11,404,750 and Robinhood Chain $404,647 (DefiLlama API). Maximum leverage: `n.a.` Yield sources: `n.a.` Liquidation mechanism: `n.a.` These three gaps are the reason the tag fit is flagged as partial.",
+      "Differentiator": "Zero-fee permissionless vault infrastructure with a high-water-mark performance fee design documented in LFG Labs' research note on the T3tris high-water-mark performance fee.",
+      "Website": "https://t3tris.finance/",
+      "OfficialDocs": null,
+      "GitHub": "https://github.com/t3tris-finance",
+      "Audits": [],
+      "AuditsNote": "DefiLlama's record points to a Google Drive audit folder plus the LFG Labs research note per the API record. No named audit firm or dated report was confirmable from a fetched page: `n.a.`",
+      "Risks": null,
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Gearbox",
+          "slug": "gearbox",
+          "positioning": "Composable leverage via Credit Accounts.",
+          "similarities": "Both provide the account and vault plumbing that levered strategies run on.",
+          "differences": "Credit Accounts compose leverage across protocols rather than a single isolated farm: up to ~10x with a unified margin position."
+        },
+        {
+          "rank": 2,
+          "name": "Stella",
+          "slug": "stella",
+          "positioning": "Pay-as-you-earn leveraged strategies (ex-Alpha Homora).",
+          "similarities": "Both are permissionless leveraged strategy venues.",
+          "differences": "0% borrow APR: lenders are compensated from strategy profit share rather than interest, aligning incentives between borrowers and lenders."
+        },
+        {
+          "rank": 3,
+          "name": "Extra Finance",
+          "slug": "extra-finance",
+          "positioning": "Lending + leveraged LP farming on the Superchain.",
+          "similarities": "Both host third-party levered yield strategies.",
+          "differences": "Tightly integrated lend + leverage-farm design focused on the Optimism/Base (Superchain) DEX ecosystem, with up to ~7x LP leverage."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 11810000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Robinhood Chain",
+          "Arbitrum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: t3tris-finance",
+          "url": "https://api.llama.fi/protocol/t3tris-finance"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z",
+      "TagFitNote": "Tag fit is provisional: T3tris is permissionless vault infrastructure (DefiLlama: Onchain Capital Allocator) included for its live Robinhood Chain presence in the levered-strategy stack; no maximum-leverage figure was confirmable from a fetched page."
+    },
+    "contango": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#contango",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "contango",
+      "Name": "Contango V2",
+      "Symbol": "TANGO",
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Leveraged Yield",
+      "Tags": [
+        "Leveraged Yield"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "One-click looping across external money markets.",
+      "Description": "Contango builds looped positions by borrowing on an underlying money market and re-supplying, so a user gets levered exposure to a rate or yield spread without managing the loop. The $44,266,567 of borrowed notional against roughly $5.49m of net supplied TVL is the signature of a looping product (DefiLlama API, 26 Jul 2026).",
+      "LongDescription": "Contango builds looped positions by borrowing on an underlying money market and re-supplying, so a user gets levered exposure to a rate or yield spread without managing the loop. The $44,266,567 of borrowed notional against roughly $5.49m of net supplied TVL is the signature of a looping product (DefiLlama API, 26 Jul 2026). It aggregates looping across many external money markets rather than running its own, so it turns any third-party lending market into a one-click leverage venue. TVL roughly $5.49m; borrowed $44,266,567 as of 26 July 2026, split Ethereum $29,289,378, Arbitrum $5,252,391, Base $4,235,088, Optimism $3,245,931, Avalanche $1,131,670 (DefiLlama API). Maximum leverage: `n.a.` Yield sources: underlying money-market rate spreads on the markets it routes into. Liquidation mechanism: inherited from the underlying money market, evidenced by Contango's handling of frozen Aave rsETH markets below.",
+      "Differentiator": "It aggregates looping across many external money markets rather than running its own, so it turns any third-party lending market into a one-click leverage venue.",
+      "Website": "https://contango.xyz",
+      "OfficialDocs": "https://docs.contango.xyz/",
+      "GitHub": "https://github.com/contango-xyz/core-v2",
+      "Audits": [],
+      "AuditsNote": "Audit reports are published in the repository at github.com/contango-xyz/core-v2/tree/main/audit, and the repo states there is no active bug bounty while audits are in place, with disclosures to security@contango.xyz (GitHub repo). Firm names and dates: `n.a.`",
+      "Risks": null,
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Gearbox",
+          "slug": "gearbox",
+          "positioning": "Composable leverage via Credit Accounts.",
+          "similarities": "Both provide packaged leverage on top of external yield.",
+          "differences": "Credit Accounts compose leverage across protocols rather than a single isolated farm: up to ~10x with a unified margin position."
+        },
+        {
+          "rank": 2,
+          "name": "Stella",
+          "slug": "stella",
+          "positioning": "Pay-as-you-earn leveraged strategies (ex-Alpha Homora).",
+          "similarities": "Both offer looped yield positions.",
+          "differences": "0% borrow APR: lenders are compensated from strategy profit share rather than interest, aligning incentives between borrowers and lenders."
+        },
+        {
+          "rank": 3,
+          "name": "Aave",
+          "slug": "aave",
+          "positioning": "Savings for Everyone: open-source non-custodial liquidity protocol.",
+          "similarities": "Contango is a demand-side wrapper that routes into Aave and peers.",
+          "differences": "Scale and breadth: large multichain lending network plus native overcollateralized stablecoin (GHO), staking/backstop mechanics (stkAAVE → Umbrella), and institutional/RWA lending (Horizon) under DAO governance."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 5490000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Arbitrum",
+          "Base",
+          "Ethereum",
+          "Optimism",
+          "Avalanche"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: contango-v2",
+          "url": "https://api.llama.fi/protocol/contango-v2"
+        },
+        {
+          "label": "Official docs",
+          "url": "https://docs.contango.xyz/"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "yield-basis": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#yield-basis",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "yield-basis",
+      "Name": "Yield Basis",
+      "Symbol": "YB",
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Leveraged Yield",
+      "Tags": [
+        "Leveraged Yield"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Levered Curve LP exposure built to cancel impermanent loss.",
+      "Description": "Yield Basis takes a Curve BTC/crvUSD liquidity position and levers it roughly 2x with borrowed crvUSD so that the levered LP's value tracks the underlying asset rather than the square root of price, which is levered exposure to an LP yield source. The mechanism is set out in the Yield Basis how-it-works documentation and analysed independently in Statemind's teardown of how YieldBasis really works. DefiLlama classifies it as Leveraged Farming (DefiLlama API).",
+      "LongDescription": "Yield Basis takes a Curve BTC/crvUSD liquidity position and levers it roughly 2x with borrowed crvUSD so that the levered LP's value tracks the underlying asset rather than the square root of price, which is levered exposure to an LP yield source. The mechanism is set out in the Yield Basis how-it-works documentation and analysed independently in Statemind's teardown of how YieldBasis really works. DefiLlama classifies it as Leveraged Farming (DefiLlama API). It is the only candidate here whose leverage exists specifically to cancel impermanent loss rather than to multiply yield. TVL $132,235,841 on Ethereum as of 26 July 2026 (DefiLlama API), the largest of the five Leveraged Yield candidates. Maximum leverage: approximately 2x, per the Yield Basis docs. Yield source: Curve BTC/crvUSD pool trading fees. Liquidation mechanism: `n.a.` from any page fetched here.",
+      "Differentiator": "It is the only candidate here whose leverage exists specifically to cancel impermanent loss rather than to multiply yield.",
+      "Website": "https://yieldbasis.com/",
+      "OfficialDocs": "https://docs.yieldbasis.com/user/how-it-works",
+      "GitHub": null,
+      "Audits": [],
+      "AuditsNote": "DefiLlama records zero audits for this entry (DefiLlama API); no audit firm or report link was confirmable from a fetched page: `n.a.` Treat as unverified.",
+      "Risks": null,
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Stella",
+          "slug": "stella",
+          "positioning": "Pay-as-you-earn leveraged strategies (ex-Alpha Homora).",
+          "similarities": "Both sell levered LP positions.",
+          "differences": "0% borrow APR: lenders are compensated from strategy profit share rather than interest, aligning incentives between borrowers and lenders."
+        },
+        {
+          "rank": 2,
+          "name": "Gearbox",
+          "slug": "gearbox",
+          "positioning": "Composable leverage via Credit Accounts.",
+          "similarities": "Both use borrowed stablecoins to lever a yield source.",
+          "differences": "Credit Accounts compose leverage across protocols rather than a single isolated farm: up to ~10x with a unified margin position."
+        },
+        {
+          "rank": 3,
+          "name": "Curve (crvUSD)",
+          "slug": "curve-stablecoin",
+          "positioning": "Soft-liquidation CDP dollar.",
+          "similarities": "Yield Basis borrows crvUSD and is built by the same founder, so it is a demand-side complement and a competitor for the same BTC collateral.",
+          "differences": "LLAMMA soft-liquidation continuously converts collateral to crvUSD as price drops, eliminating hard liquidation cascades."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 132235841,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": [
+        {
+          "slug": "yield-basis",
+          "name": "Yield Basis",
+          "symbol": "YB",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
+      "Sources": [
+        {
+          "label": "DefiLlama API: yield-basis",
+          "url": "https://api.llama.fi/protocol/yield-basis"
+        },
+        {
+          "label": "Official docs",
+          "url": "https://docs.yieldbasis.com/user/how-it-works"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "origami-finance": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#origami-finance",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "origami-finance",
+      "Name": "Origami Finance",
+      "Symbol": null,
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Leveraged Yield",
+      "Tags": [
+        "Leveraged Yield"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Folded yield-token vaults held as a single receipt token.",
+      "Description": "Origami automates folded, or looped, positions in yield-bearing tokens: the vault repeatedly deposits a yield-bearing asset as collateral, borrows against it and re-buys the asset, delivering multiplied exposure to the underlying yield. Borrowed notional of $67,218,878 exceeds supplied TVL of $49.39m, the arithmetic signature of a folded position (DefiLlama API, 26 Jul 2026). DefiLlama classifies it as Leveraged Farming.",
+      "LongDescription": "Origami automates folded, or looped, positions in yield-bearing tokens: the vault repeatedly deposits a yield-bearing asset as collateral, borrows against it and re-buys the asset, delivering multiplied exposure to the underlying yield. Borrowed notional of $67,218,878 exceeds supplied TVL of $49.39m, the arithmetic signature of a folded position (DefiLlama API, 26 Jul 2026). DefiLlama classifies it as Leveraged Farming. It packages the fold as a single-token vault position, so a depositor holds one receipt token instead of managing a loop. TVL $49.39m; borrowed $67,218,878 of which Ethereum $66,959,203 and Plasma $259,675, as of 26 July 2026 (DefiLlama API). Maximum leverage: `n.a.` Yield sources: yield-bearing tokens on Ethereum, Berachain and Plasma. Liquidation mechanism: `n.a.`",
+      "Differentiator": "It packages the fold as a single-token vault position, so a depositor holds one receipt token instead of managing a loop.",
+      "Website": "https://origami.finance",
+      "OfficialDocs": "https://docs.origami.finance/",
+      "GitHub": null,
+      "Audits": [],
+      "AuditsNote": "Origami publishes its audit register at docs.origami.finance/technical-reference/audits, the link recorded in the DefiLlama API record. Firm names and dates: `n.a.`",
+      "Risks": null,
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Gearbox",
+          "slug": "gearbox",
+          "positioning": "Composable leverage via Credit Accounts.",
+          "similarities": "Both deliver levered yield-bearing-token exposure.",
+          "differences": "Credit Accounts compose leverage across protocols rather than a single isolated farm: up to ~10x with a unified margin position."
+        },
+        {
+          "rank": 2,
+          "name": "Stella",
+          "slug": "stella",
+          "positioning": "Pay-as-you-earn leveraged strategies (ex-Alpha Homora).",
+          "similarities": "Both are one-click levered vault products.",
+          "differences": "0% borrow APR: lenders are compensated from strategy profit share rather than interest, aligning incentives between borrowers and lenders."
+        },
+        {
+          "rank": 3,
+          "name": "Extra Finance",
+          "slug": "extra-finance",
+          "positioning": "Lending + leveraged LP farming on the Superchain.",
+          "similarities": "Both automate leverage over external yield.",
+          "differences": "Tightly integrated lend + leverage-farm design focused on the Optimism/Base (Superchain) DEX ecosystem, with up to ~7x LP leverage."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 49390000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum",
+          "Berachain",
+          "Plasma"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: origami-finance",
+          "url": "https://api.llama.fi/protocol/origami-finance"
+        },
+        {
+          "label": "Official docs",
+          "url": "https://docs.origami.finance/"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "deltaprime": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#deltaprime",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "deltaprime",
+      "Name": "DeltaPrime",
+      "Symbol": "PRIME",
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Leveraged Yield",
+      "Tags": [
+        "Leveraged Yield"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Undercollateralised prime accounts for leveraged farming.",
+      "Description": "DeltaPrime issues undercollateralised \"prime accounts\" that let a user borrow multiples of deposited capital and deploy the proceeds into farming strategies, which is textbook leverage farming. DefiLlama classifies it as Leveraged Farming (DefiLlama API, 26 Jul 2026).",
+      "LongDescription": "DeltaPrime issues undercollateralised \"prime accounts\" that let a user borrow multiples of deposited capital and deploy the proceeds into farming strategies, which is textbook leverage farming. DefiLlama classifies it as Leveraged Farming (DefiLlama API, 26 Jul 2026). The borrowed capital never leaves the protocol's whitelisted strategy set, which is what allows the account to be undercollateralised. TVL $3.56m as of 26 July 2026: Avalanche $1,954,844, Arbitrum $1,608,643 (DefiLlama API). This is roughly 99% below its pre-incident scale. Maximum leverage: `n.a.` Yield sources: whitelisted Arbitrum and Avalanche farms. Liquidation mechanism: `n.a.`",
+      "Differentiator": "The borrowed capital never leaves the protocol's whitelisted strategy set, which is what allows the account to be undercollateralised.",
+      "Website": "https://deltaprime.io",
+      "OfficialDocs": null,
+      "GitHub": "https://github.com/DeltaPrimeLabs/deltaprime-primeloans",
+      "Audits": [],
+      "AuditsNote": "PeckShield audits of v1.0, v2.0 and v2.1 among others, published at github.com/DeltaPrimeLabs/deltaprime-primeloans/tree/main/audits per the DefiLlama API record. Note that these audits predate the 2024 key-compromise incidents, which were operational rather than contract-logic failures.",
+      "Risks": null,
+      "Incidents": [
+        {
+          "date": "Sep 2024",
+          "title": "First key-compromise exploit",
+          "description": "An attacker gained control of an admin private key and drained roughly $6m from DeltaPrime pools, the first of two operational breaches in under two months.",
+          "eventType": "exploit",
+          "amountUsd": 6000000,
+          "amountUsdDisplay": "$6m",
+          "outcome": "Team continued operating; a second breach followed in November 2024.",
+          "link": "https://www.certik.com/blog/deltaprime-incident-analysis"
+        },
+        {
+          "date": "11 Nov 2024",
+          "title": "Second key-compromise exploit",
+          "description": "Compromised admin keys were used to drain roughly $4.75m to $4.8m across Arbitrum and Avalanche deployments.",
+          "eventType": "exploit",
+          "amountUsd": 4800000,
+          "amountUsdDisplay": "$4.8m",
+          "outcome": "Post-mortem and reimbursement plan published December 2024. Audits predate the incidents, which were operational rather than contract-logic failures.",
+          "link": "https://www.halborn.com/blog/post/explained-the-deltaprime-hack-november-2024"
+        }
+      ],
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Gearbox",
+          "slug": "gearbox",
+          "positioning": "Composable leverage via Credit Accounts.",
+          "similarities": "credit accounts are the same architecture.",
+          "differences": "Credit Accounts compose leverage across protocols rather than a single isolated farm: up to ~10x with a unified margin position."
+        },
+        {
+          "rank": 2,
+          "name": "Stella",
+          "slug": "stella",
+          "positioning": "Pay-as-you-earn leveraged strategies (ex-Alpha Homora).",
+          "similarities": "Both lend to strategy accounts rather than to wallets.",
+          "differences": "0% borrow APR: lenders are compensated from strategy profit share rather than interest, aligning incentives between borrowers and lenders."
+        },
+        {
+          "rank": 3,
+          "name": "Extra Finance",
+          "slug": "extra-finance",
+          "positioning": "Lending + leveraged LP farming on the Superchain.",
+          "similarities": "Both are leveraged farming venues.",
+          "differences": "Tightly integrated lend + leverage-farm design focused on the Optimism/Base (Superchain) DEX ecosystem, with up to ~7x LP leverage."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 3560000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Arbitrum",
+          "Avalanche"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": [
+        {
+          "slug": "prime-2",
+          "name": "DeltaPrime",
+          "symbol": "PRIME",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
+      "Sources": [
+        {
+          "label": "DefiLlama API: deltaprime",
+          "url": "https://api.llama.fi/protocol/deltaprime"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "termmax": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#termmax",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "termmax",
+      "Name": "TermMax",
+      "Symbol": "TMX",
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Fixed Income",
+      "Tags": [
+        "Fixed Income"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Fixed-rate, fixed-maturity credit with built-in leverage tokens.",
+      "Description": "TermMax issues fixed-rate, fixed-maturity credit through paired Fixed Tokens and eXtra Tokens, with a Gearing Token representing the leveraged borrower side, so both lenders and borrowers lock a rate to a date. The design is reviewed independently in Statemind's survey of fixed-rate DeFi designs. DefiLlama classifies it as Lending with $26,293,799 borrowed (DefiLlama API, 26 Jul 2026).",
+      "LongDescription": "TermMax issues fixed-rate, fixed-maturity credit through paired Fixed Tokens and eXtra Tokens, with a Gearing Token representing the leveraged borrower side, so both lenders and borrowers lock a rate to a date. The design is reviewed independently in Statemind's survey of fixed-rate DeFi designs. DefiLlama classifies it as Lending with $26,293,799 borrowed (DefiLlama API, 26 Jul 2026). It combines a fixed-rate order market with a built-in leverage token in the same instrument set, which most fixed-rate venues keep separate. TVL $34.51m; notional borrowed $26,293,799 of which Ethereum $26,051,103 and Binance $239,858, as of 26 July 2026 (DefiLlama API). Active markets and maturities: `n.a.` Implied fixed APY range: `n.a.` Curators named in the DefiLlama record include Keyrock, Hardcoded Lab, Edge Capital, AlphaPing and Origami Crypto (DefiLlama API).",
+      "Differentiator": "It combines a fixed-rate order market with a built-in leverage token in the same instrument set, which most fixed-rate venues keep separate.",
+      "Website": "https://ts.finance/termmax/",
+      "OfficialDocs": "https://docs.ts.finance/",
+      "GitHub": "https://github.com/term-structure",
+      "Audits": [],
+      "AuditsNote": "Audit reports are published at github.com/term-structure/audits, the link recorded in the DefiLlama API record. Firm names and dates: `n.a.`",
+      "Risks": null,
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Notional Finance",
+          "slug": "notional",
+          "positioning": "Fixed-rate, fixed-term lending and borrowing.",
+          "similarities": "Both are fixed-rate fixed-maturity lending markets.",
+          "differences": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates, giving predictable cost of capital for borrowers and lenders."
+        },
+        {
+          "rank": 2,
+          "name": "Pendle Finance",
+          "slug": "pendle",
+          "positioning": "Tokenized yield: split principal and yield (PT/YT).",
+          "similarities": "Both split a yield-bearing position into principal and yield legs with a maturity.",
+          "differences": "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT buyers go long yield, a true fixed-income primitive for DeFi, with the deepest liquidity and asset coverage in the category."
+        },
+        {
+          "rank": 3,
+          "name": "Spectra",
+          "slug": "spectra",
+          "positioning": "Permissionless yield tokenization (ex-APWine).",
+          "similarities": "same yield-tokenisation category, competing on curator distribution.",
+          "differences": "Permissionless market creation for yield tokenization: anyone can list a new PT/YT market for an interest-bearing asset."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 34510000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Arbitrum",
+          "Base",
+          "Ethereum",
+          "Binance",
+          "Berachain",
+          "X Layer"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: termmax",
+          "url": "https://api.llama.fi/protocol/termmax"
+        },
+        {
+          "label": "Official docs",
+          "url": "https://docs.ts.finance/"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "term-finance": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#term-finance",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "term-finance",
+      "Name": "Term Finance",
+      "Symbol": null,
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Fixed Income",
+      "Tags": [
+        "Fixed Income"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Sealed-bid on-chain repo auctions with a real term structure.",
+      "Description": "Term Finance runs sealed-bid, weekly, fixed-rate auctions that clear lenders and borrowers at a single rate for a defined term, issuing Term Repo Tokens that behave like zero-coupon instruments. This is the closest on-chain analogue to a repo market. Documented at docs.term.finance.",
+      "LongDescription": "Term Finance runs sealed-bid, weekly, fixed-rate auctions that clear lenders and borrowers at a single rate for a defined term, issuing Term Repo Tokens that behave like zero-coupon instruments. This is the closest on-chain analogue to a repo market. Documented at docs.term.finance. Rate discovery happens through a periodic sealed-bid auction rather than a continuous curve, which produces a genuine term structure rather than a spot rate with a maturity wrapper. Combined TVL $13.67m as of 26 July 2026: Vaults $11.74m (DefiLlama API) and Lend $1.93m with $1,663,888 borrowed (DefiLlama API). Active markets and maturities: `n.a.` Implied fixed APY range: `n.a.` Notional outstanding: $1,663,888 on the Lend product.",
+      "Differentiator": "Rate discovery happens through a periodic sealed-bid auction rather than a continuous curve, which produces a genuine term structure rather than a spot rate with a maturity wrapper.",
+      "Website": "https://term.finance",
+      "OfficialDocs": "https://docs.term.finance/",
+      "GitHub": null,
+      "Audits": [],
+      "AuditsNote": "Sigma Prime, report referenced at docs.term.finance/security-audits/sigma-prime, per the DefiLlama API record. Date: `n.a.`",
+      "Risks": null,
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Notional Finance",
+          "slug": "notional",
+          "positioning": "Fixed-rate, fixed-term lending and borrowing.",
+          "similarities": "Both are fixed-rate fixed-term lending venues.",
+          "differences": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates, giving predictable cost of capital for borrowers and lenders."
+        },
+        {
+          "rank": 2,
+          "name": "Maple Finance",
+          "slug": "maple",
+          "positioning": "Onchain institutional / private credit.",
+          "similarities": "Both serve institutional lenders seeking a known rate to a known date.",
+          "differences": "Institutional / private-credit model: borrower quality, repayment history, collateral ratios, defaults, pool managers and loan terms matter most."
+        },
+        {
+          "rank": 3,
+          "name": "Pendle Finance",
+          "slug": "pendle",
+          "positioning": "Tokenized yield: split principal and yield (PT/YT).",
+          "similarities": "Both let a lender lock a yield, Pendle through tokenisation and Term through auction.",
+          "differences": "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT buyers go long yield, a true fixed-income primitive for DeFi, with the deepest liquidity and asset coverage in the category."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 13670000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Arbitrum",
+          "Ethereum",
+          "Binance",
+          "Avalanche",
+          "Base",
+          "Plasma"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: termfinance-lend",
+          "url": "https://api.llama.fi/protocol/termfinance-lend"
+        },
+        {
+          "label": "Official docs",
+          "url": "https://docs.term.finance/"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "boros": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#boros",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "boros",
+      "Name": "Boros",
+      "Symbol": null,
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Fixed Income",
+      "Tags": [
+        "Fixed Income"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Pendle's venue for trading funding rates, fixed versus floating.",
+      "Description": "Boros is a venue for trading interest rates directly, letting a user lock a funding rate or yield rate for a period, which converts a floating exposure into a fixed one. DefiLlama assigns it the category \"Interest Rate Derivatives\" (DefiLlama API, 26 Jul 2026).",
+      "LongDescription": "Boros is a venue for trading interest rates directly, letting a user lock a funding rate or yield rate for a period, which converts a floating exposure into a fixed one. DefiLlama assigns it the category \"Interest Rate Derivatives\" (DefiLlama API, 26 Jul 2026). It applies the fixed-versus-floating swap to perpetual funding rates, a yield source no other candidate in this tag addresses. TVL $7,770,420 on Arbitrum as of 26 July 2026 (DefiLlama API). Active markets and maturities: `n.a.` Implied fixed APY range: `n.a.` Notional outstanding: `n.a.`",
+      "Differentiator": "It applies the fixed-versus-floating swap to perpetual funding rates, a yield source no other candidate in this tag addresses.",
+      "Website": "https://boros.pendle.finance/markets",
+      "OfficialDocs": null,
+      "GitHub": null,
+      "Audits": [],
+      "AuditsNote": "DefiLlama records zero audits for this entry (DefiLlama API); no audit firm or report link could be confirmed from a fetched page: `n.a.` Treat as unverified.",
+      "Risks": [
+        {
+          "category": "Counterparty",
+          "description": "Boros is built and operated by Pendle Labs; it shares team, brand and operational dependencies with Pendle rather than standing as an independent protocol."
+        }
+      ],
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Pendle Finance",
+          "slug": "pendle",
+          "positioning": "Tokenized yield: split principal and yield (PT/YT).",
+          "similarities": "same parent, adjacent product, fixed versus floating on a maturity.",
+          "differences": "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT buyers go long yield, a true fixed-income primitive for DeFi, with the deepest liquidity and asset coverage in the category."
+        },
+        {
+          "rank": 2,
+          "name": "Notional Finance",
+          "slug": "notional",
+          "positioning": "Fixed-rate, fixed-term lending and borrowing.",
+          "similarities": "Both let a counterparty lock a rate.",
+          "differences": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates, giving predictable cost of capital for borrowers and lenders."
+        },
+        {
+          "rank": 3,
+          "name": "Sense Finance",
+          "slug": "sense",
+          "positioning": "Yield stripping into zero-coupon and yield tokens.",
+          "similarities": "Both are rate-splitting venues.",
+          "differences": "Early yield-tokenization design (Sense Space AMM); confirm current activity levels before treating its markets as live."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 7770420,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Arbitrum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: boros",
+          "url": "https://api.llama.fi/protocol/boros"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z",
+      "ParentSlug": "pendle"
+    },
+    "fira": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#fira",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "fira",
+      "Name": "Fira",
+      "Symbol": null,
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Fixed Income",
+      "Tags": [
+        "Fixed Income"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Bond and coupon tokens splitting loans into principal and yield legs.",
+      "Description": "Fira issues Bond Tokens and Coupon Tokens against lending positions, splitting a loan into a principal claim and a yield claim with a defined term, which is yield tokenisation with maturity. Contracts and audits are registered at docs.fira.money. DefiLlama classifies it as Lending (DefiLlama API, 26 Jul 2026).",
+      "LongDescription": "Fira issues Bond Tokens and Coupon Tokens against lending positions, splitting a loan into a principal claim and a yield claim with a defined term, which is yield tokenisation with maturity. Contracts and audits are registered at docs.fira.money. DefiLlama classifies it as Lending (DefiLlama API, 26 Jul 2026). It runs parallel fixed-rate and variable-rate vaults over the same collateral base, letting a depositor choose the rate regime rather than the market. TVL $16,528,618 on Ethereum as of 26 July 2026, with DefiLlama reporting borrowed of $429,656,566 against it, a ratio that should be verified independently before publication because it implies extreme rehypothecation or a DefiLlama accounting artefact (DefiLlama API). Implied fixed APY: fixed vaults averaged 5.8% APR and variable vaults 5.8%, per figures recorded in the DefiLlama entry as of 26 July 2026. Active markets and maturities: `n.a.`",
+      "Differentiator": "It runs parallel fixed-rate and variable-rate vaults over the same collateral base, letting a depositor choose the rate regime rather than the market.",
+      "Website": "https://www.fira.money/",
+      "OfficialDocs": "https://docs.fira.money/resources-and-ecosystem/contracts-and-audits",
+      "GitHub": null,
+      "Audits": [],
+      "AuditsNote": "Contracts and audit reports are registered at docs.fira.money/resources-and-ecosystem/contracts-and-audits, per the DefiLlama API record. Firm names and dates: `n.a.`",
+      "Risks": [
+        {
+          "category": "Data Quality",
+          "description": "DefiLlama reports $429.7m borrowed against $16.5m supplied TVL for Fira, a ratio that implies extreme rehypothecation or an accounting artefact. Verify independently before relying on the borrowed figure."
+        }
+      ],
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Pendle Finance",
+          "slug": "pendle",
+          "positioning": "Tokenized yield: split principal and yield (PT/YT).",
+          "similarities": "Both split principal and yield into tradable legs.",
+          "differences": "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT buyers go long yield, a true fixed-income primitive for DeFi, with the deepest liquidity and asset coverage in the category."
+        },
+        {
+          "rank": 2,
+          "name": "Notional Finance",
+          "slug": "notional",
+          "positioning": "Fixed-rate, fixed-term lending and borrowing.",
+          "similarities": "Both offer a fixed rate on a lending position.",
+          "differences": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates, giving predictable cost of capital for borrowers and lenders."
+        },
+        {
+          "rank": 3,
+          "name": "Spectra",
+          "slug": "spectra",
+          "positioning": "Permissionless yield tokenization (ex-APWine).",
+          "similarities": "Both are yield-tokenisation venues on Ethereum.",
+          "differences": "Permissionless market creation for yield tokenization: anyone can list a new PT/YT market for an interest-bearing asset."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 16528618,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": null,
+      "Sources": [
+        {
+          "label": "DefiLlama API: fira",
+          "url": "https://api.llama.fi/protocol/fira"
+        },
+        {
+          "label": "Official docs",
+          "url": "https://docs.fira.money/resources-and-ecosystem/contracts-and-audits"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    },
+    "exactly": {
+      "PK": "CATEGORY#Entity",
+      "SK": "PROTOCOL#exactly",
+      "Category": "Entity",
+      "SubCategory": "Protocol",
+      "Slug": "exactly",
+      "Name": "Exactly",
+      "Symbol": "EXA",
+      "Status": "APPROVED",
+      "Sector": "Credit",
+      "SubSector": "Fixed Income",
+      "Tags": [
+        "Fixed Income"
+      ],
+      "SecondarySectors": null,
+      "Tagline": "Fixed and variable rate pools on Base and Optimism.",
+      "Description": "Exactly runs paired variable-rate and fixed-rate pools, where the fixed-rate side offers borrowing and lending at a rate locked to a specific maturity date. Documented at docs.exact.ly. DefiLlama classifies it as Lending (DefiLlama API, 26 Jul 2026).",
+      "LongDescription": "Exactly runs paired variable-rate and fixed-rate pools, where the fixed-rate side offers borrowing and lending at a rate locked to a specific maturity date. Documented at docs.exact.ly. DefiLlama classifies it as Lending (DefiLlama API, 26 Jul 2026). It is the main fixed-rate credit venue whose liquidity sits on Base and Optimism rather than Ethereum mainnet, which matters for a Base-priority sourcing strategy. Total supplied $4.74m as of 26 July 2026: Optimism $2,680,666, Base $2,062,337, Ethereum $45. Total borrowed $845,761: Base $464,586, Optimism $330,016, Ethereum $51,158 (DefiLlama API). Utilisation is therefore roughly 18% at the protocol level. Implied fixed APY range and active maturities: `n.a.`",
+      "Differentiator": "It is the main fixed-rate credit venue whose liquidity sits on Base and Optimism rather than Ethereum mainnet, which matters for a Base-priority sourcing strategy.",
+      "Website": "https://exact.ly",
+      "OfficialDocs": "https://docs.exact.ly/",
+      "GitHub": "https://github.com/exactly",
+      "Audits": [],
+      "AuditsNote": "Coinspect, Chainsafe, ABDK and Cryptecon, with reports at github.com/exactly/audits, per the DefiLlama API record. Dates: `n.a.`",
+      "Risks": null,
+      "Incidents": null,
+      "Competitors": [
+        {
+          "rank": 1,
+          "name": "Notional Finance",
+          "slug": "notional",
+          "positioning": "Fixed-rate, fixed-term lending and borrowing.",
+          "similarities": "Both are fixed-maturity lending markets.",
+          "differences": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates, giving predictable cost of capital for borrowers and lenders."
+        },
+        {
+          "rank": 2,
+          "name": "Aave",
+          "slug": "aave",
+          "positioning": "Savings for Everyone: open-source non-custodial liquidity protocol.",
+          "similarities": "Exactly's variable pool is a direct substitute.",
+          "differences": "Scale and breadth: large multichain lending network plus native overcollateralized stablecoin (GHO), staking/backstop mechanics (stkAAVE → Umbrella), and institutional/RWA lending (Horizon) under DAO governance."
+        },
+        {
+          "rank": 3,
+          "name": "Pendle Finance",
+          "slug": "pendle",
+          "positioning": "Tokenized yield: split principal and yield (PT/YT).",
+          "similarities": "Both let a lender lock a yield to a date.",
+          "differences": "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT buyers go long yield, a true fixed-income primitive for DeFi, with the deepest liquidity and asset coverage in the category."
+        }
+      ],
+      "CurrentScale": {
+        "aprPct": null,
+        "loanPipelineUsd": null,
+        "marketCapUsd": null,
+        "partnerships": null,
+        "targetAprPct": null,
+        "tvlUsd": 4740000,
+        "users": null
+      },
+      "ScaleLabels": {
+        "tvl": "Protocol TVL"
+      },
+      "ArbitrumPortalMetadata": {
+        "bannerUrl": null,
+        "chains": [
+          "Base",
+          "Optimism",
+          "Ethereum"
+        ],
+        "foundedDate": null,
+        "isArbitrumNative": false,
+        "isLive": true,
+        "isPubliclyAudited": false
+      },
+      "MemberCoins": [
+        {
+          "slug": "exa",
+          "name": "Exactly",
+          "symbol": "EXA",
+          "category": "Token",
+          "role": "Governance & Utility Token",
+          "subCategory": "Governance Token"
+        }
+      ],
+      "Sources": [
+        {
+          "label": "DefiLlama API: exactly",
+          "url": "https://api.llama.fi/protocol/exactly"
+        },
+        {
+          "label": "Official docs",
+          "url": "https://docs.exact.ly/"
+        }
+      ],
+      "Partnerships": [],
+      "Events": [],
+      "CreatedAt": "2026-07-27T00:00:00.000Z",
+      "UpdatedAt": "2026-07-27T00:00:00.000Z"
+    }
+  },
+  "migrations": {
+    "liquity": {
+      "Sector": "Credit",
+      "SubSector": "Decentralized CDP",
+      "Tags": [
+        "Lending"
+      ],
+      "SecondarySectors": [
+        "Stablecoin"
+      ]
+    },
+    "curve-stablecoin": {
+      "Sector": "Credit",
+      "SubSector": "Decentralized CDP",
+      "Tags": [
+        "Lending"
+      ],
+      "SecondarySectors": [
+        "Stablecoin"
+      ]
+    },
+    "inverse-finance": {
+      "Sector": "Credit",
+      "SubSector": "Fixed-rate lending",
+      "Tags": [
+        "Fixed Income"
+      ],
+      "SecondarySectors": [
+        "Stablecoin"
+      ]
+    }
+  },
+  "mapleTagUnion": [
+    "Lending",
+    "Fixed Income"
+  ],
+  "competitorAdditions": {
+    "morpho": [
+      {
+        "rank": 4,
+        "name": "Compound",
+        "slug": "compound",
+        "positioning": "Simple, battle-tested money markets (Compound III).",
+        "similarities": "Both compete in Credit (Lending).",
+        "differences": "Compound III is simpler than Aave: one base borrowable asset per market makes risk easier to understand, at the cost of multi-asset flexibility."
+      },
+      {
+        "rank": 5,
+        "name": "Fluid",
+        "slug": "fluid",
+        "positioning": "Capital-efficient lending + DEX hybrid on a shared liquidity layer.",
+        "similarities": "Both compete in the Credit sector.",
+        "differences": "Capital efficiency: a shared liquidity layer lets collateral, debt, lending liquidity and trading liquidity work together, making it more efficient but more complex."
+      },
+      {
+        "rank": 6,
+        "name": "Gearbox",
+        "slug": "gearbox",
+        "positioning": "Composable leverage via Credit Accounts.",
+        "similarities": "Both compete in the Credit sector.",
+        "differences": "Credit Accounts compose leverage across protocols rather than a single isolated farm: up to ~10x with a unified margin position."
+      },
+      {
+        "rank": 7,
+        "name": "Maple Finance",
+        "slug": "maple",
+        "positioning": "Onchain institutional / private credit.",
+        "similarities": "Both compete in Credit (Lending).",
+        "differences": "Institutional / private-credit model: borrower quality, repayment history, collateral ratios, defaults, pool managers and loan terms matter most."
+      },
+      {
+        "rank": 8,
+        "name": "Steakhouse Financial",
+        "slug": "steakhouse-financial",
+        "positioning": "Largest risk curator in DeFi lending.",
+        "similarities": "Steakhouse sits directly on top of it, so it competes for the depositor relationship rather than the matching layer.",
+        "differences": "Largest curator in DeFi lending, roughly $1.5bn across 51 Morpho vaults and about 53% of Morpho stablecoin TVL."
+      },
+      {
+        "rank": 9,
+        "name": "Native",
+        "slug": "native-credit-pool",
+        "positioning": "Credit pool funding market-maker inventory.",
+        "similarities": "Both are present on Robinhood Chain and compete for the same USDG-denominated deposit.",
+        "differences": "Credit pool purpose-built to fund market maker inventory rather than retail leverage."
+      },
+      {
+        "rank": 10,
+        "name": "Euler V2",
+        "slug": "euler",
+        "positioning": "Permissionless modular lending vaults.",
+        "similarities": "Both are permissionless isolated-market kernels with a curator layer on top.",
+        "differences": "Permissionless vault creation with cross-vault borrowing, lending infrastructure rather than a single curated market."
+      },
+      {
+        "rank": 11,
+        "name": "Curve (crvUSD)",
+        "slug": "curve-stablecoin",
+        "positioning": "Soft-liquidation CDP dollar.",
+        "similarities": "Curve LlamaLend's isolated markets compete with Morpho Blue's isolated lending markets.",
+        "differences": "LLAMMA soft-liquidation continuously converts collateral to crvUSD as price drops, eliminating hard liquidation cascades."
+      }
+    ],
+    "aave": [
+      {
+        "rank": 9,
+        "name": "Radiant Capital",
+        "slug": "radiant",
+        "positioning": "Omnichain money market via LayerZero.",
+        "similarities": "Both compete in Credit (Lending).",
+        "differences": "Omnichain lending: deposits and borrows are bridged across chains via LayerZero rather than confined to a single network's liquidity."
+      },
+      {
+        "rank": 10,
+        "name": "Gearbox",
+        "slug": "gearbox",
+        "positioning": "Composable leverage via Credit Accounts.",
+        "similarities": "Both compete in the Credit sector.",
+        "differences": "Credit Accounts compose leverage across protocols rather than a single isolated farm: up to ~10x with a unified margin position."
+      },
+      {
+        "rank": 11,
+        "name": "Notional Finance",
+        "slug": "notional",
+        "positioning": "Fixed-rate, fixed-term lending and borrowing.",
+        "similarities": "Both compete in the Credit sector.",
+        "differences": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates, giving predictable cost of capital for borrowers and lenders."
+      },
+      {
+        "rank": 12,
+        "name": "USD.AI",
+        "slug": "usd-ai",
+        "positioning": "It lets crypto/stablecoin capital fund real-world AI compute infrastructure, especially GPUs, and turns that into a stablecoin/yield product.",
+        "similarities": "Both compete in the Credit sector.",
+        "differences": "It is not just \"a stablecoin company.\" It is more like a RWA/private credit protocol where the RWA is AI compute infrastructure."
+      },
+      {
+        "rank": 13,
+        "name": "Dolomite",
+        "slug": "dolomite",
+        "positioning": "Money market where collateral keeps its native rights.",
+        "similarities": "Both are multi-asset variable-rate money markets, Dolomite competing on collateral breadth.",
+        "differences": "Collateral keeps its native staking, vesting and governance rights while pledged."
+      },
+      {
+        "rank": 14,
+        "name": "Euler V2",
+        "slug": "euler",
+        "positioning": "Permissionless modular lending vaults.",
+        "similarities": "Both are the reference variable-rate lenders on Ethereum.",
+        "differences": "Permissionless vault creation with cross-vault borrowing, lending infrastructure rather than a single curated market."
+      },
+      {
+        "rank": 15,
+        "name": "Contango V2",
+        "slug": "contango",
+        "positioning": "One-click looping across external money markets.",
+        "similarities": "Contango is a demand-side wrapper that routes into Aave and peers.",
+        "differences": "It aggregates looping across many external money markets rather than running its own, so it turns any third-party lending market into a one-click leverage venue."
+      },
+      {
+        "rank": 16,
+        "name": "Exactly",
+        "slug": "exactly",
+        "positioning": "Fixed and variable rate pools on Base and Optimism.",
+        "similarities": "Exactly's variable pool is a direct substitute.",
+        "differences": "It is the main fixed-rate credit venue whose liquidity sits on Base and Optimism rather than Ethereum mainnet, which matters for a Base-priority sourcing strategy."
+      }
+    ],
+    "venus": [
+      {
+        "rank": 3,
+        "name": "Radiant Capital",
+        "slug": "radiant",
+        "positioning": "Omnichain money market via LayerZero.",
+        "similarities": "Both compete in the Credit sector.",
+        "differences": "Omnichain lending: deposits and borrows are bridged across chains via LayerZero rather than confined to a single network's liquidity."
+      }
+    ],
+    "compound": [
+      {
+        "rank": 3,
+        "name": "Radiant Capital",
+        "slug": "radiant",
+        "positioning": "Omnichain money market via LayerZero.",
+        "similarities": "Both compete in Credit (Lending).",
+        "differences": "Omnichain lending: deposits and borrows are bridged across chains via LayerZero rather than confined to a single network's liquidity."
+      },
+      {
+        "rank": 4,
+        "name": "Euler V2",
+        "slug": "euler",
+        "positioning": "Permissionless modular lending vaults.",
+        "similarities": "same category, Euler differentiating on modularity.",
+        "differences": "Permissionless vault creation with cross-vault borrowing, lending infrastructure rather than a single curated market."
+      }
+    ],
+    "sky": [
+      {
+        "rank": 1,
+        "name": "Spark Protocol",
+        "slug": "spark",
+        "positioning": "Stablecoin-native credit stack tied to the Sky/Maker ecosystem.",
+        "similarities": "Both compete in the Credit sector.",
+        "differences": "Not just general lending, its edge is the Sky/Maker connection (DAI/USDS): how it creates, routes, lends and manages stablecoin liquidity."
+      },
+      {
+        "rank": 2,
+        "name": "Liquity",
+        "slug": "liquity",
+        "positioning": "Immutable, governance-minimized CDP dollar.",
+        "similarities": "Both issue a decentralized stablecoin against overcollateralised positions.",
+        "differences": "Fully immutable, governance-minimized CDP, LUSD V1 has zero ongoing interest; BOLD V2 adds user-set rates and wstETH/rETH collateral."
+      },
+      {
+        "rank": 3,
+        "name": "Curve (crvUSD)",
+        "slug": "curve-stablecoin",
+        "positioning": "Soft-liquidation CDP dollar.",
+        "similarities": "Both issue a decentralized CDP stablecoin against overcollateralised positions.",
+        "differences": "LLAMMA soft-liquidation continuously converts collateral to crvUSD as price drops, eliminating hard liquidation cascades."
+      }
+    ],
+    "fluid": [
+      {
+        "rank": 3,
+        "name": "Gearbox",
+        "slug": "gearbox",
+        "positioning": "Composable leverage via Credit Accounts.",
+        "similarities": "Both compete in Credit (Leveraged Yield).",
+        "differences": "Credit Accounts compose leverage across protocols rather than a single isolated farm: up to ~10x with a unified margin position."
+      },
+      {
+        "rank": 4,
+        "name": "Dolomite",
+        "slug": "dolomite",
+        "positioning": "Money market where collateral keeps its native rights.",
+        "similarities": "Both compete on capital efficiency of collateral.",
+        "differences": "Collateral keeps its native staking, vesting and governance rights while pledged."
+      }
+    ],
+    "gearbox": [
+      {
+        "rank": 5,
+        "name": "Stella",
+        "slug": "stella",
+        "positioning": "Pay-as-you-earn leveraged strategies (ex-Alpha Homora).",
+        "similarities": "Both compete in Credit (Leveraged Yield).",
+        "differences": "0% borrow APR: lenders are compensated from strategy profit share rather than interest, aligning incentives between borrowers and lenders."
+      },
+      {
+        "rank": 6,
+        "name": "T3tris Finance",
+        "slug": "t3tris-finance",
+        "positioning": "Permissionless vault infrastructure on Robinhood Chain and Arbitrum.",
+        "similarities": "Both provide the account and vault plumbing that levered strategies run on.",
+        "differences": "Zero-fee permissionless vault infrastructure with a high-water-mark performance fee design documented in LFG Labs' research note on the T3tris high-water-mark performance fee."
+      },
+      {
+        "rank": 7,
+        "name": "Contango V2",
+        "slug": "contango",
+        "positioning": "One-click looping across external money markets.",
+        "similarities": "Both provide packaged leverage on top of external yield.",
+        "differences": "It aggregates looping across many external money markets rather than running its own, so it turns any third-party lending market into a one-click leverage venue."
+      },
+      {
+        "rank": 8,
+        "name": "Yield Basis",
+        "slug": "yield-basis",
+        "positioning": "Levered Curve LP exposure built to cancel impermanent loss.",
+        "similarities": "Both use borrowed stablecoins to lever a yield source.",
+        "differences": "It is the only candidate here whose leverage exists specifically to cancel impermanent loss rather than to multiply yield."
+      },
+      {
+        "rank": 9,
+        "name": "Origami Finance",
+        "slug": "origami-finance",
+        "positioning": "Folded yield-token vaults held as a single receipt token.",
+        "similarities": "Both deliver levered yield-bearing-token exposure.",
+        "differences": "It packages the fold as a single-token vault position, so a depositor holds one receipt token instead of managing a loop."
+      },
+      {
+        "rank": 10,
+        "name": "DeltaPrime",
+        "slug": "deltaprime",
+        "positioning": "Undercollateralised prime accounts for leveraged farming.",
+        "similarities": "credit accounts are the same architecture.",
+        "differences": "The borrowed capital never leaves the protocol's whitelisted strategy set, which is what allows the account to be undercollateralised."
+      }
+    ],
+    "notional": [
+      {
+        "rank": 5,
+        "name": "Sense Finance",
+        "slug": "sense",
+        "positioning": "Yield stripping into zero-coupon and yield tokens.",
+        "similarities": "Both compete in Credit (Fixed Income).",
+        "differences": "Early yield-tokenization design (Sense Space AMM); confirm current activity levels before treating its markets as live."
+      },
+      {
+        "rank": 6,
+        "name": "TermMax",
+        "slug": "termmax",
+        "positioning": "Fixed-rate, fixed-maturity credit with built-in leverage tokens.",
+        "similarities": "Both are fixed-rate fixed-maturity lending markets.",
+        "differences": "It combines a fixed-rate order market with a built-in leverage token in the same instrument set, which most fixed-rate venues keep separate."
+      },
+      {
+        "rank": 7,
+        "name": "Term Finance",
+        "slug": "term-finance",
+        "positioning": "Sealed-bid on-chain repo auctions with a real term structure.",
+        "similarities": "Both are fixed-rate fixed-term lending venues.",
+        "differences": "Rate discovery happens through a periodic sealed-bid auction rather than a continuous curve, which produces a genuine term structure rather than a spot rate with a maturity wrapper."
+      },
+      {
+        "rank": 8,
+        "name": "Boros",
+        "slug": "boros",
+        "positioning": "Pendle's venue for trading funding rates, fixed versus floating.",
+        "similarities": "Both let a counterparty lock a rate.",
+        "differences": "It applies the fixed-versus-floating swap to perpetual funding rates, a yield source no other candidate in this tag addresses."
+      },
+      {
+        "rank": 9,
+        "name": "Fira",
+        "slug": "fira",
+        "positioning": "Bond and coupon tokens splitting loans into principal and yield legs.",
+        "similarities": "Both offer a fixed rate on a lending position.",
+        "differences": "It runs parallel fixed-rate and variable-rate vaults over the same collateral base, letting a depositor choose the rate regime rather than the market."
+      },
+      {
+        "rank": 10,
+        "name": "Exactly",
+        "slug": "exactly",
+        "positioning": "Fixed and variable rate pools on Base and Optimism.",
+        "similarities": "Both are fixed-maturity lending markets.",
+        "differences": "It is the main fixed-rate credit venue whose liquidity sits on Base and Optimism rather than Ethereum mainnet, which matters for a Base-priority sourcing strategy."
+      },
+      {
+        "rank": 11,
+        "name": "Inverse Finance",
+        "slug": "inverse-finance",
+        "positioning": "Decentralized CDP issuer of DOLA.",
+        "similarities": "Both offer fixed-rate on-chain lending instruments.",
+        "differences": "DOLA CDP stack plus FiRM fixed-rate borrowing, distinct from Aave-style variable-rate money markets."
+      }
+    ],
+    "maple": [
+      {
+        "rank": 3,
+        "name": "USD.AI",
+        "slug": "usd-ai",
+        "positioning": "It lets crypto/stablecoin capital fund real-world AI compute infrastructure, especially GPUs, and turns that into a stablecoin/yield product.",
+        "similarities": "Both compete in the Credit sector.",
+        "differences": "It is not just \"a stablecoin company.\" It is more like a RWA/private credit protocol where the RWA is AI compute infrastructure."
+      },
+      {
+        "rank": 4,
+        "name": "Steakhouse Financial",
+        "slug": "steakhouse-financial",
+        "positioning": "Largest risk curator in DeFi lending.",
+        "similarities": "Both are institutional-facing credit underwriters, Maple on the CeFi/undercollateralised side.",
+        "differences": "Largest curator in DeFi lending, roughly $1.5bn across 51 Morpho vaults and about 53% of Morpho stablecoin TVL."
+      },
+      {
+        "rank": 5,
+        "name": "Native",
+        "slug": "native-credit-pool",
+        "positioning": "Credit pool funding market-maker inventory.",
+        "similarities": "Both run credit lines to professional trading counterparties.",
+        "differences": "Credit pool purpose-built to fund market maker inventory rather than retail leverage."
+      },
+      {
+        "rank": 6,
+        "name": "cSigma Finance",
+        "slug": "csigma-finance",
+        "positioning": "Institutional credit desk concentrated on Arbitrum.",
+        "similarities": "Both are institutional credit desks competing for the same allocator.",
+        "differences": "Institutional credit desk with TVL concentrated on Arbitrum rather than Ethereum."
+      },
+      {
+        "rank": 7,
+        "name": "Term Finance",
+        "slug": "term-finance",
+        "positioning": "Sealed-bid on-chain repo auctions with a real term structure.",
+        "similarities": "Both serve institutional lenders seeking a known rate to a known date.",
+        "differences": "Rate discovery happens through a periodic sealed-bid auction rather than a continuous curve, which produces a genuine term structure rather than a spot rate with a maturity wrapper."
+      }
+    ],
+    "spark": [
+      {
+        "rank": 4,
+        "name": "Steakhouse Financial",
+        "slug": "steakhouse-financial",
+        "positioning": "Largest risk curator in DeFi lending.",
+        "similarities": "Both are curated stablecoin yield front-ends, and both are live on Robinhood Chain.",
+        "differences": "Largest curator in DeFi lending, roughly $1.5bn across 51 Morpho vaults and about 53% of Morpho stablecoin TVL."
+      }
+    ],
+    "clearpool": [
+      {
+        "rank": 5,
+        "name": "Native",
+        "slug": "native-credit-pool",
+        "positioning": "Credit pool funding market-maker inventory.",
+        "similarities": "Both operate permissioned borrower pools funded by open LP capital.",
+        "differences": "Credit pool purpose-built to fund market maker inventory rather than retail leverage."
+      },
+      {
+        "rank": 6,
+        "name": "cSigma Finance",
+        "slug": "csigma-finance",
+        "positioning": "Institutional credit desk concentrated on Arbitrum.",
+        "similarities": "Both run permissioned borrower pools.",
+        "differences": "Institutional credit desk with TVL concentrated on Arbitrum rather than Ethereum."
+      }
+    ],
+    "radiant": [
+      {
+        "rank": 4,
+        "name": "Dolomite",
+        "slug": "dolomite",
+        "positioning": "Money market where collateral keeps its native rights.",
+        "similarities": "Both are Arbitrum-native lenders competing for the same Arbitrum deposit base.",
+        "differences": "Collateral keeps its native staking, vesting and governance rights while pledged."
+      }
+    ],
+    "goldfinch": [
+      {
+        "rank": 5,
+        "name": "cSigma Finance",
+        "slug": "csigma-finance",
+        "positioning": "Institutional credit desk concentrated on Arbitrum.",
+        "similarities": "Both underwrite off-chain borrowers with on-chain LP capital.",
+        "differences": "Institutional credit desk with TVL concentrated on Arbitrum rather than Ethereum."
+      }
+    ],
+    "stella": [
+      {
+        "rank": 4,
+        "name": "T3tris Finance",
+        "slug": "t3tris-finance",
+        "positioning": "Permissionless vault infrastructure on Robinhood Chain and Arbitrum.",
+        "similarities": "Both are permissionless leveraged strategy venues.",
+        "differences": "Zero-fee permissionless vault infrastructure with a high-water-mark performance fee design documented in LFG Labs' research note on the T3tris high-water-mark performance fee."
+      },
+      {
+        "rank": 5,
+        "name": "Contango V2",
+        "slug": "contango",
+        "positioning": "One-click looping across external money markets.",
+        "similarities": "Both offer looped yield positions.",
+        "differences": "It aggregates looping across many external money markets rather than running its own, so it turns any third-party lending market into a one-click leverage venue."
+      },
+      {
+        "rank": 6,
+        "name": "Yield Basis",
+        "slug": "yield-basis",
+        "positioning": "Levered Curve LP exposure built to cancel impermanent loss.",
+        "similarities": "Both sell levered LP positions.",
+        "differences": "It is the only candidate here whose leverage exists specifically to cancel impermanent loss rather than to multiply yield."
+      },
+      {
+        "rank": 7,
+        "name": "Origami Finance",
+        "slug": "origami-finance",
+        "positioning": "Folded yield-token vaults held as a single receipt token.",
+        "similarities": "Both are one-click levered vault products.",
+        "differences": "It packages the fold as a single-token vault position, so a depositor holds one receipt token instead of managing a loop."
+      },
+      {
+        "rank": 8,
+        "name": "DeltaPrime",
+        "slug": "deltaprime",
+        "positioning": "Undercollateralised prime accounts for leveraged farming.",
+        "similarities": "Both lend to strategy accounts rather than to wallets.",
+        "differences": "The borrowed capital never leaves the protocol's whitelisted strategy set, which is what allows the account to be undercollateralised."
+      }
+    ],
+    "extra-finance": [
+      {
+        "rank": 4,
+        "name": "T3tris Finance",
+        "slug": "t3tris-finance",
+        "positioning": "Permissionless vault infrastructure on Robinhood Chain and Arbitrum.",
+        "similarities": "Both host third-party levered yield strategies.",
+        "differences": "Zero-fee permissionless vault infrastructure with a high-water-mark performance fee design documented in LFG Labs' research note on the T3tris high-water-mark performance fee."
+      },
+      {
+        "rank": 5,
+        "name": "Origami Finance",
+        "slug": "origami-finance",
+        "positioning": "Folded yield-token vaults held as a single receipt token.",
+        "similarities": "Both automate leverage over external yield.",
+        "differences": "It packages the fold as a single-token vault position, so a depositor holds one receipt token instead of managing a loop."
+      },
+      {
+        "rank": 6,
+        "name": "DeltaPrime",
+        "slug": "deltaprime",
+        "positioning": "Undercollateralised prime accounts for leveraged farming.",
+        "similarities": "Both are leveraged farming venues.",
+        "differences": "The borrowed capital never leaves the protocol's whitelisted strategy set, which is what allows the account to be undercollateralised."
+      }
+    ],
+    "curve-stablecoin": [
+      {
+        "rank": 2,
+        "name": "Yield Basis",
+        "slug": "yield-basis",
+        "positioning": "Levered Curve LP exposure built to cancel impermanent loss.",
+        "similarities": "Yield Basis borrows crvUSD and is built by the same founder, so it is a demand-side complement and a competitor for the same BTC collateral.",
+        "differences": "It is the only candidate here whose leverage exists specifically to cancel impermanent loss rather than to multiply yield."
+      },
+      {
+        "rank": 3,
+        "name": "Liquity",
+        "slug": "liquity",
+        "positioning": "Immutable, governance-minimized CDP dollar.",
+        "similarities": "Both are decentralized CDP borrowing venues on Ethereum with continuous or soft liquidation designs.",
+        "differences": "Fully immutable, governance-minimized CDP, LUSD V1 has zero ongoing interest; BOLD V2 adds user-set rates and wstETH/rETH collateral."
+      },
+      {
+        "rank": 4,
+        "name": "Sky",
+        "slug": "sky",
+        "positioning": "Stablecoins aren't built to sit still.",
+        "similarities": "Both issue a decentralized CDP stablecoin against overcollateralised positions.",
+        "differences": "Protocol-set Sky Savings Rate, instant no-lockup yield via sUSDS, and the Sky Agent Network for allocator-driven deployment."
+      },
+      {
+        "rank": 5,
+        "name": "Morpho",
+        "slug": "morpho",
+        "positioning": "Customizable lending infrastructure: isolated markets + curated vaults.",
+        "similarities": "Curve LlamaLend's isolated markets compete with Morpho Blue's isolated lending markets.",
+        "differences": "Instead of one big pool, Morpho Blue markets each fix a collateral, loan asset, oracle and liquidation setting; curators build vaults on top, more modular and risk-specific than Aave."
+      }
+    ],
+    "pendle": [
+      {
+        "rank": 4,
+        "name": "TermMax",
+        "slug": "termmax",
+        "positioning": "Fixed-rate, fixed-maturity credit with built-in leverage tokens.",
+        "similarities": "Both split a yield-bearing position into principal and yield legs with a maturity.",
+        "differences": "It combines a fixed-rate order market with a built-in leverage token in the same instrument set, which most fixed-rate venues keep separate."
+      },
+      {
+        "rank": 5,
+        "name": "Term Finance",
+        "slug": "term-finance",
+        "positioning": "Sealed-bid on-chain repo auctions with a real term structure.",
+        "similarities": "Both let a lender lock a yield, Pendle through tokenisation and Term through auction.",
+        "differences": "Rate discovery happens through a periodic sealed-bid auction rather than a continuous curve, which produces a genuine term structure rather than a spot rate with a maturity wrapper."
+      },
+      {
+        "rank": 6,
+        "name": "Boros",
+        "slug": "boros",
+        "positioning": "Pendle's venue for trading funding rates, fixed versus floating.",
+        "similarities": "same parent, adjacent product, fixed versus floating on a maturity.",
+        "differences": "It applies the fixed-versus-floating swap to perpetual funding rates, a yield source no other candidate in this tag addresses."
+      },
+      {
+        "rank": 7,
+        "name": "Fira",
+        "slug": "fira",
+        "positioning": "Bond and coupon tokens splitting loans into principal and yield legs.",
+        "similarities": "Both split principal and yield into tradable legs.",
+        "differences": "It runs parallel fixed-rate and variable-rate vaults over the same collateral base, letting a depositor choose the rate regime rather than the market."
+      },
+      {
+        "rank": 8,
+        "name": "Exactly",
+        "slug": "exactly",
+        "positioning": "Fixed and variable rate pools on Base and Optimism.",
+        "similarities": "Both let a lender lock a yield to a date.",
+        "differences": "It is the main fixed-rate credit venue whose liquidity sits on Base and Optimism rather than Ethereum mainnet, which matters for a Base-priority sourcing strategy."
+      },
+      {
+        "rank": 9,
+        "name": "Inverse Finance",
+        "slug": "inverse-finance",
+        "positioning": "Decentralized CDP issuer of DOLA.",
+        "similarities": "Both tokenise interest to fix a rate: DBR prepays borrowing cost, YT trades the yield leg.",
+        "differences": "DOLA CDP stack plus FiRM fixed-rate borrowing, distinct from Aave-style variable-rate money markets."
+      }
+    ],
+    "spectra": [
+      {
+        "rank": 4,
+        "name": "TermMax",
+        "slug": "termmax",
+        "positioning": "Fixed-rate, fixed-maturity credit with built-in leverage tokens.",
+        "similarities": "same yield-tokenisation category, competing on curator distribution.",
+        "differences": "It combines a fixed-rate order market with a built-in leverage token in the same instrument set, which most fixed-rate venues keep separate."
+      },
+      {
+        "rank": 5,
+        "name": "Fira",
+        "slug": "fira",
+        "positioning": "Bond and coupon tokens splitting loans into principal and yield legs.",
+        "similarities": "Both are yield-tokenisation venues on Ethereum.",
+        "differences": "It runs parallel fixed-rate and variable-rate vaults over the same collateral base, letting a depositor choose the rate regime rather than the market."
+      }
+    ],
+    "sense": [
+      {
+        "rank": 4,
+        "name": "Boros",
+        "slug": "boros",
+        "positioning": "Pendle's venue for trading funding rates, fixed versus floating.",
+        "similarities": "Both are rate-splitting venues.",
+        "differences": "It applies the fixed-versus-floating swap to perpetual funding rates, a yield source no other candidate in this tag addresses."
+      }
+    ],
+    "liquity": [
+      {
+        "rank": 2,
+        "name": "Curve (crvUSD)",
+        "slug": "curve-stablecoin",
+        "positioning": "Soft-liquidation CDP dollar.",
+        "similarities": "Both are decentralized CDP borrowing venues on Ethereum with continuous or soft liquidation designs.",
+        "differences": "LLAMMA soft-liquidation continuously converts collateral to crvUSD as price drops, eliminating hard liquidation cascades."
+      },
+      {
+        "rank": 3,
+        "name": "Sky",
+        "slug": "sky",
+        "positioning": "Stablecoins aren't built to sit still.",
+        "similarities": "Both issue a decentralized stablecoin against overcollateralised positions.",
+        "differences": "Protocol-set Sky Savings Rate, instant no-lockup yield via sUSDS, and the Sky Agent Network for allocator-driven deployment."
+      },
+      {
+        "rank": 4,
+        "name": "Inverse Finance",
+        "slug": "inverse-finance",
+        "positioning": "Decentralized CDP issuer of DOLA.",
+        "similarities": "Both offer rate-certain borrowing against ETH-class collateral, user-set at Liquity and fixed at FiRM.",
+        "differences": "DOLA CDP stack plus FiRM fixed-rate borrowing, distinct from Aave-style variable-rate money markets."
+      }
+    ],
+    "inverse-finance": [
+      {
+        "rank": 2,
+        "name": "Liquity",
+        "slug": "liquity",
+        "positioning": "Immutable, governance-minimized CDP dollar.",
+        "similarities": "Both offer rate-certain borrowing against ETH-class collateral, user-set at Liquity and fixed at FiRM.",
+        "differences": "Fully immutable, governance-minimized CDP, LUSD V1 has zero ongoing interest; BOLD V2 adds user-set rates and wstETH/rETH collateral."
+      },
+      {
+        "rank": 3,
+        "name": "Notional Finance",
+        "slug": "notional",
+        "positioning": "Fixed-rate, fixed-term lending and borrowing.",
+        "similarities": "Both offer fixed-rate on-chain lending instruments.",
+        "differences": "True fixed-rate/fixed-term loans through fCash, rather than variable money-market rates, giving predictable cost of capital for borrowers and lenders."
+      },
+      {
+        "rank": 4,
+        "name": "Pendle Finance",
+        "slug": "pendle",
+        "positioning": "Tokenized yield: split principal and yield (PT/YT).",
+        "similarities": "Both tokenise interest to fix a rate: DBR prepays borrowing cost, YT trades the yield leg.",
+        "differences": "The dominant yield-tokenization market: PT buyers lock a fixed rate, YT buyers go long yield, a true fixed-income primitive for DeFi, with the deepest liquidity and asset coverage in the category."
+      }
+    ]
+  },
+  "tagCohorts": {
+    "Lending": [
+      "aave",
+      "compound",
+      "morpho",
+      "radiant",
+      "spark",
+      "steakhouse-financial",
+      "native-credit-pool",
+      "dolomite",
+      "euler",
+      "csigma-finance",
+      "liquity",
+      "curve-stablecoin"
+    ],
+    "Leveraged Yield": [
+      "extra-finance",
+      "fluid",
+      "gearbox",
+      "stella",
+      "t3tris-finance",
+      "contango",
+      "yield-basis",
+      "origami-finance",
+      "deltaprime"
+    ],
+    "Fixed Income": [
+      "maple",
+      "notional",
+      "pendle",
+      "sense",
+      "spectra",
+      "termmax",
+      "term-finance",
+      "boros",
+      "fira",
+      "exactly",
+      "inverse-finance"
+    ]
+  },
+  "riskCohorts": {
+    "Lending": [
+      "aave",
+      "compound",
+      "morpho",
+      "radiant",
+      "spark"
+    ],
+    "Leveraged Yield": [
+      "extra-finance",
+      "fluid",
+      "gearbox",
+      "stella"
+    ],
+    "Fixed Income": [
+      "maple",
+      "notional",
+      "pendle",
+      "sense",
+      "spectra"
+    ]
+  },
+  "nodes": {
+    "aave": {
+      "slug": "aave",
+      "name": "Aave",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "compound": {
+      "slug": "compound",
+      "name": "Compound",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "morpho": {
+      "slug": "morpho",
+      "name": "Morpho",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "radiant": {
+      "slug": "radiant",
+      "name": "Radiant Capital",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "nonSteadyState": true,
+      "auditStatus": "audited"
+    },
+    "spark": {
+      "slug": "spark",
+      "name": "Spark Protocol",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "steakhouse-financial": {
+      "slug": "steakhouse-financial",
+      "name": "Steakhouse Financial",
+      "tag": "Lending",
+      "entityType": "risk-curator",
+      "auditStatus": "not-applicable",
+      "dataQualityFlags": [
+        "TVL books under Morpho, Euler and Kamino vaults"
+      ]
+    },
+    "native-credit-pool": {
+      "slug": "native-credit-pool",
+      "name": "Native",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "auditStatus": "unverified"
+    },
+    "dolomite": {
+      "slug": "dolomite",
+      "name": "Dolomite",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "euler": {
+      "slug": "euler",
+      "name": "Euler V2",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "csigma-finance": {
+      "slug": "csigma-finance",
+      "name": "cSigma Finance",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "liquity": {
+      "slug": "liquity",
+      "name": "Liquity",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "auditStatus": "unverified"
+    },
+    "curve-stablecoin": {
+      "slug": "curve-stablecoin",
+      "name": "Curve (crvUSD)",
+      "tag": "Lending",
+      "entityType": "protocol",
+      "auditStatus": "unverified"
+    },
+    "extra-finance": {
+      "slug": "extra-finance",
+      "name": "Extra Finance",
+      "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "fluid": {
+      "slug": "fluid",
+      "name": "Fluid",
+      "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "gearbox": {
+      "slug": "gearbox",
+      "name": "Gearbox",
+      "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "stella": {
+      "slug": "stella",
+      "name": "Stella",
+      "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "nonSteadyState": true,
+      "auditStatus": "audited"
+    },
+    "t3tris-finance": {
+      "slug": "t3tris-finance",
+      "name": "T3tris Finance",
+      "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "tagFit": "partial",
+      "auditStatus": "audited"
+    },
+    "contango": {
+      "slug": "contango",
+      "name": "Contango V2",
+      "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "yield-basis": {
+      "slug": "yield-basis",
+      "name": "Yield Basis",
+      "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "auditStatus": "unverified"
+    },
+    "origami-finance": {
+      "slug": "origami-finance",
+      "name": "Origami Finance",
+      "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "deltaprime": {
+      "slug": "deltaprime",
+      "name": "DeltaPrime",
+      "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "maple": {
+      "slug": "maple",
+      "name": "Maple Finance",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "notional": {
+      "slug": "notional",
+      "name": "Notional Finance",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "nonSteadyState": true,
+      "auditStatus": "audited"
+    },
+    "pendle": {
+      "slug": "pendle",
+      "name": "Pendle Finance",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "sense": {
+      "slug": "sense",
+      "name": "Sense Finance",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "nonSteadyState": true,
+      "auditStatus": "audited"
+    },
+    "spectra": {
+      "slug": "spectra",
+      "name": "Spectra",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "termmax": {
+      "slug": "termmax",
+      "name": "TermMax",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "term-finance": {
+      "slug": "term-finance",
+      "name": "Term Finance",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "auditStatus": "unverified"
+    },
+    "boros": {
+      "slug": "boros",
+      "name": "Boros",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "parentSlug": "pendle",
+      "auditStatus": "unverified"
+    },
+    "fira": {
+      "slug": "fira",
+      "name": "Fira",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "auditStatus": "audited",
+      "dataQualityFlags": [
+        "DefiLlama borrowed figure ($429.7m) vastly exceeds supplied TVL; unverified"
+      ]
+    },
+    "exactly": {
+      "slug": "exactly",
+      "name": "Exactly",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "auditStatus": "audited"
+    },
+    "inverse-finance": {
+      "slug": "inverse-finance",
+      "name": "Inverse Finance",
+      "tag": "Fixed Income",
+      "entityType": "protocol",
+      "auditStatus": "unverified"
+    }
+  },
+  "edges": [
+    {
+      "a": "aave",
+      "b": "compound",
+      "sharedTag": true
+    },
+    {
+      "a": "aave",
+      "b": "contango",
+      "sharedTag": false
+    },
+    {
+      "a": "aave",
+      "b": "dolomite",
+      "sharedTag": true
+    },
+    {
+      "a": "aave",
+      "b": "euler",
+      "sharedTag": true
+    },
+    {
+      "a": "aave",
+      "b": "exactly",
+      "sharedTag": false
+    },
+    {
+      "a": "aave",
+      "b": "fluid",
+      "sharedTag": false
+    },
+    {
+      "a": "aave",
+      "b": "gearbox",
+      "sharedTag": false
+    },
+    {
+      "a": "aave",
+      "b": "justlend",
+      "sharedTag": false
+    },
+    {
+      "a": "aave",
+      "b": "kamino",
+      "sharedTag": false
+    },
+    {
+      "a": "aave",
+      "b": "maple",
+      "sharedTag": false,
+      "alsoPartner": true
+    },
+    {
+      "a": "aave",
+      "b": "morpho",
+      "sharedTag": true
+    },
+    {
+      "a": "aave",
+      "b": "notional",
+      "sharedTag": false
+    },
+    {
+      "a": "aave",
+      "b": "radiant",
+      "sharedTag": true
+    },
+    {
+      "a": "aave",
+      "b": "spark",
+      "sharedTag": true
+    },
+    {
+      "a": "aave",
+      "b": "usd-ai",
+      "sharedTag": false
+    },
+    {
+      "a": "aave",
+      "b": "venus",
+      "sharedTag": false
+    },
+    {
+      "a": "boros",
+      "b": "notional",
+      "sharedTag": true
+    },
+    {
+      "a": "boros",
+      "b": "pendle",
+      "sharedTag": true,
+      "sharedParent": true
+    },
+    {
+      "a": "boros",
+      "b": "sense",
+      "sharedTag": true
+    },
+    {
+      "a": "centrifuge",
+      "b": "clearpool",
+      "sharedTag": false
+    },
+    {
+      "a": "centrifuge",
+      "b": "goldfinch",
+      "sharedTag": false
+    },
+    {
+      "a": "clearpool",
+      "b": "csigma-finance",
+      "sharedTag": false
+    },
+    {
+      "a": "clearpool",
+      "b": "goldfinch",
+      "sharedTag": false
+    },
+    {
+      "a": "clearpool",
+      "b": "native-credit-pool",
+      "sharedTag": false
+    },
+    {
+      "a": "compound",
+      "b": "euler",
+      "sharedTag": true
+    },
+    {
+      "a": "compound",
+      "b": "morpho",
+      "sharedTag": true
+    },
+    {
+      "a": "compound",
+      "b": "radiant",
+      "sharedTag": true
+    },
+    {
+      "a": "contango",
+      "b": "gearbox",
+      "sharedTag": true
+    },
+    {
+      "a": "contango",
+      "b": "stella",
+      "sharedTag": true
+    },
+    {
+      "a": "csigma-finance",
+      "b": "goldfinch",
+      "sharedTag": false
+    },
+    {
+      "a": "csigma-finance",
+      "b": "maple",
+      "sharedTag": false
+    },
+    {
+      "a": "curve-stablecoin",
+      "b": "liquity",
+      "sharedTag": true
+    },
+    {
+      "a": "curve-stablecoin",
+      "b": "morpho",
+      "sharedTag": true
+    },
+    {
+      "a": "curve-stablecoin",
+      "b": "sky",
+      "sharedTag": false
+    },
+    {
+      "a": "curve-stablecoin",
+      "b": "yield-basis",
+      "sharedTag": false
+    },
+    {
+      "a": "deltaprime",
+      "b": "extra-finance",
+      "sharedTag": true
+    },
+    {
+      "a": "deltaprime",
+      "b": "gearbox",
+      "sharedTag": true
+    },
+    {
+      "a": "deltaprime",
+      "b": "stella",
+      "sharedTag": true
+    },
+    {
+      "a": "dolomite",
+      "b": "fluid",
+      "sharedTag": false
+    },
+    {
+      "a": "dolomite",
+      "b": "radiant",
+      "sharedTag": true
+    },
+    {
+      "a": "euler",
+      "b": "morpho",
+      "sharedTag": true
+    },
+    {
+      "a": "exactly",
+      "b": "notional",
+      "sharedTag": true
+    },
+    {
+      "a": "exactly",
+      "b": "pendle",
+      "sharedTag": true
+    },
+    {
+      "a": "extra-finance",
+      "b": "gearbox",
+      "sharedTag": true
+    },
+    {
+      "a": "extra-finance",
+      "b": "origami-finance",
+      "sharedTag": true
+    },
+    {
+      "a": "extra-finance",
+      "b": "stella",
+      "sharedTag": true
+    },
+    {
+      "a": "extra-finance",
+      "b": "t3tris-finance",
+      "sharedTag": true
+    },
+    {
+      "a": "fira",
+      "b": "notional",
+      "sharedTag": true
+    },
+    {
+      "a": "fira",
+      "b": "pendle",
+      "sharedTag": true
+    },
+    {
+      "a": "fira",
+      "b": "spectra",
+      "sharedTag": true
+    },
+    {
+      "a": "fluid",
+      "b": "gearbox",
+      "sharedTag": true
+    },
+    {
+      "a": "fluid",
+      "b": "morpho",
+      "sharedTag": false
+    },
+    {
+      "a": "gearbox",
+      "b": "morpho",
+      "sharedTag": false
+    },
+    {
+      "a": "gearbox",
+      "b": "origami-finance",
+      "sharedTag": true
+    },
+    {
+      "a": "gearbox",
+      "b": "stella",
+      "sharedTag": true
+    },
+    {
+      "a": "gearbox",
+      "b": "t3tris-finance",
+      "sharedTag": true
+    },
+    {
+      "a": "gearbox",
+      "b": "yield-basis",
+      "sharedTag": true
+    },
+    {
+      "a": "inverse-finance",
+      "b": "liquity",
+      "sharedTag": false
+    },
+    {
+      "a": "inverse-finance",
+      "b": "notional",
+      "sharedTag": true
+    },
+    {
+      "a": "inverse-finance",
+      "b": "pendle",
+      "sharedTag": true
+    },
+    {
+      "a": "justlend",
+      "b": "venus",
+      "sharedTag": false
+    },
+    {
+      "a": "kamino",
+      "b": "morpho",
+      "sharedTag": false
+    },
+    {
+      "a": "liquity",
+      "b": "sky",
+      "sharedTag": false
+    },
+    {
+      "a": "maple",
+      "b": "morpho",
+      "sharedTag": false,
+      "alsoPartner": true
+    },
+    {
+      "a": "maple",
+      "b": "native-credit-pool",
+      "sharedTag": false
+    },
+    {
+      "a": "maple",
+      "b": "steakhouse-financial",
+      "sharedTag": false
+    },
+    {
+      "a": "maple",
+      "b": "term-finance",
+      "sharedTag": true
+    },
+    {
+      "a": "maple",
+      "b": "usd-ai",
+      "sharedTag": false
+    },
+    {
+      "a": "morpho",
+      "b": "native-credit-pool",
+      "sharedTag": true
+    },
+    {
+      "a": "morpho",
+      "b": "spark",
+      "sharedTag": true
+    },
+    {
+      "a": "morpho",
+      "b": "steakhouse-financial",
+      "sharedTag": true
+    },
+    {
+      "a": "notional",
+      "b": "pendle",
+      "sharedTag": true,
+      "alsoPartner": true
+    },
+    {
+      "a": "notional",
+      "b": "sense",
+      "sharedTag": true
+    },
+    {
+      "a": "notional",
+      "b": "spectra",
+      "sharedTag": true
+    },
+    {
+      "a": "notional",
+      "b": "term-finance",
+      "sharedTag": true
+    },
+    {
+      "a": "notional",
+      "b": "termmax",
+      "sharedTag": true
+    },
+    {
+      "a": "origami-finance",
+      "b": "stella",
+      "sharedTag": true
+    },
+    {
+      "a": "pendle",
+      "b": "sense",
+      "sharedTag": true
+    },
+    {
+      "a": "pendle",
+      "b": "spectra",
+      "sharedTag": true
+    },
+    {
+      "a": "pendle",
+      "b": "term-finance",
+      "sharedTag": true
+    },
+    {
+      "a": "pendle",
+      "b": "termmax",
+      "sharedTag": true
+    },
+    {
+      "a": "radiant",
+      "b": "venus",
+      "sharedTag": false
+    },
+    {
+      "a": "sense",
+      "b": "spectra",
+      "sharedTag": true
+    },
+    {
+      "a": "sky",
+      "b": "spark",
+      "sharedTag": false
+    },
+    {
+      "a": "spark",
+      "b": "steakhouse-financial",
+      "sharedTag": true
+    },
+    {
+      "a": "spectra",
+      "b": "termmax",
+      "sharedTag": true
+    },
+    {
+      "a": "stella",
+      "b": "t3tris-finance",
+      "sharedTag": true
+    },
+    {
+      "a": "stella",
+      "b": "yield-basis",
+      "sharedTag": true
+    }
+  ],
+  "tierB": [
+    {
+      "name": "Tether (lending arm)",
+      "type": "CeFi lender",
+      "competesWithTags": [
+        "Lending"
+      ],
+      "note": "62.25% share of tracked CeFi lending, Q1 2026"
+    },
+    {
+      "name": "Nexo",
+      "type": "CeFi lender",
+      "competesWithTags": [
+        "Lending"
+      ],
+      "note": "7.02% CeFi market share Q1 2026"
+    },
+    {
+      "name": "Coinbase crypto-backed loans",
+      "type": "CeFi lender",
+      "competesWithTags": [
+        "Lending"
+      ],
+      "note": "Loan book grew $90.04m in Q1 2026, distributes Steakhouse-curated Morpho USDC lending to retail"
+    },
+    {
+      "name": "Galaxy Digital lending desk",
+      "type": "CeFi lender",
+      "competesWithTags": [
+        "Lending"
+      ],
+      "note": "Contracted 21% in Q1 2026"
+    },
+    {
+      "name": "Ledn",
+      "type": "CeFi lender, BTC",
+      "competesWithTags": [
+        "Lending"
+      ],
+      "note": "Historically third-largest CeFi lender"
+    },
+    {
+      "name": "CeFi lending market aggregate",
+      "type": "Market benchmark",
+      "competesWithTags": [
+        "Lending"
+      ],
+      "note": "Loan books fell 6% QoQ to $23.3bn in Q1 2026, first contraction since Q3 2024"
+    },
+    {
+      "name": "BlackRock BUIDL",
+      "type": "Tokenised treasury fund",
+      "competesWithTags": [
+        "Fixed Income"
+      ],
+      "note": "$2.61bn as of 26 July 2026"
+    },
+    {
+      "name": "Circle USYC",
+      "type": "Tokenised treasury",
+      "competesWithTags": [
+        "Fixed Income"
+      ],
+      "note": "$3.00bn as of 26 July 2026"
+    },
+    {
+      "name": "Ondo USDY",
+      "type": "Tokenised treasury note",
+      "competesWithTags": [
+        "Fixed Income"
+      ],
+      "note": "$2.16bn as of 26 July 2026"
+    },
+    {
+      "name": "Ondo OUSG",
+      "type": "Tokenised short-term government bond fund",
+      "competesWithTags": [
+        "Fixed Income"
+      ],
+      "note": "$481m as of 26 July 2026"
+    },
+    {
+      "name": "Franklin Templeton BENJI",
+      "type": "Tokenised money market fund",
+      "competesWithTags": [
+        "Fixed Income"
+      ],
+      "note": "$735m as of 26 July 2026, SEC-registered"
+    },
+    {
+      "name": "Tokenised US Treasuries aggregate",
+      "type": "Market benchmark",
+      "competesWithTags": [
+        "Fixed Income"
+      ],
+      "note": "$16.20bn across 85 products as of 26 July 2026"
+    },
+    {
+      "name": "Kamino Finance",
+      "type": "Non-EVM lending protocol, Solana",
+      "competesWithTags": [
+        "Lending",
+        "Leveraged Yield"
+      ],
+      "note": "Roughly $3.2bn TVL, the main non-EVM benchmark"
+    },
+    {
+      "name": "Save, MarginFi, Drift",
+      "type": "Non-EVM lending protocols, Solana",
+      "competesWithTags": [
+        "Lending"
+      ],
+      "note": "Drove Solana past $2.1bn of active loans in May 2026"
+    },
+    {
+      "name": "Jupiter Lend and Project 0 Prime",
+      "type": "Non-EVM lending infrastructure, Solana",
+      "competesWithTags": [
+        "Lending"
+      ],
+      "note": "Prime engine covers roughly 98% of Solana lending TVL"
+    }
+  ]
+}

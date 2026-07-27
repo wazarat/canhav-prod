@@ -2706,6 +2706,18 @@ export interface NetworkProfile {
   /** Ranked competitors (top→bottom) — surfaced for `sector === "Credit"`. */
   competitors?: Competitor[];
   /**
+   * Parent protocol slug when this entity is a sub-brand of another tracked
+   * entity (M8: boros -> "pendle"). Cohort views must label the pair as
+   * shared-parent, never as plain rivals.
+   */
+  parentSlug?: string | null;
+  /**
+   * Audit-status caveat (M8): "no audits by design" for curator entities,
+   * or the unresolved-verification note where zero audits are recorded.
+   * Prevents an empty Audits list reading as "unaudited".
+   */
+  auditsNote?: string | null;
+  /**
    * Credit-sector metrics block (live + curated) — `sector === "Credit"`. Field
    * name kept as `lending` to avoid renaming working live-data plumbing
    * (defillama.ts / aave.ts / data.ts read `profile.lending`).

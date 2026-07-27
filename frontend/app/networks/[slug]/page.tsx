@@ -26,7 +26,17 @@ import { formatUsdCompact, formatUsersCompact } from "@/lib/utils";
 
 interface PageProps {
   params: { slug: string };
-  searchParams: { tab?: string; m?: string; range?: string; seg?: string; view?: string };
+  searchParams: {
+    tab?: string;
+    m?: string;
+    range?: string;
+    seg?: string;
+    view?: string;
+    /** M8 Competitors tab: comparison-picker selection (up to 3 slugs). */
+    peers?: string;
+    /** M8 Competitors tab: positioning-quadrant axis pair. */
+    axes?: string;
+  };
 }
 
 export const revalidate = 300;
@@ -142,7 +152,14 @@ export default async function NetworkProfilePage({ params, searchParams }: PageP
         <NetworkAssetCoverageTab profile={profile} seg={searchParams.seg} />
       )}
       {activeTab === "risks" && <NetworkRisksTab profile={profile} view={searchParams.view} />}
-      {activeTab === "competitors" && <NetworkCompetitorsTab profile={profile} />}
+      {activeTab === "competitors" && (
+        <NetworkCompetitorsTab
+          profile={profile}
+          view={searchParams.view}
+          peers={searchParams.peers}
+          axes={searchParams.axes}
+        />
+      )}
       {activeTab === "partnerships" && <NetworkPartnershipsTab profile={profile} />}
       {activeTab === "agent-skills" && (
         <NetworkAgentSkillsTab profile={profile} skill={entitySkill} />

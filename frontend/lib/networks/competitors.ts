@@ -14,7 +14,11 @@ function sharesSectorTag(
 ): boolean {
   const tags = filterTagsForSector(profile, sector);
   const peerTags = filterTagsForSector(peer, sector);
-  if (tags.length === 0 || peerTags.length === 0) return true;
+  // A zero-tag PROFILE still auto-matches every sector peer (it has no tag to
+  // disagree with), but a zero-tag PEER no longer matches a tagged profile:
+  // pre-M8 that branch put justlend/venus/kamino on every tagged Credit page.
+  if (tags.length === 0) return true;
+  if (peerTags.length === 0) return false;
   return tags.some((t) => peerTags.includes(t));
 }
 

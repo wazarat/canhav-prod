@@ -139,6 +139,30 @@ export const LLAMA_PROTOCOL_SLUGS: Record<string, string | string[] | null> = {
   // MakerDAO-successor lending protocol the Credit view describes.
   sky: "sky-lending",
   "usd-ai": "usd-ai",
+  // Credit M8 expansion — 15 new entities + 3 Stablecoin->Credit migrations
+  // (slugs from the M8 dataset, verified against api.llama.fi 2026-07-27).
+  "steakhouse-financial": "steakhouse-financial",
+  "native-credit-pool": "native-credit-pool",
+  dolomite: "dolomite",
+  // euler DELIBERATELY ABSENT: api.llama.fi/protocol/euler-v2 is a 22.7MB
+  // payload (10x the next-largest) that can never enter the 2MB fetch cache,
+  // so every render re-downloads it and dev SSR dies (M8 finding). Headline
+  // TVL comes from the entity's CurrentScale snapshot + creditComparables
+  // until a lighter source lands (M11 register).
+  "csigma-finance": "csigma-finance",
+  "t3tris-finance": "t3tris-finance",
+  contango: "contango-v2",
+  "yield-basis": "yield-basis",
+  "origami-finance": "origami-finance",
+  deltaprime: "deltaprime",
+  termmax: "termmax",
+  "term-finance": ["termfinance-lend", "termfinance-vaults"],
+  boros: "boros",
+  fira: "fira",
+  exactly: "exactly",
+  liquity: "liquity-v2",
+  "curve-stablecoin": ["crvusd", "curve-llamalend"],
+  "inverse-finance": "inverse-finance-firm",
   // Staking sector (Liquid Staking / Restaking / Liquid Restaking; verified 2026-06-25).
   lido: "lido",
   "rocket-pool": "rocket-pool",

@@ -1,0 +1,289 @@
+{
+  "_meta": {
+    "milestone": "M8",
+    "title": "CanHav Credit sector competitor candidates",
+    "compiledAt": "2026-07-26",
+    "scope": "New EVM-only Credit protocols, max 5 per tag, plus already-on-platform migration candidates",
+    "chainPriority": ["Robinhood Chain", "Arbitrum One", "Base", "Ethereum"],
+    "primarySource": "https://api.llama.fi/protocols snapshot and per-protocol https://api.llama.fi/protocol/<slug>, fetched 26 July 2026",
+    "companionMarkdown": "out/credit-competitors-m8.md",
+    "counts": { "newEntities": 15, "perTag": 5, "migrationCandidates": 4, "tierBRows": 15 },
+    "caveats": [
+      "APY values are not exposed by the DefiLlama protocol API and are null throughout",
+      "For dolomite, contango, origami-finance, euler and fira the borrowed figure exceeds supplied TVL because supplied TVL nets out borrowed collateral",
+      "boros is Pendle's own product, not an independent rival",
+      "steakhouse-financial is a risk curator with no contracts of its own, so zero audits is expected"
+    ]
+  },
+  "robinhoodChain": {
+    "chainId": 4663,
+    "mainnetLaunch": "2026-07-01",
+    "stack": "Arbitrum Orbit / Nitro, settles to Ethereum, ETH gas, no native token",
+    "explorer": "https://robinhoodchain.blockscout.com/stats",
+    "docs": "https://docs.robinhood.com/chain/",
+    "l2beatPage": null,
+    "officialLendingProtocols": ["morpho"],
+    "creditProtocolsFound": [
+      { "slug": "steakhouse-financial", "status": "live", "note": "curator of the Robinhood Earn USDG vaults, TVL books under Morpho Blue" },
+      { "slug": "native-credit-pool", "status": "live", "chainTvlUsd": 52570 },
+      { "slug": "t3tris-finance", "status": "live", "chainTvlUsd": 404647 },
+      { "slug": "fusion-by-ipor", "status": "unverified", "chainTvlUsd": 0 }
+    ],
+    "fixedIncomeProtocolsFound": []
+  },
+  "newEntities": [
+    {
+      "name": "Steakhouse Financial", "slug": "steakhouse-financial", "tag": "Lending",
+      "entityType": "risk curator",
+      "chains": ["Robinhood Chain", "Base", "Ethereum", "Arbitrum", "Solana", "Monad", "Katana", "Polygon"],
+      "onRobinhoodChain": true, "tvlUsd": 2402000000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": null, "governanceToken": null,
+      "llamaSlug": "steakhouse-financial", "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://www.steakhouse.financial/", "docs": "https://kitchen.steakhouse.financial/", "github": null,
+      "differentiator": "Largest curator in DeFi lending, roughly $1.5bn across 51 Morpho vaults and about 53% of Morpho stablecoin TVL",
+      "closestIncumbents": ["morpho", "spark", "maple"],
+      "reciprocalListedBy": ["morpho", "spark", "maple"],
+      "audits": [], "auditsNote": "Zero audits expected, deploys no contracts of its own",
+      "riskFlags": ["DNS hijack April 2026 via OVH 2FA social engineering", "principal-agent concentration across roughly $1.8bn allocated"]
+    },
+    {
+      "name": "Native (Native Credit Pool)", "slug": "native-credit-pool", "tag": "Lending",
+      "entityType": "protocol",
+      "chains": ["Robinhood Chain", "Arbitrum", "Base", "Ethereum", "Binance", "Morph"],
+      "onRobinhoodChain": true, "tvlUsd": 37060000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": 18380177, "governanceToken": null,
+      "llamaSlug": "native-credit-pool", "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://native.org", "docs": "https://docs.native.org/native-dev/legacy-v2/native-credit-pool", "github": null,
+      "differentiator": "Credit pool purpose-built to fund market maker inventory rather than retail leverage",
+      "closestIncumbents": ["maple", "clearpool", "morpho"],
+      "reciprocalListedBy": ["maple", "clearpool", "morpho"],
+      "audits": [], "auditsNote": "Zero audits in DefiLlama record, open verification item",
+      "riskFlags": []
+    },
+    {
+      "name": "Dolomite", "slug": "dolomite", "tag": "Lending",
+      "entityType": "protocol",
+      "chains": ["Arbitrum", "Ethereum", "Berachain", "Mantle"],
+      "onRobinhoodChain": false, "tvlUsd": 247920000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": 274263180, "governanceToken": "DOLO",
+      "llamaSlug": "dolomite", "coingeckoId": "dolomite", "alreadyOnPlatform": false,
+      "website": "https://dolomite.io", "docs": null, "github": "https://github.com/dolomite-exchange",
+      "differentiator": "Collateral keeps its native staking, vesting and governance rights while pledged",
+      "closestIncumbents": ["aave", "radiant", "fluid"],
+      "reciprocalListedBy": ["aave", "radiant", "fluid"],
+      "audits": [
+        { "firm": "Cyfrin", "date": "2023-08-23" },
+        { "firm": "SECBIT", "date": "2021-08-02" }
+      ],
+      "riskFlags": ["WLFI collateral concentration, USD1 pool past 100% utilisation April 2026, supply cap raised 635m to 5.1bn"]
+    },
+    {
+      "name": "Euler V2", "slug": "euler", "tag": "Lending",
+      "entityType": "protocol",
+      "chains": ["Arbitrum", "Base", "Ethereum", "Monad", "Plasma", "Avalanche", "Sonic"],
+      "onRobinhoodChain": false, "tvlUsd": 325030000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": 602588217, "governanceToken": "EUL",
+      "llamaSlug": "euler-v2", "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://www.euler.finance", "docs": "https://docs.euler.finance/", "github": null,
+      "differentiator": "Permissionless vault creation with cross-vault borrowing, lending infrastructure rather than a single curated market",
+      "closestIncumbents": ["morpho", "aave", "compound"],
+      "reciprocalListedBy": ["morpho", "aave", "compound"],
+      "audits": [], "auditsNote": "Consolidated security page at euler.finance/#security, firm names and dates not resolvable",
+      "riskFlags": ["$197m flash loan attack 13 March 2023 on V1, funds substantially returned; V2 is a full rewrite"]
+    },
+    {
+      "name": "cSigma Finance", "slug": "csigma-finance", "tag": "Lending",
+      "entityType": "protocol",
+      "chains": ["Arbitrum", "Ethereum", "Base", "Hedera"],
+      "onRobinhoodChain": false, "tvlUsd": 12660000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": null, "governanceToken": "SIGMA",
+      "llamaSlug": "csigma-finance", "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://csigma.finance", "docs": null, "github": "https://github.com/csigma-labs",
+      "differentiator": "Institutional credit desk with TVL concentrated on Arbitrum rather than Ethereum",
+      "closestIncumbents": ["goldfinch", "clearpool", "maple"],
+      "reciprocalListedBy": ["goldfinch", "clearpool", "maple"],
+      "audits": [{ "firm": "QuillAudits", "date": null }, { "firm": "Immunebytes", "date": null }],
+      "riskFlags": []
+    },
+
+    {
+      "name": "T3tris Finance", "slug": "t3tris-finance", "tag": "Leveraged Yield",
+      "entityType": "protocol", "tagFit": "partial",
+      "chains": ["Robinhood Chain", "Arbitrum"],
+      "onRobinhoodChain": true, "tvlUsd": 11810000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": null, "governanceToken": null,
+      "llamaSlug": "t3tris-finance", "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://t3tris.finance/", "docs": null, "github": "https://github.com/t3tris-finance",
+      "closestIncumbents": ["gearbox", "stella", "extra-finance"],
+      "reciprocalListedBy": ["gearbox", "stella", "extra-finance"],
+      "audits": [], "riskFlags": []
+    },
+    {
+      "name": "Contango V2", "slug": "contango", "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "chains": ["Arbitrum", "Base", "Ethereum", "Optimism", "Avalanche"],
+      "onRobinhoodChain": false, "tvlUsd": 5490000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": 44266567, "governanceToken": "TANGO",
+      "llamaSlug": "contango-v2", "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://contango.xyz", "docs": "https://docs.contango.xyz/", "github": "https://github.com/contango-xyz/core-v2",
+      "closestIncumbents": ["gearbox", "stella", "aave"],
+      "reciprocalListedBy": ["gearbox", "stella", "aave"],
+      "audits": [], "riskFlags": []
+    },
+    {
+      "name": "Yield Basis", "slug": "yield-basis", "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "chains": ["Ethereum"],
+      "onRobinhoodChain": false, "tvlUsd": 132235841, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": null, "governanceToken": "YB",
+      "llamaSlug": "yield-basis", "coingeckoId": "yield-basis", "alreadyOnPlatform": false,
+      "website": "https://yieldbasis.com/", "docs": "https://docs.yieldbasis.com/user/how-it-works", "github": null,
+      "closestIncumbents": ["stella", "gearbox", "curve-stablecoin"],
+      "reciprocalListedBy": ["stella", "gearbox", "curve-stablecoin"],
+      "audits": [], "auditsNote": "Zero audits in DefiLlama record, open verification item",
+      "riskFlags": []
+    },
+    {
+      "name": "Origami Finance", "slug": "origami-finance", "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "chains": ["Ethereum", "Berachain", "Plasma"],
+      "onRobinhoodChain": false, "tvlUsd": 49390000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": 67218878, "governanceToken": null,
+      "llamaSlug": "origami-finance", "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://origami.finance", "docs": "https://docs.origami.finance/", "github": null,
+      "closestIncumbents": ["gearbox", "stella", "extra-finance"],
+      "reciprocalListedBy": ["gearbox", "stella", "extra-finance"],
+      "audits": [], "riskFlags": []
+    },
+    {
+      "name": "DeltaPrime", "slug": "deltaprime", "tag": "Leveraged Yield",
+      "entityType": "protocol",
+      "chains": ["Arbitrum", "Avalanche"],
+      "onRobinhoodChain": false, "tvlUsd": 3560000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": null, "governanceToken": "PRIME",
+      "llamaSlug": "deltaprime", "coingeckoId": "prime-2", "alreadyOnPlatform": false,
+      "website": "https://deltaprime.io", "docs": null, "github": "https://github.com/DeltaPrimeLabs/deltaprime-primeloans",
+      "closestIncumbents": ["gearbox", "stella", "extra-finance"],
+      "reciprocalListedBy": ["gearbox", "stella", "extra-finance"],
+      "audits": [], "riskFlags": []
+    },
+
+    {
+      "name": "TermMax", "slug": "termmax", "tag": "Fixed Income",
+      "entityType": "protocol",
+      "chains": ["Arbitrum", "Base", "Ethereum", "Binance", "Berachain", "X Layer"],
+      "onRobinhoodChain": false, "tvlUsd": 34510000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": 26293799, "governanceToken": "TMX",
+      "llamaSlug": "termmax", "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://ts.finance/termmax/", "docs": "https://docs.ts.finance/", "github": "https://github.com/term-structure",
+      "closestIncumbents": ["notional", "pendle", "spectra"],
+      "reciprocalListedBy": ["notional", "pendle", "spectra"],
+      "audits": [], "riskFlags": []
+    },
+    {
+      "name": "Term Finance", "slug": "term-finance", "tag": "Fixed Income",
+      "entityType": "protocol",
+      "chains": ["Arbitrum", "Ethereum", "Binance", "Avalanche", "Base", "Plasma"],
+      "onRobinhoodChain": false, "tvlUsd": 13670000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": 1663888, "governanceToken": null,
+      "llamaSlug": "termfinance-lend", "llamaSlugSecondary": "termfinance-vaults",
+      "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://term.finance", "docs": "https://docs.term.finance/", "github": null,
+      "closestIncumbents": ["notional", "maple", "pendle"],
+      "reciprocalListedBy": ["notional", "maple", "pendle"],
+      "audits": [], "auditsNote": "Zero audits recorded for termfinance-vaults, open verification item",
+      "riskFlags": []
+    },
+    {
+      "name": "Boros", "slug": "boros", "tag": "Fixed Income",
+      "entityType": "protocol",
+      "parentProtocol": "pendle",
+      "overlapFlag": "Boros is Pendle's own product. Model as a sub-product of pendle or hard-link the two entities. Never show them as rivals in the same cohort without a shared-parent label.",
+      "chains": ["Arbitrum"],
+      "onRobinhoodChain": false, "tvlUsd": 7770420, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": null, "governanceToken": null,
+      "llamaSlug": "boros", "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://boros.pendle.finance/markets", "docs": null, "github": null,
+      "closestIncumbents": ["pendle", "notional", "sense"],
+      "reciprocalListedBy": ["pendle", "notional", "sense"],
+      "audits": [], "auditsNote": "Zero audits in DefiLlama record, open verification item",
+      "riskFlags": []
+    },
+    {
+      "name": "Fira", "slug": "fira", "tag": "Fixed Income",
+      "entityType": "protocol",
+      "chains": ["Ethereum"],
+      "onRobinhoodChain": false, "tvlUsd": 16528618, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": 429656566, "governanceToken": null,
+      "llamaSlug": "fira", "coingeckoId": null, "alreadyOnPlatform": false,
+      "website": "https://www.fira.money/", "docs": "https://docs.fira.money/resources-and-ecosystem/contracts-and-audits", "github": null,
+      "closestIncumbents": ["pendle", "notional", "spectra"],
+      "reciprocalListedBy": ["pendle", "notional", "spectra"],
+      "audits": [], "riskFlags": []
+    },
+    {
+      "name": "Exactly", "slug": "exactly", "tag": "Fixed Income",
+      "entityType": "protocol",
+      "chains": ["Base", "Optimism", "Ethereum"],
+      "onRobinhoodChain": false, "tvlUsd": 4740000, "tvlAsOf": "2026-07-26",
+      "totalBorrowedUsd": 845761, "governanceToken": "EXA",
+      "llamaSlug": "exactly", "coingeckoId": "exa", "alreadyOnPlatform": false,
+      "website": "https://exact.ly", "docs": "https://docs.exact.ly/", "github": "https://github.com/exactly",
+      "closestIncumbents": ["notional", "aave", "pendle"],
+      "reciprocalListedBy": ["notional", "aave", "pendle"],
+      "audits": [], "riskFlags": []
+    }
+  ],
+  "migrationCandidates": [
+    {
+      "slug": "liquity", "name": "Liquity",
+      "currentSector": "Stablecoin", "currentSubSector": "Decentralized CDP",
+      "targetSector": "Credit", "targetTag": "Lending", "targetSubSector": "Decentralized CDP",
+      "chains": ["Ethereum"], "tvlUsd": 77626480, "tvlAsOf": "2026-07-26", "llamaSlug": "liquity-v2",
+      "reciprocalListedBy": ["curve-stablecoin", "sky", "inverse-finance"],
+      "note": "Liquity V2 is user-set-rate borrowing against ETH collateral"
+    },
+    {
+      "slug": "inverse-finance", "name": "Inverse Finance",
+      "currentSector": "Stablecoin", "currentSubSector": "Decentralized CDP",
+      "targetSector": "Credit", "targetTag": "Fixed Income", "targetSubSector": "Fixed-rate lending",
+      "chains": ["Ethereum"], "tvlUsd": 19200895, "tvlAsOf": "2026-07-26", "llamaSlug": "inverse-finance-firm",
+      "reciprocalListedBy": ["notional", "pendle", "liquity"],
+      "note": "FiRM is fixed-rate borrowing via DBR. Protocol's own page reported $47.74m, DefiLlama $19.2m plus $4.93m staking. Reconcile before display."
+    },
+    {
+      "slug": "curve-stablecoin", "name": "Curve stablecoin",
+      "currentSector": "Stablecoin", "currentSubSector": "Decentralized CDP",
+      "targetSector": "Credit", "targetTag": "Lending", "targetSubSector": "Decentralized CDP",
+      "chains": ["Ethereum", "Arbitrum"], "tvlUsd": 66405942, "tvlAsOf": "2026-07-26", "llamaSlug": "crvusd",
+      "reciprocalListedBy": ["liquity", "sky", "morpho"],
+      "note": "crvUSD plus Curve LlamaLend, $62.61m with $41.63m borrowed"
+    },
+    {
+      "slug": "lista-dao", "name": "Lista DAO",
+      "currentSector": "Stablecoin", "currentSubSector": "Decentralized CDP",
+      "targetSector": "Credit", "targetTag": "Lending", "targetSubSector": "Decentralized CDP",
+      "chains": ["Binance", "Ethereum"], "tvlUsd": 609816911, "tvlAsOf": "2026-07-26", "llamaSlug": "lista-lending",
+      "totalBorrowedUsd": 63187780,
+      "reciprocalListedBy": ["venus", "morpho", "sky"],
+      "flag": "99.9% BNB Chain. EVM so it passes the hard constraint, but BNB is not one of the four priority chains and the Ethereum deployment is roughly $728k. Confirm with the user before migrating."
+    }
+  ],
+  "tierB": [
+    { "name": "Tether (lending arm)", "type": "CeFi lender", "competesWithTag": "Lending", "note": "62.25% share of tracked CeFi lending, Q1 2026" },
+    { "name": "Nexo", "type": "CeFi lender", "competesWithTag": "Lending", "note": "7.02% CeFi market share Q1 2026" },
+    { "name": "Coinbase crypto-backed loans", "type": "CeFi lender", "competesWithTag": "Lending", "note": "Loan book grew $90.04m in Q1 2026, distributes Steakhouse-curated Morpho USDC lending to retail" },
+    { "name": "Galaxy Digital lending desk", "type": "CeFi lender", "competesWithTag": "Lending", "note": "Contracted 21% in Q1 2026" },
+    { "name": "Ledn", "type": "CeFi lender, BTC", "competesWithTag": "Lending", "note": "Historically third-largest CeFi lender" },
+    { "name": "CeFi lending market aggregate", "type": "Market benchmark", "competesWithTag": "Lending", "note": "Loan books fell 6% QoQ to $23.3bn in Q1 2026, first contraction since Q3 2024" },
+    { "name": "BlackRock BUIDL", "type": "Tokenised treasury fund", "competesWithTag": "Fixed Income", "note": "$2.61bn as of 26 July 2026" },
+    { "name": "Circle USYC", "type": "Tokenised treasury", "competesWithTag": "Fixed Income", "note": "$3.00bn as of 26 July 2026" },
+    { "name": "Ondo USDY", "type": "Tokenised treasury note", "competesWithTag": "Fixed Income", "note": "$2.16bn as of 26 July 2026" },
+    { "name": "Ondo OUSG", "type": "Tokenised short-term government bond fund", "competesWithTag": "Fixed Income", "note": "$481m as of 26 July 2026" },
+    { "name": "Franklin Templeton BENJI", "type": "Tokenised money market fund", "competesWithTag": "Fixed Income", "note": "$735m as of 26 July 2026, SEC-registered" },
+    { "name": "Tokenised US Treasuries aggregate", "type": "Market benchmark", "competesWithTag": "Fixed Income", "note": "$16.20bn across 85 products as of 26 July 2026" },
+    { "name": "Kamino Finance", "type": "Non-EVM lending protocol, Solana", "competesWithTag": "Lending, Leveraged Yield", "note": "Roughly $3.2bn TVL, the main non-EVM benchmark" },
+    { "name": "Save, MarginFi, Drift", "type": "Non-EVM lending protocols, Solana", "competesWithTag": "Lending", "note": "Drove Solana past $2.1bn of active loans in May 2026" },
+    { "name": "Jupiter Lend and Project 0 Prime", "type": "Non-EVM lending infrastructure, Solana", "competesWithTag": "Lending", "note": "Prime engine covers roughly 98% of Solana lending TVL" }
+  ]
+}

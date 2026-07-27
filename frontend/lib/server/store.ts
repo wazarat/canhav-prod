@@ -666,6 +666,8 @@ export const readLiveStore = cache(async (): Promise<LiveStore> => {
         subSector: taxonomy.subSector,
         tags: taxonomy.tags,
         competitors: item.Competitors ?? [],
+        parentSlug: item.ParentSlug ?? null,
+        auditsNote: item.AuditsNote ?? null,
         lending: item.Lending ?? null,
         creditMetrics: item.CreditMetrics ?? null,
         creditTagMetrics: item.CreditTagMetrics ?? null,

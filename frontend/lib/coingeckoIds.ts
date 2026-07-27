@@ -295,6 +295,23 @@ export const NETWORK_COINGECKO_IDS: Record<string, string | null> = {
   liquity: "liquity",
   "lista-dao": "lista",
   realt: "realtoken-ecosystem-governance",
+  // Credit M8 expansion — new-entity governance tokens. Only 4 of 15 resolve
+  // on CoinGecko (dataset finding); null = no id resolvable, do not guess.
+  dolomite: "dolomite",
+  "yield-basis": "yield-basis",
+  deltaprime: "prime-2",
+  exactly: "exa",
+  "steakhouse-financial": null,
+  "native-credit-pool": null,
+  euler: "euler", // EUL — same id the coin-level `eul` entry below already uses
+  "csigma-finance": null,
+  "t3tris-finance": null,
+  contango: null,
+  "origami-finance": null,
+  termmax: null,
+  "term-finance": null,
+  boros: null,
+  fira: null,
   // Credit sector expansion — Leveraged Yield + Fixed Income gov tokens (verified 2026-06-25).
   gearbox: "gearbox",
   stella: "alpha-finance", // ex-Alpha Homora (ALPHA token)

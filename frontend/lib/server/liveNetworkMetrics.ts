@@ -8,8 +8,8 @@ import { OTHER_SEED } from "@/data/other-seed";
 import { STAKING_SEED } from "@/data/staking-seed";
 import { collectDerivativesMetrics } from "@/lib/server/derivatives";
 import {
+  fetchLlamaCurrentTvlUsd,
   fetchLlamaOpenInterest,
-  fetchLlamaProtocolTvl,
   fetchLlamaTreasury,
   llamaLendingProjectForSlug,
   llamaProtocolForSlug,
@@ -83,14 +83,12 @@ function isCreditNetwork(profile: NetworkProfile): boolean {
  * The cron owns borrow-side writes when a Pro key lands. The TVL-backed
  * supplied value still populates from the free protocol endpoint.
  */
-// The raw /protocol/{slug} payloads are full daily histories (aave-v3 alone is
-// ~38MB) and can never enter the 2MB fetch cache, so the download re-ran on
-// every Credit detail render (~9s of TTFB). Cache the derived latest value.
+// Latest protocol TVL for live renders: the tiny /tvl/{slug} endpoint (a bare
+// number) wrapped in unstable_cache. Never use /protocol/{slug} for this —
+// those payloads are full daily histories (aave-v3 alone ~38MB) that can never
+// enter the 2MB fetch cache, so the download re-ran on every render.
 const fetchLatestProtocolTvlUsd = unstable_cache(
-  async (slug: string): Promise<number | null> => {
-    const tvl = await fetchLlamaProtocolTvl(slug, 1, LIVE_REVALIDATE);
-    return tvl?.points.at(-1)?.value ?? null;
-  },
+  async (slug: string): Promise<number | null> => fetchLlamaCurrentTvlUsd(slug, LIVE_REVALIDATE),
   ["latest-protocol-tvl"],
   { revalidate: LIVE_REVALIDATE },
 );

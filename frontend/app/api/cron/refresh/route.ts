@@ -27,6 +27,7 @@ import {
   fetchLlamaOptionsVolume,
   fetchLlamaPools,
   fetchLlamaProtocolMeta,
+  fetchLlamaCurrentTvlUsd,
   fetchLlamaProtocolTvl,
   fetchLlamaStablecoin,
   fetchLlamaStablecoinCharts,
@@ -1621,8 +1622,7 @@ export async function GET(req: Request): Promise<NextResponse> {
             : [];
       if (tags.length === 0) continue;
 
-      const tvl = await fetchLlamaProtocolTvl(slug, 1);
-      const tvlUsd = tvl && tvl.points.length > 0 ? tvl.points[tvl.points.length - 1].value : null;
+      const tvlUsd = await fetchLlamaCurrentTvlUsd(slug);
       const ctm: Record<string, any> = {
         ...(item.CreditTagMetrics ?? {}),
       };
@@ -1768,8 +1768,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     });
     for (const item of dexItems) {
       const slug = String(item.Slug ?? "");
-      const tvl = await fetchLlamaProtocolTvl(slug, 1);
-      const tvlUsd = tvl && tvl.points.length > 0 ? tvl.points[tvl.points.length - 1].value : null;
+      const tvlUsd = await fetchLlamaCurrentTvlUsd(slug);
       const dexVol = await fetchLlamaDexVolume(slug);
       const volume30dUsd = dexVol?.volume30dUsd ?? null;
 
@@ -1814,8 +1813,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     });
     for (const item of rwaNetworkItems) {
       const slug = String(item.Slug ?? "");
-      const tvl = await fetchLlamaProtocolTvl(slug, 1);
-      const aumUsd = tvl && tvl.points.length > 0 ? tvl.points[tvl.points.length - 1].value : null;
+      const aumUsd = await fetchLlamaCurrentTvlUsd(slug);
       if (aumUsd != null) {
         item.Rwa = { ...(item.Rwa ?? {}), aumUsd: sourced(aumUsd) };
         overlayRwaTagMetrics(item, item.Rwa as import("@/lib/types").RwaMetrics, resolveRwaSubSector(item));

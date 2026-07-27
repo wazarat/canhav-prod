@@ -610,6 +610,32 @@ export async function fetchLlamaProtocolTvl(
   };
 }
 
+/**
+ * Current protocol-wide TVL (USD) via the tiny /tvl/{slug} endpoint (a bare
+ * number, a few bytes). Use whenever only the latest value is needed —
+ * /protocol/{slug} is a full-history download (3-38MB per product) that can
+ * never enter the 2MB fetch cache; downloading it per entity is what pushed
+ * the daily cron past its 800s maxDuration (2026-07-27, two 504s).
+ * Sums multi-product slugs exactly like fetchLlamaProtocolTvl.
+ */
+export async function fetchLlamaCurrentTvlUsd(
+  slug: string,
+  revalidate?: number,
+): Promise<number | null> {
+  const protocols = llamaProtocolsForSlug(slug);
+  if (protocols.length === 0) return null;
+
+  const values = await Promise.all(
+    protocols.map(async (p) => {
+      const data = await getJson(`${PROTOCOLS_BASE}/tvl/${p}`, revalidate);
+      return typeof data === "number" && Number.isFinite(data) ? data : null;
+    }),
+  );
+  const nums = values.filter((v): v is number => v !== null);
+  if (nums.length === 0) return null;
+  return nums.reduce((sum, v) => sum + v, 0);
+}
+
 /** Merge multiple products' TVL series (SUM by date) + chain TVLs (SUM by chain). */
 function combineProtocolTvls(results: LlamaProtocolTvl[]): LlamaProtocolTvl {
   const byDate = new Map<string, number>();

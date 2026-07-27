@@ -72,7 +72,12 @@ async function getJson(url: string, revalidate?: number): Promise<any | null> {
 
   let res = await fetchJson(url, { headers, revalidate });
   if (res.status === 429) {
-    await sleep(8_000); // back off once and retry
+    // Cached live-render reads (revalidate set) sit on the request path where
+    // generateMetadata blocks the first byte — an 8s backoff there put a ~9s
+    // TTFB floor on every entity page whenever the shared rate limit was hot
+    // (429s are never fetch-cached, so it recurred every render). Only the
+    // cron path (no revalidate) can afford the full backoff.
+    await sleep(typeof revalidate === "number" ? 1_000 : 8_000);
     res = await fetchJson(url, { headers, revalidate });
     if (res.status === 429) return null;
   }

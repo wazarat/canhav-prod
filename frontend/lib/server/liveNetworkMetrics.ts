@@ -203,7 +203,7 @@ export async function enrichNetworkWithLiveSectorMetrics(
   if (sectors.includes("Staking") && !hasLiveValue(profile.staking?.totalStakedUsd)) {
     const seed = STAKING_SEED.find((s) => s.slug === profile.slug);
     if (seed?.llamaSlug) {
-      const eth = await fetchMarketData("ethereum");
+      const eth = await fetchMarketData("ethereum", LIVE_REVALIDATE);
       const live = await collectStakingMetrics(seed, eth?.currentPrice ?? null);
       if (Object.keys(live).length > 0) {
         next.staking = mergeMetrics(next.staking, live);

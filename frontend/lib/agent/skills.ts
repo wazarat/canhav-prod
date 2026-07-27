@@ -190,7 +190,7 @@ function buildSections(profile: NetworkProfile): AgentSkillSection[] {
     sections.push({
       heading: "Member coins",
       body: profile.memberCoins
-        .map((c) => `- ${c.name} (${c.symbol}) — ${c.category}${c.role ? `, ${c.role}` : ""}`)
+        .map((c) => `- ${c.name} (${c.symbol}): ${c.category}${c.role ? `, ${c.role}` : ""}`)
         .join("\n"),
     });
   }
@@ -206,7 +206,7 @@ function buildSections(profile: NetworkProfile): AgentSkillSection[] {
     sections.push({
       heading: "TradFi analogue",
       body: profile.tradFiComparison
-        .map((t) => `- ${t.product}: similar — ${t.similarity}; differs — ${t.differences}`)
+        .map((t) => `- ${t.product}: similar in that ${t.similarity}; differs in that ${t.differences}`)
         .join("\n"),
     });
   }
@@ -254,9 +254,9 @@ function buildSources(profile: NetworkProfile): SourceRef[] {
 }
 
 const GLOSSARY: { term: string; definition: string }[] = [
-  { term: "TVL", definition: "Total value locked — assets held or managed by a protocol, in USD." },
-  { term: "APR", definition: "Annual percentage rate — yield before compounding." },
-  { term: "RWA", definition: "Real-world asset — an off-chain asset represented as an on-chain token." },
+  { term: "TVL", definition: "Total value locked: assets held or managed by a protocol, in USD." },
+  { term: "APR", definition: "Annual percentage rate: yield before compounding." },
+  { term: "RWA", definition: "Real-world asset: an off-chain asset represented as an on-chain token." },
   {
     term: "ERC-8004",
     definition: "Trustless-agent identity standard; an agent's portable on-chain identity (ERC-721).",
@@ -376,7 +376,7 @@ export function buildSkillFromStablecoin(profile: StablecoinProfile): PlatformSk
   if (profile.lendingMarket) {
     sections.push({
       heading: "Lending market",
-      body: "This coin is an active Aave V3 reserve — supply/borrow rates are readable live.",
+      body: "This coin is an active Aave V3 reserve; supply/borrow rates are readable live.",
     });
   }
 

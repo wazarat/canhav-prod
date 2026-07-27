@@ -110,7 +110,7 @@ export function AssetRiskDrawer({
                 <div key={s.category}>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-400">
                     {s.category}
-                    <span className="ml-2 font-mono text-[10px] text-ink-500">
+                    <span className="ml-2 font-mono text-[10px] text-ink-300">
                       weighted {s.weighted}
                     </span>
                   </p>
@@ -135,12 +135,12 @@ export function AssetRiskDrawer({
             )}
           </div>
         ) : (
-          <p className="text-xs text-ink-500">
+          <p className="text-xs text-ink-300">
             No typed risk in the dataset attaches to this asset directly; protocol-wide risks
             still apply (listed under the table).
           </p>
         )}
-        <p className="text-[11px] leading-relaxed text-ink-500">
+        <p className="text-[11px] leading-relaxed text-ink-300">
           {CORE_RISK_CATEGORIES.join(" / ")} scores sum severity weights (critical 4, high 3,
           medium 2, low 1) over the risks linked to this asset in the M6/M7 dataset.
         </p>

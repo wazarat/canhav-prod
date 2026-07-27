@@ -109,7 +109,9 @@ export function RisksViews({
             onClick={() => setSeverities((s) => toggle(s, severity))}
             className={cn(
               "rounded-full transition",
-              severities.includes(severity) ? "" : "opacity-55 hover:opacity-100",
+              // 75% keeps the deselected chip visibly dimmed while the badge
+              // text stays above the 4.5:1 AA contrast floor (axe M10 finding).
+              severities.includes(severity) ? "" : "opacity-75 hover:opacity-100",
             )}
           >
             <Badge tone={SEVERITY_TONE[severity]} className="text-[10px] uppercase">

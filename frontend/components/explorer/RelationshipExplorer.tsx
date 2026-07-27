@@ -173,7 +173,9 @@ export function RelationshipExplorer({
                   title={item.title}
                   className={cn(
                     "rounded-full border border-ink-700/60 px-2 py-0.5 text-[11px] text-ink-100 hover:border-ink-500",
-                    item.muted && "opacity-60",
+                    // Muted = dimmer token + fainter border, not opacity: 11px
+                    // text under 75% opacity drops below the 4.5:1 AA floor.
+                    item.muted && "border-ink-800/60 text-ink-300",
                   )}
                 >
                   {item.label}
@@ -184,7 +186,7 @@ export function RelationshipExplorer({
                   title={item.title}
                   className={cn(
                     "rounded-full border border-ink-800/60 px-2 py-0.5 text-[11px] text-ink-300",
-                    item.muted && "opacity-60",
+                    item.muted && "border-dashed",
                   )}
                 >
                   {item.label}

@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 
 import { CATEGORY_COLOR, CATEGORY_COLOR_FALLBACK } from "@/components/shared/riskTone";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { incidentCategory, incidentDateRank } from "@/lib/networks/riskTab";
 import type { IncidentEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -38,16 +39,12 @@ export function IncidentRail({ incidents }: { incidents: IncidentEvent[] }) {
 
   return (
     <section id="incident-history" className="scroll-mt-24 space-y-3">
-      <div className="border-b border-ink-800/60 pb-2">
-        <h2 className="font-display text-lg font-semibold tracking-tight text-ink-50">
-          Incident history
-        </h2>
-        <p className="mt-1 text-sm text-ink-300">
-          {sorted.length} documented incident{sorted.length === 1 ? "" : "s"}
-          {first && last && first !== last ? ` · ${first} — ${last}` : first ? ` · ${first}` : ""}
-          {" · "}how the protocol behaved under stress, with sources.
-        </p>
-      </div>
+      <SectionHeading
+        title="Incident history"
+        subtitle={`${sorted.length} documented incident${sorted.length === 1 ? "" : "s"}${
+          first && last && first !== last ? ` · ${first} to ${last}` : first ? ` · ${first}` : ""
+        } · how the protocol behaved under stress, with sources.`}
+      />
       <div className="overflow-x-auto pb-2">
         <ol className="flex items-start gap-3">
           {sorted.map((incident, i) => {

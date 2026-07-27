@@ -82,13 +82,13 @@ function SeverityBars({
           const title =
             s.count === 0
               ? `${s.category}: no linked risks`
-              : `${s.category} ${s.weighted} — ${s.riskIdx
+              : `${s.category} ${s.weighted}: ${s.riskIdx
                   .map((i) => risks[i].name ?? risks[i].category)
                   .join("; ")}`;
           return (
             <span key={s.category} className="contents">
               <span
-                className="font-mono text-[9px] uppercase leading-none text-ink-500"
+                className="font-mono text-[9px] uppercase leading-none text-ink-300"
                 title={title}
               >
                 {s.category[0]}
@@ -111,7 +111,7 @@ function SeverityBars({
       {row.regulatoryIdx.length > 0 && (
         <span
           className="rounded-full border border-ink-700/70 px-1.5 py-0.5 font-mono text-[9px] uppercase text-ink-400"
-          title="Regulatory risks attach to this asset — kept separate from the four scored categories, never folded in."
+          title="Regulatory risks attach to this asset; kept separate from the four scored categories, never folded in."
         >
           Reg
         </span>
@@ -214,7 +214,7 @@ export function AssetRiskTable({
                       )}
                     </div>
                     {a.chain && model.hasParams && (
-                      <p className="mt-0.5 text-[10px] text-ink-500">{a.chain}</p>
+                      <p className="mt-0.5 text-[10px] text-ink-300">{a.chain}</p>
                     )}
                   </TD>
                   <TD>
@@ -325,9 +325,9 @@ export function AssetRiskTable({
                     {risk.severity}
                   </Badge>
                   <span className="font-medium text-ink-200">{risk.name ?? risk.category}</span>
-                  <span className="text-ink-500">{risk.category}</span>
+                  <span className="text-ink-300">{risk.category}</span>
                   {risk.linkedAssetsUnmatched?.length ? (
-                    <span className="text-[10px] text-ink-500">
+                    <span className="text-[10px] text-ink-300">
                       scope: {risk.linkedAssetsUnmatched.join(", ")}
                     </span>
                   ) : null}
@@ -335,7 +335,7 @@ export function AssetRiskTable({
               );
             })}
           </ul>
-          <p className="mt-2 text-[11px] text-ink-500">
+          <p className="mt-2 text-[11px] text-ink-300">
             Full narratives on the{" "}
             <Link
               href={`/networks/${model.entitySlug}?tab=risks`}
@@ -349,7 +349,7 @@ export function AssetRiskTable({
       )}
 
       {model.riskLinkNote && (
-        <p className="text-[11px] leading-relaxed text-ink-500">{model.riskLinkNote}</p>
+        <p className="text-[11px] leading-relaxed text-ink-300">{model.riskLinkNote}</p>
       )}
 
       <AssetRiskDrawer

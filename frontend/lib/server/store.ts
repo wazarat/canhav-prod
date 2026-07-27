@@ -407,6 +407,25 @@ function hydrateDerivativesTagMetrics(item: Record<string, unknown>): Derivative
   return { [key]: block } as DerivativesTagMetrics;
 }
 
+/**
+ * CoinGecko reports market cap 0 when it has no circulating-supply estimate;
+ * a zero market cap is a data gap, not a datum (M10: centrifuge rendered "$0"
+ * on overview/metrics/skills). Read-time guard so already-synced zeros stop
+ * rendering; the cron ingest applies the same rule going forward.
+ */
+function normalizeUniversalMetrics(raw: unknown): NetworkProfile["universalMetrics"] {
+  const metrics = raw as NetworkProfile["universalMetrics"] | undefined;
+  if (!metrics) return undefined;
+  const mcap = metrics.market?.marketCapUsd;
+  if (mcap && mcap.value === 0) {
+    return {
+      ...metrics,
+      market: { ...metrics.market, marketCapUsd: { ...mcap, value: null } },
+    };
+  }
+  return metrics;
+}
+
 function hydrateOtherTagMetrics(item: Record<string, unknown>): OtherTagMetrics | null {
   const existing = item.OtherTagMetrics as OtherTagMetrics | null | undefined;
   if (existing) return existing;
@@ -737,7 +756,7 @@ export const readLiveStore = cache(async (): Promise<LiveStore> => {
         // DeFi Llama overlays (written by the cron). Options/OI are scaffolded
         // for the coming-soon options/perpetuals categories.
         protocolFeesRevenue: item.ProtocolFeesRevenue ?? undefined,
-        universalMetrics: item.UniversalMetrics ?? undefined,
+        universalMetrics: normalizeUniversalMetrics(item.UniversalMetrics),
         dexVolume: item.DexVolume ?? undefined,
         optionsVolume: item.OptionsVolume ?? undefined,
         openInterest: item.OpenInterest ?? undefined,

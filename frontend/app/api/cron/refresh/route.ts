@@ -478,7 +478,10 @@ async function refreshUniversalMetrics(
         : {}),
   };
 
-  const marketCapUsd = resolution?.marketCapUsd ?? meta?.mcapUsd ?? null;
+  // CoinGecko reports market cap 0 when it has no circulating-supply
+  // estimate; a zero market cap is a data gap, not a datum (M10: centrifuge
+  // rendered "$0" across overview/metrics/skills).
+  const marketCapUsd = (resolution?.marketCapUsd || null) ?? (meta?.mcapUsd || null);
   const volume24hUsd = resolution?.volume24hUsd ?? null;
   const marketCapSource =
     resolution?.marketCapUsd != null ? "CoinGecko" : llamaLive ? "DeFi Llama" : "Unavailable";

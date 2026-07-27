@@ -10,7 +10,10 @@ export function TableShell({ className, ...props }: React.HTMLAttributes<HTMLDiv
         className,
       )}
     >
-      <div className="overflow-x-auto" {...props} />
+      {/* Focusable region: keyboard users must be able to scroll overflowing
+          tables (axe scrollable-region-focusable, M10). Callers may override
+          the label via aria-label in props. */}
+      <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table" {...props} />
     </div>
   );
 }

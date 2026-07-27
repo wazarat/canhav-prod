@@ -64,7 +64,9 @@ export function pegSymbol(pegTarget: string | null | undefined): string {
 
 /** Format a large bare number compactly (1.2B, 340.0M, 12.3K) — no currency. */
 export function formatNumberCompact(value: number | null | undefined): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  // A malformed store value (e.g. a prose string in a numeric field) must
+  // degrade to the placeholder, never crash SSR (M10: compound research 500).
+  if (typeof value !== "number" || Number.isNaN(value)) return "—";
   const abs = Math.abs(value);
   if (abs >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
   if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;

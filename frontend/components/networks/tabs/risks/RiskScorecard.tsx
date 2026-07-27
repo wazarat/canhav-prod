@@ -119,7 +119,7 @@ export function RiskScorecard({
               </Badge>
             </div>
             <p className="mt-1.5 text-[11px] leading-relaxed text-ink-300">
-              No Regulatory risk rows in the dataset — a recorded finding (no fetchable
+              No Regulatory risk rows in the dataset: a recorded finding (no fetchable
               regulatory exposure source), not missing data.
             </p>
           </div>
@@ -133,7 +133,7 @@ export function RiskScorecard({
         </summary>
         <div className="mt-3 space-y-3 rounded-xl border border-ink-800/60 bg-ink-950/40 p-3 text-xs leading-relaxed text-ink-300">
           <p>
-            Every score is recomputed at render time from the typed risks below — nothing is
+            Every score is recomputed at render time from the typed risks below; nothing is
             hand-assigned. Each risk contributes its severity weight (
             <span className="font-mono">critical 4 · high 3 · medium 2 · low 1</span>) to its
             category; the headline number is the sum across all categories. Bars scale to this
@@ -141,7 +141,7 @@ export function RiskScorecard({
             <span className="text-ink-200">
               Scores are not comparable across tags
             </span>{" "}
-            — a permissionless-market protocol concentrates technological risk while an
+            because a permissionless-market protocol concentrates technological risk while an
             institutional-credit protocol concentrates counterparty and regulatory risk, and a
             single league table would misrepresent both.
           </p>

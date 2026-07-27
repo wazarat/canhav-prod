@@ -14,7 +14,7 @@ export function DriverBadge({
 }) {
   return (
     <span
-      title={`${badge.label} appears in ${badge.entityCount} of ${total} Credit entities' risk tables${badge.audit ? " (audit/bounty firm — weaker signal than a shared oracle or issuer)" : ""}`}
+      title={`${badge.label} appears in ${badge.entityCount} of ${total} Credit entities' risk tables${badge.audit ? " (audit/bounty firm; weaker signal than a shared oracle or issuer)" : ""}`}
       className={`inline-flex shrink-0 items-center gap-1 rounded-md border px-1.5 py-0.5 font-mono text-[10px] ${
         badge.audit
           ? "border-ink-700/60 text-ink-300"

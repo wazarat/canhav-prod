@@ -42,6 +42,6 @@ export function deriveSecurityStatus(input: SecurityInputs): SecurityInfo {
   return {
     status: "unverified",
     auditUrl: null,
-    source: "OZ-derived · unverified — agents are gated from interacting on-chain",
+    source: "OZ-derived · unverified; agents are gated from interacting on-chain",
   };
 }

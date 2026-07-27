@@ -65,11 +65,11 @@ export function AssetTableSegment({
                     aria-hidden
                   />
                   {slice.label}
-                  <span className="font-mono text-[10px] text-ink-500">{slice.value}</span>
+                  <span className="font-mono text-[10px] text-ink-300">{slice.value}</span>
                 </li>
               ))}
             </ul>
-            <p className="mt-1.5 text-[11px] text-ink-500">{composition.basis}</p>
+            <p className="mt-1.5 text-[11px] text-ink-300">{composition.basis}</p>
           </div>
         </Card>
       )}

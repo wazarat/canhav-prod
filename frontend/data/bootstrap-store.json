@@ -1552,7 +1552,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:30.430Z",
+      "UpdatedAt": "2026-07-27T09:26:13.936Z",
       "Website": "https://aave.com",
       "TradFiAnalogue": "a secured overnight repo desk at a broker-dealer, financing a standardised haircut book against liquid collateral with mark-to-market margining.",
       "OrgIntro": "Legal entity: Avara (formerly Aave Companies), with Aave Labs as the core development firm and the Aave DAO as the on-chain governing body. 2026 has been dominated by the separation of the DAO's service-provider layer from Aave Labs.",
@@ -2465,7 +2465,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: Bridged assets on Harmony, CRV, GHO on Ethereum, Multichain-served deployments. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -10614,7 +10614,7 @@
         }
       ],
       "Tokenomics": {
-        "maxSupply": "10,000,000 COMP",
+        "maxSupply": 10000000,
         "summary": "COMP governs the protocol; emissions directed by governance to markets and contributors."
       },
       "TradFiComparison": [
@@ -11053,7 +11053,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:02.620Z",
+      "UpdatedAt": "2026-07-27T09:30:43.635Z",
       "Website": "https://compound.finance",
       "TradFiAnalogue": "a single-currency secured lending facility at a clearing bank, where the bank funds one currency against a defined pledge list and the pledged assets sit idle as security.",
       "FundingNote": "No further equity rounds appear in the fetched sources; ByteTree states Compound had carried out two funding rounds since inception as of its 2021 review ([ByteTree](https://www.bytetree.com/research/2021/07/global-credit-markets-benefit-all/)).",
@@ -12055,7 +12055,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: All listed collateral, Assets on Unichain, BAT, DAI, MKR, Ronin comets, USDT comets, YFI, ZRX, cETH, deUSD, n.a, rsETH, sdeUSD. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -19395,7 +19395,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:02.620Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://extrafi.io",
       "TradFiAnalogue": "a non recourse warehouse line against an LP position, the DeFi equivalent of a repo facility funding a structured note.",
       "OrgIntro": "All named contributors are pseudonyms disclosed in the protocol's own FAQ.",
@@ -20418,7 +20418,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: Aerodrome, EXA, EXTRA, FAI listed in Feb 2025, LP pairs in newly listed or low-liquidity pools, Long-tail Base, Optimism, Optimism pair tokens such as VVV, USDT, VELO LP pairs on Aerodrome, Velodrome, Velodrome LP tokens for smaller pairs, WETH lending pools on Base, n.a. (protocol-wide on LYF), n.a. (protocol-wide), veEXTRA. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -22398,7 +22398,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:30.430Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://fluid.io",
       "TradFiAnalogue": "a universal banking balance sheet with an internal market maker, where the same deposit base funds lending and market making rather than sitting in segregated books. A narrower analogy for Smart Debt is a repo funded market making book, where the funding leg itself earns bid ask spread.",
       "FundingNote": "Fluid itself has not raised; the funding history belongs to Instadapp, its builder.",
@@ -23369,7 +23369,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: BTC-denominated assets on Sui testnet, ETH, Ethena assets in the Bitwise market, FLUID, FLUID rewards, GHO, JUP-market collateral, REUSD, SOL, SUSDAI, Smart collateral, USDC, USDT, USDT0, USR, WBTC, WEETH, WSTETH, all vaults), correlated pairs, fGHO, iETHv2, n.a. (protocol-wide, n.a. (protocol-wide), rsETH, smart debt LP positions, stablecoin, weETH, wstETH, wstUSR. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -26036,7 +26036,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:02.620Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://gearbox.fi",
       "TradFiAnalogue": "a prime brokerage margin account funded by a syndicated revolving credit facility. The lender side resembles a senior secured revolver; the borrower side resembs a prime broker margin account where the broker holds the client assets in a segregated account and can liquidate them.",
       "OrgIntro": "Gearbox publishes no CEO or executive team. Named individuals are visible mainly through the multisig signer lists.",
@@ -26968,7 +26968,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: Curve LP, Diesel LP tokens (dUSDC, Ethena sUSDe, LRT collateral generally, LST, LSTs priced at exchange rate, Mellow Finance vault tokens, Pendle PT, Pool underlying assets: USDC, Sky sUSDS, Stablecoins priced at aliased 1.00, all pool assets), equivalents), mBASIS, mRe7YIELD, mTBILL, n.a. (per-market, n.a. (per-market), n.a. (protocol-wide), sUSDS. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -29352,7 +29352,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "DOLA CDP stack plus FiRM fixed-rate borrowing — distinct from Aave-style variable-rate money markets.",
+      "Differentiator": "DOLA CDP stack plus FiRM fixed-rate borrowing; distinct from Aave-style variable-rate money markets.",
       "Discord": null,
       "Events": [],
       "Faq": [
@@ -29485,7 +29485,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/InverseFinance",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://inverse.finance"
     },
     "CATEGORY#Entity|PROTOCOL#jones-dao": {
@@ -32355,7 +32355,7 @@
       "Dex": null,
       "DexSecondaryTags": null,
       "DexSubSector": null,
-      "Differentiator": "Fully immutable, governance-minimized CDP — LUSD V1 has zero ongoing interest; BOLD V2 adds user-set rates and wstETH/rETH collateral.",
+      "Differentiator": "Fully immutable, governance-minimized CDP: LUSD V1 has zero ongoing interest; BOLD V2 adds user-set rates and wstETH/rETH collateral.",
       "Discord": null,
       "Events": [],
       "Faq": [
@@ -32521,7 +32521,7 @@
       "TradFiComparison": [],
       "Twitter": "https://x.com/LiquityProtocol",
       "TypedRisks": null,
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://www.liquity.org"
     },
     "CATEGORY#Entity|PROTOCOL#lista-dao": {
@@ -34930,7 +34930,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:02.620Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://maple.finance",
       "TradFiAnalogue": "a private credit fund with a secured institutional loan book, wrapped in a transferable share (syrupUSDC), plus a money market fund for the Cash Management product.",
       "FundingNote": "Total raised per DefiLlama: $17.7m ([DefiLlama Maple](https://defillama.com/protocol/maple-finance)).",
@@ -35743,7 +35743,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: BTC collateral, BTC collateral posted against syrupUSDC, HYPE (1.05%), Maple cash management pool, USDC, USTB, XRP collateral marks, all Maple pool contracts, syrupUSDC on non Ethereum chains, syrupUSDT loans, weETH (1.06%). These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -37701,7 +37701,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:02.620Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://morpho.org",
       "TradFiAnalogue": "a securitisation platform plus the fund managers who buy its tranches. Morpho Blue is the standardised, immutable issuance rail; MetaMorpho and Vaults V2 curators are the asset managers making the actual credit selection on behalf of end investors.",
       "BullBearCase": {
@@ -38603,7 +38603,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: Aerodrome LP, All market collateral, Any market collateral, PT-USD0++, RLP, USD0++, USDC, USDO, USR, USUAL, User-approved ERC-20 tokens, Vault V1.0 share tokens, Vault share tokens, cUSDO, deUSD, wstUSR, xUSD. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -41071,7 +41071,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:02.620Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://notional.finance",
       "TradFiAnalogue": "the fixed-rate term loan and the zero-coupon discount note, priced off a term structure. fCash is the discount note.",
       "FundingNote": "Total raised per DefiLlama: $10m ([DefiLlama Notional](https://defillama.com/protocol/notional)).",
@@ -41943,7 +41943,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: All V3 markets on mainnet, All collateral currencies, All listed currencies, Arbitrum, Core protocol contracts, ETH lending markets on Ethereum mainnet, Leveraged vault positions, WETH vault shares, WETH vaults on Arbitrum, WETH vaults on mainnet, all vault strategy contracts, fCash, fCash across all listed maturities, mAPOLLO, mHYPER, mHYPER USDC vaults, non ETH reserve assets, other nTokens, vaults. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -44713,7 +44713,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:02.620Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://www.pendle.finance",
       "TradFiAnalogue": "Closest instruments: the zero-coupon bond and the interest rate strip for PT and YT, and the interest rate swap for Boros.",
       "BullBearCase": {
@@ -45500,7 +45500,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: All PT, All PT markets, All PT tokens, All Pendle V2 contracts, All YT, Arbitrum 128.82 million USD, Ethereum 594.57 million USD, Fake market 0x0ab305033592E16dB7D8e77d613F8d172a76ddc9, Hyperliquid L1 21.25 million USD, Monad 49.79 million USD, PENDLE, PNP, PT collateral listings on Aave, PT collateralised Morpho, PT positions, PT-ENA, PT-USD0++, PT-USD0++-27MAR2025, PT-WBTC, PT-sUSDe, PT-sUSDe markets, PT-sUSDe-29MAY2025, PT-sUSDe-29MAY2025 (max lnImpliedRate change 17.09%), PT-weETH, PT-weETH-27JUN2024, Plasma 128.49 million USD, SY contracts, Spark vaults, USD0++, YT, other listed PTs, structurally similar markets. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -47302,7 +47302,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:02.620Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://radiant.capital/",
       "TradFiAnalogue": "a failed non-bank lender in members' voluntary liquidation, where the operating business is closed, the loan book is being run off, and a claims administrator distributes recoveries in tranches.",
       "FundingNote": "No venture funding round is documented in the fetched sources. Radiant's capital came from its RDNT token and protocol revenue rather than an identified equity raise, and the remediation multisig is funded from protocol revenue, DAO treasury, adjusted emissions, reserves, new investments and new partner contributions ([Radiant docs](https://docs.radiant.capital/radiant/remediation/remediation-plan)).",
@@ -48201,7 +48201,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: All Core, Any ERC-20 approved to Radiant contracts, Assets across Arbitrum, Assets lost in the October 2024 exploit, Assets on Arbitrum, BSC, Base, Base deployments, DLP, Ethereum, RDNT, RIZv1 market assets, n.a, rTokens, rizUSDT. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -54384,7 +54384,7 @@
           "sourceUrl": "https://www.streetbrief.co/article/spark-protocol-captures-1-4b-inflow-kelp-dao-exploit-triggers-aave-liquidity-crisis-2604/"
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:02.620Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://spark.fi",
       "TradFiAnalogue": "a wholesale-funded specialist lender inside a banking group, drawing on a parent credit line at concessional cost and deploying it across a mandated asset list, with the parent's board retaining risk-limit authority.",
       "OrgIntro": "Where Spark's mandate ends and Sky's begins. This distinction matters more for Spark than for any other entity in the set, so it is set out explicitly.\n\n- Sky owns the balance sheet. Spark borrows from Sky's stablecoin reserves and is described as the distribution layer within the SKY ecosystem, with SKY as the parent protocol; the Spark treasury acts as junior capital required by SKY to fulfil the risk-required capital needs for accessing the SKY credit line ([Spark docs](https://docs.spark.fi/faq), [Spark Q1 2026 report](https://paragraph.com/@spark-11/spark-q1-2026-financial-report)).\n- Sky Governance sets SparkLend's risk parameters. Per-market supply and borrow caps are configured by Sky Governance, transparent rates change based on Sky Governance, and Sky Governance can reduce borrowing power of any asset to 0% without impacting existing borrowers ([Spark docs](https://docs.spark.fi/products/sparklend)).\n- Sky controls SPK supply and distribution. 65% of the 10 billion genesis supply sits with Sky for a 10-year farming campaign following rules set in the Sky Atlas, and Sky retains the ability to mint additional SPK under extreme circumstances ([Spark docs](https://docs.spark.fi/governance/spk-token)).\n- Spark governs itself through Atlas edits, not independent sovereignty. The Spark governance process centres on updating the Spark Agent artifact in the Sky Atlas, which controls budgets, risk settings, asset onboarding, SLL integrations and new chain deployments; proposals are filed in the Spark Prime section of the Sky forum and voted on Snapshot with SPK ([Spark governance docs](https://docs.spark.fi/governance)).\n- Historically the ownership was even more direct. All products created by Phoenix Labs were to belong to MakerDAO, inheriting Maker's governance system, and Phoenix Labs committed 10% of DAI-market profits to Aave DAO for the first two years as a fork licence ([Binance Square](https://www.binance.com/en/square/post/213372), [CoinDesk](https://www.coindesk.com/markets/2023/02/08/makerdao-contributors-propose-first-native-liquidity-market-focused-on-dai-stablecoin)).",
@@ -55352,7 +55352,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: All SparkLend collateral, PT-sUSDe, SKY, USDe, USTB, all Gnosis market assets, sUSDe, spETH, spUSDG. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -56378,7 +56378,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:02.620Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://www.spectra.finance",
       "TradFiAnalogue": "the zero-coupon bond stripped from a floating rate note, issued through what is effectively a self-service issuance platform.",
       "BullBearCase": {
@@ -57195,7 +57195,7 @@
             "sources": []
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: 110 USD, 539 USD, All Principal Tokens, All Spectra pools, All Spectra pools on Hemi, Avalanche 1.15 million USD, Base 588, ETH held in user wallets that approved the router, Ethereum 966, Flare, Flare 11.23 million USD, Hemi 13.1 million USD, Katana 1.23 million USD, MetaVaults V1, PT, PT-wstUSR, Principal Tokens, Spectra core contracts, USR, YT pools on Curve, YT tokens, app.spectra.finance, other AMMs, other listed ERC-4626 assets, sFLR, scUSD, stS, stXRP, their ERC-4626 underlyings, user wallet approvals, wstUSR. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },
@@ -59780,7 +59780,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T05:45:30.430Z",
+      "UpdatedAt": "2026-07-27T09:26:13.937Z",
       "Website": "https://stellaxyz.io",
       "TradFiAnalogue": "a profit participating margin loan, or a total return swap with no financing leg and a performance fee. The lender is paid only out of realised gains rather than a contractual coupon.",
       "FundingNote": "No venture round has been disclosed since 2020 on any page reviewed in this session.",
@@ -60715,7 +60715,7 @@
             ]
           }
         ],
-        "curatedNote": "Curated list ranked by size and strategic importance — not the exhaustive on-chain asset universe.",
+        "curatedNote": "Curated list ranked by size and strategic importance; not the exhaustive on-chain asset universe.",
         "riskLinkNote": "Risk-linked assets with no row in this entity's asset table: ALPHA, ALPHA (as collateral), All leveraged LP positions, All listed LP strategies, Camelot, DAI, GNS, Penpie eETH, Perpetual, STG, Trader Joe V2, Trader Joe V2 JOE, USDT balances, USDT held via Iron Bank, USDT owed to Iron Bank, Uniswap V3 LPs, Uniswap V3 WETH, frozen ETH, n.a. (protocol-wide), spot pairs supported on Stella Trade, wstETH PT, wstETH PT positions, ysToken lending receipts on USDC.e. These are real dependencies that sit outside the curated top 20, so render them as text in the risk drill down rather than as a clickable asset row.",
         "asOf": "2026-07-26"
       },

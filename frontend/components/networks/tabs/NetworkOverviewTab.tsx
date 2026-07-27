@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { InlineLinkText } from "@/components/shared/InlineLinkText";
+import { stripInlineLinks } from "@/lib/text";
 import { MemberCoinsLauncher } from "@/components/networks/MemberCoinsLauncher";
 import { NetworkOverviewMetricsBlock } from "@/components/networks/NetworkOverviewMetricsBlock";
 import { NetworkPulsePanel } from "@/components/networks/NetworkPulsePanel";
@@ -183,9 +184,9 @@ function AboutCollapse({ text }: { text: string }) {
   return (
     <details className="group/about max-w-prose">
       <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-        <span className="line-clamp-3 group-open/about:hidden">
-          <InlineLinkText text={text} />
-        </span>
+        {/* Plain text in the clamped preview: focusable links inside a summary
+            are a nested-interactive violation; links render in the body. */}
+        <span className="line-clamp-3 group-open/about:hidden">{stripInlineLinks(text)}</span>
         <span className="mt-1 inline-block text-xs text-electric-400 hover:underline">
           <span className="group-open/about:hidden">Read full thesis</span>
           <span className="hidden group-open/about:inline">Collapse</span>

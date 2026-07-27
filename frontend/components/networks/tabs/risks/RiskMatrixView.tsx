@@ -105,7 +105,7 @@ export function RiskMatrixView({
                               key={i}
                               type="button"
                               onClick={() => onSelect(i)}
-                              aria-label={`${risk.name ?? risk.category} — ${risk.category}, ${risk.severity}, likelihood ${likelihood}, impact ${impact}`}
+                              aria-label={`${risk.name ?? risk.category}: ${risk.category}, ${risk.severity}, likelihood ${likelihood}, impact ${impact}`}
                               title={`${risk.name ?? risk.category} (${risk.severity})`}
                               className={cn(
                                 "h-3.5 w-3.5 rounded-full transition hover:scale-125",
@@ -153,7 +153,7 @@ export function RiskMatrixView({
       {model.matrix.unplacedIdx.length > 0 && (
         <details className="group/unplaced text-[11px] text-ink-300">
           <summary className="cursor-pointer list-none hover:text-ink-300 [&::-webkit-details-marker]:hidden">
-            {model.matrix.unplacedIdx.length} risk(s) without a likelihood/impact assessment —
+            {model.matrix.unplacedIdx.length} risk(s) without a likelihood/impact assessment:
             listed, never dropped
           </summary>
           <ul className="mt-1 list-inside list-disc">

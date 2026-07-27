@@ -1,5 +1,7 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
+
 import { DERIVATIVES_SEED } from "@/data/derivatives-seed";
 import { LIQUIDITY_SEED } from "@/data/liquidity-seed";
 import { OTHER_SEED } from "@/data/other-seed";
@@ -81,9 +83,20 @@ function isCreditNetwork(profile: NetworkProfile): boolean {
  * The cron owns borrow-side writes when a Pro key lands. The TVL-backed
  * supplied value still populates from the free protocol endpoint.
  */
+// The raw /protocol/{slug} payloads are full daily histories (aave-v3 alone is
+// ~38MB) and can never enter the 2MB fetch cache, so the download re-ran on
+// every Credit detail render (~9s of TTFB). Cache the derived latest value.
+const fetchLatestProtocolTvlUsd = unstable_cache(
+  async (slug: string): Promise<number | null> => {
+    const tvl = await fetchLlamaProtocolTvl(slug, 1, LIVE_REVALIDATE);
+    return tvl?.points.at(-1)?.value ?? null;
+  },
+  ["latest-protocol-tvl"],
+  { revalidate: LIVE_REVALIDATE },
+);
+
 async function fetchLiveLendingMetrics(slug: string): Promise<Partial<LendingMarketMetrics>> {
-  const tvl = await fetchLlamaProtocolTvl(slug, 1, LIVE_REVALIDATE);
-  const tvlUsd = tvl?.points.at(-1)?.value ?? null;
+  const tvlUsd = await fetchLatestProtocolTvlUsd(slug);
 
   const live: Partial<LendingMarketMetrics> = {};
   if (tvlUsd != null) live.totalSuppliedUsd = sourced(tvlUsd);
@@ -263,8 +276,7 @@ export async function enrichNetworkWithLiveSectorMetrics(
   }
 
   if (sectors.includes("RWA") && !hasLiveValue(profile.rwa?.aumUsd) && llamaProtocolForSlug(profile.slug)) {
-    const tvl = await fetchLlamaProtocolTvl(profile.slug, 1, LIVE_REVALIDATE);
-    const aumUsd = tvl?.points.at(-1)?.value ?? null;
+    const aumUsd = await fetchLatestProtocolTvlUsd(profile.slug);
     if (aumUsd != null) {
       const live: Partial<RwaMetrics> = { aumUsd: sourced(aumUsd) };
       next.rwa = mergeMetrics(next.rwa, live);

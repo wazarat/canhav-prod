@@ -8,6 +8,14 @@
       "schedule": "0 6 * * *"
     },
     {
+      "path": "/api/cron/refresh-universal",
+      "schedule": "30 6 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-tags",
+      "schedule": "45 6 * * *"
+    },
+    {
       "path": "/api/cron/agent-verdicts",
       "schedule": "0 7 * * *"
     }

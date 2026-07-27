@@ -69,14 +69,27 @@ function readItemsFromDisk(): Record<string, unknown>[] {
 /** Invalidate with `revalidateTag(STORE_CACHE_TAG)` after any store write. */
 export const STORE_CACHE_TAG = "canhav-store";
 
-// Cross-request cache of the raw items array. TTL matches the pages'
-// `revalidate = 300`, so freshness is unchanged; force-dynamic routes drop from
-// one HGETALL per request to at most one per 5 minutes. The serialized entry is
-// ~1MB today — Vercel caps unstable_cache entries at 2MB; if the store grows
-// near that, split the entry per Category instead. On overflow Next logs a
-// cache-set failure and serves uncached (degraded, not broken).
-const readItemsShared = unstable_cache(
-  async (): Promise<Record<string, unknown>[]> => {
+// Cross-request cache of the raw items array, split per Category (Entity also
+// sharded) because Vercel caps unstable_cache entries at 2MB and the whole
+// store serializes to ~3.9MB (2026-07: Entity alone is ~3.2MB). A single entry
+// silently failed every cache SET, so every request re-did a full HGETALL +
+// parse. Each part carries STORE_CACHE_TAG, so the existing
+// `revalidateTag(STORE_CACHE_TAG)` write sites keep invalidating everything.
+// The Redis layout is untouched — this is a cache-layer split of one
+// `canhav:store` HGETALL.
+
+// Short in-process memo so N concurrent cache-miss parts share ONE HGETALL.
+// Deliberately short-lived: an in-process memo can't be invalidated by
+// `revalidateTag`, so a longer TTL would let a warm lambda re-fill freshly
+// invalidated entries with pre-edit data. 30s bounds that staleness while
+// still deduping cold bursts.
+const RAW_ITEMS_TTL_MS = 30_000;
+let _rawItems: { at: number; promise: Promise<Record<string, unknown>[]> } | null = null;
+
+function readRawItems(): Promise<Record<string, unknown>[]> {
+  const now = Date.now();
+  if (_rawItems && now - _rawItems.at < RAW_ITEMS_TTL_MS) return _rawItems.promise;
+  const promise = (async () => {
     if (hasUpstash()) {
       const fromRedis = await readAllItemsFromRedis();
       // Upstash creds are often set locally before the hash is seeded. Fall back to
@@ -84,10 +97,71 @@ const readItemsShared = unstable_cache(
       if (fromRedis.length > 0) return fromRedis;
     }
     return readItemsFromDisk();
-  },
-  ["canhav-store-items"],
-  { revalidate: 300, tags: [STORE_CACHE_TAG] },
+  })();
+  _rawItems = { at: now, promise };
+  promise.catch(() => {
+    if (_rawItems?.promise === promise) _rawItems = null;
+  });
+  return promise;
+}
+
+const STORE_CATEGORIES = [
+  "Entity",
+  "Network",
+  "Stablecoin",
+  "Token",
+  "Receipt",
+  "RWA",
+  "SectorAggregate",
+] as const;
+// Shard counts sized from live measurements (Entity ~3.2MB serialized); every
+// other category fits in one sub-2MB entry. Bump a count if a category's
+// serialized size approaches ~1.8MB — cache keys change, old entries just expire.
+const CATEGORY_SHARDS: Record<string, number> = { Entity: 4 };
+const KNOWN_CATEGORY_SET = new Set<string>(STORE_CATEGORIES);
+
+function itemShardIndex(item: Record<string, unknown>, shards: number): number {
+  if (shards <= 1) return 0;
+  const key = String(item.Slug ?? item.Name ?? "");
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) | 0;
+  return Math.abs(h) % shards;
+}
+
+const storePartReaders: (() => Promise<Record<string, unknown>[]>)[] = [];
+for (const category of STORE_CATEGORIES) {
+  const shards = CATEGORY_SHARDS[category] ?? 1;
+  for (let shard = 0; shard < shards; shard++) {
+    storePartReaders.push(
+      unstable_cache(
+        async (): Promise<Record<string, unknown>[]> =>
+          (await readRawItems()).filter(
+            (it) =>
+              String(it.Category ?? "") === category &&
+              itemShardIndex(it, shards) === shard,
+          ),
+        ["canhav-store-items", category, String(shard)],
+        { revalidate: 300, tags: [STORE_CACHE_TAG] },
+      ),
+    );
+  }
+}
+// Catch-all so an item with an unlisted Category can never silently drop.
+storePartReaders.push(
+  unstable_cache(
+    async (): Promise<Record<string, unknown>[]> =>
+      (await readRawItems()).filter(
+        (it) => !KNOWN_CATEGORY_SET.has(String(it.Category ?? "")),
+      ),
+    ["canhav-store-items", "misc"],
+    { revalidate: 300, tags: [STORE_CACHE_TAG] },
+  ),
 );
+
+async function readItemsShared(): Promise<Record<string, unknown>[]> {
+  const parts = await Promise.all(storePartReaders.map((read) => read()));
+  return parts.flat();
+}
 
 // react `cache()`: one store read per render pass, no matter how many
 // accessors (homepage fires six) ask for it.
@@ -426,6 +500,17 @@ function normalizeUniversalMetrics(raw: unknown): NetworkProfile["universalMetri
   return metrics;
 }
 
+/**
+ * Same zero-mcap rule for the legacy CurrentScale block: pre-M10 cron runs
+ * wrote CoinGecko's 0 straight into CurrentScale.marketCapUsd, and the
+ * headline resolver falls back to currentScale when universalMetrics is null,
+ * resurrecting the "$0" that normalizeUniversalMetrics just removed.
+ */
+function normalizeCurrentScale<T extends { marketCapUsd?: unknown }>(scale: T): T {
+  if (scale.marketCapUsd === 0) return { ...scale, marketCapUsd: null };
+  return scale;
+}
+
 function hydrateOtherTagMetrics(item: Record<string, unknown>): OtherTagMetrics | null {
   const existing = item.OtherTagMetrics as OtherTagMetrics | null | undefined;
   if (existing) return existing;
@@ -730,7 +815,7 @@ export const readLiveStore = cache(async (): Promise<LiveStore> => {
         otherSecondaryTags: item.OtherSecondaryTags ?? undefined,
         other: item.Other ?? null,
         childEntities: item.ChildEntities ?? undefined,
-        currentScale: {
+        currentScale: normalizeCurrentScale({
           tvlUsd: null,
           users: null,
           aprPct: null,
@@ -740,7 +825,7 @@ export const readLiveStore = cache(async (): Promise<LiveStore> => {
           loanPipelineUsd: null,
           partnerships: null,
           ...((item.CurrentScale as Record<string, unknown> | undefined) ?? {}),
-        },
+        }),
         memberCoins: item.MemberCoins ?? [],
         arbitrumPortalMetadata: item.ArbitrumPortalMetadata ?? {
           portalUrl: null,

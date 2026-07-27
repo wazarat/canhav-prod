@@ -220,8 +220,18 @@ export async function getApprovedNetworks(): Promise<NetworkProfile[]> {
 const loadNetworkWithSectorMetrics = cache(
   async (slug: string): Promise<NetworkProfile | null> => {
     const networks = await loadEnrichedNetworks();
-    const profile = networks.find((p) => p.slug === slug) ?? null;
+    let profile = networks.find((p) => p.slug === slug) ?? null;
     if (!profile) return null;
+    // Per-slug DeFi Llama mcap backfill — the list-wide fan-out was removed from
+    // enrichNetworksWithMarketMetrics, so a detail render pays at most ONE
+    // /protocol/* fetch, and only while the cron universal pass hasn't filled
+    // the store yet.
+    if (networkHeadlineMarketCapUsd(profile) == null && llamaProtocolForSlug(slug)) {
+      const meta = await fetchLlamaProtocolMeta(slug, 300);
+      if (meta?.mcapUsd != null) {
+        profile = patchNetworkMarketScale(profile, { marketCapUsd: meta.mcapUsd });
+      }
+    }
     return enrichNetworkWithLiveSectorMetrics(profile);
   },
 );

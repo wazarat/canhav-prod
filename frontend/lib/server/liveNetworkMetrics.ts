@@ -6,7 +6,6 @@ import { OTHER_SEED } from "@/data/other-seed";
 import { STAKING_SEED } from "@/data/staking-seed";
 import { collectDerivativesMetrics } from "@/lib/server/derivatives";
 import {
-  aggregateLendingBorrow,
   fetchLlamaOpenInterest,
   fetchLlamaProtocolTvl,
   fetchLlamaTreasury,
@@ -83,25 +82,11 @@ function isCreditNetwork(profile: NetworkProfile): boolean {
  * supplied value still populates from the free protocol endpoint.
  */
 async function fetchLiveLendingMetrics(slug: string): Promise<Partial<LendingMarketMetrics>> {
-  const borrow: ReturnType<typeof aggregateLendingBorrow> = null;
   const tvl = await fetchLlamaProtocolTvl(slug, 1, LIVE_REVALIDATE);
   const tvlUsd = tvl?.points.at(-1)?.value ?? null;
 
-  const supplyApy = borrow?.supplyApyPct ?? null;
-  const borrowApy = borrow?.borrowApyPct ?? null;
-  const nim = supplyApy != null && borrowApy != null ? borrowApy - supplyApy : null;
-
   const live: Partial<LendingMarketMetrics> = {};
   if (tvlUsd != null) live.totalSuppliedUsd = sourced(tvlUsd);
-  if (borrow?.totalBorrowUsd != null) live.totalBorrowsUsd = sourced(borrow.totalBorrowUsd);
-  if (borrow?.utilizationPct != null) live.utilizationPct = sourced(borrow.utilizationPct);
-  if (tvlUsd != null && borrow?.totalBorrowUsd != null) {
-    live.availableLiquidityUsd = sourced(Math.max(0, tvlUsd - borrow.totalBorrowUsd), "Derived");
-    live.availableLiquidityUsd.dataSource = "derived";
-  }
-  if (supplyApy != null) live.supplyApyPct = sourced(supplyApy);
-  if (borrowApy != null) live.borrowApyPct = sourced(borrowApy);
-  if (nim != null) live.netInterestMarginPct = sourced(nim);
   return live;
 }
 

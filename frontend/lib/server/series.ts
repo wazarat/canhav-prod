@@ -1,5 +1,7 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
+
 import { fetchTotalValueLocked } from "@/lib/server/alchemy";
 import { coinIdForSlug, fetchMarketChart } from "@/lib/server/coingecko";
 import {
@@ -148,13 +150,36 @@ export async function resolveTvlSeries(profile: RwaProfile): Promise<TvlSeries> 
   return { points: stored, source: null };
 }
 
-/** Protocol TVL time series for a network slug (DeFi Llama). */
+/**
+ * Protocol TVL time series for a network slug (DeFi Llama).
+ *
+ * The DERIVED series (a handful of points) is cached in `unstable_cache`
+ * because the underlying /protocol/{slug} payloads are full daily histories
+ * (3-38MB) that exceed Vercel's 2MB fetch-cache entry cap — their fetch cache
+ * SETs always fail, so without this layer every render re-downloaded them
+ * (~40 slugs on the /networks Credit list alone).
+ */
+const resolveNetworkTvlSeriesCached = unstable_cache(
+  async (slug: string, days: number): Promise<TvlSeries> => {
+    const llama = await fetchLlamaProtocolTvl(slug, days, LIVE_REVALIDATE);
+    if (llama && llama.points.length >= 2) {
+      return { points: llama.points, source: "defillama" };
+    }
+    // Throw so a transient upstream failure is NOT cached for the whole
+    // revalidate window (unstable_cache does not cache rejections); the
+    // wrapper below converts it back to an empty series.
+    throw new Error("empty-tvl-series");
+  },
+  ["network-tvl-series"],
+  { revalidate: LIVE_REVALIDATE },
+);
+
 export async function resolveNetworkTvlSeries(slug: string, days: number = DAYS): Promise<TvlSeries> {
-  const llama = await fetchLlamaProtocolTvl(slug, days, LIVE_REVALIDATE);
-  if (llama && llama.points.length >= 2) {
-    return { points: llama.points, source: "defillama" };
+  try {
+    return await resolveNetworkTvlSeriesCached(slug, days);
+  } catch {
+    return { points: [], source: null };
   }
-  return { points: [], source: null };
 }
 
 /* -------------------------------------------------------------------------- */

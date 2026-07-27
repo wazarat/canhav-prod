@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
+import { buildStarterPrompts } from "@/lib/agent/starterPrompts";
 import { cn } from "@/lib/utils";
 import { AgentActivityFeed, type ActivityStep } from "./AgentActivityFeed";
 import { AgentMessageContent } from "./AgentMessageContent";
@@ -52,17 +53,12 @@ function extractSteps(messages: UIMessage[]): ActivityStep[] {
   return steps;
 }
 
-const SUGGESTIONS = [
-  "What stablecoins does CanHav track?",
-  "Summarize the Jupiter entity and its member coins.",
-  "How is JLP's yield generated?",
-];
-
 export function AgentChat({
   agentId,
   llmConfigured,
   conversationId: conversationIdProp = null,
   initialMessages = [],
+  suggestions,
   onConversationChange,
   onMessageComplete,
 }: {
@@ -70,9 +66,12 @@ export function AgentChat({
   llmConfigured: boolean;
   conversationId?: string | null;
   initialMessages?: UIMessage[];
+  /** Starter prompts for the empty state; defaults to the generic research set. */
+  suggestions?: string[];
   onConversationChange?: (id: string) => void;
   onMessageComplete?: () => void;
 }) {
+  const starterPrompts = suggestions?.length ? suggestions : buildStarterPrompts();
   const conversationIdRef = useRef<string | null>(conversationIdProp);
   conversationIdRef.current = conversationIdProp;
 
@@ -210,7 +209,7 @@ export function AgentChat({
                 Ask about anything CanHav tracks. Chats are saved to your account.
               </p>
               <div className="flex flex-wrap gap-2">
-                {SUGGESTIONS.map((s) => (
+                {starterPrompts.map((s) => (
                   <button
                     key={s}
                     type="button"

@@ -1589,7 +1589,8 @@ export async function GET(req: Request): Promise<NextResponse> {
   // lands), Leveraged Yield (TVL), Fixed Income (TVL). Since M4.1 (CAN-70) this
   // is the ONLY lending metrics writer; the legacy `Lending` numeric overlay is
   // retired and `Lending` keeps editorial fields only. Tags resolve through the
-  // canonical-lender fallback so canonical entities with empty KV Tags cannot
+  // canonical-lender fallback PLUS the Llama lending-project map, so Credit
+  // entities with empty KV Tags (justlend/kamino/venus pre-CAN-48) cannot
   // silently skip (the pre-M4 aave gap). Curated fields are preserved; the
   // Morpho/Kamino chain-native overlays below spread richer data on top.
   const creditItems = items.filter(
@@ -1614,7 +1615,8 @@ export async function GET(req: Request): Promise<NextResponse> {
       const tags =
         rawTags.length > 0
           ? rawTags
-          : CANONICAL_LENDING_SLUGS.includes(slug as (typeof CANONICAL_LENDING_SLUGS)[number])
+          : CANONICAL_LENDING_SLUGS.includes(slug as (typeof CANONICAL_LENDING_SLUGS)[number]) ||
+              llamaLendingProjectForSlug(slug) != null
             ? ["Lending"]
             : [];
       if (tags.length === 0) continue;

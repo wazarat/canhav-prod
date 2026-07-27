@@ -6,6 +6,7 @@ import { ArrowUpRight, Bot, Loader2, MessageCircle, X } from "lucide-react";
 import type { UIMessage } from "ai";
 
 import { Badge } from "@/components/ui/Badge";
+import { buildStarterPrompts } from "@/lib/agent/starterPrompts";
 import { cn } from "@/lib/utils";
 import { AgentChat } from "./AgentChat";
 import {
@@ -19,6 +20,7 @@ interface ForEntityResponse {
   agentId?: string | null;
   onChain?: boolean;
   agentName?: string | null;
+  entityTags?: string[];
 }
 
 interface MeResponse {
@@ -88,6 +90,7 @@ export function FloatingResearchChat({
   const [onChain, setOnChain] = useState(cached?.onChain ?? false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [initialMessages, setInitialMessages] = useState<UIMessage[]>([]);
+  const [entityTags, setEntityTags] = useState<string[]>([]);
   const chatKeyRef = useRef(0);
   const prevAgentIdRef = useRef<string | null>(cached?.agentId ?? null);
   const conversationForRef = useRef<string | null>(null);
@@ -139,6 +142,7 @@ export function FloatingResearchChat({
           const res = await fetch(`/api/agent/for-entity?slug=${encodeURIComponent(entitySlug)}`);
           if (res.ok) {
             const data = (await res.json()) as ForEntityResponse;
+            if (active) setEntityTags(data.entityTags ?? []);
             if (!data.authenticated) {
               if (active) {
                 setPhase("hidden");
@@ -153,6 +157,8 @@ export function FloatingResearchChat({
             }
           }
         }
+
+        if (!entitySlug && active) setEntityTags([]);
 
         if (!resolvedId) {
           const res = await fetch("/api/agent/me");
@@ -309,6 +315,11 @@ export function FloatingResearchChat({
                 llmConfigured={llmConfigured}
                 conversationId={conversationId}
                 initialMessages={initialMessages}
+                suggestions={
+                  entitySlug && entityName
+                    ? buildStarterPrompts({ entityName, tags: entityTags })
+                    : undefined
+                }
                 onConversationChange={(id) => setConversationId(id)}
               />
             )}

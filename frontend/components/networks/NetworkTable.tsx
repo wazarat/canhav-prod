@@ -94,9 +94,10 @@ export function NetworkTable({
             <TH className="text-right">TVL</TH>
             {creditColumns && (
               <>
+                {/* Borrowed/Util columns hidden while yields.llama.fi/poolsBorrow
+                    is behind the DeFi Llama paid plan (HTTP 402 since 2026-07).
+                    The creditTagMetrics pipeline still carries the fields. */}
                 <TH className="text-right">Supplied</TH>
-                <TH className="text-right">Borrowed</TH>
-                <TH className="text-right">Util</TH>
                 <TH className="text-right">TVL 7d</TH>
               </>
             )}
@@ -180,16 +181,6 @@ export function NetworkTable({
                       {formatUsdCompact(
                         p.creditTagMetrics?.lending?.totalSuppliedUsd?.value ?? null,
                       )}
-                    </TD>
-                    <TD className="text-right font-mono text-ink-200">
-                      {formatUsdCompact(
-                        p.creditTagMetrics?.lending?.totalBorrowsUsd?.value ?? null,
-                      )}
-                    </TD>
-                    <TD className="text-right font-mono text-ink-200">
-                      {p.creditTagMetrics?.lending?.utilizationPct?.value != null
-                        ? `${p.creditTagMetrics.lending.utilizationPct.value.toFixed(1)}%`
-                        : "—"}
                     </TD>
                     <TD className="text-right">
                       <TrendCell slug={p.slug} series={creditSparklines?.[p.slug]} />

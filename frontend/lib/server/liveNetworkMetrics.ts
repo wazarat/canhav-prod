@@ -7,7 +7,6 @@ import { STAKING_SEED } from "@/data/staking-seed";
 import { collectDerivativesMetrics } from "@/lib/server/derivatives";
 import {
   aggregateLendingBorrow,
-  fetchLlamaBorrowPools,
   fetchLlamaOpenInterest,
   fetchLlamaProtocolTvl,
   fetchLlamaTreasury,
@@ -77,13 +76,14 @@ function isCreditNetwork(profile: NetworkProfile): boolean {
 /**
  * Live lending metrics shaped for `creditTagMetrics.lending` — the single
  * lending representation since M4.1 (CAN-70). The legacy `profile.lending`
- * block is editorial-only and no longer written here. The /poolsBorrow call
- * fails soft (HTTP 402 since 2026-07); the TVL-backed supplied value still
- * populates from the free protocol endpoint.
+ * block is editorial-only and no longer written here. Borrow-side data is
+ * skipped entirely: yields.llama.fi/poolsBorrow is behind the paid plan
+ * (HTTP 402 since 2026-07), so calling it per render only burned a round trip.
+ * The cron owns borrow-side writes when a Pro key lands. The TVL-backed
+ * supplied value still populates from the free protocol endpoint.
  */
 async function fetchLiveLendingMetrics(slug: string): Promise<Partial<LendingMarketMetrics>> {
-  const borrowPools = await fetchLlamaBorrowPools(LIVE_REVALIDATE);
-  const borrow = aggregateLendingBorrow(slug, borrowPools);
+  const borrow: ReturnType<typeof aggregateLendingBorrow> = null;
   const tvl = await fetchLlamaProtocolTvl(slug, 1, LIVE_REVALIDATE);
   const tvlUsd = tvl?.points.at(-1)?.value ?? null;
 

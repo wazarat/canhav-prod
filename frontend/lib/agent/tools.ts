@@ -37,11 +37,13 @@ import { execTradePropose } from "@/lib/agent/trade/propose";
 import { searchKnowledge } from "@/lib/agent/knowledge";
 import { resolveEntityBinding, type AgentScope } from "@/lib/agent/entity-binding";
 import { getAgentSkillById } from "@/lib/agent/skills";
+import { filterTagsForSector, matchesSectorFilter } from "@/lib/networkTaxonomy";
+import { networkHeadlineTvlUsd } from "@/lib/networks/marketHeadlines";
 import { fetchReserveRatesForSlug } from "@/lib/server/aave";
 import { fetchRecentTransfers, fetchTokenMetadata, fetchTotalSupply } from "@/lib/server/alchemy";
 import { ensureVerdictTable, hasDuneWrite, insertVerdict } from "@/lib/server/dune";
 import { resolvePegSeries, resolveTvlSeries } from "@/lib/server/series";
-import type { LendingMarket, OffchainFact } from "@/lib/types";
+import type { LendingMarket, NetworkProfile, OffchainFact, Sourced } from "@/lib/types";
 
 /**
  * Compact off-chain facts for agent consumption: drop the nested source object
@@ -57,6 +59,16 @@ function compactFacts(facts: OffchainFact[] | undefined) {
     sourceUrl: f.source?.url ?? null,
     theoretical: f.theoretical ?? false,
   }));
+}
+
+/**
+ * Compact a `Sourced<number|null>` metric to `{ value, source, asOf }` so every
+ * number the agent quotes carries its provenance. Null/absent metrics compact
+ * to null (never a fake zero).
+ */
+function sourcedNum(s: Sourced<number | null> | null | undefined) {
+  if (!s || s.value == null) return null;
+  return { value: s.value, source: s.sourceLabel ?? s.dataSource, asOf: s.updatedAt ?? null };
 }
 
 /** Compact Aave V3 lending rates for agent consumption (null when not a reserve). */
@@ -96,6 +108,47 @@ const schemas = {
   research_getHistory: z.object({
     slug: z.string(),
     metric: z.enum(["peg", "tvl"]),
+  }),
+  research_compare: z.object({
+    sector: z
+      .string()
+      .describe('Sector to screen, e.g. "Credit", "Staking", "Derivatives", "RWA".'),
+    tag: z
+      .string()
+      .optional()
+      .describe(
+        'Optional tag filter within the sector, e.g. "Lending", "Leveraged Yield", "Fixed Income".',
+      ),
+    limit: z.number().int().min(1).max(25).optional().describe("Max rows (default 15)."),
+  }),
+  research_getRisks: z.object({
+    slug: z.string().describe("Network entity slug, e.g. 'aave'."),
+  }),
+  research_getPartnerships: z.object({
+    slug: z.string().describe("Network entity slug, e.g. 'aave'."),
+    limit: z.number().int().min(1).max(50).optional().describe("Max rows (default 20)."),
+  }),
+  research_getCompetitors: z.object({
+    slug: z.string().describe("Network entity slug, e.g. 'aave'."),
+  }),
+  research_getAssetCoverage: z.object({
+    slug: z.string().describe("Network entity slug, e.g. 'aave'."),
+    asset: z
+      .string()
+      .optional()
+      .describe("Optional asset name/symbol filter, e.g. 'USDC' (substring match)."),
+    limit: z.number().int().min(1).max(40).optional().describe("Max asset rows (default 20)."),
+  }),
+  research_whatChanged: z.object({
+    slug: z.string().describe("Stablecoin slug (peg) or RWA slug (tvl)."),
+    metric: z.enum(["peg", "tvl"]),
+    days: z
+      .number()
+      .int()
+      .min(1)
+      .max(90)
+      .optional()
+      .describe("Lookback window in days (default 7)."),
   }),
   chain_readLive: z.object({
     address: z.string().describe("Token contract address (Arbitrum)."),
@@ -197,6 +250,15 @@ async function execGetEntity(a: Args<"research_getEntity">) {
     tagline: p.tagline,
     description: p.description,
     differentiator: p.differentiator,
+    // Taxonomy so the agent can tell Lending from Fixed Income and route
+    // follow-ups (research_compare / research_getRisks / ...) correctly.
+    sector: p.sector ?? null,
+    secondarySectors: p.secondarySectors ?? [],
+    tags: p.tags ?? (p.subSector ? [p.subSector] : []),
+    riskCount: p.typedRisks?.length ?? p.risks?.length ?? 0,
+    partnershipCount: p.partnerships?.length ?? 0,
+    hasAssetCoverage: Boolean(p.assetCoverage),
+    hasCompetitors: (p.competitors?.length ?? 0) > 0,
     chains: p.arbitrumPortalMetadata.chains,
     memberCoins: p.memberCoins.map((c) => ({
       slug: c.slug,
@@ -364,6 +426,293 @@ async function execHistory(a: Args<"research_getHistory">) {
     summary: points.length
       ? `Pulled ${points.length} ${a.metric} points for ${a.slug} (source: ${source}).`
       : `No ${a.metric} history available for ${a.slug} from any source (Dune/DeFi Llama/CoinGecko).`,
+  };
+}
+
+/** Compact headline metrics for one comparison row, keyed by the entity's credit tags. */
+function creditHighlights(p: NetworkProfile) {
+  const m = p.creditTagMetrics;
+  if (!m) return null;
+  const out: Record<string, unknown> = {};
+  if (m.lending) {
+    out.lending = {
+      totalSuppliedUsd: sourcedNum(m.lending.totalSuppliedUsd),
+      totalBorrowsUsd: sourcedNum(m.lending.totalBorrowsUsd),
+      supplyApyPct: sourcedNum(m.lending.supplyApyPct),
+      borrowApyPct: sourcedNum(m.lending.borrowApyPct),
+      utilizationPct: sourcedNum(m.lending.utilizationPct),
+      maxLtvPct: sourcedNum(m.lending.maxLtvPct),
+      badDebtUsd: sourcedNum(m.lending.badDebtUsd),
+    };
+  }
+  if (m.leveragedYield) {
+    out.leveragedYield = {
+      tvlUsd: sourcedNum(m.leveragedYield.tvlUsd),
+      maxLeverageX: m.leveragedYield.maxLeverageX ?? null,
+      borrowApyPct: sourcedNum(m.leveragedYield.borrowApyPct),
+      loopingApyNetPct: sourcedNum(m.leveragedYield.loopingApyNetPct),
+    };
+  }
+  if (m.fixedIncome) {
+    out.fixedIncome = {
+      tvlUsd: sourcedNum(m.fixedIncome.tvlUsd),
+      fixedApyPct: sourcedNum(m.fixedIncome.fixedApyPct),
+      underlyingApyPct: sourcedNum(m.fixedIncome.underlyingApyPct),
+    };
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+async function execCompare(a: Args<"research_compare">) {
+  const networks = await getApprovedNetworks();
+  let members = networks.filter((p) => matchesSectorFilter(p, a.sector));
+  if (a.tag) {
+    const wanted = a.tag.toLowerCase();
+    members = members.filter((p) =>
+      filterTagsForSector(p, a.sector).some((t) => t.toLowerCase() === wanted),
+    );
+  }
+  if (!members.length) {
+    const sectors = [...new Set(networks.map((p) => p.sector).filter(Boolean))].sort();
+    return {
+      found: false,
+      rows: [],
+      summary: `No entities matched sector "${a.sector}"${a.tag ? ` + tag "${a.tag}"` : ""}. Sectors in the dataset: ${sectors.join(", ")}.`,
+    };
+  }
+  const limit = a.limit ?? 15;
+  const rows = members
+    .map((p) => {
+      const typedRisks = p.typedRisks ?? [];
+      return {
+        slug: p.slug,
+        name: p.name,
+        tags: filterTagsForSector(p, a.sector),
+        tvlUsd: networkHeadlineTvlUsd(p),
+        creditMetrics: creditHighlights(p),
+        riskCount: typedRisks.length || (p.risks?.length ?? 0),
+        highSeverityRiskCount: typedRisks.filter(
+          (r) => r.severity === "high" || r.severity === "critical",
+        ).length,
+        partnershipCount: p.partnerships?.length ?? 0,
+        flaggedAssetCount: p.assetCoverage?.flaggedAssets?.length ?? 0,
+      };
+    })
+    .sort((x, y) => (y.tvlUsd ?? 0) - (x.tvlUsd ?? 0))
+    .slice(0, limit);
+  return {
+    found: true,
+    sector: a.sector,
+    tag: a.tag ?? null,
+    totalMatched: members.length,
+    returned: rows.length,
+    rows,
+    source: "CanHav dataset (DeFi Llama TVL + curated tag metrics)",
+    summary: `Compared ${rows.length} of ${members.length} ${a.sector}${a.tag ? ` / ${a.tag}` : ""} entities, ranked by TVL. Drill into risks/assets per slug before recommending.`,
+  };
+}
+
+async function execGetRisks(a: Args<"research_getRisks">) {
+  const p = await getApprovedNetworkBySlug(a.slug);
+  if (!p) return { found: false, summary: `No CanHav network for "${a.slug}".` };
+  const typed = (p.typedRisks ?? []).slice(0, 16).map((r) => ({
+    name: r.name ?? null,
+    category: r.category,
+    severity: r.severity,
+    likelihood: r.likelihood ?? null,
+    impact: r.impact ?? null,
+    description: r.description,
+    mitigation: r.mitigation ?? null,
+    monitoringSignal: r.monitoringSignal ?? null,
+    linkedAssets: r.linkedAssets ?? [],
+    asOf: r.asOf ?? null,
+    source: r.sourceLabel ?? null,
+    sourceUrl: r.sourceUrl ?? null,
+  }));
+  // Legacy prose risks only matter when the typed dataset is absent.
+  const legacy = typed.length
+    ? []
+    : (p.risks ?? []).slice(0, 10).map((r) => ({ category: r.category, description: r.description }));
+  return {
+    found: true,
+    slug: p.slug,
+    name: p.name,
+    typedRisks: typed,
+    legacyRisks: legacy,
+    riskPosture: p.riskPosture ?? null,
+    incidents: (p.incidents ?? []).slice(0, 8).map((i) => ({
+      date: i.date,
+      title: i.title,
+      severity: i.severity ?? null,
+      eventType: i.eventType ?? null,
+      amountUsd: i.amountUsd ?? null,
+      outcome: i.outcome ?? null,
+    })),
+    auditsNote: p.auditsNote ?? null,
+    summary: typed.length
+      ? `Read ${typed.length} typed risk(s) for ${p.name} (${typed.filter((r) => r.severity === "high" || r.severity === "critical").length} high/critical).`
+      : `Read ${legacy.length} legacy risk note(s) for ${p.name} (no typed risk dataset).`,
+  };
+}
+
+async function execGetPartnerships(a: Args<"research_getPartnerships">) {
+  const p = await getApprovedNetworkBySlug(a.slug);
+  if (!p) return { found: false, summary: `No CanHav network for "${a.slug}".` };
+  const all = p.partnerships ?? [];
+  const limit = a.limit ?? 20;
+  const rows = all.slice(0, limit).map((x) => ({
+    name: x.name,
+    date: x.date,
+    amountLabel: x.amountLabel,
+    description: x.description,
+    // Slug set when the partner is also tracked on-platform (follow-up read).
+    slug: x.slug ?? null,
+  }));
+  return {
+    found: true,
+    slug: p.slug,
+    name: p.name,
+    totalCount: all.length,
+    returned: rows.length,
+    partnerships: rows,
+    source: "CanHav curated partnership dataset",
+    summary: `Read ${rows.length} of ${all.length} partnership(s) for ${p.name}.`,
+  };
+}
+
+async function execGetCompetitors(a: Args<"research_getCompetitors">) {
+  const p = await getApprovedNetworkBySlug(a.slug);
+  if (!p) return { found: false, summary: `No CanHav network for "${a.slug}".` };
+  const rows = (p.competitors ?? [])
+    .slice()
+    .sort((x, y) => x.rank - y.rank)
+    .slice(0, 10)
+    .map((c) => ({
+      rank: c.rank,
+      name: c.name,
+      slug: c.slug ?? null,
+      positioning: c.positioning,
+      similarities: c.similarities,
+      differences: c.differences,
+    }));
+  return {
+    found: true,
+    slug: p.slug,
+    name: p.name,
+    competitors: rows,
+    source: "CanHav curated competitor dataset",
+    summary: rows.length
+      ? `Read ${rows.length} ranked competitor(s) for ${p.name} (top: ${rows[0].name}).`
+      : `No curated competitor set for ${p.name}.`,
+  };
+}
+
+async function execGetAssetCoverage(a: Args<"research_getAssetCoverage">) {
+  const p = await getApprovedNetworkBySlug(a.slug);
+  if (!p) return { found: false, summary: `No CanHav network for "${a.slug}".` };
+  const ac = p.assetCoverage;
+  if (!ac) {
+    return {
+      found: false,
+      slug: p.slug,
+      summary: `No curated asset-coverage dataset for ${p.name}.`,
+    };
+  }
+  let assets = ac.assets;
+  if (a.asset) {
+    const wanted = a.asset.toLowerCase();
+    assets = assets.filter((x) => x.asset.toLowerCase().includes(wanted));
+  }
+  const limit = a.limit ?? 20;
+  const rows = assets.slice(0, limit).map((x) => ({
+    asset: x.asset,
+    role: x.role,
+    roleKind: x.roleKind,
+    chain: x.chain,
+    // Lending-shape params (null on fixed-income rows). Display text carries
+    // the value when the source cell was prose; never re-derive numbers.
+    maxLtvPct: x.maxLtvPct ?? x.maxLtvText,
+    liqThresholdPct: x.liqThresholdPct ?? x.liqThresholdText,
+    supplyCap: x.supplyCapValue ?? x.supplyCapDisplay,
+    borrowCap: x.borrowingDisabled ? "borrowing disabled" : (x.borrowCapValue ?? x.borrowCapDisplay),
+    ltvWithdrawn: x.ltvWithdrawn,
+    // Fixed-income-shape params (null on lending rows).
+    maturityOrTerm: x.maturityOrTerm,
+    fixedImpliedApy: x.fixedImpliedApy,
+    underlyingYieldSource: x.underlyingYieldSource,
+    oracle: x.oracle,
+    notes: x.notes,
+    sources: x.sources.map((s) => s.label),
+  }));
+  return {
+    found: true,
+    slug: p.slug,
+    name: p.name,
+    shape: ac.shape,
+    assetStrategy: ac.assetStrategy,
+    totalAssets: assets.length,
+    returned: rows.length,
+    assets: rows,
+    oracles: ac.oracles.map((o) => ({ provider: o.provider, assetsCovered: o.assetsCovered })),
+    flaggedAssets: ac.flaggedAssets.slice(0, 10).map((f) => ({ asset: f.asset, flag: f.flag, reason: f.reason })),
+    curatedNote: ac.curatedNote ?? null,
+    asOf: ac.asOf,
+    source: "CanHav M6 asset coverage dataset",
+    summary: `Read ${rows.length} of ${assets.length} ${ac.shape} asset row(s) for ${p.name}${ac.asOf ? ` (as of ${ac.asOf})` : ""}.`,
+  };
+}
+
+async function execWhatChanged(a: Args<"research_whatChanged">) {
+  const days = a.days ?? 7;
+  let points: { date: string; price?: number; value?: number }[] = [];
+  let source: string | null = null;
+  if (a.metric === "peg") {
+    const profile = await getApprovedStablecoinBySlug(a.slug);
+    if (!profile) return { found: false, summary: `No stablecoin found for slug "${a.slug}".` };
+    const series = await resolvePegSeries(profile);
+    points = series.points;
+    source = series.source;
+  } else {
+    const profile = await getApprovedRwaBySlug(a.slug);
+    if (!profile) return { found: false, summary: `No RWA found for slug "${a.slug}".` };
+    const series = await resolveTvlSeries(profile);
+    points = series.points;
+    source = series.source;
+  }
+  const val = (pt: { price?: number; value?: number }) => pt.price ?? pt.value ?? null;
+  const usable = points.filter((pt) => val(pt) != null);
+  if (usable.length < 2) {
+    return {
+      found: false,
+      slug: a.slug,
+      metric: a.metric,
+      summary: `Not enough ${a.metric} history for ${a.slug} to compute a ${days}-day change.`,
+    };
+  }
+  const end = usable[usable.length - 1];
+  const cutoff = new Date(new Date(end.date).getTime() - days * 86_400_000).toISOString().slice(0, 10);
+  // First point at/after the cutoff; falls back to the oldest point when the
+  // series is shorter than the requested window (reported via windowDays).
+  const start = usable.find((pt) => pt.date >= cutoff) ?? usable[0];
+  const startV = val(start) as number;
+  const endV = val(end) as number;
+  const window = usable.filter((pt) => pt.date >= start.date);
+  const values = window.map((pt) => val(pt) as number);
+  return {
+    found: true,
+    slug: a.slug,
+    metric: a.metric,
+    requestedDays: days,
+    start: { date: start.date, value: startV },
+    end: { date: end.date, value: endV },
+    change: endV - startV,
+    changePct: startV !== 0 ? ((endV - startV) / startV) * 100 : null,
+    min: Math.min(...values),
+    max: Math.max(...values),
+    pointCount: window.length,
+    source,
+    asOf: end.date,
+    summary: `${a.slug} ${a.metric} moved ${startV !== 0 ? (((endV - startV) / startV) * 100).toFixed(2) : "?"}% over ${days}d (${start.date} to ${end.date}, source: ${source}).`,
   };
 }
 
@@ -714,6 +1063,42 @@ export async function buildAgentTools(
       inputSchema: schemas.research_getHistory,
       execute: safe("research_getHistory", execHistory),
     }),
+    research_compare: tool({
+      description:
+        "Screen and rank entities in a sector (optionally one tag, e.g. Credit / Lending) by TVL, tag metrics (APYs, utilization, leverage), risk counts and partnership counts. Call this FIRST for 'which protocol is best/safest' questions, then drill into the top slugs.",
+      inputSchema: schemas.research_compare,
+      execute: safe("research_compare", execCompare),
+    }),
+    research_getRisks: tool({
+      description:
+        "Read an entity's typed risk register (severity/likelihood/impact, mitigation, monitoring signal), risk-posture narrative and incident history. Call this before any risk or safety judgment.",
+      inputSchema: schemas.research_getRisks,
+      execute: safe("research_getRisks", execGetRisks),
+    }),
+    research_getPartnerships: tool({
+      description:
+        "Read an entity's curated partnership rows (partner, date, amount, description; slug when the partner is tracked on-platform).",
+      inputSchema: schemas.research_getPartnerships,
+      execute: safe("research_getPartnerships", execGetPartnerships),
+    }),
+    research_getCompetitors: tool({
+      description:
+        "Read an entity's ranked competitor set with positioning, similarities and differences.",
+      inputSchema: schemas.research_getCompetitors,
+      execute: safe("research_getCompetitors", execGetCompetitors),
+    }),
+    research_getAssetCoverage: tool({
+      description:
+        "Read an entity's curated asset-coverage table: per-asset LTV / liquidation threshold / caps / oracles (lending shape) or maturity / implied APY (fixed-income shape), plus flagged assets. Optionally filter by asset symbol.",
+      inputSchema: schemas.research_getAssetCoverage,
+      execute: safe("research_getAssetCoverage", execGetAssetCoverage),
+    }),
+    research_whatChanged: tool({
+      description:
+        "Compute the change in a stablecoin's peg or an RWA's TVL over a lookback window (default 7 days): start/end values, delta, percent change, min/max.",
+      inputSchema: schemas.research_whatChanged,
+      execute: safe("research_whatChanged", execWhatChanged),
+    }),
     chain_readLive: tool({
       description: "Read live on-chain supply + metadata for a token contract (Arbitrum).",
       inputSchema: schemas.chain_readLive,
@@ -838,6 +1223,36 @@ export const TOOL_CATALOG: ToolCatalogEntry[] = [
   { name: "research_listByCategory", description: "List profiles in a category.", sample: { category: "networks" } },
   { name: "research_getHistory", description: "Historical peg/TVL series for a slug.", sample: { slug: "usdc", metric: "peg" } },
   {
+    name: "research_compare",
+    description: "Rank entities in a sector/tag by TVL, tag metrics and risk counts.",
+    sample: { sector: "Credit", tag: "Lending", limit: 10 },
+  },
+  {
+    name: "research_getRisks",
+    description: "Typed risks + risk posture + incidents for an entity.",
+    sample: { slug: "aave" },
+  },
+  {
+    name: "research_getPartnerships",
+    description: "Curated partnership rows for an entity.",
+    sample: { slug: "aave", limit: 10 },
+  },
+  {
+    name: "research_getCompetitors",
+    description: "Ranked competitor set for an entity.",
+    sample: { slug: "aave" },
+  },
+  {
+    name: "research_getAssetCoverage",
+    description: "Per-asset LTV/caps/oracles or maturity/APY rows for an entity.",
+    sample: { slug: "aave", asset: "USDC" },
+  },
+  {
+    name: "research_whatChanged",
+    description: "Peg/TVL delta over a lookback window for a slug.",
+    sample: { slug: "usdc", metric: "peg", days: 7 },
+  },
+  {
     name: "chain_readLive",
     description: "Live on-chain supply/metadata for a contract.",
     sample: { address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" },
@@ -954,6 +1369,24 @@ export async function runTool(
       break;
     case "research_getHistory":
       out = await execHistory(a as Args<"research_getHistory">);
+      break;
+    case "research_compare":
+      out = await execCompare(a as Args<"research_compare">);
+      break;
+    case "research_getRisks":
+      out = await execGetRisks(a as Args<"research_getRisks">);
+      break;
+    case "research_getPartnerships":
+      out = await execGetPartnerships(a as Args<"research_getPartnerships">);
+      break;
+    case "research_getCompetitors":
+      out = await execGetCompetitors(a as Args<"research_getCompetitors">);
+      break;
+    case "research_getAssetCoverage":
+      out = await execGetAssetCoverage(a as Args<"research_getAssetCoverage">);
+      break;
+    case "research_whatChanged":
+      out = await execWhatChanged(a as Args<"research_whatChanged">);
       break;
     case "chain_readLive":
       out = await execChainReadLive(a as Args<"chain_readLive">);

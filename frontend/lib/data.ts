@@ -374,7 +374,10 @@ function patchNetworkMarketScale(
   const nextScale = { ...network.currentScale };
   let changed = false;
   if (
+    // CoinGecko emits mcap 0 when it lacks circulating supply — a 0 here would
+    // re-inject the "$0" that normalizeUniversalMetrics just nulled (M10 fix).
     patch.marketCapUsd != null &&
+    patch.marketCapUsd > 0 &&
     network.universalMetrics?.market.marketCapUsd.value == null &&
     nextScale.marketCapUsd == null
   ) {
@@ -468,27 +471,12 @@ async function enrichNetworksWithMarketMetrics(
     return patchNetworkMarketScale(network, { marketCapUsd, volume24hUsd });
   });
 
-  const llamaSlugs = enriched
-    .filter((n) => networkHeadlineMarketCapUsd(n) == null && llamaProtocolForSlug(n.slug))
-    .map((n) => n.slug);
-
-  if (llamaSlugs.length === 0) return enriched;
-
-  const llamaMeta = await Promise.all(
-    llamaSlugs.map(async (slug) => ({
-      slug,
-      meta: await fetchLlamaProtocolMeta(slug, 300),
-    })),
-  );
-
-  const llamaBySlug = new Map(llamaMeta.map(({ slug, meta }) => [slug, meta]));
-
-  return enriched.map((network) => {
-    if (networkHeadlineMarketCapUsd(network) != null) return network;
-    const mcap = llamaBySlug.get(network.slug)?.mcapUsd ?? null;
-    if (mcap == null) return network;
-    return patchNetworkMarketScale(network, { marketCapUsd: mcap });
-  });
+  // No DeFi Llama backfill here: with ~100+ networks missing mcap this fanned
+  // out to ~104 /protocol/* fetches (multi-MB, over the 2MB fetch-cache cap, so
+  // uncacheable) on EVERY page render. Durable mcap/vol comes from the cron
+  // universal pass; detail pages do a single per-slug Llama backfill in
+  // loadNetworkWithSectorMetrics.
+  return enriched;
 }
 
 export async function getNetworkBySlug(slug: string): Promise<NetworkProfile | null> {

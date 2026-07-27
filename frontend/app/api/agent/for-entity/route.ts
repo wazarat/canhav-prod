@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getAgentProfile } from "@/lib/agent/memory";
 import { getSession } from "@/lib/auth/session";
 import { getUserEntityAgent } from "@/lib/auth/users";
+import { getApprovedNetworkBySlug } from "@/lib/data";
 
 /**
  * Resolve the logged-in wallet's agent for a given project (Entity slug).
@@ -25,7 +26,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "slug query param is required." }, { status: 400 });
   }
 
-  const agentId = await getUserEntityAgent(session.userId, slug);
+  const [agentId, entity] = await Promise.all([
+    getUserEntityAgent(session.userId, slug),
+    getApprovedNetworkBySlug(slug),
+  ]);
   const profile = agentId ? await getAgentProfile(agentId) : null;
 
   return NextResponse.json({
@@ -34,5 +38,7 @@ export async function GET(req: Request) {
     agentId: agentId ?? null,
     onChain: Boolean(profile?.onChain),
     agentName: profile?.name ?? null,
+    // Entity taxonomy for contextual starter prompts in the floating chat.
+    entityTags: entity?.tags ?? (entity?.subSector ? [entity.subSector] : []),
   });
 }

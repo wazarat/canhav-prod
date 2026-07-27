@@ -3,6 +3,7 @@
  * Canonical UI spec: docs/NETWORK_PAGE_UI.md (read before editing network pages).
  */
 
+import { PARTNERSHIP_COVERED_SLUGS } from "@/lib/networks/creditPartnershipCoverage";
 import type { NetworkProfile } from "@/lib/types";
 
 export const NETWORK_TAB_IDS = [
@@ -47,6 +48,16 @@ function hasResearchContent(profile: NetworkProfile): boolean {
     profile.tradFiComparison.length > 0 ||
     Boolean(profile.bullBearCase) ||
     (profile.researchPublications?.length ?? 0) > 0
+  );
+}
+
+/** M9: the 14 dataset-covered Credit entities get the explorer tab from the
+ * COMMITTED model — no store/push dependency (gearbox had no tab before).
+ * Non-Credit and uncovered entities keep the store-driven gate above. */
+function hasPartnershipModelContent(profile: NetworkProfile): boolean {
+  return (
+    (profile.sector === "Credit" || (profile.secondarySectors?.includes("Credit") ?? false)) &&
+    PARTNERSHIP_COVERED_SLUGS.includes(profile.slug)
   );
 }
 
@@ -144,7 +155,7 @@ export function buildNetworkTabs(profile: NetworkProfile): NetworkTabDefinition[
   if ((profile.competitors?.length ?? 0) > 0) {
     tabs.push({ id: "competitors", label: TAB_LABELS.competitors });
   }
-  if (profile.partnerships.length > 0) {
+  if (profile.partnerships.length > 0 || hasPartnershipModelContent(profile)) {
     tabs.push({ id: "partnerships", label: TAB_LABELS.partnerships });
   }
   tabs.push({ id: "agent-skills", label: TAB_LABELS["agent-skills"] });

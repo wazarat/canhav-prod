@@ -820,16 +820,60 @@
       "PK": "CATEGORY#Entity",
       "Partnerships": [
         {
+          "name": "Chainlink (oracle)",
+          "date": "",
           "amountLabel": null,
-          "date": "2026-06-04",
-          "description": "Treasury balances routed to Veda vault → Aave Plasma V3 (up to 6% APY).",
-          "name": "Whop"
+          "description": "Aave production markets read Chainlink Price Feeds through the protocol oracle contracts. Source: aave.com.",
+          "slug": null
         },
         {
+          "name": "Correlated Assets Price Oracle (CAPO) (oracle)",
+          "date": "",
           "amountLabel": null,
-          "date": "2026-05-29",
-          "description": "Governance temp-check to deploy Aave V4 on Arc (proposal).",
-          "name": "Circle / Arc"
+          "description": "CAPO is the second oracle contract type used on Aave production markets alongside Chainlink feeds. Source: aave.com.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (22)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum, Arbitrum, Base, Avalanche, BNB Chain, Polygon, OP Mainnet, Gnosis, Linea, Scroll, Sonic, Celo and 10 more. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (14)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by ABDK, Blackthorn, Cantina, Certora, Enigma Dark, MixBytes, OpenZeppelin, Oxorio and 6 more. Source: github.com.",
+          "slug": null
+        },
+        {
+          "name": "Spark Protocol",
+          "date": "",
+          "amountLabel": null,
+          "description": "DefiLlama breaks out Spark revenue by yield source across these venues. Source: defillama.com.",
+          "slug": "spark"
+        },
+        {
+          "name": "Ant Digital Technologies",
+          "date": "2025",
+          "amountLabel": null,
+          "description": "Ant Digital Technologies is named among Horizon launch partners. Source: aave.com.",
+          "slug": null
+        },
+        {
+          "name": "Centrifuge",
+          "date": "2025",
+          "amountLabel": null,
+          "description": "Centrifuge JTRSY and JAAA are listed as Horizon RWA collateral. Source: aave.com.",
+          "slug": "centrifuge"
+        },
+        {
+          "name": "Circle",
+          "date": "2025",
+          "amountLabel": null,
+          "description": "Circle USYC is one of the tokenized assets available in the Aave Horizon RWA market. Source: aave.com.",
+          "slug": "circle"
         }
       ],
       "PriceHistory": null,
@@ -1508,7 +1552,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.536Z",
+      "UpdatedAt": "2026-07-27T05:45:30.430Z",
       "Website": "https://aave.com",
       "TradFiAnalogue": "a secured overnight repo desk at a broker-dealer, financing a standardised haircut book against liquid collateral with mark-to-market margining.",
       "OrgIntro": "Legal entity: Avara (formerly Aave Companies), with Aave Labs as the core development firm and the Aave DAO as the on-chain governing body. 2026 has been dominated by the separation of the DAO's service-provider layer from Aave Labs.",
@@ -10371,9 +10415,53 @@
       "PK": "CATEGORY#Entity",
       "Partnerships": [
         {
-          "date": "ongoing",
-          "description": "Price oracles for collateral and base assets across Compound III markets.",
-          "name": "Chainlink"
+          "name": "Chainlink (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Comet price feed contracts import the Chainlink AggregatorV3Interface, and the mainnet USDC market configuration points at Chainlink feed addresses. Source: raw.githubusercontent.com.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (11)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum, Arbitrum, Base, OP Mainnet, Polygon, Mantle, Unichain, Ronin, Scroll, Linea, Comet deployment directory. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (4)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by ChainSecurity, Compound documentation auditor list, OpenZeppelin, SEAL 911. Source: reports.chainsecurity.com.",
+          "slug": null
+        },
+        {
+          "name": "Andreessen Horowitz",
+          "date": "11-2019",
+          "amountLabel": "$25m",
+          "description": "a16z backed Compound's 25M dollar Series A and its earlier 8.2M dollar 2018 seed round. Source: theblock.co.",
+          "slug": null
+        },
+        {
+          "name": "Paradigm",
+          "date": "11-2019",
+          "amountLabel": "$25m",
+          "description": "Paradigm participated in the 25M dollar Series A. Source: theblock.co.",
+          "slug": null
+        },
+        {
+          "name": "Morpho",
+          "date": "03-2025",
+          "amountLabel": "$20m",
+          "description": "Compound Blue, launched 13 March 2025, runs Compound branded lending on Polygon using Morpho infrastructure and passed 20M dollars of TVL in its first week. Source: forum.morpho.org.",
+          "slug": "morpho"
+        },
+        {
+          "name": "Gauntlet",
+          "date": "09-2025",
+          "amountLabel": "$2.3m",
+          "description": "Gauntlet's Year 5 risk management partnership runs 28 September 2025 to 28 September 2026 for 2.3M dollars, covering up to 50 Comet deployments with a 30 percent insolvency refund. Source: comp.xyz.",
+          "slug": null
         }
       ],
       "PriceHistory": null,
@@ -10965,7 +11053,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://compound.finance",
       "TradFiAnalogue": "a single-currency secured lending facility at a clearing bank, where the bank funds one currency against a defined pledge list and the pledged assets sit idle as security.",
       "FundingNote": "No further equity rounds appear in the fetched sources; ByteTree states Compound had carried out two funding rounds since inception as of its 2021 review ([ByteTree](https://www.bytetree.com/research/2021/07/global-credit-markets-benefit-all/)).",
@@ -18684,10 +18772,60 @@
       "PK": "CATEGORY#Entity",
       "Partnerships": [
         {
+          "name": "Aerodrome Finance (oracle)",
+          "date": "2023",
           "amountLabel": null,
-          "date": "2025-01-01",
-          "description": "Official liquidity pool launched on Base with PancakeSwap, featuring up to ~300% APR incentives (reported in the January 2025 monthly review; date set to the 1st as only the month is known).",
-          "name": "PancakeSwap"
+          "description": "Extra Finance reads real-time AMM prices plus a 30 minute TWAP from the underlying DEX pools as its primary price source. Source: docs.extrafi.io.",
+          "slug": "aerodrome"
+        },
+        {
+          "name": "Chainlink (oracle)",
+          "date": "2023",
+          "amountLabel": null,
+          "description": "Extra Finance aggregates Chainlink price feeds for Optimism assets and uses them as a sanity check that gates liquidations. Source: docs.extrafi.io.",
+          "slug": null
+        },
+        {
+          "name": "Velodrome (oracle)",
+          "date": "2023",
+          "amountLabel": null,
+          "description": "Extra Finance reads real-time AMM prices plus a 30 minute TWAP from the underlying DEX pools as its primary price source. Source: docs.extrafi.io.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (3)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on OP Mainnet, Base, Berachain. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (5)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by BlockSec, EtherAuthority, Immunefi, PeckShield, Sherlock. Source: github.com.",
+          "slug": null
+        },
+        {
+          "name": "Aerodrome Finance",
+          "date": "2023",
+          "amountLabel": null,
+          "description": "EXTRA trades against WETH in an Aerodrome pool on Base. Source: geckoterminal.com.",
+          "slug": "aerodrome"
+        },
+        {
+          "name": "OKX",
+          "date": "Aug 2023",
+          "amountLabel": null,
+          "description": "OKX integrated Extra Finance USDC and ETH lending pools into its platform. Source: medium.com.",
+          "slug": null
+        },
+        {
+          "name": "Aave",
+          "date": "2024",
+          "amountLabel": null,
+          "description": "The XLend liquidity protocol is a fork of Aave V3. Source: docs.extrafi.io.",
+          "slug": "aave"
         }
       ],
       "PriceHistory": null,
@@ -19257,7 +19395,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://extrafi.io",
       "TradFiAnalogue": "a non recourse warehouse line against an LP position, the DeFi equivalent of a repo facility funding a structured note.",
       "OrgIntro": "All named contributors are pseudonyms disclosed in the protocol's own FAQ.",
@@ -21563,7 +21701,78 @@
       "OtherSecondaryTags": null,
       "OtherSubSector": null,
       "PK": "CATEGORY#Entity",
-      "Partnerships": [],
+      "Partnerships": [
+        {
+          "name": "Chainlink (oracle)",
+          "date": "2023",
+          "amountLabel": null,
+          "description": "Fluid checks its Uniswap TWAP against Chainlink feeds, and its FallbackOracleImpl supports Chainlink-only and Chainlink-with-Redstone-fallback modes. Source: docs.fluid.instadapp.io.",
+          "slug": null
+        },
+        {
+          "name": "L2 sequencer uptime feed (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "On L2s, UniV3CheckCLRSOracleL2 combines Uniswap v3 with Chainlink or Redstone and additionally checks a sequencer uptime feed. Source: docs.fluid.io.",
+          "slug": null
+        },
+        {
+          "name": "RedStone (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Fluid's fallback oracle supports Redstone as primary with Chainlink fallback, and FluidGenericOracleL2 combines Redstone and Chainlink hops. Source: docs.fluid.instadapp.io.",
+          "slug": null
+        },
+        {
+          "name": "Uniswap (oracle)",
+          "date": "2023",
+          "amountLabel": null,
+          "description": "Fluid's primary price input is a Uniswap TWAP taken across three checkpoints. Source: fluid.io.",
+          "slug": "uniswap"
+        },
+        {
+          "name": "Chain deployments (6)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum, Arbitrum, Base, Polygon, Plasma, Solana. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (6)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by Cantina, Hats Finance, Immunefi, MixBytes, PeckShield, Statemind. Source: docs.fluid.instadapp.io.",
+          "slug": null
+        },
+        {
+          "name": "Bitwise Asset Management",
+          "date": "2026",
+          "amountLabel": "$11b",
+          "description": "Bitwise, described as managing 11 billion USD in client assets, curates a USDe lending market powered by Fluid. Source: x.com.",
+          "slug": null
+        },
+        {
+          "name": "Maple Finance",
+          "date": "",
+          "amountLabel": "$40m",
+          "description": "Fluid Lite supports syrupUSDC and syrupUSDT as vault assets. Source: lite.guides.instadapp.io.",
+          "slug": "maple"
+        },
+        {
+          "name": "Uniswap",
+          "date": "2025",
+          "amountLabel": null,
+          "description": "Fluid governance approved seeding FLUID DEX liquidity on Base and Arbitrum alongside Uniswap v3 protocol-owned liquidity. Source: gov.fluid.io.",
+          "slug": "uniswap"
+        },
+        {
+          "name": "Arbitrum Foundation",
+          "date": "Dec 2024",
+          "amountLabel": "$750k",
+          "description": "The Arbitrum Foundation co-authored the Fluid DEX Arbitrum deployment proposal committing up to 750,000 USD in FLUID and 750,000 USD in USDC of rewards over three months for wstETH/ETH, weETH/ETH and FLUID/ETH pools. Source: gov.fluid.io.",
+          "slug": null
+        }
+      ],
       "PriceHistory": null,
       "Risks": [
         {
@@ -22189,7 +22398,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:30.430Z",
       "Website": "https://fluid.io",
       "TradFiAnalogue": "a universal banking balance sheet with an internal market maker, where the same deposit base funds lending and market making rather than sitting in segregated books. A narrower analogy for Smart Debt is a repo funded market making book, where the funding leg itself earns bid ask spread.",
       "FundingNote": "Fluid itself has not raised; the funding history belongs to Instadapp, its builder.",
@@ -25112,7 +25321,78 @@
       "OtherSecondaryTags": null,
       "OtherSubSector": null,
       "PK": "CATEGORY#Entity",
-      "Partnerships": [],
+      "Partnerships": [
+        {
+          "name": "Chainlink (oracle)",
+          "date": "2021",
+          "amountLabel": null,
+          "description": "Gearbox's multichain architecture lists Chainlink among supported oracle providers, and Gearbox price feeds return USD prices in a Chainlink-compatible latestRoundData format. Source: docs.gearbox.fi.",
+          "slug": null
+        },
+        {
+          "name": "Curve Finance (oracle)",
+          "date": "2022",
+          "amountLabel": null,
+          "description": "Gearbox maintains LP price feeds for Curve LP and Yearn share prices with bounding logic to prevent manipulation. Source: github.com.",
+          "slug": "curve-finance"
+        },
+        {
+          "name": "Pyth (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Pyth is listed as a supported oracle provider and as an on-demand feed requiring price pushes per transaction. Source: docs.gearbox.finance.",
+          "slug": null
+        },
+        {
+          "name": "RedStone (oracle)",
+          "date": "2023",
+          "amountLabel": null,
+          "description": "The Gearbox and RedStone integration allows permissionless day-zero usage of feeds on any chain, and RedStone lists Gearbox as a pull-model user. Source: docs.gearbox.fi.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (11)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum, Arbitrum, OP Mainnet, Etherlink, Sonic, BNB Chain, Plasma, Lisk, Hemi, Monad, Somnia. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (8)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by ABDK, ChainSecurity, Consensys Diligence, Decurity, Immunefi, MixBytes, PeckShield, Sigma Prime. Source: docs.gearbox.finance.",
+          "slug": null
+        },
+        {
+          "name": "Re7 Labs",
+          "date": "Aug 2025",
+          "amountLabel": "$700m",
+          "description": "Re7 Labs, described as managing over 700 million USD across 100-plus pools on 14 chains, curates the Gearbox USDC vault on Etherlink. Source: tezos.com.",
+          "slug": null
+        },
+        {
+          "name": "A.Capital Ventures",
+          "date": "2022",
+          "amountLabel": "$5.5m",
+          "description": "The approved 5.5 million USD strategic DAO funding proposal listed A.Capital Ventures and Galaxy Digital among planned investors. Source: tokeninsight.com.",
+          "slug": null
+        },
+        {
+          "name": "Galaxy Digital",
+          "date": "2022",
+          "amountLabel": "$5.5m",
+          "description": "The approved 5.5 million USD strategic DAO funding proposal listed A.Capital Ventures and Galaxy Digital among planned investors. Source: tokeninsight.com.",
+          "slug": null
+        },
+        {
+          "name": "Placeholder",
+          "date": "Aug 2022",
+          "amountLabel": "$4m",
+          "description": "Placeholder participated in Gearbox's 4 million USD DAO round at a 150 million USD valuation. Source: blockworks.com.",
+          "slug": null
+        }
+      ],
       "PriceHistory": null,
       "Risks": [
         {
@@ -25756,7 +26036,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://gearbox.fi",
       "TradFiAnalogue": "a prime brokerage margin account funded by a syndicated revolving credit facility. The lender side resembles a senior secured revolver; the borrower side resembs a prime broker margin account where the broker holds the client assets in a segregated account and can liquidate them.",
       "OrgIntro": "Gearbox publishes no CEO or executive team. Named individuals are visible mainly through the multisig signer lists.",
@@ -34001,7 +34281,71 @@
       "OtherSecondaryTags": null,
       "OtherSubSector": null,
       "PK": "CATEGORY#Entity",
-      "Partnerships": [],
+      "Partnerships": [
+        {
+          "name": "Chainlink (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Maple reads Chainlink oracles, with protocol wrappers around the feeds, for collateral valuation. Source: docs.maple.finance.",
+          "slug": null
+        },
+        {
+          "name": "CoinGecko (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "CoinGecko API pricing is listed as an integration data source for Maple assets. Source: docs.maple.finance.",
+          "slug": null
+        },
+        {
+          "name": "CoinMarketCap (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "CoinMarketCap API pricing is listed as an integration data source for Maple assets. Source: docs.maple.finance.",
+          "slug": null
+        },
+        {
+          "name": "Pyth Network (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Pyth provides price feeds for syrupUSDC/USDC and syrupUSDT/USDT used by integrators. Source: docs.maple.finance.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (11)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum, Solana, Arbitrum, Base, Ink, Monad, Tempo, Plasma, Mantle, BNB Chain, Robinhood Chain. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (11)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by 0xMacro, Cantina, Dedaub, Immunefi, PagerDuty, Sherlock, Sigma Prime, Spearbit and 3 more. Source: docs.maple.finance.",
+          "slug": null
+        },
+        {
+          "name": "Cantor Fitzgerald",
+          "date": "May 2025",
+          "amountLabel": "$2b",
+          "description": "Maple received a Bitcoin-backed financing facility from Cantor under a program sized up to 2 billion USD. Source: maple.finance.",
+          "slug": null
+        },
+        {
+          "name": "Spark Protocol",
+          "date": "",
+          "amountLabel": "$50m",
+          "description": "The SLL submits and cancels Maple Finance redemption requests. Source: docs.spark.fi.",
+          "slug": "spark"
+        },
+        {
+          "name": "Fluid",
+          "date": "",
+          "amountLabel": "$40m",
+          "description": "Fluid Lite supports syrupUSDC and syrupUSDT as vault assets. Source: lite.guides.instadapp.io.",
+          "slug": "fluid"
+        }
+      ],
       "PriceHistory": null,
       "Risks": [
         {
@@ -34586,7 +34930,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://maple.finance",
       "TradFiAnalogue": "a private credit fund with a secured institutional loan book, wrapped in a transferable share (syrupUSDC), plus a money market fund for the Cash Management product.",
       "FundingNote": "Total raised per DefiLlama: $17.7m ([DefiLlama Maple](https://defillama.com/protocol/maple-finance)).",
@@ -36690,9 +37034,67 @@
       "PK": "CATEGORY#Entity",
       "Partnerships": [
         {
-          "date": "2024",
-          "description": "Morpho Blue and vaults deployed on Base alongside Ethereum mainnet.",
-          "name": "Coinbase / Base"
+          "name": "API3 (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "API3 is listed among oracle providers usable with Morpho markets. Source: docs.morpho.org.",
+          "slug": null
+        },
+        {
+          "name": "Chainlink (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Morpho is oracle agnostic and its reference implementation MorphoChainlinkOracleV2 reads Chainlink compliant feeds. Source: docs.morpho.org.",
+          "slug": null
+        },
+        {
+          "name": "Chronicle (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Chronicle is listed among oracle providers usable with Morpho markets. Source: docs.morpho.org.",
+          "slug": null
+        },
+        {
+          "name": "Pyth (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Pyth is listed among oracle providers usable with Morpho markets. Source: docs.morpho.org.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (38)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum, Base, Arbitrum, OP Mainnet, Polygon, Unichain, Hyperliquid L1, Monad, Katana, Flare, World Chain, Stable and 26 more. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (11)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by ABDK Consulting, Blackthorn, Cantina, Certora, ChainSecurity, Lexfo, Omniscia, OpenZeppelin and 3 more. Source: docs.morpho.org.",
+          "slug": null
+        },
+        {
+          "name": "Steakhouse Financial",
+          "date": "03-2025",
+          "amountLabel": "$500m",
+          "description": "Steakhouse curates Morpho vaults and reached 500M dollars of TVL across them, and curates the Cronos USDC vaults for Crypto.com. Source: morpho.org.",
+          "slug": "steakhouse-financial"
+        },
+        {
+          "name": "Sky",
+          "date": "",
+          "amountLabel": "$325m",
+          "description": "Sky deployed five savings vaults through sky.money on Morpho, and sUSDS backs over 325M dollars of Morpho lending markets. Source: morpho.org.",
+          "slug": "sky"
+        },
+        {
+          "name": "Kraken",
+          "date": "2025",
+          "amountLabel": "$200m",
+          "description": "Kraken DeFi Earn routes over 200M dollars into Morpho vaults, with a Bitcoin Vault taking 150M dollars in its first week. Source: morpho.org.",
+          "slug": null
         }
       ],
       "PriceHistory": null,
@@ -37299,7 +37701,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://morpho.org",
       "TradFiAnalogue": "a securitisation platform plus the fund managers who buy its tranches. Morpho Blue is the standardised, immutable issuance rail; MetaMorpho and Vaults V2 curators are the asset managers making the actual credit selection on behalf of end investors.",
       "BullBearCase": {
@@ -40044,7 +40446,71 @@
       "OtherSecondaryTags": null,
       "OtherSubSector": null,
       "PK": "CATEGORY#Entity",
-      "Partnerships": [],
+      "Partnerships": [
+        {
+          "name": "Chainlink (oracle)",
+          "date": "2021",
+          "amountLabel": null,
+          "description": "Notional integrated Chainlink Price Feeds for ETH/USD, BTC/USD, USDC/USD and DAI/USD to drive fixed rate collateralization calculations. Source: blog.notional.finance.",
+          "slug": null
+        },
+        {
+          "name": "Chronicle (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "NIP-82 listed a Balancer osETH/ETH leveraged vault relying on a Chronicle oracle. Source: forum.notional.finance.",
+          "slug": null
+        },
+        {
+          "name": "Exponent (oracle)",
+          "date": "Jun 2025",
+          "amountLabel": null,
+          "description": "Morpho markets list the Exponent vault itself as the price oracle, with the Trading Module supplying yieldToken/USD and asset/USD feeds. Source: docs.notional.finance.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (3)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum, Arbitrum, Ethereum and Arbitrum. Source: docs.notional.finance.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (4)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by Hypernative, Immunefi, MixBytes, Sherlock. Source: docs.notional.finance.",
+          "slug": null
+        },
+        {
+          "name": "Pantera Capital",
+          "date": "Apr 2021",
+          "amountLabel": "$10m",
+          "description": "Pantera Capital backed Notional's 10 million USD Series A. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Apollo Crypto",
+          "date": "Jan 2026",
+          "amountLabel": null,
+          "description": "Apollo Crypto is the strategist behind the mAPOLLO vault, the first vault live on Exponent. Source: blog.notional.finance.",
+          "slug": null
+        },
+        {
+          "name": "Clearstar",
+          "date": "Jan 2026",
+          "amountLabel": null,
+          "description": "Notional announced a liquidity partnership with Clearstar, a risk curator on Morpho, at the Exponent launch. Source: blog.notional.finance.",
+          "slug": null
+        },
+        {
+          "name": "Hyperithm",
+          "date": "Jan 2026",
+          "amountLabel": null,
+          "description": "Hyperithm is the strategist for the mHYPER vault and provides liquidity for that market. Source: blog.notional.finance.",
+          "slug": null
+        }
+      ],
       "PriceHistory": null,
       "Risks": [
         {
@@ -40605,7 +41071,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://notional.finance",
       "TradFiAnalogue": "the fixed-rate term loan and the zero-coupon discount note, priced off a term structure. fCash is the discount note.",
       "FundingNote": "Total raised per DefiLlama: $10m ([DefiLlama Notional](https://defillama.com/protocol/notional)).",
@@ -43596,22 +44062,67 @@
       "PK": "CATEGORY#Entity",
       "Partnerships": [
         {
+          "name": "Chainlink (oracle)",
+          "date": "",
           "amountLabel": null,
-          "date": "2024",
-          "description": "USDe and sUSDe fixed-yield markets became Pendle's largest, with Ethena collateral growing to roughly 70% of Pendle TVL, making stablecoin yield Pendle's flagship category.",
-          "name": "Ethena"
+          "description": "Pendle ships a Chainlink-compatible oracle wrapper so integrators can read PT prices through the standard Chainlink interface. Source: docs.pendle.finance.",
+          "slug": null
         },
         {
+          "name": "LlamaRisk (oracle)",
+          "date": "Jun 2026",
           "amountLabel": null,
-          "date": "2024",
-          "description": "weETH liquid-restaking markets on Pendle let users fix or leverage restaking yield and points during the restaking wave.",
-          "name": "Ether.fi"
+          "description": "LlamaRisk operates the risk manager and Updater role for Aave's Pendle PT discount rate oracle stack. Source: governance.aave.com.",
+          "slug": null
         },
         {
+          "name": "Chainlink CRE (oracle)",
+          "date": "Jun 2026",
           "amountLabel": null,
+          "description": "Aave's PT risk oracle is being upgraded to run three Chainlink Runtime Environment workflows computing implied rate, discount rate and per E-Mode risk parameters for Pendle PTs. Source: governance.aave.com.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (17)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum, Optimism, BNB Chain, Monad, Sonic, HyperEVM, Mantle, Base, Arbitrum, Ink, Berachain, Katana and 5 more. Source: docs.pendle.finance.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (8)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by Ackee Blockchain, BGD Labs, Certora, Chaos Labs, Code4rena, Dedaub, Dingbats, Pendle audits repository. Source: docs.pendle.finance.",
+          "slug": null
+        },
+        {
+          "name": "Ethena",
           "date": "2025",
-          "description": "Integration with the Aave ecosystem extended Pendle PT tokens into lending as collateral, broadening fixed-yield PT utility.",
-          "name": "Aave"
+          "amountLabel": "$450m",
+          "description": "Ethena is named as a partner in Pendle's Citadel strategy, and Ethena governance recorded roughly 450 million USD of Pendle PT collateral on Aave. Source: gov.ethenafoundation.com.",
+          "slug": "ethena"
+        },
+        {
+          "name": "Mechanism Capital",
+          "date": "May 2021",
+          "amountLabel": "$3.7m",
+          "description": "Mechanism Capital participated in Pendle's 3.7 million USD seed round. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Arbitrum",
+          "date": "Feb 2025",
+          "amountLabel": null,
+          "description": "Pendle's 2025 roadmap names Arbitrum among chains where it works on liquidity boosting programs. Source: medium.com.",
+          "slug": null
+        },
+        {
+          "name": "Berachain",
+          "date": "Feb 2025",
+          "amountLabel": null,
+          "description": "Berachain is named in Pendle's 2025 roadmap as a liquidity boosting partner chain. Source: medium.com.",
+          "slug": null
         }
       ],
       "PriceHistory": null,
@@ -44202,7 +44713,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://www.pendle.finance",
       "TradFiAnalogue": "Closest instruments: the zero-coupon bond and the interest rate strip for PT and YT, and the interest rate swap for Boros.",
       "BullBearCase": {
@@ -46165,9 +46676,53 @@
       "PK": "CATEGORY#Entity",
       "Partnerships": [
         {
-          "date": "2022",
-          "description": "Cross-chain messaging layer enabling omnichain deposit/borrow.",
-          "name": "LayerZero"
+          "name": "Chainlink (oracle)",
+          "date": "02-2023",
+          "amountLabel": null,
+          "description": "Radiant integrated Chainlink USD price feeds on Arbitrum mainnet for BTC, DAI, ETH, USDC, USDT and BNB, with BNB Chain to follow. Source: medium.com.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (5)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Arbitrum, Ethereum, Base, BNB Chain, Binance Chain. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (9)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by BlockSec, Hypernative, Immunefi, Mandiant, OpenZeppelin, PeckShield, SEAL 911, zeroShadow and 1 more. Source: docs.radiant.capital.",
+          "slug": null
+        },
+        {
+          "name": "Angle Merkl",
+          "date": "11-2023",
+          "amountLabel": null,
+          "description": "Angle's Merkl distribution contract was the mechanism for manual v3 liquidity incentives. Source: forum.arbitrum.foundation.",
+          "slug": null
+        },
+        {
+          "name": "Balancer",
+          "date": "11-2023",
+          "amountLabel": null,
+          "description": "Balancer is listed as a Radiant integration and supported the Ethereum mainnet launch alongside LayerZero and Stargate. Source: docs.radiant.capital.",
+          "slug": "balancer"
+        },
+        {
+          "name": "Camelot",
+          "date": "11-2023",
+          "amountLabel": null,
+          "description": "Camelot v3 hosted the incentivized RDNT/ETH liquidity pool under the STIP programme. Source: forum.arbitrum.foundation.",
+          "slug": null
+        },
+        {
+          "name": "Dopex",
+          "date": "11-2023",
+          "amountLabel": null,
+          "description": "Dopex v2 was paired with Camelot in the RDNT/ETH liquidity incentive initiative. Source: forum.arbitrum.foundation.",
+          "slug": "dopex"
         }
       ],
       "PriceHistory": null,
@@ -46747,7 +47302,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://radiant.capital/",
       "TradFiAnalogue": "a failed non-bank lender in members' voluntary liquidation, where the operating business is closed, the loan book is being run off, and a claims administrator distributes recoveries in tranches.",
       "FundingNote": "No venture funding round is documented in the fetched sources. Radiant's capital came from its RDNT token and protocol revenue rather than an identified equity raise, and the remediation multisig is funded from protocol revenue, DAO treasury, adjusted emissions, reserves, new investments and new partner contributions ([Radiant docs](https://docs.radiant.capital/radiant/remediation/remediation-plan)).",
@@ -51108,10 +51663,53 @@
       "PK": "CATEGORY#Entity",
       "Partnerships": [
         {
+          "name": "Chainlink stETH price feed (oracle)",
+          "date": "",
           "amountLabel": null,
-          "date": "2023-10-26",
-          "description": "Sense participated in Morpho's early liquidity-mining program; Sense's sunset notice told users that $MORPHO rewards earned through Age 7 (Oct 4, 2023) would be claimable once made transferable by Morpho Governance.",
-          "name": "Morpho"
+          "description": "A stale stETH price feed used in wstETH Adapter 7 caused an incident, and the price feed integration was removed in Adapter 8. Source: medium.com.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (1)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum. Source: docs.sense.finance.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (6)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by ABDK, Fixed Point Solutions, Immunefi, PeckShield, Sherlock, Spearbit. Source: docs.sense.finance.",
+          "slug": null
+        },
+        {
+          "name": "Bain Capital Crypto",
+          "date": "Aug 2021",
+          "amountLabel": "$5.2m",
+          "description": "Bain Capital's crypto arm backed Sense's 5.2 million USD seed round. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Dragonfly Capital",
+          "date": "Aug 2021",
+          "amountLabel": "$5.2m",
+          "description": "Dragonfly led the 5.2 million USD Sense round. Source: medium.com.",
+          "slug": null
+        },
+        {
+          "name": "Balancer V2",
+          "date": "2022",
+          "amountLabel": null,
+          "description": "Space, Sense's yield space AMM, hosted all PT liquidity as a Balancer V2 pool type. Source: medium.com.",
+          "slug": null
+        },
+        {
+          "name": "Morpho",
+          "date": "2023",
+          "amountLabel": null,
+          "description": "MORPHO token rewards accrued to Sense Roller Liquidity Vault users and remained claimable through Morpho Governance up to Age 7. Source: medium.com.",
+          "slug": "morpho"
         }
       ],
       "PriceHistory": null,
@@ -51603,7 +52201,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://sense.finance",
       "TradFiAnalogue": "Sense named it itself, the zero-coupon bond paired with a floating rate note.",
       "OrgIntro": "Note: no other named officers or a Jonathan Wu role could be confirmed from a fetched source, so those are `n.a.`",
@@ -53036,9 +53634,67 @@
       "PK": "CATEGORY#Entity",
       "Partnerships": [
         {
-          "date": "2023",
-          "description": "Spark routes Sky ecosystem stablecoin liquidity through SparkLend and Spark Savings.",
-          "name": "Sky (MakerDAO)"
+          "name": "Chainlink (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Chainlink feeds are used by SparkLend, including in redundant multi provider setups. Source: docs.spark.fi.",
+          "slug": null
+        },
+        {
+          "name": "Chronicle (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Chronicle is one of three oracle providers powering SparkLend price feeds. Source: docs.spark.fi.",
+          "slug": null
+        },
+        {
+          "name": "RedStone (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "RedStone is the third oracle provider used by SparkLend, with a Uniswap TWAP as final fallback. Source: docs.spark.fi.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (9)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum, Arbitrum, Base, OP Mainnet, Unichain, Gnosis, Avalanche, Optimism, Robinhood chain. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (8)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by ABDK, Cantina, Certora, ChainSecurity, OpenZeppelin, PeckShield, Sigma Prime, Trail of Bits. Source: github.com.",
+          "slug": null
+        },
+        {
+          "name": "Sky governance",
+          "date": "04-2025",
+          "amountLabel": "$1b",
+          "description": "Final allocation of the 1B dollar Grand Prix was funded by Sky and subject to a Sky governance vote scheduled for 3 April 2025. Source: paragraph.com.",
+          "slug": null
+        },
+        {
+          "name": "BlackRock",
+          "date": "03-2025",
+          "amountLabel": "$500m",
+          "description": "The BUIDL fund, managed by BlackRock and tokenized by Securitize, won a 500M dollar allocation in the Spark Tokenization Grand Prix. Source: paragraph.com.",
+          "slug": null
+        },
+        {
+          "name": "Securitize",
+          "date": "03-2025",
+          "amountLabel": "$500m",
+          "description": "The BUIDL fund, managed by BlackRock and tokenized by Securitize, won a 500M dollar allocation in the Spark Tokenization Grand Prix. Source: paragraph.com.",
+          "slug": "securitize"
+        },
+        {
+          "name": "Superstate",
+          "date": "03-2025",
+          "amountLabel": "$300m",
+          "description": "Superstate's USTB short duration Treasury fund won a 300M dollar allocation. Source: paragraph.com.",
+          "slug": null
         }
       ],
       "PriceHistory": null,
@@ -53728,7 +54384,7 @@
           "sourceUrl": "https://www.streetbrief.co/article/spark-protocol-captures-1-4b-inflow-kelp-dao-exploit-triggers-aave-liquidity-crisis-2604/"
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://spark.fi",
       "TradFiAnalogue": "a wholesale-funded specialist lender inside a banking group, drawing on a parent credit line at concessional cost and deploying it across a mandated asset list, with the parent's board retaining risk-limit authority.",
       "OrgIntro": "Where Spark's mandate ends and Sky's begins. This distinction matters more for Spark than for any other entity in the set, so it is set out explicitly.\n\n- Sky owns the balance sheet. Spark borrows from Sky's stablecoin reserves and is described as the distribution layer within the SKY ecosystem, with SKY as the parent protocol; the Spark treasury acts as junior capital required by SKY to fulfil the risk-required capital needs for accessing the SKY credit line ([Spark docs](https://docs.spark.fi/faq), [Spark Q1 2026 report](https://paragraph.com/@spark-11/spark-q1-2026-financial-report)).\n- Sky Governance sets SparkLend's risk parameters. Per-market supply and borrow caps are configured by Sky Governance, transparent rates change based on Sky Governance, and Sky Governance can reduce borrowing power of any asset to 0% without impacting existing borrowers ([Spark docs](https://docs.spark.fi/products/sparklend)).\n- Sky controls SPK supply and distribution. 65% of the 10 billion genesis supply sits with Sky for a 10-year farming campaign following rules set in the Sky Atlas, and Sky retains the ability to mint additional SPK under extreme circumstances ([Spark docs](https://docs.spark.fi/governance/spk-token)).\n- Spark governs itself through Atlas edits, not independent sovereignty. The Spark governance process centres on updating the Spark Agent artifact in the Sky Atlas, which controls budgets, risk settings, asset onboarding, SLL integrations and new chain deployments; proposals are filed in the Spark Prime section of the Sky forum and voted on Snapshot with SPK ([Spark governance docs](https://docs.spark.fi/governance)).\n- Historically the ownership was even more direct. All products created by Phoenix Labs were to belong to MakerDAO, inheriting Maker's governance system, and Phoenix Labs committed 10% of DAI-market profits to Aave DAO for the first two years as a fork licence ([Binance Square](https://www.binance.com/en/square/post/213372), [CoinDesk](https://www.coindesk.com/markets/2023/02/08/makerdao-contributors-propose-first-native-liquidity-market-focused-on-dai-stablecoin)).",
@@ -55104,7 +55760,71 @@
       "OtherSecondaryTags": null,
       "OtherSubSector": null,
       "PK": "CATEGORY#Entity",
-      "Partnerships": [],
+      "Partnerships": [
+        {
+          "name": "Chainlink (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Spectra oracles conform to the Chainlink AggregatorV3 standard so integrators can consume them as standard feeds. Source: dev.spectra.finance.",
+          "slug": null
+        },
+        {
+          "name": "Curve Finance (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Spectra TWAP oracles read price_oracle() from the underlying Curve twocrypto-ng and stableswap-ng pools. Source: dev.spectra.finance.",
+          "slug": "curve-finance"
+        },
+        {
+          "name": "Morpho (oracle)",
+          "date": "Jan 2025",
+          "amountLabel": null,
+          "description": "The Morpho PT-wstUSR market prices collateral via a Spectra PT to USR linear price adapter combined with Resolv and Chainlink feeds. Source: app.morpho.org.",
+          "slug": "morpho"
+        },
+        {
+          "name": "Ojo Network (oracle)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Ojo Network applied for a Morpho grant to build a Smart Oracle serving Pendle and Spectra PT markets on Morpho. Source: forum.morpho.org.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (13)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Ethereum, Arbitrum, Optimism, Base, Sonic, Hemi, HyperEVM, Katana, Avalanche, BNB Chain, Flare, Monad and 1 more. Source: dev.spectra.finance.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (5)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by Code4rena, Code4rena report, Immunefi, Pashov Audit Group, Sherlock. Source: docs.spectra.finance.",
+          "slug": null
+        },
+        {
+          "name": "Seed extension round",
+          "date": "Nov 2022",
+          "amountLabel": "$2.6m",
+          "description": "DefiLlama records a 2.6 million USD seed round on November 14 2022 led by Greenfield Capital. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Greenfield Capital",
+          "date": "Nov 2022",
+          "amountLabel": "$2.5m",
+          "description": "Greenfield led the 2.5 million USD seed extension round for APWine, now Spectra. Source: greenfieldcapital.com.",
+          "slug": null
+        },
+        {
+          "name": "Delphi Ventures",
+          "date": "Mar 2021",
+          "amountLabel": "$1m",
+          "description": "Delphi Ventures led APWine's earlier 1 million USD seed round. Source: icodrops.com.",
+          "slug": null
+        }
+      ],
       "PriceHistory": null,
       "Risks": [
         {
@@ -55658,7 +56378,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:02.620Z",
       "Website": "https://www.spectra.finance",
       "TradFiAnalogue": "the zero-coupon bond stripped from a floating rate note, issued through what is effectively a self-service issuance platform.",
       "BullBearCase": {
@@ -58375,10 +59095,53 @@
       "PK": "CATEGORY#Entity",
       "Partnerships": [
         {
+          "name": "Chainlink (oracle)",
+          "date": "Jun 2023",
           "amountLabel": null,
-          "date": "2020-10-06",
-          "description": "Alpha Finance Lab announced The Spartan Group, Multicoin Capital and DeFiance Capital as strategic investors/advisors supporting its cross-chain DeFi ecosystem. Amounts were not disclosed in the announcement.",
-          "name": "Strategic investors: Spartan Group, Multicoin Capital, DeFiance Capital"
+          "description": "Stella integrated Chainlink Price Feeds on Arbitrum mainnet, beginning with ETH/USD, ARB/USD, USDT/USD, USDC/USD and BTC/USD. Source: medium.com.",
+          "slug": null
+        },
+        {
+          "name": "Chain deployments (4)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Deployed on Arbitrum, Ethereum, BNB Smart Chain, Avalanche C-Chain. Source: defillama.com.",
+          "slug": null
+        },
+        {
+          "name": "Security auditors (3)",
+          "date": "",
+          "amountLabel": null,
+          "description": "Audited or reviewed by PeckShield, Quantstamp, Trust Security. Source: medium.com.",
+          "slug": null
+        },
+        {
+          "name": "Binance",
+          "date": "Oct 2020",
+          "amountLabel": null,
+          "description": "Binance listed ALPHA in the Innovation Zone with ALPHA/BTC, ALPHA/BNB, ALPHA/BUSD and ALPHA/USDT pairs. Source: binance.com.",
+          "slug": "binance-wbeth"
+        },
+        {
+          "name": "Camelot",
+          "date": "2024",
+          "amountLabel": null,
+          "description": "Camelot supplied additional ARB incentives on top of Stella's own boosters for users opening leveraged market making positions on Camelot. Source: medium.com.",
+          "slug": null
+        },
+        {
+          "name": "SCB 10X",
+          "date": "2020",
+          "amountLabel": null,
+          "description": "Alpha Finance Lab, the predecessor entity of Stella, secured a strategic partnership with SCB 10X, the venture arm of Siam Commercial Bank. Source: blog.alphaventuredao.io.",
+          "slug": null
+        },
+        {
+          "name": "Arbitrum canonical bridge",
+          "date": "2023",
+          "amountLabel": null,
+          "description": "ALPHA is bridged to Arbitrum through the canonical Arbitrum bridge. Source: docs.stellaxyz.io.",
+          "slug": null
         }
       ],
       "PriceHistory": null,
@@ -59017,7 +59780,7 @@
           ]
         }
       ],
-      "UpdatedAt": "2026-07-27T02:31:29.537Z",
+      "UpdatedAt": "2026-07-27T05:45:30.430Z",
       "Website": "https://stellaxyz.io",
       "TradFiAnalogue": "a profit participating margin loan, or a total return swap with no financing leg and a performance fee. The lender is paid only out of realised gains rather than a contractual coupon.",
       "FundingNote": "No venture round has been disclosed since 2020 on any page reviewed in this session.",

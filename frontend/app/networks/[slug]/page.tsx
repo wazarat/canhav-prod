@@ -36,6 +36,8 @@ interface PageProps {
     peers?: string;
     /** M8 Competitors tab: positioning-quadrant axis pair. */
     axes?: string;
+    /** M9 Partnerships tab: selected explorer node (?node= deep link). */
+    node?: string;
   };
 }
 
@@ -160,7 +162,9 @@ export default async function NetworkProfilePage({ params, searchParams }: PageP
           axes={searchParams.axes}
         />
       )}
-      {activeTab === "partnerships" && <NetworkPartnershipsTab profile={profile} />}
+      {activeTab === "partnerships" && (
+        <NetworkPartnershipsTab profile={profile} view={searchParams.view} node={searchParams.node} />
+      )}
       {activeTab === "agent-skills" && (
         <NetworkAgentSkillsTab profile={profile} skill={entitySkill} />
       )}

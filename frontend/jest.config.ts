@@ -16,6 +16,7 @@ const config: Config = {
   testMatch: [
     "<rootDir>/lib/server/**/*.test.ts",
     "<rootDir>/lib/networks/**/*.test.ts",
+    "<rootDir>/lib/explorer/**/*.test.ts",
     "<rootDir>/lib/agent/**/*.test.ts",
     "<rootDir>/components/agent/trade/rails/**/*.test.ts",
   ],

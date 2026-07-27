@@ -233,3 +233,11 @@ export function resolveNetworkLogoUrl(profile: NetworkProfile): string | null {
 export function networkLogoInitial(name: string): string {
   return name.charAt(0).toUpperCase();
 }
+
+/** Slug-only variant for surfaces that hold a slug but no full profile
+ * (the M9 relationship-explorer cards). Static maps only — no live data. */
+export function resolveSlugLogoUrl(slug: string): string | null {
+  return (
+    PORTAL_LOGO_BY_SLUG[slug] ?? llamaIconUrl(slug) ?? BRAND_LOGO_BY_SLUG[slug] ?? null
+  );
+}
